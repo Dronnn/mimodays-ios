@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+# Build output
+build/
+DerivedData/
+*.xcresult
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved.orig
+
+# Local configuration and secrets
+*.local.xcconfig
+Local.xcconfig
+.env
+.env.*
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+AuthKey_*.p8
+
+# Snapshot test failure artifacts
+**/__Snapshots__/**/*_failure*

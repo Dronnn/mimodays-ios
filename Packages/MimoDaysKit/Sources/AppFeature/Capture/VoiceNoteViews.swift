@@ -190,7 +190,7 @@ struct VoiceNoteCard: View {
         .padding(.bottom, voice.transcript == nil ? 14 : 15)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            VoiceCardBlob()
+            FieldBlob()
                 .fill(ColorToken.surfaceCard.color)
                 .shadow(color: CameraPalette.chipText.opacity(0.08), radius: 2, y: 1)
         )

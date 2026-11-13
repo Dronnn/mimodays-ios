@@ -18,10 +18,42 @@ struct CameraSettings: Codable, Equatable, Sendable {
         var duration: Duration { .seconds(rawValue) }
     }
 
+    /// Where the selfie window sits and how big it is (C04). Medium in the top right by default.
+    struct SelfieWindow: Codable, Equatable, Sendable {
+        enum Corner: String, Codable, CaseIterable, Sendable {
+            case topLeft
+            case topRight
+            case bottomLeft
+            case bottomRight
+
+            var isTop: Bool { self == .topLeft || self == .topRight }
+            var isLeft: Bool { self == .topLeft || self == .bottomLeft }
+        }
+
+        /// ±25% around the designed 112 × 150 frame (Andrew, 2026-11-13).
+        enum Scale: String, Codable, CaseIterable, Sendable {
+            case small
+            case medium
+            case large
+
+            var factor: CGFloat {
+                switch self {
+                case .small: 0.75
+                case .medium: 1
+                case .large: 1.25
+                }
+            }
+        }
+
+        var corner = Corner.topRight
+        var scale = Scale.medium
+    }
+
     var opensIn = Mode.photo
     var videoLength = VideoLength.short
     var recordsSound = true
     var cameraSounds = false
+    var selfieWindow = SelfieWindow()
 }
 
 @MainActor

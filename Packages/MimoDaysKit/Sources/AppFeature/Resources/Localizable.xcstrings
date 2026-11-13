@@ -85,6 +85,18 @@
         }
       }
     },
+    "Adjust selfie window": {
+      "comment": "VoiceOver action on the camera's selfie window: opens the corner and size sheet.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjust selfie window"
+          }
+        }
+      }
+    },
     "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties.": {
       "comment": "OB-02 body",
       "extractionState": "manual",
@@ -117,6 +129,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Back"
+          }
+        }
+      }
+    },
+    "Bottom left": {
+      "comment": "Selfie window sheet (C04): corner option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom left"
+          }
+        }
+      }
+    },
+    "Bottom right": {
+      "comment": "Selfie window sheet (C04): corner option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom right"
           }
         }
       }
@@ -325,6 +361,18 @@
         }
       }
     },
+    "Large": {
+      "comment": "Selfie window sheet (C04): size option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Large"
+          }
+        }
+      }
+    },
     "Latest": {
       "comment": "Surprise schedule (onboarding O07): row title, latest time a surprise may arrive",
       "extractionState": "manual",
@@ -381,6 +429,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maybe later"
+          }
+        }
+      }
+    },
+    "Medium": {
+      "comment": "Selfie window sheet (C04): size option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medium"
           }
         }
       }
@@ -637,6 +697,18 @@
         }
       }
     },
+    "Reset to default": {
+      "comment": "Selfie window sheet (C04): puts the window back in the top right at medium size.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset to default"
+          }
+        }
+      }
+    },
     "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional.": {
       "comment": "OB-04 body",
       "extractionState": "manual",
@@ -705,6 +777,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Skip"
+          }
+        }
+      }
+    },
+    "Small": {
+      "comment": "Selfie window sheet (C04): size option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Small"
           }
         }
       }
@@ -921,6 +1005,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Today, %@"
+          }
+        }
+      }
+    },
+    "Top left": {
+      "comment": "Selfie window sheet (C04): corner option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top left"
+          }
+        }
+      }
+    },
+    "Top right": {
+      "comment": "Selfie window sheet (C04): corner option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top right"
           }
         }
       }

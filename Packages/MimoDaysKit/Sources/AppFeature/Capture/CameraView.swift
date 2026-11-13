@@ -2,15 +2,28 @@ import Core
 import DesignSystem
 import SwiftUI
 
-/// The camera (C01 photo, C01s surprise, C02 video idle, C03 recording, C05 single camera).
+/// The camera (C01 photo, C01s surprise, C02 video idle, C03 recording, C04 selfie window, C05 single camera).
 /// Dark in both appearances; sizes follow the 402 pt design.
 struct CameraView: View {
     @State var model: CameraModel
     let onClose: () -> Void
     @State private var showsSettings = false
+    /// C04: the selfie window sheet is open.
+    @State private var adjustsSelfie: Bool
+    /// The selfie window's drag offset; springs back as the window snaps to a corner.
+    @GestureState(resetTransaction: Transaction(animation: .snappy)) private var selfieDrag: CGSize?
     /// The top safe-area inset, measured before the preview extends under the status bar.
     @State private var topInset: CGFloat = 0
-    @Environment(\.scenePhase) private var scenePhase
+    @State private var chipBottom: CGFloat?
+    @Environment(\.layoutDirection) private var layoutDirection
+
+    private typealias Corner = CameraSettings.SelfieWindow.Corner
+
+    init(model: CameraModel, adjustsSelfie: Bool = false, onClose: @escaping () -> Void) {
+        _model = State(initialValue: model)
+        _adjustsSelfie = State(initialValue: adjustsSelfie)
+        self.onClose = onClose
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -28,6 +41,9 @@ struct CameraView: View {
         .sheet(isPresented: $showsSettings) {
             CameraSettingsSheet(settings: $model.settings)
         }
+        .sheet(isPresented: $adjustsSelfie) {
+            SelfieWindowSheet(placement: $model.settings.selfieWindow)
+        }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("camera")
     }
@@ -41,9 +57,11 @@ struct CameraView: View {
                 CameraPreview(engine: model.engine, position: model.mainPosition)
                     .accessibilityHidden(true)
                 if let selfie = model.selfiePosition {
-                    SelfiePreviewWindow(engine: model.engine, position: selfie, showsHandle: !model.isRecording)
-                        .frame(width: 112, height: 160)
-                        .position(x: proxy.size.width - 23.3 - 56, y: topInset + 49.1 + 80)
+                    let chip = model.isSurprise ? chipBottom.map { (corner: layoutDirection == .rightToLeft ? Corner.topRight : .topLeft, bottom: $0) } : nil
+                    ZStack {
+                        selfieWindow(selfie, layout: SelfieWindowLayout(preview: proxy.size, topInset: topInset, chip: chip))
+                    }
+                    .environment(\.layoutDirection, .leftToRight)
                 }
                 VStack(spacing: 0) {
                     if model.isRecording {
@@ -54,6 +72,9 @@ struct CameraView: View {
                             .padding(.top, topInset - 8)
                         if model.isSurprise {
                             SurpriseChip()
+                                .onGeometryChange(for: CGFloat.self, of: { $0.frame(in: .named(Self.previewSpace)).maxY }) {
+                                    chipBottom = $0
+                                }
                                 .padding(.top, 16)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 16)
@@ -72,7 +93,53 @@ struct CameraView: View {
                     }
                 }
             }
+            .coordinateSpace(.named(Self.previewSpace))
         }
+    }
+
+    private static let previewSpace = "preview"
+
+    /// The selfie window at its corner; while it is dragged or the C04 sheet is open, the four corners show as
+    /// targets with the one it will land on in coral.
+    @ViewBuilder
+    private func selfieWindow(_ position: CameraPosition, layout: SelfieWindowLayout) -> some View {
+        let placement = model.settings.selfieWindow
+        let home = layout.center(placement.corner, placement.scale)
+        let offset = selfieDrag ?? .zero
+        let center = CGPoint(x: home.x + offset.width, y: home.y + offset.height)
+        if adjustsSelfie || selfieDrag != nil {
+            let target = selfieDrag == nil ? placement.corner : layout.nearest(to: center, placement.scale)
+            ForEach(Corner.allCases, id: \.self) { corner in
+                SelfieTarget(scale: placement.scale, isSelected: corner == target)
+                    .position(layout.frameCenter(corner, placement.scale))
+            }
+        }
+        SelfiePreviewWindow(engine: model.engine, position: position, scale: placement.scale, showsHandle: !model.isRecording)
+            .position(center)
+            .gesture(adjustGesture(layout), isEnabled: !model.isRecording)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Selfie window", bundle: .module))
+            .accessibilityValue(Text(placement.accessibilityValue))
+            .accessibilityAction(named: Text("Adjust selfie window", bundle: .module)) {
+                if !model.isRecording { adjustsSelfie = true }
+            }
+            .accessibilityIdentifier("camera.selfieWindow")
+    }
+
+    /// Touch and hold opens C04; dragging moves the window and it snaps to the nearest corner.
+    private func adjustGesture(_ layout: SelfieWindowLayout) -> some Gesture {
+        LongPressGesture(minimumDuration: 0.5, maximumDistance: 6)
+            .onEnded { _ in adjustsSelfie = true }
+            .exclusively(
+                before: DragGesture(minimumDistance: 6)
+                    .updating($selfieDrag) { value, state, _ in state = value.translation }
+                    .onEnded { value in
+                        let placement = model.settings.selfieWindow
+                        let home = layout.center(placement.corner, placement.scale)
+                        let end = CGPoint(x: home.x + value.predictedEndTranslation.width, y: home.y + value.predictedEndTranslation.height)
+                        withAnimation(.snappy) { model.settings.selfieWindow.corner = layout.nearest(to: end, placement.scale) }
+                    }
+            )
     }
 
     private var topBar: some View {
@@ -371,9 +438,11 @@ private struct SingleCameraNote: View {
 private struct SelfiePreviewWindow: View {
     let engine: any CaptureEngine
     let position: CameraPosition
+    let scale: CameraSettings.SelfieWindow.Scale
     let showsHandle: Bool
 
     var body: some View {
+        let frame = SelfieWindowLayout.frameSize(scale)
         VStack(spacing: 6) {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(ColorToken.mediaFrame.color)
@@ -385,12 +454,34 @@ private struct SelfiePreviewWindow: View {
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .padding(4)
                 }
-                .frame(width: 112, height: 150)
+                .frame(width: frame.width, height: frame.height)
                 .shadow(color: .black.opacity(0.22), radius: 7, y: 4)
             Capsule()
                 .fill(CameraPalette.cream.opacity(0.9))
                 .frame(width: 24, height: 4)
                 .opacity(showsHandle ? 1 : 0)
+        }
+        .rotationEffect(Size.selfieWindowTilt)
+    }
+}
+
+/// C04 corner target: dashed, or a coral ring around the window where it lands.
+private struct SelfieTarget: View {
+    let scale: CameraSettings.SelfieWindow.Scale
+    let isSelected: Bool
+
+    var body: some View {
+        let frame = SelfieWindowLayout.frameSize(scale)
+        Group {
+            if isSelected {
+                RoundedRectangle(cornerRadius: 26, style: .continuous)
+                    .stroke(CameraPalette.coral, lineWidth: 2.5)
+                    .frame(width: frame.width + 8, height: frame.height + 8)
+            } else {
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(CameraPalette.cream.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [10, 10]))
+                    .frame(width: frame.width, height: frame.height)
+            }
         }
         .rotationEffect(Size.selfieWindowTilt)
         .accessibilityHidden(true)

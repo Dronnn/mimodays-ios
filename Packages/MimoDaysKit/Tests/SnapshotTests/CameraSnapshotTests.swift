@@ -1,19 +1,22 @@
 @testable import AppFeature
 import Core
+import DesignSystem
 import Foundation
 import Testing
 import SwiftUI
 import TestSupport
 
-/// C01, C01s, C02, C03, C05 with the simulated engine. The camera is dark in both appearances.
+/// C01, C01s, C02, C03, C04, C05 with the simulated engine. The camera is dark in both appearances.
 @MainActor
 @Suite(.tags(.snapshot))
 struct CameraSnapshotTests {
     private func camera(
-        multiCam: Bool = true, surprise: Bool = false, mode: CameraSettings.Mode = .photo
+        multiCam: Bool = true, surprise: Bool = false, mode: CameraSettings.Mode = .photo,
+        selfieWindow: CameraSettings.SelfieWindow = .init()
     ) async -> CameraModel {
         var settings = CameraSettings()
         settings.opensIn = mode
+        settings.selfieWindow = selfieWindow
         let model = CameraModel(
             engine: SimulatedCaptureEngine(multiCam: multiCam), store: InMemoryCameraSettingsStore(settings),
             isSurprise: surprise, microphoneAllowed: { true }, onCapture: { _ in }
@@ -45,6 +48,26 @@ struct CameraSnapshotTests {
         assertScreenSnapshots(of: CameraView(model: await camera(multiCam: false), onClose: {}))
     }
 
+    /// C04 behind its sheet: corner targets, the chosen one in coral.
+    @Test func adjustSelfieWindow() async {
+        let model = await camera(selfieWindow: .init(corner: .topLeft, scale: .medium))
+        assertScreenSnapshots(of: CameraView(model: model, adjustsSelfie: true, onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func largeSelfieWindowBottomRight() async {
+        let model = await camera(mode: .video, selfieWindow: .init(corner: .bottomRight, scale: .large))
+        assertScreenSnapshots(of: CameraView(model: model, onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func smallSelfieWindowBelowTheSurpriseChip() async {
+        let model = await camera(surprise: true, selfieWindow: .init(corner: .topLeft, scale: .small))
+        assertScreenSnapshots(of: CameraView(model: model, onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func selfieWindowSheet() {
+        assertScreenSnapshots(of: SelfieWindowSheetPreview())
+    }
+
     @Test func settingsSheet() {
         assertScreenSnapshots(of: CameraSettingsSheetPreview())
     }
@@ -54,4 +77,13 @@ struct CameraSnapshotTests {
 private struct CameraSettingsSheetPreview: View {
     @State private var settings = CameraSettings()
     var body: some View { CameraSettingsSheet(settings: $settings) }
+}
+
+private struct SelfieWindowSheetPreview: View {
+    @State private var placement = CameraSettings.SelfieWindow(corner: .topLeft)
+    var body: some View {
+        SelfieWindowSheet(placement: $placement)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .background(ColorToken.surfaceSheet.color)
+    }
 }

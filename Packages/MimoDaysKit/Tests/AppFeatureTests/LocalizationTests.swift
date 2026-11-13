@@ -19,6 +19,8 @@ struct LocalizationTests {
         "Stop recording", "Recording", "Tap to stop",
         "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.",
         "Opens in", "Video length", "Record sound", "Camera sounds", "Camera", "Photo", "Video",
+        "Top left", "Top right", "Bottom left", "Bottom right", "Small", "Medium", "Large", "Reset to default",
+        "Adjust selfie window",
     ]
 
     private static var resourceKeys: [String] {

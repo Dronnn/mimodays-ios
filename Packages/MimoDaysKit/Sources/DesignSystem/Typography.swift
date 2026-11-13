@@ -90,6 +90,14 @@ public struct TextStyle: Equatable, Sendable {
     public static let editorDone = TextStyle(.nunito, size: 17, weight: 800, relativeTo: .body, maximumScale: 1.35)
     public static let noteMeta = TextStyle(.nunito, size: 14, weight: 600, relativeTo: .footnote)
     public static let noteCount = TextStyle(.nunito, size: 13, weight: 500, relativeTo: .caption1)
+    /// Bottom sheet titles (C04, C09).
+    public static let sheetTitle = TextStyle(.fraunces, size: 22, weight: 600, relativeTo: .title2, maximumScale: 1.35)
+    /// C09 "0:12 / 1:00".
+    public static let voiceTimer = TextStyle(.nunito, size: 16, weight: 700, relativeTo: .callout)
+    /// C09 "Tap to stop".
+    public static let voiceHint = TextStyle(.patrickHand, size: 17, relativeTo: .body)
+    /// C10 "Transcribed on this iPhone".
+    public static let voiceCredit = TextStyle(.nunito, size: 12, weight: 500, relativeTo: .caption2)
     /// Retake sits on the photo, so it stops growing at 1.35x like the camera controls.
     public static let reviewRetake = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
 

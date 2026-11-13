@@ -19,6 +19,8 @@ struct MomentDraft {
     var window: SelfieWindowFrame?
     /// The surprise this answers, if it was opened in time.
     var promptID: UUID?
+    /// C10; kept as its own file, never mixed into the clip's sound.
+    var voice: ReviewVoiceNote?
 }
 
 enum SaveError: Error, Equatable {
@@ -45,7 +47,7 @@ struct MomentSaver {
 
     func save(_ draft: MomentDraft) async throws -> Moment {
         let capture = draft.capture
-        try checkSpace(for: capture)
+        try checkSpace(for: [capture.mainURL, capture.selfieURL, draft.voice?.url].compactMap(\.self))
         var written: [String] = []
         var composedPhoto: URL?
         do {
@@ -78,8 +80,18 @@ struct MomentSaver {
             let note = draft.note.trimmingCharacters(in: .whitespacesAndNewlines)
             moment.note = note.isEmpty ? nil : note
             moment.pipLayout = window.map { PiPLayout($0, source: role(capture.mainPosition.other)) }
+            let voiceNote = try draft.voice.map { voice in
+                let file = try store.store(copyOf: voice.url, in: .originals)
+                written.append(file.relativePath)
+                let transcript = voice.transcript?.trimmingCharacters(in: .whitespacesAndNewlines)
+                return MomentVoiceNote(
+                    relativePath: file.relativePath, duration: voice.duration, recordedAt: voice.recordedAt,
+                    transcript: transcript?.isEmpty == false ? transcript : nil
+                )
+            }
             context.insert(moment)
             moment.media = media
+            if let voiceNote { moment.voiceNotes = [voiceNote] }
             do {
                 try context.save()
             } catch {
@@ -98,9 +110,9 @@ struct MomentSaver {
     }
 
     /// Copies, the composite and a thumbnail need about the sources' size twice, plus the reserve.
-    private func checkSpace(for capture: CaptureResult) throws {
+    private func checkSpace(for files: [URL]) throws {
         guard let free = freeBytes() else { return }
-        let sources = [capture.mainURL, capture.selfieURL].compactMap(\.self).reduce(Int64(0)) { sum, url in
+        let sources = files.reduce(Int64(0)) { sum, url in
             sum + Int64((try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
         }
         let needed = sources * 2 + Self.reserve

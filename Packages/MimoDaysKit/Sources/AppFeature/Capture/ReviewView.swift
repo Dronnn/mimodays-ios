@@ -13,6 +13,10 @@ struct ReviewView: View {
     @State private var isSaving = false
     @State private var editsNote = false
     @State private var confirmsRetake = false
+    /// C09 while it is open.
+    @State private var recording: VoiceRecording?
+    @State private var microphoneOff = false
+    @Environment(\.permissions) private var permissions
     /// C13c, or the generic save failure.
     @State private var saveError: SaveError?
     @Environment(\.openURL) private var openURL
@@ -42,7 +46,17 @@ struct ReviewView: View {
         .fullScreenCover(isPresented: $editsNote) {
             NoteEditorView(model: model)
         }
-        .confirmationDialog(Text("Retake and drop the note?", bundle: .module), isPresented: $confirmsRetake, titleVisibility: .visible) {
+        .sheet(item: $recording) { recording in
+            VoiceRecordingSheet(recording: recording) { model.addVoice(at: $0.url, recordedAt: $0.startedAt) }
+        }
+        .sheet(isPresented: $microphoneOff) {
+            PermissionExplainerView(screen: .microphoneOff) {
+                openSettings()
+            } secondary: {
+                microphoneOff = false
+            }
+        }
+        .confirmationDialog(retakeTitle, isPresented: $confirmsRetake, titleVisibility: .visible) {
             Button(role: .destructive) { discardAndRetake() } label: { Text("Retake", bundle: .module) }
             Button(role: .cancel) {} label: { Text("Keep editing", bundle: .module) }
         }
@@ -136,6 +150,32 @@ struct ReviewView: View {
         }
     }
 
+    /// Copy approved by Andrew, 2026-11-13.
+    private var retakeTitle: Text {
+        switch (model.note.isEmpty, model.voice == nil) {
+        case (false, false): Text("Retake and drop the notes?", bundle: .module)
+        case (true, false): Text("Retake and drop the voice note?", bundle: .module)
+        default: Text("Retake and drop the note?", bundle: .module)
+        }
+    }
+
+    /// The system prompt the first time (the tap says why); once it is off, the way to Settings.
+    private func recordVoice() {
+        guard !isSaving else { return }
+        Task {
+            var status = await permissions.status(of: .microphone)
+            if status == .notDetermined { status = await permissions.request(.microphone) }
+            guard status.isUsable else {
+                microphoneOff = true
+                return
+            }
+            model.stopPlayback()
+            model.stopVoice()
+            guard let recording = try? model.makeVoiceRecording(), recording.start() else { return }
+            self.recording = recording
+        }
+    }
+
     private func discardAndRetake() {
         model.discard()
         onRetake()
@@ -184,7 +224,15 @@ struct ReviewView: View {
         VStack(alignment: .leading, spacing: 0) {
             CaptionField(text: $model.caption, isFocused: $editsCaption)
                 .padding(.top, 20)
+            if let voice = model.voice {
+                VoiceNoteCard(model: model, voice: voice)
+                    .padding(.top, 14)
+            }
             HStack(spacing: 8) {
+                if model.voice == nil {
+                    ReviewChip(icon: .glyphMic, title: Text("Voice note", bundle: .module), action: recordVoice)
+                        .accessibilityIdentifier("review.voiceNote")
+                }
                 ReviewChip(icon: .glyphNote, title: model.note.isEmpty ? Text("Note", bundle: .module) : Text(model.note), isFilled: !model.note.isEmpty) {
                     editsNote = true
                 }

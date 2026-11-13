@@ -90,6 +90,60 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
     }
 
+    /// C09/C10: the first Voice note goes straight to the system prompt (no explainer), records until Stop, then
+    /// shows as a card with its words that plays; Retake asks before dropping it, and Save keeps it.
+    @MainActor
+    func testAVoiceNoteIsRecordedPlayedAndKept() {
+        openCamera(permissions: .notDetermined)
+        app.buttons["camera.shutter"].tap()
+        let chip = app.buttons["review.voiceNote"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        chip.tap()
+        let stop = app.buttons["voice.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["permission.primary"].exists)
+        // Let it record a little over a second.
+        XCTAssertFalse(app.staticTexts["review.voice.transcript"].waitForExistence(timeout: 1.5))
+        stop.tap()
+
+        let play = app.buttons["review.voice.play"]
+        XCTAssertTrue(play.waitForExistence(timeout: 5))
+        XCTAssertFalse(chip.exists)
+        XCTAssertTrue(app.staticTexts["review.voice.transcript"].waitForExistence(timeout: 5))
+        play.tap()
+        XCTAssertEqual(play.label, "Pause voice note")
+
+        app.buttons["review.retake"].tap()
+        let confirmation = app.sheets["Retake and drop the voice note?"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
+        XCTAssertTrue(confirmation.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(play.exists)
+        app.buttons["review.save"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+    }
+
+    /// C10: the trash removes the voice note and the chip comes back.
+    @MainActor
+    func testRemovingTheVoiceNoteBringsTheChipBack() {
+        openCamera()
+        app.buttons["camera.shutter"].tap()
+        let chip = app.buttons["review.voiceNote"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        chip.tap()
+        let stop = app.buttons["voice.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["review.voice.transcript"].waitForExistence(timeout: 1))
+        stop.tap()
+        let remove = app.buttons["review.voice.remove"]
+        XCTAssertTrue(remove.waitForExistence(timeout: 5))
+        remove.tap()
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        // Nothing left to drop: Retake goes straight back to the camera.
+        app.buttons["review.retake"].tap()
+        XCTAssertTrue(app.buttons["camera.shutter"].waitForExistence(timeout: 5))
+    }
+
     /// C07: the selfie window still moves in review, and Retake leaves the camera's own corner as it was.
     @MainActor
     func testTheSelfieWindowMovesInReviewOnly() {

@@ -10,12 +10,15 @@ enum PermissionScreen: CaseIterable {
     case microphone
     /// C13a: camera access is off; only Settings can turn it back on.
     case cameraOff
+    /// Like C13a, when Voice note is tapped with the microphone off.
+    case microphoneOff
 
     var glyph: Icon {
         switch self {
         case .camera: .explainerCamera
         case .microphone: .explainerMicrophone
         case .cameraOff: .explainerCameraOff
+        case .microphoneOff: .explainerMicrophone
         }
     }
 
@@ -24,6 +27,7 @@ enum PermissionScreen: CaseIterable {
         case .camera: LocalizedStringResource("Let MimoDays use the camera", bundle: .atURL(Bundle.module.bundleURL))
         case .microphone: LocalizedStringResource("Add sound to your videos?", bundle: .atURL(Bundle.module.bundleURL))
         case .cameraOff: LocalizedStringResource("The camera is turned off for MimoDays", bundle: .atURL(Bundle.module.bundleURL))
+        case .microphoneOff: LocalizedStringResource("The microphone is turned off for MimoDays", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
@@ -44,25 +48,30 @@ enum PermissionScreen: CaseIterable {
                 "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
+        case .microphoneOff:
+            LocalizedStringResource(
+                "To record voice notes, allow microphone access in Settings. You can still write a note.",
+                bundle: .atURL(Bundle.module.bundleURL)
+            )
         }
     }
 
     var primaryAction: LocalizedStringResource {
         switch self {
         case .camera, .microphone: LocalizedStringResource("Continue", bundle: .atURL(Bundle.module.bundleURL))
-        case .cameraOff: LocalizedStringResource("Open Settings", bundle: .atURL(Bundle.module.bundleURL))
+        case .cameraOff, .microphoneOff: LocalizedStringResource("Open Settings", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
     var secondaryAction: LocalizedStringResource {
         switch self {
-        case .camera, .cameraOff: LocalizedStringResource("Not now", bundle: .atURL(Bundle.module.bundleURL))
+        case .camera, .cameraOff, .microphoneOff: LocalizedStringResource("Not now", bundle: .atURL(Bundle.module.bundleURL))
         case .microphone: LocalizedStringResource("Record without sound", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
     /// Explainers keep their buttons at the bottom; the "turned off" screen keeps them under the text.
-    var pinsActions: Bool { self != .cameraOff }
+    var pinsActions: Bool { self != .cameraOff && self != .microphoneOff }
 }
 
 /// Layout of C06 / C06c / C13a. The system prompt itself is never drawn.

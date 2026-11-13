@@ -65,6 +65,41 @@ struct ReviewSnapshotTests {
         ])
     }
 
+    /// C10: a 12 s voice note with its words; the Voice note chip gives way to the card.
+    @Test func photoWithAVoiceNote() async throws {
+        let model = try await review()
+        defer { model.discard() }
+        let url = FileManager.default.temporaryDirectory.appending(path: "snapshot-voice-\(UUID().uuidString).m4a")
+        try SimulatedVoiceRecorder.writeTone(to: url, seconds: 12)
+        model.addVoice(at: url, recordedAt: time.instant)
+        model.voice?.transcript = "She did it, she actually did it, look at her go, all the way to the corner"
+        assertScreenSnapshots(of: screen(model), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+        ])
+    }
+
+    /// C09 at 0:12 of 1:00, drawn as the sheet sits over review.
+    @Test func recordingAVoiceNote() {
+        // 12 s in on the recorder's clock, so the sheet's own ticks agree.
+        let start = Date(timeIntervalSince1970: 0)
+        var now = start
+        let recorder = SimulatedVoiceRecorder(now: { now })
+        let recording = VoiceRecording(recorder: recorder, url: URL(filePath: "/dev/null"), limit: ReviewModel.voiceLimit)
+        #expect(recording.start())
+        now = start + 12
+        recording.elapsed = 12
+        recording.levels = (0 ..< 11).map { Float(0.35 + 0.3 * sin(Double($0) * 1.3)) + 0.25 }
+        let screen = ZStack(alignment: .bottom) {
+            Color.black.opacity(0.35).ignoresSafeArea()
+            VoiceRecordingSheet(recording: recording) { _ in }
+                .padding(.bottom, 8)
+                .frame(maxWidth: .infinity)
+                .background(ColorToken.surfaceSheet.color, in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28))
+                .ignoresSafeArea(edges: .bottom)
+        }
+        assertScreenSnapshots(of: screen, variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
+    }
+
     @Test func video() async throws {
         let model = try await review(video: true)
         defer { model.discard() }

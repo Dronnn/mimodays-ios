@@ -20,6 +20,10 @@ final class ReviewModel {
     static let captionLimit = 80
     /// C08 counter: "86 / 500".
     static let noteLimit = 500
+    /// C09: "0:12 / 1:00".
+    static let voiceLimit: TimeInterval = 60
+    /// C10 waveform bars.
+    static let voiceBars = 38
 
     let capture: CaptureResult
     /// The surprise this capture answers, if it was opened in time.
@@ -44,7 +48,13 @@ final class ReviewModel {
         }
     }
 
+    /// C09/C10; nil means no voice note.
+    var voice: ReviewVoiceNote? {
+        didSet { keepDraft() }
+    }
+
     private let drafts: ReviewDraftStore?
+    private let services: VoiceServices
 
     /// Where the window's frame sits in the shown media, reported by the view; the moment is composed with it.
     var windowFrame: SelfieWindowFrame?
@@ -53,36 +63,131 @@ final class ReviewModel {
     private(set) var playback = Playback.stopped
     let player = AVPlayer()
     private var endObserver: (any NSObjectProtocol)?
+    /// C10 waveform, one level (0...1) per bar.
+    private(set) var voiceLevels: [Float] = []
+    private(set) var playsVoice = false
+    let voicePlayer = AVPlayer()
+    private var voiceEndObserver: (any NSObjectProtocol)?
+    private var transcription: Task<Void, Never>?
 
     /// A new capture; with `drafts` it is kept on disk until saved or retaken.
-    init(capture: CaptureResult, promptID: UUID? = nil, drafts: ReviewDraftStore? = nil) {
+    init(capture: CaptureResult, promptID: UUID? = nil, drafts: ReviewDraftStore? = nil, voice services: VoiceServices = .simulated) {
         self.capture = capture
         self.promptID = promptID
         self.drafts = drafts
+        self.services = services
         window = capture.window ?? CameraSettings.SelfieWindow()
         keepDraft()
     }
 
     /// The review iOS closed mid-way, as it was.
-    init(draft: ReviewDraft, drafts: ReviewDraftStore?) {
+    init(draft: ReviewDraft, drafts: ReviewDraftStore?, voice services: VoiceServices = .simulated) {
         capture = draft.capture
         promptID = draft.promptID
         self.drafts = drafts
+        self.services = services
         window = draft.window
         caption = draft.caption
         note = draft.note
+        voice = draft.voice
+        if let voice = draft.voice {
+            voiceLevels = VoiceWaveform.read(voice.url, bars: Self.voiceBars)?.levels ?? []
+            transcribe()
+        }
     }
 
     /// Something Retake would throw away besides the capture.
-    var hasAnnotations: Bool { !note.isEmpty }
+    var hasAnnotations: Bool { !note.isEmpty || voice != nil }
 
     private func keepDraft() {
-        drafts?.save(ReviewDraft(capture: capture, caption: caption, note: note, window: window, promptID: promptID))
+        drafts?.save(ReviewDraft(capture: capture, caption: caption, note: note, window: window, promptID: promptID, voice: voice))
     }
 
     /// The pending draft is done with: the moment was saved.
     func clearDraft() {
+        stopVoice()
+        if drafts == nil, let voice { try? FileManager.default.removeItem(at: voice.url) }
         drafts?.clear()
+    }
+
+    // MARK: Voice note
+
+    /// A recorder for C09, writing next to the capture.
+    func makeVoiceRecording() throws -> VoiceRecording {
+        let url = try drafts?.newVoiceURL() ?? CaptureFiles.temporaryURL("m4a")
+        Task { [transcriber = services.transcriber] in await transcriber.prepare() }
+        return VoiceRecording(recorder: services.makeRecorder(), url: url, limit: Self.voiceLimit)
+    }
+
+    /// A finished C09 recording becomes the voice note, in place of any earlier one. Under half a second is dropped.
+    func addVoice(at url: URL, recordedAt: Date) {
+        guard let read = VoiceWaveform.read(url, bars: Self.voiceBars), read.duration >= 0.5 else {
+            try? FileManager.default.removeItem(at: url)
+            return
+        }
+        removeVoice()
+        voiceLevels = read.levels
+        voice = ReviewVoiceNote(url: url, duration: read.duration, recordedAt: recordedAt)
+        transcribe()
+    }
+
+    func removeVoice() {
+        stopVoice()
+        transcription?.cancel()
+        transcription = nil
+        if let voice { try? FileManager.default.removeItem(at: voice.url) }
+        voice = nil
+        voiceLevels = []
+    }
+
+    /// Save waits for this: seconds on device, since the model is never downloaded here.
+    func finishTranscription() async {
+        await transcription?.value
+    }
+
+    private func transcribe() {
+        guard let voice, voice.transcript == nil else { return }
+        let url = voice.url
+        let transcriber = services.transcriber
+        transcription = Task { [weak self] in
+            let text = await transcriber.transcribe(url)
+            guard let self, !Task.isCancelled, self.voice?.url == url, let text else { return }
+            self.voice?.transcript = text
+        }
+    }
+
+    /// Play from the start, pause, or carry on. The video stops while the voice note plays.
+    func toggleVoice() {
+        guard let voice else { return }
+        if playsVoice {
+            voicePlayer.pause()
+            playsVoice = false
+            return
+        }
+        stopPlayback()
+        if voicePlayer.currentItem == nil {
+            let item = AVPlayerItem(url: voice.url)
+            if let voiceEndObserver { NotificationCenter.default.removeObserver(voiceEndObserver) }
+            voiceEndObserver = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.stopVoice() }
+            }
+            voicePlayer.replaceCurrentItem(with: item)
+        }
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
+        voicePlayer.play()
+        playsVoice = true
+    }
+
+    func stopVoice() {
+        voicePlayer.pause()
+        voicePlayer.replaceCurrentItem(with: nil)
+        playsVoice = false
+    }
+
+    /// How much of the voice note has played, 0...1.
+    var voiceProgress: Double {
+        guard let voice, voice.duration > 0, voicePlayer.currentItem != nil else { return 0 }
+        return min(1, max(0, voicePlayer.currentTime().seconds / voice.duration))
     }
 
     var hasSelfie: Bool { capture.selfieURL != nil }
@@ -121,6 +226,7 @@ final class ReviewModel {
             player.play()
             playback = .playing
         case .stopped:
+            stopVoice()
             guard let video, let composed = try? await VideoComposer.compose(
                 mainURL: video.mainURL, selfieURL: video.selfieURL, timing: timing(video)
             ) else { return }
@@ -141,12 +247,13 @@ final class ReviewModel {
 
     /// What Save keeps.
     var momentDraft: MomentDraft {
-        MomentDraft(capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID)
+        MomentDraft(capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID, voice: voice)
     }
 
     /// Retake / Record again: nothing is kept.
     func discard() {
         stopPlayback()
+        removeVoice()
         capture.discardFiles()
         drafts?.clear()
     }

@@ -10,7 +10,7 @@ struct SelfieWindowSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Selfie window", bundle: .module)
-                .textStyle(TextStyle(.fraunces, size: 22, weight: 600, relativeTo: .title2, maximumScale: 1.35))
+                .textStyle(.sheetTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)
                 .padding(.bottom, 13)

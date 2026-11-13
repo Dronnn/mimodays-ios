@@ -31,6 +31,8 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphPlay
     /// 24 pt check on the mint disc of the saved toast (C12).
     case glyphCheck
+    /// 24 pt remove control on the voice note card (C10).
+    case glyphTrash
     /// 56 pt line glyphs on explainer art.
     case explainerCamera
     case explainerMicrophone

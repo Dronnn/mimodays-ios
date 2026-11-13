@@ -1,6 +1,18 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ of %@": {
+      "comment": "Voice note sheet (C09): accessibility value of the stop button, e.g. \"12 seconds of 1 minute\". First: time recorded, second: the limit",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ of %2$@"
+          }
+        }
+      }
+    },
     "%lld of %lld characters": {
       "comment": "Note editor (C08): VoiceOver reading of the counter, e.g. 86 of 500 characters",
       "extractionState": "manual",
@@ -590,7 +602,7 @@
       }
     },
     "Not now": {
-      "comment": "Closes a permission screen without asking; generic save failure alert: button that closes the alert and stays on review",
+      "comment": "Closes a permission screen without asking; generic save failure alert: button that closes the alert and stays on review; microphone off screen: secondary button",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -698,7 +710,7 @@
       }
     },
     "Open Settings": {
-      "comment": "Opens the app's page in iOS Settings",
+      "comment": "Opens the app's page in iOS Settings; microphone off screen: primary button",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -745,6 +757,18 @@
         }
       }
     },
+    "Pause voice note": {
+      "comment": "Voice note card (C10): accessibility label of the play button while the voice note plays",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause voice note"
+          }
+        }
+      }
+    },
     "Pauses the video": {
       "comment": "Review (C07): accessibility hint of a playing video",
       "extractionState": "manual",
@@ -777,6 +801,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pick how often and when. The exact time is always a surprise."
+          }
+        }
+      }
+    },
+    "Play voice note": {
+      "comment": "Voice note card (C10): accessibility label of the play button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play voice note"
           }
         }
       }
@@ -865,6 +901,18 @@
         }
       }
     },
+    "Remove voice note": {
+      "comment": "Voice note card (C10): accessibility label of the trash button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove voice note"
+          }
+        }
+      }
+    },
     "Reset to default": {
       "comment": "Selfie window sheet (C04): puts the window back in the top right at medium size.",
       "extractionState": "manual",
@@ -897,6 +945,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Retake and drop the note?"
+          }
+        }
+      }
+    },
+    "Retake and drop the notes?": {
+      "comment": "Review (C07): confirmation before Retake throws away both a written note and a voice note",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retake and drop the notes?"
+          }
+        }
+      }
+    },
+    "Retake and drop the voice note?": {
+      "comment": "Review (C07): confirmation before Retake throws away a recorded voice note",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retake and drop the voice note?"
           }
         }
       }
@@ -1058,7 +1130,7 @@
       }
     },
     "Stop recording": {
-      "comment": "Camera (C03): accessibility label of the stop button while recording",
+      "comment": "Camera (C03): accessibility label of the stop button while recording; voice note sheet (C09): accessibility label of the stop button",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1118,7 +1190,7 @@
       }
     },
     "Tap to stop": {
-      "comment": "Camera (C03): handwritten hint above the stop button while recording",
+      "comment": "Camera (C03): handwritten hint above the stop button while recording; voice note sheet (C09): hint under the stop button",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1209,6 +1281,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "The camera turns on only while this screen is open, and only you start a recording. Nothing is captured in the background or sent anywhere."
+          }
+        }
+      }
+    },
+    "The microphone is turned off for MimoDays": {
+      "comment": "Microphone off screen: title, shown when Voice note is tapped and microphone access is off in Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone is turned off for MimoDays"
           }
         }
       }
@@ -1357,6 +1441,18 @@
         }
       }
     },
+    "To record voice notes, allow microphone access in Settings. You can still write a note.": {
+      "comment": "Microphone off screen: message under the title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To record voice notes, allow microphone access in Settings. You can still write a note."
+          }
+        }
+      }
+    },
     "Today": {
       "comment": "Tab: today's capture screen",
       "extractionState": "manual",
@@ -1401,6 +1497,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Top right"
+          }
+        }
+      }
+    },
+    "Transcribed on this iPhone": {
+      "comment": "Voice note card (C10): small line under the transcript; the words were worked out on the device, nothing was sent anywhere",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transcribed on this iPhone"
+          }
+        }
+      }
+    },
+    "Transcript in quotes: %@": {
+      "comment": "Voice note card (C10): the voice note's words in quotation marks. Use the quotation marks of your language",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”"
           }
         }
       }
@@ -1497,6 +1617,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "View my moments"
+          }
+        }
+      }
+    },
+    "Voice note": {
+      "comment": "Review: chip that records a voice note (C07), and the title of the recording sheet (C09)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice note"
           }
         }
       }
@@ -1730,5 +1862,5 @@
       }
     }
   },
-  "version": "1.0"
+  "version": "1.1"
 }

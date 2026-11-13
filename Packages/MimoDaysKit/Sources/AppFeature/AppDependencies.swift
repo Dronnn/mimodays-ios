@@ -41,7 +41,8 @@ public final class AppDependencies {
         camera = CameraServices(
             makeEngine: { @MainActor () -> any CaptureEngine in simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine() },
             settings: configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore(),
-            drafts: ReviewDraftStore(root: Self.reviewRoot(configuration))
+            drafts: ReviewDraftStore(root: Self.reviewRoot(configuration)),
+            voice: simulatedCamera ? .simulated : VoiceServices(makeRecorder: { AVVoiceRecorder() }, transcriber: OnDeviceTranscriber())
         )
         do {
             momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))

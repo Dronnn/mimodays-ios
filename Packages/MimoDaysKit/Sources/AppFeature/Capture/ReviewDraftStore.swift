@@ -10,6 +10,16 @@ struct ReviewDraft: Codable, Equatable {
     var note = ""
     var window: CameraSettings.SelfieWindow
     var promptID: UUID?
+    var voice: ReviewVoiceNote?
+}
+
+/// C09/C10: a voice note recorded in review, kept apart from the clip's own sound.
+struct ReviewVoiceNote: Codable, Equatable {
+    var url: URL
+    var duration: TimeInterval
+    var recordedAt: Date
+    /// Worked out on this iPhone (iOS 26 and later); nil until it is done, or when it can't be.
+    var transcript: String?
 }
 
 /// One pending review on disk: the capture's files and `draft.json`, in Application Support (tmp can be purged
@@ -34,6 +44,12 @@ struct ReviewDraftStore: Sendable {
         return moved
     }
 
+    /// Where a new voice note is recorded, next to the capture.
+    func newVoiceURL() throws -> URL {
+        try prepare()
+        return root.appending(path: "voice-\(UUID().uuidString).m4a")
+    }
+
     func save(_ draft: ReviewDraft) {
         do {
             try prepare()
@@ -51,6 +67,12 @@ struct ReviewDraftStore: Sendable {
         try? draft.capture.mapFiles { root.appending(path: $0.lastPathComponent) }
         if let selfie = draft.capture.selfieURL, !FileManager.default.fileExists(atPath: selfie.path) {
             draft.capture.dropSelfie()
+        }
+        if let voice = draft.voice {
+            let url = root.appending(path: voice.url.lastPathComponent)
+            draft.voice = FileManager.default.fileExists(atPath: url.path) ? ReviewVoiceNote(
+                url: url, duration: voice.duration, recordedAt: voice.recordedAt, transcript: voice.transcript
+            ) : nil
         }
         return FileManager.default.fileExists(atPath: draft.capture.mainURL.path) ? draft : nil
     }

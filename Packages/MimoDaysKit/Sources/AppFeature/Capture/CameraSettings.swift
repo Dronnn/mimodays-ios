@@ -110,13 +110,25 @@ struct CameraServices {
     var settings: any CameraSettingsStore
     /// Where a capture in review waits, so it survives the app being closed.
     var drafts: ReviewDraftStore
+    var voice: VoiceServices
 
     /// Previews and anything without a device camera.
     @MainActor static var simulated: CameraServices {
         CameraServices(
             makeEngine: { SimulatedCaptureEngine() }, settings: InMemoryCameraSettingsStore(),
-            drafts: ReviewDraftStore(root: FileManager.default.temporaryDirectory.appending(path: "Review-\(UUID().uuidString)"))
+            drafts: ReviewDraftStore(root: FileManager.default.temporaryDirectory.appending(path: "Review-\(UUID().uuidString)")),
+            voice: .simulated
         )
+    }
+}
+
+/// C09/C10: the recorder and the on-device transcriber.
+struct VoiceServices {
+    var makeRecorder: @MainActor () -> any VoiceRecorder
+    var transcriber: any VoiceTranscriber
+
+    @MainActor static var simulated: VoiceServices {
+        VoiceServices(makeRecorder: { SimulatedVoiceRecorder() }, transcriber: SimulatedTranscriber())
     }
 }
 

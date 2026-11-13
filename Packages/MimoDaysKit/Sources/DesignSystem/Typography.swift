@@ -69,6 +69,8 @@ public struct TextStyle: Equatable, Sendable {
     public static let rowDetail = TextStyle(.nunito, size: 15, weight: 500, relativeTo: .subheadline)
     public static let control = TextStyle(.nunito, size: 16, weight: 700, relativeTo: .callout)
     public static let meta = TextStyle(.nunito, size: 13.5, weight: 500, relativeTo: .footnote)
+    public static let tabLabel = TextStyle(.nunito, size: 12.5, weight: 600, relativeTo: .caption1)
+    public static let tabLabelSelected = TextStyle(.nunito, size: 12.5, weight: 700, relativeTo: .caption1)
     public static let labelCaps = TextStyle(.inter, size: 11.5, weight: 600, tracking: 2.2, isUppercase: true, relativeTo: .caption2)
     /// Captions, notes and ribbons only; never body text or actions.
     public static let hand = TextStyle(.patrickHand, size: 17, relativeTo: .callout)

@@ -1,0 +1,114 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "A little surprise": {
+      "comment": "Ribbon on the camera when it was opened from a surprise notification",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little surprise"
+          }
+        }
+      }
+    },
+    "Capture": {
+      "comment": "Accessibility label of the big camera button on Today",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture"
+          }
+        }
+      }
+    },
+    "Close": {
+      "comment": "Closes the camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        }
+      }
+    },
+    "Done": {
+      "comment": "Closes the Settings sheet",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Map": {
+      "comment": "Tab: moments on a map",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Map"
+          }
+        }
+      }
+    },
+    "Memories": {
+      "comment": "Tab: grid of all saved moments",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memories"
+          }
+        }
+      }
+    },
+    "Movies": {
+      "comment": "Tab: movies made from moments",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Movies"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "comment": "Gear button and Settings sheet title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        }
+      }
+    },
+    "Today": {
+      "comment": "Tab: today's capture screen",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        }
+      }
+    }
+  }
+}

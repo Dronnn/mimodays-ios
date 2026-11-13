@@ -5,7 +5,7 @@ import TestSupport
 @MainActor
 @Suite(.tags(.snapshot))
 struct RootViewSnapshotTests {
-    @Test func placeholder() {
+    @Test func shell() {
         assertScreenSnapshots(of: RootView())
     }
 }

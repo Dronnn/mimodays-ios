@@ -19,7 +19,7 @@ let package = Package(
         .target(name: "Core"),
         .target(name: "DesignSystem", resources: [.process("Resources")]),
         .target(name: "Persistence", dependencies: ["Core"]),
-        .target(name: "AppFeature", dependencies: ["Core", "DesignSystem"]),
+        .target(name: "AppFeature", dependencies: ["Core", "DesignSystem"], resources: [.process("Resources")]),
         .target(
             name: "TestSupport",
             dependencies: [
@@ -28,9 +28,10 @@ let package = Package(
             ],
             resources: [.copy("Fixtures")]
         ),
-        // Unit tests, one target per module (AppFeatureTests arrives with the first view model).
+        // Unit tests, one target per module.
         .testTarget(name: "CoreTests", dependencies: ["Core", "TestSupport"]),
         .testTarget(name: "DesignSystemTests", dependencies: ["DesignSystem"]),
+        .testTarget(name: "AppFeatureTests", dependencies: ["AppFeature"]),
         // Integration tests: in-memory SwiftData + temporary file store.
         .testTarget(name: "IntegrationTests", dependencies: ["Core", "Persistence", "TestSupport"]),
         // Screen snapshots: light/dark, iPhone regular/compact, iPad, AX3.

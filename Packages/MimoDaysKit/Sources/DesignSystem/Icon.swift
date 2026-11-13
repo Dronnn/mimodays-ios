@@ -22,6 +22,9 @@ public enum Icon: String, CaseIterable, Sendable {
     case artBlob
     case markStar
     case markTicks
+    /// Standalone marks (own bounds), placed next to heroes and photos.
+    case markStarSolo
+    case markTicksA
     /// Hand-cut primary button outline (362×54), stretched to the button.
     case shapeButton
     /// Hand-cut segmented control track (362×40) and selected pill (88.5×32), stretched to fit.

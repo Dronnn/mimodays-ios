@@ -12,7 +12,9 @@ struct LocalizationTests {
         "How often", "On these days", "Earliest", "Latest", "Surprises only arrive between these times. Focus modes still apply.",
         "Enable reminders", "Maybe later", "Your first surprise is on its way.", "No reminders for now. That's okay.",
         "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings.",
-        "Open iOS Settings",
+        "Open iOS Settings", "Ready for your first little moment?", "Try the camera. Save the photo or video only if you like it.",
+        "Capture my first moment", "I'll do it later", "Your first moment is here.",
+        "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.", "View my moments", "Today, %@",
     ]
 
     private static var resourceKeys: [String] {
@@ -25,7 +27,7 @@ struct LocalizationTests {
                 schedule.frequency = frequency
                 return schedule.summary(calendar: .current, locale: .current)
             }
-            + OnboardingPage.allCases.flatMap(\.artLayers).compactMap { layer -> LocalizedStringResource? in
+            + (OnboardingPage.allCases.flatMap(\.artLayers) + FirstCaptureView.artLayers).compactMap { layer -> LocalizedStringResource? in
                 guard case let .text(.localized(resource), _, _, _, _) = layer else { return nil }
                 return resource
             }

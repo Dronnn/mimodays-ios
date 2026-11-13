@@ -1,5 +1,6 @@
 @testable import AppFeature
 import Core
+import Foundation
 import Testing
 
 @MainActor
@@ -47,5 +48,26 @@ struct OnboardingFlowTests {
         flow.step = .reminders(outcome)
         flow.finishReminders()
         #expect(flow.step == .firstCapture)
+    }
+
+    @Test func firstCaptureOpensTheCameraAndASaveShowsTheMoment() {
+        let flow = OnboardingFlow(permissions: PresetPermissionService(status: .notDetermined))
+        flow.step = .firstCapture
+        flow.startFirstCapture()
+        #expect(flow.isCapturing)
+        let savedAt = Date(timeIntervalSince1970: 1_000)
+        flow.firstMomentSaved(SavedMoment(photo: .placeholder, selfie: nil, capturedAt: savedAt))
+        #expect(!flow.isCapturing)
+        #expect(flow.step == .firstMomentSaved)
+        #expect(flow.firstMoment?.capturedAt == savedAt)
+    }
+
+    @Test func closingTheCameraWithoutSavingStaysOnTheInvitation() {
+        let flow = OnboardingFlow(permissions: PresetPermissionService(status: .notDetermined))
+        flow.step = .firstCapture
+        flow.startFirstCapture()
+        flow.isCapturing = false
+        #expect(flow.step == .firstCapture)
+        #expect(flow.firstMoment == nil)
     }
 }

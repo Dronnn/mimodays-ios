@@ -1,4 +1,6 @@
 import Core
+import DesignSystem
+import Foundation
 import Observation
 
 /// Where onboarding is (flow 01): intro pages, reminder setup, its outcome, then the first capture.
@@ -6,7 +8,17 @@ enum OnboardingStep: Equatable {
     case intro
     case schedule
     case reminders(RemindersOutcome)
+    /// O09
     case firstCapture
+    /// O10
+    case firstMomentSaved
+}
+
+/// The moment saved from the first capture, shown on O10.
+struct SavedMoment {
+    var photo: HeroMedia
+    var selfie: HeroMedia?
+    var capturedAt: Date
 }
 
 /// O08b / O08c.
@@ -24,6 +36,9 @@ final class OnboardingFlow {
     var step: OnboardingStep = .intro
     var page: OnboardingPage = .welcome
     var schedule = ReminderSchedule()
+    /// The camera is open for the first capture.
+    var isCapturing = false
+    private(set) var firstMoment: SavedMoment?
 
     private let permissions: any PermissionService
 
@@ -52,5 +67,16 @@ final class OnboardingFlow {
 
     func finishReminders() {
         step = .firstCapture
+    }
+
+    /// "Capture my first moment": the camera, with its own explainer if access isn't granted yet.
+    func startFirstCapture() {
+        isCapturing = true
+    }
+
+    func firstMomentSaved(_ moment: SavedMoment) {
+        firstMoment = moment
+        isCapturing = false
+        step = .firstMomentSaved
     }
 }

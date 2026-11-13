@@ -1,8 +1,10 @@
 import SwiftUI
 
-/// Flow 01 after launch: intro pages, reminder setup and its outcome. The first capture follows (OB-08).
+/// Flow 01 after launch: intro pages, reminder setup and its outcome, the first capture.
+/// `onFinish` gets the tab to land on.
 struct OnboardingView: View {
     @Bindable var flow: OnboardingFlow
+    let onFinish: (MainTab) -> Void
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -22,9 +24,16 @@ struct OnboardingView: View {
                     if let url = URL(string: UIApplication.openNotificationSettingsURLString) { openURL(url) }
                 }
             case .firstCapture:
-                EmptyView()
+                FirstCaptureView(capture: flow.startFirstCapture) { onFinish(.today) }
+            case .firstMomentSaved:
+                if let moment = flow.firstMoment {
+                    FirstMomentView(moment: moment) { onFinish(.memories) } done: { onFinish(.today) }
+                }
             }
         }
         .animation(.default, value: flow.step)
+        .fullScreenCover(isPresented: $flow.isCapturing) {
+            CaptureFlowView(request: CaptureRequest())
+        }
     }
 }

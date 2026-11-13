@@ -122,6 +122,18 @@
         }
       }
     },
+    "Capture my first moment": {
+      "comment": "First capture invitation (onboarding O09): primary button, opens the camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture my first moment"
+          }
+        }
+      }
+    },
     "Close": {
       "comment": "Closes the camera",
       "extractionState": "manual",
@@ -226,6 +238,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "How often"
+          }
+        }
+      }
+    },
+    "I'll do it later": {
+      "comment": "First capture invitation (onboarding O09): secondary button, finishes onboarding",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I'll do it later"
+          }
+        }
+      }
+    },
+    "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.": {
+      "comment": "First moment saved (onboarding O10): body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives."
           }
         }
       }
@@ -434,6 +470,18 @@
         }
       }
     },
+    "Ready for your first little moment?": {
+      "comment": "First capture invitation (onboarding O09): headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready for your first little moment?"
+          }
+        }
+      }
+    },
     "Record without sound": {
       "comment": "C06c: skip the microphone and record silent videos",
       "extractionState": "manual",
@@ -638,6 +686,30 @@
         }
       }
     },
+    "Today, %@": {
+      "comment": "Handwritten caption on a moment saved today. %@ = time, e.g. 4:12 PM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today, %@"
+          }
+        }
+      }
+    },
+    "Try the camera. Save the photo or video only if you like it.": {
+      "comment": "First capture invitation (onboarding O09): body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try the camera. Save the photo or video only if you like it."
+          }
+        }
+      }
+    },
     "Twice": {
       "comment": "Surprise schedule (onboarding O07): frequency option meaning twice a day, keep very short (segmented control)",
       "extractionState": "manual",
@@ -658,6 +730,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Twice a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "View my moments": {
+      "comment": "First moment saved (onboarding O10): primary button, opens Memories",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View my moments"
           }
         }
       }
@@ -730,6 +814,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your captures stay on your device by default. You choose when to back up, share, export, or delete them. No public profile is required."
+          }
+        }
+      }
+    },
+    "Your first moment is here.": {
+      "comment": "First moment saved (onboarding O10): headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your first moment is here."
           }
         }
       }
@@ -838,6 +934,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "the world around you"
+          }
+        }
+      }
+    },
+    "whatever is in front of you": {
+      "comment": "Onboarding art caption on the back-camera sample (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "whatever is in front of you"
           }
         }
       }

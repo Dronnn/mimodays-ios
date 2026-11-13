@@ -1,6 +1,7 @@
 import Core
 import Persistence
 import SwiftData
+import UserNotifications
 
 /// Everything one launch shares, built once by the app and handed to `RootView`.
 @MainActor
@@ -9,6 +10,7 @@ public final class AppDependencies {
     let permissions: any PermissionService
     let skipsOnboarding: Bool
     let surprises: SurpriseCoordinator
+    let notificationTaps = SurpriseNotificationHandler()
 
     public init(configuration: LaunchConfiguration = LaunchConfiguration()) {
         do {
@@ -28,5 +30,18 @@ public final class AppDependencies {
         let notifications: any NotificationScheduler = configuration.isUITesting
             ? InMemoryNotificationScheduler() : SystemNotificationScheduler()
         surprises = SurpriseCoordinator(context: modelContainer.mainContext, notifications: notifications, permissions: permissions)
+        UNUserNotificationCenter.current().delegate = notificationTaps
+        if configuration.isUITesting, let tap = configuration.surpriseTap {
+            simulate(tap)
+        }
+    }
+
+    /// A prompt that fired a minute ago (or 20 minutes ago, so it has expired), then a tap on it.
+    private func simulate(_ tap: LaunchConfiguration.SurpriseTap) {
+        let planned = Date().addingTimeInterval(tap == .inTime ? -60 : -20 * 60)
+        let prompt = SurprisePrompt(plannedAt: planned, expiresAt: planned.addingTimeInterval(15 * 60), notificationRequestID: "ui-test")
+        modelContainer.mainContext.insert(prompt)
+        try? modelContainer.mainContext.save()
+        notificationTaps.deliver(prompt.id)
     }
 }

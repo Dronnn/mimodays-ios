@@ -101,8 +101,8 @@ public final class AppRouter {
     }
 
     /// A surprise notification opens the camera directly (UX decision 3).
-    public static func route(fromNotification userInfo: [AnyHashable: Any]) -> Route? {
-        guard let value = userInfo[promptIDKey] as? String, let id = UUID(uuidString: value) else { return nil }
+    public nonisolated static func route(fromNotification userInfo: [AnyHashable: Any]) -> Route? {
+        guard let value = userInfo[SurpriseNotification.promptIDKey] as? String, let id = UUID(uuidString: value) else { return nil }
         return .capture(promptID: id)
     }
 }

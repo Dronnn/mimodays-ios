@@ -11,6 +11,7 @@ public struct RootView: View {
     @State private var onboarding: OnboardingFlow?
     private let permissions: any PermissionService
     private let surprises: SurpriseCoordinator
+    private let notificationTaps: SurpriseNotificationHandler
     @Environment(\.scenePhase) private var scenePhase
 
     public init(router: AppRouter = AppRouter(), dependencies: AppDependencies) {
@@ -18,6 +19,7 @@ public struct RootView: View {
         permissions = dependencies.permissions
         let surprises = dependencies.surprises
         self.surprises = surprises
+        notificationTaps = dependencies.notificationTaps
         let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
         let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
@@ -37,6 +39,9 @@ public struct RootView: View {
         .environment(router)
         .environment(\.permissions, permissions)
         // Launch and every return to the app (notification permission may have changed in Settings).
+        .onAppear {
+            notificationTaps.listen(openSurprise)
+        }
         .onChange(of: scenePhase, initial: true) { _, phase in
             if phase == .active { refreshSurprises() }
         }
@@ -48,6 +53,11 @@ public struct RootView: View {
             NSTimeZone.resetSystemTimeZone()
             refreshSurprises()
         }
+    }
+
+    /// In time it's "A little surprise"; too late it's a plain capture, never backdated (doc 01).
+    private func openSurprise(_ promptID: UUID) {
+        router.open(.capture(promptID: surprises.open(promptID: promptID) ? promptID : nil))
     }
 
     private func refreshSurprises() {
@@ -219,6 +229,7 @@ struct CapturePlaceholderView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 6)
                     .background(ColorToken.accentMint.color, in: Capsule())
+                    .accessibilityIdentifier("camera.surprise")
                     .frame(maxWidth: .infinity)
                     .padding(.top, 70)
             }

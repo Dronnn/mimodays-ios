@@ -333,3 +333,19 @@ struct OnboardingSurprisesTests {
         #expect(await notifications.pending().isEmpty)
     }
 }
+
+@MainActor
+struct SurpriseNotificationHandlerTests {
+    @Test func aTapBeforeTheUIListensWaitsForIt() {
+        let handler = SurpriseNotificationHandler()
+        let id = UUID()
+        handler.deliver(id)
+        var opened: [UUID] = []
+        handler.listen { opened.append($0) }
+        #expect(opened == [id])
+        // Delivered once, then straight through.
+        let next = UUID()
+        handler.deliver(next)
+        #expect(opened == [id, next])
+    }
+}

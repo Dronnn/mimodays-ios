@@ -8,8 +8,12 @@ import SwiftUI
 struct ReviewView: View {
     @State var model: ReviewModel
     let onRetake: () -> Void
-    let onSave: () -> Void
+    let onSave: () async throws -> Void
     @State private var adjustsSelfie = false
+    @State private var isSaving = false
+    /// C13c, or the generic save failure.
+    @State private var saveError: SaveError?
+    @Environment(\.openURL) private var openURL
     @State private var topInset: CGFloat = 0
     @FocusState private var editsCaption: Bool
 
@@ -32,6 +36,17 @@ struct ReviewView: View {
         .onDisappear { model.stopPlayback() }
         .sheet(isPresented: $adjustsSelfie) {
             SelfieWindowSheet(placement: $model.window)
+        }
+        .alert(saveErrorTitle, isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            if case .lowStorage = saveError {
+                Button { openSettings() } label: { Text("Manage storage", bundle: .module) }
+            } else {
+                Button(role: .cancel) {} label: { Text("Not now", bundle: .module) }
+            }
+            Button { save() } label: { Text("Try again", bundle: .module) }
+                .keyboardShortcut(.defaultAction)
+        } message: {
+            saveErrorMessage
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("review")
@@ -104,8 +119,46 @@ struct ReviewView: View {
     }
 
     private func retake() {
+        guard !isSaving else { return }
         model.discard()
         onRetake()
+    }
+
+    private func save() {
+        guard !isSaving else { return }
+        isSaving = true
+        Task {
+            do {
+                try await onSave()
+            } catch {
+                saveError = error as? SaveError ?? .failed
+            }
+            isSaving = false
+        }
+    }
+
+    // MARK: Save errors
+
+    private var saveErrorTitle: Text {
+        if case .lowStorage = saveError {
+            Text("Not enough space to save", bundle: .module)
+        } else {
+            Text("This moment didn't save", bundle: .module)
+        }
+    }
+
+    private var saveErrorMessage: Text {
+        if case let .lowStorage(shortfall) = saveError {
+            // Rounded up to 10 MB: "about 40 MB".
+            let rounded = (shortfall + 9_999_999) / 10_000_000 * 10_000_000
+            return Text("This moment is kept until you free up about \(rounded.formatted(.byteCount(style: .file))). Nothing is lost.", bundle: .module)
+        }
+        return Text("Nothing is lost. Try again in a moment.", bundle: .module)
+    }
+
+    /// There is no public link to iPhone Storage; Settings is one tap away from it (Andrew, 2026-11-13).
+    private func openSettings() {
+        if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
     }
 
     // MARK: Panels
@@ -120,8 +173,9 @@ struct ReviewView: View {
                 .padding(.leading, 2)
                 .padding(.top, 18)
                 .accessibilityIdentifier("review.time")
-            Button { onSave() } label: { Text("Save", bundle: .module) }
+            Button { save() } label: { Text("Save", bundle: .module) }
                 .buttonStyle(.primary)
+                .disabled(isSaving)
                 .padding(.horizontal, 4)
                 .padding(.top, 21)
                 .padding(.bottom, 50)
@@ -151,8 +205,9 @@ struct ReviewView: View {
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("review.interrupted")
             .padding(.top, 20)
-            Button { onSave() } label: { Text("Save \(model.keptSeconds) seconds", bundle: .module) }
+            Button { save() } label: { Text("Save \(model.keptSeconds) seconds", bundle: .module) }
                 .buttonStyle(.primary)
+                .disabled(isSaving)
                 .padding(.horizontal, 4)
                 .padding(.top, 20)
                 .accessibilityIdentifier("review.save")

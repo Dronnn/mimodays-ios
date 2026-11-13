@@ -13,6 +13,9 @@ public struct RootView: View {
     private let surprises: SurpriseCoordinator
     private let notificationTaps: SurpriseNotificationHandler
     private let camera: CameraServices
+    private let momentSaver: MomentSaver
+    /// C12 toast after a save.
+    @State private var showsSavedToast = false
     @Environment(\.scenePhase) private var scenePhase
 
     public init(router: AppRouter = AppRouter(), dependencies: AppDependencies) {
@@ -22,6 +25,7 @@ public struct RootView: View {
         self.surprises = surprises
         notificationTaps = dependencies.notificationTaps
         camera = dependencies.camera
+        momentSaver = dependencies.momentSaver
         let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
         let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
@@ -41,6 +45,7 @@ public struct RootView: View {
         .environment(router)
         .environment(\.permissions, permissions)
         .environment(\.camera, camera)
+        .environment(\.momentSaver, momentSaver)
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)
@@ -86,8 +91,24 @@ public struct RootView: View {
             SettingsPlaceholderView()
         }
         .fullScreenCover(item: $router.capture) { request in
-            CaptureFlowView(request: request)
+            CaptureFlowView(request: request) { saved in
+                if let promptID = request.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
+                showsSavedToast = true
+            }
         }
+        .overlay(alignment: .bottom) {
+            if showsSavedToast {
+                SavedToast()
+                    .padding(.bottom, 100)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .task {
+                        AccessibilityNotification.Announcement(String(localized: "Saved to today", bundle: .module)).post()
+                        try? await Task.sleep(for: .seconds(2.5))
+                        withAnimation { showsSavedToast = false }
+                    }
+            }
+        }
+        .animation(.snappy, value: showsSavedToast)
     }
 }
 
@@ -171,8 +192,11 @@ struct SettingsPlaceholderView: View {
 /// Camera access first (C06 explainer → system prompt, or C13a when it's off), then the camera, then review (C07).
 struct CaptureFlowView: View {
     let request: CaptureRequest
+    /// After the save, before the flow closes.
+    var onSaved: @MainActor (SavedCapture) -> Void = { _ in }
     @Environment(\.permissions) private var permissions
     @Environment(\.camera) private var services
+    @Environment(\.momentSaver) private var saver
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -202,9 +226,7 @@ struct CaptureFlowView: View {
                     ReviewView(model: review) {
                         self.review = nil
                     } onSave: {
-                        // The save path (7.5) keeps it; until then nothing is kept.
-                        review.discard()
-                        dismiss()
+                        try await save(review)
                     }
                 } else if let camera {
                     CameraView(model: camera) { dismiss() }
@@ -218,6 +240,15 @@ struct CaptureFlowView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await refresh() } }
         }
+    }
+
+    /// Keeps the moment, then closes. A failure leaves review as it is, so Try again works.
+    private func save(_ review: ReviewModel) async throws {
+        guard let saver else { throw SaveError.failed }
+        let moment = try await saver.save(review.draft(promptID: request.promptID))
+        review.stopPlayback()
+        onSaved(SavedCapture(momentID: moment.id, main: review.main, selfie: review.selfie, capturedAt: moment.capturedAt))
+        dismiss()
     }
 
     private func refresh() async {
@@ -236,4 +267,12 @@ struct CaptureFlowView: View {
             )
         }
     }
+}
+
+/// A moment that was just saved, for what comes after (C12 toast, O10, the surprise link).
+struct SavedCapture {
+    var momentID: UUID
+    var main: UIImage?
+    var selfie: UIImage?
+    var capturedAt: Date
 }

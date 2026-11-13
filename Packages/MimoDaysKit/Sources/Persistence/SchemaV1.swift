@@ -96,6 +96,8 @@ public enum SchemaV1: VersionedSchema {
         /// EXIF orientation (1...8).
         public var orientation: Int
         public var hasAudio: Bool
+        /// Video streams: seconds this stream starts after the main one (negative: earlier). Nil for the main stream.
+        public var startOffset: Double?
         /// SHA-256, hex.
         public var checksum: String
         public var byteCount: Int64
@@ -103,7 +105,8 @@ public enum SchemaV1: VersionedSchema {
 
         public init(
             id: UUID = UUID(), role: MediaRole, relativePath: String, uniformType: String, pixelWidth: Int, pixelHeight: Int,
-            checksum: String, byteCount: Int64, orientation: Int = 1, codec: String? = nil, duration: Double? = nil, hasAudio: Bool = false
+            checksum: String, byteCount: Int64, orientation: Int = 1, codec: String? = nil, duration: Double? = nil, hasAudio: Bool = false,
+            startOffset: Double? = nil
         ) {
             self.id = id
             roleRaw = role.rawValue
@@ -115,6 +118,7 @@ public enum SchemaV1: VersionedSchema {
             self.pixelHeight = pixelHeight
             self.orientation = orientation
             self.hasAudio = hasAudio
+            self.startOffset = startOffset
             self.checksum = checksum
             self.byteCount = byteCount
         }

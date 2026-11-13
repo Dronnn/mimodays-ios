@@ -94,7 +94,7 @@ public actor ThumbnailPipeline {
         }
     }
 
-    static func jpegData(_ image: CGImage, quality: Double = 0.8) throws -> Data {
+    public static func jpegData(_ image: CGImage, quality: Double = 0.8) throws -> Data {
         let data = NSMutableData()
         guard let destination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
             throw ThumbnailError.encodingFailed

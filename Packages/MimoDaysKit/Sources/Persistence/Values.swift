@@ -56,13 +56,19 @@ public struct PiPLayout: Codable, Equatable, Hashable, Sendable {
     public var shape: Shape
     /// Degrees; the design tilts the window -5.4.
     public var rotation: Double
+    /// The stream in the window: the front camera, or the rear one after ↻ made the front camera the big one.
+    public var source: MediaRole
 
-    public init(centerX: Double, centerY: Double, scale: Double, shape: Shape = .roundedRectangle, rotation: Double = -5.4) {
+    public init(
+        centerX: Double, centerY: Double, scale: Double, shape: Shape = .roundedRectangle, rotation: Double = -5.4,
+        source: MediaRole = .frontSource
+    ) {
         self.centerX = centerX
         self.centerY = centerY
         self.scale = scale
         self.shape = shape
         self.rotation = rotation
+        self.source = source
     }
 }
 

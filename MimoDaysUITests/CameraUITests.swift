@@ -58,7 +58,9 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(media.waitForExistence(timeout: 10))
         media.tap()
         app.buttons["review.save"].tap()
-        XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
+        // C12: back on Today with the saved toast.
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["capture"].exists)
     }
 
     /// C07: the selfie window still moves in review, and Retake leaves the camera's own corner as it was.

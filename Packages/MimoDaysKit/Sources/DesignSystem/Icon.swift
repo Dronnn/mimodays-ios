@@ -29,6 +29,8 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphWarning
     /// 30 pt play triangle on the cream play button.
     case glyphPlay
+    /// 24 pt check on the mint disc of the saved toast (C12).
+    case glyphCheck
     /// 56 pt line glyphs on explainer art.
     case explainerCamera
     case explainerMicrophone

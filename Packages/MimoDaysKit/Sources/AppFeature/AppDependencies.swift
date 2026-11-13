@@ -12,6 +12,7 @@ public final class AppDependencies {
     let surprises: SurpriseCoordinator
     let notificationTaps = SurpriseNotificationHandler()
     let camera: CameraServices
+    let momentSaver: MomentSaver
 
     public init(configuration: LaunchConfiguration = LaunchConfiguration()) {
         do {
@@ -41,10 +42,23 @@ public final class AppDependencies {
             makeEngine: { @MainActor () -> any CaptureEngine in simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine() },
             settings: configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore()
         )
+        do {
+            momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))
+        } catch {
+            fatalError("MimoDays can't open its media folder: \(error)")
+        }
         UNUserNotificationCenter.current().delegate = notificationTaps
         if configuration.isUITesting, let tap = configuration.surpriseTap {
             simulate(tap)
         }
+    }
+
+    /// Application Support/Media, out of the user's Files view. UI tests use a fresh temporary folder.
+    private static func mediaRoot(_ configuration: LaunchConfiguration) -> URL {
+        if configuration.isUITesting {
+            return FileManager.default.temporaryDirectory.appending(path: "UITestMedia-\(UUID().uuidString)", directoryHint: .isDirectory)
+        }
+        return URL.applicationSupportDirectory.appending(path: "Media", directoryHint: .isDirectory)
     }
 
     /// A prompt that fired a minute ago (or 20 minutes ago, so it has expired), then a tap on it.

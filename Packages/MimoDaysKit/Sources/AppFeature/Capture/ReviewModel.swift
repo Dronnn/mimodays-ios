@@ -93,6 +93,11 @@ final class ReviewModel {
         playback = .stopped
     }
 
+    /// What Save keeps.
+    func draft(promptID: UUID?) -> MomentDraft {
+        MomentDraft(capture: capture, caption: caption, window: hasSelfie ? windowFrame : nil, promptID: promptID)
+    }
+
     /// Retake / Record again: nothing is kept.
     func discard() {
         stopPlayback()

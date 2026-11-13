@@ -1,5 +1,6 @@
 @testable import AppFeature
 @testable import Core
+import DesignSystem
 import Foundation
 import SnapshotTesting
 import SwiftUI
@@ -58,5 +59,14 @@ struct ReviewSnapshotTests {
         let model = try await review(video: true, interruption: .anotherApp)
         defer { model.discard() }
         assertScreenSnapshots(of: screen(model))
+    }
+
+    /// C12 over the canvas, as it shows on Today.
+    @Test func savedToast() {
+        let screen = ZStack(alignment: .bottom) {
+            ColorToken.canvas.color.ignoresSafeArea()
+            SavedToast().padding(.bottom, 100)
+        }
+        assertScreenSnapshots(of: screen, variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
     }
 }

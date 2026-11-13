@@ -33,7 +33,13 @@ struct OnboardingView: View {
         }
         .animation(.default, value: flow.step)
         .fullScreenCover(isPresented: $flow.isCapturing) {
-            CaptureFlowView(request: CaptureRequest())
+            CaptureFlowView(request: CaptureRequest()) { saved in
+                flow.firstMomentSaved(SavedMoment(
+                    photo: saved.main.map { .image(Image(uiImage: $0)) } ?? .placeholder,
+                    selfie: saved.selfie.map { .image(Image(uiImage: $0)) },
+                    capturedAt: saved.capturedAt
+                ))
+            }
         }
     }
 

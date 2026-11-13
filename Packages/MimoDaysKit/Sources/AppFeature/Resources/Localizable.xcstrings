@@ -445,6 +445,18 @@
         }
       }
     },
+    "Manage storage": {
+      "comment": "Alert when there isn't enough space to save (C13c): button that opens iOS Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manage storage"
+          }
+        }
+      }
+    },
     "Map": {
       "comment": "Tab: moments on a map",
       "extractionState": "manual",
@@ -529,14 +541,38 @@
         }
       }
     },
+    "Not enough space to save": {
+      "comment": "Alert title when there isn't enough space to save a moment (C13c)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not enough space to save"
+          }
+        }
+      }
+    },
     "Not now": {
-      "comment": "Closes a permission screen without asking",
+      "comment": "Closes a permission screen without asking; generic save failure alert: button that closes the alert and stays on review",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Not now"
+          }
+        }
+      }
+    },
+    "Nothing is lost. Try again in a moment.": {
+      "comment": "Alert message when saving a moment failed for a reason other than space; the capture stays on review",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing is lost. Try again in a moment."
           }
         }
       }
@@ -837,6 +873,18 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Saved to today": {
+      "comment": "Saved toast (C12) shown after a moment is saved, also announced by VoiceOver",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved to today"
           }
         }
       }
@@ -1189,6 +1237,30 @@
         }
       }
     },
+    "This moment didn't save": {
+      "comment": "Alert title when saving a moment failed for a reason other than space",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This moment didn't save"
+          }
+        }
+      }
+    },
+    "This moment is kept until you free up about %@. Nothing is lost.": {
+      "comment": "Alert message when there isn't enough space to save (C13c). %@ = space to free, e.g. 40 MB",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This moment is kept until you free up about %@. Nothing is lost."
+          }
+        }
+      }
+    },
     "Three times a day, between %@ and %@. You can change this any time in Settings.": {
       "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
       "extractionState": "manual",
@@ -1269,6 +1341,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Top right"
+          }
+        }
+      }
+    },
+    "Try again": {
+      "comment": "Save failure alerts (C13c and the generic one): button that tries to save again",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try again"
           }
         }
       }

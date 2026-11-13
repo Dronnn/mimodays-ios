@@ -1,10 +1,12 @@
 import Core
 import Foundation
 import Observation
+import os
 
 /// What the camera hands on: Review (C07) takes it from here.
 enum CaptureResult: Equatable, Sendable {
-    case photo(CapturedPhoto)
+    /// `composedURL`: the photo with the selfie window baked in, when there is a selfie and composing worked.
+    case photo(CapturedPhoto, composedURL: URL?)
     case video(CapturedVideo)
 }
 
@@ -32,6 +34,8 @@ final class CameraModel {
     private(set) var showsSelfie = true
     /// Dual setups: the front camera is the big one (↻).
     private(set) var isSwapped = false
+    /// Where the selfie window is on screen, reported by the view; the composed photo puts it there.
+    var selfieWindowFrame: SelfieWindowFrame?
     /// C05 note, shown until the person flips or captures.
     private(set) var showsSingleCameraNote = false
     var settings: CameraSettings {
@@ -143,9 +147,10 @@ final class CameraModel {
         phase = .busy
         showsSingleCameraNote = false
         do {
-            let photo = try await engine.capturePhoto(flash: isFlashOn, silent: !settings.cameraSounds)
+            let photo = arranged(try await engine.capturePhoto(flash: isFlashOn, silent: !settings.cameraSounds))
+            let composedURL = await composed(photo)
             phase = .ready
-            onCapture(.photo(arranged(photo)))
+            onCapture(.photo(photo, composedURL: composedURL))
         } catch {
             phase = .ready
         }
@@ -174,6 +179,17 @@ final class CameraModel {
             photo.selfieURL = nil
         }
         return photo
+    }
+
+    /// The sources are what counts: if composing fails the photo is still kept, without a composite.
+    private func composed(_ photo: CapturedPhoto) async -> URL? {
+        guard let selfieURL = photo.selfieURL, let selfieWindowFrame else { return nil }
+        do {
+            return try await PhotoComposer.compose(mainURL: photo.mainURL, selfieURL: selfieURL, window: selfieWindowFrame)
+        } catch {
+            Logger(subsystem: "MimoDays", category: "Camera").error("Composing the photo failed: \(String(describing: error), privacy: .public)")
+            return nil
+        }
     }
 
     private func arranged(_ video: CapturedVideo) -> CapturedVideo {

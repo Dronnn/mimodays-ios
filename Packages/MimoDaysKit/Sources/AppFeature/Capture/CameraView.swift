@@ -58,10 +58,12 @@ struct CameraView: View {
                     .accessibilityHidden(true)
                 if let selfie = model.selfiePosition {
                     let chip = model.isSurprise ? chipBottom.map { (corner: layoutDirection == .rightToLeft ? Corner.topRight : .topLeft, bottom: $0) } : nil
+                    let layout = SelfieWindowLayout(preview: proxy.size, topInset: topInset, chip: chip)
                     ZStack {
-                        selfieWindow(selfie, layout: SelfieWindowLayout(preview: proxy.size, topInset: topInset, chip: chip))
+                        selfieWindow(selfie, layout: layout)
                     }
                     .environment(\.layoutDirection, .leftToRight)
+                    .onChange(of: layout.windowFrame(model.settings.selfieWindow), initial: true) { model.selfieWindowFrame = $1 }
                 }
                 VStack(spacing: 0) {
                     if model.isRecording {

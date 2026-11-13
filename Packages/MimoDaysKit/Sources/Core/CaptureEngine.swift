@@ -129,9 +129,10 @@ public protocol CaptureEngine: AnyObject, Sendable {
     var events: AsyncStream<CaptureEvent> { get }
 }
 
-extension CaptureEngine {
+/// Where capture writes its files until a moment is saved.
+public enum CaptureFiles {
     /// A fresh file for captured media in the temporary directory.
-    static func temporaryURL(_ fileExtension: String) throws -> URL {
+    public static func temporaryURL(_ fileExtension: String) throws -> URL {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Capture", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory.appendingPathComponent("\(UUID().uuidString).\(fileExtension)")

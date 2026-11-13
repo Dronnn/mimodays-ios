@@ -164,7 +164,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                 for (position, movie) in outputs {
                     movie.maxRecordedDuration = maximum
                     do {
-                        movie.startRecording(to: try Self.temporaryURL("mov"), recordingDelegate: delegate)
+                        movie.startRecording(to: try CaptureFiles.temporaryURL("mov"), recordingDelegate: delegate)
                     } catch {
                         delegate.fail(position)
                     }
@@ -396,7 +396,7 @@ private final class PhotoDelegate: NSObject, AVCapturePhotoCaptureDelegate, Send
             return
         }
         do {
-            let url = try AVCaptureEngine.temporaryURL(fileExtension)
+            let url = try CaptureFiles.temporaryURL(fileExtension)
             try data.write(to: url, options: .atomic)
             completion(url)
         } catch {

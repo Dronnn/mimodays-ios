@@ -44,6 +44,14 @@ struct SelfieWindowLayout {
         return CGPoint(x: center.x, y: center.y - Self.handleSpace / 2)
     }
 
+    /// The frame (without the handle) where the window sits, for composing the photo.
+    func windowFrame(_ placement: CameraSettings.SelfieWindow) -> SelfieWindowFrame {
+        let center = frameCenter(placement.corner, placement.scale)
+        let size = Self.frameSize(placement.scale)
+        let frame = CGRect(x: center.x - size.width / 2, y: center.y - size.height / 2, width: size.width, height: size.height)
+        return SelfieWindowFrame(frame: frame, preview: preview)
+    }
+
     /// The corner a window centred at `point` snaps to.
     func nearest(to point: CGPoint, _ scale: Scale) -> Corner {
         Corner.allCases.min { distance(center($0, scale), point) < distance(center($1, scale), point) } ?? .topRight

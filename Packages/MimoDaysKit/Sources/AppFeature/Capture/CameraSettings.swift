@@ -123,7 +123,7 @@ extension CaptureResult {
     /// Removes the temporary files of a capture nobody keeps.
     func discardFiles() {
         let urls: [URL?] = switch self {
-        case let .photo(photo): [photo.mainURL, photo.selfieURL]
+        case let .photo(photo, composedURL): [photo.mainURL, photo.selfieURL, composedURL]
         case let .video(video): [video.mainURL, video.selfieURL]
         }
         urls.compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }

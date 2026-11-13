@@ -1,8 +1,9 @@
 @testable import AppFeature
-import Core
+@testable import Core
 import DesignSystem
 import Foundation
 import Testing
+import SnapshotTesting
 import SwiftUI
 import TestSupport
 
@@ -66,6 +67,15 @@ struct CameraSnapshotTests {
 
     @Test func selfieWindowSheet() {
         assertScreenSnapshots(of: SelfieWindowSheetPreview())
+    }
+
+    /// 6.5: the composed photo, default window on a 402 × 700 preview, simulated 900 × 1200 sources.
+    @Test func composedPhoto() throws {
+        let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 700))
+        let main = try #require(SimulatedMedia.image(.back).cgImage)
+        let selfie = try #require(SimulatedMedia.image(.front).cgImage)
+        let composed = PhotoComposer.compose(main: main, selfie: selfie, window: window)
+        assertSnapshot(of: UIImage(cgImage: composed), as: .image(precision: 0.99))
     }
 
     @Test func settingsSheet() {

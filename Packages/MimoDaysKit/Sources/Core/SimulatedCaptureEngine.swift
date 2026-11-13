@@ -54,7 +54,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     public func capturePhoto(flash _: Bool, silent _: Bool) throws -> CapturedPhoto {
         guard isRunning, let setup else { throw CaptureError.notRunning }
         let urls = try setup.positions.map { position in
-            let url = try Self.temporaryURL("jpg")
+            let url = try CaptureFiles.temporaryURL("jpg")
             guard let data = SimulatedMedia.image(position).jpegData(compressionQuality: 0.8) else { throw CaptureError.photoFailed }
             try data.write(to: url, options: .atomic)
             return url
@@ -151,7 +151,7 @@ enum SimulatedMedia {
 
     /// An H.264 clip at 10 fps, half the photo size.
     static func writeClip(_ position: CameraPosition, seconds: Double) async throws -> URL {
-        let url = try SimulatedCaptureEngine.temporaryURL("mov")
+        let url = try CaptureFiles.temporaryURL("mov")
         let size = CGSize(width: size(position).width / 2, height: size(position).height / 2)
         let writer = try AVAssetWriter(outputURL: url, fileType: .mov)
         let input = AVAssetWriterInput(mediaType: .video, outputSettings: [

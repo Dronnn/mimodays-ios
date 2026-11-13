@@ -1,4 +1,5 @@
 import Core
+import Foundation
 import Persistence
 import SwiftData
 import UserNotifications
@@ -13,6 +14,7 @@ public final class AppDependencies {
     let notificationTaps = SurpriseNotificationHandler()
     let camera: CameraServices
     let momentSaver: MomentSaver
+    let thumbnails = ThumbnailPipeline()
 
     /// The simulator has no microphone worth testing with, and UI tests need a fixed transcript.
     private static func voice(simulated: Bool) -> VoiceServices {
@@ -62,6 +64,34 @@ public final class AppDependencies {
         UNUserNotificationCenter.current().delegate = notificationTaps
         if configuration.isUITesting, let tap = configuration.surpriseTap {
             simulate(tap)
+        }
+        if configuration.isUITesting, configuration.seed == .populated {
+            seedMoments()
+        }
+    }
+
+    /// `-seed populated`: a few moments from the simulated camera, saved the normal way. The newest is from
+    /// two hours ago in Yerevan; one is from a year ago today, for On this day.
+    private func seedMoments() {
+        let calendar = Calendar.current
+        let now = Date()
+        let dates = [
+            calendar.date(byAdding: .year, value: -1, to: now),
+            calendar.date(byAdding: .day, value: -3, to: now),
+            calendar.date(byAdding: .day, value: -1, to: now),
+            now.addingTimeInterval(-2 * 3600),
+        ].compactMap(\.self)
+        let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
+        Task {
+            let engine = SimulatedCaptureEngine()
+            _ = await engine.start()
+            for (index, date) in dates.enumerated() {
+                guard let photo = try? await engine.capturePhoto(flash: false, silent: true) else { continue }
+                let capture = CaptureResult(media: .photo(photo), window: .init(), capturedAt: CaptureTime(instant: date, timeZone: .current))
+                let place = index == dates.count - 1
+                    ? ReviewPlace.current(city: "Yerevan", at: GeoPoint(latitude: 40.18111, longitude: 44.51361, horizontalAccuracy: 30)) : nil
+                _ = try? await momentSaver.save(MomentDraft(capture: capture, caption: "", window: window, promptID: nil, place: place))
+            }
         }
     }
 

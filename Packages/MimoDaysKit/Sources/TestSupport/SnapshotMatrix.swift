@@ -12,12 +12,15 @@ public enum SnapshotDevice: String, CaseIterable, Sendable {
     case iPhone
     case iPhoneCompact
     case iPad
+    /// X01 and the other two-column iPad boards are drawn landscape.
+    case iPadLandscape
 
     var size: CGSize {
         switch self {
         case .iPhone: CGSize(width: 402, height: 874)
         case .iPhoneCompact: CGSize(width: 375, height: 812)
         case .iPad: CGSize(width: 820, height: 1180)
+        case .iPadLandscape: CGSize(width: 1180, height: 820)
         }
     }
 
@@ -25,11 +28,11 @@ public enum SnapshotDevice: String, CaseIterable, Sendable {
         switch self {
         case .iPhone: UIEdgeInsets(top: 62, left: 0, bottom: 34, right: 0)
         case .iPhoneCompact: UIEdgeInsets(top: 50, left: 0, bottom: 34, right: 0)
-        case .iPad: UIEdgeInsets(top: 24, left: 0, bottom: 20, right: 0)
+        case .iPad, .iPadLandscape: UIEdgeInsets(top: 24, left: 0, bottom: 20, right: 0)
         }
     }
 
-    var isPad: Bool { self == .iPad }
+    var isPad: Bool { self == .iPad || self == .iPadLandscape }
 }
 
 /// One rendering environment for a snapshot.
@@ -52,7 +55,7 @@ public struct SnapshotVariant: Sendable {
 
     /// Every device in light and dark, iPhone at a large accessibility text size, and iPhone right-to-left.
     public static let standard: [SnapshotVariant] =
-        SnapshotDevice.allCases.flatMap { [SnapshotVariant($0, .light), SnapshotVariant($0, .dark)] }
+        [SnapshotDevice.iPhone, .iPhoneCompact, .iPad].flatMap { [SnapshotVariant($0, .light), SnapshotVariant($0, .dark)] }
         + [SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .dark, .accessibilityExtraLarge)]
         + [SnapshotVariant(.iPhone, .light, rightToLeft: true)]
 

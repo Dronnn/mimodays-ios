@@ -25,6 +25,54 @@
         }
       }
     },
+    "%lld moments": {
+      "comment": "On this day (T06): how many moments that day has.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld moment"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld moments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld moments saved": {
+      "comment": "Make my movie card subtitle (T02): how many moments are saved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld moment saved"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld moments saved"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld of %lld characters": {
       "comment": "Note editor (C08): VoiceOver reading of the counter, e.g. 86 of 500 characters",
       "extractionState": "manual",
@@ -45,6 +93,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld s"
+          }
+        }
+      }
+    },
+    "%lld years ago": {
+      "comment": "On this day (T06): how many years ago the moments are from.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "One year ago"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld years ago"
+                }
+              }
+            }
           }
         }
       }
@@ -117,6 +189,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "A little surprise, every day."
+          }
+        }
+      }
+    },
+    "A surprise moment is ready": {
+      "comment": "Surprise ribbon on Today (T03): a surprise notification fired and can still be answered.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A surprise moment is ready"
           }
         }
       }
@@ -277,18 +361,6 @@
         }
       }
     },
-    "Capture": {
-      "comment": "Accessibility label of the big camera button on Today",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Capture"
-          }
-        }
-      }
-    },
     "Capture my first moment": {
       "comment": "First capture invitation (onboarding O09): primary button, opens the camera",
       "extractionState": "manual",
@@ -297,6 +369,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "Capture my first moment"
+          }
+        }
+      }
+    },
+    "Catch a moment": {
+      "comment": "Label under Today's capture button (T02); also its VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catch a moment"
+          }
+        }
+      }
+    },
+    "Catch the surprise": {
+      "comment": "Label under Today's capture button while a surprise can be answered (T03).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catch the surprise"
+          }
+        }
+      }
+    },
+    "Catch your first moment": {
+      "comment": "Label under Today's capture button before the first moment (T01).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catch your first moment"
           }
         }
       }
@@ -357,6 +465,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Current location · city only"
+          }
+        }
+      }
+    },
+    "Day and time: %@ · %@": {
+      "comment": "When a moment was captured, older than yesterday: a short date and a time, e.g. \"Wed, Nov 11 · 6:42 PM\".",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
           }
         }
       }
@@ -561,6 +681,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Look around. This could be a memory."
+          }
+        }
+      }
+    },
+    "Make my movie": {
+      "comment": "Today card that leads to making a movie (T02).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make my movie"
           }
         }
       }
@@ -793,6 +925,18 @@
         }
       }
     },
+    "On this day": {
+      "comment": "Today section title for moments from the same day in earlier years (T06).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On this day"
+          }
+        }
+      }
+    },
     "Once a day": {
       "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
       "extractionState": "manual",
@@ -825,6 +969,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "One day, it becomes a movie."
+          }
+        }
+      }
+    },
+    "Open": {
+      "comment": "Surprise ribbon action (T03): opens the camera to answer the surprise.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
           }
         }
       }
@@ -902,7 +1058,7 @@
       }
     },
     "Photo": {
-      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option; review (C07) accessibility label of a photo",
+      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option; review (C07) accessibility label of a photo Also the first word of a moment's VoiceOver description, e.g. \"Photo, Today, 2:37 PM\".",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1065,6 +1221,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reset to default"
+          }
+        }
+      }
+    },
+    "Resume": {
+      "comment": "Surprise ribbon action (T05): ends the pause.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume"
           }
         }
       }
@@ -1333,6 +1501,42 @@
         }
       }
     },
+    "Surprises are paused": {
+      "comment": "Surprise ribbon on Today (T05): surprises are paused until the person resumes them.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surprises are paused"
+          }
+        }
+      }
+    },
+    "Surprises are paused until %@": {
+      "comment": "Surprise ribbon on Today (T05): the argument is a weekday (\"Monday\") or a short date (\"Nov 18\").",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surprises are paused until %@"
+          }
+        }
+      }
+    },
+    "Surprises are paused until tomorrow": {
+      "comment": "Surprise ribbon on Today (T05): surprises are paused for the rest of today.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surprises are paused until tomorrow"
+          }
+        }
+      }
+    },
     "Surprises only arrive between these times. Focus modes still apply.": {
       "comment": "Surprise schedule (onboarding O07): note under the time rows",
       "extractionState": "manual",
@@ -1401,6 +1605,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "That one didn't come out. Try again."
+          }
+        }
+      }
+    },
+    "That surprise has passed. Catch a moment anyway?": {
+      "comment": "Surprise ribbon on Today (T04): today's surprise expired without a moment. Gentle, no guilt.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That surprise has passed. Catch a moment anyway?"
           }
         }
       }
@@ -1645,6 +1861,18 @@
         }
       }
     },
+    "Today headline": {
+      "comment": "Today's headline (T02). Keep the line break where it reads naturally in two short lines; on iPad it shows on one line.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your life,\nin little pieces."
+          }
+        }
+      }
+    },
     "Today, %@": {
       "comment": "Handwritten caption on a moment saved today. %@ = time, e.g. 4:12 PM; also the capture time on review (C07)",
       "extractionState": "manual",
@@ -1729,6 +1957,30 @@
         }
       }
     },
+    "Turn on": {
+      "comment": "Surprise ribbon action (T07): turns surprises on, asking for notifications or opening Settings if needed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on"
+          }
+        }
+      }
+    },
+    "Turn on little surprises": {
+      "comment": "Surprise ribbon on Today (T07): notifications are off or surprises were never turned on.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on little surprises"
+          }
+        }
+      }
+    },
     "Twice": {
       "comment": "Surprise schedule (onboarding O07): frequency option meaning twice a day, keep very short (segmented control)",
       "extractionState": "manual",
@@ -1778,7 +2030,7 @@
       }
     },
     "Video": {
-      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option; review (C07) accessibility label of a video",
+      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option; review (C07) accessibility label of a video Also the first word of a moment's VoiceOver description, e.g. \"Video, Yesterday, 6:42 PM\".",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1885,6 +2137,30 @@
         }
       }
     },
+    "Years ago and count: %@ · %@": {
+      "comment": "On this day card caption (T06): how long ago, then how many moments, e.g. \"One year ago · 3 moments\".",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Yesterday, %@": {
+      "comment": "When a moment was captured, on the Today hero and in VoiceOver; the argument is a time like 6:42 PM.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yesterday, %@"
+          }
+        }
+      }
+    },
     "You and the world around you.": {
       "comment": "OB-03 title",
       "extractionState": "manual",
@@ -1909,6 +2185,18 @@
         }
       }
     },
+    "Your %@": {
+      "comment": "Today section title for this month's moments (T02); the argument is the month name, e.g. \"Your November\". Opens Memories.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your %@"
+          }
+        }
+      }
+    },
     "Your captures stay on your device by default. You choose when to back up, share, export, or delete them. No public profile is required.": {
       "comment": "OB-06 body",
       "extractionState": "manual",
@@ -1929,6 +2217,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your first moment is here."
+          }
+        }
+      }
+    },
+    "Your first moment will live here.": {
+      "comment": "Empty Today hero before the first moment (T01).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your first moment will live here."
           }
         }
       }
@@ -1965,6 +2265,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your moments. Your memories."
+          }
+        }
+      }
+    },
+    "Your next surprise is on its way": {
+      "comment": "Surprise ribbon on Today (T02): a surprise is planned. No times or countdowns on purpose.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your next surprise is on its way"
+          }
+        }
+      }
+    },
+    "Your story starts with one moment": {
+      "comment": "Make my movie card subtitle before the first moment (T01); the card is dimmed then.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your story starts with one moment"
           }
         }
       }
@@ -2029,6 +2353,18 @@
         }
       }
     },
+    "surprise": {
+      "comment": "Tag on a moment captured from a surprise notification (Today hero, T03), and in VoiceOver descriptions. Lowercase in English.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "surprise"
+          }
+        }
+      }
+    },
     "the world around you": {
       "comment": "Onboarding art caption on the back-camera sample (handwritten)",
       "extractionState": "manual",
@@ -2037,6 +2373,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "the world around you"
+          }
+        }
+      }
+    },
+    "what you see": {
+      "comment": "Empty Today hero (T01): label under the placeholder for the back camera's picture. Lowercase, handwritten.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "what you see"
           }
         }
       }
@@ -2053,8 +2401,20 @@
         }
       }
     },
+    "with selfie": {
+      "comment": "VoiceOver: ends a moment's description when it has a selfie window, e.g. \"Photo, Today, 2:37 PM, with selfie\".",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "with selfie"
+          }
+        }
+      }
+    },
     "you": {
-      "comment": "Onboarding art caption on the selfie sample (handwritten)",
+      "comment": "Onboarding art caption on the selfie sample (handwritten); also the label under the selfie placeholder on the empty Today hero (T01)",
       "extractionState": "manual",
       "localizations": {
         "en": {

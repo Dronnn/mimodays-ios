@@ -14,6 +14,7 @@ public struct RootView: View {
     private let notificationTaps: SurpriseNotificationHandler
     private let camera: CameraServices
     private let momentSaver: MomentSaver
+    @State private var today: TodayModel
     /// C12 toast after a save.
     @State private var showsSavedToast = false
     @Environment(\.scenePhase) private var scenePhase
@@ -26,6 +27,10 @@ public struct RootView: View {
         notificationTaps = dependencies.notificationTaps
         camera = dependencies.camera
         momentSaver = dependencies.momentSaver
+        _today = State(initialValue: TodayModel(
+            context: dependencies.modelContainer.mainContext, surprises: surprises, permissions: dependencies.permissions,
+            store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
+        ))
         let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
         let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
@@ -82,7 +87,11 @@ public struct RootView: View {
             ForEach(MainTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
                     NavigationStack {
-                        TabRootView(tab: tab)
+                        if tab == .today {
+                            TodayView(model: today)
+                        } else {
+                            TabRootView(tab: tab)
+                        }
                     }
                 } label: {
                     Label { Text(tab.title) } icon: { tab.icon.image }
@@ -116,7 +125,7 @@ public struct RootView: View {
     }
 }
 
-/// Root of each tab until its phase builds the real screen.
+/// Root of Memories, Map and Movies until their phases build the real screens.
 struct TabRootView: View {
     let tab: MainTab
     @Environment(AppRouter.self) private var router
@@ -128,9 +137,6 @@ struct TabRootView: View {
                     .textStyle(.displayTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .accessibilityAddTraits(.isHeader)
-                if tab == .today {
-                    CaptureButton { router.open(.capture(promptID: nil)) }
-                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, Spacing.screenMargin)
@@ -149,28 +155,6 @@ struct TabRootView: View {
             }
         }
         .toolbarBackground(ColorToken.canvas.color, for: .navigationBar)
-    }
-}
-
-/// Coral capture disk (80 pt) with the camera glyph. The full Today layout comes in Phase 8.
-struct CaptureButton: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Icon.glyphCamera.image
-                .resizable()
-                .frame(width: 34, height: 34)
-                .foregroundStyle(ColorToken.textOnCoral.color)
-                .frame(width: Size.captureButton, height: Size.captureButton)
-                .background(LinearGradient.actionCoral, in: Circle())
-                .overlay(Circle().strokeBorder(ColorToken.surfaceCard.color, lineWidth: 4))
-                .elevation(.photoFrame)
-        }
-        .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
-        .accessibilityLabel(Text("Capture", bundle: .module))
-        .accessibilityIdentifier("capture")
     }
 }
 

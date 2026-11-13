@@ -82,6 +82,40 @@ final class SurpriseCoordinator {
         }
     }
 
+    /// Today's "Turn on" (T07): surprises back on with the saved settings, or the defaults when there are none.
+    func turnOn() async {
+        await serially {
+            let schedule = self.fetchSchedule() ?? {
+                let schedule = SurpriseSchedule()
+                self.context.insert(schedule)
+                return schedule
+            }()
+            schedule.isEnabled = true
+            schedule.pausedUntil = nil
+            schedule.isPausedIndefinitely = false
+            await self.performRefresh(replan: true)
+        }
+    }
+
+    // MARK: Today
+
+    /// What Today's ribbon says (T02-T07), and when that may change on its own (a prompt fires or expires,
+    /// a pause ends). `latestCapture` is the newest moment: after it, a missed surprise is no longer news.
+    func todayStatus(latestCapture: Date?) async -> (status: SurpriseStatus, changesAt: Date?) {
+        let notifications = await permissions.status(of: .notifications)
+        let now = clock.now()
+        let schedule = fetchSchedule()
+        let calendar = calendar(for: schedule)
+        let prompts = fetchRecentPrompts(now: now, calendar: calendar)
+        let status = SurpriseStatus(
+            schedule: schedule, prompts: prompts, notificationsAllowed: notifications.isUsable,
+            latestCapture: latestCapture, now: now, calendar: calendar
+        )
+        let pending = prompts.filter { $0.outcome == .pending }
+        let changes = pending.map(\.expiresAt) + pending.map(\.plannedAt) + [schedule?.pausedUntil].compactMap(\.self)
+        return (status, changes.filter { $0 > now }.min())
+    }
+
     // MARK: Prompt lifecycle
 
     /// A notification tap (or Today) opening a prompt. True while it can still be answered as a surprise:
@@ -248,6 +282,50 @@ final class SurpriseCoordinator {
         } catch {
             logger.error("Saving surprises failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+}
+
+/// The surprise ribbon on Today. No countdowns and no pressure (doc 03 §H5).
+enum SurpriseStatus: Equatable {
+    /// T02: one is planned, or will be.
+    case onItsWay
+    /// T03: a prompt fired and can still be answered.
+    case ready(promptID: UUID)
+    /// T04: today's last prompt expired and nothing was caught since.
+    case passed
+    /// T05: until the start of `until`, or until resumed when nil.
+    case paused(until: Date?)
+    /// T07: notifications aren't allowed, or surprises were never turned on.
+    case off
+
+    init(
+        schedule: SurpriseSchedule?, prompts: [SurprisePrompt], notificationsAllowed: Bool, latestCapture: Date?,
+        now: Date, calendar: Calendar
+    ) {
+        if let ready = prompts.first(where: { $0.outcome == .pending && $0.plannedAt <= now && now < $0.expiresAt }) {
+            self = .ready(promptID: ready.id)
+            return
+        }
+        guard let schedule, schedule.isEnabled, notificationsAllowed else {
+            self = .off
+            return
+        }
+        if schedule.isPausedIndefinitely {
+            self = .paused(until: nil)
+            return
+        }
+        if let until = schedule.pausedUntil, until > now {
+            self = .paused(until: until)
+            return
+        }
+        let last = prompts.filter { $0.plannedAt <= now && $0.outcome != .cancelled }.max { $0.plannedAt < $1.plannedAt }
+        if let last, calendar.isDate(last.plannedAt, inSameDayAs: now),
+           last.outcome == .expired || (last.outcome == .pending && last.expiresAt <= now),
+           (latestCapture ?? .distantPast) < last.plannedAt {
+            self = .passed
+            return
+        }
+        self = .onItsWay
     }
 }
 

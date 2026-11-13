@@ -104,6 +104,20 @@ public struct TextStyle: Equatable, Sendable {
     public static let rowCaption = TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote)
     /// Retake sits on the photo, so it stops growing at 1.35x like the camera controls.
     public static let reviewRetake = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
+    // Today (T01-T07).
+    /// "surprise" on the hero's mint tag.
+    public static let heroTag = TextStyle(.nunito, size: 13, weight: 600, relativeTo: .caption1)
+    /// The time under the place on a hero caption.
+    public static let heroTime = TextStyle(.patrickHand, size: 15.5, relativeTo: .subheadline)
+    /// "Catch a moment" under the capture button.
+    public static let captureLabel = TextStyle(.patrickHand, size: 21.6, relativeTo: .title3)
+    /// Open / Resume / Turn on on the surprise ribbon.
+    public static let ribbonAction = TextStyle(.nunito, size: 14, weight: 700, relativeTo: .subheadline)
+    /// "Make my movie".
+    public static let cardTitle = TextStyle(.fraunces, size: 17.7, weight: 600, relativeTo: .headline, maximumScale: 1.35)
+    /// T01 "Your first moment will live here." and its labels.
+    public static let emptyHeroTitle = TextStyle(.patrickHand, size: 19, relativeTo: .body)
+    public static let emptyHeroLabel = TextStyle(.patrickHand, size: 15, relativeTo: .subheadline)
 
     public static let all: [(name: String, style: TextStyle)] = [
         ("display.hero", .displayHero), ("display.title", .displayTitle), ("display.headline", .displayHeadline),

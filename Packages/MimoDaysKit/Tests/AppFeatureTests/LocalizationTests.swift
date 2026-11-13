@@ -7,7 +7,14 @@ struct LocalizationTests {
     private static let missing = "\u{0}missing"
 
     /// Keys used directly as `Text("…", bundle: .module)`.
-    private static let literalKeys = ["Settings", "Capture", "Done", "Close", "A little surprise", "Skip", "Page %lld of %lld",
+    private static let literalKeys = ["Today headline", "surprise", "Your first moment will live here.",
+        "what you see", "Catch a moment", "Catch your first moment", "Catch the surprise", "Your %@", "On this day",
+        "Years ago and count: %@ · %@", "%lld years ago", "%lld moments", "Make my movie",
+        "Your story starts with one moment", "%lld moments saved", "with selfie", "Yesterday, %@", "Day and time: %@ · %@",
+        "Your next surprise is on its way", "A surprise moment is ready",
+        "That surprise has passed. Catch a moment anyway?", "Surprises are paused", "Surprises are paused until tomorrow",
+        "Surprises are paused until %@", "Turn on little surprises", "Open", "Resume", "Turn on",
+        "Settings", "Done", "Close", "A little surprise", "Skip", "Page %lld of %lld",
         "Back", "When should MimoDays surprise you?", "Pick how often and when. The exact time is always a surprise.",
         "How often", "On these days", "Earliest", "Latest", "Surprises only arrive between these times. Focus modes still apply.",
         "Enable reminders", "Maybe later", "Your first surprise is on its way.", "No reminders for now. That's okay.",

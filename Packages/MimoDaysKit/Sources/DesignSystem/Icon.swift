@@ -36,6 +36,18 @@ public enum Icon: String, CaseIterable, Sendable {
     /// C11 place picker: 24 pt search field glyph, 20 pt recent-place clock.
     case glyphSearch
     case glyphClock
+    /// 42×36 film frame on the Make my movie card (T02).
+    case glyphFilm
+    /// 14×18 solid pin before the place on a hero caption.
+    case glyphPinSolid
+    /// `Brand / Wordmark` on Today: the letters and the star, two layers on one 103.7×33 canvas.
+    case brandWordmark
+    case brandWordmarkStar
+    /// Today's hand-drawn marks (own bounds): the headline underline, the sage hatch, small tick bursts.
+    case markBrush
+    case markHatch
+    case markTicksB
+    case markTicksC
     /// 56 pt line glyphs on explainer art.
     case explainerCamera
     case explainerMicrophone

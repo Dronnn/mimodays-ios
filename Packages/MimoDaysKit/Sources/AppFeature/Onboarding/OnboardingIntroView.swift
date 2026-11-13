@@ -104,6 +104,9 @@ struct ProgressDots: View {
                     .frame(width: index == current ? 22 : 7, height: 7)
             }
         }
+        // Same height as the header row, so the VoiceOver element isn't a 7 pt sliver.
+        .frame(minHeight: Size.minimumTapTarget)
+        .contentShape(.accessibility, Rectangle())
         .accessibilityElement()
         .accessibilityLabel(Text("Page \(current + 1) of \(count)", bundle: .module))
     }

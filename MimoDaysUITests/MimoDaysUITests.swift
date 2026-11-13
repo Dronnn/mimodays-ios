@@ -6,31 +6,34 @@ final class MimoDaysUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        app = XCUIApplication()
-        launch(permissions: .granted)
     }
 
-    private func launch(permissions: PermissionStatus) {
+    /// Past onboarding, empty store, every permission in `permissions`.
+    @MainActor
+    private func launch(permissions: PermissionStatus = .granted) {
+        app = XCUIApplication()
         app.launchArguments = LaunchConfiguration(
             isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: permissions
         ).arguments
+        app.launch()
     }
 
     /// System tab bar buttons by position (Today, Memories, Map, Movies); identifiers don't reach them.
+    @MainActor
     private func tab(_ index: Int) -> XCUIElement {
         app.tabBars.firstMatch.buttons.element(boundBy: index)
     }
 
     @MainActor
     func testLaunchesOnToday() {
-        app.launch()
+        launch()
         XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
         XCTAssertTrue(tab(0).isSelected)
     }
 
     @MainActor
     func testSwitchesTabs() {
-        app.launch()
+        launch()
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 5))
         XCTAssertEqual(app.tabBars.firstMatch.buttons.count, 4)
         for index in [1, 2, 3, 0] {
@@ -41,7 +44,7 @@ final class MimoDaysUITests: XCTestCase {
 
     @MainActor
     func testOpensAndClosesSettings() {
-        app.launch()
+        launch()
         tab(2).tap()
         app.buttons["settings"].firstMatch.tap()
         let done = app.buttons["settings.done"]
@@ -53,7 +56,7 @@ final class MimoDaysUITests: XCTestCase {
 
     @MainActor
     func testOpensAndClosesCamera() {
-        app.launch()
+        launch()
         app.buttons["capture"].tap()
         let close = app.buttons["capture.close"]
         XCTAssertTrue(close.waitForExistence(timeout: 5))
@@ -64,7 +67,6 @@ final class MimoDaysUITests: XCTestCase {
     @MainActor
     func testCameraExplainerLeadsToCamera() {
         launch(permissions: .notDetermined)
-        app.launch()
         app.buttons["capture"].tap()
         let continueButton = app.buttons["permission.primary"]
         XCTAssertTrue(continueButton.waitForExistence(timeout: 5))
@@ -75,7 +77,6 @@ final class MimoDaysUITests: XCTestCase {
     @MainActor
     func testCameraExplainerNotNowCloses() {
         launch(permissions: .notDetermined)
-        app.launch()
         app.buttons["capture"].tap()
         let notNow = app.buttons["permission.secondary"]
         XCTAssertTrue(notNow.waitForExistence(timeout: 5))
@@ -87,7 +88,6 @@ final class MimoDaysUITests: XCTestCase {
     @MainActor
     func testCameraOffOffersSettings() {
         launch(permissions: .denied)
-        app.launch()
         app.buttons["capture"].tap()
         XCTAssertTrue(app.buttons["permission.primary"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["capture.close"].exists)

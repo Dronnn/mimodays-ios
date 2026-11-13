@@ -75,6 +75,39 @@ public enum CaptureError: Error, Equatable, Sendable {
     case recordingFailed
 }
 
+/// Something the camera screen should react to.
+public enum CaptureEvent: Equatable, Sendable {
+    /// The engine changed cameras on its own, e.g. dropped the selfie camera under heavy load.
+    case setupChanged(CameraSetup)
+}
+
+/// How the engine reacts to heat and load (doc 01: degrade gracefully). Pure, so it is tested without cameras.
+public enum CapturePressurePolicy {
+    /// Mirrors `AVCaptureDevice.SystemPressureState.Level`.
+    public enum Level: Int, Comparable, Sendable {
+        case nominal, fair, serious, critical, shutdown
+
+        public static func < (lhs: Level, rhs: Level) -> Bool { lhs.rawValue < rhs.rawValue }
+    }
+
+    public struct Response: Equatable, Sendable {
+        public var frameRate: Int
+        /// Keep only the rear camera. Never mid-recording: that would break the clip.
+        public var dropsSelfie: Bool
+    }
+
+    public static func response(to level: Level, setup: CameraSetup, isRecording: Bool) -> Response {
+        switch level {
+        case .nominal, .fair: Response(frameRate: 30, dropsSelfie: false)
+        case .serious: Response(frameRate: 24, dropsSelfie: false)
+        case .critical, .shutdown: Response(frameRate: 15, dropsSelfie: setup == .dual && !isRecording)
+        }
+    }
+
+    /// Format widths tried for each camera of a dual setup, largest first, before keeping one camera.
+    public static let dualFormatWidths: [Int32] = [1920, 1280, 640]
+}
+
 /// The camera, behind a protocol so the UI can run on a simulated engine (simulator, UI tests).
 public protocol CaptureEngine: AnyObject, Sendable {
     /// Configures and starts the session: dual when the device supports it, otherwise the rear camera.
@@ -92,6 +125,8 @@ public protocol CaptureEngine: AnyObject, Sendable {
     func stopRecording() async
     /// Live preview of one camera for the UI to host; nil when that camera isn't in the setup.
     @MainActor func previewLayer(for position: CameraPosition) -> CALayer?
+    /// Changes the camera screen should show. One listener.
+    var events: AsyncStream<CaptureEvent> { get }
 }
 
 extension CaptureEngine {

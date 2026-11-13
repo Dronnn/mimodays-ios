@@ -16,6 +16,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private var cameras: [CameraPosition: Camera] = [:]
     private var microphone: AVCaptureDeviceInput?
     private var recording: RecordingDelegate?
+    private var pressure: [CameraPosition: CapturePressurePolicy.Level] = [:]
+    private var pressureObservations: [CameraPosition: NSKeyValueObservation] = [:]
+
+    public let events: AsyncStream<CaptureEvent>
+    private let eventSink: AsyncStream<CaptureEvent>.Continuation
 
     private struct Camera {
         var input: AVCaptureDeviceInput
@@ -29,6 +34,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         let session = isMultiCam ? AVCaptureMultiCamSession() : AVCaptureSession()
         self.isMultiCam = isMultiCam
         self.session = session
+        (events, eventSink) = AsyncStream.makeStream()
         previews = Dictionary(uniqueKeysWithValues: CameraPosition.allCases.map { position in
             let layer = AVCaptureVideoPreviewLayer(sessionWithNoConnection: session)
             layer.videoGravity = .resizeAspectFill
@@ -44,15 +50,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                 if !self.session.isRunning { self.session.startRunning() }
                 return setup
             }
-            var setup: CameraSetup = self.isMultiCam ? .dual : .single(.back)
-            try self.configure(setup)
-            // The pair doesn't fit the hardware budget (6.2 refines this): keep the rear camera only.
-            if let multiCam = self.session as? AVCaptureMultiCamSession, multiCam.hardwareCost > 1 {
-                setup = .single(.back)
-                self.session.beginConfiguration()
-                self.removeCamera(.front)
-                self.session.commitConfiguration()
-            }
+            let setup = try self.configureWithinBudget()
             self.setup = setup
             self.session.startRunning()
             return setup
@@ -151,7 +149,13 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     // One stream failing ends the others too.
                     streamFailed: { Task { await self.stopRecording() } }
                 ) { result in
-                    self.queue.async { self.recording = nil }
+                    self.queue.async {
+                        self.recording = nil
+                        // Pressure that rose while recording can drop the selfie camera now.
+                        if let position = self.pressure.max(by: { $0.value < $1.value })?.key, let level = self.pressure[position] {
+                            self.pressureChanged(level, on: position)
+                        }
+                    }
                     continuation.resume(with: result)
                 }
                 self.recording = delegate
@@ -178,24 +182,78 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     // MARK: Configuration (on `queue`)
 
-    private func configure(_ setup: CameraSetup) throws {
+    /// Both cameras at the largest formats the hardware budget allows, then a lower frame rate if the
+    /// system pressure cost is too high; the rear camera alone when nothing fits.
+    private func configureWithinBudget() throws -> CameraSetup {
+        guard let multiCam = session as? AVCaptureMultiCamSession else {
+            try configure(.single(.back), formatWidth: nil)
+            return .single(.back)
+        }
+        for width in CapturePressurePolicy.dualFormatWidths {
+            try configure(.dual, formatWidth: width)
+            if multiCam.hardwareCost <= 1 {
+                for frameRate in [30, 24, 15] where multiCam.systemPressureCost > 1 {
+                    setFrameRate(frameRate)
+                }
+                if multiCam.systemPressureCost <= 1 { return .dual }
+            }
+            removeAllCameras()
+        }
+        try configure(.single(.back), formatWidth: CapturePressurePolicy.dualFormatWidths[0])
+        return .single(.back)
+    }
+
+    private func configure(_ setup: CameraSetup, formatWidth: Int32?) throws {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
         if !isMultiCam { session.sessionPreset = .high }
         do {
-            for position in setup.positions { try addCamera(position) }
+            for position in setup.positions { try addCamera(position, formatWidth: formatWidth) }
         } catch {
-            for position in CameraPosition.allCases { removeCamera(position) }
+            removeAllCameras()
             throw error
         }
     }
 
-    private func addCamera(_ position: CameraPosition) throws {
+    private func removeAllCameras() {
+        session.beginConfiguration()
+        CameraPosition.allCases.forEach(removeCamera)
+        session.commitConfiguration()
+    }
+
+    private func setFrameRate(_ frameRate: Int) {
+        for camera in cameras.values {
+            let device = camera.input.device
+            let supported = device.activeFormat.videoSupportedFrameRateRanges.contains {
+                $0.minFrameRate <= Double(frameRate) && Double(frameRate) <= $0.maxFrameRate
+            }
+            guard supported, (try? device.lockForConfiguration()) != nil else { continue }
+            device.activeVideoMinFrameDuration = CMTime(value: 1, timescale: CMTimeScale(frameRate))
+            device.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: CMTimeScale(frameRate))
+            device.unlockForConfiguration()
+        }
+    }
+
+    /// Heat or load on a camera: lower the frame rate, and drop the selfie camera when it gets critical.
+    private func pressureChanged(_ level: CapturePressurePolicy.Level, on position: CameraPosition) {
+        pressure[position] = level
+        guard let setup, let worst = pressure.values.max() else { return }
+        let response = CapturePressurePolicy.response(to: worst, setup: setup, isRecording: recording != nil)
+        setFrameRate(response.frameRate)
+        guard response.dropsSelfie else { return }
+        session.beginConfiguration()
+        removeCamera(.front)
+        session.commitConfiguration()
+        self.setup = .single(.back)
+        eventSink.yield(.setupChanged(.single(.back)))
+    }
+
+    private func addCamera(_ position: CameraPosition, formatWidth: Int32? = CapturePressurePolicy.dualFormatWidths[0]) throws {
         let avPosition: AVCaptureDevice.Position = position == .back ? .back : .front
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: avPosition) else {
             throw CaptureError.cameraUnavailable
         }
-        if isMultiCam { try selectMultiCamFormat(device) }
+        if isMultiCam, let formatWidth { try selectMultiCamFormat(device, maxWidth: formatWidth) }
         let input = try deviceInput(device)
         guard session.canAddInput(input) else { throw CaptureError.configurationFailed }
         session.addInputWithNoConnections(input)
@@ -214,6 +272,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
         if let largest = device.activeFormat.supportedMaxPhotoDimensions.last { photo.maxPhotoDimensions = largest }
         cameras[position] = Camera(input: input, photo: photo, movie: movie)
+        pressureObservations[position] = device.observe(\.systemPressureState, options: [.initial, .new]) { [weak self] device, _ in
+            guard let engine = self else { return }
+            let level = CapturePressurePolicy.Level(device.systemPressureState.level)
+            engine.queue.async { engine.pressureChanged(level, on: position) }
+        }
         if microphone != nil, position == setup?.positions.first ?? .back { try connectMicrophone(to: movie) }
     }
 
@@ -239,17 +302,20 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     }
 
     private func removeCamera(_ position: CameraPosition) {
+        pressureObservations[position] = nil
+        pressure[position] = nil
         guard let camera = cameras.removeValue(forKey: position) else { return }
         session.removeInput(camera.input)
         session.removeOutput(camera.photo)
         session.removeOutput(camera.movie)
     }
 
-    /// The largest multi-camera format up to 1920 pixels wide, so two cameras fit the hardware budget.
-    private func selectMultiCamFormat(_ device: AVCaptureDevice) throws {
+    /// The largest multi-camera format up to `maxWidth` pixels wide, so two cameras fit the hardware budget.
+    private func selectMultiCamFormat(_ device: AVCaptureDevice, maxWidth: Int32) throws {
         let formats = device.formats.filter(\.isMultiCamSupported)
         func width(_ format: AVCaptureDevice.Format) -> Int32 { CMVideoFormatDescriptionGetDimensions(format.formatDescription).width }
-        guard let format = formats.filter({ width($0) <= 1920 }).max(by: { width($0) < width($1) }) ?? formats.first else {
+        guard let format = formats.filter({ width($0) <= maxWidth }).max(by: { width($0) < width($1) })
+            ?? formats.min(by: { width($0) < width($1) }) else {
             throw CaptureError.configurationFailed
         }
         try device.lockForConfiguration()
@@ -417,5 +483,18 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
             mainURL: mainResult.url, mainPosition: main.position, selfieURL: selfie?.result?.url,
             duration: mainResult.duration, selfieOffset: offset, hasAudio: hasAudio
         ))
+    }
+}
+
+extension CapturePressurePolicy.Level {
+    init(_ level: AVCaptureDevice.SystemPressureState.Level) {
+        switch level {
+        case .nominal: self = .nominal
+        case .fair: self = .fair
+        case .serious: self = .serious
+        case .critical: self = .critical
+        case .shutdown: self = .shutdown
+        default: self = .serious
+        }
     }
 }

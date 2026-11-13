@@ -11,9 +11,21 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     private var hasMicrophone = false
     private var isRecording = false
     private var stopSignal: CheckedContinuation<Void, Never>?
+    public nonisolated let events: AsyncStream<CaptureEvent>
+    private let eventSink: AsyncStream<CaptureEvent>.Continuation
 
     public init(multiCam: Bool = true) {
         self.multiCam = multiCam
+        (events, eventSink) = AsyncStream.makeStream()
+    }
+
+    /// Heat or load the way the device engine would see it (tests and UI tests).
+    public func simulatePressure(_ level: CapturePressurePolicy.Level) {
+        guard let setup else { return }
+        if CapturePressurePolicy.response(to: level, setup: setup, isRecording: isRecording).dropsSelfie {
+            self.setup = .single(.back)
+            eventSink.yield(.setupChanged(.single(.back)))
+        }
     }
 
     public func start() -> CameraSetup {

@@ -85,3 +85,37 @@ struct AVCaptureEngineTests {
         #expect(engine.previewLayer(for: .back) != nil)
     }
 }
+
+struct CapturePressurePolicyTests {
+    typealias Policy = CapturePressurePolicy
+
+    @Test(arguments: [(Policy.Level.nominal, 30), (.fair, 30), (.serious, 24), (.critical, 15), (.shutdown, 15)])
+    func frameRateFallsWithPressure(level: Policy.Level, frameRate: Int) {
+        #expect(Policy.response(to: level, setup: .dual, isRecording: false).frameRate == frameRate)
+    }
+
+    @Test func onlyCriticalPressureDropsTheSelfieCamera() {
+        #expect(!Policy.response(to: .serious, setup: .dual, isRecording: false).dropsSelfie)
+        #expect(Policy.response(to: .critical, setup: .dual, isRecording: false).dropsSelfie)
+        #expect(Policy.response(to: .shutdown, setup: .dual, isRecording: false).dropsSelfie)
+    }
+
+    @Test func aRecordingIsNeverCutAndOneCameraHasNothingToDrop() {
+        #expect(!Policy.response(to: .critical, setup: .dual, isRecording: true).dropsSelfie)
+        #expect(!Policy.response(to: .critical, setup: .single(.front), isRecording: false).dropsSelfie)
+    }
+
+    @Test func dualFormatsStepDown() {
+        #expect(Policy.dualFormatWidths == Policy.dualFormatWidths.sorted(by: >))
+    }
+
+    @Test func simulatedEngineReportsTheDroppedSelfieCamera() async throws {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        var events = engine.events.makeAsyncIterator()
+        await engine.simulatePressure(.serious)
+        await engine.simulatePressure(.critical)
+        #expect(await events.next() == .setupChanged(.single(.back)))
+        #expect(try await engine.capturePhoto(flash: false).selfieURL == nil)
+    }
+}

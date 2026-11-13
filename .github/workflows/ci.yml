@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DESTINATION: platform=iOS Simulator,name=iPhone 18 Pro,OS=27.2
+
+jobs:
+  app:
+    name: App (unit + UI)
+    runs-on: xcode-27
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.2
+        run: sudo xcode-select -s /Applications/Xcode_27.2.app
+      - name: Unit tests
+        run: >
+          xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan Unit
+          -destination "$DESTINATION" -resultBundlePath results/Unit.xcresult CODE_SIGNING_ALLOWED=NO
+      - name: UI tests
+        run: >
+          xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan UI
+          -destination "$DESTINATION" -resultBundlePath results/UI.xcresult CODE_SIGNING_ALLOWED=NO
+      - name: Upload results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-results
+          path: results
+
+  package:
+    name: MimoDaysKit (unit, integration, snapshots)
+    runs-on: xcode-27
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: Packages/MimoDaysKit
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.2
+        run: sudo xcode-select -s /Applications/Xcode_27.2.app
+      - name: Package tests
+        run: >
+          xcodebuild test -scheme MimoDaysKit-Package
+          -destination "$DESTINATION" -resultBundlePath results/Package.xcresult
+      - name: Upload results and snapshot diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-results
+          path: |
+            Packages/MimoDaysKit/results
+            Packages/MimoDaysKit/Tests/**/__Snapshots__/**/*_failure*

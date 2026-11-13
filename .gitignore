@@ -33,3 +33,6 @@ AuthKey_*.p8
 
 # Snapshot test failure artifacts
 **/__Snapshots__/**/*_failure*
+
+# Test results
+results/

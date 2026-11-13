@@ -37,3 +37,23 @@ public struct SystemNotificationScheduler: NotificationScheduler {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
     }
 }
+
+/// Keeps requests in memory instead of handing them to iOS: UI tests, which must not leave
+/// notifications behind on the simulator.
+public actor InMemoryNotificationScheduler: NotificationScheduler {
+    private var requests: [String: SurpriseNotification] = [:]
+
+    public init() {}
+
+    public func pending() -> [SurpriseNotification] {
+        requests.values.sorted { $0.fireDate < $1.fireDate }
+    }
+
+    public func schedule(_ notification: SurpriseNotification) {
+        requests[notification.id] = notification
+    }
+
+    public func cancel(ids: [String]) {
+        ids.forEach { requests[$0] = nil }
+    }
+}

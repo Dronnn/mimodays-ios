@@ -233,3 +233,43 @@ struct SurpriseCoordinatorTests {
         #expect(SurpriseFrequency.threeADay.cadence == .daily(3))
     }
 }
+
+/// The onboarding reminders choice plans surprises right away (same store as the app).
+@MainActor
+struct OnboardingSurprisesTests {
+    typealias DeviceCalendar = SurpriseCoordinatorTests.DeviceCalendar
+    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let notifications = FakeNotificationScheduler()
+
+    private func flow(answer: PermissionStatus) -> OnboardingFlow {
+        let permissions = PresetPermissionService(status: .notDetermined, requestResult: answer)
+        let surprises = SurpriseCoordinator(
+            context: container.mainContext, notifications: notifications, permissions: permissions,
+            clock: TestDateProvider(), calendar: { DeviceCalendar("Europe/Berlin").calendar },
+            generator: SeededRandomNumberGenerator(seed: 1)
+        )
+        let flow = OnboardingFlow(
+            permissions: permissions, store: SwiftDataOnboardingStore(context: container.mainContext)
+        ) { await surprises.settingsChanged() }
+        flow.finishIntro()
+        return flow
+    }
+
+    private var prompts: [SurprisePrompt] { (try? container.mainContext.fetch(FetchDescriptor<SurprisePrompt>())) ?? [] }
+
+    @Test func enablingRemindersPlansTheFirstSurprises() async {
+        let flow = flow(answer: .granted)
+        flow.schedule.frequency = .twiceADay
+        await flow.enableReminders()
+        #expect(prompts.count == 28)
+        #expect(await notifications.pending().count == 28)
+    }
+
+    @Test func deniedOrLaterPlansNothing() async {
+        await flow(answer: .denied).enableReminders()
+        #expect(prompts.isEmpty)
+        flow(answer: .granted).remindLater()
+        #expect(prompts.isEmpty)
+        #expect(await notifications.pending().isEmpty)
+    }
+}

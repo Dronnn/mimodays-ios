@@ -45,10 +45,13 @@ final class OnboardingFlow {
 
     private let permissions: any PermissionService
     private let store: any OnboardingStore
+    /// Runs once the reminders choice is saved, so surprises are planned (or dropped) right away.
+    private let remindersChanged: @MainActor () async -> Void
 
-    init(permissions: any PermissionService, store: any OnboardingStore) {
+    init(permissions: any PermissionService, store: any OnboardingStore, remindersChanged: @escaping @MainActor () async -> Void = {}) {
         self.permissions = permissions
         self.store = store
+        self.remindersChanged = remindersChanged
         let record = store.load()
         schedule = record.schedule
         remindersEnabled = record.remindersEnabled
@@ -74,6 +77,7 @@ final class OnboardingFlow {
         remindersEnabled = true
         let status = await permissions.request(.notifications)
         step = .reminders(status.isUsable ? .on : status.needsSettings ? .denied : .later)
+        await remindersChanged()
     }
 
     func remindLater() {

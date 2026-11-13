@@ -8,6 +8,7 @@ public final class AppDependencies {
     let modelContainer: ModelContainer
     let permissions: any PermissionService
     let skipsOnboarding: Bool
+    let surprises: SurpriseCoordinator
 
     public init(configuration: LaunchConfiguration = LaunchConfiguration()) {
         do {
@@ -23,5 +24,9 @@ public final class AppDependencies {
             permissions = SystemPermissionService()
         }
         skipsOnboarding = configuration.skipsOnboarding
+        // UI tests keep notification requests in memory so nothing is left on the simulator.
+        let notifications: any NotificationScheduler = configuration.isUITesting
+            ? InMemoryNotificationScheduler() : SystemNotificationScheduler()
+        surprises = SurpriseCoordinator(context: modelContainer.mainContext, notifications: notifications, permissions: permissions)
     }
 }

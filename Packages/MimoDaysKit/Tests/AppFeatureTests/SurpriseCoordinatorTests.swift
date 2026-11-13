@@ -143,6 +143,66 @@ struct SurpriseCoordinatorTests {
         #expect(first.outcome == .pending)
     }
 
+    @Test func openingInTimeMakesItASurpriseAndClosingKeepsItAnswerable() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let prompt = try #require(try prompts().first)
+        clock.set(prompt.plannedAt.addingTimeInterval(60))
+        #expect(coordinator.open(promptID: prompt.id))
+        let opened = try #require(prompt.openedAt)
+        // Camera closed without saving, opened again from Today a few minutes later.
+        clock.advance(by: 10 * 60)
+        #expect(coordinator.open(promptID: prompt.id))
+        #expect(prompt.openedAt == opened)
+        #expect(prompt.outcome == .pending)
+    }
+
+    @Test func openingTooLateIsAPlainCapture() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let prompt = try #require(try prompts().first)
+        clock.set(prompt.expiresAt)
+        #expect(!coordinator.open(promptID: prompt.id))
+        #expect(prompt.outcome == .expired)
+        #expect(prompt.openedAt == nil)
+    }
+
+    @Test func unknownOrCancelledPromptsDoNotOpen() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        #expect(!coordinator.open(promptID: UUID()))
+        schedule.isEnabled = false
+        await coordinator.refresh()
+        let cancelled = try #require(try prompts(.cancelled).first)
+        clock.set(cancelled.plannedAt)
+        #expect(!coordinator.open(promptID: cancelled.id))
+    }
+
+    @Test func aMomentSavedAfterOpeningInTimeAnswersThePrompt() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let prompt = try #require(try prompts().first)
+        clock.set(prompt.plannedAt.addingTimeInterval(14 * 60))
+        #expect(coordinator.open(promptID: prompt.id))
+        // Reviewing takes a while; the window closes before the save.
+        clock.advance(by: 5 * 60)
+        await coordinator.refresh()
+        #expect(prompt.outcome == .expired)
+        let moment = UUID()
+        coordinator.captured(promptID: prompt.id, momentID: moment)
+        #expect(prompt.outcome == .captured)
+        #expect(prompt.capturedMomentID == moment)
+    }
+
+    @Test func aPromptThatWasNeverOpenedIsNotAnswered() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let prompt = try #require(try prompts().first)
+        coordinator.captured(promptID: prompt.id, momentID: UUID())
+        #expect(prompt.outcome == .pending)
+        #expect(prompt.capturedMomentID == nil)
+    }
+
     // MARK: Turning surprises off
 
     @Test(arguments: [PermissionStatus.denied, .notDetermined, .restricted])

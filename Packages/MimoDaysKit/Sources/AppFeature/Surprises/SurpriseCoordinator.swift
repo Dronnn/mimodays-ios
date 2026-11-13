@@ -55,6 +55,34 @@ final class SurpriseCoordinator {
         await serially { await self.performRefresh(replan: true) }
     }
 
+    // MARK: Prompt lifecycle
+
+    /// A notification tap (or Today) opening a prompt. True while it can still be answered as a surprise:
+    /// pending and within its expiry window. Closing the camera keeps it answerable until it expires
+    /// (Andrew, 2026-11-13); afterwards the person can still capture, just not as this surprise.
+    func open(promptID: UUID) -> Bool {
+        guard let prompt = fetchPrompt(promptID), prompt.outcome == .pending else { return false }
+        let now = clock.now()
+        guard now < prompt.expiresAt else {
+            prompt.outcome = .expired
+            save()
+            return false
+        }
+        if prompt.openedAt == nil { prompt.openedAt = now }
+        save()
+        return true
+    }
+
+    /// Links a saved moment to the prompt it answered. Only a prompt that was opened in time counts,
+    /// even when the moment is saved after the window closed; a manual capture never answers a prompt.
+    func captured(promptID: UUID, momentID: UUID) {
+        guard let prompt = fetchPrompt(promptID), prompt.openedAt != nil,
+              prompt.outcome == .pending || prompt.outcome == .expired else { return }
+        prompt.outcome = .captured
+        prompt.capturedMomentID = momentID
+        save()
+    }
+
     // MARK: Refresh
 
     private func serially(_ work: @escaping @MainActor () async -> Void) async {
@@ -159,6 +187,12 @@ final class SurpriseCoordinator {
             predicate: #Predicate { $0.plannedAt >= cutoff || $0.outcomeRaw == pending },
             sortBy: [SortDescriptor(\.plannedAt)]
         ))
+    }
+
+    private func fetchPrompt(_ id: UUID) -> SurprisePrompt? {
+        var descriptor = FetchDescriptor<SurprisePrompt>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return fetch(descriptor).first
     }
 
     private func fetchUpcomingPending(now: Date) -> [SurprisePrompt] {

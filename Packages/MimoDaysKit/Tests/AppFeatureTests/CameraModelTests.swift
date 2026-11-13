@@ -71,7 +71,7 @@ struct CameraModelInterruptionTests {
         while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
         await engine.simulateInterruption(.anotherApp)
         await recording
-        guard case let .video(video, _) = try #require(results.first) else { Issue.record("not a video"); return }
+        guard case let .video(video) = try #require(results.first).media else { Issue.record("not a video"); return }
         #expect(video.interruption == .anotherApp)
         results.first?.discardFiles()
 

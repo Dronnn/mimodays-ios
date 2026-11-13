@@ -17,6 +17,8 @@ struct SelfieWindowLayout {
     /// The "A little surprise" chip's corner (top left, top right in right-to-left languages) and bottom edge:
     /// a window in that corner starts below it.
     var chip: (corner: Corner, bottom: CGFloat)?
+    /// Space under the bottom corners: the camera keeps clear of the 10/30/60 s picker; review has nothing there.
+    var bottomMargin: CGFloat = 125
 
     static func frameSize(_ scale: Scale) -> CGSize {
         CGSize(width: frame.width * scale.factor, height: frame.height * scale.factor)
@@ -34,7 +36,7 @@ struct SelfieWindowLayout {
         let x = corner.isLeft ? 8.7 + size.width / 2 : preview.width - 23.3 - size.width / 2
         var top = topInset + 49.1
         if let chip, chip.corner == corner { top = max(top, chip.bottom + 12) }
-        let y = corner.isTop ? top + size.height / 2 : preview.height - 125 - size.height / 2
+        let y = corner.isTop ? top + size.height / 2 : preview.height - bottomMargin - size.height / 2
         return CGPoint(x: x, y: y)
     }
 

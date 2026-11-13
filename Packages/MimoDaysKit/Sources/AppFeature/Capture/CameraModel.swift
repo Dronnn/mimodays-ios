@@ -1,15 +1,38 @@
 import Core
 import Foundation
 import Observation
-import os
 
-/// What the camera hands on: Review (C07) takes it from here.
-enum CaptureResult: Equatable, Sendable {
-    /// `window`: where the selfie window was (nil without a selfie). `composedURL`: the photo with the selfie
-    /// window baked in, when composing worked.
-    case photo(CapturedPhoto, window: SelfieWindowFrame?, composedURL: URL?)
-    /// Played back composed with `VideoComposer` from the files and `window`.
-    case video(CapturedVideo, window: SelfieWindowFrame?)
+/// What the camera hands on to review (C07).
+struct CaptureResult: Equatable, Sendable {
+    enum Media: Equatable, Sendable {
+        case photo(CapturedPhoto)
+        case video(CapturedVideo)
+    }
+
+    var media: Media
+    /// The selfie window's corner and size at capture; nil without a selfie. Review can still move it, and the
+    /// composed preview is made at save with where it ends up (Andrew, 2026-11-13).
+    var window: CameraSettings.SelfieWindow?
+    var capturedAt: CaptureTime
+
+    var mainURL: URL {
+        switch media {
+        case let .photo(photo): photo.mainURL
+        case let .video(video): video.mainURL
+        }
+    }
+
+    var selfieURL: URL? {
+        switch media {
+        case let .photo(photo): photo.selfieURL
+        case let .video(video): video.selfieURL
+        }
+    }
+
+    /// Removes the temporary files of a capture nobody keeps.
+    func discardFiles() {
+        [mainURL, selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
+    }
 }
 
 /// A capture that didn't work, for the C13 note.
@@ -58,8 +81,6 @@ final class CameraModel {
     private(set) var showsSelfie = true
     /// Dual setups: the front camera is the big one (↻).
     private(set) var isSwapped = false
-    /// Where the selfie window is on screen, reported by the view; the composed photo puts it there.
-    var selfieWindowFrame: SelfieWindowFrame?
     /// A call, the background or heat has the camera; nothing can be captured until it's back.
     private(set) var interruption: CaptureInterruption?
     /// C05 note, shown until the person flips or captures.
@@ -191,12 +212,11 @@ final class CameraModel {
         showsSingleCameraNote = false
         failure = nil
         do {
-            let window = selfieWindowFrame
+            let capturedAt = now
             let captured = arranged(try await engine.capturePhoto(flash: isFlashOn, silent: !settings.cameraSounds))
             guard let photo = MediaCheck.checked(captured) else { throw CaptureError.photoFailed }
-            let composedURL = await composed(photo, window: window)
             phase = .ready
-            onCapture(.photo(photo, window: photo.selfieURL == nil ? nil : window, composedURL: composedURL))
+            onCapture(result(.photo(photo), selfie: photo.selfieURL, at: capturedAt))
         } catch {
             phase = .ready
             failure = CaptureFailure(error)
@@ -204,16 +224,15 @@ final class CameraModel {
     }
 
     private func record() async {
-        phase = .recording(startedAt: clock.now())
+        let capturedAt = now
+        phase = .recording(startedAt: capturedAt.instant)
         showsSingleCameraNote = false
-        // The window can't move while recording; this is where it is for the whole clip.
-        let window = selfieWindowFrame
         failure = nil
         do {
             let recorded = arranged(try await engine.record(limit: settings.videoLength.duration))
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready
-            onCapture(.video(video, window: video.selfieURL == nil ? nil : window))
+            onCapture(result(.video(video), selfie: video.selfieURL, at: capturedAt))
         } catch {
             phase = .ready
             failure = CaptureFailure(error)
@@ -233,15 +252,11 @@ final class CameraModel {
         return photo
     }
 
-    /// The sources are what counts: if composing fails the photo is still kept, without a composite.
-    private func composed(_ photo: CapturedPhoto, window: SelfieWindowFrame?) async -> URL? {
-        guard let selfieURL = photo.selfieURL, let window else { return nil }
-        do {
-            return try await PhotoComposer.compose(mainURL: photo.mainURL, selfieURL: selfieURL, window: window)
-        } catch {
-            Logger(subsystem: "MimoDays", category: "Camera").error("Composing the photo failed: \(String(describing: error), privacy: .public)")
-            return nil
-        }
+    private var now: CaptureTime { CaptureTime(instant: clock.now(), timeZone: .current) }
+
+    /// The window can't move while capturing, so the current placement is where it was.
+    private func result(_ media: CaptureResult.Media, selfie: URL?, at time: CaptureTime) -> CaptureResult {
+        CaptureResult(media: media, window: selfie == nil ? nil : settings.selfieWindow, capturedAt: time)
     }
 
     private func arranged(_ video: CapturedVideo) -> CapturedVideo {

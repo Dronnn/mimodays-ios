@@ -37,6 +37,18 @@
         }
       }
     },
+    "A call stopped the recording at %@. The part before the call is kept.": {
+      "comment": "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; a call or another app took the camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A call stopped the recording at %@. The part before the call is kept."
+          }
+        }
+      }
+    },
     "A little moment is happening.": {
       "comment": "Surprise notification title (also shown in onboarding art)",
       "extractionState": "manual",
@@ -69,6 +81,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "A little surprise, every day."
+          }
+        }
+      }
+    },
+    "Add a few words (optional)": {
+      "comment": "Review (C07): placeholder of the one-line caption field",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a few words (optional)"
           }
         }
       }
@@ -189,6 +213,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Camera sounds"
+          }
+        }
+      }
+    },
+    "Caption": {
+      "comment": "Review (C07): accessibility label of the one-line caption field",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caption"
           }
         }
       }
@@ -625,8 +661,20 @@
         }
       }
     },
+    "Pauses the video": {
+      "comment": "Review (C07): accessibility hint of a playing video",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pauses the video"
+          }
+        }
+      }
+    },
     "Photo": {
-      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option",
+      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option; review (C07) accessibility label of a photo",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -649,6 +697,18 @@
         }
       }
     },
+    "Plays the video": {
+      "comment": "Review (C07): accessibility hint of a paused video; plays it with sound",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plays the video"
+          }
+        }
+      }
+    },
     "Ready for your first little moment?": {
       "comment": "First capture invitation (onboarding O09): headline",
       "extractionState": "manual",
@@ -657,6 +717,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ready for your first little moment?"
+          }
+        }
+      }
+    },
+    "Record again": {
+      "comment": "Review after a recording stopped early (C13d): text button that drops the clip and goes back to the camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record again"
           }
         }
       }
@@ -717,6 +789,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reset to default"
+          }
+        }
+      }
+    },
+    "Retake": {
+      "comment": "Review (C07): button over the photo that drops this capture and goes back to the camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retake"
+          }
+        }
+      }
+    },
+    "Save": {
+      "comment": "Review (C07): primary button that keeps the moment",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        }
+      }
+    },
+    "Save %lld seconds": {
+      "comment": "Review after a recording stopped early (C13d): primary button that keeps the part recorded before it stopped. %lld = whole seconds kept",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Save %lld second"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Save %lld seconds"
+                }
+              }
+            }
           }
         }
       }
@@ -997,6 +1117,30 @@
         }
       }
     },
+    "The recording stopped at %@ when you left MimoDays. The part before is kept.": {
+      "comment": "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the app went to the background",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The recording stopped at %@ when you left MimoDays. The part before is kept."
+          }
+        }
+      }
+    },
+    "The recording stopped at %@. The part before is kept.": {
+      "comment": "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; any other reason",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The recording stopped at %@. The part before is kept."
+          }
+        }
+      }
+    },
     "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.": {
       "comment": "Camera (C05): note on iPhones that can't use both cameras at once; ↻ is the switch-camera button",
       "extractionState": "manual",
@@ -1009,6 +1153,18 @@
         }
       }
     },
+    "This iPhone got too warm, so the recording stopped at %@. The part before is kept.": {
+      "comment": "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the iPhone overheated",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone got too warm, so the recording stopped at %@. The part before is kept."
+          }
+        }
+      }
+    },
     "This iPhone is too warm for the camera right now. It comes back once it cools down.": {
       "comment": "Camera note: iOS paused the camera because the iPhone is too warm.",
       "extractionState": "manual",
@@ -1017,6 +1173,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "This iPhone is too warm for the camera right now. It comes back once it cools down."
+          }
+        }
+      }
+    },
+    "This iPhone ran out of space, so the recording stopped at %@. The part before is kept.": {
+      "comment": "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the disk filled up",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone ran out of space, so the recording stopped at %@. The part before is kept."
           }
         }
       }
@@ -1070,7 +1238,7 @@
       }
     },
     "Today, %@": {
-      "comment": "Handwritten caption on a moment saved today. %@ = time, e.g. 4:12 PM",
+      "comment": "Handwritten caption on a moment saved today. %@ = time, e.g. 4:12 PM; also the capture time on review (C07)",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1142,7 +1310,7 @@
       }
     },
     "Video": {
-      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option",
+      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option; review (C07) accessibility label of a video",
       "extractionState": "manual",
       "localizations": {
         "en": {

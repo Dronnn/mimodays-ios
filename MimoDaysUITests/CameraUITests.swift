@@ -29,12 +29,18 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
     }
 
-    /// Flow 03 up to review (Phase 7): a photo, then a video recorded and stopped, on the simulated engine.
+    /// Flow 03 up to review: a photo to review and Retake back to the camera, then a video recorded, stopped
+    /// and reviewed, on the simulated engine.
     @MainActor
     func testTakesAPhotoThenRecordsAndStopsAVideo() {
         openCamera()
         let shutter = app.buttons["camera.shutter"]
         shutter.tap()
+        let retake = app.buttons["review.retake"]
+        XCTAssertTrue(retake.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["review.selfieWindow"].exists)
+        XCTAssertTrue(app.buttons["review.save"].exists)
+        retake.tap()
         XCTAssertTrue(shutter.waitForExistence(timeout: 5))
         XCTAssertFalse(app.descendants(matching: .any)["camera.notice"].exists)
 
@@ -47,9 +53,27 @@ final class CameraUITests: XCTestCase {
         // While recording the top controls give way to the timer.
         XCTAssertFalse(app.buttons["capture.close"].exists)
         stop.tap()
-        XCTAssertTrue(shutter.waitForExistence(timeout: 10))
-        XCTAssertFalse(app.descendants(matching: .any)["camera.notice"].exists)
-        XCTAssertTrue(app.buttons["capture.close"].exists)
+        // Review: the clip plays on tap; Save leaves the capture flow.
+        let media = app.descendants(matching: .any)["review.media"]
+        XCTAssertTrue(media.waitForExistence(timeout: 10))
+        media.tap()
+        app.buttons["review.save"].tap()
+        XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
+    }
+
+    /// C07: the selfie window still moves in review, and Retake leaves the camera's own corner as it was.
+    @MainActor
+    func testTheSelfieWindowMovesInReviewOnly() {
+        openCamera()
+        app.buttons["camera.shutter"].tap()
+        let window = app.descendants(matching: .any)["review.selfieWindow"]
+        XCTAssertTrue(window.waitForExistence(timeout: 5))
+        XCTAssertEqual(window.value as? String, "Top right, Medium")
+        window.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.5)))
+        XCTAssertEqual(window.value as? String, "Bottom left, Medium")
+        app.buttons["review.retake"].tap()
+        XCTAssertEqual(selfieWindow.value as? String, "Top right, Medium")
     }
 
     @MainActor

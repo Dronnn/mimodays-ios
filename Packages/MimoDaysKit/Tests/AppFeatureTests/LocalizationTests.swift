@@ -28,6 +28,13 @@ struct LocalizationTests {
         "The camera paused for a moment. It comes back on its own.",
         "The camera isn't available right now. Close and try again in a moment.",
         "That one didn't come out. Try again.",
+        "Retake", "Add a few words (optional)", "Caption", "Save", "Record again", "Save %lld seconds",
+        "Plays the video", "Pauses the video",
+        "A call stopped the recording at %@. The part before the call is kept.",
+        "The recording stopped at %@ when you left MimoDays. The part before is kept.",
+        "This iPhone got too warm, so the recording stopped at %@. The part before is kept.",
+        "This iPhone ran out of space, so the recording stopped at %@. The part before is kept.",
+        "The recording stopped at %@. The part before is kept.",
     ]
 
     private static var resourceKeys: [String] {
@@ -62,7 +69,9 @@ struct LocalizationTests {
         #expect(catalog.sourceLanguage == "en")
         for (key, entry) in catalog.strings {
             #expect(entry.comment?.isEmpty == false, "no comment: \(key)")
-            #expect(entry.localizations?["en"]?.stringUnit.state == "translated", "no English: \(key)")
+            let english = entry.localizations?["en"]
+            let units = english?.stringUnit.map { [$0] } ?? english?.variations?.plural?.values.map(\.stringUnit) ?? []
+            #expect(!units.isEmpty && units.allSatisfy { $0.state == "translated" }, "no English: \(key)")
         }
     }
 
@@ -70,7 +79,10 @@ struct LocalizationTests {
         struct Entry: Decodable {
             struct Localization: Decodable {
                 struct Unit: Decodable { var state: String }
-                var stringUnit: Unit
+                struct Variant: Decodable { var stringUnit: Unit }
+                struct Variations: Decodable { var plural: [String: Variant]? }
+                var stringUnit: Unit?
+                var variations: Variations?
             }
 
             var comment: String?

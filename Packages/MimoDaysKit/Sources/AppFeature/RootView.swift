@@ -168,11 +168,9 @@ struct SettingsPlaceholderView: View {
     }
 }
 
-/// Camera access first (C06 explainer → system prompt, or C13a when it's off), then the camera.
+/// Camera access first (C06 explainer → system prompt, or C13a when it's off), then the camera, then review (C07).
 struct CaptureFlowView: View {
     let request: CaptureRequest
-    /// Review (C07) takes the capture from here in Phase 7; until then it is discarded.
-    var onCapture: @MainActor (CaptureResult) -> Void = { $0.discardFiles() }
     @Environment(\.permissions) private var permissions
     @Environment(\.camera) private var services
     @Environment(\.dismiss) private var dismiss
@@ -180,6 +178,7 @@ struct CaptureFlowView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var step: CameraAccessStep?
     @State private var camera: CameraModel?
+    @State private var review: ReviewModel?
 
     var body: some View {
         Group {
@@ -199,7 +198,15 @@ struct CaptureFlowView: View {
                     dismiss()
                 }
             case .camera:
-                if let camera {
+                if let review {
+                    ReviewView(model: review) {
+                        self.review = nil
+                    } onSave: {
+                        // The save path (7.5) keeps it; until then nothing is kept.
+                        review.discard()
+                        dismiss()
+                    }
+                } else if let camera {
                     CameraView(model: camera) { dismiss() }
                 } else {
                     CameraPalette.background.ignoresSafeArea()
@@ -225,7 +232,7 @@ struct CaptureFlowView: View {
             camera = CameraModel(
                 engine: services.makeEngine(), store: services.settings, isSurprise: request.isSurprise,
                 microphoneStatus: { await permissions.status(of: .microphone) },
-                onCapture: onCapture
+                onCapture: { review = ReviewModel(capture: $0) }
             )
         }
     }

@@ -4,6 +4,7 @@ import CoreGraphics
 import Foundation
 import ImageIO
 import Testing
+import TestSupport
 
 struct PhotoComposerTests {
     /// iPhone preview 402 × 700 with the default window (frame 112 × 150 at 266.7, 111.1).
@@ -34,41 +35,24 @@ struct PhotoComposerTests {
     }
 
     @MainActor
-    @Test func theShutterDeliversSourcesAndTheComposite() async throws {
+    @Test func theShutterDeliversBothSourcesWithTheWindowAndTime() async throws {
         var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.selfieWindow = CameraSettings.SelfieWindow(corner: .bottomLeft, scale: .large)
         let model = CameraModel(
-            engine: SimulatedCaptureEngine(), store: InMemoryCameraSettingsStore(), isSurprise: false,
+            engine: SimulatedCaptureEngine(), store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            clock: TestDateProvider(Date(timeIntervalSince1970: 1_000)),
             microphoneStatus: { .granted }, onCapture: { results.append($0) }
         )
         await model.start()
-        model.selfieWindowFrame = window
         await model.shutter()
-        guard case let .photo(photo, _, composedURL) = try #require(results.first) else { Issue.record("not a photo"); return }
+        let result = try #require(results.first)
+        guard case let .photo(photo) = result.media else { Issue.record("not a photo"); return }
         #expect(photo.selfieURL != nil)
-        let url = try #require(composedURL)
-        let source = try #require(CGImageSourceCreateWithURL(url as CFURL, nil))
-        let properties = try #require(CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any])
-        #expect(properties[kCGImagePropertyPixelWidth] as? Int == 900)
-        #expect(properties[kCGImagePropertyPixelHeight] as? Int == 1200)
-        results.first?.discardFiles()
-        #expect(!FileManager.default.fileExists(atPath: url.path))
-    }
-
-    @MainActor
-    @Test func noSelfieMeansNoComposite() async throws {
-        var results: [CaptureResult] = []
-        let model = CameraModel(
-            engine: SimulatedCaptureEngine(), store: InMemoryCameraSettingsStore(), isSurprise: false,
-            microphoneStatus: { .granted }, onCapture: { results.append($0) }
-        )
-        await model.start()
-        model.selfieWindowFrame = window
-        model.toggleSelfie()
-        await model.shutter()
-        guard case let .photo(photo, _, composedURL) = try #require(results.first) else { Issue.record("not a photo"); return }
-        #expect(photo.selfieURL == nil)
-        #expect(composedURL == nil)
-        results.first?.discardFiles()
+        #expect(result.window == settings.selfieWindow)
+        #expect(result.capturedAt == CaptureTime(instant: Date(timeIntervalSince1970: 1_000), timeZone: .current))
+        result.discardFiles()
+        #expect(!FileManager.default.fileExists(atPath: photo.mainURL.path))
     }
 
     // MARK: Helpers

@@ -77,6 +77,13 @@ public struct TextStyle: Equatable, Sendable {
     public static let cameraChip = TextStyle(.nunito, size: 13, weight: 700, relativeTo: .caption1, maximumScale: 1.35)
     public static let cameraTimer = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
     public static let cameraNote = TextStyle(.nunito, size: 14, weight: 500, lineHeight: 1.2, relativeTo: .footnote)
+    // Review (C07, C13d).
+    public static let reviewField = TextStyle(.patrickHand, size: 18, relativeTo: .body)
+    public static let reviewChip = TextStyle(.nunito, size: 14, weight: 600, relativeTo: .subheadline)
+    public static let reviewMeta = TextStyle(.nunito, size: 14, weight: 500, relativeTo: .footnote)
+    public static let reviewNote = TextStyle(.nunito, size: 15, weight: 500, lineHeight: 1.2, relativeTo: .subheadline)
+    /// Retake sits on the photo, so it stops growing at 1.35x like the camera controls.
+    public static let reviewRetake = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
 
     public static let all: [(name: String, style: TextStyle)] = [
         ("display.hero", .displayHero), ("display.title", .displayTitle), ("display.headline", .displayHeadline),

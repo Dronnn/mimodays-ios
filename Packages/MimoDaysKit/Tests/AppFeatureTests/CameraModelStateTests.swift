@@ -68,7 +68,7 @@ struct CameraModelStateTests {
         let model = await camera(captures: captures)
         await model.flip()
         await model.shutter()
-        guard case let .photo(photo, _, _) = try #require(captures.results.first) else { Issue.record("not a photo"); return }
+        guard case let .photo(photo) = try #require(captures.results.first).media else { Issue.record("not a photo"); return }
         #expect(photo.mainPosition == .front)
         #expect(photo.selfieURL != nil)
         #expect(model.phase == .ready)
@@ -80,8 +80,9 @@ struct CameraModelStateTests {
         model.toggleSelfie()
         #expect(model.selfiePosition == nil)
         await model.shutter()
-        guard case let .photo(photo, window, composedURL) = try #require(captures.results.first) else { Issue.record("not a photo"); return }
-        #expect(photo.selfieURL == nil && window == nil && composedURL == nil)
+        let result = try #require(captures.results.first)
+        guard case let .photo(photo) = result.media else { Issue.record("not a photo"); return }
+        #expect(photo.selfieURL == nil && result.window == nil)
     }
 
     @Test func recordingStopsOnTheSecondTapAndLocksTheControls() async throws {
@@ -96,7 +97,7 @@ struct CameraModelStateTests {
         await model.shutter()
         await first
         #expect(model.phase == .ready)
-        guard case let .video(video, _) = try #require(captures.results.first) else { Issue.record("not a video"); return }
+        guard case let .video(video) = try #require(captures.results.first).media else { Issue.record("not a video"); return }
         #expect(video.selfieURL != nil && video.interruption == nil)
     }
 

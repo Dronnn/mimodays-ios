@@ -21,6 +21,14 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphSpeaker
     case glyphMute
     case glyphInfo
+    /// 18 pt review chip glyphs (C07).
+    case glyphPin
+    case glyphMic
+    case glyphNote
+    /// 24 pt coral warning on the C13d card.
+    case glyphWarning
+    /// 30 pt play triangle on the cream play button.
+    case glyphPlay
     /// 56 pt line glyphs on explainer art.
     case explainerCamera
     case explainerMicrophone

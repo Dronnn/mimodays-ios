@@ -1,16 +1,19 @@
 import SwiftUI
 
-/// `Explainer / Art`: peach blob with a plum line glyph, an apricot star and coral ticks (150×140).
+/// `Explainer / Art`: a soft blob with a plum line glyph, an apricot star and coral ticks (150×140).
+/// The blob is peach on permission explainers, mint for surprises and chip-coloured when reminders are off.
 public struct ExplainerArt: View {
     let glyph: Icon
+    let blob: ColorToken
 
-    public init(glyph: Icon) {
+    public init(glyph: Icon, blob: ColorToken = .accentPeach) {
         self.glyph = glyph
+        self.blob = blob
     }
 
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            layer(.artBlob, .accentPeach)
+            layer(.artBlob, blob)
             layer(.markStar, .accentApricot)
             layer(.markTicks, .accentCoralMark)
             glyph.image

@@ -89,7 +89,11 @@ public func assertScreenSnapshots(
 ) {
     for variant in variants {
         let controller = UIHostingController(
-            rootView: view.environment(\.layoutDirection, variant.isRightToLeft ? .rightToLeft : .leftToRight)
+            rootView: view
+                .environment(\.layoutDirection, variant.isRightToLeft ? .rightToLeft : .leftToRight)
+                .environment(\.locale, snapshotLocale)
+                .environment(\.calendar, snapshotCalendar)
+                .environment(\.timeZone, snapshotCalendar.timeZone)
         )
         assertSnapshot(
             of: controller,
@@ -104,3 +108,12 @@ public func assertScreenSnapshots(
         )
     }
 }
+
+/// Snapshots must not follow the Mac's region: US English, its Sunday-first week, UTC.
+private let snapshotLocale = Locale(identifier: "en_US")
+private let snapshotCalendar: Calendar = {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = snapshotLocale
+    calendar.timeZone = TimeZone(identifier: "UTC") ?? .gmt
+    return calendar
+}()

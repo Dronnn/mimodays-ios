@@ -19,7 +19,7 @@ let package = Package(
         .target(name: "Core"),
         .target(name: "DesignSystem", resources: [.process("Resources")]),
         .target(name: "Persistence", dependencies: ["Core"]),
-        .target(name: "AppFeature", dependencies: ["Core", "DesignSystem"], resources: [.process("Resources")]),
+        .target(name: "AppFeature", dependencies: ["Core", "DesignSystem", "Persistence"], resources: [.process("Resources")]),
         .target(
             name: "TestSupport",
             dependencies: [

@@ -19,12 +19,16 @@ public enum ColorToken: String, CaseIterable, Sendable {
     case textSecondary
     /// Explainer and long-form body copy.
     case textBody
+    /// Row details, e.g. the time in a settings row.
+    case textTertiary
     case textLink
     case textOnCoral
     case actionCoral
     case actionCoralGradientStart
     case actionCoralGradientEnd
     case borderSubtle
+    /// Hairlines between rows in a card.
+    case separator
     /// Progress dots not reached yet.
     case indicatorInactive
     /// PiP / selfie frame; stays light in dark mode.

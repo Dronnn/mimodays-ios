@@ -1,17 +1,30 @@
 @testable import AppFeature
 import Foundation
+import Persistence
 import Testing
 
 struct LocalizationTests {
     private static let missing = "\u{0}missing"
 
     /// Keys used directly as `Text("…", bundle: .module)`.
-    private static let literalKeys = ["Settings", "Capture", "Done", "Close", "A little surprise", "Skip", "Page %lld of %lld"]
+    private static let literalKeys = ["Settings", "Capture", "Done", "Close", "A little surprise", "Skip", "Page %lld of %lld",
+        "Back", "When should MimoDays surprise you?", "Pick how often and when. The exact time is always a surprise.",
+        "How often", "On these days", "Earliest", "Latest", "Surprises only arrive between these times. Focus modes still apply.",
+        "Enable reminders", "Maybe later", "Your first surprise is on its way.", "No reminders for now. That's okay.",
+        "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings.",
+        "Open iOS Settings",
+    ]
 
     private static var resourceKeys: [String] {
         let resources = MainTab.allCases.map(\.title)
             + PermissionScreen.allCases.flatMap { [$0.title, $0.message, $0.primaryAction, $0.secondaryAction] }
             + OnboardingPage.allCases.flatMap { [$0.title, $0.message, $0.primaryAction] }
+            + SurpriseFrequency.allCases.map(\.label)
+            + SurpriseFrequency.allCases.map { frequency in
+                var schedule = ReminderSchedule()
+                schedule.frequency = frequency
+                return schedule.summary(calendar: .current, locale: .current)
+            }
             + OnboardingPage.allCases.flatMap(\.artLayers).compactMap { layer -> LocalizedStringResource? in
                 guard case let .text(.localized(resource), _, _, _, _) = layer else { return nil }
                 return resource

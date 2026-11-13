@@ -8,16 +8,25 @@ public enum Icon: String, CaseIterable, Sendable {
     case tabMovies
     case glyphGear
     case glyphCamera
+    /// 24 pt back chevron in `Navigation / Back bar`.
+    case glyphBack
+    /// 20 pt row disclosure chevron.
+    case glyphChevron
     /// 56 pt line glyphs on explainer art.
     case explainerCamera
     case explainerMicrophone
     case explainerCameraOff
+    case explainerSparkle
+    case explainerBell
     /// Explainer art layers, all on the same 150×140 canvas.
     case artBlob
     case markStar
     case markTicks
     /// Hand-cut primary button outline (362×54), stretched to the button.
     case shapeButton
+    /// Hand-cut segmented control track (362×40) and selected pill (88.5×32), stretched to fit.
+    case shapeSegmentTrack
+    case shapeSegmentPill
 
     public var image: Image { Image(rawValue, bundle: .module).renderingMode(.template) }
 }

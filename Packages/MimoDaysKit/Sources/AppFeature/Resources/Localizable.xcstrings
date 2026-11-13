@@ -2,6 +2,30 @@
   "sourceLanguage": "en",
   "version": "1.0",
   "strings": {
+    "3 a day": {
+      "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 a day"
+          }
+        }
+      }
+    },
+    "3 a week": {
+      "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 a week"
+          }
+        }
+      }
+    },
     "A little moment is happening.": {
       "comment": "Surprise notification title (also shown in onboarding art)",
       "extractionState": "manual",
@@ -74,6 +98,18 @@
         }
       }
     },
+    "Back": {
+      "comment": "Back button label in a navigation bar",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
     "Capture": {
       "comment": "Accessibility label of the big camera button on Today",
       "extractionState": "manual",
@@ -134,6 +170,30 @@
         }
       }
     },
+    "Earliest": {
+      "comment": "Surprise schedule (onboarding O07): row title, earliest time a surprise may arrive",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earliest"
+          }
+        }
+      }
+    },
+    "Enable reminders": {
+      "comment": "Surprise schedule (onboarding O07): primary button, shows the system notification prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable reminders"
+          }
+        }
+      }
+    },
     "Find your memories by date or place. Turn a month, a year, or any part of your life into a movie made from real, little moments.": {
       "comment": "OB-05 body",
       "extractionState": "manual",
@@ -154,6 +214,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Give your moment a voice."
+          }
+        }
+      }
+    },
+    "How often": {
+      "comment": "Surprise schedule (onboarding O07): section label, shown in capitals",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How often"
+          }
+        }
+      }
+    },
+    "Latest": {
+      "comment": "Surprise schedule (onboarding O07): row title, latest time a surprise may arrive",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latest"
           }
         }
       }
@@ -194,6 +278,18 @@
         }
       }
     },
+    "Maybe later": {
+      "comment": "Surprise schedule (onboarding O07): secondary button, skips reminders for now",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maybe later"
+          }
+        }
+      }
+    },
     "Memories": {
       "comment": "Tab: grid of all saved moments",
       "extractionState": "manual",
@@ -218,6 +314,18 @@
         }
       }
     },
+    "No reminders for now. That's okay.": {
+      "comment": "Onboarding O08c, reminders off: headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No reminders for now. That's okay."
+          }
+        }
+      }
+    },
     "Not now": {
       "comment": "Closes a permission screen without asking",
       "extractionState": "manual",
@@ -226,6 +334,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "Not now"
+          }
+        }
+      }
+    },
+    "On these days": {
+      "comment": "Surprise schedule (onboarding O07): section label above the weekday circles, shown in capitals",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On these days"
+          }
+        }
+      }
+    },
+    "Once a day": {
+      "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once a day"
+          }
+        }
+      }
+    },
+    "Once a day, between %@ and %@. You can change this any time in Settings.": {
+      "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once a day, between %1$@ and %2$@. You can change this any time in Settings."
           }
         }
       }
@@ -254,6 +398,18 @@
         }
       }
     },
+    "Open iOS Settings": {
+      "comment": "Onboarding O08c button, opens the app's notification settings in iOS Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open iOS Settings"
+          }
+        }
+      }
+    },
     "Page %lld of %lld": {
       "comment": "VoiceOver label of the onboarding progress dots, e.g. Page 2 of 6",
       "extractionState": "manual",
@@ -262,6 +418,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Page %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Pick how often and when. The exact time is always a surprise.": {
+      "comment": "Surprise schedule (onboarding O07): body under the headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick how often and when. The exact time is always a surprise."
           }
         }
       }
@@ -362,6 +530,18 @@
         }
       }
     },
+    "Surprises only arrive between these times. Focus modes still apply.": {
+      "comment": "Surprise schedule (onboarding O07): note under the time rows",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surprises only arrive between these times. Focus modes still apply."
+          }
+        }
+      }
+    },
     "Tbilisi · optional": {
       "comment": "Sample place chip in onboarding art",
       "extractionState": "manual",
@@ -410,6 +590,30 @@
         }
       }
     },
+    "Three times a day, between %@ and %@. You can change this any time in Settings.": {
+      "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three times a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "Three times a week, between %@ and %@. You can change this any time in Settings.": {
+      "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three times a week, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
     "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today.": {
       "comment": "C13a body: camera access off",
       "extractionState": "manual",
@@ -434,6 +638,30 @@
         }
       }
     },
+    "Twice": {
+      "comment": "Surprise schedule (onboarding O07): frequency option meaning twice a day, keep very short (segmented control)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twice"
+          }
+        }
+      }
+    },
+    "Twice a day, between %@ and %@. You can change this any time in Settings.": {
+      "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twice a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
     "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too.": {
       "comment": "OB-01 body",
       "extractionState": "manual",
@@ -442,6 +670,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too."
+          }
+        }
+      }
+    },
+    "When should MimoDays surprise you?": {
+      "comment": "Surprise schedule (onboarding O07): headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When should MimoDays surprise you?"
           }
         }
       }
@@ -470,6 +710,18 @@
         }
       }
     },
+    "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings.": {
+      "comment": "Onboarding O08c, reminders off: body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings."
+          }
+        }
+      }
+    },
     "Your captures stay on your device by default. You choose when to back up, share, export, or delete them. No public profile is required.": {
       "comment": "OB-06 body",
       "extractionState": "manual",
@@ -478,6 +730,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your captures stay on your device by default. You choose when to back up, share, export, or delete them. No public profile is required."
+          }
+        }
+      }
+    },
+    "Your first surprise is on its way.": {
+      "comment": "Onboarding O08b, reminders turned on: headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your first surprise is on its way."
           }
         }
       }

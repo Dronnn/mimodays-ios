@@ -8,7 +8,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     nonisolated let multiCam: Bool
     private var setup: CameraSetup?
     private var isRunning = false
-    private var hasMicrophone = false
+    private(set) var hasMicrophone = false
     private(set) var isRecording = false
     private var stopSignal: CheckedContinuation<Void, Never>?
     public nonisolated let events: AsyncStream<CaptureEvent>

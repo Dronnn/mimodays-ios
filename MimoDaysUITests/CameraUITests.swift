@@ -2,6 +2,7 @@ import Core
 import XCTest
 
 /// C04: the selfie window moves by touch and hold (sheet) or by dragging it to a corner.
+/// C06c: the microphone is explained the first time the camera is in Video.
 final class CameraUITests: XCTestCase {
     private var app: XCUIApplication!
 
@@ -14,14 +15,45 @@ final class CameraUITests: XCTestCase {
     }
 
     @MainActor
-    private func openCamera() {
+    private func openCamera(permissions: PermissionStatus = .granted) {
         app = XCUIApplication()
         app.launchArguments = LaunchConfiguration(
-            isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: .granted
+            isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: permissions
         ).arguments
         app.launch()
         app.buttons["capture"].tap()
+        if permissions == .notDetermined {
+            // C06 camera explainer first.
+            app.buttons["permission.primary"].tap()
+        }
         XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testFirstVideoExplainsTheMicrophoneThenRecordsSound() {
+        openCamera(permissions: .notDetermined)
+        app.buttons["camera.mode.video"].tap()
+        let allow = app.buttons["permission.primary"]
+        XCTAssertTrue(allow.waitForExistence(timeout: 5))
+        allow.tap()
+        XCTAssertTrue(allow.waitForNonExistence(timeout: 5))
+        let sound = app.buttons["camera.sound"]
+        XCTAssertTrue(sound.waitForExistence(timeout: 5))
+        XCTAssertEqual(sound.value as? String, "On")
+    }
+
+    @MainActor
+    func testRecordWithoutSoundKeepsVideosSilentAndDoesNotAskAgain() {
+        openCamera(permissions: .notDetermined)
+        app.buttons["camera.mode.video"].tap()
+        let withoutSound = app.buttons["permission.secondary"]
+        XCTAssertTrue(withoutSound.waitForExistence(timeout: 5))
+        withoutSound.tap()
+        XCTAssertTrue(withoutSound.waitForNonExistence(timeout: 5))
+        XCTAssertEqual(app.buttons["camera.sound"].value as? String, "Off")
+        app.buttons["camera.mode.photo"].tap()
+        app.buttons["camera.mode.video"].tap()
+        XCTAssertFalse(app.buttons["permission.primary"].waitForExistence(timeout: 2))
     }
 
     @MainActor

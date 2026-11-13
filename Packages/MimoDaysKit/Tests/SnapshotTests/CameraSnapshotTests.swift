@@ -26,43 +26,49 @@ struct CameraSnapshotTests {
         return model
     }
 
+    /// The camera with every permission granted, so nothing asks the system.
+    private func screen(_ model: CameraModel, adjustsSelfie: Bool = false) -> some View {
+        CameraView(model: model, adjustsSelfie: adjustsSelfie, onClose: {})
+            .environment(\.permissions, PresetPermissionService(status: .granted))
+    }
+
     @Test func photo() async {
-        assertScreenSnapshots(of: CameraView(model: await camera(), onClose: {}))
+        assertScreenSnapshots(of: screen(await camera()))
     }
 
     @Test func surprise() async {
-        assertScreenSnapshots(of: CameraView(model: await camera(surprise: true), onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: screen(await camera(surprise: true)), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     @Test func videoIdle() async {
-        assertScreenSnapshots(of: CameraView(model: await camera(mode: .video), onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: screen(await camera(mode: .video)), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     /// 7.5 s into a 10 s clip: "00:07 / 00:10".
     @Test func recording() async {
         let model = await camera(mode: .video)
         model.phase = .recording(startedAt: Date().addingTimeInterval(-7.5))
-        assertScreenSnapshots(of: CameraView(model: model, onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     @Test func singleCamera() async {
-        assertScreenSnapshots(of: CameraView(model: await camera(multiCam: false), onClose: {}))
+        assertScreenSnapshots(of: screen(await camera(multiCam: false)))
     }
 
     /// C04 behind its sheet: corner targets, the chosen one in coral.
     @Test func adjustSelfieWindow() async {
         let model = await camera(selfieWindow: .init(corner: .topLeft, scale: .medium))
-        assertScreenSnapshots(of: CameraView(model: model, adjustsSelfie: true, onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: screen(model, adjustsSelfie: true), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     @Test func largeSelfieWindowBottomRight() async {
         let model = await camera(mode: .video, selfieWindow: .init(corner: .bottomRight, scale: .large))
-        assertScreenSnapshots(of: CameraView(model: model, onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     @Test func smallSelfieWindowBelowTheSurpriseChip() async {
         let model = await camera(surprise: true, selfieWindow: .init(corner: .topLeft, scale: .small))
-        assertScreenSnapshots(of: CameraView(model: model, onClose: {}), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     @Test func selfieWindowSheet() {

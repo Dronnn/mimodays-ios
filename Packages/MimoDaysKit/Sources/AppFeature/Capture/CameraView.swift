@@ -15,6 +15,9 @@ struct CameraView: View {
     /// The top safe-area inset, measured before the preview extends under the status bar.
     @State private var topInset: CGFloat = 0
     @State private var chipBottom: CGFloat?
+    /// C06c, before the microphone prompt.
+    @State private var explainsMicrophone = false
+    @Environment(\.permissions) private var permissions
     @Environment(\.layoutDirection) private var layoutDirection
 
     private typealias Corner = CameraSettings.SelfieWindow.Corner
@@ -43,6 +46,24 @@ struct CameraView: View {
         }
         .sheet(isPresented: $adjustsSelfie) {
             SelfieWindowSheet(placement: $model.settings.selfieWindow)
+        }
+        // First time in Video with sound on and the microphone not asked yet (Andrew, 2026-11-13).
+        .onChange(of: model.mode == .video && model.settings.recordsSound, initial: true) { _, wantsSound in
+            guard wantsSound else { return }
+            Task { if await permissions.status(of: .microphone) == .notDetermined { explainsMicrophone = true } }
+        }
+        .fullScreenCover(isPresented: $explainsMicrophone) {
+            PermissionExplainerView(screen: .microphone) {
+                Task {
+                    _ = await permissions.request(.microphone)
+                    explainsMicrophone = false
+                    await model.refreshMicrophone()
+                }
+            } secondary: {
+                // Record without sound: videos stay silent until sound is turned back on.
+                model.settings.recordsSound = false
+                explainsMicrophone = false
+            }
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("camera")
@@ -162,7 +183,7 @@ struct CameraView: View {
                     RoundButton(
                         icon: model.microphoneOn ? .glyphSpeaker : .glyphMute,
                         label: Text("Sound", bundle: .module), id: "camera.sound", isOn: model.microphoneOn
-                    ) { Task { await model.toggleSound() } }
+                    ) { model.toggleSound() }
                 } else {
                     RoundButton(
                         icon: .glyphPiP, label: Text("Selfie window", bundle: .module), id: "camera.selfie",

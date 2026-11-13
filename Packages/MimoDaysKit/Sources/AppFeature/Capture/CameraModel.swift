@@ -27,7 +27,7 @@ final class CameraModel {
     var phase = Phase.starting
     private(set) var setup: CameraSetup?
     var mode: CameraSettings.Mode {
-        didSet { if mode != oldValue { Task { await updateMicrophone() } } }
+        didSet { if mode != oldValue { Task { await refreshMicrophone() } } }
     }
     var isFlashOn = false
     /// The selfie window is shown and captured (dual setups only).
@@ -39,7 +39,10 @@ final class CameraModel {
     /// C05 note, shown until the person flips or captures.
     private(set) var showsSingleCameraNote = false
     var settings: CameraSettings {
-        didSet { store.save(settings) }
+        didSet {
+            store.save(settings)
+            if settings.recordsSound != oldValue.recordsSound { Task { await refreshMicrophone() } }
+        }
     }
 
     let isSurprise: Bool
@@ -96,7 +99,7 @@ final class CameraModel {
             setup = try await engine.start()
             showsSingleCameraNote = setup != .dual
             phase = .ready
-            await updateMicrophone()
+            await refreshMicrophone()
             listenForEvents()
         } catch {
             phase = .failed(error as? CaptureError ?? .cameraUnavailable)
@@ -126,9 +129,8 @@ final class CameraModel {
         showsSelfie.toggle()
     }
 
-    func toggleSound() async {
+    func toggleSound() {
         settings.recordsSound.toggle()
-        await updateMicrophone()
     }
 
     // MARK: Capture
@@ -210,8 +212,9 @@ final class CameraModel {
 
     // MARK: Engine
 
-    /// The microphone runs only in video mode, with permission and "Record sound" on.
-    private func updateMicrophone() async {
+    /// The microphone runs only in video mode, with permission and "Record sound" on. Also called after the
+    /// microphone permission is answered (C06c).
+    func refreshMicrophone() async {
         guard phase != .starting else { return }
         microphoneAvailable = await microphoneAllowed()
         try? await engine.setMicrophone(mode == .video && microphoneOn)

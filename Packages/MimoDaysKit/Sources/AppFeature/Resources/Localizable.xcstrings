@@ -758,6 +758,18 @@
         }
       }
     },
+    "Whatever today looks like, it counts.": {
+      "comment": "Surprise notification body (one of two, picked at random)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Whatever today looks like, it counts."
+          }
+        }
+      }
+    },
     "When should MimoDays surprise you?": {
       "comment": "Surprise schedule (onboarding O07): headline",
       "extractionState": "manual",

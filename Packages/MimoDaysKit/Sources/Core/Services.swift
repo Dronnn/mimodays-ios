@@ -17,12 +17,20 @@ public struct SystemDateProvider: DateProvider {
 // MARK: Notifications (5.1-5.2)
 
 public struct SurpriseNotification: Equatable, Identifiable, Sendable {
+    /// Key in the notification's `userInfo` holding the prompt's UUID string.
+    public static let promptIDKey = "promptID"
+
+    /// The prompt's UUID string, also the notification request identifier.
     public var id: String
     public var fireDate: Date
+    public var title: String
+    public var body: String
 
-    public init(id: String, fireDate: Date) {
+    public init(id: String, fireDate: Date, title: String = "", body: String = "") {
         self.id = id
         self.fireDate = fireDate
+        self.title = title
+        self.body = body
     }
 }
 

@@ -10,12 +10,18 @@ public struct RootView: View {
     /// Set while onboarding runs; nil once it is finished or skipped.
     @State private var onboarding: OnboardingFlow?
     private let permissions: any PermissionService
+    private let surprises: SurpriseCoordinator
+    private let notificationTaps: SurpriseNotificationHandler
+    @Environment(\.scenePhase) private var scenePhase
 
     public init(router: AppRouter = AppRouter(), dependencies: AppDependencies) {
         _router = State(initialValue: router)
         permissions = dependencies.permissions
+        let surprises = dependencies.surprises
+        self.surprises = surprises
+        notificationTaps = dependencies.notificationTaps
         let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
-        let flow = OnboardingFlow(permissions: dependencies.permissions, store: store)
+        let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
     }
 
@@ -32,6 +38,30 @@ public struct RootView: View {
         }
         .environment(router)
         .environment(\.permissions, permissions)
+        // Launch and every return to the app (notification permission may have changed in Settings).
+        .onAppear {
+            notificationTaps.listen(openSurprise)
+        }
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            if phase == .active { refreshSurprises() }
+        }
+        // Midnight, a clock change or a new time zone: hours follow the device.
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+            refreshSurprises()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
+            NSTimeZone.resetSystemTimeZone()
+            refreshSurprises()
+        }
+    }
+
+    /// In time it's "A little surprise"; too late it's a plain capture, never backdated (doc 01).
+    private func openSurprise(_ promptID: UUID) {
+        router.open(.capture(promptID: surprises.open(promptID: promptID) ? promptID : nil))
+    }
+
+    private func refreshSurprises() {
+        Task { await surprises.refresh() }
     }
 
     private var tabs: some View {
@@ -199,6 +229,7 @@ struct CapturePlaceholderView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 6)
                     .background(ColorToken.accentMint.color, in: Capsule())
+                    .accessibilityIdentifier("camera.surprise")
                     .frame(maxWidth: .infinity)
                     .padding(.top, 70)
             }

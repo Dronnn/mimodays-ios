@@ -9,7 +9,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     private var setup: CameraSetup?
     private var isRunning = false
     private var hasMicrophone = false
-    private var isRecording = false
+    private(set) var isRecording = false
     private var stopSignal: CheckedContinuation<Void, Never>?
     public nonisolated let events: AsyncStream<CaptureEvent>
     private let eventSink: AsyncStream<CaptureEvent>.Continuation

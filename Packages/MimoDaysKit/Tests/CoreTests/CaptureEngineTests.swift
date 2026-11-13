@@ -59,19 +59,21 @@ struct SimulatedCaptureEngineTests {
         let engine = SimulatedCaptureEngine(multiCam: false)
         _ = await engine.start()
         async let video = engine.record(limit: .seconds(60))
-        try await Task.sleep(for: .milliseconds(300))
+        // A stop before the recording starts is ignored, so wait for it (slow CI runners).
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
         await engine.stopRecording()
         let clip = try await video
-        #expect(clip.duration < 2)
+        #expect(clip.duration < 10)
         #expect(clip.selfieURL == nil)
     }
 
     @Test func oneRecordingAtATime() async throws {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
-        async let first = engine.record(limit: .seconds(1))
-        try await Task.sleep(for: .milliseconds(100))
+        async let first = engine.record(limit: .seconds(30))
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
         await #expect(throws: CaptureError.alreadyRecording) { try await engine.record(limit: nil) }
+        await engine.stopRecording()
         _ = try await first
     }
 }

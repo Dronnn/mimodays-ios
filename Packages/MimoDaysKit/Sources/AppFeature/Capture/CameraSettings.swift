@@ -104,14 +104,19 @@ final class InMemoryCameraSettingsStore: CameraSettingsStore {
     func save(_ settings: CameraSettings) { self.settings = settings }
 }
 
-/// What the camera needs from the app: an engine for each time it opens, and the settings store.
+/// What the camera needs from the app: an engine for each time it opens, the settings and the review draft.
 struct CameraServices {
     var makeEngine: @MainActor () -> any CaptureEngine
     var settings: any CameraSettingsStore
+    /// Where a capture in review waits, so it survives the app being closed.
+    var drafts: ReviewDraftStore
 
     /// Previews and anything without a device camera.
     @MainActor static var simulated: CameraServices {
-        CameraServices(makeEngine: { SimulatedCaptureEngine() }, settings: InMemoryCameraSettingsStore())
+        CameraServices(
+            makeEngine: { SimulatedCaptureEngine() }, settings: InMemoryCameraSettingsStore(),
+            drafts: ReviewDraftStore(root: FileManager.default.temporaryDirectory.appending(path: "Review-\(UUID().uuidString)"))
+        )
     }
 }
 

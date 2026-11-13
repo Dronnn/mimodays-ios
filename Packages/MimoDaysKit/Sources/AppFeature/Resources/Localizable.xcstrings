@@ -1,6 +1,18 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%lld of %lld characters": {
+      "comment": "Note editor (C08): VoiceOver reading of the counter, e.g. 86 of 500 characters",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld of %lld characters"
+          }
+        }
+      }
+    },
     "%lld s": {
       "comment": "Camera settings: video length option in seconds, e.g. 10 s",
       "extractionState": "manual",
@@ -217,6 +229,18 @@
         }
       }
     },
+    "Cancel": {
+      "comment": "Note editor (C08): drops the changes made since it opened",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
     "Caption": {
       "comment": "Review (C07): accessibility label of the one-line caption field",
       "extractionState": "manual",
@@ -397,6 +421,18 @@
         }
       }
     },
+    "Keep editing": {
+      "comment": "Review (C07): button in the Retake confirmation that stays on review",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep editing"
+          }
+        }
+      }
+    },
     "Large": {
       "comment": "Selfie window sheet (C04): size option.",
       "extractionState": "manual",
@@ -561,6 +597,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Not now"
+          }
+        }
+      }
+    },
+    "Note": {
+      "comment": "Review (C07): chip that opens the note editor, and the note editor's title (C08)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Note"
           }
         }
       }
@@ -837,6 +885,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Retake"
+          }
+        }
+      }
+    },
+    "Retake and drop the note?": {
+      "comment": "Review (C07): confirmation before Retake throws away a note that was written",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retake and drop the note?"
           }
         }
       }

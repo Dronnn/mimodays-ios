@@ -11,6 +11,8 @@ struct ReviewView: View {
     let onSave: () async throws -> Void
     @State private var adjustsSelfie = false
     @State private var isSaving = false
+    @State private var editsNote = false
+    @State private var confirmsRetake = false
     /// C13c, or the generic save failure.
     @State private var saveError: SaveError?
     @Environment(\.openURL) private var openURL
@@ -36,6 +38,13 @@ struct ReviewView: View {
         .onDisappear { model.stopPlayback() }
         .sheet(isPresented: $adjustsSelfie) {
             SelfieWindowSheet(placement: $model.window)
+        }
+        .fullScreenCover(isPresented: $editsNote) {
+            NoteEditorView(model: model)
+        }
+        .confirmationDialog(Text("Retake and drop the note?", bundle: .module), isPresented: $confirmsRetake, titleVisibility: .visible) {
+            Button(role: .destructive) { discardAndRetake() } label: { Text("Retake", bundle: .module) }
+            Button(role: .cancel) {} label: { Text("Keep editing", bundle: .module) }
         }
         .alert(saveErrorTitle, isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
             if case .lowStorage = saveError {
@@ -120,6 +129,14 @@ struct ReviewView: View {
 
     private func retake() {
         guard !isSaving else { return }
+        if model.hasAnnotations {
+            confirmsRetake = true
+        } else {
+            discardAndRetake()
+        }
+    }
+
+    private func discardAndRetake() {
         model.discard()
         onRetake()
     }
@@ -167,7 +184,16 @@ struct ReviewView: View {
         VStack(alignment: .leading, spacing: 0) {
             CaptionField(text: $model.caption, isFocused: $editsCaption)
                 .padding(.top, 20)
-            timeLabel
+            HStack(spacing: 8) {
+                ReviewChip(icon: .glyphNote, title: model.note.isEmpty ? Text("Note", bundle: .module) : Text(model.note), isFilled: !model.note.isEmpty) {
+                    editsNote = true
+                }
+                .accessibilityLabel(Text("Note", bundle: .module))
+                .accessibilityValue(Text(model.note))
+                .accessibilityIdentifier("review.note")
+            }
+            .padding(.top, 14)
+            CaptureTimeLabel(time: model.capture.capturedAt)
                 .textStyle(.reviewMeta)
                 .foregroundStyle(ColorToken.textBody.color)
                 .padding(.leading, 2)
@@ -230,21 +256,6 @@ struct ReviewView: View {
         case .other: Text("The recording stopped at \(at). The part before is kept.", bundle: .module)
         }
     }
-
-    /// "Today, 2:37 PM" in the time zone it was captured in.
-    private var timeLabel: Text {
-        let time = model.capture.capturedAt
-        var format = Date.FormatStyle(date: .omitted, time: .shortened)
-        format.timeZone = time.timeZone
-        var calendar = Calendar.current
-        calendar.timeZone = time.timeZone
-        if calendar.isDate(time.instant, inSameDayAs: .now) {
-            return Text("Today, \(Text(time.instant, format: format))", bundle: .module)
-        }
-        var full = Date.FormatStyle(date: .abbreviated, time: .shortened)
-        full.timeZone = time.timeZone
-        return Text(time.instant, format: full)
-    }
 }
 
 // MARK: - Pieces
@@ -295,6 +306,37 @@ private struct CaptionField: View {
         )
         .accessibilityLabel(Text("Caption", bundle: .module))
         .accessibilityIdentifier("review.caption")
+    }
+}
+
+/// `Chip / Review`: glyph and label on a hand-cut chip; peach once something was added (it then shows its
+/// first words).
+private struct ReviewChip: View {
+    let icon: Icon
+    let title: Text
+    var isFilled = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                icon.image
+                    .frame(width: 18, height: 18)
+                title
+                    .textStyle(.reviewChip)
+                    .lineLimit(1)
+            }
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .padding(.leading, 11)
+            .padding(.trailing, 13)
+            .frame(minHeight: 34)
+            .frame(maxWidth: 200, alignment: .leading)
+            .fixedSize(horizontal: !isFilled, vertical: false)
+            .background(ReviewChipBlob().fill(isFilled ? ColorToken.accentPeach.color : ColorToken.surfaceChip.color))
+            .frame(minHeight: Size.minimumTapTarget)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
 

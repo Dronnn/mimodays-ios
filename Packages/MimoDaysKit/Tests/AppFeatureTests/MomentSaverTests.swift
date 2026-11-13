@@ -49,11 +49,14 @@ struct MomentSaverTests {
 
     @Test func aPhotoKeepsBothSourcesTheCompositeAndAThumbnail() async throws {
         let capture = try await photo()
-        let moment = try await saver().save(MomentDraft(capture: capture, caption: "  Lena on her bike ", window: window, promptID: nil))
+        let moment = try await saver().save(MomentDraft(
+            capture: capture, caption: "  Lena on her bike ", note: "She shouted \"don't let go\"\n", window: window, promptID: nil
+        ))
 
         #expect(try moments().count == 1)
         #expect(moment.mediaType == .photo && moment.origin == .manual && moment.promptID == nil)
         #expect(moment.title == "Lena on her bike")
+        #expect(moment.note == "She shouted \"don't let go\"")
         #expect(moment.timeZoneID == "Asia/Yerevan" && moment.localDay == 20261111)
         #expect(Set(moment.media.map(\.role)) == [.rearSource, .frontSource, .composedPreview, .thumbnail])
         for media in moment.media {
@@ -72,7 +75,7 @@ struct MomentSaverTests {
 
     @Test func aSwappedPhotoRemembersTheRearCameraIsInTheWindow() async throws {
         let moment = try await saver().save(MomentDraft(capture: try await photo(swapped: true), caption: "", window: window, promptID: nil))
-        #expect(moment.title == nil)
+        #expect(moment.title == nil && moment.note == nil)
         #expect(moment.pipLayout?.source == .rearSource)
         #expect(try #require(moment.media.first { $0.role == .frontSource }).pixelWidth == 360)
     }

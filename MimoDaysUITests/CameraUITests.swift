@@ -63,6 +63,33 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(app.buttons["capture"].exists)
     }
 
+    /// C08: a note shows on its chip, Retake asks before dropping it, and Save keeps it.
+    @MainActor
+    func testANoteIsKeptAndRetakeAsksBeforeDroppingIt() {
+        openCamera()
+        app.buttons["camera.shutter"].tap()
+        let note = app.buttons["review.note"]
+        XCTAssertTrue(note.waitForExistence(timeout: 5))
+        note.tap()
+        let text = app.textViews["note.text"]
+        XCTAssertTrue(text.waitForExistence(timeout: 5))
+        text.typeText("Lena on her bike")
+        XCTAssertEqual(app.staticTexts["note.count"].label, "16 of 500 characters")
+        app.buttons["note.done"].tap()
+        XCTAssertTrue(note.waitForExistence(timeout: 5))
+        XCTAssertEqual(note.value as? String, "Lena on her bike")
+
+        app.buttons["review.retake"].tap()
+        let confirmation = app.sheets["Retake and drop the note?"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        // iOS shows the dialog without its cancel button; a tap outside keeps editing.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
+        XCTAssertTrue(confirmation.waitForNonExistence(timeout: 5))
+        XCTAssertEqual(note.value as? String, "Lena on her bike")
+        app.buttons["review.save"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+    }
+
     /// C07: the selfie window still moves in review, and Retake leaves the camera's own corner as it was.
     @MainActor
     func testTheSelfieWindowMovesInReviewOnly() {

@@ -32,6 +32,7 @@ struct LocalizationTests {
         "Plays the video", "Pauses the video", "Saved to today", "Manage storage", "Try again", "Not now",
         "Not enough space to save", "This moment is kept until you free up about %@. Nothing is lost.",
         "This moment didn't save", "Nothing is lost. Try again in a moment.",
+        "Note", "Cancel", "Retake and drop the note?", "Keep editing", "%lld of %lld characters",
         "A call stopped the recording at %@. The part before the call is kept.",
         "The recording stopped at %@ when you left MimoDays. The part before is kept.",
         "This iPhone got too warm, so the recording stopped at %@. The part before is kept.",

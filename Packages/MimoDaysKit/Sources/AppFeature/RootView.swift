@@ -49,6 +49,10 @@ public struct RootView: View {
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)
+            // iOS closed the app mid-review: back to it, as it was.
+            if onboarding == nil, let draft = camera.drafts.load() {
+                router.open(.capture(promptID: draft.promptID))
+            }
         }
         .onChange(of: scenePhase, initial: true) { _, phase in
             if phase == .active { refreshSurprises() }
@@ -92,7 +96,7 @@ public struct RootView: View {
         }
         .fullScreenCover(item: $router.capture) { request in
             CaptureFlowView(request: request) { saved in
-                if let promptID = request.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
+                if let promptID = saved.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
                 showsSavedToast = true
             }
         }
@@ -245,9 +249,10 @@ struct CaptureFlowView: View {
     /// Keeps the moment, then closes. A failure leaves review as it is, so Try again works.
     private func save(_ review: ReviewModel) async throws {
         guard let saver else { throw SaveError.failed }
-        let moment = try await saver.save(review.draft(promptID: request.promptID))
+        let moment = try await saver.save(review.momentDraft)
         review.stopPlayback()
-        onSaved(SavedCapture(momentID: moment.id, main: review.main, selfie: review.selfie, capturedAt: moment.capturedAt))
+        review.clearDraft()
+        onSaved(SavedCapture(momentID: moment.id, promptID: review.promptID, main: review.main, selfie: review.selfie, capturedAt: moment.capturedAt))
         dismiss()
     }
 
@@ -259,11 +264,19 @@ struct CaptureFlowView: View {
         self.step = step
         if step == .camera, camera == nil {
             let services = services ?? .simulated
+            // A review iOS closed mid-way comes back first.
+            if let draft = services.drafts.load() {
+                review = ReviewModel(draft: draft, drafts: services.drafts)
+            }
             let permissions = permissions
             camera = CameraModel(
                 engine: services.makeEngine(), store: services.settings, isSurprise: request.isSurprise,
                 microphoneStatus: { await permissions.status(of: .microphone) },
-                onCapture: { review = ReviewModel(capture: $0) }
+                onCapture: { capture in
+                    let drafts = services.drafts
+                    let adopted = try? drafts.adopt(capture)
+                    review = ReviewModel(capture: adopted ?? capture, promptID: request.promptID, drafts: adopted == nil ? nil : drafts)
+                }
             )
         }
     }
@@ -272,6 +285,7 @@ struct CaptureFlowView: View {
 /// A moment that was just saved, for what comes after (C12 toast, O10, the surprise link).
 struct SavedCapture {
     var momentID: UUID
+    var promptID: UUID?
     var main: UIImage?
     var selfie: UIImage?
     var capturedAt: Date

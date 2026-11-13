@@ -82,6 +82,14 @@ public struct TextStyle: Equatable, Sendable {
     public static let reviewChip = TextStyle(.nunito, size: 14, weight: 600, relativeTo: .subheadline)
     public static let reviewMeta = TextStyle(.nunito, size: 14, weight: 500, relativeTo: .footnote)
     public static let reviewNote = TextStyle(.nunito, size: 15, weight: 500, lineHeight: 1.2, relativeTo: .subheadline)
+    /// C08 note text.
+    public static let noteBody = TextStyle(.patrickHand, size: 22, lineHeight: 1.3, relativeTo: .body)
+    /// `Navigation / Editor bar` (C08): Cancel, title, Done.
+    public static let editorCancel = TextStyle(.nunito, size: 17, weight: 600, relativeTo: .body, maximumScale: 1.35)
+    public static let editorTitle = TextStyle(.fraunces, size: 18, weight: 650, relativeTo: .headline, maximumScale: 1.35)
+    public static let editorDone = TextStyle(.nunito, size: 17, weight: 800, relativeTo: .body, maximumScale: 1.35)
+    public static let noteMeta = TextStyle(.nunito, size: 14, weight: 600, relativeTo: .footnote)
+    public static let noteCount = TextStyle(.nunito, size: 13, weight: 500, relativeTo: .caption1)
     /// Retake sits on the photo, so it stops growing at 1.35x like the camera controls.
     public static let reviewRetake = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
 

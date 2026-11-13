@@ -18,13 +18,33 @@ final class ReviewModel {
 
     /// One line (Andrew, 2026-11-13: a short caption; the longer note is C08).
     static let captionLimit = 80
+    /// C08 counter: "86 / 500".
+    static let noteLimit = 500
 
     let capture: CaptureResult
+    /// The surprise this capture answers, if it was opened in time.
+    let promptID: UUID?
     /// The review's own placement: moving the window here doesn't change the camera's default.
-    var window: CameraSettings.SelfieWindow
-    var caption = "" {
-        didSet { if caption.count > Self.captionLimit { caption = String(caption.prefix(Self.captionLimit)) } }
+    var window: CameraSettings.SelfieWindow {
+        didSet { keepDraft() }
     }
+
+    var caption = "" {
+        didSet {
+            if caption.count > Self.captionLimit { caption = String(caption.prefix(Self.captionLimit)) }
+            keepDraft()
+        }
+    }
+
+    /// C08's text; empty means no note.
+    var note = "" {
+        didSet {
+            if note.count > Self.noteLimit { note = String(note.prefix(Self.noteLimit)) }
+            keepDraft()
+        }
+    }
+
+    private let drafts: ReviewDraftStore?
 
     /// Where the window's frame sits in the shown media, reported by the view; the moment is composed with it.
     var windowFrame: SelfieWindowFrame?
@@ -34,9 +54,35 @@ final class ReviewModel {
     let player = AVPlayer()
     private var endObserver: (any NSObjectProtocol)?
 
-    init(capture: CaptureResult) {
+    /// A new capture; with `drafts` it is kept on disk until saved or retaken.
+    init(capture: CaptureResult, promptID: UUID? = nil, drafts: ReviewDraftStore? = nil) {
         self.capture = capture
+        self.promptID = promptID
+        self.drafts = drafts
         window = capture.window ?? CameraSettings.SelfieWindow()
+        keepDraft()
+    }
+
+    /// The review iOS closed mid-way, as it was.
+    init(draft: ReviewDraft, drafts: ReviewDraftStore?) {
+        capture = draft.capture
+        promptID = draft.promptID
+        self.drafts = drafts
+        window = draft.window
+        caption = draft.caption
+        note = draft.note
+    }
+
+    /// Something Retake would throw away besides the capture.
+    var hasAnnotations: Bool { !note.isEmpty }
+
+    private func keepDraft() {
+        drafts?.save(ReviewDraft(capture: capture, caption: caption, note: note, window: window, promptID: promptID))
+    }
+
+    /// The pending draft is done with: the moment was saved.
+    func clearDraft() {
+        drafts?.clear()
     }
 
     var hasSelfie: Bool { capture.selfieURL != nil }
@@ -94,14 +140,15 @@ final class ReviewModel {
     }
 
     /// What Save keeps.
-    func draft(promptID: UUID?) -> MomentDraft {
-        MomentDraft(capture: capture, caption: caption, window: hasSelfie ? windowFrame : nil, promptID: promptID)
+    var momentDraft: MomentDraft {
+        MomentDraft(capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID)
     }
 
     /// Retake / Record again: nothing is kept.
     func discard() {
         stopPlayback()
         capture.discardFiles()
+        drafts?.clear()
     }
 
     /// What a saved video needs to play composed again.

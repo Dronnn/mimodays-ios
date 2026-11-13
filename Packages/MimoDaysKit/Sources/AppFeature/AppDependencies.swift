@@ -40,7 +40,8 @@ public final class AppDependencies {
         #endif
         camera = CameraServices(
             makeEngine: { @MainActor () -> any CaptureEngine in simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine() },
-            settings: configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore()
+            settings: configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore(),
+            drafts: ReviewDraftStore(root: Self.reviewRoot(configuration))
         )
         do {
             momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))
@@ -59,6 +60,14 @@ public final class AppDependencies {
             return FileManager.default.temporaryDirectory.appending(path: "UITestMedia-\(UUID().uuidString)", directoryHint: .isDirectory)
         }
         return URL.applicationSupportDirectory.appending(path: "Media", directoryHint: .isDirectory)
+    }
+
+    /// Application Support/Review; UI tests use a fresh temporary folder.
+    private static func reviewRoot(_ configuration: LaunchConfiguration) -> URL {
+        if configuration.isUITesting {
+            return FileManager.default.temporaryDirectory.appending(path: "UITestReview-\(UUID().uuidString)", directoryHint: .isDirectory)
+        }
+        return URL.applicationSupportDirectory.appending(path: "Review", directoryHint: .isDirectory)
     }
 
     /// A prompt that fired a minute ago (or 20 minutes ago, so it has expired), then a tap on it.

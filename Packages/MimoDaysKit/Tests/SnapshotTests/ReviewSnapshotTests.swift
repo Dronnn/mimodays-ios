@@ -48,6 +48,23 @@ struct ReviewSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
+    @Test func photoWithANote() async throws {
+        let model = try await review()
+        defer { model.discard() }
+        model.note = "Lena finally rode without training wheels. She shouted \"don't let go\" for the whole street"
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// C08 with the keyboard's space left out (the keyboard doesn't render in snapshots).
+    @Test func noteEditor() async throws {
+        let model = try await review()
+        defer { model.discard() }
+        model.note = "Lena finally rode without training wheels. She shouted \"don't let go\" for the whole street"
+        assertScreenSnapshots(of: NoteEditorView(model: model), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+        ])
+    }
+
     @Test func video() async throws {
         let model = try await review(video: true)
         defer { model.discard() }

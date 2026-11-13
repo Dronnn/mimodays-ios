@@ -25,7 +25,7 @@ public enum CameraSetup: Equatable, Sendable {
 }
 
 /// A photo straight from the cameras, in a temporary file until the moment is saved.
-public struct CapturedPhoto: Equatable, Sendable {
+public struct CapturedPhoto: Codable, Equatable, Sendable {
     /// The main frame: the rear camera, or whichever camera a single-camera setup used.
     public var mainURL: URL
     public var mainPosition: CameraPosition
@@ -40,7 +40,7 @@ public struct CapturedPhoto: Equatable, Sendable {
 }
 
 /// A clip with one file per camera (separate streams), in temporary files until the moment is saved.
-public struct CapturedVideo: Equatable, Sendable {
+public struct CapturedVideo: Codable, Equatable, Sendable {
     public var mainURL: URL
     public var mainPosition: CameraPosition
     public var selfieURL: URL?

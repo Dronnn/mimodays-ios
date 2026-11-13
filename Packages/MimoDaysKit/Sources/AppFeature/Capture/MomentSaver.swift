@@ -13,6 +13,8 @@ struct MomentDraft {
     var capture: CaptureResult
     /// One line; empty means no caption.
     var caption: String
+    /// C08; empty means no note.
+    var note = ""
     /// Where the selfie window sits in the shown media; nil without a selfie.
     var window: SelfieWindowFrame?
     /// The surprise this answers, if it was opened in time.
@@ -73,6 +75,8 @@ struct MomentSaver {
             )
             let caption = draft.caption.trimmingCharacters(in: .whitespacesAndNewlines)
             moment.title = caption.isEmpty ? nil : caption
+            let note = draft.note.trimmingCharacters(in: .whitespacesAndNewlines)
+            moment.note = note.isEmpty ? nil : note
             moment.pipLayout = window.map { PiPLayout($0, source: role(capture.mainPosition.other)) }
             context.insert(moment)
             moment.media = media

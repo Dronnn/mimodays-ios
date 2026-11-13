@@ -3,8 +3,8 @@ import Foundation
 import Observation
 
 /// What the camera hands on to review (C07).
-struct CaptureResult: Equatable, Sendable {
-    enum Media: Equatable, Sendable {
+struct CaptureResult: Codable, Equatable, Sendable {
+    enum Media: Codable, Equatable, Sendable {
         case photo(CapturedPhoto)
         case video(CapturedVideo)
     }

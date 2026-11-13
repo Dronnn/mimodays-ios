@@ -120,7 +120,7 @@ struct CameraView: View {
         }
     }
 
-    private static let previewSpace = "preview"
+    private nonisolated static let previewSpace = "preview"
 
     /// The selfie window at its corner; while it is dragged or the C04 sheet is open, the four corners show as
     /// targets with the one it will land on in coral.

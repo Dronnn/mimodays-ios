@@ -1,12 +1,12 @@
 import Core
-import DesignSystem
+import CoreImage
 import Foundation
 import ImageIO
 import UIKit
 import UniformTypeIdentifiers
 
 /// Where the selfie window's frame (without its handle) sat in the preview when the shutter fired.
-struct SelfieWindowFrame: Equatable, Sendable {
+struct SelfieWindowFrame: Codable, Equatable, Sendable {
     var frame: CGRect
     var preview: CGSize
 }
@@ -41,35 +41,13 @@ enum PhotoComposer {
     }
 
     static func compose(main: CGImage, selfie: CGImage, window: SelfieWindowFrame) -> CGImage {
-        let size = CGSize(width: main.width, height: main.height)
-        let (rect, scale) = placement(of: window, in: size)
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        format.opaque = true
-        let image = UIGraphicsImageRenderer(size: size, format: format).image { context in
-            UIImage(cgImage: main).draw(in: CGRect(origin: .zero, size: size))
-            let cg = context.cgContext
-            // Same as the live window (`SelfiePreviewWindow`): 22 pt corners, 4 pt cream border, -5.4°, shadow.
-            cg.translateBy(x: rect.midX, y: rect.midY)
-            cg.rotate(by: Size.selfieWindowTilt.radians)
-            let outer = CGRect(x: -rect.width / 2, y: -rect.height / 2, width: rect.width, height: rect.height)
-            cg.saveGState()
-            cg.setShadow(offset: CGSize(width: 0, height: 4 * scale), blur: 14 * scale, color: UIColor.black.withAlphaComponent(0.22).cgColor)
-            UIColor(red: 0xFB / 255, green: 0xF6 / 255, blue: 0xEF / 255, alpha: 1).setFill()
-            UIBezierPath(roundedRect: outer, cornerRadius: 22 * scale).fill()
-            cg.restoreGState()
-            let inner = outer.insetBy(dx: 4 * scale, dy: 4 * scale)
-            UIBezierPath(roundedRect: inner, cornerRadius: 18 * scale).addClip()
-            UIImage(cgImage: selfie).draw(in: aspectFill(CGSize(width: selfie.width, height: selfie.height), in: inner))
-        }
-        return image.cgImage ?? main
+        let canvas = CGSize(width: main.width, height: main.height)
+        let art = SelfieWindowArt(window: window, canvas: canvas)
+        let image = art.compose(main: CIImage(cgImage: main), selfie: CIImage(cgImage: selfie))
+        return context.createCGImage(image, from: CGRect(origin: .zero, size: canvas), format: .RGBA8, colorSpace: CGColorSpace(name: CGColorSpace.sRGB)) ?? main
     }
 
-    private static func aspectFill(_ size: CGSize, in rect: CGRect) -> CGRect {
-        let scale = max(rect.width / size.width, rect.height / size.height)
-        let fitted = CGSize(width: size.width * scale, height: size.height * scale)
-        return CGRect(x: rect.midX - fitted.width / 2, y: rect.midY - fitted.height / 2, width: fitted.width, height: fitted.height)
-    }
+    private static let context = CIContext(options: [.cacheIntermediates: false])
 
     /// The full-size image with its EXIF orientation applied.
     private static func uprightImage(_ url: URL) -> CGImage? {

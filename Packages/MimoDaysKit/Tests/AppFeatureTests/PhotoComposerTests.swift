@@ -43,7 +43,7 @@ struct PhotoComposerTests {
         await model.start()
         model.selfieWindowFrame = window
         await model.shutter()
-        guard case let .photo(photo, composedURL) = try #require(results.first) else { Issue.record("not a photo"); return }
+        guard case let .photo(photo, _, composedURL) = try #require(results.first) else { Issue.record("not a photo"); return }
         #expect(photo.selfieURL != nil)
         let url = try #require(composedURL)
         let source = try #require(CGImageSourceCreateWithURL(url as CFURL, nil))
@@ -65,7 +65,7 @@ struct PhotoComposerTests {
         model.selfieWindowFrame = window
         model.toggleSelfie()
         await model.shutter()
-        guard case let .photo(photo, composedURL) = try #require(results.first) else { Issue.record("not a photo"); return }
+        guard case let .photo(photo, _, composedURL) = try #require(results.first) else { Issue.record("not a photo"); return }
         #expect(photo.selfieURL == nil)
         #expect(composedURL == nil)
         results.first?.discardFiles()

@@ -5,9 +5,11 @@ import os
 
 /// What the camera hands on: Review (C07) takes it from here.
 enum CaptureResult: Equatable, Sendable {
-    /// `composedURL`: the photo with the selfie window baked in, when there is a selfie and composing worked.
-    case photo(CapturedPhoto, composedURL: URL?)
-    case video(CapturedVideo)
+    /// `window`: where the selfie window was (nil without a selfie). `composedURL`: the photo with the selfie
+    /// window baked in, when composing worked.
+    case photo(CapturedPhoto, window: SelfieWindowFrame?, composedURL: URL?)
+    /// Played back composed with `VideoComposer` from the files and `window`.
+    case video(CapturedVideo, window: SelfieWindowFrame?)
 }
 
 /// The camera screen's state (C01-C05): engine setup, mode, controls and recording.
@@ -149,10 +151,11 @@ final class CameraModel {
         phase = .busy
         showsSingleCameraNote = false
         do {
+            let window = selfieWindowFrame
             let photo = arranged(try await engine.capturePhoto(flash: isFlashOn, silent: !settings.cameraSounds))
-            let composedURL = await composed(photo)
+            let composedURL = await composed(photo, window: window)
             phase = .ready
-            onCapture(.photo(photo, composedURL: composedURL))
+            onCapture(.photo(photo, window: photo.selfieURL == nil ? nil : window, composedURL: composedURL))
         } catch {
             phase = .ready
         }
@@ -161,10 +164,12 @@ final class CameraModel {
     private func record() async {
         phase = .recording(startedAt: clock.now())
         showsSingleCameraNote = false
+        // The window can't move while recording; this is where it is for the whole clip.
+        let window = selfieWindowFrame
         do {
-            let video = try await engine.record(limit: settings.videoLength.duration)
+            let video = arranged(try await engine.record(limit: settings.videoLength.duration))
             phase = .ready
-            onCapture(.video(arranged(video)))
+            onCapture(.video(video, window: video.selfieURL == nil ? nil : window))
         } catch {
             phase = .ready
         }
@@ -184,10 +189,10 @@ final class CameraModel {
     }
 
     /// The sources are what counts: if composing fails the photo is still kept, without a composite.
-    private func composed(_ photo: CapturedPhoto) async -> URL? {
-        guard let selfieURL = photo.selfieURL, let selfieWindowFrame else { return nil }
+    private func composed(_ photo: CapturedPhoto, window: SelfieWindowFrame?) async -> URL? {
+        guard let selfieURL = photo.selfieURL, let window else { return nil }
         do {
-            return try await PhotoComposer.compose(mainURL: photo.mainURL, selfieURL: selfieURL, window: selfieWindowFrame)
+            return try await PhotoComposer.compose(mainURL: photo.mainURL, selfieURL: selfieURL, window: window)
         } catch {
             Logger(subsystem: "MimoDays", category: "Camera").error("Composing the photo failed: \(String(describing: error), privacy: .public)")
             return nil

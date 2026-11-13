@@ -55,6 +55,33 @@ final class SurpriseCoordinator {
         await serially { await self.performRefresh(replan: true) }
     }
 
+    // MARK: Pause
+
+    /// Pauses quietly: no countdown, no resend of what was skipped (doc 01). Calendar days
+    /// (Andrew, 2026-11-13): `.today` lasts until tonight's midnight, `.week` until midnight seven days from today.
+    func pause(_ length: SurprisePause) async {
+        await serially {
+            guard let schedule = self.fetchSchedule() else { return }
+            let calendar = self.calendar(for: schedule)
+            let today = calendar.startOfDay(for: self.clock.now())
+            switch length {
+            case .today: schedule.pausedUntil = calendar.date(byAdding: .day, value: 1, to: today)
+            case .week: schedule.pausedUntil = calendar.date(byAdding: .day, value: 7, to: today)
+            case .indefinitely: schedule.isPausedIndefinitely = true
+            }
+            await self.performRefresh(replan: false)
+        }
+    }
+
+    func resume() async {
+        await serially {
+            guard let schedule = self.fetchSchedule() else { return }
+            schedule.pausedUntil = nil
+            schedule.isPausedIndefinitely = false
+            await self.performRefresh(replan: false)
+        }
+    }
+
     // MARK: Prompt lifecycle
 
     /// A notification tap (or Today) opening a prompt. True while it can still be answered as a surprise:
@@ -99,6 +126,7 @@ final class SurpriseCoordinator {
         let status = await permissions.status(of: .notifications)
         let now = clock.now()
         let schedule = fetchSchedule()
+        if let pausedUntil = schedule?.pausedUntil, pausedUntil <= now { schedule?.pausedUntil = nil }
         let calendar = calendar(for: schedule)
         let prompts = fetchRecentPrompts(now: now, calendar: calendar)
 
@@ -221,6 +249,12 @@ final class SurpriseCoordinator {
             logger.error("Saving surprises failed: \(error.localizedDescription, privacy: .public)")
         }
     }
+}
+
+enum SurprisePause: CaseIterable, Sendable {
+    case today
+    case week
+    case indefinitely
 }
 
 extension SurpriseSchedule {

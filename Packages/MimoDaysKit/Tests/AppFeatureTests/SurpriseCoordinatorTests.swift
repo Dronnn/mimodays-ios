@@ -239,6 +239,60 @@ struct SurpriseCoordinatorTests {
         #expect(await notifications.pending().allSatisfy { $0.fireDate >= resume })
     }
 
+    @Test func pausingForTodayResumesTomorrowMorning() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        await coordinator.pause(.today)
+        let tomorrow = date("2026-11-12 00:00")
+        #expect(schedule.pausedUntil == tomorrow)
+        let upcoming = try prompts(.pending)
+        // Today's surprise is dropped; the two weeks now start tomorrow.
+        #expect(upcoming.count == 14)
+        #expect(upcoming.allSatisfy { $0.plannedAt >= tomorrow })
+        #expect(await notifications.pending().map(\.id) == upcoming.map(\.notificationRequestID))
+    }
+
+    @Test func pausingForAWeekSkipsSevenCalendarDays() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        await coordinator.pause(.week)
+        let end = date("2026-11-18 00:00")
+        #expect(schedule.pausedUntil == end)
+        #expect(try prompts(.pending).allSatisfy { $0.plannedAt >= end })
+        #expect(await notifications.pending().allSatisfy { $0.fireDate >= end })
+    }
+
+    @Test func anIndefinitePauseLastsUntilResumed() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        await coordinator.pause(.indefinitely)
+        clock.advance(by: 30 * 24 * 3600)
+        await coordinator.refresh()
+        #expect(try prompts(.pending).isEmpty)
+        #expect(await notifications.pending().isEmpty)
+        await coordinator.resume()
+        #expect(!schedule.isPausedIndefinitely)
+        #expect(try prompts(.pending).count == 14)
+        #expect(await notifications.pending().count == 14)
+    }
+
+    @Test func resumingEarlyPlansTodayAgain() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        await coordinator.pause(.today)
+        await coordinator.resume()
+        #expect(schedule.pausedUntil == nil)
+        #expect(try prompts(.pending).contains { device.calendar.isDate($0.plannedAt, inSameDayAs: date("2026-11-11 12:00")) })
+    }
+
+    @Test func aPauseThatEndedIsCleared() async {
+        let coordinator = coordinator()
+        await coordinator.pause(.today)
+        clock.set(date("2026-11-12 07:00"))
+        await coordinator.refresh()
+        #expect(schedule.pausedUntil == nil)
+    }
+
     // MARK: Changes
 
     @Test func newSettingsReplaceTheFuturePlan() async throws {

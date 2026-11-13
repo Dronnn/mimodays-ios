@@ -1,32 +1,19 @@
-//
-//  MimoDaysApp.swift
-//  MimoDays
-//
-//  Created by andreas maier on 11.11.2026.
-//
-
+import AppFeature
+import Core
 import SwiftUI
-import SwiftData
+import UIKit
 
 @main
 struct MimoDaysApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+    init() {
+        if LaunchConfiguration().isUITesting {
+            UIView.setAnimationsEnabled(false)
         }
-    }()
+    }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
-        .modelContainer(sharedModelContainer)
     }
 }

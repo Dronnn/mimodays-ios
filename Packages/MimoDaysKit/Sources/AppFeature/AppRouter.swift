@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import Foundation
 import Observation
@@ -82,7 +83,7 @@ public final class AppRouter {
 
     public static let urlScheme = "mimodays"
     /// Key in a surprise notification's `userInfo`.
-    public static let promptIDKey = "promptID"
+    public static let promptIDKey = SurpriseNotification.promptIDKey
 
     /// `mimodays://capture?prompt=<uuid>`, `mimodays://settings`, `mimodays://today` (and the other tabs).
     public static func route(from url: URL) -> Route? {

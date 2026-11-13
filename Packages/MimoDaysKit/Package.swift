@@ -31,7 +31,7 @@ let package = Package(
         // Unit tests, one target per module.
         .testTarget(name: "CoreTests", dependencies: ["Core", "TestSupport"]),
         .testTarget(name: "DesignSystemTests", dependencies: ["DesignSystem"]),
-        .testTarget(name: "AppFeatureTests", dependencies: ["AppFeature"]),
+        .testTarget(name: "AppFeatureTests", dependencies: ["AppFeature", "TestSupport"]),
         // Integration tests: in-memory SwiftData + temporary file store.
         .testTarget(name: "IntegrationTests", dependencies: ["Core", "Persistence", "TestSupport"]),
         // Screen snapshots: light/dark, iPhone regular/compact, iPad, AX3.

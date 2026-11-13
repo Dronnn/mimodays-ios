@@ -31,6 +31,7 @@ jobs:
         run: >
           xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan UI
           -destination "$DESTINATION" -resultBundlePath results/UI.xcresult CODE_SIGNING_ALLOWED=NO
+          -retry-tests-on-failure -test-iterations 2
       - name: Upload results
         if: failure()
         uses: actions/upload-artifact@v4

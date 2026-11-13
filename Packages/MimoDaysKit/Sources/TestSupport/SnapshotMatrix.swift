@@ -93,7 +93,8 @@ public func assertScreenSnapshots(
         )
         assertSnapshot(
             of: controller,
-            as: .image(on: variant.config, precision: 0.995, perceptualPrecision: 0.98),
+            // 1x keeps reference images small in git (Andrew, 2026-11-13); layout and colour regressions still show.
+            as: .image(on: variant.config, precision: 0.995, perceptualPrecision: 0.98, traits: UITraitCollection(displayScale: 1)),
             named: variant.name,
             fileID: fileID,
             file: filePath,

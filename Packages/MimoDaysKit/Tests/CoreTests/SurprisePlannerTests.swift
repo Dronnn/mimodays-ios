@@ -106,6 +106,19 @@ struct SurprisePlannerTests {
         #expect(draw(Self.rules(.daily(2)), now: morning, seed: 7) != draw(Self.rules(.daily(2)), now: morning, seed: 8))
     }
 
+    /// Over many seeds a daily surprise lands in every hour of the window, none far more often than the rest.
+    @Test func dailyTimesSpreadOverTheWholeWindow() {
+        var perHour = [Int: Int]()
+        for seed in UInt64(1)...300 {
+            for time in draw(Self.rules(.daily(1)), now: morning, seed: seed) {
+                perHour[Self.minute(of: time, calendar) / 60, default: 0] += 1
+            }
+        }
+        #expect(Set(perHour.keys).isSuperset(of: 8..<22))
+        let expected = Double(300 * 14) / 14 // 14 hours in the window
+        #expect(perHour.filter { (8..<22).contains($0.key) }.values.allSatisfy { Double($0) > expected * 0.7 && Double($0) < expected * 1.3 })
+    }
+
     // MARK: Weekly
 
     @Test(arguments: 1...20)
@@ -118,6 +131,19 @@ struct SurprisePlannerTests {
             #expect(week.count == 3)
             #expect(Set(week.map { calendar.startOfDay(for: $0) }).count == 3)
         }
+    }
+
+    @Test func threeAWeekUsesEveryEnabledDayAlike() {
+        let monday = Self.date("2026-11-09 06:00", in: calendar)
+        var perWeekday = [Int: Int]()
+        for seed in UInt64(1)...300 {
+            for time in draw(Self.rules(.weekly(3)), now: monday, seed: seed) {
+                perWeekday[calendar.component(.weekday, from: time), default: 0] += 1
+            }
+        }
+        let expected = Double(300 * 2 * 3) / 7
+        #expect(perWeekday.count == 7)
+        #expect(perWeekday.values.allSatisfy { Double($0) > expected * 0.75 && Double($0) < expected * 1.25 })
     }
 
     @Test func weeksFollowTheCalendarsFirstWeekday() {

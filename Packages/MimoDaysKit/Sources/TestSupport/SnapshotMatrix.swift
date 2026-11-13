@@ -37,22 +37,29 @@ public struct SnapshotVariant: Sendable {
     public var device: SnapshotDevice
     public var style: UIUserInterfaceStyle
     public var contentSize: UIContentSizeCategory
+    /// Right-to-left layout (Arabic, Hebrew) with the English strings.
+    public var isRightToLeft: Bool
 
-    public init(_ device: SnapshotDevice, _ style: UIUserInterfaceStyle, _ contentSize: UIContentSizeCategory = .large) {
+    public init(
+        _ device: SnapshotDevice, _ style: UIUserInterfaceStyle, _ contentSize: UIContentSizeCategory = .large,
+        rightToLeft: Bool = false
+    ) {
         self.device = device
         self.style = style
         self.contentSize = contentSize
+        isRightToLeft = rightToLeft
     }
 
-    /// Every device in light and dark, plus iPhone at a large accessibility text size.
+    /// Every device in light and dark, iPhone at a large accessibility text size, and iPhone right-to-left.
     public static let standard: [SnapshotVariant] =
         SnapshotDevice.allCases.flatMap { [SnapshotVariant($0, .light), SnapshotVariant($0, .dark)] }
         + [SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .dark, .accessibilityExtraLarge)]
+        + [SnapshotVariant(.iPhone, .light, rightToLeft: true)]
 
     var name: String {
         let styleName = style == .dark ? "dark" : "light"
         let sizeName = contentSize == .large ? "default" : "AX3"
-        return "\(device.rawValue)-\(styleName)-\(sizeName)"
+        return "\(device.rawValue)-\(styleName)-\(sizeName)" + (isRightToLeft ? "-rtl" : "")
     }
 
     @MainActor var config: ViewImageConfig {
@@ -62,6 +69,7 @@ public struct SnapshotVariant: Sendable {
             traits.userInterfaceIdiom = device.isPad ? .pad : .phone
             traits.horizontalSizeClass = device.isPad ? .regular : .compact
             traits.verticalSizeClass = .regular
+            traits.layoutDirection = isRightToLeft ? .rightToLeft : .leftToRight
         }
         return ViewImageConfig(safeArea: device.safeArea, size: device.size, traits: traits)
     }
@@ -80,7 +88,9 @@ public func assertScreenSnapshots(
     column: UInt = #column
 ) {
     for variant in variants {
-        let controller = UIHostingController(rootView: view)
+        let controller = UIHostingController(
+            rootView: view.environment(\.layoutDirection, variant.isRightToLeft ? .rightToLeft : .leftToRight)
+        )
         assertSnapshot(
             of: controller,
             as: .image(on: variant.config, precision: 0.995, perceptualPrecision: 0.98),

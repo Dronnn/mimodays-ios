@@ -37,7 +37,8 @@ struct DesignSystemTests {
         #expect(hero.scaledSize(for: .large) == hero.size)
     }
 
-    @Test(arguments: ColorToken.allCases)
+    // UIColor(Color) uses a SwiftUI cache that is not thread-safe; parallel cases crashed off the main actor.
+    @MainActor @Test(arguments: ColorToken.allCases)
     func everyTokenResolvesInBothAppearances(token: ColorToken) {
         let color = UIColor(token.color)
         let light = color.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))

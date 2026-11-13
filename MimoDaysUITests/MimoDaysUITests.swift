@@ -10,34 +10,39 @@ final class MimoDaysUITests: XCTestCase {
         app.launchArguments = LaunchConfiguration(isUITesting: true, skipsOnboarding: true, seed: .empty).arguments
     }
 
+    /// System tab bar buttons by position (Today, Memories, Map, Movies); identifiers don't reach them.
+    private func tab(_ index: Int) -> XCUIElement {
+        app.tabBars.firstMatch.buttons.element(boundBy: index)
+    }
+
     @MainActor
     func testLaunchesOnToday() {
         app.launch()
         XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["tab.today"].isSelected)
+        XCTAssertTrue(tab(0).isSelected)
     }
 
     @MainActor
     func testSwitchesTabs() {
         app.launch()
-        for tab in ["memories", "map", "movies", "today"] {
-            let button = app.buttons["tab.\(tab)"]
-            XCTAssertTrue(button.waitForExistence(timeout: 5))
-            button.tap()
-            XCTAssertTrue(button.isSelected, "tab \(tab) not selected")
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.tabBars.firstMatch.buttons.count, 4)
+        for index in [1, 2, 3, 0] {
+            tab(index).tap()
+            XCTAssertTrue(tab(index).isSelected, "tab \(index) not selected")
         }
     }
 
     @MainActor
     func testOpensAndClosesSettings() {
         app.launch()
-        app.buttons["tab.map"].tap()
+        tab(2).tap()
         app.buttons["settings"].firstMatch.tap()
         let done = app.buttons["settings.done"]
         XCTAssertTrue(done.waitForExistence(timeout: 5))
         done.tap()
         XCTAssertTrue(done.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["tab.map"].isSelected)
+        XCTAssertTrue(tab(2).isSelected)
     }
 
     @MainActor

@@ -1,3 +1,4 @@
+import DesignSystem
 import Foundation
 import Observation
 
@@ -6,6 +7,24 @@ public enum MainTab: String, CaseIterable, Hashable, Sendable {
     case memories
     case map
     case movies
+
+    var title: LocalizedStringResource {
+        switch self {
+        case .today: LocalizedStringResource("Today", bundle: .atURL(Bundle.module.bundleURL))
+        case .memories: LocalizedStringResource("Memories", bundle: .atURL(Bundle.module.bundleURL))
+        case .map: LocalizedStringResource("Map", bundle: .atURL(Bundle.module.bundleURL))
+        case .movies: LocalizedStringResource("Movies", bundle: .atURL(Bundle.module.bundleURL))
+        }
+    }
+
+    var icon: Icon {
+        switch self {
+        case .today: .tabToday
+        case .memories: .tabMemories
+        case .map: .tabMap
+        case .movies: .tabMovies
+        }
+    }
 }
 
 /// Where the app can be sent from outside: a notification, a link, or a UI test.

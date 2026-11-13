@@ -2,10 +2,9 @@ import DesignSystem
 import SwiftUI
 
 /// App shell: four tabs, Settings from the gear on every tab root, Capture on Today.
-/// iPhone uses the design's tab bar; iPad uses the system floating tab bar / sidebar.
+/// System tab bar on iPhone; floating tab bar / sidebar on iPad.
 public struct RootView: View {
     @State private var router: AppRouter
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     public init(router: AppRouter = AppRouter()) {
         _router = State(initialValue: router)
@@ -13,14 +12,12 @@ public struct RootView: View {
 
     public var body: some View {
         @Bindable var router = router
-        let isCompact = horizontalSizeClass != .regular
         TabView(selection: $router.selectedTab) {
             ForEach(MainTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
                     NavigationStack {
                         TabRootView(tab: tab)
                     }
-                    .toolbar(isCompact ? .hidden : .automatic, for: .tabBar)
                 } label: {
                     Label { Text(tab.title) } icon: { tab.icon.image }
                 }
@@ -28,11 +25,6 @@ public struct RootView: View {
         }
         .tabViewStyle(.sidebarAdaptable)
         .tint(ColorToken.textLink.color)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if isCompact {
-                MimoTabBar(selection: $router.selectedTab)
-            }
-        }
         .sheet(isPresented: $router.isSettingsPresented) {
             SettingsPlaceholderView()
         }

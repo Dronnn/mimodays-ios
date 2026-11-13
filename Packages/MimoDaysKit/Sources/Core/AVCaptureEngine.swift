@@ -110,7 +110,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     // MARK: Photo
 
-    public func capturePhoto(flash: Bool) async throws -> CapturedPhoto {
+    public func capturePhoto(flash: Bool, silent: Bool) async throws -> CapturedPhoto {
         try await withCheckedThrowingContinuation { continuation in
             queue.async {
                 guard let setup = self.setup, self.session.isRunning else {
@@ -124,6 +124,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     let settings = hevc ? AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc]) : AVCapturePhotoSettings()
                     settings.maxPhotoDimensions = output.maxPhotoDimensions
                     if flash, position == .back, output.supportedFlashModes.contains(.on) { settings.flashMode = .on }
+                    if silent, output.isShutterSoundSuppressionSupported { settings.isShutterSoundSuppressionEnabled = true }
                     output.capturePhoto(with: settings, delegate: batch.delegate(for: position, fileExtension: hevc ? "heic" : "jpg"))
                 }
             }

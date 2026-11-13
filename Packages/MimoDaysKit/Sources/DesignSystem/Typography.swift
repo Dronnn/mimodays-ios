@@ -72,6 +72,11 @@ public struct TextStyle: Equatable, Sendable {
     public static let labelCaps = TextStyle(.inter, size: 11.5, weight: 600, tracking: 2.2, isUppercase: true, relativeTo: .caption2)
     /// Captions, notes and ribbons only; never body text or actions.
     public static let hand = TextStyle(.patrickHand, size: 17, relativeTo: .callout)
+    // Camera (C01-C05): controls sit on a fixed layout, so they stop growing at 1.35x.
+    public static let cameraMode = TextStyle(.nunito, size: 13, weight: 800, tracking: 1.5, isUppercase: true, relativeTo: .caption1, maximumScale: 1.35)
+    public static let cameraChip = TextStyle(.nunito, size: 13, weight: 700, relativeTo: .caption1, maximumScale: 1.35)
+    public static let cameraTimer = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
+    public static let cameraNote = TextStyle(.nunito, size: 14, weight: 500, lineHeight: 1.2, relativeTo: .footnote)
 
     public static let all: [(name: String, style: TextStyle)] = [
         ("display.hero", .displayHero), ("display.title", .displayTitle), ("display.headline", .displayHeadline),

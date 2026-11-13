@@ -12,6 +12,7 @@ public struct RootView: View {
     private let permissions: any PermissionService
     private let surprises: SurpriseCoordinator
     private let notificationTaps: SurpriseNotificationHandler
+    private let camera: CameraServices
     @Environment(\.scenePhase) private var scenePhase
 
     public init(router: AppRouter = AppRouter(), dependencies: AppDependencies) {
@@ -20,6 +21,7 @@ public struct RootView: View {
         let surprises = dependencies.surprises
         self.surprises = surprises
         notificationTaps = dependencies.notificationTaps
+        camera = dependencies.camera
         let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
         let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
@@ -38,6 +40,7 @@ public struct RootView: View {
         }
         .environment(router)
         .environment(\.permissions, permissions)
+        .environment(\.camera, camera)
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)
@@ -168,20 +171,24 @@ struct SettingsPlaceholderView: View {
 /// Camera access first (C06 explainer → system prompt, or C13a when it's off), then the camera.
 struct CaptureFlowView: View {
     let request: CaptureRequest
+    /// Review (C07) takes the capture from here in Phase 7; until then it is discarded.
+    var onCapture: @MainActor (CaptureResult) -> Void = { $0.discardFiles() }
     @Environment(\.permissions) private var permissions
+    @Environment(\.camera) private var services
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @State private var step: CameraAccessStep?
+    @State private var camera: CameraModel?
 
     var body: some View {
         Group {
             switch step {
             case nil:
-                ColorToken.canvas.color.ignoresSafeArea()
+                CameraPalette.background.ignoresSafeArea()
             case .explain:
                 PermissionExplainerView(screen: .camera) {
-                    Task { step = CameraAccessStep(await permissions.request(.camera)) }
+                    Task { show(CameraAccessStep(await permissions.request(.camera))) }
                 } secondary: {
                     dismiss()
                 }
@@ -192,7 +199,11 @@ struct CaptureFlowView: View {
                     dismiss()
                 }
             case .camera:
-                CapturePlaceholderView(request: request)
+                if let camera {
+                    CameraView(model: camera) { dismiss() }
+                } else {
+                    CameraPalette.background.ignoresSafeArea()
+                }
             }
         }
         .task { await refresh() }
@@ -203,38 +214,19 @@ struct CaptureFlowView: View {
     }
 
     private func refresh() async {
-        step = CameraAccessStep(await permissions.status(of: .camera))
+        show(CameraAccessStep(await permissions.status(of: .camera)))
     }
-}
 
-struct CapturePlaceholderView: View {
-    let request: CaptureRequest
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        ZStack(alignment: .topLeading) {
-            Color.black.ignoresSafeArea()
-            Button { dismiss() } label: {
-                Text("Close", bundle: .module)
-                    .textStyle(.control)
-                    .foregroundStyle(.white)
-                    .frame(minWidth: Size.minimumTapTarget, minHeight: Size.minimumTapTarget)
-            }
-            .padding(Spacing.screenMargin)
-            .accessibilityIdentifier("capture.close")
-            if request.isSurprise {
-                Text("A little surprise", bundle: .module)
-                    .textStyle(.hand)
-                    .foregroundStyle(ColorToken.textPrimary.color)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 6)
-                    .background(ColorToken.accentMint.color, in: Capsule())
-                    .accessibilityIdentifier("camera.surprise")
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 70)
-            }
+    private func show(_ step: CameraAccessStep) {
+        self.step = step
+        if step == .camera, camera == nil {
+            let services = services ?? .simulated
+            let permissions = permissions
+            camera = CameraModel(
+                engine: services.makeEngine(), store: services.settings, isSurprise: request.isSurprise,
+                microphoneAllowed: { await permissions.status(of: .microphone).isUsable },
+                onCapture: onCapture
+            )
         }
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("camera")
     }
 }

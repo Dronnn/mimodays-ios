@@ -51,7 +51,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         hasMicrophone = enabled
     }
 
-    public func capturePhoto(flash _: Bool) throws -> CapturedPhoto {
+    public func capturePhoto(flash _: Bool, silent _: Bool) throws -> CapturedPhoto {
         guard isRunning, let setup else { throw CaptureError.notRunning }
         let urls = try setup.positions.map { position in
             let url = try Self.temporaryURL("jpg")

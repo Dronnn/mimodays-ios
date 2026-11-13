@@ -11,6 +11,7 @@ public final class AppDependencies {
     let skipsOnboarding: Bool
     let surprises: SurpriseCoordinator
     let notificationTaps = SurpriseNotificationHandler()
+    let camera: CameraServices
 
     public init(configuration: LaunchConfiguration = LaunchConfiguration()) {
         do {
@@ -30,6 +31,16 @@ public final class AppDependencies {
         let notifications: any NotificationScheduler = configuration.isUITesting
             ? InMemoryNotificationScheduler() : SystemNotificationScheduler()
         surprises = SurpriseCoordinator(context: modelContainer.mainContext, notifications: notifications, permissions: permissions)
+        // The simulator has no cameras; UI tests can ask for the simulated one on devices too.
+        #if targetEnvironment(simulator)
+        let simulatedCamera = true
+        #else
+        let simulatedCamera = configuration.usesFakeCamera
+        #endif
+        camera = CameraServices(
+            makeEngine: { @MainActor () -> any CaptureEngine in simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine() },
+            settings: configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore()
+        )
         UNUserNotificationCenter.current().delegate = notificationTaps
         if configuration.isUITesting, let tap = configuration.surpriseTap {
             simulate(tap)

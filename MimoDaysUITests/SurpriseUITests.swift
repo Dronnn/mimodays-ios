@@ -21,7 +21,7 @@ final class SurpriseUITests: XCTestCase {
     func testTapInTimeOpensTheSurpriseCamera() {
         let app = launch(tap: .inTime)
         XCTAssertTrue(app.otherElements["camera"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["camera.surprise"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["camera.surprise"].exists)
         // Not now: closing is safe and lands on Today.
         app.buttons["capture.close"].tap()
         XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
@@ -32,6 +32,6 @@ final class SurpriseUITests: XCTestCase {
     func testTapAfterExpiryOpensAPlainCamera() {
         let app = launch(tap: .expired)
         XCTAssertTrue(app.otherElements["camera"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["camera.surprise"].exists)
+        XCTAssertFalse(app.descendants(matching: .any)["camera.surprise"].exists)
     }
 }

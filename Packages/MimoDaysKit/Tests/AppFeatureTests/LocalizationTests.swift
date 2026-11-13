@@ -15,6 +15,10 @@ struct LocalizationTests {
         "Open iOS Settings", "Ready for your first little moment?", "Try the camera. Save the photo or video only if you like it.",
         "Capture my first moment", "I'll do it later", "Your first moment is here.",
         "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.", "View my moments", "Today, %@",
+        "Camera settings", "Flash", "Sound", "Selfie window", "On", "Off", "Switch camera", "Take photo", "Record video",
+        "Stop recording", "Recording", "Tap to stop",
+        "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.",
+        "Opens in", "Video length", "Record sound", "Camera sounds", "Camera", "Photo", "Video",
     ]
 
     private static var resourceKeys: [String] {
@@ -22,6 +26,7 @@ struct LocalizationTests {
             + PermissionScreen.allCases.flatMap { [$0.title, $0.message, $0.primaryAction, $0.secondaryAction] }
             + OnboardingPage.allCases.flatMap { [$0.title, $0.message, $0.primaryAction] }
             + SurpriseFrequency.allCases.map(\.label)
+            + CameraSettings.VideoLength.allCases.map(\.settingsLabel)
             + SurpriseFrequency.allCases.map { frequency in
                 var schedule = ReminderSchedule()
                 schedule.frequency = frequency

@@ -1,7 +1,18 @@
 {
   "sourceLanguage": "en",
-  "version": "1.0",
   "strings": {
+    "%lld s": {
+      "comment": "Camera settings: video length option in seconds, e.g. 10 s",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld s"
+          }
+        }
+      }
+    },
     "3 a day": {
       "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
       "extractionState": "manual",
@@ -110,6 +121,42 @@
         }
       }
     },
+    "Camera": {
+      "comment": "Camera settings sheet: title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera"
+          }
+        }
+      }
+    },
+    "Camera settings": {
+      "comment": "Camera (C01): accessibility label of the ••• button that opens the camera settings sheet",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera settings"
+          }
+        }
+      }
+    },
+    "Camera sounds": {
+      "comment": "Camera settings: toggle, play the shutter sound where iOS allows turning it off",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera sounds"
+          }
+        }
+      }
+    },
     "Capture": {
       "comment": "Accessibility label of the big camera button on Today",
       "extractionState": "manual",
@@ -214,6 +261,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Find your memories by date or place. Turn a month, a year, or any part of your life into a movie made from real, little moments."
+          }
+        }
+      }
+    },
+    "Flash": {
+      "comment": "Camera (C01): accessibility label of the flash button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flash"
           }
         }
       }
@@ -374,6 +433,30 @@
         }
       }
     },
+    "Off": {
+      "comment": "Camera: accessibility value of a switched-off control (flash, sound, selfie window)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        }
+      }
+    },
+    "On": {
+      "comment": "Camera: accessibility value of a switched-on control (flash, sound, selfie window)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
+          }
+        }
+      }
+    },
     "On these days": {
       "comment": "Surprise schedule (onboarding O07): section label above the weekday circles, shown in capitals",
       "extractionState": "manual",
@@ -446,6 +529,18 @@
         }
       }
     },
+    "Opens in": {
+      "comment": "Camera settings: section title, which mode the camera opens in (Photo/Video)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens in"
+          }
+        }
+      }
+    },
     "Page %lld of %lld": {
       "comment": "VoiceOver label of the onboarding progress dots, e.g. Page 2 of 6",
       "extractionState": "manual",
@@ -454,6 +549,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Page %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Photo": {
+      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo"
           }
         }
       }
@@ -482,6 +589,30 @@
         }
       }
     },
+    "Record sound": {
+      "comment": "Camera settings: toggle, record microphone sound with videos",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record sound"
+          }
+        }
+      }
+    },
+    "Record video": {
+      "comment": "Camera (C02): accessibility label of the shutter in video mode",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record video"
+          }
+        }
+      }
+    },
     "Record without sound": {
       "comment": "C06c: skip the microphone and record silent videos",
       "extractionState": "manual",
@@ -494,6 +625,18 @@
         }
       }
     },
+    "Recording": {
+      "comment": "Camera (C03): accessibility label of the timer pill; its value is elapsed / limit",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording"
+          }
+        }
+      }
+    },
     "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional.": {
       "comment": "OB-04 body",
       "extractionState": "manual",
@@ -502,6 +645,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional."
+          }
+        }
+      }
+    },
+    "Selfie window": {
+      "comment": "Camera (C01): accessibility label of the button that shows or hides the front-camera window",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selfie window"
           }
         }
       }
@@ -554,6 +709,18 @@
         }
       }
     },
+    "Sound": {
+      "comment": "Camera (C02): accessibility label of the microphone on/off button in video mode",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sound"
+          }
+        }
+      }
+    },
     "Spring": {
       "comment": "Season label under a sample movie clip",
       "extractionState": "manual",
@@ -562,6 +729,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Spring"
+          }
+        }
+      }
+    },
+    "Stop recording": {
+      "comment": "Camera (C03): accessibility label of the stop button while recording",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop recording"
           }
         }
       }
@@ -586,6 +765,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "Surprises only arrive between these times. Focus modes still apply."
+          }
+        }
+      }
+    },
+    "Switch camera": {
+      "comment": "Camera (C01): accessibility label of ↻; swaps the big camera, or switches cameras on single-camera iPhones",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch camera"
+          }
+        }
+      }
+    },
+    "Take photo": {
+      "comment": "Camera (C01): accessibility label of the shutter in photo mode",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take photo"
+          }
+        }
+      }
+    },
+    "Tap to stop": {
+      "comment": "Camera (C03): handwritten hint above the stop button while recording",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap to stop"
           }
         }
       }
@@ -634,6 +849,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "The microphone records only while you are recording a video or a voice note. You can say no: videos are still saved, just silent."
+          }
+        }
+      }
+    },
+    "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.": {
+      "comment": "Camera (C05): note on iPhones that can't use both cameras at once; ↻ is the switch-camera button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world."
           }
         }
       }
@@ -730,6 +957,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Twice a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "Video": {
+      "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video"
+          }
+        }
+      }
+    },
+    "Video length": {
+      "comment": "Camera settings: section title, default video length",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video length"
           }
         }
       }
@@ -974,5 +1225,6 @@
         }
       }
     }
-  }
+  },
+  "version": "1.0"
 }

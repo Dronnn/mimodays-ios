@@ -118,8 +118,8 @@ public protocol CaptureEngine: AnyObject, Sendable {
     func flip() async throws -> CameraSetup
     /// Adds or removes the microphone. Only with permission, and only for video.
     func setMicrophone(_ enabled: Bool) async throws
-    /// Flash applies to the rear camera only.
-    func capturePhoto(flash: Bool) async throws -> CapturedPhoto
+    /// Flash applies to the rear camera only. `silent` suppresses the shutter sound where iOS allows it.
+    func capturePhoto(flash: Bool, silent: Bool) async throws -> CapturedPhoto
     /// Records until `stopRecording()` is called or `limit` is reached, then returns the clip.
     func record(limit: Duration?) async throws -> CapturedVideo
     func stopRecording() async

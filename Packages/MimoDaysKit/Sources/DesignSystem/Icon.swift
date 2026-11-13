@@ -12,6 +12,15 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphBack
     /// 20 pt row disclosure chevron.
     case glyphChevron
+    /// 24 pt camera controls (C01-C05, C13b).
+    case glyphClose
+    case glyphFlash
+    case glyphPiP
+    case glyphMore
+    case glyphFlip
+    case glyphSpeaker
+    case glyphMute
+    case glyphInfo
     /// 56 pt line glyphs on explainer art.
     case explainerCamera
     case explainerMicrophone
@@ -25,6 +34,8 @@ public enum Icon: String, CaseIterable, Sendable {
     /// Standalone marks (own bounds), placed next to heroes and photos.
     case markStarSolo
     case markTicksA
+    /// 16 pt star on the camera's surprise chip.
+    case markStarSmall
     /// Hand-cut primary button outline (362×54), stretched to the button.
     case shapeButton
     /// Hand-cut segmented control track (362×40) and selected pill (88.5×32), stretched to fit.

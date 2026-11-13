@@ -124,16 +124,3 @@ public actor FakeTipStore: TipStore {
         return outcome
     }
 }
-
-/// Returns fixture photos instead of camera output.
-public actor FakeCaptureEngine: CaptureEngine {
-    public var multiCam: Bool
-
-    public init(multiCam: Bool = true) { self.multiCam = multiCam }
-
-    public func supportsMultiCam() -> Bool { multiCam }
-
-    public func capturePhoto() -> CapturedPhoto {
-        CapturedPhoto(backURL: Fixture.backPhoto.url, frontURL: multiCam ? Fixture.frontPhoto.url : nil)
-    }
-}

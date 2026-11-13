@@ -88,21 +88,3 @@ public protocol TipStore: Sendable {
     func products() async throws -> [TipProduct]
     func purchase(productID: String) async throws -> PurchaseOutcome
 }
-
-// MARK: Camera (6.1)
-
-public struct CapturedPhoto: Equatable, Sendable {
-    public var backURL: URL
-    /// Nil on devices without multi-camera support.
-    public var frontURL: URL?
-
-    public init(backURL: URL, frontURL: URL?) {
-        self.backURL = backURL
-        self.frontURL = frontURL
-    }
-}
-
-public protocol CaptureEngine: Sendable {
-    func supportsMultiCam() async -> Bool
-    func capturePhoto() async throws -> CapturedPhoto
-}

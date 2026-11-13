@@ -2,6 +2,7 @@
 @testable import Core
 import DesignSystem
 import Foundation
+import Persistence
 import SnapshotTesting
 import SwiftUI
 import Testing
@@ -84,6 +85,34 @@ struct ReviewSnapshotTests {
         defer { model.discard() }
         await model.locate()
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// 7.6: a capture answering a surprise says so by its time (Penpot §H20).
+    @Test func photoFromASurprise() async throws {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let capture = CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(), capturedAt: time)
+        let model = ReviewModel(capture: capture, promptID: UUID())
+        defer { model.discard() }
+        await model.load()
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
+    }
+
+    /// 7.6: every origin in both orders, as lists and the viewer will show them.
+    @Test func originLabels() {
+        let time = Text(verbatim: "8:05 AM")
+        let rows = VStack(alignment: .leading, spacing: 16) {
+            ForEach([MomentOrigin.randomPrompt, .manual, .imported], id: \.self) { origin in
+                OriginLabel(origin: origin, time: time)
+                OriginLabel(origin: origin, time: Text(verbatim: "Wed, Nov 11 · 6:42 PM"), order: .originFirst)
+            }
+        }
+        .textStyle(.reviewMeta)
+        .foregroundStyle(ColorToken.textBody.color)
+        .padding(20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(ColorToken.canvas.color)
+        assertScreenSnapshots(of: rows, variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
     /// C11: the current city chosen, places nearby and one used before.

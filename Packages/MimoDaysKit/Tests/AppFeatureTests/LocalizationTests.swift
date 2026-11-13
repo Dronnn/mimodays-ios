@@ -38,6 +38,7 @@ struct LocalizationTests {
         "Place", "Current location", "None", "Finding where you are…", "Current location · city only", "Nearby",
         "Used %lld times", "No place", "No places found", "Search places",
         "Places are stored on this iPhone only. You can choose how precise they are in Settings.",
+        "%@ · Surprise", "Surprise · %@", "Surprise moment, %@", "Imported · %@", "Imported from Photos, %@",
         "A call stopped the recording at %@. The part before the call is kept.",
         "The recording stopped at %@ when you left MimoDays. The part before is kept.",
         "This iPhone got too warm, so the recording stopped at %@. The part before is kept.",

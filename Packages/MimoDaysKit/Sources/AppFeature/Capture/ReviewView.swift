@@ -1,6 +1,7 @@
 import AVFoundation
 import Core
 import DesignSystem
+import Persistence
 import SwiftUI
 
 /// C07 review, or C13d when a recording stopped early. The whole capture is shown (aspect-fit, never cropped);
@@ -282,7 +283,7 @@ struct ReviewView: View {
                 VStack(alignment: .leading, spacing: 0) { chips }
             }
             .padding(.top, 14)
-            CaptureTimeLabel(time: model.capture.capturedAt)
+            OriginLabel(origin: model.promptID == nil ? .manual : .randomPrompt, time: CaptureTimeLabel.text(model.capture.capturedAt))
                 .textStyle(.reviewMeta)
                 .foregroundStyle(ColorToken.textBody.color)
                 .padding(.leading, 2)

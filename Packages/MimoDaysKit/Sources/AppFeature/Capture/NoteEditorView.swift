@@ -106,7 +106,9 @@ struct NoteEditorView: View {
 struct CaptureTimeLabel: View {
     let time: CaptureTime
 
-    var body: some View {
+    var body: some View { Self.text(time) }
+
+    static func text(_ time: CaptureTime) -> Text {
         var format = Date.FormatStyle(date: .omitted, time: .shortened)
         format.timeZone = time.timeZone
         var calendar = Calendar.current

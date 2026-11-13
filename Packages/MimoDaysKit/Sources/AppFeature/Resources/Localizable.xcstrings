@@ -13,6 +13,18 @@
         }
       }
     },
+    "%@ · Surprise": {
+      "comment": "Origin of a moment, after its time in lists and review: \"8:05 AM · Surprise\". The moment answered a surprise notification",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · Surprise"
+          }
+        }
+      }
+    },
     "%lld of %lld characters": {
       "comment": "Note editor (C08): VoiceOver reading of the counter, e.g. 86 of 500 characters",
       "extractionState": "manual",
@@ -453,6 +465,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "I'll do it later"
+          }
+        }
+      }
+    },
+    "Imported from Photos, %@": {
+      "comment": "VoiceOver: a moment imported from Photos, then its date",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imported from Photos, %@"
+          }
+        }
+      }
+    },
+    "Imported · %@": {
+      "comment": "Origin of a moment imported from Photos, before its date: \"Imported · Jun 3, 2024 · 4:10 PM\"",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imported · %@"
           }
         }
       }
@@ -1269,6 +1305,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Summer"
+          }
+        }
+      }
+    },
+    "Surprise moment, %@": {
+      "comment": "VoiceOver: a moment that answered a surprise notification, then its time",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surprise moment, %@"
+          }
+        }
+      }
+    },
+    "Surprise · %@": {
+      "comment": "Origin of a moment, before its date and time in the viewer: \"Surprise · Wed, Nov 11 · 6:42 PM\"",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surprise · %@"
           }
         }
       }

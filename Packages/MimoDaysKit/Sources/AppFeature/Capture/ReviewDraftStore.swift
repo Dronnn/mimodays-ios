@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import Persistence
 import os
 
 /// A capture in review with what was added so far. Written on every change, so if iOS closes the app mid-review
@@ -11,6 +12,9 @@ struct ReviewDraft: Codable, Equatable {
     var window: CameraSettings.SelfieWindow
     var promptID: UUID?
     var voice: ReviewVoiceNote?
+    var place: ReviewPlace?
+    /// A place or "No place" was picked, so a late location fix doesn't fill it in.
+    var placeWasChosen = false
 }
 
 /// C09/C10: a voice note recorded in review, kept apart from the clip's own sound.

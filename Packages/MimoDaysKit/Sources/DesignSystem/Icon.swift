@@ -33,6 +33,9 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphCheck
     /// 24 pt remove control on the voice note card (C10).
     case glyphTrash
+    /// C11 place picker: 24 pt search field glyph, 20 pt recent-place clock.
+    case glyphSearch
+    case glyphClock
     /// 56 pt line glyphs on explainer art.
     case explainerCamera
     case explainerMicrophone

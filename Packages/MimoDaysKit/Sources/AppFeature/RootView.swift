@@ -267,7 +267,7 @@ struct CaptureFlowView: View {
             let services = services ?? .simulated
             // A review iOS closed mid-way comes back first.
             if let draft = services.drafts.load() {
-                review = ReviewModel(draft: draft, drafts: services.drafts, voice: services.voice)
+                review = ReviewModel(draft: draft, drafts: services.drafts, voice: services.voice, places: services.places)
             }
             let permissions = permissions
             camera = CameraModel(
@@ -276,7 +276,7 @@ struct CaptureFlowView: View {
                 onCapture: { capture in
                     let drafts = services.drafts
                     let adopted = try? drafts.adopt(capture)
-                    review = ReviewModel(capture: adopted ?? capture, promptID: request.promptID, drafts: adopted == nil ? nil : drafts, voice: services.voice)
+                    review = ReviewModel(capture: adopted ?? capture, promptID: request.promptID, drafts: adopted == nil ? nil : drafts, voice: services.voice, places: services.places)
                 }
             )
         }

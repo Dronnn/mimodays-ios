@@ -21,6 +21,8 @@ struct MomentDraft {
     var promptID: UUID?
     /// C10; kept as its own file, never mixed into the clip's sound.
     var voice: ReviewVoiceNote?
+    /// C11; nil means no place.
+    var place: ReviewPlace?
 }
 
 enum SaveError: Error, Equatable {
@@ -92,6 +94,12 @@ struct MomentSaver {
             context.insert(moment)
             moment.media = media
             if let voiceNote { moment.voiceNotes = [voiceNote] }
+            if let place = draft.place {
+                moment.location = MomentLocation(
+                    latitude: place.latitude, longitude: place.longitude, precision: place.precision, source: place.source,
+                    placeLabel: place.label
+                )
+            }
             do {
                 try context.save()
             } catch {

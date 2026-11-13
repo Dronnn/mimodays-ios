@@ -325,6 +325,30 @@
         }
       }
     },
+    "Current location": {
+      "comment": "Place: name shown for this iPhone's position when the city couldn't be looked up (offline)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current location"
+          }
+        }
+      }
+    },
+    "Current location · city only": {
+      "comment": "Place sheet (C11): under the city name; the place is saved at city level, not the exact spot",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current location · city only"
+          }
+        }
+      }
+    },
     "Done": {
       "comment": "Closes the Settings sheet",
       "extractionState": "manual",
@@ -369,6 +393,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Find your memories by date or place. Turn a month, a year, or any part of your life into a movie made from real, little moments."
+          }
+        }
+      }
+    },
+    "Finding where you are…": {
+      "comment": "Place sheet (C11): first row while this iPhone's location is being found",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finding where you are…"
           }
         }
       }
@@ -565,6 +601,42 @@
         }
       }
     },
+    "Nearby": {
+      "comment": "Place sheet (C11): under a place close to where the iPhone is",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nearby"
+          }
+        }
+      }
+    },
+    "No place": {
+      "comment": "Place sheet (C11): row that saves the moment without a place",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No place"
+          }
+        }
+      }
+    },
+    "No places found": {
+      "comment": "Place sheet (C11): shown when a search finds nothing",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No places found"
+          }
+        }
+      }
+    },
     "No reminders for now. That's okay.": {
       "comment": "Onboarding O08c, reminders off: headline",
       "extractionState": "manual",
@@ -573,6 +645,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "No reminders for now. That's okay."
+          }
+        }
+      }
+    },
+    "None": {
+      "comment": "Review (C07): accessibility value of the Place chip when the moment has no place",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
           }
         }
       }
@@ -805,6 +889,30 @@
         }
       }
     },
+    "Place": {
+      "comment": "Review (C07): chip that picks where the moment happened, until a place is picked; also the title of the place sheet (C11)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Place"
+          }
+        }
+      }
+    },
+    "Places are stored on this iPhone only. You can choose how precise they are in Settings.": {
+      "comment": "Place sheet (C11): note under the list",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Places are stored on this iPhone only. You can choose how precise they are in Settings."
+          }
+        }
+      }
+    },
     "Play voice note": {
       "comment": "Voice note card (C10): accessibility label of the play button",
       "extractionState": "manual",
@@ -1029,6 +1137,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional."
+          }
+        }
+      }
+    },
+    "Search places": {
+      "comment": "Place sheet (C11): placeholder of the search field",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search places"
           }
         }
       }
@@ -1569,6 +1689,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Twice a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "Used %lld times": {
+      "comment": "Place sheet (C11): under a place earlier moments were saved with; the number of moments",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Used once"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Used %lld times"
+                }
+              }
+            }
           }
         }
       }

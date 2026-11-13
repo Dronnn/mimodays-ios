@@ -78,6 +78,36 @@ struct ReviewSnapshotTests {
         ])
     }
 
+    /// C07 with the city filled in by itself, as in the design.
+    @Test func photoWithAPlace() async throws {
+        let model = try await review()
+        defer { model.discard() }
+        await model.locate()
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// C11: the current city chosen, places nearby and one used before.
+    @Test func choosingAPlace() async throws {
+        let recent = RecentPlace(place: ReviewPlace(label: "Grandma's house", latitude: 40.2, longitude: 44.49, precision: .city, source: .manual), uses: 4)
+        let places = PlaceServices(location: SimulatedLocationProvider(), lookup: SimulatedPlaceLookup(), recents: { [recent] })
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let model = ReviewModel(capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(), capturedAt: time), places: places)
+        defer { model.discard() }
+        await model.locate()
+        await model.loadNearby()
+        let screen = ZStack(alignment: .bottom) {
+            Color.black.opacity(0.35).ignoresSafeArea()
+            PlaceSheet(model: model, showsCurrent: true)
+                .frame(maxWidth: .infinity)
+                .background(ColorToken.surfaceSheet.color, in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28))
+                .ignoresSafeArea(edges: .bottom)
+        }
+        assertScreenSnapshots(of: screen, variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+        ])
+    }
+
     /// C09 at 0:12 of 1:00, drawn as the sheet sits over review.
     @Test func recordingAVoiceNote() {
         // 12 s in on the recorder's clock, so the sheet's own ticks agree.

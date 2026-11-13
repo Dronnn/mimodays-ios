@@ -98,6 +98,10 @@ public struct TextStyle: Equatable, Sendable {
     public static let voiceHint = TextStyle(.patrickHand, size: 17, relativeTo: .body)
     /// C10 "Transcribed on this iPhone".
     public static let voiceCredit = TextStyle(.nunito, size: 12, weight: 500, relativeTo: .caption2)
+    /// C11 search field text and placeholder.
+    public static let searchField = TextStyle(.patrickHand, size: 17, relativeTo: .body)
+    /// Second line of a list row ("Nearby", "Used 4 times") and the note under a list.
+    public static let rowCaption = TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote)
     /// Retake sits on the photo, so it stops growing at 1.35x like the camera controls.
     public static let reviewRetake = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
 

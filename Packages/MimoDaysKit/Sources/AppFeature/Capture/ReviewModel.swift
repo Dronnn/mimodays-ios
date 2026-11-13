@@ -53,8 +53,30 @@ final class ReviewModel {
         didSet { keepDraft() }
     }
 
+    /// C11; nil means no place.
+    var place: ReviewPlace? {
+        didSet { keepDraft() }
+    }
+
+    /// A place or "No place" was picked: a late location fix no longer fills it in.
+    private(set) var placeWasChosen = false {
+        didSet { keepDraft() }
+    }
+
+    /// C11's current location row: the city this iPhone is in now.
+    private(set) var currentPlace: ReviewPlace?
+    private(set) var isLocating = false
+    /// C11's nearby rows, looked up when the sheet first shows after a fix.
+    private(set) var nearby: [PlaceSuggestion] = []
+    private var fix: GeoPoint?
+    private var nearbyFix: GeoPoint?
+    /// A new capture takes the city by itself once location is allowed; a review restored after a relaunch doesn't,
+    /// since the iPhone may have moved since.
+    private let fillsPlace: Bool
+
     private let drafts: ReviewDraftStore?
     private let services: VoiceServices
+    private let places: PlaceServices
 
     /// Where the window's frame sits in the shown media, reported by the view; the moment is composed with it.
     var windowFrame: SelfieWindowFrame?
@@ -71,21 +93,30 @@ final class ReviewModel {
     private var transcription: Task<Void, Never>?
 
     /// A new capture; with `drafts` it is kept on disk until saved or retaken.
-    init(capture: CaptureResult, promptID: UUID? = nil, drafts: ReviewDraftStore? = nil, voice services: VoiceServices = .simulated) {
+    init(
+        capture: CaptureResult, promptID: UUID? = nil, drafts: ReviewDraftStore? = nil,
+        voice services: VoiceServices = .simulated, places: PlaceServices = .simulated
+    ) {
         self.capture = capture
         self.promptID = promptID
         self.drafts = drafts
         self.services = services
+        self.places = places
+        fillsPlace = true
         window = capture.window ?? CameraSettings.SelfieWindow()
         keepDraft()
     }
 
     /// The review iOS closed mid-way, as it was.
-    init(draft: ReviewDraft, drafts: ReviewDraftStore?, voice services: VoiceServices = .simulated) {
+    init(draft: ReviewDraft, drafts: ReviewDraftStore?, voice services: VoiceServices = .simulated, places: PlaceServices = .simulated) {
         capture = draft.capture
         promptID = draft.promptID
         self.drafts = drafts
         self.services = services
+        self.places = places
+        fillsPlace = false
+        place = draft.place
+        placeWasChosen = draft.placeWasChosen
         window = draft.window
         caption = draft.caption
         note = draft.note
@@ -100,7 +131,10 @@ final class ReviewModel {
     var hasAnnotations: Bool { !note.isEmpty || voice != nil }
 
     private func keepDraft() {
-        drafts?.save(ReviewDraft(capture: capture, caption: caption, note: note, window: window, promptID: promptID, voice: voice))
+        drafts?.save(ReviewDraft(
+            capture: capture, caption: caption, note: note, window: window, promptID: promptID, voice: voice,
+            place: place, placeWasChosen: placeWasChosen
+        ))
     }
 
     /// The pending draft is done with: the moment was saved.
@@ -108,6 +142,40 @@ final class ReviewModel {
         stopVoice()
         if drafts == nil, let voice { try? FileManager.default.removeItem(at: voice.url) }
         drafts?.clear()
+    }
+
+    // MARK: Place
+
+    /// One fix and its city, once per review. Call only with location allowed.
+    func locate() async {
+        guard fix == nil, !isLocating else { return }
+        isLocating = true
+        defer { isLocating = false }
+        guard let fix = try? await places.location.currentLocation() else { return }
+        self.fix = fix
+        currentPlace = ReviewPlace.current(city: await places.lookup.city(at: fix), at: fix)
+        if fillsPlace, !placeWasChosen, place == nil { place = currentPlace }
+    }
+
+    /// A row in C11; nil is "No place".
+    func choose(_ place: ReviewPlace?) {
+        self.place = place
+        placeWasChosen = true
+    }
+
+    /// Up to three places around the fix, once per fix.
+    func loadNearby() async {
+        guard let fix, nearbyFix != fix else { return }
+        nearbyFix = fix
+        nearby = Array(await places.lookup.nearby(fix).prefix(3))
+    }
+
+    func searchPlaces(_ text: String) async -> [PlaceSuggestion] {
+        await places.lookup.search(text, near: fix)
+    }
+
+    func recentPlaces() -> [RecentPlace] {
+        places.recents()
     }
 
     // MARK: Voice note
@@ -247,7 +315,7 @@ final class ReviewModel {
 
     /// What Save keeps.
     var momentDraft: MomentDraft {
-        MomentDraft(capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID, voice: voice)
+        MomentDraft(capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID, voice: voice, place: place)
     }
 
     /// Retake / Record again: nothing is kept.

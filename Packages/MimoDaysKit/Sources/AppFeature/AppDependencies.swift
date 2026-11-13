@@ -14,6 +14,11 @@ public final class AppDependencies {
     let camera: CameraServices
     let momentSaver: MomentSaver
 
+    /// The simulator has no microphone worth testing with, and UI tests need a fixed transcript.
+    private static func voice(simulated: Bool) -> VoiceServices {
+        simulated ? .simulated : VoiceServices(makeRecorder: { AVVoiceRecorder() }, transcriber: OnDeviceTranscriber())
+    }
+
     public init(configuration: LaunchConfiguration = LaunchConfiguration()) {
         do {
             // UI tests start from an empty store on every launch.
@@ -42,7 +47,12 @@ public final class AppDependencies {
             makeEngine: { @MainActor () -> any CaptureEngine in simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine() },
             settings: configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore(),
             drafts: ReviewDraftStore(root: Self.reviewRoot(configuration)),
-            voice: simulatedCamera ? .simulated : VoiceServices(makeRecorder: { AVVoiceRecorder() }, transcriber: OnDeviceTranscriber())
+            voice: Self.voice(simulated: simulatedCamera),
+            // UI tests fake the location permission, so the fix and the lookups are faked too.
+            places: configuration.isUITesting ? .simulated : PlaceServices(
+                location: SystemLocationProvider(), lookup: MapKitPlaceLookup(),
+                recents: { [context = modelContainer.mainContext] in RecentPlace.load(from: context) }
+            )
         )
         do {
             momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))

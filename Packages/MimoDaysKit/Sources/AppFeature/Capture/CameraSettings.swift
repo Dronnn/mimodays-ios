@@ -111,13 +111,15 @@ struct CameraServices {
     /// Where a capture in review waits, so it survives the app being closed.
     var drafts: ReviewDraftStore
     var voice: VoiceServices
+    var places: PlaceServices
 
     /// Previews and anything without a device camera.
     @MainActor static var simulated: CameraServices {
         CameraServices(
             makeEngine: { SimulatedCaptureEngine() }, settings: InMemoryCameraSettingsStore(),
             drafts: ReviewDraftStore(root: FileManager.default.temporaryDirectory.appending(path: "Review-\(UUID().uuidString)")),
-            voice: .simulated
+            voice: .simulated,
+            places: .simulated
         )
     }
 }

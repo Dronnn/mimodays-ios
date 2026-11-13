@@ -144,6 +144,50 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(app.buttons["camera.shutter"].waitForExistence(timeout: 5))
     }
 
+    /// C11: location is asked for only at the first tap on Place, then the city fills in; a place nearby, a search
+    /// result or No place can replace it.
+    @MainActor
+    func testTheFirstPlaceTapAsksThenTheCityCanBeChanged() {
+        openCamera(permissions: .notDetermined)
+        app.buttons["camera.shutter"].tap()
+        let place = app.buttons["review.place"]
+        XCTAssertTrue(place.waitForExistence(timeout: 5))
+        XCTAssertEqual(place.value as? String, "None")
+
+        place.tap()
+        let current = app.buttons["place.current"]
+        XCTAssertTrue(current.waitForExistence(timeout: 5))
+        // The city fills in by itself and is the chosen row.
+        XCTAssertTrue(waitFor("label CONTAINS 'Yerevan' AND isSelected == true", current))
+        let nearby = app.buttons.matching(identifier: "place.nearby").firstMatch
+        XCTAssertTrue(nearby.waitForExistence(timeout: 5))
+        nearby.tap()
+        XCTAssertTrue(waitFor("value == 'Cascade Complex'", place))
+
+        place.tap()
+        let search = app.textFields["place.search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("sevan")
+        let result = app.buttons.matching(identifier: "place.result").firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 5))
+        result.tap()
+        XCTAssertTrue(waitFor("value == 'Lake Sevan'", place))
+
+        place.tap()
+        let none = app.buttons["place.none"]
+        XCTAssertTrue(none.waitForExistence(timeout: 5))
+        none.tap()
+        XCTAssertTrue(waitFor("value == 'None'", place))
+        app.buttons["review.save"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+    }
+
+    private func waitFor(_ format: String, _ element: XCUIElement) -> Bool {
+        let expectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: format), object: element)
+        return XCTWaiter().wait(for: [expectation], timeout: 5) == .completed
+    }
+
     /// C07: the selfie window still moves in review, and Retake leaves the camera's own corner as it was.
     @MainActor
     func testTheSelfieWindowMovesInReviewOnly() {

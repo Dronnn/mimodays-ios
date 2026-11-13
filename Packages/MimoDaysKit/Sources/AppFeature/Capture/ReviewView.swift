@@ -16,6 +16,8 @@ struct ReviewView: View {
     /// C09 while it is open.
     @State private var recording: VoiceRecording?
     @State private var microphoneOff = false
+    @State private var choosesPlace = false
+    @State private var locationAllowed = false
     @Environment(\.permissions) private var permissions
     /// C13c, or the generic save failure.
     @State private var saveError: SaveError?
@@ -39,6 +41,12 @@ struct ReviewView: View {
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = $0 }
         .task { await model.load() }
+        .task {
+            // Location is never asked for here: only after a tap on Place.
+            guard await permissions.status(of: .location).isUsable else { return }
+            locationAllowed = true
+            await model.locate()
+        }
         .onDisappear { model.stopPlayback() }
         .sheet(isPresented: $adjustsSelfie) {
             SelfieWindowSheet(placement: $model.window)
@@ -48,6 +56,9 @@ struct ReviewView: View {
         }
         .sheet(item: $recording) { recording in
             VoiceRecordingSheet(recording: recording) { model.addVoice(at: $0.url, recordedAt: $0.startedAt) }
+        }
+        .sheet(isPresented: $choosesPlace) {
+            PlaceSheet(model: model, showsCurrent: locationAllowed)
         }
         .sheet(isPresented: $microphoneOff) {
             PermissionExplainerView(screen: .microphoneOff) {
@@ -159,6 +170,18 @@ struct ReviewView: View {
         }
     }
 
+    /// The system prompt the first time (the tap says why), then one fix for the city (Andrew, 2026-11-13).
+    private func choosePlace() {
+        guard !isSaving else { return }
+        Task {
+            var status = await permissions.status(of: .location)
+            if status == .notDetermined { status = await permissions.request(.location) }
+            locationAllowed = status.isUsable
+            choosesPlace = true
+            if status.isUsable { await model.locate() }
+        }
+    }
+
     /// The system prompt the first time (the tap says why); once it is off, the way to Settings.
     private func recordVoice() {
         guard !isSaving else { return }
@@ -192,6 +215,31 @@ struct ReviewView: View {
             }
             isSaving = false
         }
+    }
+
+    /// Place, Voice note (until there is one: then its card shows above), Note.
+    @ViewBuilder
+    private var chips: some View {
+        ReviewChip(icon: .glyphPin, title: placeTitle, action: choosePlace)
+            .accessibilityLabel(Text("Place", bundle: .module))
+            .accessibilityValue(model.place.map { $0.label.map { Text($0) } ?? Text("Current location", bundle: .module) } ?? Text("None", bundle: .module))
+            .accessibilityIdentifier("review.place")
+        if model.voice == nil {
+            ReviewChip(icon: .glyphMic, title: Text("Voice note", bundle: .module), action: recordVoice)
+                .accessibilityIdentifier("review.voiceNote")
+        }
+        ReviewChip(icon: .glyphNote, title: model.note.isEmpty ? Text("Note", bundle: .module) : Text(model.note), isFilled: !model.note.isEmpty) {
+            editsNote = true
+        }
+        .accessibilityLabel(Text("Note", bundle: .module))
+        .accessibilityValue(Text(model.note))
+        .accessibilityIdentifier("review.note")
+    }
+
+    /// The place's name; "Place" until there is one.
+    private var placeTitle: Text {
+        guard let place = model.place else { return Text("Place", bundle: .module) }
+        return place.label.map { Text($0) } ?? Text("Current location", bundle: .module)
     }
 
     // MARK: Save errors
@@ -228,17 +276,10 @@ struct ReviewView: View {
                 VoiceNoteCard(model: model, voice: voice)
                     .padding(.top, 14)
             }
-            HStack(spacing: 8) {
-                if model.voice == nil {
-                    ReviewChip(icon: .glyphMic, title: Text("Voice note", bundle: .module), action: recordVoice)
-                        .accessibilityIdentifier("review.voiceNote")
-                }
-                ReviewChip(icon: .glyphNote, title: model.note.isEmpty ? Text("Note", bundle: .module) : Text(model.note), isFilled: !model.note.isEmpty) {
-                    editsNote = true
-                }
-                .accessibilityLabel(Text("Note", bundle: .module))
-                .accessibilityValue(Text(model.note))
-                .accessibilityIdentifier("review.note")
+            // One row; under each other once large text no longer fits them side by side.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) { chips }
+                VStack(alignment: .leading, spacing: 0) { chips }
             }
             .padding(.top, 14)
             CaptureTimeLabel(time: model.capture.capturedAt)

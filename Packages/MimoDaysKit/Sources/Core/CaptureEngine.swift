@@ -50,11 +50,14 @@ public struct CapturedVideo: Equatable, Sendable {
     public var selfieOffset: TimeInterval
     /// Microphone audio, in the main stream only.
     public var hasAudio: Bool
+    /// Why the recording ended early; the part before is kept (C13d). Nil for a stop or the time limit.
+    public var interruption: CaptureInterruption?
 
     public init(
         mainURL: URL, mainPosition: CameraPosition, selfieURL: URL?, duration: TimeInterval,
-        selfieOffset: TimeInterval, hasAudio: Bool
+        selfieOffset: TimeInterval, hasAudio: Bool, interruption: CaptureInterruption? = nil
     ) {
+        self.interruption = interruption
         self.mainURL = mainURL
         self.mainPosition = mainPosition
         self.selfieURL = selfieURL
@@ -73,12 +76,52 @@ public enum CaptureError: Error, Equatable, Sendable {
     case alreadyRecording
     case photoFailed
     case recordingFailed
+    /// Too little free space to start a recording.
+    case lowStorage
+}
+
+/// What took the camera away (doc 01: call, app switching, overheating, low disk space).
+public enum CaptureInterruption: String, Codable, Sendable {
+    /// A call or another app is using the camera or microphone.
+    case anotherApp
+    /// MimoDays went to the background.
+    case background
+    /// The iPhone got too warm.
+    case tooWarm
+    /// The disk filled up while recording.
+    case lowStorage
+    case other
 }
 
 /// Something the camera screen should react to.
 public enum CaptureEvent: Equatable, Sendable {
     /// The engine changed cameras on its own, e.g. dropped the selfie camera under heavy load.
     case setupChanged(CameraSetup)
+    /// The camera stopped delivering; a recording in progress ends and keeps what it has.
+    case interrupted(CaptureInterruption)
+    /// The camera is back after an interruption or a media services reset.
+    case resumed
+}
+
+/// How much a recording may write (doc 01: handle low disk space). Pure, so it is tested without a disk.
+public enum CaptureStorage {
+    /// Left free for the system and for saving the moment.
+    public static let reserve: Int64 = 200_000_000
+    /// Less than this per stream isn't worth starting (a few seconds of video).
+    public static let minimumPerStream: Int64 = 20_000_000
+
+    /// The largest file each stream may grow to, or nil when there isn't room to record.
+    public static func budgetPerStream(freeBytes: Int64, streams: Int) -> Int64? {
+        guard streams > 0 else { return nil }
+        let perStream = (freeBytes - reserve) / Int64(streams)
+        return perStream >= minimumPerStream ? perStream : nil
+    }
+
+    /// Free space for the temporary capture files, as iOS counts it for important work.
+    public static func freeBytes() -> Int64? {
+        let values = try? FileManager.default.temporaryDirectory.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+        return values?.volumeAvailableCapacityForImportantUsage
+    }
 }
 
 /// How the engine reacts to heat and load (doc 01: degrade gracefully). Pure, so it is tested without cameras.
@@ -96,8 +139,9 @@ public enum CapturePressurePolicy {
         public var dropsSelfie: Bool
     }
 
-    public static func response(to level: Level, setup: CameraSetup, isRecording: Bool) -> Response {
-        switch level {
+    /// Low Power Mode counts as at least serious pressure: a lower frame rate saves battery.
+    public static func response(to level: Level, lowPower: Bool = false, setup: CameraSetup, isRecording: Bool) -> Response {
+        switch lowPower ? max(level, .serious) : level {
         case .nominal, .fair: Response(frameRate: 30, dropsSelfie: false)
         case .serious: Response(frameRate: 24, dropsSelfie: false)
         case .critical, .shutdown: Response(frameRate: 15, dropsSelfie: setup == .dual && !isRecording)

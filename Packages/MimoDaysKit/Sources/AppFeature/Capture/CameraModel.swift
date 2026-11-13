@@ -38,6 +38,8 @@ final class CameraModel {
     private(set) var isSwapped = false
     /// Where the selfie window is on screen, reported by the view; the composed photo puts it there.
     var selfieWindowFrame: SelfieWindowFrame?
+    /// A call, the background or heat has the camera; nothing can be captured until it's back.
+    private(set) var interruption: CaptureInterruption?
     /// C05 note, shown until the person flips or captures.
     private(set) var showsSingleCameraNote = false
     var settings: CameraSettings {
@@ -88,6 +90,9 @@ final class CameraModel {
     }
 
     var canToggleSelfie: Bool { setup == .dual }
+
+    /// The shutter works: the camera is idle and not interrupted.
+    var canCapture: Bool { phase == .ready && interruption == nil }
 
     var isRecording: Bool {
         if case .recording = phase { true } else { false }
@@ -140,8 +145,8 @@ final class CameraModel {
     /// Shutter: a photo, or start/stop a video.
     func shutter() async {
         switch (mode, phase) {
-        case (.photo, .ready): await takePhoto()
-        case (.video, .ready): await record()
+        case (.photo, .ready) where interruption == nil: await takePhoto()
+        case (.video, .ready) where interruption == nil: await record()
         case (.video, .recording): await engine.stopRecording()
         default: break
         }
@@ -234,6 +239,10 @@ final class CameraModel {
                 case let .setupChanged(setup):
                     self.setup = setup
                     if setup != .dual { isSwapped = false }
+                case let .interrupted(reason):
+                    interruption = reason
+                case .resumed:
+                    interruption = nil
                 }
             }
         }

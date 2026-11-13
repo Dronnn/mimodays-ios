@@ -53,3 +53,34 @@ struct CameraModelMicrophoneTests {
         #expect(await eventually { await !engine.hasMicrophone })
     }
 }
+
+@MainActor
+struct CameraModelInterruptionTests {
+    @Test func aCallDuringRecordingHandsOverThePartBeforeIt() async throws {
+        let engine = SimulatedCaptureEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.videoLength = .long
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneAllowed: { false }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        async let recording: Void = model.shutter()
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+        await engine.simulateInterruption(.anotherApp)
+        await recording
+        guard case let .video(video, _) = try #require(results.first) else { Issue.record("not a video"); return }
+        #expect(video.interruption == .anotherApp)
+        results.first?.discardFiles()
+
+        // The shutter waits for the camera to come back.
+        for _ in 0..<50 where model.interruption == nil { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(model.interruption == .anotherApp)
+        #expect(!model.canCapture)
+        await engine.simulateInterruptionEnded()
+        for _ in 0..<50 where model.interruption != nil { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(model.canCapture)
+    }
+}

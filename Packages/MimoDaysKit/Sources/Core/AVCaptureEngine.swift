@@ -4,7 +4,8 @@ import Synchronization
 
 /// The device cameras. `AVCaptureMultiCamSession` with rear + front when supported, otherwise one
 /// `AVCaptureSession` camera at a time. Each camera has its own photo and movie output (separate streams).
-/// All session work runs on one serial queue.
+/// All session work runs on one serial queue. Interruptions (calls, background, heat) end a recording with
+/// what it has; a media services reset restarts the session.
 public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private let queue = DispatchQueue(label: "MimoDays.capture")
     private let session: AVCaptureSession
@@ -18,6 +19,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private var recording: RecordingDelegate?
     private var pressure: [CameraPosition: CapturePressurePolicy.Level] = [:]
     private var pressureObservations: [CameraPosition: NSKeyValueObservation] = [:]
+    /// Between `start()` and `stop()`: the session should be running.
+    private var isActive = false
+    private var lastInterruption: CaptureInterruption?
+    /// Set once in `init`.
+    private var observers: [any NSObjectProtocol] = []
 
     public let events: AsyncStream<CaptureEvent>
     private let eventSink: AsyncStream<CaptureEvent>.Continuation
@@ -40,12 +46,58 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             layer.videoGravity = .resizeAspectFill
             return (position, layer)
         })
+        observeSystem()
+    }
+
+    deinit {
+        observers.forEach(NotificationCenter.default.removeObserver)
+    }
+
+    private func observeSystem() {
+        let center = NotificationCenter.default
+        observers = [
+            center.addObserver(forName: AVCaptureSession.wasInterruptedNotification, object: session, queue: nil) { [weak self] note in
+                let raw = (note.userInfo?[AVCaptureSessionInterruptionReasonKey] as? NSNumber)?.intValue
+                let reason = raw.flatMap(AVCaptureSession.InterruptionReason.init(rawValue:)).map(CaptureInterruption.init) ?? .other
+                guard let engine = self else { return }
+                engine.queue.async {
+                    engine.lastInterruption = reason
+                    engine.eventSink.yield(.interrupted(reason))
+                }
+            },
+            center.addObserver(forName: AVCaptureSession.interruptionEndedNotification, object: session, queue: nil) { [weak self] _ in
+                guard let engine = self else { return }
+                engine.queue.async { engine.eventSink.yield(.resumed) }
+            },
+            center.addObserver(forName: AVCaptureSession.runtimeErrorNotification, object: session, queue: nil) { [weak self] note in
+                let reset = (note.userInfo?[AVCaptureSessionErrorKey] as? AVError)?.code == .mediaServicesWereReset
+                guard let engine = self else { return }
+                engine.queue.async { engine.runtimeError(mediaServicesWereReset: reset) }
+            },
+            center.addObserver(forName: Notification.Name.NSProcessInfoPowerStateDidChange, object: nil, queue: nil) { [weak self] _ in
+                guard let engine = self else { return }
+                engine.queue.async { engine.applyPressure() }
+            },
+        ]
+    }
+
+    /// Media services reset: the session can simply start again. Anything else is an interruption.
+    private func runtimeError(mediaServicesWereReset: Bool) {
+        guard isActive else { return }
+        if mediaServicesWereReset {
+            session.startRunning()
+            if session.isRunning { eventSink.yield(.resumed) }
+        } else {
+            lastInterruption = .other
+            eventSink.yield(.interrupted(.other))
+        }
     }
 
     // MARK: Session
 
     public func start() async throws -> CameraSetup {
         try await onQueue {
+            self.isActive = true
             if let setup = self.setup {
                 if !self.session.isRunning { self.session.startRunning() }
                 return setup
@@ -59,6 +111,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     public func stop() async {
         _ = try? await onQueue {
+            self.isActive = false
             if self.session.isRunning { self.session.stopRunning() }
         }
     }
@@ -145,6 +198,13 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     return
                 }
                 let outputs = setup.positions.compactMap { position in self.cameras[position].map { (position, $0.movie) } }
+                // Each stream stops cleanly before the disk is full, keeping what it has.
+                guard let budget = CaptureStorage.freeBytes().flatMap({ CaptureStorage.budgetPerStream(freeBytes: $0, streams: outputs.count) })
+                else {
+                    continuation.resume(throwing: CaptureError.lowStorage)
+                    return
+                }
+                self.lastInterruption = nil
                 let delegate = RecordingDelegate(
                     outputs: outputs.map { ($0.0, ObjectIdentifier($0.1)) }, hasAudio: self.microphone != nil,
                     // One stream failing ends the others too.
@@ -153,16 +213,20 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     self.queue.async {
                         self.recording = nil
                         // Pressure that rose while recording can drop the selfie camera now.
-                        if let position = self.pressure.max(by: { $0.value < $1.value })?.key, let level = self.pressure[position] {
-                            self.pressureChanged(level, on: position)
-                        }
+                        self.applyPressure()
+                        // The session tells why it was interrupted; the movie output only that it was.
+                        continuation.resume(with: result.map { video in
+                            var video = video
+                            if video.interruption == .other, let reason = self.lastInterruption { video.interruption = reason }
+                            return video
+                        })
                     }
-                    continuation.resume(with: result)
                 }
                 self.recording = delegate
                 let maximum = limit.map { CMTime(seconds: TimeInterval($0.components.seconds), preferredTimescale: 600) } ?? .invalid
                 for (position, movie) in outputs {
                     movie.maxRecordedDuration = maximum
+                    movie.maxRecordedFileSize = budget
                     do {
                         movie.startRecording(to: try CaptureFiles.temporaryURL("mov"), recordingDelegate: delegate)
                     } catch {
@@ -238,8 +302,16 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     /// Heat or load on a camera: lower the frame rate, and drop the selfie camera when it gets critical.
     private func pressureChanged(_ level: CapturePressurePolicy.Level, on position: CameraPosition) {
         pressure[position] = level
-        guard let setup, let worst = pressure.values.max() else { return }
-        let response = CapturePressurePolicy.response(to: worst, setup: setup, isRecording: recording != nil)
+        applyPressure()
+    }
+
+    /// The worst camera pressure, with Low Power Mode, applied to the setup.
+    private func applyPressure() {
+        guard let setup else { return }
+        let response = CapturePressurePolicy.response(
+            to: pressure.values.max() ?? .nominal, lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled,
+            setup: setup, isRecording: recording != nil
+        )
         setFrameRate(response.frameRate)
         guard response.dropsSelfie else { return }
         session.beginConfiguration()
@@ -413,6 +485,7 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
         var result: (url: URL, duration: TimeInterval)?
         var finished = false
         var failed = false
+        var interruption: CaptureInterruption?
     }
 
     private let streams: Mutex<[ObjectIdentifier: Stream]>
@@ -450,15 +523,17 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
     func fileOutput(
         _ output: AVCaptureFileOutput, didFinishRecordingTo url: URL, from _: [AVCaptureConnection], error: (any Error)?
     ) {
-        // Reaching the time limit or a stop still "finishes successfully".
+        // Reaching the time limit, a stop or an interruption still "finishes successfully" with a playable file.
         let succeeded = error == nil
             || ((error as NSError?)?.userInfo[AVErrorRecordingSuccessfullyFinishedKey] as? Bool ?? false)
         let duration = output.recordedDuration.seconds
+        let interruption = error.flatMap { CaptureInterruption(endingRecording: $0) }
         let outcome = streams.withLock { streams -> Result<CapturedVideo, any Error>? in
             let key = ObjectIdentifier(output)
             streams[key]?.finished = true
             if succeeded, duration > 0 {
                 streams[key]?.result = (url, duration)
+                streams[key]?.interruption = interruption
             } else {
                 streams[key]?.failed = true
                 try? FileManager.default.removeItem(at: url)
@@ -482,7 +557,8 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
         if let mainStart = main.started, let selfieStart = selfie?.started { offset = selfieStart - mainStart }
         return .success(CapturedVideo(
             mainURL: mainResult.url, mainPosition: main.position, selfieURL: selfie?.result?.url,
-            duration: mainResult.duration, selfieOffset: offset, hasAudio: hasAudio
+            duration: mainResult.duration, selfieOffset: offset, hasAudio: hasAudio,
+            interruption: main.interruption ?? selfie?.interruption
         ))
     }
 }
@@ -496,6 +572,28 @@ extension CapturePressurePolicy.Level {
         case .critical: self = .critical
         case .shutdown: self = .shutdown
         default: self = .serious
+        }
+    }
+}
+
+extension CaptureInterruption {
+    init(_ reason: AVCaptureSession.InterruptionReason) {
+        switch reason {
+        case .videoDeviceNotAvailableInBackground: self = .background
+        case .audioDeviceInUseByAnotherClient, .videoDeviceInUseByAnotherClient, .videoDeviceNotAvailableWithMultipleForegroundApps:
+            self = .anotherApp
+        case .videoDeviceNotAvailableDueToSystemPressure: self = .tooWarm
+        default: self = .other
+        }
+    }
+
+    /// Why a movie output stopped early; nil for a stop or the time limit. A session interruption is `.other`
+    /// here and gets its reason from the session.
+    init?(endingRecording error: any Error) {
+        switch (error as? AVError)?.code {
+        case .maximumDurationReached?: return nil
+        case .diskFull?, .maximumFileSizeReached?: self = .lowStorage
+        default: self = .other
         }
     }
 }

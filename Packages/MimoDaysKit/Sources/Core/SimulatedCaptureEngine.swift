@@ -6,17 +6,38 @@ import UIKit
 /// device engine (setups, flip, limits, separate streams) so the capture UI runs unchanged.
 public actor SimulatedCaptureEngine: CaptureEngine {
     nonisolated let multiCam: Bool
+    /// Free disk space as the engine sees it; nil means plenty.
+    nonisolated let freeBytes: Int64?
     private var setup: CameraSetup?
     private var isRunning = false
+    private var interruption: CaptureInterruption?
+    /// Why the current recording is being stopped, when it isn't the person or the limit.
+    private var stopReason: CaptureInterruption?
     private(set) var hasMicrophone = false
     private(set) var isRecording = false
     private var stopSignal: CheckedContinuation<Void, Never>?
     public nonisolated let events: AsyncStream<CaptureEvent>
     private let eventSink: AsyncStream<CaptureEvent>.Continuation
 
-    public init(multiCam: Bool = true) {
+    public init(multiCam: Bool = true, freeBytes: Int64? = nil) {
         self.multiCam = multiCam
+        self.freeBytes = freeBytes
         (events, eventSink) = AsyncStream.makeStream()
+    }
+
+    /// A call, the app going to the background, heat: a recording ends with what it has.
+    public func simulateInterruption(_ reason: CaptureInterruption) {
+        interruption = reason
+        if isRecording {
+            stopReason = reason
+            signalStop()
+        }
+        eventSink.yield(.interrupted(reason))
+    }
+
+    public func simulateInterruptionEnded() {
+        interruption = nil
+        eventSink.yield(.resumed)
     }
 
     /// Heat or load the way the device engine would see it (tests and UI tests).
@@ -52,7 +73,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     }
 
     public func capturePhoto(flash _: Bool, silent _: Bool) throws -> CapturedPhoto {
-        guard isRunning, let setup else { throw CaptureError.notRunning }
+        guard isRunning, interruption == nil, let setup else { throw CaptureError.notRunning }
         let urls = try setup.positions.map { position in
             let url = try CaptureFiles.temporaryURL("jpg")
             guard let data = SimulatedMedia.image(position).jpegData(compressionQuality: 0.8) else { throw CaptureError.photoFailed }
@@ -63,9 +84,13 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     }
 
     public func record(limit: Duration?) async throws -> CapturedVideo {
-        guard isRunning, let setup else { throw CaptureError.notRunning }
+        guard isRunning, interruption == nil, let setup else { throw CaptureError.notRunning }
         guard !isRecording else { throw CaptureError.alreadyRecording }
+        if let freeBytes, CaptureStorage.budgetPerStream(freeBytes: freeBytes, streams: setup.positions.count) == nil {
+            throw CaptureError.lowStorage
+        }
         isRecording = true
+        stopReason = nil
         defer { isRecording = false }
 
         let clock = ContinuousClock()
@@ -94,7 +119,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         }
         return CapturedVideo(
             mainURL: urls[0], mainPosition: setup.positions[0], selfieURL: urls.dropFirst().first,
-            duration: seconds, selfieOffset: 0, hasAudio: false
+            duration: seconds, selfieOffset: 0, hasAudio: false, interruption: stopReason
         )
     }
 

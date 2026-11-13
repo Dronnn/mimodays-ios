@@ -215,7 +215,7 @@ struct CameraView: View {
                     .frame(height: 48, alignment: .top)
                 ZStack {
                     ShutterButton(mode: model.mode) { Task { await model.shutter() } }
-                        .disabled(model.phase != .ready)
+                        .disabled(!model.canCapture)
                     HStack {
                         // Last capture thumbnail arrives with saved moments (Phase 7).
                         Color.clear.frame(width: 48, height: 48)

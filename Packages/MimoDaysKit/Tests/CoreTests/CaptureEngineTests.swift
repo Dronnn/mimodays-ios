@@ -121,3 +121,65 @@ struct CapturePressurePolicyTests {
         #expect(try await engine.capturePhoto(flash: false, silent: false).selfieURL == nil)
     }
 }
+
+struct CaptureInterruptionTests {
+    @Test func storageBudgetKeepsAReserveAndASensibleMinimum() {
+        #expect(CaptureStorage.budgetPerStream(freeBytes: 10_000_000_000, streams: 2) == 4_900_000_000)
+        #expect(CaptureStorage.budgetPerStream(freeBytes: 250_000_000, streams: 2) == 25_000_000)
+        #expect(CaptureStorage.budgetPerStream(freeBytes: 230_000_000, streams: 2) == nil)
+        #expect(CaptureStorage.budgetPerStream(freeBytes: 10_000_000_000, streams: 0) == nil)
+    }
+
+    @Test func lowPowerModeLowersTheFrameRateButDropsNothing() {
+        #expect(CapturePressurePolicy.response(to: .nominal, lowPower: true, setup: .dual, isRecording: false) == .init(frameRate: 24, dropsSelfie: false))
+        #expect(CapturePressurePolicy.response(to: .critical, lowPower: true, setup: .dual, isRecording: false).dropsSelfie)
+    }
+
+    @Test func sessionReasonsMapToWhatThePersonSees() {
+        #expect(CaptureInterruption(.videoDeviceNotAvailableInBackground) == .background)
+        #expect(CaptureInterruption(.audioDeviceInUseByAnotherClient) == .anotherApp)
+        #expect(CaptureInterruption(.videoDeviceInUseByAnotherClient) == .anotherApp)
+        #expect(CaptureInterruption(.videoDeviceNotAvailableDueToSystemPressure) == .tooWarm)
+    }
+
+    @Test func recordingErrorsMapToInterruptions() {
+        #expect(CaptureInterruption(endingRecording: AVError(.maximumDurationReached)) == nil)
+        #expect(CaptureInterruption(endingRecording: AVError(.diskFull)) == .lowStorage)
+        #expect(CaptureInterruption(endingRecording: AVError(.maximumFileSizeReached)) == .lowStorage)
+        #expect(CaptureInterruption(endingRecording: AVError(.sessionWasInterrupted)) == .other)
+    }
+
+    @Test func anInterruptedRecordingKeepsWhatItHas() async throws {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        async let video = engine.record(limit: .seconds(30))
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+        await engine.simulateInterruption(.anotherApp)
+        let clip = try await video
+        defer { [clip.mainURL, clip.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) } }
+        #expect(clip.interruption == .anotherApp)
+        #expect(clip.duration < 10)
+        #expect(clip.selfieURL != nil)
+        // Nothing is captured until the camera is back.
+        await #expect(throws: CaptureError.notRunning) { try await engine.capturePhoto(flash: false, silent: false) }
+        await engine.simulateInterruptionEnded()
+        let photo = try await engine.capturePhoto(flash: false, silent: false)
+        [photo.mainURL, photo.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
+    }
+
+    @Test func noRoomNoRecording() async {
+        let engine = SimulatedCaptureEngine(freeBytes: 210_000_000)
+        _ = await engine.start()
+        await #expect(throws: CaptureError.lowStorage) { try await engine.record(limit: .seconds(10)) }
+    }
+
+    @Test func interruptionsAreReported() async {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        var events = engine.events.makeAsyncIterator()
+        await engine.simulateInterruption(.background)
+        await engine.simulateInterruptionEnded()
+        #expect(await events.next() == .interrupted(.background))
+        #expect(await events.next() == .resumed)
+    }
+}

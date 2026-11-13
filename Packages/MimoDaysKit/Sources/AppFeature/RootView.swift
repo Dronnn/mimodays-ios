@@ -1,13 +1,17 @@
+import Core
 import DesignSystem
 import SwiftUI
+import UIKit
 
 /// App shell: four tabs, Settings from the gear on every tab root, Capture on Today.
 /// System tab bar on iPhone; floating tab bar / sidebar on iPad.
 public struct RootView: View {
     @State private var router: AppRouter
+    private let permissions: any PermissionService
 
-    public init(router: AppRouter = AppRouter()) {
+    public init(router: AppRouter = AppRouter(), permissions: any PermissionService = SystemPermissionService()) {
         _router = State(initialValue: router)
+        self.permissions = permissions
     }
 
     public var body: some View {
@@ -29,9 +33,10 @@ public struct RootView: View {
             SettingsPlaceholderView()
         }
         .fullScreenCover(item: $router.capture) { request in
-            CapturePlaceholderView(request: request)
+            CaptureFlowView(request: request)
         }
         .environment(router)
+        .environment(\.permissions, permissions)
     }
 }
 
@@ -109,6 +114,48 @@ struct SettingsPlaceholderView: View {
                     }
                 }
         }
+    }
+}
+
+/// Camera access first (C06 explainer → system prompt, or C13a when it's off), then the camera.
+struct CaptureFlowView: View {
+    let request: CaptureRequest
+    @Environment(\.permissions) private var permissions
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var step: CameraAccessStep?
+
+    var body: some View {
+        Group {
+            switch step {
+            case nil:
+                ColorToken.canvas.color.ignoresSafeArea()
+            case .explain:
+                PermissionExplainerView(screen: .camera) {
+                    Task { step = CameraAccessStep(await permissions.request(.camera)) }
+                } secondary: {
+                    dismiss()
+                }
+            case .openSettings:
+                PermissionExplainerView(screen: .cameraOff) {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                } secondary: {
+                    dismiss()
+                }
+            case .camera:
+                CapturePlaceholderView(request: request)
+            }
+        }
+        .task { await refresh() }
+        // Coming back from Settings with access turned on.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await refresh() } }
+        }
+    }
+
+    private func refresh() async {
+        step = CameraAccessStep(await permissions.status(of: .camera))
     }
 }
 

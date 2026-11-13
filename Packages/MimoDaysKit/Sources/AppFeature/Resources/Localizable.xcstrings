@@ -14,6 +14,18 @@
         }
       }
     },
+    "Add sound to your videos?": {
+      "comment": "C06c title: explainer shown before the system microphone prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add sound to your videos?"
+          }
+        }
+      }
+    },
     "Capture": {
       "comment": "Accessibility label of the big camera button on Today",
       "extractionState": "manual",
@@ -38,6 +50,18 @@
         }
       }
     },
+    "Continue": {
+      "comment": "Primary button on a permission explainer; shows the system prompt next",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
     "Done": {
       "comment": "Closes the Settings sheet",
       "extractionState": "manual",
@@ -46,6 +70,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Done"
+          }
+        }
+      }
+    },
+    "Let MimoDays use the camera": {
+      "comment": "C06 title: explainer shown before the system camera prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let MimoDays use the camera"
           }
         }
       }
@@ -86,6 +122,42 @@
         }
       }
     },
+    "Not now": {
+      "comment": "Closes a permission screen without asking",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not now"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "comment": "Opens the app's page in iOS Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "Record without sound": {
+      "comment": "C06c: skip the microphone and record silent videos",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record without sound"
+          }
+        }
+      }
+    },
     "Settings": {
       "comment": "Gear button and Settings sheet title",
       "extractionState": "manual",
@@ -94,6 +166,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Settings"
+          }
+        }
+      }
+    },
+    "The camera is turned off for MimoDays": {
+      "comment": "C13a title: camera access was denied in Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera is turned off for MimoDays"
+          }
+        }
+      }
+    },
+    "The camera turns on only while this screen is open, and only you start a recording. Nothing is captured in the background or sent anywhere.": {
+      "comment": "C06 body: camera explainer",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera turns on only while this screen is open, and only you start a recording. Nothing is captured in the background or sent anywhere."
+          }
+        }
+      }
+    },
+    "The microphone records only while you are recording a video or a voice note. You can say no: videos are still saved, just silent.": {
+      "comment": "C06c body: microphone explainer",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone records only while you are recording a video or a voice note. You can say no: videos are still saved, just silent."
+          }
+        }
+      }
+    },
+    "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today.": {
+      "comment": "C13a body: camera access off",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today."
           }
         }
       }

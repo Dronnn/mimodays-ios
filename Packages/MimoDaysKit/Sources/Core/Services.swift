@@ -14,29 +14,6 @@ public struct SystemDateProvider: DateProvider {
     public func now() -> Date { Date() }
 }
 
-// MARK: Permissions (3.7)
-
-public enum Permission: CaseIterable, Sendable {
-    case camera
-    case microphone
-    case photoLibrary
-    case location
-    case notifications
-}
-
-public enum PermissionStatus: Equatable, Sendable {
-    case notDetermined
-    case granted
-    case limited
-    case denied
-    case restricted
-}
-
-public protocol PermissionService: Sendable {
-    func status(of permission: Permission) async -> PermissionStatus
-    func request(_ permission: Permission) async -> PermissionStatus
-}
-
 // MARK: Notifications (5.1-5.2)
 
 public struct SurpriseNotification: Equatable, Identifiable, Sendable {

@@ -13,8 +13,12 @@ public enum ColorToken: String, CaseIterable, Sendable {
     case accentApricot
     /// Decoration only (hatch marks).
     case accentSage
+    /// Decoration only (coral tick marks).
+    case accentCoralMark
     case textPrimary
     case textSecondary
+    /// Explainer and long-form body copy.
+    case textBody
     case textLink
     case textOnCoral
     case actionCoral

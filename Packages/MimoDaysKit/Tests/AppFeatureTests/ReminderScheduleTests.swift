@@ -76,4 +76,16 @@ struct ReminderScheduleTests {
         let text = String(localized: ReminderSchedule().summary(calendar: calendar, locale: Locale(identifier: "en_GB")))
         #expect(text.contains("between 8:00 and 22:00"))
     }
+
+    @Test func restoringRepairsBrokenValues() {
+        let restored = ReminderSchedule(frequency: .twiceADay, weekdayMask: 0, earliestMinute: 23 * 60 + 30, latestMinute: 60)
+        #expect(restored.weekdayMask == 0b111_1111)
+        #expect(restored.earliestMinute == 22 * 60 + 59)
+        #expect(restored.latestMinute == 23 * 60 + 59)
+        let kept = ReminderSchedule(frequency: .threeAWeek, weekdayMask: 0b100_0001, earliestMinute: 9 * 60, latestMinute: 18 * 60)
+        #expect(kept.frequency == .threeAWeek)
+        #expect(kept.weekdayMask == 0b100_0001)
+        #expect(kept.earliestMinute == 9 * 60)
+        #expect(kept.latestMinute == 18 * 60)
+    }
 }

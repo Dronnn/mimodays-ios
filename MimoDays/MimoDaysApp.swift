@@ -5,25 +5,19 @@ import UIKit
 
 @main
 struct MimoDaysApp: App {
-    private let configuration = LaunchConfiguration()
+    private let dependencies: AppDependencies
 
     init() {
+        let configuration = LaunchConfiguration()
         if configuration.isUITesting {
             UIView.setAnimationsEnabled(false)
         }
+        dependencies = AppDependencies(configuration: configuration)
     }
 
     var body: some Scene {
         WindowGroup {
-            RootView(permissions: permissions)
+            RootView(dependencies: dependencies)
         }
-    }
-
-    /// UI tests can start every permission in a fixed state instead of hitting system prompts.
-    private var permissions: any PermissionService {
-        if configuration.isUITesting, let status = configuration.permissions {
-            return PresetPermissionService(status: status)
-        }
-        return SystemPermissionService()
     }
 }

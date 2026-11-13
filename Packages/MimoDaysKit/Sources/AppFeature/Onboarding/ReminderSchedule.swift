@@ -13,6 +13,17 @@ struct ReminderSchedule: Equatable {
     static let minimumWindow = 60
     static let lastMinute = 24 * 60 - 1
 
+    init() {}
+
+    /// Restores saved values, repairing anything that breaks the rules (no days, window under an hour).
+    init(frequency: SurpriseFrequency, weekdayMask: Int, earliestMinute: Int, latestMinute: Int) {
+        self.frequency = frequency
+        let mask = weekdayMask & 0b111_1111
+        self.weekdayMask = mask == 0 ? 0b111_1111 : mask
+        self.earliestMinute = min(max(earliestMinute, 0), Self.lastMinute - Self.minimumWindow)
+        self.latestMinute = min(max(latestMinute, self.earliestMinute + Self.minimumWindow), Self.lastMinute)
+    }
+
     /// `weekday` is a `Calendar` weekday, 1 = Sunday.
     func isOn(_ weekday: Int) -> Bool {
         weekdayMask & (1 << (weekday - 1)) != 0

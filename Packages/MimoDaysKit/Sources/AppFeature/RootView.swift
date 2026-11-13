@@ -7,16 +7,36 @@ import UIKit
 /// System tab bar on iPhone; floating tab bar / sidebar on iPad.
 public struct RootView: View {
     @State private var router: AppRouter
+    /// Set while onboarding runs; nil once it is finished or skipped.
+    @State private var onboarding: OnboardingFlow?
     private let permissions: any PermissionService
 
-    public init(router: AppRouter = AppRouter(), permissions: any PermissionService = SystemPermissionService()) {
+    public init(router: AppRouter = AppRouter(), dependencies: AppDependencies) {
         _router = State(initialValue: router)
-        self.permissions = permissions
+        permissions = dependencies.permissions
+        let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
+        let flow = OnboardingFlow(permissions: dependencies.permissions, store: store)
+        _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
     }
 
     public var body: some View {
+        Group {
+            if let onboarding {
+                OnboardingView(flow: onboarding) { tab in
+                    router.selectedTab = tab
+                    self.onboarding = nil
+                }
+            } else {
+                tabs
+            }
+        }
+        .environment(router)
+        .environment(\.permissions, permissions)
+    }
+
+    private var tabs: some View {
         @Bindable var router = router
-        TabView(selection: $router.selectedTab) {
+        return TabView(selection: $router.selectedTab) {
             ForEach(MainTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
                     NavigationStack {
@@ -35,8 +55,6 @@ public struct RootView: View {
         .fullScreenCover(item: $router.capture) { request in
             CaptureFlowView(request: request)
         }
-        .environment(router)
-        .environment(\.permissions, permissions)
     }
 }
 

@@ -24,10 +24,10 @@ struct OnboardingView: View {
                     if let url = URL(string: UIApplication.openNotificationSettingsURLString) { openURL(url) }
                 }
             case .firstCapture:
-                FirstCaptureView(capture: flow.startFirstCapture) { onFinish(.today) }
+                FirstCaptureView(capture: flow.startFirstCapture) { finish(on: .today) }
             case .firstMomentSaved:
                 if let moment = flow.firstMoment {
-                    FirstMomentView(moment: moment) { onFinish(.memories) } done: { onFinish(.today) }
+                    FirstMomentView(moment: moment) { finish(on: .memories) } done: { finish(on: .today) }
                 }
             }
         }
@@ -35,5 +35,10 @@ struct OnboardingView: View {
         .fullScreenCover(isPresented: $flow.isCapturing) {
             CaptureFlowView(request: CaptureRequest())
         }
+    }
+
+    private func finish(on tab: MainTab) {
+        flow.finish()
+        onFinish(tab)
     }
 }

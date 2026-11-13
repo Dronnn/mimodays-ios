@@ -13,14 +13,14 @@ import TestSupport
 struct CameraSnapshotTests {
     private func camera(
         multiCam: Bool = true, surprise: Bool = false, mode: CameraSettings.Mode = .photo,
-        selfieWindow: CameraSettings.SelfieWindow = .init()
+        selfieWindow: CameraSettings.SelfieWindow = .init(), microphone: PermissionStatus = .granted
     ) async -> CameraModel {
         var settings = CameraSettings()
         settings.opensIn = mode
         settings.selfieWindow = selfieWindow
         let model = CameraModel(
             engine: SimulatedCaptureEngine(multiCam: multiCam), store: InMemoryCameraSettingsStore(settings),
-            isSurprise: surprise, microphoneAllowed: { true }, onCapture: { _ in }
+            isSurprise: surprise, microphoneStatus: { microphone }, onCapture: { _ in }
         )
         await model.start()
         return model
@@ -53,6 +53,11 @@ struct CameraSnapshotTests {
 
     @Test func singleCamera() async {
         assertScreenSnapshots(of: screen(await camera(multiCam: false)))
+    }
+
+    /// C13b: video with sound on, microphone off in Settings.
+    @Test func microphoneOff() async {
+        assertScreenSnapshots(of: screen(await camera(mode: .video, microphone: .denied)), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     /// C04 behind its sheet: corner targets, the chosen one in coral.

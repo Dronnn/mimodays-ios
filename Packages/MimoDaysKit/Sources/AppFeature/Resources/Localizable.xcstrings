@@ -481,6 +481,18 @@
         }
       }
     },
+    "Not enough space to record. Free up some space on this iPhone and try again.": {
+      "comment": "Camera note: too little free storage to start a video.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not enough space to record. Free up some space on this iPhone and try again."
+          }
+        }
+      }
+    },
     "Not now": {
       "comment": "Closes a permission screen without asking",
       "extractionState": "manual",
@@ -901,6 +913,30 @@
         }
       }
     },
+    "That one didn't come out. Try again.": {
+      "comment": "Camera note: a photo or video failed or its file was unreadable; nothing was kept.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That one didn't come out. Try again."
+          }
+        }
+      }
+    },
+    "The camera is busy with a call or another app. It comes back on its own.": {
+      "comment": "Camera note: a call or another app took the camera or microphone.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera is busy with a call or another app. It comes back on its own."
+          }
+        }
+      }
+    },
     "The camera is turned off for MimoDays": {
       "comment": "C13a title: camera access was denied in Settings",
       "extractionState": "manual",
@@ -909,6 +945,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "The camera is turned off for MimoDays"
+          }
+        }
+      }
+    },
+    "The camera isn't available right now. Close and try again in a moment.": {
+      "comment": "Camera note: the camera could not start.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera isn't available right now. Close and try again in a moment."
+          }
+        }
+      }
+    },
+    "The camera paused for a moment. It comes back on its own.": {
+      "comment": "Camera note: the camera was interrupted for another reason.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera paused for a moment. It comes back on its own."
           }
         }
       }
@@ -945,6 +1005,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world."
+          }
+        }
+      }
+    },
+    "This iPhone is too warm for the camera right now. It comes back once it cools down.": {
+      "comment": "Camera note: iOS paused the camera because the iPhone is too warm.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone is too warm for the camera right now. It comes back once it cools down."
           }
         }
       }
@@ -1089,6 +1161,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Video length"
+          }
+        }
+      }
+    },
+    "Videos will be silent. Turn on the microphone in Settings to add sound.": {
+      "comment": "Camera note (C13b): video mode with sound on while the microphone is turned off in Settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Videos will be silent. Turn on the microphone in Settings to add sound."
           }
         }
       }

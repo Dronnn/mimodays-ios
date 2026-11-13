@@ -38,7 +38,7 @@ struct PhotoComposerTests {
         var results: [CaptureResult] = []
         let model = CameraModel(
             engine: SimulatedCaptureEngine(), store: InMemoryCameraSettingsStore(), isSurprise: false,
-            microphoneAllowed: { true }, onCapture: { results.append($0) }
+            microphoneStatus: { .granted }, onCapture: { results.append($0) }
         )
         await model.start()
         model.selfieWindowFrame = window
@@ -59,7 +59,7 @@ struct PhotoComposerTests {
         var results: [CaptureResult] = []
         let model = CameraModel(
             engine: SimulatedCaptureEngine(), store: InMemoryCameraSettingsStore(), isSurprise: false,
-            microphoneAllowed: { true }, onCapture: { results.append($0) }
+            microphoneStatus: { .granted }, onCapture: { results.append($0) }
         )
         await model.start()
         model.selfieWindowFrame = window

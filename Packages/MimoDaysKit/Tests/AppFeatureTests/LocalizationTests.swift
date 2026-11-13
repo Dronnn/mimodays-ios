@@ -21,6 +21,13 @@ struct LocalizationTests {
         "Opens in", "Video length", "Record sound", "Camera sounds", "Camera", "Photo", "Video",
         "Top left", "Top right", "Bottom left", "Bottom right", "Small", "Medium", "Large", "Reset to default",
         "Adjust selfie window",
+        "Videos will be silent. Turn on the microphone in Settings to add sound.",
+        "Not enough space to record. Free up some space on this iPhone and try again.",
+        "The camera is busy with a call or another app. It comes back on its own.",
+        "This iPhone is too warm for the camera right now. It comes back once it cools down.",
+        "The camera paused for a moment. It comes back on its own.",
+        "The camera isn't available right now. Close and try again in a moment.",
+        "That one didn't come out. Try again.",
     ]
 
     private static var resourceKeys: [String] {

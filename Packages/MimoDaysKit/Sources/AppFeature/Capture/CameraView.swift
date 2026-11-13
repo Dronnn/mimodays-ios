@@ -105,8 +105,13 @@ struct CameraView: View {
                     }
                     Spacer(minLength: 0)
                     if !model.isRecording {
-                        if model.showsSingleCameraNote {
-                            SingleCameraNote()
+                        if let notice = model.notice {
+                            CameraNote(notice)
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, model.mode == .video ? 17 : 20)
+                        }
+                        if model.notice == nil, model.showsSingleCameraNote {
+                            CameraNote(icon: .glyphInfo, text: Text("This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.", bundle: .module), id: "camera.singleNote")
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 20)
                         } else if model.mode == .video {
@@ -435,14 +440,43 @@ private struct SurpriseChip: View {
     }
 }
 
-/// C05: one camera at a time.
-private struct SingleCameraNote: View {
+/// C05 and C13: a note card over the preview, above the controls.
+private struct CameraNote: View {
+    let icon: Icon
+    let text: Text
+    let id: String
+
+    init(icon: Icon, text: Text, id: String) {
+        self.icon = icon
+        self.text = text
+        self.id = id
+    }
+
+    init(_ notice: CameraNotice) {
+        switch notice {
+        case .microphoneOff:
+            self.init(icon: .glyphMute, text: Text("Videos will be silent. Turn on the microphone in Settings to add sound.", bundle: .module), id: "camera.notice")
+        case .lowStorage:
+            self.init(icon: .glyphInfo, text: Text("Not enough space to record. Free up some space on this iPhone and try again.", bundle: .module), id: "camera.notice")
+        case .interrupted(.anotherApp):
+            self.init(icon: .glyphInfo, text: Text("The camera is busy with a call or another app. It comes back on its own.", bundle: .module), id: "camera.notice")
+        case .interrupted(.tooWarm):
+            self.init(icon: .glyphInfo, text: Text("This iPhone is too warm for the camera right now. It comes back once it cools down.", bundle: .module), id: "camera.notice")
+        case .interrupted:
+            self.init(icon: .glyphInfo, text: Text("The camera paused for a moment. It comes back on its own.", bundle: .module), id: "camera.notice")
+        case .unavailable:
+            self.init(icon: .glyphInfo, text: Text("The camera isn't available right now. Close and try again in a moment.", bundle: .module), id: "camera.notice")
+        case .captureFailed:
+            self.init(icon: .glyphInfo, text: Text("That one didn't come out. Try again.", bundle: .module), id: "camera.notice")
+        }
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            Icon.glyphInfo.image
+            icon.image
                 .frame(width: 24, height: 24)
                 .accessibilityHidden(true)
-            Text("This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.", bundle: .module)
+            text
                 .textStyle(.cameraNote)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -453,7 +487,7 @@ private struct SingleCameraNote: View {
         .padding(.bottom, 16)
         .background(CameraPalette.background.opacity(0.88), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("camera.singleNote")
+        .accessibilityIdentifier(id)
     }
 }
 

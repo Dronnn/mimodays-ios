@@ -12,6 +12,28 @@ enum CaptureResult: Equatable, Sendable {
     case video(CapturedVideo, window: SelfieWindowFrame?)
 }
 
+/// A capture that didn't work, for the C13 note.
+enum CaptureFailure: Equatable {
+    case lowStorage
+    case failed
+
+    init(_ error: any Error) {
+        self = error as? CaptureError == .lowStorage ? .lowStorage : .failed
+    }
+}
+
+/// The camera's C13 note (Andrew approved the copy for the undesigned ones, 2026-11-13).
+enum CameraNotice: Equatable {
+    /// C13b: video with sound on, microphone denied in Settings.
+    case microphoneOff
+    case lowStorage
+    case interrupted(CaptureInterruption)
+    /// The camera couldn't start.
+    case unavailable
+    /// A capture failed or its file was unreadable; nothing was kept.
+    case captureFailed
+}
+
 /// The camera screen's state (C01-C05): engine setup, mode, controls and recording.
 @MainActor
 @Observable
@@ -53,21 +75,21 @@ final class CameraModel {
     let engine: any CaptureEngine
     private let store: any CameraSettingsStore
     private let clock: any DateProvider
-    private let microphoneAllowed: @MainActor () async -> Bool
+    private let microphoneStatus: @MainActor () async -> PermissionStatus
     private let onCapture: @MainActor (CaptureResult) -> Void
     private var events: Task<Void, Never>?
 
     init(
         engine: any CaptureEngine, store: any CameraSettingsStore, isSurprise: Bool,
         clock: any DateProvider = SystemDateProvider(),
-        microphoneAllowed: @escaping @MainActor () async -> Bool,
+        microphoneStatus: @escaping @MainActor () async -> PermissionStatus,
         onCapture: @escaping @MainActor (CaptureResult) -> Void
     ) {
         self.engine = engine
         self.store = store
         self.isSurprise = isSurprise
         self.clock = clock
-        self.microphoneAllowed = microphoneAllowed
+        self.microphoneStatus = microphoneStatus
         self.onCapture = onCapture
         let settings = store.load()
         self.settings = settings
@@ -98,8 +120,20 @@ final class CameraModel {
         if case .recording = phase { true } else { false }
     }
 
-    var microphoneOn: Bool { settings.recordsSound && microphoneAvailable }
-    private(set) var microphoneAvailable = false
+    var microphoneOn: Bool { settings.recordsSound && microphone.isUsable }
+    private(set) var microphone = PermissionStatus.notDetermined
+    /// The last capture that didn't work; cleared by the next try.
+    private(set) var failure: CaptureFailure?
+
+    /// What the C13 note says, most important first. Nil while recording.
+    var notice: CameraNotice? {
+        if isRecording { return nil }
+        if case .failed = phase { return .unavailable }
+        if let interruption { return .interrupted(interruption) }
+        if let failure { return failure == .lowStorage ? .lowStorage : .captureFailed }
+        if mode == .video, settings.recordsSound, microphone.needsSettings { return .microphoneOff }
+        return nil
+    }
 
     func start() async {
         do {
@@ -155,14 +189,17 @@ final class CameraModel {
     private func takePhoto() async {
         phase = .busy
         showsSingleCameraNote = false
+        failure = nil
         do {
             let window = selfieWindowFrame
-            let photo = arranged(try await engine.capturePhoto(flash: isFlashOn, silent: !settings.cameraSounds))
+            let captured = arranged(try await engine.capturePhoto(flash: isFlashOn, silent: !settings.cameraSounds))
+            guard let photo = MediaCheck.checked(captured) else { throw CaptureError.photoFailed }
             let composedURL = await composed(photo, window: window)
             phase = .ready
             onCapture(.photo(photo, window: photo.selfieURL == nil ? nil : window, composedURL: composedURL))
         } catch {
             phase = .ready
+            failure = CaptureFailure(error)
         }
     }
 
@@ -171,12 +208,15 @@ final class CameraModel {
         showsSingleCameraNote = false
         // The window can't move while recording; this is where it is for the whole clip.
         let window = selfieWindowFrame
+        failure = nil
         do {
-            let video = arranged(try await engine.record(limit: settings.videoLength.duration))
+            let recorded = arranged(try await engine.record(limit: settings.videoLength.duration))
+            guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready
             onCapture(.video(video, window: video.selfieURL == nil ? nil : window))
         } catch {
             phase = .ready
+            failure = CaptureFailure(error)
         }
     }
 
@@ -226,7 +266,7 @@ final class CameraModel {
     /// microphone permission is answered (C06c).
     func refreshMicrophone() async {
         guard phase != .starting else { return }
-        microphoneAvailable = await microphoneAllowed()
+        microphone = await microphoneStatus()
         try? await engine.setMicrophone(mode == .video && microphoneOn)
     }
 

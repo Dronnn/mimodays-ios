@@ -88,7 +88,7 @@ struct SelfieWindowSettingsTests {
     @Test func theCameraKeepsWhatTheUserChose() async {
         let store = InMemoryCameraSettingsStore()
         let model = CameraModel(
-            engine: SimulatedCaptureEngine(), store: store, isSurprise: false, microphoneAllowed: { true }, onCapture: { _ in }
+            engine: SimulatedCaptureEngine(), store: store, isSurprise: false, microphoneStatus: { .granted }, onCapture: { _ in }
         )
         model.settings.selfieWindow.corner = .bottomRight
         #expect(store.settings.selfieWindow.corner == .bottomRight)

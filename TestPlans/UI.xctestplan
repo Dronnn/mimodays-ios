@@ -1,0 +1,26 @@
+{
+  "configurations": [
+    {
+      "id": "6D6F1E18-2B50-4831-B9A8-AF73E071A300",
+      "name": "Default",
+      "options": {}
+    }
+  ],
+  "defaultOptions": {
+    "targetForVariableExpansion": {
+      "containerPath": "container:MimoDays.xcodeproj",
+      "identifier": "18C246AD30A477E30055D2C7",
+      "name": "MimoDays"
+    }
+  },
+  "testTargets": [
+    {
+      "target": {
+        "containerPath": "container:MimoDays.xcodeproj",
+        "identifier": "18C246C630A477E40055D2C7",
+        "name": "MimoDaysUITests"
+      }
+    }
+  ],
+  "version": 1
+}

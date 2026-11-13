@@ -1,0 +1,966 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "3 a day": {
+      "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 a day"
+          }
+        }
+      }
+    },
+    "3 a week": {
+      "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 a week"
+          }
+        }
+      }
+    },
+    "A little moment is happening.": {
+      "comment": "Surprise notification title (also shown in onboarding art)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little moment is happening."
+          }
+        }
+      }
+    },
+    "A little surprise": {
+      "comment": "Ribbon on the camera when it was opened from a surprise notification",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little surprise"
+          }
+        }
+      }
+    },
+    "A little surprise, every day.": {
+      "comment": "OB-02 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little surprise, every day."
+          }
+        }
+      }
+    },
+    "Add sound to your videos?": {
+      "comment": "C06c title: explainer shown before the system microphone prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add sound to your videos?"
+          }
+        }
+      }
+    },
+    "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties.": {
+      "comment": "OB-02 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties."
+          }
+        }
+      }
+    },
+    "Autumn": {
+      "comment": "Season label under a sample movie clip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autumn"
+          }
+        }
+      }
+    },
+    "Back": {
+      "comment": "Back button label in a navigation bar",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "Capture": {
+      "comment": "Accessibility label of the big camera button on Today",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture"
+          }
+        }
+      }
+    },
+    "Capture my first moment": {
+      "comment": "First capture invitation (onboarding O09): primary button, opens the camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture my first moment"
+          }
+        }
+      }
+    },
+    "Close": {
+      "comment": "Closes the camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        }
+      }
+    },
+    "Coffee, rain, and one stubborn bug.": {
+      "comment": "Sample handwritten note in onboarding art",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coffee, rain, and one stubborn bug."
+          }
+        }
+      }
+    },
+    "Continue": {
+      "comment": "Primary button on a permission explainer; shows the system prompt next",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
+    "Done": {
+      "comment": "Closes the Settings sheet",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Earliest": {
+      "comment": "Surprise schedule (onboarding O07): row title, earliest time a surprise may arrive",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earliest"
+          }
+        }
+      }
+    },
+    "Enable reminders": {
+      "comment": "Surprise schedule (onboarding O07): primary button, shows the system notification prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable reminders"
+          }
+        }
+      }
+    },
+    "Find your memories by date or place. Turn a month, a year, or any part of your life into a movie made from real, little moments.": {
+      "comment": "OB-05 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Find your memories by date or place. Turn a month, a year, or any part of your life into a movie made from real, little moments."
+          }
+        }
+      }
+    },
+    "Give your moment a voice.": {
+      "comment": "OB-04 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Give your moment a voice."
+          }
+        }
+      }
+    },
+    "How often": {
+      "comment": "Surprise schedule (onboarding O07): section label, shown in capitals",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How often"
+          }
+        }
+      }
+    },
+    "I'll do it later": {
+      "comment": "First capture invitation (onboarding O09): secondary button, finishes onboarding",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I'll do it later"
+          }
+        }
+      }
+    },
+    "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.": {
+      "comment": "First moment saved (onboarding O10): body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives."
+          }
+        }
+      }
+    },
+    "Latest": {
+      "comment": "Surprise schedule (onboarding O07): row title, latest time a surprise may arrive",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latest"
+          }
+        }
+      }
+    },
+    "Let MimoDays use the camera": {
+      "comment": "C06 title: explainer shown before the system camera prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let MimoDays use the camera"
+          }
+        }
+      }
+    },
+    "Look around. This could be a memory.": {
+      "comment": "Surprise notification body (also shown in onboarding art)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Look around. This could be a memory."
+          }
+        }
+      }
+    },
+    "Map": {
+      "comment": "Tab: moments on a map",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Map"
+          }
+        }
+      }
+    },
+    "Maybe later": {
+      "comment": "Surprise schedule (onboarding O07): secondary button, skips reminders for now",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maybe later"
+          }
+        }
+      }
+    },
+    "Memories": {
+      "comment": "Tab: grid of all saved moments",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memories"
+          }
+        }
+      }
+    },
+    "Movies": {
+      "comment": "Tab: movies made from moments",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Movies"
+          }
+        }
+      }
+    },
+    "No reminders for now. That's okay.": {
+      "comment": "Onboarding O08c, reminders off: headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No reminders for now. That's okay."
+          }
+        }
+      }
+    },
+    "Not now": {
+      "comment": "Closes a permission screen without asking",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not now"
+          }
+        }
+      }
+    },
+    "On these days": {
+      "comment": "Surprise schedule (onboarding O07): section label above the weekday circles, shown in capitals",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On these days"
+          }
+        }
+      }
+    },
+    "Once a day": {
+      "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once a day"
+          }
+        }
+      }
+    },
+    "Once a day, between %@ and %@. You can change this any time in Settings.": {
+      "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "One day, it becomes a movie.": {
+      "comment": "OB-05 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One day, it becomes a movie."
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "comment": "Opens the app's page in iOS Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "Open iOS Settings": {
+      "comment": "Onboarding O08c button, opens the app's notification settings in iOS Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open iOS Settings"
+          }
+        }
+      }
+    },
+    "Page %lld of %lld": {
+      "comment": "VoiceOver label of the onboarding progress dots, e.g. Page 2 of 6",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Pick how often and when. The exact time is always a surprise.": {
+      "comment": "Surprise schedule (onboarding O07): body under the headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick how often and when. The exact time is always a surprise."
+          }
+        }
+      }
+    },
+    "Ready for your first little moment?": {
+      "comment": "First capture invitation (onboarding O09): headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready for your first little moment?"
+          }
+        }
+      }
+    },
+    "Record without sound": {
+      "comment": "C06c: skip the microphone and record silent videos",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record without sound"
+          }
+        }
+      }
+    },
+    "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional.": {
+      "comment": "OB-04 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional."
+          }
+        }
+      }
+    },
+    "Set up reminders": {
+      "comment": "OB-06 button; leads to reminder setup",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up reminders"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "comment": "Gear button and Settings sheet title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        }
+      }
+    },
+    "Show what you see and how you look in the same photo or video. Your face appears in a small picture-in-picture frame. A single camera works, too.": {
+      "comment": "OB-03 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show what you see and how you look in the same photo or video. Your face appears in a small picture-in-picture frame. A single camera works, too."
+          }
+        }
+      }
+    },
+    "Skip": {
+      "comment": "Skips the remaining onboarding pages",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "Spring": {
+      "comment": "Season label under a sample movie clip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spring"
+          }
+        }
+      }
+    },
+    "Summer": {
+      "comment": "Season label under a sample movie clip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Summer"
+          }
+        }
+      }
+    },
+    "Surprises only arrive between these times. Focus modes still apply.": {
+      "comment": "Surprise schedule (onboarding O07): note under the time rows",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surprises only arrive between these times. Focus modes still apply."
+          }
+        }
+      }
+    },
+    "Tbilisi · optional": {
+      "comment": "Sample place chip in onboarding art",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tbilisi · optional"
+          }
+        }
+      }
+    },
+    "The camera is turned off for MimoDays": {
+      "comment": "C13a title: camera access was denied in Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera is turned off for MimoDays"
+          }
+        }
+      }
+    },
+    "The camera turns on only while this screen is open, and only you start a recording. Nothing is captured in the background or sent anywhere.": {
+      "comment": "C06 body: camera explainer",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera turns on only while this screen is open, and only you start a recording. Nothing is captured in the background or sent anywhere."
+          }
+        }
+      }
+    },
+    "The microphone records only while you are recording a video or a voice note. You can say no: videos are still saved, just silent.": {
+      "comment": "C06c body: microphone explainer",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone records only while you are recording a video or a voice note. You can say no: videos are still saved, just silent."
+          }
+        }
+      }
+    },
+    "Three times a day, between %@ and %@. You can change this any time in Settings.": {
+      "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three times a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "Three times a week, between %@ and %@. You can change this any time in Settings.": {
+      "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three times a week, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today.": {
+      "comment": "C13a body: camera access off",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today."
+          }
+        }
+      }
+    },
+    "Today": {
+      "comment": "Tab: today's capture screen",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        }
+      }
+    },
+    "Today, %@": {
+      "comment": "Handwritten caption on a moment saved today. %@ = time, e.g. 4:12 PM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today, %@"
+          }
+        }
+      }
+    },
+    "Try the camera. Save the photo or video only if you like it.": {
+      "comment": "First capture invitation (onboarding O09): body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try the camera. Save the photo or video only if you like it."
+          }
+        }
+      }
+    },
+    "Twice": {
+      "comment": "Surprise schedule (onboarding O07): frequency option meaning twice a day, keep very short (segmented control)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twice"
+          }
+        }
+      }
+    },
+    "Twice a day, between %@ and %@. You can change this any time in Settings.": {
+      "comment": "Onboarding O08b body. %1$@ = earliest time, %2$@ = latest time, e.g. 8:00 AM",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twice a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "View my moments": {
+      "comment": "First moment saved (onboarding O10): primary button, opens Memories",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View my moments"
+          }
+        }
+      }
+    },
+    "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too.": {
+      "comment": "OB-01 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too."
+          }
+        }
+      }
+    },
+    "When should MimoDays surprise you?": {
+      "comment": "Surprise schedule (onboarding O07): headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When should MimoDays surprise you?"
+          }
+        }
+      }
+    },
+    "Winter": {
+      "comment": "Season label under a sample movie clip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Winter"
+          }
+        }
+      }
+    },
+    "You and the world around you.": {
+      "comment": "OB-03 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You and the world around you."
+          }
+        }
+      }
+    },
+    "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings.": {
+      "comment": "Onboarding O08c, reminders off: body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings."
+          }
+        }
+      }
+    },
+    "Your captures stay on your device by default. You choose when to back up, share, export, or delete them. No public profile is required.": {
+      "comment": "OB-06 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your captures stay on your device by default. You choose when to back up, share, export, or delete them. No public profile is required."
+          }
+        }
+      }
+    },
+    "Your first moment is here.": {
+      "comment": "First moment saved (onboarding O10): headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your first moment is here."
+          }
+        }
+      }
+    },
+    "Your first surprise is on its way.": {
+      "comment": "Onboarding O08b, reminders turned on: headline",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your first surprise is on its way."
+          }
+        }
+      }
+    },
+    "Your life, in little pieces.": {
+      "comment": "OB-01 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your life, in little pieces."
+          }
+        }
+      }
+    },
+    "Your moments. Your memories.": {
+      "comment": "OB-06 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your moments. Your memories."
+          }
+        }
+      }
+    },
+    "an ordinary afternoon": {
+      "comment": "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "an ordinary afternoon"
+          }
+        }
+      }
+    },
+    "bus window": {
+      "comment": "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bus window"
+          }
+        }
+      }
+    },
+    "dog asleep": {
+      "comment": "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dog asleep"
+          }
+        }
+      }
+    },
+    "kitchen table": {
+      "comment": "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kitchen table"
+          }
+        }
+      }
+    },
+    "now": {
+      "comment": "Time on the sample notification in onboarding art",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "now"
+          }
+        }
+      }
+    },
+    "the world around you": {
+      "comment": "Onboarding art caption on the back-camera sample (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "the world around you"
+          }
+        }
+      }
+    },
+    "whatever is in front of you": {
+      "comment": "Onboarding art caption on the back-camera sample (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "whatever is in front of you"
+          }
+        }
+      }
+    },
+    "you": {
+      "comment": "Onboarding art caption on the selfie sample (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "you"
+          }
+        }
+      }
+    }
+  }
+}

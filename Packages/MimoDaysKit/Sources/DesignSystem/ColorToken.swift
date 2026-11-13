@@ -25,6 +25,8 @@ public enum ColorToken: String, CaseIterable, Sendable {
     case actionCoralGradientStart
     case actionCoralGradientEnd
     case borderSubtle
+    /// Progress dots not reached yet.
+    case indicatorInactive
     /// PiP / selfie frame; stays light in dark mode.
     case mediaFrame
     /// 45 % scrim behind text on photos.

@@ -2,6 +2,18 @@
   "sourceLanguage": "en",
   "version": "1.0",
   "strings": {
+    "A little moment is happening.": {
+      "comment": "Surprise notification title (also shown in onboarding art)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little moment is happening."
+          }
+        }
+      }
+    },
     "A little surprise": {
       "comment": "Ribbon on the camera when it was opened from a surprise notification",
       "extractionState": "manual",
@@ -14,6 +26,18 @@
         }
       }
     },
+    "A little surprise, every day.": {
+      "comment": "OB-02 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little surprise, every day."
+          }
+        }
+      }
+    },
     "Add sound to your videos?": {
       "comment": "C06c title: explainer shown before the system microphone prompt",
       "extractionState": "manual",
@@ -22,6 +46,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Add sound to your videos?"
+          }
+        }
+      }
+    },
+    "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties.": {
+      "comment": "OB-02 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties."
+          }
+        }
+      }
+    },
+    "Autumn": {
+      "comment": "Season label under a sample movie clip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autumn"
           }
         }
       }
@@ -50,6 +98,18 @@
         }
       }
     },
+    "Coffee, rain, and one stubborn bug.": {
+      "comment": "Sample handwritten note in onboarding art",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coffee, rain, and one stubborn bug."
+          }
+        }
+      }
+    },
     "Continue": {
       "comment": "Primary button on a permission explainer; shows the system prompt next",
       "extractionState": "manual",
@@ -74,6 +134,30 @@
         }
       }
     },
+    "Find your memories by date or place. Turn a month, a year, or any part of your life into a movie made from real, little moments.": {
+      "comment": "OB-05 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Find your memories by date or place. Turn a month, a year, or any part of your life into a movie made from real, little moments."
+          }
+        }
+      }
+    },
+    "Give your moment a voice.": {
+      "comment": "OB-04 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Give your moment a voice."
+          }
+        }
+      }
+    },
     "Let MimoDays use the camera": {
       "comment": "C06 title: explainer shown before the system camera prompt",
       "extractionState": "manual",
@@ -82,6 +166,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Let MimoDays use the camera"
+          }
+        }
+      }
+    },
+    "Look around. This could be a memory.": {
+      "comment": "Surprise notification body (also shown in onboarding art)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Look around. This could be a memory."
           }
         }
       }
@@ -134,6 +230,18 @@
         }
       }
     },
+    "One day, it becomes a movie.": {
+      "comment": "OB-05 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One day, it becomes a movie."
+          }
+        }
+      }
+    },
     "Open Settings": {
       "comment": "Opens the app's page in iOS Settings",
       "extractionState": "manual",
@@ -142,6 +250,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "Page %lld of %lld": {
+      "comment": "VoiceOver label of the onboarding progress dots, e.g. Page 2 of 6",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page %1$lld of %2$lld"
           }
         }
       }
@@ -158,6 +278,30 @@
         }
       }
     },
+    "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional.": {
+      "comment": "OB-04 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional."
+          }
+        }
+      }
+    },
+    "Set up reminders": {
+      "comment": "OB-06 button; leads to reminder setup",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up reminders"
+          }
+        }
+      }
+    },
     "Settings": {
       "comment": "Gear button and Settings sheet title",
       "extractionState": "manual",
@@ -166,6 +310,66 @@
           "stringUnit": {
             "state": "translated",
             "value": "Settings"
+          }
+        }
+      }
+    },
+    "Show what you see and how you look in the same photo or video. Your face appears in a small picture-in-picture frame. A single camera works, too.": {
+      "comment": "OB-03 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show what you see and how you look in the same photo or video. Your face appears in a small picture-in-picture frame. A single camera works, too."
+          }
+        }
+      }
+    },
+    "Skip": {
+      "comment": "Skips the remaining onboarding pages",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "Spring": {
+      "comment": "Season label under a sample movie clip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spring"
+          }
+        }
+      }
+    },
+    "Summer": {
+      "comment": "Season label under a sample movie clip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Summer"
+          }
+        }
+      }
+    },
+    "Tbilisi · optional": {
+      "comment": "Sample place chip in onboarding art",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tbilisi · optional"
           }
         }
       }
@@ -226,6 +430,162 @@
           "stringUnit": {
             "state": "translated",
             "value": "Today"
+          }
+        }
+      }
+    },
+    "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too.": {
+      "comment": "OB-01 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too."
+          }
+        }
+      }
+    },
+    "Winter": {
+      "comment": "Season label under a sample movie clip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Winter"
+          }
+        }
+      }
+    },
+    "You and the world around you.": {
+      "comment": "OB-03 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You and the world around you."
+          }
+        }
+      }
+    },
+    "Your captures stay on your device by default. You choose when to back up, share, export, or delete them. No public profile is required.": {
+      "comment": "OB-06 body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your captures stay on your device by default. You choose when to back up, share, export, or delete them. No public profile is required."
+          }
+        }
+      }
+    },
+    "Your life, in little pieces.": {
+      "comment": "OB-01 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your life, in little pieces."
+          }
+        }
+      }
+    },
+    "Your moments. Your memories.": {
+      "comment": "OB-06 title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your moments. Your memories."
+          }
+        }
+      }
+    },
+    "an ordinary afternoon": {
+      "comment": "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "an ordinary afternoon"
+          }
+        }
+      }
+    },
+    "bus window": {
+      "comment": "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bus window"
+          }
+        }
+      }
+    },
+    "dog asleep": {
+      "comment": "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dog asleep"
+          }
+        }
+      }
+    },
+    "kitchen table": {
+      "comment": "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kitchen table"
+          }
+        }
+      }
+    },
+    "now": {
+      "comment": "Time on the sample notification in onboarding art",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "now"
+          }
+        }
+      }
+    },
+    "the world around you": {
+      "comment": "Onboarding art caption on the back-camera sample (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "the world around you"
+          }
+        }
+      }
+    },
+    "you": {
+      "comment": "Onboarding art caption on the selfie sample (handwritten)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "you"
           }
         }
       }

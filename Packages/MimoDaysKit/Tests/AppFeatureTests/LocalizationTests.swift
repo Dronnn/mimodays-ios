@@ -6,11 +6,16 @@ struct LocalizationTests {
     private static let missing = "\u{0}missing"
 
     /// Keys used directly as `Text("…", bundle: .module)`.
-    private static let literalKeys = ["Settings", "Capture", "Done", "Close", "A little surprise"]
+    private static let literalKeys = ["Settings", "Capture", "Done", "Close", "A little surprise", "Skip", "Page %lld of %lld"]
 
     private static var resourceKeys: [String] {
         let resources = MainTab.allCases.map(\.title)
             + PermissionScreen.allCases.flatMap { [$0.title, $0.message, $0.primaryAction, $0.secondaryAction] }
+            + OnboardingPage.allCases.flatMap { [$0.title, $0.message, $0.primaryAction] }
+            + OnboardingPage.allCases.flatMap(\.artLayers).compactMap { layer -> LocalizedStringResource? in
+                guard case let .text(.localized(resource), _, _, _, _) = layer else { return nil }
+                return resource
+            }
         return resources.map(\.key)
     }
 

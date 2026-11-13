@@ -29,6 +29,43 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
     }
 
+    /// Flow 03 up to review (Phase 7): a photo, then a video recorded and stopped, on the simulated engine.
+    @MainActor
+    func testTakesAPhotoThenRecordsAndStopsAVideo() {
+        openCamera()
+        let shutter = app.buttons["camera.shutter"]
+        shutter.tap()
+        XCTAssertTrue(shutter.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.descendants(matching: .any)["camera.notice"].exists)
+
+        app.buttons["camera.mode.video"].tap()
+        app.buttons["camera.length.30"].tap()
+        shutter.tap()
+        let stop = app.buttons["camera.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["camera.timer"].exists)
+        // While recording the top controls give way to the timer.
+        XCTAssertFalse(app.buttons["capture.close"].exists)
+        stop.tap()
+        XCTAssertTrue(shutter.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.descendants(matching: .any)["camera.notice"].exists)
+        XCTAssertTrue(app.buttons["capture.close"].exists)
+    }
+
+    @MainActor
+    func testFlipAndHideTheSelfieWindow() {
+        openCamera()
+        app.buttons["camera.flip"].tap()
+        XCTAssertTrue(selfieWindow.exists)
+        let toggle = app.buttons["camera.selfie"]
+        XCTAssertEqual(toggle.value as? String, "On")
+        toggle.tap()
+        XCTAssertFalse(selfieWindow.waitForExistence(timeout: 1))
+        XCTAssertEqual(toggle.value as? String, "Off")
+        toggle.tap()
+        XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
+    }
+
     @MainActor
     func testFirstVideoExplainsTheMicrophoneThenRecordsSound() {
         openCamera(permissions: .notDetermined)

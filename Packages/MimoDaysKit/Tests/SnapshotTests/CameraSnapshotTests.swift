@@ -60,6 +60,41 @@ struct CameraSnapshotTests {
         assertScreenSnapshots(of: screen(await camera(mode: .video, microphone: .denied)), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
+    /// The camera couldn't start (the simulator has no cameras).
+    @Test func unavailable() async {
+        let model = CameraModel(
+            engine: AVCaptureEngine(), store: InMemoryCameraSettingsStore(), isSurprise: false,
+            microphoneStatus: { .granted }, onCapture: { _ in }
+        )
+        await model.start()
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// ↻ on a dual setup: the front camera big, the rear one in the window.
+    @Test func swapped() async {
+        let model = await camera()
+        await model.flip()
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func selfieWindowHidden() async {
+        let model = await camera()
+        model.toggleSelfie()
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func interruptedTooWarm() async throws {
+        let engine = SimulatedCaptureEngine()
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(), isSurprise: false,
+            microphoneStatus: { .granted }, onCapture: { _ in }
+        )
+        await model.start()
+        await engine.simulateInterruption(.tooWarm)
+        for _ in 0..<50 where model.interruption == nil { try await Task.sleep(for: .milliseconds(20)) }
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
     /// C04 behind its sheet: corner targets, the chosen one in coral.
     @Test func adjustSelfieWindow() async {
         let model = await camera(selfieWindow: .init(corner: .topLeft, scale: .medium))

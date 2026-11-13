@@ -1,3 +1,4 @@
+import Core
 import Foundation
 import SwiftData
 
@@ -38,4 +39,17 @@ public enum MimoDaysStore {
         }
         return try ModelContainer(for: schema, migrationPlan: MimoDaysMigrationPlan.self, configurations: configuration)
     }
+}
+
+
+public extension SchemaV1.Moment {
+    /// Creates a moment whose day and time zone come from one capture time, so they can't disagree.
+    convenience init(captured: CaptureTime, origin: MomentOrigin, mediaType: MediaType, promptID: UUID? = nil, createdAt: Date) {
+        self.init(
+            capturedAt: captured.instant, timeZoneID: captured.timeZoneID, localDay: captured.localDay.key,
+            origin: origin, mediaType: mediaType, promptID: promptID, createdAt: createdAt
+        )
+    }
+
+    var captureTime: CaptureTime { CaptureTime(instant: capturedAt, timeZoneID: timeZoneID) }
 }

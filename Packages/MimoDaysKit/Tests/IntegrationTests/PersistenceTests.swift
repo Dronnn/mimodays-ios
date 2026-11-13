@@ -1,3 +1,4 @@
+import Core
 import Foundation
 import Persistence
 import SwiftData
@@ -126,5 +127,14 @@ struct PersistenceTests {
         #expect(moment.pipLayout?.rotation == -5.4)
         #expect(moment.tags == ["bike"])
         #expect(try context.fetch(FetchDescriptor<SurpriseSchedule>()).first?.frequency == .twiceADay)
+    }
+}
+
+struct MomentCaptureTimeTests {
+    @Test func dayAndZoneComeFromCaptureTime() throws {
+        let captured = CaptureTime(instant: try Date("2026-11-12T07:30:00Z", strategy: .iso8601), timeZoneID: "America/Los_Angeles")
+        let moment = Moment(captured: captured, origin: .manual, mediaType: .photo, createdAt: captured.instant)
+        #expect(moment.localDay == 2026_11_11)
+        #expect(moment.captureTime == captured)
     }
 }

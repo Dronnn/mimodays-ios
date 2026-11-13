@@ -18,7 +18,7 @@ let package = Package(
     targets: [
         .target(name: "Core"),
         .target(name: "DesignSystem", resources: [.process("Resources")]),
-        .target(name: "Persistence"),
+        .target(name: "Persistence", dependencies: ["Core"]),
         .target(name: "AppFeature", dependencies: ["Core", "DesignSystem"]),
         .target(
             name: "TestSupport",

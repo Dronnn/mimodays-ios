@@ -28,6 +28,22 @@ final class SurpriseUITests: XCTestCase {
         XCTAssertTrue(app.tabBars.firstMatch.buttons.element(boundBy: 0).isSelected)
     }
 
+    /// 7.7: from the notification a moment is kept in two taps, shutter and Save, with nothing in between.
+    @MainActor
+    func testASurpriseIsKeptInTwoTaps() {
+        let app = launch(tap: .inTime)
+        let shutter = app.buttons["camera.shutter"]
+        XCTAssertTrue(shutter.waitForExistence(timeout: 5))
+        shutter.tap()
+        let save = app.buttons["review.save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        // 7.6: review marks it as a surprise.
+        XCTAssertTrue(app.descendants(matching: .any)["review.time"].label.hasPrefix("Surprise moment"))
+        save.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["capture"].exists)
+    }
+
     @MainActor
     func testTapAfterExpiryOpensAPlainCamera() {
         let app = launch(tap: .expired)

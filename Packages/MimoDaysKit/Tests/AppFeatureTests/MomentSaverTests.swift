@@ -127,6 +127,19 @@ struct MomentSaverTests {
         #expect(FileManager.default.fileExists(atPath: capture.mainURL.path))
     }
 
+    @Test func aVoiceNoteThatCannotBeCopiedRollsBackEveryFile() async throws {
+        let capture = try await photo()
+        defer { capture.discardFiles() }
+        // The voice note is copied last: its file is gone, so the sources, composite and thumbnail already written go too.
+        let voice = ReviewVoiceNote(url: root.appending(path: "missing.m4a"), duration: 3, recordedAt: .now, transcript: nil)
+        var draft = MomentDraft(capture: capture, caption: "", window: window, promptID: nil)
+        draft.voice = voice
+        await #expect(throws: SaveError.failed) { _ = try await saver().save(draft) }
+        #expect(try moments().isEmpty)
+        #expect(try store.orphans(referenced: []).isEmpty)
+        #expect(FileManager.default.fileExists(atPath: capture.mainURL.path))
+    }
+
     @Test func aMomentWithoutASelfieHasNoWindow() async throws {
         let engine = SimulatedCaptureEngine(multiCam: false)
         _ = await engine.start()

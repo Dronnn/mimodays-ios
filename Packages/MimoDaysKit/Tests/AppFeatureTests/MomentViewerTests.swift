@@ -23,8 +23,11 @@ struct MomentViewerTests {
 
     private var library: MediaLibrary { MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline()) }
 
-    private func save(video: Bool = false, caption: String = "", note: String = "", voice: Bool = false, place: String? = nil) async throws -> UUID {
-        let engine = SimulatedCaptureEngine()
+    private func save(
+        video: Bool = false, multiCam: Bool = true,
+        caption: String = "", note: String = "", voice: Bool = false, place: String? = nil
+    ) async throws -> UUID {
+        let engine = SimulatedCaptureEngine(multiCam: multiCam)
         _ = await engine.start()
         let media: CaptureResult.Media = video
             ? .video(try await engine.record(limit: .seconds(1)))
@@ -211,6 +214,27 @@ struct MomentViewerTests {
             let (r, g, b) = (Int(bytes[i]), Int(bytes[i + 1]), Int(bytes[i + 2]))
             return (r, g, b, 0.299 * Double(r) + 0.587 * Double(g) + 0.114 * Double(b))
         }
+    }
+
+    /// 9.27: a single-camera video plays, shares and has no window anywhere.
+    @Test func aSingleCameraVideoHasNoWindow() async throws {
+        let id = try await save(video: true, multiCam: false)
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        let source = try #require(viewer.moments[id]?.video)
+        #expect(source.selfiePath == nil && source.layout == nil && source.timing.window == nil)
+        let items = try #require(await viewer.playerItems(id))
+        #expect(items.selfie == nil)
+        let player = ViewerVideoPlayer(duration: 1)
+        await player.load(main: items.main, selfie: items.selfie)
+        #expect(player.isReady && !player.hasSelfie)
+        player.play()
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(player.isPlaying && player.main.currentTime().seconds > 0.1)
+        player.stop()
+        let url = try #require(await viewer.exportVideo(id))
+        defer { try? FileManager.default.removeItem(at: url) }
+        #expect(try await AVURLAsset(url: url).loadTracks(withMediaType: .video).count == 1)
     }
 
     @Test func aDeletedMomentIsNotShown() async throws {

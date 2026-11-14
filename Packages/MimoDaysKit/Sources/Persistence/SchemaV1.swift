@@ -405,6 +405,8 @@ public enum SchemaV1: VersionedSchema {
         public var kindRaw: String
         /// The person's own audio file (no bundled music in v1), relative to the media store root.
         public var relativePath: String
+        /// The file's name as the person picked it ("Sunday song"), shown on F09.
+        public var name: String?
         public var startOffset: Double
         public var gain: Double
         public var gainEnvelope: [GainPoint]

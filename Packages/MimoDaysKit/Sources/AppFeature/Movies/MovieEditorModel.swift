@@ -1,0 +1,435 @@
+@preconcurrency import AVFoundation
+import Core
+import Foundation
+import OSLog
+import Persistence
+import SwiftData
+
+/// F06-F09: one project's edits. Every change is saved as it's made (11.9); Undo steps back through them;
+/// the stage plays the movie as it stands.
+@MainActor
+@Observable
+final class MovieEditorModel {
+    enum Tool: Hashable, CaseIterable {
+        case clips
+        case shape
+        case captions
+        case audio
+    }
+
+    /// One clip's edit decisions, as Undo puts them back.
+    struct ClipState: Equatable {
+        var momentID: UUID
+        var trimStart: Double?
+        var trimEnd: Double?
+        var crop: NormalizedRect?
+        var selfiePlacement: MovieSelfiePlacement?
+        var transition: MovieTransition
+        var clipAudio: ClipAudio
+        var clipVolume: Double
+        var includesVoiceNote: Bool
+    }
+
+    /// The whole project's edit decisions at one moment.
+    struct Snapshot: Equatable {
+        var title: String
+        var aspectRatio: MovieAspectRatio
+        var fit: MovieFit
+        var showsDates: Bool
+        var showsPlaces: Bool
+        var showsTitle: Bool
+        var clipSoundLevel: Double
+        var voiceNoteLevel: Double
+        var music: Music?
+        var clips: [ClipState]
+    }
+
+    struct Music: Equatable {
+        var relativePath: String
+        var name: String?
+        var gain: Double
+    }
+
+    let project: MovieProject
+    let tiles: MemoriesModel
+    var tool: Tool = .clips
+    /// The clips as the movie plays them, and what the composer made of each (same order).
+    private(set) var clips: [MovieClip] = []
+    private(set) var plan: MoviePlan
+    private(set) var selected = 0
+    private(set) var canUndo = false
+    let player = AVPlayer()
+    private(set) var time: Double = 0
+    private(set) var isPlaying = false
+    /// The composer couldn't make the movie (a clip's file is unreadable); the stage says so.
+    private(set) var failed = false
+    private let library: MediaLibrary
+    private let clock: any DateProvider
+    private var undoStack: [Snapshot] = []
+    private var rebuild: Task<Void, Never>?
+    private var timeObserver: Any?
+    /// Every music file this editor has seen; the ones nothing points at go when it closes.
+    private var musicFiles: Set<String> = []
+    private let logger = Logger(subsystem: "MimoDays", category: "Movies")
+    /// Undo keeps this many steps.
+    static let undoLimit = 50
+    /// The stage is drawn at 720p; the export renders at the chosen quality.
+    static let previewResolution = MovieResolution.p720
+    /// Music sits under the clips' own sound and the voice notes.
+    static let musicGain = 0.8
+
+    init(project: MovieProject, library: MediaLibrary, clock: any DateProvider = SystemDateProvider()) {
+        self.project = project
+        self.library = library
+        self.clock = clock
+        tiles = MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails, clock: clock)
+        plan = MoviePlan(clips: [], aspectRatio: project.aspectRatio, fit: project.fit)
+        musicFiles = Set(project.audioTracks.map(\.relativePath))
+        reload()
+        timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 30), queue: .main) { [weak self] time in
+            MainActor.assumeIsolated { self?.tick(time.seconds) }
+        }
+    }
+
+    private var store: MovieStore { MovieStore(context: library.context, store: library.store, now: { [clock] in clock.now() }) }
+
+    // MARK: Timeline
+
+    var duration: Double { plan.duration }
+
+    /// Where each clip starts in the movie.
+    var starts: [Double] {
+        var cursor = 0.0
+        return plan.clips.map { clip in
+            defer { cursor += clip.duration }
+            return cursor
+        }
+    }
+
+    /// The clip playing at `time`, and how far into it (0...1).
+    var playhead: (index: Int, fraction: Double)? {
+        guard !plan.clips.isEmpty else { return nil }
+        let starts = starts
+        let index = starts.lastIndex { $0 <= time + 0.0001 } ?? 0
+        let length = plan.clips[index].duration
+        return (index, length > 0 ? min(max((time - starts[index]) / length, 0), 1) : 0)
+    }
+
+    var selectedClip: MovieClip? { clips.indices.contains(selected) ? clips[selected] : nil }
+    var selectedPlan: MoviePlan.Clip? { plan.clips.indices.contains(selected) ? plan.clips[selected] : nil }
+
+    func select(_ index: Int) {
+        guard clips.indices.contains(index) else { return }
+        selected = index
+        seek(to: starts[index])
+    }
+
+    // MARK: Playback
+
+    func togglePlay() {
+        if isPlaying {
+            player.pause()
+        } else {
+            if time >= duration - 0.05 { seek(to: 0) }
+            player.play()
+        }
+        isPlaying.toggle()
+    }
+
+    func pause() {
+        player.pause()
+        isPlaying = false
+    }
+
+    func seek(to seconds: Double) {
+        time = min(max(seconds, 0), duration)
+        player.seek(to: CMTime(seconds: time, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+
+    private func tick(_ seconds: Double) {
+        guard isPlaying, seconds.isFinite else { return }
+        time = seconds
+        if let index = playhead?.index, index != selected { selected = index }
+        if seconds >= duration - 0.02 {
+            isPlaying = false
+        }
+    }
+
+    // MARK: Clips (F06)
+
+    var canRemove: Bool { clips.count > 1 }
+
+    func remove() {
+        guard canRemove, let clip = selectedClip else { return }
+        edit {
+            library.context.delete(clip)
+            renumber(clips.filter { $0 !== clip })
+        }
+        selected = min(selected, clips.count - 1)
+    }
+
+    /// Long-press and drag: the clip at `source` goes to `destination`.
+    func move(from source: Int, to destination: Int) {
+        guard source != destination, clips.indices.contains(source), clips.indices.contains(destination) else { return }
+        edit {
+            var order = clips
+            order.insert(order.remove(at: source), at: destination)
+            renumber(order)
+        }
+        selected = destination
+    }
+
+    func setTransition(_ transition: MovieTransition) {
+        guard let clip = selectedClip, clip.transition != transition else { return }
+        edit { clip.transition = transition }
+    }
+
+    /// The selected clip shows another moment instead; its place in the movie and its transition stay.
+    func replace(with momentID: UUID) {
+        guard let clip = selectedClip,
+              let moment = try? library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == momentID })).first
+        else { return }
+        edit {
+            clip.moment = moment
+            clip.trimStart = nil
+            clip.trimEnd = nil
+            clip.crop = nil
+            clip.selfiePlacement = nil
+        }
+    }
+
+    /// Video: the part from `start` to `end` seconds. Photo: shown for `end - start` seconds.
+    func trim(start: Double, end: Double) {
+        guard let clip = selectedClip, let media = selectedPlan?.media else { return }
+        edit {
+            switch media {
+            case .photo:
+                clip.trimStart = nil
+                clip.trimEnd = end - start
+            case .video:
+                clip.trimStart = start
+                clip.trimEnd = end
+            }
+        }
+    }
+
+    /// The moments Replace offers: the source's, not already in the movie; every moment when the source has none.
+    func replacements() -> [MemoryItem] {
+        let used = Set(clips.compactMap { $0.moment?.id })
+        let source = NewMovieModel(library: library, source: project.sourceRule, clock: clock)
+        _ = source.loadCandidates()
+        var items = source.items.filter { !used.contains($0.id) }
+        if items.isEmpty {
+            let all = NewMovieModel(library: library, source: MovieSourceRule(kind: .selection), clock: clock)
+            _ = all.loadCandidates()
+            items = all.items.filter { !used.contains($0.id) }
+        }
+        return items
+    }
+
+    // MARK: Shape (F07)
+
+    func setAspectRatio(_ ratio: MovieAspectRatio) {
+        guard project.aspectRatio != ratio else { return }
+        edit { project.aspectRatio = ratio }
+    }
+
+    func setFit(_ fit: MovieFit) {
+        guard project.fit != fit else { return }
+        edit { project.fit = fit }
+    }
+
+    func setPlacement(_ placement: MovieSelfiePlacement) {
+        guard let clip = selectedClip, clip.selfiePlacement != placement else { return }
+        edit { clip.selfiePlacement = placement }
+    }
+
+    // MARK: Captions (F08)
+
+    func setShowsDates(_ on: Bool) { edit { project.showsDates = on } }
+    func setShowsPlaces(_ on: Bool) { edit { project.showsPlaces = on } }
+
+    /// The title is the movie's name too; an empty one keeps the old name.
+    func setTitle(_ title: String, shows: Bool) {
+        let title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        edit {
+            if !title.isEmpty { project.title = title }
+            project.showsTitle = shows
+        }
+    }
+
+    // MARK: Audio (F09)
+
+    /// Clips with a voice note of their own ("6 of 24 clips").
+    var voiceNoteCount: Int { plan.clips.filter { $0.voiceURL != nil }.count }
+
+    var music: MovieAudioTrack? { project.audioTracks.first { $0.kind == .soundtrack } }
+
+    /// A slider started moving: one Undo step for the whole drag.
+    func beginLevelChange() { pushUndo() }
+
+    /// While a slider moves the level changes at once; the movie is rebuilt when it stops.
+    func setClipSoundLevel(_ level: Double) { project.clipSoundLevel = min(max(level, 0), 1) }
+    func setVoiceNoteLevel(_ level: Double) { project.voiceNoteLevel = min(max(level, 0), 1) }
+
+    func endLevelChange() { saved() }
+
+    /// The person's own file (from Files) plays under the movie; it's copied in, so the original can go.
+    func setMusic(from url: URL) {
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+        do {
+            let file = try library.store.store(copyOf: url, in: .originals, fileExtension: url.pathExtension.isEmpty ? nil : url.pathExtension)
+            musicFiles.insert(file.relativePath)
+            edit {
+                for track in project.audioTracks where track.kind == .soundtrack { library.context.delete(track) }
+                let track = MovieAudioTrack(kind: .soundtrack, relativePath: file.relativePath, gain: Self.musicGain)
+                track.name = url.deletingPathExtension().lastPathComponent
+                track.project = project
+                library.context.insert(track)
+            }
+        } catch {
+            logger.error("Adding music failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// The file stays until the editor closes, so Undo can bring it back.
+    func removeMusic() {
+        guard music != nil else { return }
+        edit {
+            for track in project.audioTracks where track.kind == .soundtrack { library.context.delete(track) }
+        }
+    }
+
+    // MARK: Undo
+
+    func undo() {
+        guard let snapshot = undoStack.popLast() else { return }
+        apply(snapshot)
+        canUndo = !undoStack.isEmpty
+        saved()
+    }
+
+    var snapshot: Snapshot {
+        Snapshot(
+            title: project.title, aspectRatio: project.aspectRatio, fit: project.fit, showsDates: project.showsDates,
+            showsPlaces: project.showsPlaces, showsTitle: project.showsTitle, clipSoundLevel: project.clipSoundLevel,
+            voiceNoteLevel: project.voiceNoteLevel, music: music.map { Music(relativePath: $0.relativePath, name: $0.name, gain: $0.gain) },
+            clips: clips.compactMap { clip in
+                clip.moment.map {
+                    ClipState(
+                        momentID: $0.id, trimStart: clip.trimStart, trimEnd: clip.trimEnd, crop: clip.crop,
+                        selfiePlacement: clip.selfiePlacement, transition: clip.transition, clipAudio: clip.clipAudio,
+                        clipVolume: clip.clipVolume, includesVoiceNote: clip.includesVoiceNote
+                    )
+                }
+            }
+        )
+    }
+
+    private func apply(_ snapshot: Snapshot) {
+        project.title = snapshot.title
+        project.aspectRatio = snapshot.aspectRatio
+        project.fit = snapshot.fit
+        project.showsDates = snapshot.showsDates
+        project.showsPlaces = snapshot.showsPlaces
+        project.showsTitle = snapshot.showsTitle
+        project.clipSoundLevel = snapshot.clipSoundLevel
+        project.voiceNoteLevel = snapshot.voiceNoteLevel
+        if music.map({ Music(relativePath: $0.relativePath, name: $0.name, gain: $0.gain) }) != snapshot.music {
+            for track in project.audioTracks where track.kind == .soundtrack { library.context.delete(track) }
+            if let music = snapshot.music {
+                let track = MovieAudioTrack(kind: .soundtrack, relativePath: music.relativePath, gain: music.gain)
+                track.name = music.name
+                track.project = project
+                library.context.insert(track)
+            }
+        }
+        if self.snapshot.clips != snapshot.clips {
+            for clip in project.clips { library.context.delete(clip) }
+            let ids = snapshot.clips.map(\.momentID)
+            let moments = (try? library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { ids.contains($0.id) }))) ?? []
+            let byID = Dictionary(moments.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+            for (position, state) in snapshot.clips.enumerated() {
+                guard let moment = byID[state.momentID] else { continue }
+                let clip = MovieClip(project: project, moment: moment, position: position)
+                clip.trimStart = state.trimStart
+                clip.trimEnd = state.trimEnd
+                clip.crop = state.crop
+                clip.selfiePlacement = state.selfiePlacement
+                clip.transition = state.transition
+                clip.clipAudio = state.clipAudio
+                clip.clipVolume = state.clipVolume
+                clip.includesVoiceNote = state.includesVoiceNote
+                library.context.insert(clip)
+            }
+        }
+    }
+
+    private func pushUndo() {
+        undoStack.append(snapshot)
+        if undoStack.count > Self.undoLimit { undoStack.removeFirst() }
+        canUndo = true
+    }
+
+    // MARK: Saving
+
+    /// One Undo step: what the change was made on, the change, saved at once.
+    private func edit(_ change: () -> Void) {
+        pushUndo()
+        change()
+        saved()
+    }
+
+    private func renumber(_ order: [MovieClip]) {
+        for (position, clip) in order.enumerated() { clip.position = position }
+    }
+
+    /// Autosave (11.9): every change is kept the moment it's made; the stage follows.
+    private func saved() {
+        project.updatedAt = clock.now()
+        do {
+            try library.context.save()
+        } catch {
+            logger.error("Saving the movie failed: \(error.localizedDescription, privacy: .public)")
+        }
+        reload()
+    }
+
+    /// Reads the clips back and rebuilds what the stage plays, keeping its place.
+    func reload() {
+        plan = MoviePlan(project, store: library.store)
+        let planned = Set(plan.clips.map(\.momentID))
+        clips = MovieStore.liveClips(of: project).filter { $0.moment.map { planned.contains($0.id) } ?? false }
+        selected = min(selected, max(clips.count - 1, 0))
+        time = min(time, duration)
+        let plan = plan
+        rebuild?.cancel()
+        rebuild = Task {
+            do {
+                let composed = try await MovieComposer.compose(plan, renderSize: plan.aspectRatio.renderSize(Self.previewResolution))
+                guard !Task.isCancelled else { return }
+                failed = false
+                player.replaceCurrentItem(with: composed.playerItem())
+                await player.seek(to: CMTime(seconds: time, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
+                if isPlaying { player.play() }
+            } catch {
+                guard !Task.isCancelled else { return }
+                failed = true
+                logger.error("Composing the movie failed: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+    }
+
+    /// Waits for the stage to catch up with the last change (tests, export).
+    func settled() async { await rebuild?.value }
+
+    /// Music files no project uses any more go when the editor closes.
+    func close() {
+        pause()
+        rebuild?.cancel()
+        if let timeObserver { player.removeTimeObserver(timeObserver) }
+        timeObserver = nil
+        store.removeUnusedAudio(musicFiles)
+    }
+}

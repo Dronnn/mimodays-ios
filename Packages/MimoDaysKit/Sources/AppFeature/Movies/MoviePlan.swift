@@ -48,6 +48,10 @@ struct MoviePlan: Sendable, Equatable {
 
     var duration: Double { clips.reduce(0) { $0 + $1.duration } }
 
+    /// How long a photo can be made to show (F06's Trim).
+    static let shortestPhoto = 1.0
+    static let longestPhoto = 6.0
+
     @MainActor
     init(_ project: MovieProject, store: MediaStore) {
         aspectRatio = project.aspectRatio
@@ -94,7 +98,8 @@ struct MoviePlan: Sendable, Equatable {
             duration = max(end - start, 0.1)
         } else {
             media = .photo
-            duration = MovieSelection.photoSeconds
+            // A photo's trim is how long it shows (F06's Trim).
+            duration = min(max(clip.trimEnd ?? MovieSelection.photoSeconds, MoviePlan.shortestPhoto), MoviePlan.longestPhoto)
         }
         var parts: [String] = []
         if showsDates, let zone = TimeZone(identifier: summary.captured.timeZoneID) {

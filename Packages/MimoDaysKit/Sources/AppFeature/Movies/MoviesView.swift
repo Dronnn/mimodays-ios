@@ -50,9 +50,17 @@ struct MoviesView: View {
         .navigationTitle(Text("Movies", bundle: .module))
         .toolbar(.hidden, for: .navigationBar)
         .fullScreenCover(item: Binding(get: { router.newMovie }, set: { router.newMovie = $0 })) { request in
-            NewMovieScreen(source: request.source) { _ in
+            NewMovieScreen(source: request.source) { id in
                 router.newMovie = nil
                 model.refresh()
+                router.moviesPath = [.editor(id)]
+            }
+        }
+        .navigationDestination(for: MovieRoute.self) { route in
+            switch route {
+            case let .editor(id): MovieEditorScreen(projectID: id)
+            case let .movie(id): MoviePageScreen(projectID: id)
+            case let .export(id): MovieExportScreen(projectID: id)
             }
         }
         .task { model.refresh() }
@@ -127,8 +135,11 @@ struct MoviesView: View {
             sectionTitle(Text("Drafts", bundle: .module))
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 8, alignment: .top), GridItem(.flexible(), alignment: .top)], spacing: 18) {
                 ForEach(Array(model.drafts.enumerated()), id: \.element.id) { index, draft in
-                    DraftCard(draft: draft, image: draft.coverID.flatMap { model.tiles.images[$0] }, column: index % 2, now: model.now)
-                        .task { if let id = draft.coverID { await model.tiles.load(id) } }
+                    NavigationLink(value: MovieRoute.editor(draft.id)) {
+                        DraftCard(draft: draft, image: draft.coverID.flatMap { model.tiles.images[$0] }, column: index % 2, now: model.now)
+                    }
+                    .buttonStyle(.plain)
+                    .task { if let id = draft.coverID { await model.tiles.load(id) } }
                 }
             }
             .padding(.horizontal, 20)
@@ -142,8 +153,11 @@ struct MoviesView: View {
             sectionTitle(Text("Movies", bundle: .module))
             VStack(spacing: 12) {
                 ForEach(model.movies) { movie in
-                    MovieRow(movie: movie, image: movie.coverID.flatMap { model.tiles.images[$0] })
-                        .task { if let id = movie.coverID { await model.tiles.load(id) } }
+                    NavigationLink(value: MovieRoute.movie(movie.id)) {
+                        MovieRow(movie: movie, image: movie.coverID.flatMap { model.tiles.images[$0] })
+                    }
+                    .buttonStyle(.plain)
+                    .task { if let id = movie.coverID { await model.tiles.load(id) } }
                 }
             }
             .padding(.horizontal, 16)

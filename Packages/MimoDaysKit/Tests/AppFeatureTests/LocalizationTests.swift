@@ -64,6 +64,23 @@ struct LocalizationTests {
         "This iPhone got too warm, so the recording stopped at %@. The part before is kept.",
         "This iPhone ran out of space, so the recording stopped at %@. The part before is kept.",
         "The recording stopped at %@. The part before is kept.",
+        // Movie editor, export and movie page (Phase 11).
+        "Music", "Choose another file", "Remove music", "Export", "This movie can't play right now.", "Movie preview", "Undo", "Clips", "Captions",
+        "Audio", "Transition", "Cut", "Fade", "Long-press and drag a clip to move it.", "Trim", "Replace", "Remove", "Fill", "Show all",
+        "Selfie window for this clip", "This clip has no selfie.", "Bottom", "Hidden", "Date on each clip", "Place on each clip",
+        "Title at the start", "Sound from clips", "Voice notes", "Your own audio file from Files. Fades in and out.", "Seconds on screen", "Start",
+        "End", "Replace with", "Every moment is already in the movie.", "Title", "Movie title", "Show it at the start", "Export movie", "Quality",
+        "Privacy", "Date in the file", "Exact place in the file",
+        "Captions you added are part of the picture. File details are hidden unless you turn them on.", "4K", "Making your movie", "Progress",
+        "You can leave this screen or lock the phone. We'll let you know when it's ready.", "Play the movie", "Your movie is ready",
+        "Saved to Photos", "Save to Photos", "Save to Files", "Couldn't save to Photos", "OK", "Allow MimoDays to add to your photos in Settings.",
+        "Something went wrong. Try again.", "The movie couldn't be finished", "Free up space", "Back to the editor",
+        "Something went wrong while making it.\nYour draft is safe.", "Saved", "Project", "Delete movie and project",
+        "Copies saved to Photos or Files stay there.", "Rename movie", "Delete this movie and its project?", "Duplicate", "Changes make a new version",
+        "Position", "Move earlier", "Move later", "%lld of %lld clips", "Clip %lld of %lld", "Clip %lld of %lld · %@ · %@ s",
+        "Shows for %@ s", "%@ – %@ · %@ s", "About %@. You have %@ free.", "About %@.", "%@ · %@ · %lld clips", "%@ · about %@ left",
+        "Make it in 720p (about %@)", "There isn't enough free space on this iPhone.\nIt needs about %@ more.\nYour draft is safe.",
+        "Movie · %@ · %@ · %@ · made %@",
     ]
 
     private static var resourceKeys: [String] {

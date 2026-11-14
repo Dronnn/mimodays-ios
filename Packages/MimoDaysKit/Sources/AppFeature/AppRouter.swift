@@ -39,6 +39,16 @@ public enum Route: Equatable, Sendable {
     case newMovie(MovieSourceRule?)
 }
 
+/// A screen pushed on Movies (F06, F11, F15).
+enum MovieRoute: Hashable {
+    /// F06-F09.
+    case editor(UUID)
+    /// F15.
+    case movie(UUID)
+    /// F11-F14.
+    case export(UUID)
+}
+
 /// A movie wizard to show, maybe with its source already chosen.
 public struct NewMovieRequest: Equatable, Identifiable, Sendable {
     public var id = UUID()
@@ -63,6 +73,8 @@ public final class AppRouter {
     public var isSettingsPresented = false
     public var capture: CaptureRequest?
     public var newMovie: NewMovieRequest?
+    /// What's pushed on Movies.
+    var moviesPath: [MovieRoute] = []
 
     public init(selectedTab: MainTab = .today) {
         self.selectedTab = selectedTab
@@ -79,6 +91,7 @@ public final class AppRouter {
         case let .newMovie(source):
             dismissAll()
             selectedTab = .movies
+            moviesPath = []
             newMovie = NewMovieRequest(source: source)
         case let .capture(promptID):
             // A surprise wins over whatever is on screen; Capture lives on Today.

@@ -95,6 +95,40 @@
         }
       }
     },
+    "%@ · %@ · %lld clips" : {
+      "comment" : "F11: the movie's length, shape and clip count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@ · %3$#@clips@"
+          },
+          "substitutions" : {
+            "clips" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg clip"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg clips"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%@ · Surprise" : {
       "comment" : "Origin of a moment, after its time in lists and review: \"8:05 AM · Surprise\". The moment answered a surprise notification",
       "extractionState" : "manual",
@@ -103,6 +137,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ · Surprise"
+          }
+        }
+      }
+    },
+    "%@ · about %@ left" : {
+      "comment" : "F12: progress and time left, as 42% · about 20 seconds left",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · about %2$@ left"
+          }
+        }
+      }
+    },
+    "%@ – %@ · %@ s" : {
+      "comment" : "Trim sheet: a video's chosen start and end and their length, as 0:02 – 0:05 · 3.0 s",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ – %2$@ · %3$@ s"
           }
         }
       }
@@ -329,6 +387,40 @@
         }
       }
     },
+    "%lld of %lld clips" : {
+      "comment" : "F09: how many clips have a voice note",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld of %2$#@clips@"
+          },
+          "substitutions" : {
+            "clips" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg clip"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg clips"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld places" : {
       "comment" : "Map: VoiceOver name of a cluster of several places.",
       "extractionState" : "manual",
@@ -485,6 +577,18 @@
         }
       }
     },
+    "4K" : {
+      "comment" : "Movie export quality, 2160p",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4K"
+          }
+        }
+      }
+    },
     "9:16 · Phone" : {
       "comment" : "New movie (F04): tall shape option",
       "extractionState" : "manual",
@@ -589,6 +693,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A surprise moment is ready"
+          }
+        }
+      }
+    },
+    "About %@." : {
+      "comment" : "Export (F11): the movie's estimated size, as About 95 MB.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About %@."
+          }
+        }
+      }
+    },
+    "About %@. You have %@ free." : {
+      "comment" : "Export (F11): the movie's estimated size and the free space, as About 95 MB. You have 12 GB free.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About %1$@. You have %2$@ free."
           }
         }
       }
@@ -773,6 +901,18 @@
         }
       }
     },
+    "Allow MimoDays to add to your photos in Settings." : {
+      "comment" : "Alert message when Photos access is off",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow MimoDays to add to your photos in Settings."
+          }
+        }
+      }
+    },
     "Any" : {
       "comment" : "Search filters (M08b), Collection row: no collection chosen, and the menu item that clears it",
       "extractionState" : "manual",
@@ -821,6 +961,18 @@
         }
       }
     },
+    "Audio" : {
+      "comment" : "Movie editor: tool bar tab for sound levels and music (F09)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
     "Autumn" : {
       "comment" : "Season label under a sample movie clip",
       "extractionState" : "manual",
@@ -841,6 +993,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Back"
+          }
+        }
+      }
+    },
+    "Back to the editor" : {
+      "comment" : "Export failed (F14): button that goes back to the movie editor",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to the editor"
+          }
+        }
+      }
+    },
+    "Bottom" : {
+      "comment" : "Movie editor (F07): selfie window position option",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom"
           }
         }
       }
@@ -954,7 +1130,7 @@
       }
     },
     "Cancel" : {
-      "comment" : "Note editor (C08): drops the changes made since it opened",
+      "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -973,6 +1149,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Caption"
+          }
+        }
+      }
+    },
+    "Captions" : {
+      "comment" : "Movie editor: tool bar tab for date, place and title captions (F08)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captions"
+          }
+        }
+      }
+    },
+    "Captions you added are part of the picture. File details are hidden unless you turn them on." : {
+      "comment" : "Export (F11): note under the privacy toggles",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captions you added are part of the picture. File details are hidden unless you turn them on."
           }
         }
       }
@@ -1037,6 +1237,30 @@
         }
       }
     },
+    "Changes make a new version" : {
+      "comment" : "Movie page (F15): detail of the Edit row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changes make a new version"
+          }
+        }
+      }
+    },
+    "Choose another file" : {
+      "comment" : "Movie editor (F09): menu action that swaps the music file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose another file"
+          }
+        }
+      }
+    },
     "Choose moments" : {
       "comment" : "New movie (F02): source row for picking moments by hand",
       "extractionState" : "manual",
@@ -1073,8 +1297,44 @@
         }
       }
     },
+    "Clip %lld of %lld" : {
+      "comment" : "Movie editor timeline: VoiceOver label of a clip tile",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Clip %lld of %lld · %@ · %@ s" : {
+      "comment" : "Editor: which clip is chosen, its day, and how many seconds it plays",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip %1$lld of %2$lld · %3$@ · %4$@ s"
+          }
+        }
+      }
+    },
+    "Clips" : {
+      "comment" : "Movie editor: tool bar tab for choosing, trimming and ordering clips (F06)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clips"
+          }
+        }
+      }
+    },
     "Close" : {
-      "comment" : "Closes the camera",
+      "comment" : "Closes the camera; also the movie preview (F10)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1157,6 +1417,18 @@
         }
       }
     },
+    "Copies saved to Photos or Files stay there." : {
+      "comment" : "Movie page (F15): note under the delete button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copies saved to Photos or Files stay there."
+          }
+        }
+      }
+    },
     "Couldn't save the changes" : {
       "comment" : "Edit moment: alert title when saving fails.",
       "extractionState" : "manual",
@@ -1165,6 +1437,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Couldn't save the changes"
+          }
+        }
+      }
+    },
+    "Couldn't save to Photos" : {
+      "comment" : "Alert title when the movie can't be added to Photos",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save to Photos"
           }
         }
       }
@@ -1213,6 +1497,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Custom"
+          }
+        }
+      }
+    },
+    "Cut" : {
+      "comment" : "Movie editor (F06): transition option, straight to the next clip",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut"
+          }
+        }
+      }
+    },
+    "Date in the file" : {
+      "comment" : "Export (F11): toggle that writes the capture date into the movie file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date in the file"
+          }
+        }
+      }
+    },
+    "Date on each clip" : {
+      "comment" : "Movie editor (F08): toggle for the date caption on every clip",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date on each clip"
           }
         }
       }
@@ -1373,6 +1693,18 @@
         }
       }
     },
+    "Delete movie and project" : {
+      "comment" : "Movie page (F15): button that deletes the movie and its project",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete movie and project"
+          }
+        }
+      }
+    },
     "Delete now" : {
       "comment" : "Deleted moment (M16b): deletes it for good.",
       "extractionState" : "manual",
@@ -1429,6 +1761,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete this moment?"
+          }
+        }
+      }
+    },
+    "Delete this movie and its project?" : {
+      "comment" : "Movie page (F15): delete confirmation title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete movie and project?"
           }
         }
       }
@@ -1554,7 +1898,7 @@
       }
     },
     "Done" : {
-      "comment" : "Closes the Settings sheet",
+      "comment" : "Closes the Settings sheet; also closes the editor sheets and the finished export (F13)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1589,6 +1933,18 @@
         }
       }
     },
+    "Duplicate" : {
+      "comment" : "Movie page (F15): row that copies the project into a new draft",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        }
+      }
+    },
     "Earliest" : {
       "comment" : "Surprise schedule (onboarding O07): row title, earliest time a surprise may arrive",
       "extractionState" : "manual",
@@ -1602,7 +1958,7 @@
       }
     },
     "Edit" : {
-      "comment" : "Viewer toolbar button that opens Edit moment (M07).",
+      "comment" : "Viewer toolbar button that opens Edit moment (M07).; also the movie preview (F10) and the movie page (F15)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1649,6 +2005,78 @@
         }
       }
     },
+    "End" : {
+      "comment" : "Trim sheet: VoiceOver label of a video clip's end handle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End"
+          }
+        }
+      }
+    },
+    "Every moment is already in the movie." : {
+      "comment" : "Replace sheet: shown when there's no other moment to choose",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every moment is already in the movie."
+          }
+        }
+      }
+    },
+    "Exact place in the file" : {
+      "comment" : "Export (F11): toggle that writes the place into the movie file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exact place in the file"
+          }
+        }
+      }
+    },
+    "Export" : {
+      "comment" : "Movie editor: top bar button that opens Export movie (F11); also on the preview (F10)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export"
+          }
+        }
+      }
+    },
+    "Export movie" : {
+      "comment" : "Export (F11): screen title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export movie"
+          }
+        }
+      }
+    },
+    "Fade" : {
+      "comment" : "Movie editor (F06): transition option, a cross-fade into the next clip",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fade"
+          }
+        }
+      }
+    },
     "Favorite" : {
       "comment" : "Moment viewer toolbar button that marks or unmarks a favorite, VoiceOver label.",
       "extractionState" : "manual",
@@ -1681,6 +2109,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favorites only"
+          }
+        }
+      }
+    },
+    "Fill" : {
+      "comment" : "Movie editor (F07): fit option, the picture fills the frame and is cropped",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill"
           }
         }
       }
@@ -1757,6 +2197,18 @@
         }
       }
     },
+    "Free up space" : {
+      "comment" : "Export failed (F14): button that opens Settings to make room",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free up space"
+          }
+        }
+      }
+    },
     "From" : {
       "comment" : "Filters (M08b): the first day of the span.",
       "extractionState" : "manual",
@@ -1825,6 +2277,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Has a written note"
+          }
+        }
+      }
+    },
+    "Hidden" : {
+      "comment" : "Movie editor (F07): selfie window option, no selfie in this clip",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden"
           }
         }
       }
@@ -1997,6 +2461,18 @@
         }
       }
     },
+    "Long-press and drag a clip to move it." : {
+      "comment" : "Movie editor (F06): hint under the clip tools",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long-press and drag a clip to move it."
+          }
+        }
+      }
+    },
     "Look around. This could be a memory." : {
       "comment" : "Surprise notification body (also shown in onboarding art)",
       "extractionState" : "manual",
@@ -2057,6 +2533,18 @@
         }
       }
     },
+    "Make it in 720p (about %@)" : {
+      "comment" : "Export failed (F14): button that renders a smaller movie, with its size",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make it in 720p (about %@)"
+          }
+        }
+      }
+    },
     "Make my movie" : {
       "comment" : "Today card that leads to making a movie (T02).",
       "extractionState" : "manual",
@@ -2065,6 +2553,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Make my movie"
+          }
+        }
+      }
+    },
+    "Making your movie" : {
+      "comment" : "Export (F12): title while the movie renders",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Making your movie"
           }
         }
       }
@@ -2238,13 +2738,37 @@
       }
     },
     "More" : {
-      "comment" : "Collection (M12): VoiceOver label of the ••• menu.",
+      "comment" : "Collection (M12): VoiceOver label of the ••• menu.; also the movie page (F15) menu",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "More"
+          }
+        }
+      }
+    },
+    "Move earlier" : {
+      "comment" : "Movie editor timeline: VoiceOver action that moves a clip one place earlier",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move earlier"
+          }
+        }
+      }
+    },
+    "Move later" : {
+      "comment" : "Movie editor timeline: VoiceOver action that moves a clip one place later",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move later"
           }
         }
       }
@@ -2297,6 +2821,42 @@
         }
       }
     },
+    "Movie preview" : {
+      "comment" : "Movie editor: VoiceOver label of the stage, which opens the full-screen preview",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movie preview"
+          }
+        }
+      }
+    },
+    "Movie title" : {
+      "comment" : "Title sheet: placeholder of the title field",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movie title"
+          }
+        }
+      }
+    },
+    "Movie · %@ · %@ · %@ · made %@" : {
+      "comment" : "F15: a rendered movie's length, shape, quality and the day it was made",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movie · %1$@ · %2$@ · %3$@ · made %4$@"
+          }
+        }
+      }
+    },
     "Movies" : {
       "comment" : "Tab: movies made from moments",
       "extractionState" : "manual",
@@ -2305,6 +2865,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Movies"
+          }
+        }
+      }
+    },
+    "Music" : {
+      "comment" : "Movie editor (F09): the music row's title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music"
           }
         }
       }
@@ -2717,8 +3289,20 @@
         }
       }
     },
+    "OK" : {
+      "comment" : "Closes an alert",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
     "Off" : {
-      "comment" : "Camera: accessibility value of a switched-off control (flash, sound, selfie window)",
+      "comment" : "Camera: accessibility value of a switched-off control (flash, sound, selfie window); also the editor's Music row (F09) when there's no music",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3053,6 +3637,18 @@
         }
       }
     },
+    "Place on each clip" : {
+      "comment" : "Movie editor (F08): toggle for the place caption on every clip",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place on each clip"
+          }
+        }
+      }
+    },
     "Places" : {
       "comment" : "Search (M08): section of places whose name matches.",
       "extractionState" : "manual",
@@ -3085,6 +3681,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Play"
+          }
+        }
+      }
+    },
+    "Play the movie" : {
+      "comment" : "VoiceOver label of the play button over a movie's poster (F13, F15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the movie"
           }
         }
       }
@@ -3137,6 +3745,18 @@
         }
       }
     },
+    "Position" : {
+      "comment" : "Movie player: VoiceOver label of the scrubber",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position"
+          }
+        }
+      }
+    },
     "Previous month" : {
       "comment" : "Calendar arrow, VoiceOver label.",
       "extractionState" : "manual",
@@ -3157,6 +3777,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Previous year"
+          }
+        }
+      }
+    },
+    "Privacy" : {
+      "comment" : "Export (F11): section title (shown in capitals)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        }
+      }
+    },
+    "Progress" : {
+      "comment" : "Export (F12): VoiceOver label of the progress bar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress"
+          }
+        }
+      }
+    },
+    "Project" : {
+      "comment" : "Movie page (F15): section title (shown in capitals)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Project"
+          }
+        }
+      }
+    },
+    "Quality" : {
+      "comment" : "Export (F11): section title (shown in capitals)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quality"
           }
         }
       }
@@ -3293,6 +3961,18 @@
         }
       }
     },
+    "Remove" : {
+      "comment" : "Movie editor (F06): button that takes the chosen clip out of the movie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
     "Remove from collection" : {
       "comment" : "Collection (M12): long-press action on a moment; the moment stays in Memories.",
       "extractionState" : "manual",
@@ -3301,6 +3981,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove from collection"
+          }
+        }
+      }
+    },
+    "Remove music" : {
+      "comment" : "Movie editor (F09): menu action that takes the music out",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove music"
           }
         }
       }
@@ -3373,6 +4065,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rename collection"
+          }
+        }
+      }
+    },
+    "Rename movie" : {
+      "comment" : "Movie page (F15): rename alert title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename movie"
+          }
+        }
+      }
+    },
+    "Replace" : {
+      "comment" : "Movie editor (F06): button that swaps the chosen clip for another moment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        }
+      }
+    },
+    "Replace with" : {
+      "comment" : "Replace sheet: title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace with"
           }
         }
       }
@@ -3462,7 +4190,7 @@
       }
     },
     "Save" : {
-      "comment" : "Review (C07): primary button that keeps the moment",
+      "comment" : "Review (C07): primary button that keeps the moment; also the movie page (F15) button that adds the movie to Photos",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3493,6 +4221,54 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Save to Files" : {
+      "comment" : "Export (F13): button that saves the movie with Files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Files"
+          }
+        }
+      }
+    },
+    "Save to Photos" : {
+      "comment" : "Export (F13): button that adds the movie to Photos",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Photos"
+          }
+        }
+      }
+    },
+    "Saved" : {
+      "comment" : "Movie page (F15): the Save button after the movie is saved",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        }
+      }
+    },
+    "Saved to Photos" : {
+      "comment" : "Export (F13) and movie page (F15): the Save button after the movie is in Photos",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to Photos"
           }
         }
       }
@@ -3581,6 +4357,18 @@
         }
       }
     },
+    "Seconds on screen" : {
+      "comment" : "Trim sheet: VoiceOver label of the slider for how long a photo shows",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seconds on screen"
+          }
+        }
+      }
+    },
     "See all %lld moments" : {
       "comment" : "Place preview (P02): opens the place's moments (P03).",
       "extractionState" : "manual",
@@ -3665,6 +4453,18 @@
         }
       }
     },
+    "Selfie window for this clip" : {
+      "comment" : "Movie editor (F07): section title for where the selfie sits in the chosen clip",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selfie window for this clip"
+          }
+        }
+      }
+    },
     "Set place" : {
       "comment" : "Without a place (P05b): bottom action before any moment is ticked.",
       "extractionState" : "manual",
@@ -3714,7 +4514,7 @@
       }
     },
     "Shape" : {
-      "comment" : "New movie (F04): section title (shown in capitals)",
+      "comment" : "New movie (F04): section title (shown in capitals); also the movie editor's tool bar tab (F07)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3726,7 +4526,7 @@
       }
     },
     "Share" : {
-      "comment" : "Moment viewer toolbar button, VoiceOver label.",
+      "comment" : "Moment viewer toolbar button, VoiceOver label.; also the export (F13) and movie page (F15) buttons",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3773,6 +4573,18 @@
         }
       }
     },
+    "Show all" : {
+      "comment" : "Movie editor (F07): fit option, the whole picture shows with bars",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show all"
+          }
+        }
+      }
+    },
     "Show all of it" : {
       "comment" : "New movie (F04): show whole photos and videos inside the movie's shape",
       "extractionState" : "manual",
@@ -3793,6 +4605,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show all places"
+          }
+        }
+      }
+    },
+    "Show it at the start" : {
+      "comment" : "Title sheet: toggle for showing the title at the start of the movie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show it at the start"
           }
         }
       }
@@ -3845,6 +4669,18 @@
         }
       }
     },
+    "Shows for %@ s" : {
+      "comment" : "Trim sheet: how many seconds a photo shows, as Shows for 2.5 s",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows for %@ s"
+          }
+        }
+      }
+    },
     "Shows the whole year" : {
       "comment" : "VoiceOver hint on the calendar's month title: tapping it shows the year.",
       "extractionState" : "manual",
@@ -3881,6 +4717,30 @@
         }
       }
     },
+    "Something went wrong while making it.\nYour draft is safe." : {
+      "comment" : "Export failed (F14): message for any other failure",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong while making it.\nYour draft is safe."
+          }
+        }
+      }
+    },
+    "Something went wrong. Try again." : {
+      "comment" : "Alert message when saving the movie to Photos failed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Try again."
+          }
+        }
+      }
+    },
     "Sound" : {
       "comment" : "Camera (C02): accessibility label of the microphone on/off button in video mode",
       "extractionState" : "manual",
@@ -3889,6 +4749,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sound"
+          }
+        }
+      }
+    },
+    "Sound from clips" : {
+      "comment" : "Movie editor (F09): slider for the sound recorded with the clips",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound from clips"
           }
         }
       }
@@ -3937,6 +4809,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spring"
+          }
+        }
+      }
+    },
+    "Start" : {
+      "comment" : "Trim sheet: VoiceOver label of a video clip's start handle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
           }
         }
       }
@@ -4277,6 +5161,18 @@
         }
       }
     },
+    "The movie couldn't be finished" : {
+      "comment" : "Export failed (F14): title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The movie couldn't be finished"
+          }
+        }
+      }
+    },
     "The photo and its time can't be changed." : {
       "comment" : "Edit moment: under the date, explains what stays fixed for a photo.",
       "extractionState" : "manual",
@@ -4349,6 +5245,18 @@
         }
       }
     },
+    "There isn't enough free space on this iPhone.\nIt needs about %@ more.\nYour draft is safe." : {
+      "comment" : "Export failed (F14): no room. %@: how much more space is needed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There isn't enough free space on this iPhone.\nIt needs about %@ more.\nYour draft is safe."
+          }
+        }
+      }
+    },
     "These dates" : {
       "comment" : "New movie (F16): sentence subject for picked dates",
       "extractionState" : "manual",
@@ -4393,6 +5301,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This choice"
+          }
+        }
+      }
+    },
+    "This clip has no selfie." : {
+      "comment" : "Movie editor (F07): shown instead of the selfie options",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This clip has no selfie."
           }
         }
       }
@@ -4481,6 +5401,18 @@
         }
       }
     },
+    "This movie can't play right now." : {
+      "comment" : "Movie editor: shown on the stage when the movie couldn't be put together",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This movie can't play right now."
+          }
+        }
+      }
+    },
     "This place" : {
       "comment" : "New movie (F16): sentence subject for a place",
       "extractionState" : "manual",
@@ -4537,6 +5469,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Timeline"
+          }
+        }
+      }
+    },
+    "Title" : {
+      "comment" : "Title sheet: title; also the editor's Title row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        }
+      }
+    },
+    "Title at the start" : {
+      "comment" : "Movie editor (F08): row that edits the movie's opening title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title at the start"
           }
         }
       }
@@ -4661,6 +5617,30 @@
         }
       }
     },
+    "Transition" : {
+      "comment" : "Movie editor (F06): the chosen clip's transition, Cut or Fade",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transition"
+          }
+        }
+      }
+    },
+    "Trim" : {
+      "comment" : "Movie editor (F06): button that opens Trim for the chosen clip; also the Trim sheet's title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trim"
+          }
+        }
+      }
+    },
     "Try again" : {
       "comment" : "Save failure alerts (C13c and the generic one): button that tries to save again",
       "extractionState" : "manual",
@@ -4753,6 +5733,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Twice a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "Undo" : {
+      "comment" : "Movie editor: button that takes back the last change",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
           }
         }
       }
@@ -4945,6 +5937,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voice note · %@"
+          }
+        }
+      }
+    },
+    "Voice notes" : {
+      "comment" : "Movie editor (F09): slider for the voice notes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice notes"
           }
         }
       }
@@ -5153,6 +6157,18 @@
         }
       }
     },
+    "You can leave this screen or lock the phone. We'll let you know when it's ready." : {
+      "comment" : "Export (F12): note while the movie renders",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can leave this screen or lock the phone. We'll let you know when it's ready."
+          }
+        }
+      }
+    },
     "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings." : {
       "comment" : "Onboarding O08c, reminders off: body",
       "extractionState" : "manual",
@@ -5249,6 +6265,18 @@
         }
       }
     },
+    "Your movie is ready" : {
+      "comment" : "Export (F13): title when the movie is done",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your movie is ready"
+          }
+        }
+      }
+    },
     "Your next surprise is on its way" : {
       "comment" : "Surprise ribbon on Today (T02): a surprise is planned. No times or countdowns on purpose.",
       "extractionState" : "manual",
@@ -5257,6 +6285,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your next surprise is on its way"
+          }
+        }
+      }
+    },
+    "Your own audio file from Files. Fades in and out." : {
+      "comment" : "Movie editor (F09): note under the music row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your own audio file from Files. Fades in and out."
           }
         }
       }

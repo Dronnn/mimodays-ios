@@ -56,6 +56,15 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphFilm
     /// 14×18 solid pin before the place on a hero caption.
     case glyphPinSolid
+    /// The movie editor's tools and actions (F06-F15).
+    case glyphScissors
+    case glyphCrop
+    case glyphText
+    case glyphMusic
+    case glyphRefresh
+    case glyphUndo
+    case glyphDownload
+    case glyphFolder
     /// `Brand / Wordmark` on Today: the letters and the star, two layers on one 103.7×33 canvas.
     case brandWordmark
     case brandWordmarkStar

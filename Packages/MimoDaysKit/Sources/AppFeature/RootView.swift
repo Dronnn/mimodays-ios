@@ -104,12 +104,17 @@ public struct RootView: View {
         return TabView(selection: $router.selectedTab) {
             ForEach(MainTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
-                    NavigationStack {
-                        switch tab {
-                        case .today: TodayView(model: today)
-                        case .memories: MemoriesView(model: memories)
-                        case .map: MapScreen()
-                        case .movies: MoviesScreen()
+                    if tab == .movies {
+                        // Movies' screens are opened from outside the tab too (a new movie, its export's Done).
+                        NavigationStack(path: $router.moviesPath) { MoviesScreen() }
+                    } else {
+                        NavigationStack {
+                            switch tab {
+                            case .today: TodayView(model: today)
+                            case .memories: MemoriesView(model: memories)
+                            case .map: MapScreen()
+                            case .movies: EmptyView()
+                            }
                         }
                     }
                 } label: {

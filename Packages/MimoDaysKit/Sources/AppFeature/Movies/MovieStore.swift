@@ -55,6 +55,8 @@ struct MovieStore {
         copy.showsDates = project.showsDates
         copy.showsPlaces = project.showsPlaces
         copy.clipSoundLevel = project.clipSoundLevel
+        copy.voiceNoteLevel = project.voiceNoteLevel
+        copy.showsTitle = project.showsTitle
         copy.selectionSeed = project.selectionSeed
         context.insert(copy)
         for clip in project.orderedClips {
@@ -74,6 +76,7 @@ struct MovieStore {
             // The person's audio file is shared: both projects point at it until the last one goes.
             let new = MovieAudioTrack(kind: track.kind, relativePath: track.relativePath, startOffset: track.startOffset, gain: track.gain)
             new.gainEnvelope = track.gainEnvelope
+            new.name = track.name
             new.project = copy
             context.insert(new)
         }
@@ -98,6 +101,13 @@ struct MovieStore {
         if let render { removeFile(render) }
         let stillUsed = Set(try context.fetch(FetchDescriptor<MovieAudioTrack>()).map(\.relativePath))
         for path in audio where !stillUsed.contains(path) { removeFile(path) }
+    }
+
+    /// Music files the editor let go of (replaced or removed) once no project points at them; their paths are
+    /// remembered while the editor is open so Undo can bring them back.
+    func removeUnusedAudio(_ paths: Set<String>) {
+        let stillUsed = Set((try? context.fetch(FetchDescriptor<MovieAudioTrack>()).map(\.relativePath)) ?? [])
+        for path in paths where !stillUsed.contains(path) { removeFile(path) }
     }
 
     /// Keeps a finished render on its project; the one it replaces is deleted.
@@ -125,6 +135,10 @@ struct MovieStore {
     /// The clips a movie is made of: in order, without moments deleted since (they're skipped, never padded).
     static func liveClips(of project: MovieProject) -> [MovieClip] {
         project.orderedClips.filter { $0.moment.map { $0.deletedAt == nil } ?? false }
+    }
+
+    static func project(_ id: UUID, in context: ModelContext) -> MovieProject? {
+        try? context.fetch(FetchDescriptor<MovieProject>(predicate: #Predicate { $0.id == id })).first
     }
 
     private func projects() throws -> [MovieProject] {

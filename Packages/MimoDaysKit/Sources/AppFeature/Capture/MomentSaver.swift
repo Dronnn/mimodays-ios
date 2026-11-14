@@ -150,13 +150,7 @@ struct MomentSaver {
         let size = Self.thumbnailSize
         var image: CGImage?
         if case let .video(video) = capture.media {
-            let main = await ReviewModel.still(video.mainURL, maxPixelSize: size, at: 0)?.cgImage
-            if let main, let selfieURL = video.selfieURL, let window,
-               let selfie = await ReviewModel.still(selfieURL, maxPixelSize: size, at: max(0, -video.selfieOffset))?.cgImage {
-                image = PhotoComposer.compose(main: main, selfie: selfie, window: window)
-            } else {
-                image = main
-            }
+            image = await Self.videoThumbnail(mainURL: video.mainURL, selfieURL: video.selfieURL, selfieOffset: video.selfieOffset, window: window)
         } else {
             image = await ReviewModel.still(composedPhoto ?? capture.mainURL, maxPixelSize: size, at: 0)?.cgImage
         }
@@ -164,6 +158,16 @@ struct MomentSaver {
         let url = try CaptureFiles.temporaryURL("jpg")
         try ThumbnailPipeline.jpegData(image).write(to: url)
         return url
+    }
+
+    /// A video's first frames composed with its selfie window, as grids show it; also when the player moves
+    /// the window.
+    static func videoThumbnail(mainURL: URL, selfieURL: URL?, selfieOffset: TimeInterval, window: SelfieWindowFrame?) async -> CGImage? {
+        let size = thumbnailSize
+        guard let main = await ReviewModel.still(mainURL, maxPixelSize: size, at: 0)?.cgImage else { return nil }
+        guard let selfieURL, let window,
+              let selfie = await ReviewModel.still(selfieURL, maxPixelSize: size, at: max(0, -selfieOffset))?.cgImage else { return main }
+        return PhotoComposer.compose(main: main, selfie: selfie, window: window)
     }
 
     private struct Info {

@@ -171,6 +171,32 @@ struct MomentViewerTests {
         #expect(outside.r > outside.g, "warm main stream: \(outside)")
     }
 
+    /// 9.25: grids show the window where the player put it - the thumbnail is composed again and replaces
+    /// the old file.
+    @Test func movingTheWindowRecomposesTheThumbnail() async throws {
+        let id = try await save(video: true)
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        let source = try #require(viewer.moments[id]?.video)
+        func thumbnail() throws -> String {
+            try #require(try container.mainContext.fetch(FetchDescriptor<Moment>()).first?.media.first { $0.role == .thumbnail }?.relativePath)
+        }
+        let before = try thumbnail()
+        let layout = SelfieWindowLayout.media(width: 402, aspectRatio: source.aspectRatio, topInset: 62)
+        viewer.setWindow(PiPLayout(layout.windowFrame(.init(corner: .bottomLeft, scale: .large)), source: .frontSource), for: id)
+        await viewer.thumbnailRefresh?.value
+
+        let after = try thumbnail()
+        #expect(after != before)
+        #expect(!FileManager.default.fileExists(atPath: try store.url(for: before).path))
+        let image = try #require(await ImageDecoding.thumbnail(try store.url(for: after), maxPixelSize: nil))
+        let window = try #require(viewer.moments[id]?.video?.timing.window)
+        let rect = PhotoComposer.placement(of: window, in: CGSize(width: image.width, height: image.height)).rect
+        let inside = try Self.pixels(image)((Int(rect.midX), Int(rect.midY)))
+        #expect(rect.midX < CGFloat(image.width) / 2 && rect.midY > CGFloat(image.height) / 2)
+        #expect(inside.g > inside.r, "mint selfie: \(inside)")
+    }
+
     private static func pixels(_ image: CGImage) throws -> ((Int, Int)) -> (r: Int, g: Int, b: Int, luma: Double) {
         let width = image.width, height = image.height
         var data = [UInt8](repeating: 0, count: width * height * 4)

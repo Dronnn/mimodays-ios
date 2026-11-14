@@ -299,6 +299,44 @@ final class MomentViewerModel {
         video.layout = saved
         video.timing.window = saved.windowFrame(in: video.pixelSize)
         moments[id]?.video = video
+        let previous = thumbnailRefresh
+        let source = video
+        thumbnailRefresh = Task {
+            await previous?.value
+            await refreshThumbnail(id, source)
+        }
+    }
+
+    /// The last thumbnail rebuild; each waits for the one before, so files are replaced in order.
+    private(set) var thumbnailRefresh: Task<Void, Never>?
+
+    /// Grids show the window where the player put it: the thumbnail is composed again and replaces the old one.
+    private func refreshThumbnail(_ id: UUID, _ source: ViewerMoment.VideoSource) async {
+        guard let main = url(source.mainPath),
+              let image = await MomentSaver.videoThumbnail(
+                  mainURL: main, selfieURL: url(source.selfiePath), selfieOffset: source.timing.selfieOffset, window: source.timing.window
+              ),
+              let media = fetch(id)?.media.first(where: { $0.role == .thumbnail }) else { return }
+        do {
+            let temporary = try CaptureFiles.temporaryURL("jpg")
+            defer { try? FileManager.default.removeItem(at: temporary) }
+            try ThumbnailPipeline.jpegData(image).write(to: temporary)
+            let file = try library.store.store(copyOf: temporary, in: .derived)
+            let old = media.relativePath
+            media.relativePath = file.relativePath
+            media.checksum = file.checksum
+            media.byteCount = file.byteCount
+            do {
+                try library.context.save()
+            } catch {
+                library.context.rollback()
+                try? library.store.remove(file.relativePath)
+                throw error
+            }
+            try? library.store.remove(old)
+        } catch {
+            logger.error("Refreshing the thumbnail failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// Main and selfie streams as one, the window where the player has it: what sharing exports.

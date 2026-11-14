@@ -481,6 +481,42 @@
         }
       }
     },
+    "Day label today: %@": {
+      "comment": "Memories day heading for today, shown in capitals. %@ is the date, e.g. Wed, Nov 11.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today · %@"
+          }
+        }
+      }
+    },
+    "Day label yesterday: %@": {
+      "comment": "Memories day heading for yesterday, shown in capitals. %@ is the date, e.g. Tue, Nov 10.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yesterday · %@"
+          }
+        }
+      }
+    },
+    "Description has voice note": {
+      "comment": "VoiceOver: added to a moment's description when it has a voice note.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "voice note"
+          }
+        }
+      }
+    },
     "Done": {
       "comment": "Closes the Settings sheet",
       "extractionState": "manual",
@@ -757,6 +793,18 @@
         }
       }
     },
+    "Moments you capture on Today show up here, grouped by day.": {
+      "comment": "Memories body text before the first moment is saved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moments you capture on Today show up here, grouped by day."
+          }
+        }
+      }
+    },
     "Movies": {
       "comment": "Tab: movies made from moments",
       "extractionState": "manual",
@@ -777,6 +825,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nearby"
+          }
+        }
+      }
+    },
+    "No memories yet": {
+      "comment": "Memories title before the first moment is saved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No memories yet"
           }
         }
       }
@@ -2325,6 +2385,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "dog asleep"
+          }
+        }
+      }
+    },
+    "favorite": {
+      "comment": "VoiceOver: added to a moment's description when it is a favorite, e.g. Photo, 2:37 PM, favorite.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "favorite"
           }
         }
       }

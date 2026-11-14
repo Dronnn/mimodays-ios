@@ -6,9 +6,9 @@ import TestSupport
 @MainActor
 @Suite(.tags(.snapshot))
 struct RootViewSnapshotTests {
-    /// A tab root that its phase hasn't built yet. Today has its own suite.
+    /// A tab root that its phase hasn't built yet. Today and Memories have their own suites.
     /// The system tab bar is Liquid Glass, which does not render offscreen (UI tests cover it).
-    @Test func memoriesPlaceholder() {
-        assertScreenSnapshots(of: NavigationStack { TabRootView(tab: .memories) }.environment(AppRouter()), variants: [SnapshotVariant(.iPhone, .light)])
+    @Test func mapPlaceholder() {
+        assertScreenSnapshots(of: NavigationStack { TabRootView(tab: .map) }.environment(AppRouter()), variants: [SnapshotVariant(.iPhone, .light)])
     }
 }

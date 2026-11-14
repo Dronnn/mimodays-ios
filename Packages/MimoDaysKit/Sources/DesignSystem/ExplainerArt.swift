@@ -18,6 +18,7 @@ public struct ExplainerArt: View {
             layer(.markTicks, .accentCoralMark)
             glyph.image
                 .resizable()
+                .scaledToFit()
                 .frame(width: 56, height: 56)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .offset(x: 47, y: 44)

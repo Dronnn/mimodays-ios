@@ -118,6 +118,15 @@ public struct TextStyle: Equatable, Sendable {
     /// T01 "Your first moment will live here." and its labels.
     public static let emptyHeroTitle = TextStyle(.patrickHand, size: 19, relativeTo: .body)
     public static let emptyHeroLabel = TextStyle(.patrickHand, size: 15, relativeTo: .subheadline)
+    // Memories (M01).
+    /// A tab's own big title: "Memories".
+    public static let screenTitle = TextStyle(.fraunces, size: 36, weight: 650, relativeTo: .largeTitle, maximumScale: 1.35)
+    /// "No memories yet".
+    public static let emptyTitle = TextStyle(.fraunces, size: 26, weight: 650, relativeTo: .title1, maximumScale: 1.35)
+    /// A month's moment count beside its title.
+    public static let sectionCount = TextStyle(.nunito, size: 13, weight: 600, relativeTo: .footnote)
+    /// The video length on a grid tile; it sits on the picture, so it stops growing at 1.35x.
+    public static let tileBadge = TextStyle(.nunito, size: 12, weight: 700, relativeTo: .caption2, maximumScale: 1.35)
 
     public static let all: [(name: String, style: TextStyle)] = [
         ("display.hero", .displayHero), ("display.title", .displayTitle), ("display.headline", .displayHeadline),

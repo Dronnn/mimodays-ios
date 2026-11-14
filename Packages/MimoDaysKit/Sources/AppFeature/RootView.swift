@@ -15,6 +15,7 @@ public struct RootView: View {
     private let camera: CameraServices
     private let momentSaver: MomentSaver
     @State private var today: TodayModel
+    @State private var memories: MemoriesModel
     /// C12 toast after a save.
     @State private var showsSavedToast = false
     @Environment(\.scenePhase) private var scenePhase
@@ -30,6 +31,9 @@ public struct RootView: View {
         _today = State(initialValue: TodayModel(
             context: dependencies.modelContainer.mainContext, surprises: surprises, permissions: dependencies.permissions,
             store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
+        ))
+        _memories = State(initialValue: MemoriesModel(
+            context: dependencies.modelContainer.mainContext, store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
         ))
         let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
         let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
@@ -87,9 +91,10 @@ public struct RootView: View {
             ForEach(MainTab.allCases, id: \.self) { tab in
                 Tab(value: tab) {
                     NavigationStack {
-                        if tab == .today {
-                            TodayView(model: today)
-                        } else {
+                        switch tab {
+                        case .today: TodayView(model: today)
+                        case .memories: MemoriesView(model: memories)
+                        case .map, .movies:
                             TabRootView(tab: tab)
                         }
                     }
@@ -125,7 +130,7 @@ public struct RootView: View {
     }
 }
 
-/// Root of Memories, Map and Movies until their phases build the real screens.
+/// Root of Map and Movies until their phases build the real screens.
 struct TabRootView: View {
     let tab: MainTab
     @Environment(AppRouter.self) private var router

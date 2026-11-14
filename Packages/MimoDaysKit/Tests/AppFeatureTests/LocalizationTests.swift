@@ -7,7 +7,8 @@ struct LocalizationTests {
     private static let missing = "\u{0}missing"
 
     /// Keys used directly as `Text("…", bundle: .module)`.
-    private static let literalKeys = ["Today headline", "surprise", "Your first moment will live here.",
+    private static let literalKeys = ["Day label today: %@", "Day label yesterday: %@", "No memories yet",
+        "Moments you capture on Today show up here, grouped by day.", "favorite", "Description has voice note", "Today headline", "surprise", "Your first moment will live here.",
         "what you see", "Catch a moment", "Catch your first moment", "Catch the surprise", "Your %@", "On this day",
         "Years ago and count: %@ · %@", "%lld years ago", "%lld moments", "Make my movie",
         "Your story starts with one moment", "%lld moments saved", "with selfie", "Yesterday, %@", "Day and time: %@ · %@",

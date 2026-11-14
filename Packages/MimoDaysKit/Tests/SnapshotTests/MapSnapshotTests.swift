@@ -125,6 +125,20 @@ struct MapSnapshotTests {
         )
     }
 
+    /// `Map / Pin`, `Map / Cluster` and the chosen ring: the drawn outlines, not rounded squares.
+    @Test func markers() {
+        assertScreenSnapshots(
+            of: HStack(spacing: 24) {
+                MapMarker(image: nil, count: 1, isSelected: false)
+                MapMarker(image: nil, count: 4, isSelected: false)
+                MapMarker(image: nil, count: 4, isSelected: true)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(hex: 0xEFE4D6).ignoresSafeArea()),
+            variants: [SnapshotVariant(.iPhone, .light)]
+        )
+    }
+
     /// P06: the drawn grid, the card and Try again, then every place.
     @Test func unavailable() async throws {
         try await save(3, at: "Lake Merritt")

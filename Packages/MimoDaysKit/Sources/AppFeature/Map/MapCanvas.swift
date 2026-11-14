@@ -12,18 +12,18 @@ struct MapMarker: View {
     var body: some View {
         ZStack {
             if isSelected {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                MapPinFrameBlob()
                     .fill(ColorToken.actionCoral.color)
                     .frame(width: 66, height: 66)
             }
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
+            MapPinFrameBlob()
                 .fill(ColorToken.mediaFrame.color)
                 .frame(width: 56, height: 56)
                 .shadow(color: Color(hex: 0x4B2938).opacity(isSelected ? 0 : 0.18), radius: 4, y: 2)
             Color(hex: 0xB9A89A)
                 .overlay { if let image { Image(uiImage: image).filling() } }
                 .frame(width: 46, height: 46)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipShape(MapPinPhotoBlob())
         }
         .frame(width: 66, height: 66)
         .overlay(alignment: .topTrailing) {

@@ -297,6 +297,8 @@ struct RecentPlacesPanel: View {
     let select: (String) -> Void
     /// A place's column, 108 pt as drawn; it widens with larger text so names keep whole words.
     @ScaledMetric(relativeTo: .footnote) private var width: CGFloat = 108
+    /// P01 draws each photo with its own uneven outline; places cycle through them.
+    private static let photoShapes = [AnyShape(PlacePhotoBlobA()), AnyShape(PlacePhotoBlobB()), AnyShape(PlacePhotoBlobC())]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -317,8 +319,8 @@ struct RecentPlacesPanel: View {
             .padding(.top, 2)
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: 19) {
-                    ForEach(model.recentPlaces.prefix(10)) { place in
-                        Button { select(place.id) } label: { recentPlace(place) }
+                    ForEach(Array(model.recentPlaces.prefix(10).enumerated()), id: \.element.id) { index, place in
+                        Button { select(place.id) } label: { recentPlace(place, index: index) }
                             .buttonStyle(.plain)
                             .accessibilityIdentifier("map.recentPlace")
                     }
@@ -336,14 +338,14 @@ struct RecentPlacesPanel: View {
         }
     }
 
-    private func recentPlace(_ place: MapPlace) -> some View {
+    private func recentPlace(_ place: MapPlace, index: Int) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Color(hex: 0xC9B8AA)
                 .overlay {
                     if let id = place.moments.first?.id, let image = model.images[id] { Image(uiImage: image).filling() }
                 }
                 .frame(width: width, height: 66)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(Self.photoShapes[index % Self.photoShapes.count])
                 .task { if let id = place.moments.first?.id { await model.load(id) } }
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 // One line as drawn; a long name or larger text wraps rather than being cut off.
@@ -601,6 +603,10 @@ struct PlacePreviewSheet: View {
     let seeAll: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var height: CGFloat = 380
+    /// P02's four previews, each its own uneven outline.
+    private static let previewShapes = [
+        AnyShape(PlacePreviewBlobA()), AnyShape(PlacePreviewBlobB()), AnyShape(PlacePreviewBlobC()), AnyShape(PlacePreviewBlobD()),
+    ]
 
     var body: some View {
         ScrollView {
@@ -645,8 +651,8 @@ struct PlacePreviewSheet: View {
                 .foregroundStyle(ColorToken.textSecondary.color)
                 .padding(.top, 4)
             HStack(spacing: 6) {
-                ForEach(place.moments.prefix(4)) { moment in
-                    Button { open(MomentPager(ids: place.moments.map(\.id), start: moment.id)) } label: { preview(moment) }
+                ForEach(Array(place.moments.prefix(4).enumerated()), id: \.element.id) { index, moment in
+                    Button { open(MomentPager(ids: place.moments.map(\.id), start: moment.id)) } label: { preview(moment, index: index) }
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("place.preview")
                 }
@@ -666,11 +672,11 @@ struct PlacePreviewSheet: View {
         .padding(.bottom, 12)
     }
 
-    private func preview(_ moment: MapMoment) -> some View {
+    private func preview(_ moment: MapMoment, index: Int) -> some View {
         Color(hex: 0xC9B8AA)
             .overlay { if let image = model.images[moment.id] { Image(uiImage: image).filling() } }
             .aspectRatio(86 / 108, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .clipShape(Self.previewShapes[index])
             .overlay(alignment: .bottom) {
                 if let duration = model.durations[moment.id] {
                     VideoBadge(duration: duration).padding(.bottom, 6)

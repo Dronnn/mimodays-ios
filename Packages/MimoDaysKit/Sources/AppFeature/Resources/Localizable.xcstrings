@@ -1,6 +1,18 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ copy": {
+      "comment": "Title of a duplicated movie project (F15 Duplicate). %@: the original title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ copy"
+          }
+        }
+      }
+    },
     "%@ of %@": {
       "comment": "Voice note sheet (C09): accessibility value of the stop button, e.g. \"12 seconds of 1 minute\". First: time recorded, second: the limit",
       "extractionState": "manual",

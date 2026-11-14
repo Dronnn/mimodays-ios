@@ -51,7 +51,7 @@ struct LocalizationTests {
         "Not enough space to save", "This moment is kept until you free up about %@. Nothing is lost.",
         "This moment didn't save", "Nothing is lost. Try again in a moment.",
         "Note", "Cancel", "Retake and drop the note?", "Keep editing", "%lld of %lld characters",
-        "Voice note", "%@ of %@", "Remove voice note", "Pause voice note", "Play voice note", "Transcript in quotes: %@",
+        "Voice note", "%@ of %@", "%@ copy", "Remove voice note", "Pause voice note", "Play voice note", "Transcript in quotes: %@",
         "Transcribed on this iPhone", "Retake and drop the voice note?", "Retake and drop the notes?",
         "Place", "Current location", "None", "Finding where you are…", "Current location · city only", "Nearby",
         "Used %lld times", "No place", "No places found", "Search places",

@@ -138,6 +138,52 @@ public enum MovieStatus: String, Codable, CaseIterable, Sendable {
     case failed
 }
 
+/// How a photo or video that doesn't match the movie's shape sits in its frame (F04, F07).
+public enum MovieFit: String, Codable, CaseIterable, Sendable {
+    case fill
+    case showAll
+}
+
+/// How a clip begins after the one before it (F06).
+public enum MovieTransition: String, Codable, CaseIterable, Sendable {
+    case cut
+    case fade
+}
+
+/// Where a clip's selfie window goes in the movie (F07). A clip without one keeps it where it was recorded.
+public enum MovieSelfiePlacement: String, Codable, CaseIterable, Sendable {
+    case topRight
+    case topLeft
+    case bottom
+    case hidden
+}
+
+/// Rendered movie height (F11).
+public enum MovieResolution: String, Codable, CaseIterable, Sendable {
+    case p720
+    case p1080
+    case p2160
+}
+
+/// A rendered file: an export made from a project. Losing it never loses the project, which can render it again.
+public struct MovieRender: Codable, Equatable, Hashable, Sendable {
+    /// Relative to the media store root.
+    public var relativePath: String
+    public var renderedAt: Date
+    /// Seconds.
+    public var duration: Double
+    public var resolution: MovieResolution
+    public var byteCount: Int64
+
+    public init(relativePath: String, renderedAt: Date, duration: Double, resolution: MovieResolution, byteCount: Int64) {
+        self.relativePath = relativePath
+        self.renderedAt = renderedAt
+        self.duration = duration
+        self.resolution = resolution
+        self.byteCount = byteCount
+    }
+}
+
 public enum ClipAudio: String, Codable, CaseIterable, Sendable {
     case original
     case muted

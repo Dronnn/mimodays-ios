@@ -301,8 +301,18 @@ public enum SchemaV1: VersionedSchema {
         public var lengthRaw: String
         public var style: String?
         public var statusRaw: String
-        /// Rendered file, relative to the media store root.
-        public var renderedRelativePath: String?
+        /// Seconds, for `MovieLength.custom`.
+        public var customLength: Double?
+        public var fitRaw: String = MovieFit.fill.rawValue
+        /// F08: the day, and the place, on each clip.
+        public var showsDates: Bool = true
+        public var showsPlaces: Bool = true
+        /// F09: the clips' own sound, 0...1.
+        public var clipSoundLevel: Double = 0.7
+        /// Seed of the automatic pick, so the same source picks the same moments again.
+        public var selectionSeed: Int = 0
+        /// The latest rendered file; nil for a draft. Kept apart from the edit decisions above.
+        public var render: MovieRender?
         public var createdAt: Date
         public var updatedAt: Date
         @Relationship(deleteRule: .cascade, inverse: \MovieClip.project) public var clips: [MovieClip] = []
@@ -337,6 +347,11 @@ public enum SchemaV1: VersionedSchema {
             set { statusRaw = newValue.rawValue }
         }
 
+        public var fit: MovieFit {
+            get { MovieFit(rawValue: fitRaw) ?? .fill }
+            set { fitRaw = newValue.rawValue }
+        }
+
         public var orderedClips: [MovieClip] { clips.sorted { $0.position < $1.position } }
     }
 
@@ -346,9 +361,13 @@ public enum SchemaV1: VersionedSchema {
         public var trimStart: Double?
         public var trimEnd: Double?
         public var crop: NormalizedRect?
-        public var pipLayoutOverride: PiPLayout?
+        /// nil keeps the selfie window where it was recorded.
+        public var selfiePlacementRaw: String?
+        public var transitionRaw: String = MovieTransition.cut.rawValue
         public var clipAudioRaw: String
         public var clipVolume: Double
+        /// F09: the moment's voice note plays over its clip.
+        public var includesVoiceNote: Bool = true
         public var project: MovieProject?
         public var moment: Moment?
 
@@ -363,6 +382,16 @@ public enum SchemaV1: VersionedSchema {
         public var clipAudio: ClipAudio {
             get { ClipAudio(rawValue: clipAudioRaw) ?? .original }
             set { clipAudioRaw = newValue.rawValue }
+        }
+
+        public var selfiePlacement: MovieSelfiePlacement? {
+            get { selfiePlacementRaw.flatMap(MovieSelfiePlacement.init(rawValue:)) }
+            set { selfiePlacementRaw = newValue?.rawValue }
+        }
+
+        public var transition: MovieTransition {
+            get { MovieTransition(rawValue: transitionRaw) ?? .cut }
+            set { transitionRaw = newValue.rawValue }
         }
     }
 

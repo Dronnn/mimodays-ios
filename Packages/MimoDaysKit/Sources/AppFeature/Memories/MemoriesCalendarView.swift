@@ -15,6 +15,11 @@ struct MemoriesCalendarView: View {
             case .year: year
             }
         }
+        .contentShape(Rectangle())
+        // Like Photos: pinch closed for the whole year, open for a month. The month title does the same with a tap.
+        .simultaneousGesture(MagnifyGesture().onEnded { value in
+            if value.magnification < 0.8 { model.zoomOut() } else if value.magnification > 1.25 { model.zoomIn() }
+        })
     }
 
     // MARK: Month (M02)

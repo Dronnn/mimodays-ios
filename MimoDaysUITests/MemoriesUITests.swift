@@ -43,6 +43,29 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(openDay.waitForExistence(timeout: 5))
     }
 
+    /// M02 ↔ M03: the whole year from a month - pinching closed, or tapping the month's title - and a month
+    /// from the year, by pinching open or tapping it.
+    @MainActor
+    func testTheWholeYearIsReachableFromAMonth() {
+        launch(.populated)
+        let calendar = app.buttons["Calendar"]
+        XCTAssertTrue(calendar.waitForExistence(timeout: 10))
+        calendar.tap()
+        let title = app.buttons["calendar.title"]
+        let november = app.buttons["calendar.month.11"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+
+        app.buttons["calendar.openDay"].pinch(withScale: 0.4, velocity: -2)
+        XCTAssertTrue(november.waitForExistence(timeout: 5), "pinching closed shows the year")
+        november.pinch(withScale: 2.5, velocity: 2)
+        XCTAssertTrue(title.waitForExistence(timeout: 5), "pinching open shows the month again")
+
+        title.tap()
+        XCTAssertTrue(november.waitForExistence(timeout: 5), "the title shows the year")
+        november.tap()
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+    }
+
     /// M01 → M05: a tile opens the viewer, the heart is kept, a swipe goes to the next moment.
     @MainActor
     func testATileOpensTheViewer() {

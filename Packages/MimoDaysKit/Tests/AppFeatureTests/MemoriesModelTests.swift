@@ -188,6 +188,25 @@ struct MemoriesModelTests {
         #expect(model.scale == .month && model.selectedDay == 20250302 && model.days[20250302]?.count == 1)
     }
 
+    /// 9.15: pinching closed shows the month's year; open, the month again - or a year's first month after
+    /// stepping to another year.
+    @Test func pinchingMovesBetweenAMonthAndItsYear() async throws {
+        try await save(at: Self.date(2025, 3, 2))
+        let model = model()
+        model.zoomIn()
+        #expect(model.scale == .month && model.shownMonth == 202611)
+        model.zoomOut()
+        #expect(model.scale == .year && model.shownYear == 2026)
+        model.zoomOut()
+        #expect(model.scale == .year)
+        model.zoomIn()
+        #expect(model.scale == .month && model.shownMonth == 202611)
+        model.zoomOut()
+        model.step(-1)
+        model.zoomIn()
+        #expect(model.scale == .month && model.shownMonth == 202503)
+    }
+
     @Test func aDayListsItsMomentsOldestFirstWithItsPlaces() async throws {
         let morning = try await save(at: Self.date(2026, 11, 11, 8))
         let evening = try await save(at: Self.date(2026, 11, 11, 18))

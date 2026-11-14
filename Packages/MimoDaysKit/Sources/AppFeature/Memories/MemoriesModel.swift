@@ -178,6 +178,18 @@ final class MemoriesModel {
         scale = .year
     }
 
+    /// Pinching the calendar closed: from a month to its year.
+    func zoomOut() {
+        guard scale == .month else { return }
+        show(year: shownMonth / 100)
+    }
+
+    /// Pinching it open: from a year to the month shown before, or that year's first month.
+    func zoomIn() {
+        guard scale == .year else { return }
+        show(month: shownMonth / 100 == shownYear ? shownMonth : shownYear * 100 + 1)
+    }
+
     var canGoBack: Bool { scale == .month ? shownMonth > earliestMonth : shownYear > earliestMonth / 100 }
     var canGoForward: Bool { scale == .month ? shownMonth < thisMonth : shownYear < today / 10_000 }
 

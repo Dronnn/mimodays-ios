@@ -1,4 +1,5 @@
 import CoreGraphics
+import Persistence
 
 /// Where the selfie window goes in the preview (C01, C04). Values from the 402 pt design: the top corners sit
 /// 49.1 pt below the safe area, the bottom ones 125 pt above the preview's bottom edge (clear of the 10/30/60 s
@@ -61,5 +62,26 @@ struct SelfieWindowLayout {
 
     private func distance(_ a: CGPoint, _ b: CGPoint) -> CGFloat {
         hypot(a.x - b.x, a.y - b.y)
+    }
+}
+
+extension SelfieWindowLayout {
+    /// The camera's layout on media of `aspectRatio` shown at the full `width`. Review and the player lay the
+    /// window out here and draw it scaled to the size the media is shown at, so it is the recorded window
+    /// wherever it shows, and what is saved does not depend on how big the media happens to be on screen.
+    static func media(width: CGFloat, aspectRatio: CGFloat, topInset: CGFloat) -> SelfieWindowLayout {
+        SelfieWindowLayout(preview: CGSize(width: width, height: width / max(aspectRatio, 0.01)), topInset: topInset)
+    }
+
+    /// The corner and size closest to a saved window. Moments saved before 9.17, with odd layouts, land in
+    /// the nearest corner at the nearest size.
+    func placement(nearest layout: PiPLayout) -> CameraSettings.SelfieWindow {
+        let width = layout.scale * preview.width
+        let scale = Scale.allCases.min {
+            abs(Self.frameSize($0).width - width) < abs(Self.frameSize($1).width - width)
+        } ?? .medium
+        // The saved centre is the frame's; the layout's corners are the whole window's (frame and handle).
+        let center = CGPoint(x: layout.centerX * preview.width, y: layout.centerY * preview.height + Self.handleSpace / 2)
+        return CameraSettings.SelfieWindow(corner: nearest(to: center, scale), scale: scale)
     }
 }

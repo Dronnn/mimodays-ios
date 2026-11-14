@@ -65,18 +65,8 @@ struct SelfieWindowView<Content: View>: View {
     var body: some View {
         let frame = SelfieWindowLayout.frameSize(scale)
         VStack(spacing: 6) {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(ColorToken.mediaFrame.color)
-                .overlay {
-                    ZStack {
-                        CameraPalette.selfiePlaceholder
-                        content()
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .padding(4)
-                }
+            SelfieFrame(placeholder: CameraPalette.selfiePlaceholder, tilted: false, content: content)
                 .frame(width: frame.width, height: frame.height)
-                .shadow(color: .black.opacity(0.22), radius: 7, y: 4)
             Capsule()
                 .fill(CameraPalette.cream.opacity(0.9))
                 .frame(width: 24, height: 4)

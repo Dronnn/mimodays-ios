@@ -4,7 +4,7 @@ import UIKit
 
 /// The signature selfie window for one canvas (a photo or a video's render size), drawn once and reused for
 /// every frame: shadow + cream frame, and the opening the selfie shows through, both already tilted.
-/// Same look as the live window (`SelfiePreviewWindow`): 22 pt corners, 4 pt cream border, -5.4°, soft shadow.
+/// The same window as `SelfieFrame` on screen: every metric comes from `SelfieWindowStyle`.
 struct SelfieWindowArt: @unchecked Sendable {
     /// Shadow and cream frame on a clear canvas.
     let frame: CIImage
@@ -17,10 +17,13 @@ struct SelfieWindowArt: @unchecked Sendable {
 
     init(window: SelfieWindowFrame, canvas: CGSize) {
         self.canvas = canvas
-        let (rect, scale) = PhotoComposer.placement(of: window, in: canvas)
-        let tilt = Size.selfieWindowTilt.radians
+        let rect = PhotoComposer.placement(of: window, in: canvas).rect
+        let style = SelfieWindowStyle.self
+        // Metrics scale with the window's own width, like `SelfieFrame`, whatever units the frame came in.
+        let scale = rect.width / style.size.width
+        let tilt = style.tilt.radians
         let outer = CGRect(x: -rect.width / 2, y: -rect.height / 2, width: rect.width, height: rect.height)
-        let inner = outer.insetBy(dx: 4 * scale, dy: 4 * scale)
+        let inner = outer.insetBy(dx: style.border * scale, dy: style.border * scale)
 
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
@@ -30,16 +33,22 @@ struct SelfieWindowArt: @unchecked Sendable {
             let cg = context.cgContext
             cg.translateBy(x: rect.midX, y: rect.midY)
             cg.rotate(by: tilt)
-            cg.setShadow(offset: CGSize(width: 0, height: 4 * scale), blur: 14 * scale, color: UIColor.black.withAlphaComponent(0.22).cgColor)
-            UIColor(red: 0xFB / 255, green: 0xF6 / 255, blue: 0xEF / 255, alpha: 1).setFill()
-            UIBezierPath(roundedRect: outer, cornerRadius: 22 * scale).fill()
+            cg.setShadow(
+                offset: CGSize(width: 0, height: style.shadowY * scale), blur: style.shadowBlur * scale,
+                color: UIColor.black.withAlphaComponent(style.shadowOpacity).cgColor
+            )
+            UIColor(
+                red: CGFloat(style.frameHex >> 16 & 0xFF) / 255, green: CGFloat(style.frameHex >> 8 & 0xFF) / 255,
+                blue: CGFloat(style.frameHex & 0xFF) / 255, alpha: 1
+            ).setFill()
+            UIBezierPath(roundedRect: outer, cornerRadius: style.cornerRadius * scale).fill()
         }
         let openingImage = renderer.image { context in
             let cg = context.cgContext
             cg.translateBy(x: rect.midX, y: rect.midY)
             cg.rotate(by: tilt)
             UIColor.white.setFill()
-            UIBezierPath(roundedRect: inner, cornerRadius: 18 * scale).fill()
+            UIBezierPath(roundedRect: inner, cornerRadius: style.innerCornerRadius * scale).fill()
         }
         frame = frameImage.cgImage.map { CIImage(cgImage: $0) } ?? CIImage.empty()
         opening = openingImage.cgImage.map { CIImage(cgImage: $0) } ?? CIImage.empty()

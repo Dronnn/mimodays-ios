@@ -118,8 +118,8 @@ struct ReviewView: View {
                 if model.hasSelfie, model.playback == .stopped, proxy.size.width > 0 {
                     // Laid out as the camera did, on the media at full width, then drawn at the size it is shown:
                     // what is saved is what was recorded, whatever the keyboard or the panel leaves of the media.
-                    let reference = CGSize(width: proxy.size.width, height: proxy.size.width / model.aspectRatio)
-                    let layout = SelfieWindowLayout(preview: reference, topInset: topInset)
+                    let layout = SelfieWindowLayout.media(width: proxy.size.width, aspectRatio: model.aspectRatio, topInset: topInset)
+                    let reference = layout.preview
                     AdjustableSelfieWindow(placement: $model.window, showsSheet: $adjustsSelfie, layout: layout, id: "review.selfieWindow") {
                         if let selfie = model.selfie {
                             Image(uiImage: selfie).resizable().scaledToFill()

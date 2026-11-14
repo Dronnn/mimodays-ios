@@ -57,7 +57,7 @@ public struct MomentHero: View {
                     .padding(.bottom, 42 * scale)
                 if let selfie {
                     SelfieWindow(media: selfie)
-                        .frame(width: 89 * scale, height: 110 * scale)
+                        .frame(width: 89 * scale, height: SelfieWindowStyle.height(forWidth: 89 * scale))
                         .position(x: proxy.size.width - 72.9 * scale, y: 37 * scale)
                 }
             }
@@ -152,7 +152,7 @@ public struct EmptyMomentHero: View {
                     .position(x: 150 * scale, y: 106 * scale)
                 SelfieWindow(media: .placeholder)
                     .overlay { PersonGlyph().stroke(Self.glyph, style: Self.line).frame(width: 26, height: 34).rotationEffect(Size.selfieWindowTilt) }
-                    .frame(width: 89 * scale, height: 110 * scale)
+                    .frame(width: 89 * scale, height: SelfieWindowStyle.height(forWidth: 89 * scale))
                     .position(x: 237.5 * scale, y: 99 * scale)
                 scene
                     .textStyle(.emptyHeroLabel)
@@ -210,7 +210,65 @@ private struct PersonGlyph: Shape {
     }
 }
 
-/// `Hero / PiP selfie`: cream rounded frame, tilted like every selfie window. Scales with its width.
+/// The selfie window's look. The camera's window (C01/C04) is the reference; the review, the player, every
+/// preview and the exported files draw the same window (Andrew, 2026-11-14). Metrics are for the 112 × 150
+/// medium window and scale with the width, so any size is the same window.
+public enum SelfieWindowStyle {
+    public static let size = CGSize(width: 112, height: 150)
+    public static let cornerRadius: CGFloat = 22
+    public static let border: CGFloat = 4
+    public static let innerCornerRadius: CGFloat = 18
+    public static let shadowOpacity = 0.22
+    /// Blur radius as Core Graphics takes it; SwiftUI's shadow radius is half of it.
+    public static let shadowBlur: CGFloat = 14
+    public static let shadowY: CGFloat = 4
+    public static var tilt: Angle { Size.selfieWindowTilt }
+    /// One cream in light and dark, so the window on screen and in an exported file is the same.
+    public static let frameHex: UInt32 = 0xFBF6EF
+    public static var frameColor: Color { Color(hex: frameHex) }
+
+    /// The window's height for a width.
+    public static func height(forWidth width: CGFloat) -> CGFloat {
+        width * size.height / size.width
+    }
+}
+
+/// The selfie window: a cream frame with the picture clipped inside it, never over it. Takes the window's
+/// shape at the width it is given; `tilted` false when the caller tilts it together with something else.
+public struct SelfieFrame<Content: View>: View {
+    let placeholder: Color
+    let tilted: Bool
+    let content: Content
+
+    public init(placeholder: Color = Color(hex: 0xB9A89A), tilted: Bool = true, @ViewBuilder content: () -> Content) {
+        self.placeholder = placeholder
+        self.tilted = tilted
+        self.content = content()
+    }
+
+    public var body: some View {
+        GeometryReader { proxy in
+            let k = proxy.size.width / SelfieWindowStyle.size.width
+            RoundedRectangle(cornerRadius: SelfieWindowStyle.cornerRadius * k, style: .continuous)
+                .fill(SelfieWindowStyle.frameColor)
+                .shadow(
+                    color: .black.opacity(SelfieWindowStyle.shadowOpacity),
+                    radius: SelfieWindowStyle.shadowBlur / 2 * k, y: SelfieWindowStyle.shadowY * k
+                )
+                .overlay {
+                    // The colour takes the opening's size; the picture fills it and is cut to it.
+                    placeholder
+                        .overlay { content }
+                        .clipShape(RoundedRectangle(cornerRadius: SelfieWindowStyle.innerCornerRadius * k, style: .continuous))
+                        .padding(SelfieWindowStyle.border * k)
+                }
+        }
+        .aspectRatio(SelfieWindowStyle.size.width / SelfieWindowStyle.size.height, contentMode: .fit)
+        .rotationEffect(tilted ? SelfieWindowStyle.tilt : .zero)
+    }
+}
+
+/// `Hero / PiP selfie`: the selfie window with a still in it, at the width it is given.
 public struct SelfieWindow: View {
     let media: HeroMedia
 
@@ -219,18 +277,11 @@ public struct SelfieWindow: View {
     }
 
     public var body: some View {
-        GeometryReader { proxy in
-            let scale = proxy.size.width / 89
-            RoundedRectangle(cornerRadius: 19 * scale)
-                .fill(ColorToken.mediaFrame.color)
-                .shadow(color: Color(hex: 0x4B2938).opacity(0.2), radius: 6, y: 4)
-                .overlay {
-                    MomentHero.fill(media, placeholder: 0xB9A89A)
-                        .clipShape(RoundedRectangle(cornerRadius: 15.5 * scale))
-                        .padding(4 * scale)
-                }
+        SelfieFrame {
+            if case let .image(image) = media {
+                image.resizable().scaledToFill()
+            }
         }
-        .rotationEffect(Size.selfieWindowTilt)
     }
 }
 

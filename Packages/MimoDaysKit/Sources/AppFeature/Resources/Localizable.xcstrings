@@ -361,6 +361,18 @@
         }
       }
     },
+    "Add to collection": {
+      "comment": "Viewer ••• menu item: put this moment in one or more collections.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add to collection"
+          }
+        }
+      }
+    },
     "Adjust selfie window": {
       "comment": "VoiceOver action on the camera's selfie window: opens the corner and size sheet.",
       "extractionState": "manual",
@@ -1125,6 +1137,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Favorite"
+          }
+        }
+      }
+    },
+    "Favorites": {
+      "comment": "Memories chip (M01) and Favorites title (M10).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorites"
           }
         }
       }
@@ -2733,6 +2757,18 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Show the whole day": {
+      "comment": "Viewer ••• menu item: open the day this moment belongs to.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show the whole day"
           }
         }
       }

@@ -78,6 +78,22 @@ enum VideoComposer {
         return Composed(asset: composition, videoComposition: videoComposition)
     }
 
+    /// The selfie stream alone on the main stream's timeline, silent: the player shows it in the live window
+    /// over the main stream, so the two stay separate files until they are exported together.
+    static func selfieStream(_ selfieURL: URL, offset: TimeInterval, mainDuration: CMTime) async throws -> AVComposition {
+        let composition = AVMutableComposition()
+        let selfie = AVURLAsset(url: selfieURL)
+        guard let video = try await selfie.loadTracks(withMediaType: .video).first,
+              let track = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            throw Failure.noVideo
+        }
+        let range = try await video.load(.timeRange)
+        guard let (source, start) = placement(selfie: range.duration, offset: offset, main: mainDuration) else { throw Failure.noVideo }
+        try track.insertTimeRange(source, of: video, at: start)
+        track.preferredTransform = try await video.load(.preferredTransform)
+        return composition
+    }
+
     /// Which part of the selfie stream goes where on the main timeline: a later start is inserted later,
     /// an earlier one is trimmed; nothing runs past the main stream.
     static func placement(selfie: CMTime, offset: TimeInterval, main: CMTime) -> (source: CMTimeRange, at: CMTime)? {

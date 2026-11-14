@@ -1,5 +1,7 @@
 @testable import AppFeature
 @testable import Core
+@preconcurrency import AVFoundation
+import DesignSystem
 import Foundation
 import Persistence
 import SwiftData
@@ -89,6 +91,100 @@ struct MomentViewerTests {
         #expect(source.selfiePath != nil && source.timing.window != nil && source.timing.duration > 0.5)
         let composed = try #require(await viewer.composedVideo(id))
         #expect(composed.videoComposition != nil)
+    }
+
+    /// 9.24: the player gets the two streams separately - the main one, and the selfie one for the window.
+    @Test func thePlayerGetsBothStreamsApart() async throws {
+        let id = try await save(video: true)
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        let items = try #require(await viewer.playerItems(id))
+        let selfie = try #require(items.selfie)
+        #expect(try await items.main.asset.loadTracks(withMediaType: .video).count == 1)
+        #expect(try await selfie.asset.loadTracks(withMediaType: .video).count == 1)
+        #expect(try await selfie.asset.loadTracks(withMediaType: .audio).isEmpty)
+    }
+
+    /// 9.24: the two streams play together, and stop and seek together.
+    @Test func bothStreamsPlayInStep() async throws {
+        let id = try await save(video: true)
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        let items = try #require(await viewer.playerItems(id))
+        let player = ViewerVideoPlayer(duration: 1)
+        await player.load(main: items.main, selfie: items.selfie)
+        #expect(player.isReady && player.hasSelfie, "main \(items.main.status.rawValue) \(String(describing: items.main.error)), selfie \(String(describing: items.selfie?.status.rawValue)) \(String(describing: items.selfie?.error))")
+        player.play()
+        try await Task.sleep(for: .milliseconds(400))
+        #expect(player.isPlaying)
+        #expect(player.main.rate == 1 && player.selfie.rate == 1)
+        let drift = abs(player.main.currentTime().seconds - player.selfie.currentTime().seconds)
+        #expect(drift < 0.05, "drift \(drift)")
+        #expect(player.main.currentTime().seconds > 0.2)
+        player.pause()
+        player.seek(to: 0.1)
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(abs(player.selfie.currentTime().seconds - 0.1) < 0.02)
+        player.stop()
+    }
+
+    /// 9.25: where the player puts the window is kept on the moment and is what the shared file shows - the
+    /// selfie inside the window, the cream border around it, at the new corner and size.
+    @Test func theSharedVideoHasTheWindowWhereThePlayerPutIt() async throws {
+        let id = try await save(video: true)
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        let source = try #require(viewer.moments[id]?.video)
+        let layout = SelfieWindowLayout.media(width: 402, aspectRatio: source.aspectRatio, topInset: 62)
+        let moved = CameraSettings.SelfieWindow(corner: .bottomLeft, scale: .large)
+        viewer.setWindow(PiPLayout(layout.windowFrame(moved), source: .frontSource), for: id)
+
+        let reread = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await reread.load(id)
+        let saved = try #require(reread.moments[id]?.video)
+        #expect(saved.layout.map(layout.placement(nearest:)) == moved)
+
+        let url = try #require(await viewer.exportVideo(id))
+        defer { try? FileManager.default.removeItem(at: url) }
+        let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
+        generator.appliesPreferredTrackTransform = true
+        generator.requestedTimeToleranceBefore = .zero
+        generator.requestedTimeToleranceAfter = .zero
+        let frame = try await generator.image(at: CMTime(seconds: 0.5, preferredTimescale: 600)).image
+        #expect(CGSize(width: frame.width, height: frame.height) == source.pixelSize)
+
+        let window = try #require(saved.timing.window)
+        let rect = PhotoComposer.placement(of: window, in: source.pixelSize).rect
+        #expect(rect.midX < source.pixelSize.width / 2 && rect.midY > source.pixelSize.height / 2)
+        let pixel = try Self.pixels(frame)
+        // Along the window's tilted vertical axis: the border's middle, and well inside the opening.
+        let border = SelfieWindowStyle.border * rect.width / SelfieWindowStyle.size.width
+        let tilt = SelfieWindowStyle.tilt.radians
+        func point(_ y: CGFloat) -> (Int, Int) {
+            (Int((rect.midX - y * sin(tilt)).rounded()), Int((rect.midY + y * cos(tilt)).rounded()))
+        }
+        let edge = pixel(point(-rect.height / 2 + border / 2))
+        let inside = pixel(point(-rect.height / 2 + border * 4))
+        let outside = pixel(point(-rect.height / 2 - border * 3))
+        #expect(edge.luma > 220, "cream border: \(edge)")
+        #expect(inside.g > inside.r, "mint selfie: \(inside)")
+        #expect(outside.r > outside.g, "warm main stream: \(outside)")
+    }
+
+    private static func pixels(_ image: CGImage) throws -> ((Int, Int)) -> (r: Int, g: Int, b: Int, luma: Double) {
+        let width = image.width, height = image.height
+        var data = [UInt8](repeating: 0, count: width * height * 4)
+        let context = try #require(CGContext(
+            data: &data, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4,
+            space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ))
+        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        let bytes = data
+        return { point in
+            let i = (point.1 * width + point.0) * 4
+            let (r, g, b) = (Int(bytes[i]), Int(bytes[i + 1]), Int(bytes[i + 2]))
+            return (r, g, b, 0.299 * Double(r) + 0.587 * Double(g) + 0.114 * Double(b))
+        }
     }
 
     @Test func aDeletedMomentIsNotShown() async throws {

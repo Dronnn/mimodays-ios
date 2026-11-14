@@ -33,6 +33,13 @@ struct MomentViewer: View {
     @State private var editing: EditMomentModel?
     /// M15 while it is open, for this moment.
     @State private var deleting: ViewerMoment?
+    /// The ••• menu's Add to collection, for this moment.
+    @State private var collecting: CollectingMoment?
+    /// A video's composed file, ready to share.
+    @State private var sharing: SharedFile?
+    @State private var preparingShare = false
+    /// The status bar's height: the video's selfie window is laid out from it, as on the camera.
+    @State private var screenTop: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
 
     private var isVideo: Bool { model.currentMoment?.mediaType == .video }
@@ -52,21 +59,11 @@ struct MomentViewer: View {
         .scrollPosition(id: $model.current)
         .scrollIndicators(.hidden)
         .background((isVideo ? Color.black : ColorToken.canvas.color).ignoresSafeArea())
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.visible, for: .navigationBar)
+        // M05/M06 draw their own bar: back with the day, the time, •••. Swiping back still works.
+        .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
-        // A solid bar would cover the top of each page; the canvas behind it is the same colour anyway.
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(isVideo ? .dark : nil, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                if let moment = model.currentMoment {
-                    Self.time(moment.captured, date: false)
-                        .textStyle(.editorTitle)
-                        .foregroundStyle((isVideo ? ColorToken.mediaFrame : .textPrimary).color)
-                }
-            }
-        }
+        .background(SwipeBackEnabler())
+        .safeAreaInset(edge: .top, spacing: 0) { topBar }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let moment = model.currentMoment { actions(moment) }
         }
@@ -78,25 +75,94 @@ struct MomentViewer: View {
                 model.delete(moment.id)
             }
         }
+        .sheet(item: $collecting) { collecting in
+            CollectionPickerSheet(library: model.library, selection: Binding(
+                get: { collecting.selection },
+                set: { self.collecting?.selection = $0 }
+            ))
+            .onDisappear { model.setCollections(self.collecting?.selection ?? collecting.selection, for: collecting.id) }
+        }
+        .sheet(item: $sharing) { ShareSheet(items: [$0.url]) }
         .onChange(of: model.ids.isEmpty) { _, isEmpty in if isEmpty { dismiss() } }
         .onChange(of: model.current) { model.stopVoice() }
         .onDisappear { model.stopVoice() }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
             Task { await model.reload() }
         }
+        // Outside the bars' insets: the screen's own.
+        .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { screenTop = $0 }
     }
 
     @ViewBuilder
     private func page(_ id: UUID) -> some View {
         if let moment = model.moments[id] {
             if moment.mediaType == .video {
-                VideoPage(model: model, moment: moment, isCurrent: model.current == id)
+                VideoPage(model: model, moment: moment, isCurrent: model.current == id, topInset: screenTop)
             } else {
                 photoPage(moment)
             }
         } else {
             Color.clear
         }
+    }
+
+    // MARK: Bar
+
+    /// `Navigation / Back bar`: ‹ and the moment's day ("Nov 11"), its time, the ••• menu. Cream on a video.
+    private var topBar: some View {
+        let ink = (isVideo ? ColorToken.mediaFrame : .textPrimary).color
+        return ZStack {
+            if let moment = model.currentMoment {
+                Self.time(moment.captured, date: false)
+                    .textStyle(.editorTitle)
+                    .foregroundStyle(ink)
+                    .accessibilityAddTraits(.isHeader)
+            }
+            HStack(spacing: 0) {
+                Button { dismiss() } label: {
+                    HStack(spacing: 0) {
+                        Icon.glyphBack.image
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(ink)
+                            .flipsForRightToLeftLayoutDirection(true)
+                        if let moment = model.currentMoment {
+                            Self.day(moment.captured)
+                                .textStyle(.editorCancel)
+                                .foregroundStyle((isVideo ? ColorToken.mediaFrame : .textLink).color)
+                        }
+                    }
+                    .frame(minHeight: Size.minimumTapTarget)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Back", bundle: .module))
+                .accessibilityIdentifier("viewer.back")
+                Spacer(minLength: 8)
+                if let moment = model.currentMoment {
+                    Menu {
+                        Button { collecting = CollectingMoment(id: moment.id, selection: Set(moment.collections.map(\.id))) } label: {
+                            Label { Text("Add to collection", bundle: .module) } icon: { Icon.glyphCollection.image }
+                        }
+                        NavigationLink(value: MemoriesRoute.day(LocalDay(moment.captured.instant, in: moment.captured.timeZone).key)) {
+                            Label { Text("Show the whole day", bundle: .module) } icon: { Icon.glyphClock.image }
+                        }
+                    } label: {
+                        Icon.glyphMore.image
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(ink)
+                            .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
+                            .contentShape(Rectangle())
+                    }
+                    .accessibilityLabel(Text("More", bundle: .module))
+                    .accessibilityIdentifier("viewer.more")
+                }
+            }
+        }
+        .padding(.leading, 8)
+        .padding(.trailing, 4)
+        .frame(height: 44)
     }
 
     // MARK: Photo (M05)
@@ -113,7 +179,7 @@ struct MomentViewer: View {
                     .overlay(alignment: .topTrailing) {
                         if let selfie = moment.selfiePath {
                             SelfieWindow(media: model.image(selfie).map { .image(Image(uiImage: $0)) } ?? .placeholder)
-                                .frame(width: 89, height: 110)
+                                .frame(width: 89, height: SelfieWindowStyle.height(forWidth: 89))
                                 .padding(.top, 10)
                                 .padding(.trailing, 24)
                         }
@@ -195,6 +261,30 @@ struct MomentViewer: View {
                 .accessibilityLabel(Text("Share", bundle: .module))
                 .accessibilityIdentifier("viewer.share")
                 .frame(maxWidth: .infinity)
+            } else if moment.mediaType == .video {
+                // The video is shared as seen: both streams in one file, made when asked for.
+                Button {
+                    preparingShare = true
+                    Task {
+                        sharing = await model.exportVideo(moment.id).map(SharedFile.init)
+                        preparingShare = false
+                    }
+                } label: {
+                    Group {
+                        if preparingShare {
+                            ProgressView().tint(tint)
+                        } else {
+                            Icon.glyphShare.image.resizable().frame(width: 24, height: 24).foregroundStyle(tint)
+                        }
+                    }
+                    .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(preparingShare)
+                .accessibilityLabel(Text("Share", bundle: .module))
+                .accessibilityIdentifier("viewer.share")
+                .frame(maxWidth: .infinity)
             }
             Button { model.toggleFavorite(moment.id) } label: {
                 (moment.isFavorite ? Icon.glyphHeartFilled : .glyphHeart).image
@@ -258,6 +348,13 @@ struct MomentViewer: View {
 
     // MARK: Pieces
 
+    /// "Nov 11", in the moment's own time zone.
+    static func day(_ captured: CaptureTime) -> Text {
+        var format = Date.FormatStyle().month(.abbreviated).day()
+        format.timeZone = captured.timeZone
+        return Text(captured.instant, format: format)
+    }
+
     /// "6:42 PM", or "Wed, Nov 11, 2026 · 6:42 PM", in the moment's own time zone.
     static func time(_ captured: CaptureTime, date: Bool) -> Text {
         var clock = Date.FormatStyle(date: .omitted, time: .shortened)
@@ -269,7 +366,7 @@ struct MomentViewer: View {
     }
 }
 
-/// A moment's caption, then its longer note; cream on a video.
+/// A moment's caption, then its longer note, both handwritten (M05 Patrick Hand 20); cream on a video.
 struct MomentWords: View {
     let moment: ViewerMoment
     let onPhoto: Bool
@@ -285,15 +382,16 @@ struct MomentWords: View {
             }
             if let note = moment.note {
                 Text(note)
-                    .textStyle(.body)
-                    .foregroundStyle(onPhoto ? color : ColorToken.textBody.color)
+                    .textStyle(.dayCaption)
+                    .foregroundStyle(color)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
 }
 
-/// `Viewer / Voice pill`: play or stop, its length and its waveform. Cream on a video.
+/// `Viewer / Voice pill`: play or stop, its length and its waveform, filling coral as it plays.
+/// On the canvas a cream hand-cut card; on a video a translucent cream capsule without the waveform.
 struct VoicePill: View {
     let model: MomentViewerModel
     let id: UUID
@@ -302,44 +400,103 @@ struct VoicePill: View {
 
     var body: some View {
         let isPlaying = model.playingVoice == id
-        let ink = (onPhoto ? ColorToken.mediaFrame : .textPrimary).color
+        let progress = isPlaying && voice.duration > 0 ? min(model.voiceTime / voice.duration, 1) : 0
+        let length = Text(Duration.seconds(voice.duration.rounded()), format: .time(pattern: .minuteSecond))
         Button { model.toggleVoice(id) } label: {
-            HStack(spacing: 12) {
-                (isPlaying ? Icon.glyphPause : .glyphPlay).image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 16, height: 16)
-                    .foregroundStyle(onPhoto ? ink : ColorToken.textOnCoral.color)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(onPhoto ? Color.clear : ColorToken.actionCoral.color))
-                Text("Voice note · \(Text(Duration.seconds(voice.duration.rounded()), format: .time(pattern: .minuteSecond)))", bundle: .module)
-                    .textStyle(.reviewChip)
-                    .foregroundStyle(ink)
-                if !onPhoto {
-                    WaveformBars(
-                        levels: model.voiceLevels[id] ?? [], count: MomentViewerModel.voiceBars, filled: 0,
-                        minHeight: 6, maxHeight: 22, rest: ColorToken.textPrimary.color.opacity(0.55)
-                    )
-                    .frame(height: 24)
-                    .accessibilityHidden(true)
-                }
-            }
-            .padding(.leading, 10)
-            .padding(.trailing, 16)
-            .frame(minHeight: onPhoto ? 40 : 52)
-            .frame(maxWidth: onPhoto ? nil : .infinity, alignment: .leading)
-            .background {
+            Group {
                 if onPhoto {
-                    Capsule().fill(ColorToken.mediaFrame.color.opacity(0.18))
+                    HStack(spacing: 8) {
+                        (isPlaying ? Icon.glyphPause : .glyphPlay).image.resizable().scaledToFit().frame(width: 20, height: 20)
+                        Text("Voice note · \(length)", bundle: .module).textStyle(.voicePill)
+                    }
+                    .foregroundStyle(ColorToken.mediaFrame.color)
+                    .padding(.leading, 12)
+                    .padding(.trailing, 20)
+                    .frame(minWidth: 230, minHeight: 40, alignment: .leading)
+                    .background(Capsule().fill(ColorToken.mediaFrame.color.opacity(0.18)))
                 } else {
-                    FieldBlob().fill(ColorToken.surfaceChip.color)
+                    HStack(spacing: 12) {
+                        (isPlaying ? Icon.glyphPause : .glyphPlay).image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundStyle(ColorToken.textOnCoral.color)
+                            .frame(width: 36, height: 36)
+                            .background(Circle().fill(ColorToken.actionCoral.color))
+                        Text("Voice note · \(length)", bundle: .module)
+                            .textStyle(.voicePill)
+                            .foregroundStyle(ColorToken.textPrimary.color)
+                        Spacer(minLength: 8)
+                        WaveformBars(
+                            levels: model.voiceLevels[id] ?? [], count: MomentViewerModel.voiceBars,
+                            filled: Int((progress * Double(MomentViewerModel.voiceBars)).rounded()),
+                            minHeight: 8, maxHeight: 22, rest: ColorToken.textPrimary.color.opacity(0.55)
+                        )
+                        .frame(width: CGFloat(MomentViewerModel.voiceBars) * 6, height: 24)
+                        .environment(\.layoutDirection, .leftToRight)
+                        .accessibilityHidden(true)
+                    }
+                    .padding(.leading, 10)
+                    .padding(.trailing, 26)
+                    .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+                    .background(FieldBlob().fill(ColorToken.surfaceCard.color).shadow(color: Color(hex: 0x4B2938).opacity(0.08), radius: 2, y: 1))
                 }
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text("Voice note · \(Text(Duration.seconds(voice.duration.rounded()), format: .time(pattern: .minuteSecond)))", bundle: .module))
+        .accessibilityLabel(Text("Voice note · \(length)", bundle: .module))
+        .accessibilityValue(isPlaying ? Text(Duration.seconds(model.voiceTime.rounded()), format: .time(pattern: .minuteSecond)) : Text(verbatim: ""))
         .accessibilityHint(Text(isPlaying ? "Stops it" : "Plays it", bundle: .module))
         .accessibilityIdentifier("viewer.voice")
+    }
+}
+
+/// The ••• menu's Add to collection: the moment and the collections ticked so far.
+struct CollectingMoment: Identifiable {
+    let id: UUID
+    var selection: Set<UUID>
+}
+
+/// A file handed to the share sheet.
+struct SharedFile: Identifiable {
+    let url: URL
+    var id: URL { url }
+}
+
+/// The system share sheet for files.
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+    func makeUIViewController(context _: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_: UIActivityViewController, context _: Context) {}
+}
+
+/// Keeps the edge swipe back on screens that hide the navigation bar to draw their own (M05/M06).
+struct SwipeBackEnabler: UIViewControllerRepresentable {
+    func makeUIViewController(context _: Context) -> Controller { Controller() }
+    func updateUIViewController(_: Controller, context _: Context) {}
+
+    final class Controller: UIViewController {
+        private weak var previous: (any UIGestureRecognizerDelegate)?
+        private weak var navigation: UINavigationController?
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            guard let navigation = navigationController, navigation.viewControllers.count > 1,
+                  let gesture = navigation.interactivePopGestureRecognizer else { return }
+            self.navigation = navigation
+            previous = gesture.delegate
+            gesture.isEnabled = true
+            gesture.delegate = nil
+        }
+
+        // Back as it was before the screen goes: a nil delegate on the root screen can freeze the swipe.
+        override func viewWillDisappear(_ animated: Bool) {
+            super.viewWillDisappear(animated)
+            navigation?.interactivePopGestureRecognizer?.delegate = previous
+        }
     }
 }

@@ -449,6 +449,8 @@ struct MemoryTile: View {
     let image: UIImage?
     /// Select mode: the mic steps left of the selection circle (M13).
     var leavesRoomForMark = false
+    /// The tile badges' deliberate offset of their glyph from the disc's centre (design: 5 pt right and down).
+    static let badgeOffset: CGFloat = 5
 
     var body: some View {
         Color(hex: 0xC9B8AA)
@@ -459,9 +461,12 @@ struct MemoryTile: View {
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(alignment: .topLeading) {
                 if item.isFavorite {
+                    // `Badge / Favorite`: the heart sits 5 pt right of and below the disc's centre, past its
+                    // edge - on purpose, never centred (Andrew, 2026-11-14).
                     HeartShape()
                         .fill(ColorToken.actionCoral.color)
-                        .frame(width: 13, height: 11.7)
+                        .frame(width: 20, height: 18)
+                        .offset(x: Self.badgeOffset, y: Self.badgeOffset)
                         .frame(width: 26, height: 26)
                         .background(Circle().fill(ColorToken.mediaFrame.color))
                         .padding(7)
@@ -483,14 +488,16 @@ struct MemoryTile: View {
             }
             .overlay(alignment: .bottomTrailing) {
                 if detail?.hasVoiceNote == true {
+                    // `Badge / Voice`: offset like the favourite's heart.
                     Icon.glyphMic.image
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 12, height: 16)
+                        .frame(width: 14, height: 20)
                         .foregroundStyle(.white)
+                        .offset(x: Self.badgeOffset, y: Self.badgeOffset)
                         .frame(width: 26, height: 26)
                         .background(Circle().fill(ColorToken.mediaScrim.color))
-                        .padding(6)
+                        .padding(7)
                         .padding(.trailing, leavesRoomForMark ? 29 : 0)
                 }
             }

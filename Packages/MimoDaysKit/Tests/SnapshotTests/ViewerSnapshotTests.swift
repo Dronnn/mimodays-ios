@@ -77,6 +77,9 @@ struct ViewerSnapshotTests {
         let id = try await save(video: false)
         let model = try #require(EditMomentModel(id: id, library: library, voice: .simulated, places: .simulated))
         await model.loadThumbnail()
+        // The saved caption wraps right at a word in the multi-line field at AX3, and machines disagree on
+        // which side of it: a shorter one keeps the snapshot about the screen.
+        model.caption = "First snow"
         assertScreenSnapshots(of: EditMomentView(model: model), variants: [
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
             SnapshotVariant(.iPhone, .light, rightToLeft: true),

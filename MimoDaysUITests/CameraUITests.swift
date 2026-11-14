@@ -95,6 +95,55 @@ final class CameraUITests: XCTestCase {
         XCTAssertEqual(share(), before, accuracy: 0.01)
     }
 
+    /// 9.24/9.25: a saved two-camera video plays with its selfie window, which moves in the player as while
+    /// recording, and stays where it was put.
+    @MainActor
+    func testASavedVideoPlaysWithItsSelfieWindowWhichMovesInThePlayer() {
+        openCamera()
+        app.buttons["camera.mode.video"].tap()
+        app.buttons["camera.length.30"].tap()
+        app.buttons["camera.shutter"].tap()
+        let stop = app.buttons["camera.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        sleep(2)
+        stop.tap()
+        let save = app.buttons["review.save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        let hero = app.descendants(matching: .any)["today.hero"]
+        XCTAssertTrue(hero.waitForExistence(timeout: 10))
+        sleep(1)
+        hero.tap()
+
+        let window = app.descendants(matching: .any)["viewer.selfieWindow"]
+        XCTAssertTrue(window.waitForExistence(timeout: 10))
+        XCTAssertEqual(window.value as? String, "Top right, Medium")
+        // It plays by itself.
+        let play = app.buttons["viewer.play"]
+        let playing = expectation(for: NSPredicate(format: "label == 'Pause'"), evaluatedWith: play)
+        wait(for: [playing], timeout: 3)
+        attachScreenshot("player-recorded")
+        window.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.6)))
+        XCTAssertEqual(window.value as? String, "Bottom left, Medium")
+        sleep(1)
+        attachScreenshot("player-moved")
+
+        app.buttons["viewer.back"].tap()
+        XCTAssertTrue(hero.waitForExistence(timeout: 5))
+        hero.tap()
+        XCTAssertTrue(window.waitForExistence(timeout: 10))
+        XCTAssertEqual(window.value as? String, "Bottom left, Medium")
+    }
+
+    @MainActor
+    private func attachScreenshot(_ name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .original)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     /// C08: a note shows on its chip, Retake asks before dropping it, and Save keeps it.
     @MainActor
     func testANoteIsKeptAndRetakeAsksBeforeDroppingIt() {

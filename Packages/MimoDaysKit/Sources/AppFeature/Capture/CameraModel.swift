@@ -78,8 +78,10 @@ final class CameraModel {
     }
     /// Photos: the flash. Videos: the rear light while recording, also turned on or off mid-recording.
     var isFlashOn = false {
-        didSet { if isRecording, isFlashOn != oldValue { Task { await engine.setTorch(isFlashOn) } } }
+        didSet { if isRecording, isFlashOn != oldValue { setTorch(isFlashOn) } }
     }
+    /// The last torch change asked for; each waits for the one before, so they reach the camera in order.
+    private var torch: Task<Void, Never>?
     /// The selfie window is shown and captured (dual setups only).
     private(set) var showsSelfie = true
     /// Dual setups: the front camera is the big one (↻).
@@ -231,18 +233,30 @@ final class CameraModel {
         phase = .recording(startedAt: capturedAt.instant)
         showsSingleCameraNote = false
         failure = nil
-        if isFlashOn { await engine.setTorch(true) }
+        if isFlashOn { await setTorch(true).value }
         do {
             let recorded = arranged(try await engine.record(limit: settings.videoLength.duration))
-            await engine.setTorch(false)
+            await setTorch(false).value
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready
             onCapture(result(.video(video), selfie: video.selfieURL, at: capturedAt))
         } catch {
-            await engine.setTorch(false)
+            await setTorch(false).value
             phase = .ready
             failure = CaptureFailure(error)
         }
+    }
+
+    @discardableResult
+    private func setTorch(_ on: Bool) -> Task<Void, Never> {
+        let previous = torch
+        let engine = engine
+        let task = Task {
+            await previous?.value
+            await engine.setTorch(on)
+        }
+        torch = task
+        return task
     }
 
     /// Big camera first; a hidden selfie window is never kept.

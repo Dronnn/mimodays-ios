@@ -58,7 +58,7 @@ final class MemoriesUITests: XCTestCase {
         wait(for: [flipped], timeout: 5)
         app.swipeLeft()
         XCTAssertTrue(favorite.waitForExistence(timeout: 5))
-        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["viewer.back"].tap()
         XCTAssertTrue(tile.waitForExistence(timeout: 5))
     }
 
@@ -99,7 +99,7 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(result.waitForExistence(timeout: 5))
         result.tap()
         XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
-        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["viewer.back"].tap()
         let filters = app.buttons["search.filters"]
         XCTAssertTrue(filters.waitForExistence(timeout: 5))
         filters.tap()
@@ -125,7 +125,7 @@ final class MemoriesUITests: XCTestCase {
         let favorite = app.buttons["viewer.favorite"]
         XCTAssertTrue(favorite.waitForExistence(timeout: 10))
         favorite.tap()
-        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["viewer.back"].tap()
         XCTAssertTrue(chip.waitForExistence(timeout: 5))
         chip.tap()
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch.waitForExistence(timeout: 5))
@@ -174,7 +174,7 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(confirm.waitForExistence(timeout: 5))
         confirm.tap()
         XCTAssertTrue(delete.waitForExistence(timeout: 5))
-        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["viewer.back"].tap()
         let chip = app.buttons["memories.collections"]
         XCTAssertTrue(chip.waitForExistence(timeout: 10))
         chip.tap()

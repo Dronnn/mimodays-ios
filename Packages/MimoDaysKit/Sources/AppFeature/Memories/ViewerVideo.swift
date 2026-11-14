@@ -2,18 +2,23 @@
 import Core
 import DesignSystem
 import Observation
+import Persistence
 import SwiftUI
 
-/// Plays a composed video for the viewer: play and pause, the sound, where it is and seeking (M06).
+/// Plays a saved video for the viewer: the main stream with its sound, and the selfie stream (when there is
+/// one) in step with it for the live window. The two stay separate files; they become one only on export.
 @MainActor
 @Observable
 final class ViewerVideoPlayer {
-    let player = AVPlayer()
+    let main = AVPlayer()
+    let selfie = AVPlayer()
+    private(set) var hasSelfie = false
+    private(set) var isReady = false
     private(set) var time: Double = 0
     private(set) var duration: Double
     private(set) var isPlaying = false
     var isMuted = false {
-        didSet { player.isMuted = isMuted }
+        didSet { main.isMuted = isMuted }
     }
 
     private var timeObserver: Any?
@@ -21,75 +26,101 @@ final class ViewerVideoPlayer {
 
     init(duration: Double) {
         self.duration = duration
+        selfie.isMuted = true
+        // Started together at one host time, which needs players that don't wait on their own.
+        main.automaticallyWaitsToMinimizeStalling = false
+        selfie.automaticallyWaitsToMinimizeStalling = false
     }
 
-    func load(_ video: VideoComposer.Composed) {
-        let item = video.playerItem()
-        player.replaceCurrentItem(with: item)
-        timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 20), queue: .main) { [weak self] time in
+    func load(main item: AVPlayerItem, selfie selfieItem: AVPlayerItem?) async {
+        main.replaceCurrentItem(with: item)
+        selfie.replaceCurrentItem(with: selfieItem)
+        hasSelfie = selfieItem != nil
+        await Self.ready(item)
+        if let selfieItem { await Self.ready(selfieItem) }
+        if item.status == .readyToPlay { duration = max(duration, item.duration.seconds.isFinite ? item.duration.seconds : 0) }
+        timeObserver = main.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 20), queue: .main) { [weak self] time in
             MainActor.assumeIsolated { self?.time = time.seconds }
         }
         endObserver = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
-                self?.isPlaying = false
+                self?.pause()
                 self?.seek(to: 0)
             }
         }
+        isReady = item.status == .readyToPlay
     }
 
     func toggle() {
         isPlaying ? pause() : play()
     }
 
+    /// Both streams start at the same host time from the main one's position.
     func play() {
-        player.play()
+        guard isReady else { return }
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+        let time = main.currentTime()
+        let start = CMTimeAdd(CMClockGetTime(CMClockGetHostTimeClock()), CMTime(value: 1, timescale: 20))
+        main.setRate(1, time: time, atHostTime: start)
+        if hasSelfie { selfie.setRate(1, time: time, atHostTime: start) }
         isPlaying = true
     }
 
     func pause() {
-        player.pause()
+        main.pause()
+        selfie.pause()
         isPlaying = false
+        if hasSelfie { selfie.seek(to: main.currentTime(), toleranceBefore: .zero, toleranceAfter: .zero) }
     }
 
     func seek(to seconds: Double) {
         time = seconds
-        player.seek(to: CMTime(seconds: seconds, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
+        let target = CMTime(seconds: seconds, preferredTimescale: 600)
+        main.seek(to: target, toleranceBefore: .zero, toleranceAfter: .zero)
+        if hasSelfie { selfie.seek(to: target, toleranceBefore: .zero, toleranceAfter: .zero) }
     }
 
     func stop() {
         pause()
-        if let timeObserver { player.removeTimeObserver(timeObserver) }
+        if let timeObserver { main.removeTimeObserver(timeObserver) }
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         timeObserver = nil
         endObserver = nil
-        player.replaceCurrentItem(with: nil)
+        main.replaceCurrentItem(with: nil)
+        selfie.replaceCurrentItem(with: nil)
+        isReady = false
+    }
+
+    /// Until the item is ready or failed, at most a few seconds (local files are ready almost at once).
+    private static func ready(_ item: AVPlayerItem) async {
+        for _ in 0..<150 where item.status == .unknown {
+            try? await Task.sleep(for: .milliseconds(20))
+        }
     }
 }
 
-/// M06: the video fills the screen; its words, voice note, scrubber, pause and sound sit at the bottom in cream.
+/// M06: the whole video from the top edge, as the camera showed it, with the selfie window where it was
+/// recorded. The window moves and changes size as while recording; where it ends up is kept and is what
+/// sharing exports. Words, voice note, scrubber, pause and sound sit at the bottom in cream.
 /// It plays when its page is the one on screen and stops when swiped away.
 struct VideoPage: View {
     let model: MomentViewerModel
     let moment: ViewerMoment
     let isCurrent: Bool
+    /// The screen's top inset (status bar), which the camera's window layout counts from.
+    let topInset: CGFloat
     @State private var playback: ViewerVideoPlayer?
-    @State private var poster: UIImage?
+    @State private var placement = CameraSettings.SelfieWindow()
+    @State private var adjustsSelfie = false
+    /// Playing before a scrub started.
+    @State private var resumesAfterScrub: Bool?
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.black
-                .overlay {
-                    if let playback {
-                        PlayerLayerView(player: playback.player)
-                    } else if let image = model.image(moment.mainPath) {
-                        Image(uiImage: image).resizable().scaledToFill()
-                    }
-                }
-                .clipped()
-                .ignoresSafeArea()
-                .accessibilityElement()
-                .accessibilityLabel(Text("Video", bundle: .module))
-                .accessibilityAddTraits(.isImage)
+            GeometryReader { proxy in
+                media(in: proxy.size)
+            }
+            .ignoresSafeArea()
             LinearGradient(colors: [.clear, ColorToken.mediaScrim.color], startPoint: .top, endPoint: .bottom)
                 .frame(height: 360)
                 .ignoresSafeArea()
@@ -98,16 +129,19 @@ struct VideoPage: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 12)
         }
+        .sheet(isPresented: $adjustsSelfie) {
+            SelfieWindowSheet(placement: $placement)
+        }
         .task(id: isCurrent) {
             guard isCurrent else {
                 playback?.stop()
                 playback = nil
                 return
             }
-            guard playback == nil, let composed = await model.composedVideo(moment.id) else { return }
+            guard playback == nil, let items = await model.playerItems(moment.id) else { return }
             let player = ViewerVideoPlayer(duration: moment.video?.timing.duration ?? 0)
-            player.load(composed)
             playback = player
+            await player.load(main: items.main, selfie: items.selfie)
             player.play()
         }
         .onDisappear {
@@ -115,6 +149,65 @@ struct VideoPage: View {
             playback = nil
         }
     }
+
+    // MARK: Media
+
+    /// The main stream aspect-fit at the top, the selfie window laid out as the camera did and drawn at the
+    /// size the media has here.
+    @ViewBuilder
+    private func media(in size: CGSize) -> some View {
+        let aspectRatio = moment.video?.aspectRatio ?? 9.0 / 16.0
+        let width = min(size.width, size.height * aspectRatio)
+        let shown = CGSize(width: width, height: width / aspectRatio)
+        ZStack(alignment: .topLeading) {
+            ZStack {
+                if let image = model.image(moment.mainPath) {
+                    Image(uiImage: image).resizable().scaledToFill()
+                }
+                if let playback {
+                    PlayerLayerView(player: playback.main)
+                }
+            }
+            .frame(width: shown.width, height: shown.height)
+            .clipped()
+            .accessibilityElement()
+            .accessibilityLabel(Text("Video", bundle: .module))
+            .accessibilityAddTraits(.isImage)
+            if let layout = moment.video?.layout, size.width > 0 {
+                window(layout, reference: size.width, shown: shown)
+            }
+        }
+        .frame(width: size.width, height: size.height, alignment: .top)
+        .background(Color.black)
+    }
+
+    private func window(_ saved: PiPLayout, reference width: CGFloat, shown: CGSize) -> some View {
+        let layout = SelfieWindowLayout.media(width: width, aspectRatio: shown.width / shown.height, topInset: topInset)
+        return AdjustableSelfieWindow(placement: $placement, showsSheet: $adjustsSelfie, layout: layout, id: "viewer.selfieWindow") {
+            ZStack {
+                if let image = model.image(moment.selfiePath) {
+                    Image(uiImage: image).resizable().scaledToFill()
+                }
+                if let playback, playback.hasSelfie {
+                    PlayerLayerView(player: playback.selfie)
+                }
+            }
+        }
+        .frame(width: layout.preview.width, height: layout.preview.height)
+        .scaleEffect(shown.width / layout.preview.width, anchor: .topLeading)
+        .frame(width: shown.width, height: shown.height, alignment: .topLeading)
+        .onAppear {
+            // What the player shows is what sharing exports: a saved layout off every corner (moments saved
+            // before 9.17) is kept as the corner and size it is shown at.
+            placement = layout.placement(nearest: saved)
+            model.setWindow(PiPLayout(layout.windowFrame(placement), source: saved.source), for: moment.id)
+        }
+        .onChange(of: placement) { _, new in
+            model.setWindow(PiPLayout(layout.windowFrame(new), source: saved.source), for: moment.id)
+        }
+    }
+
+    // MARK: Controls
 
     private var controls: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -130,7 +223,7 @@ struct VideoPage: View {
                     (playback?.isPlaying == true ? Icon.glyphPause : .glyphPlay).image
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 32, height: 32)
+                        .frame(width: 40, height: 40)
                         .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
                         .contentShape(Rectangle())
                 }
@@ -155,20 +248,57 @@ struct VideoPage: View {
         .foregroundStyle(ColorToken.mediaFrame.color)
     }
 
+    /// M06 scrubber: a 4 pt track, coral up to where it is, a 16 pt cream knob; drag anywhere on it to seek.
     private var scrubber: some View {
         let duration = max(playback?.duration ?? moment.video?.timing.duration ?? 0, 0.1)
         let time = min(playback?.time ?? 0, duration)
         return VStack(spacing: 6) {
-            Slider(value: Binding(get: { time }, set: { playback?.seek(to: $0) }), in: 0...duration)
-                .tint(ColorToken.actionCoral.color)
-                .accessibilityLabel(Text("Playback position", bundle: .module))
-                .accessibilityValue(Text(Duration.seconds(time.rounded()), format: .time(pattern: .minuteSecond)))
+            GeometryReader { proxy in
+                let progress = CGFloat(time / duration)
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(ColorToken.mediaFrame.color.opacity(0.3))
+                        .frame(height: 4)
+                    Capsule()
+                        .fill(ColorToken.actionCoral.color)
+                        .frame(width: max(4, proxy.size.width * progress), height: 4)
+                    Circle()
+                        .fill(ColorToken.mediaFrame.color)
+                        .frame(width: 16, height: 16)
+                        .offset(x: proxy.size.width * progress - 8)
+                }
+                .frame(maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            if resumesAfterScrub == nil {
+                                resumesAfterScrub = playback?.isPlaying ?? false
+                                playback?.pause()
+                            }
+                            let fraction = min(max(value.location.x / max(proxy.size.width, 1), 0), 1)
+                            playback?.seek(to: duration * fraction)
+                        }
+                        .onEnded { _ in
+                            if resumesAfterScrub == true { playback?.play() }
+                            resumesAfterScrub = nil
+                        }
+                )
+            }
+            .frame(height: Size.minimumTapTarget / 2)
+            .accessibilityElement()
+            .accessibilityLabel(Text("Playback position", bundle: .module))
+            .accessibilityValue(Text(Duration.seconds(time.rounded()), format: .time(pattern: .minuteSecond)))
+            .accessibilityAdjustableAction { direction in
+                let step = direction == .increment ? 5.0 : -5.0
+                playback?.seek(to: min(max(time + step, 0), duration))
+            }
             HStack {
                 Text(Duration.seconds(time.rounded()), format: .time(pattern: .minuteSecond))
                 Spacer()
                 Text(Duration.seconds(duration.rounded()), format: .time(pattern: .minuteSecond))
             }
-            .textStyle(.tileBadge)
+            .textStyle(.scrubTime)
             .accessibilityHidden(true)
         }
         .environment(\.layoutDirection, .leftToRight)

@@ -37,6 +37,12 @@ struct ViewerMoment: Equatable, Identifiable {
         var mainPath: String
         var selfiePath: String?
         var timing: VideoTiming
+        /// The main stream's upright size in pixels.
+        var pixelSize: CGSize
+        /// Where the selfie window is, as saved on the moment; nil without a selfie stream.
+        var layout: PiPLayout?
+
+        var aspectRatio: CGFloat { pixelSize.height > 0 ? pixelSize.width / pixelSize.height : 9.0 / 16.0 }
     }
 
     var id: UUID
@@ -79,13 +85,16 @@ struct ViewerMoment: Equatable, Identifiable {
         voice = moment.voiceNotes.first.map { Voice(path: $0.relativePath, duration: $0.duration, transcript: $0.transcript) }
         if moment.mediaType == .video, let main = moment.media.first(where: { $0.relativePath == summary.mainPath }) {
             let selfie = moment.media.first { $0.relativePath == summary.selfiePath }
+            let pixelSize = CGSize(width: main.pixelWidth, height: main.pixelHeight)
+            let layout = selfie == nil ? nil : moment.pipLayout
             video = VideoSource(
                 mainPath: main.relativePath, selfiePath: selfie?.relativePath,
                 timing: VideoTiming(
                     duration: main.duration ?? 0, selfieOffset: selfie?.startOffset ?? 0, hasAudio: main.hasAudio,
                     mainPosition: main.role == .frontSource ? .front : .back,
-                    window: selfie == nil ? nil : moment.pipLayout?.windowFrame(in: CGSize(width: main.pixelWidth, height: main.pixelHeight))
-                )
+                    window: layout?.windowFrame(in: pixelSize)
+                ),
+                pixelSize: pixelSize, layout: layout
             )
         }
     }
@@ -104,6 +113,9 @@ final class MomentViewerModel {
     private(set) var voiceLevels: [UUID: [Float]] = [:]
     /// The moment whose voice note is playing.
     private(set) var playingVoice: UUID?
+    /// How far the playing voice note is, in seconds.
+    private(set) var voiceTime: Double = 0
+    private var voiceClock: Any?
     let voicePlayer = AVPlayer()
 
     static let photoPixels = 1600
@@ -204,6 +216,12 @@ final class MomentViewerModel {
         voiceEnd = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.stopVoice() }
         }
+        voiceClock = voicePlayer.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 20), queue: .main) { [weak self] time in
+            MainActor.assumeIsolated { self?.voiceTime = time.seconds }
+        }
+        // Heard with the ring/silent switch on silent too: it's something the person asked to play.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
+        try? AVAudioSession.sharedInstance().setActive(true)
         playingVoice = id
         voicePlayer.play()
     }
@@ -211,12 +229,79 @@ final class MomentViewerModel {
     func stopVoice() {
         voicePlayer.pause()
         voicePlayer.replaceCurrentItem(with: nil)
+        if let voiceClock { voicePlayer.removeTimeObserver(voiceClock) }
+        voiceClock = nil
+        voiceTime = 0
         if let voiceEnd { NotificationCenter.default.removeObserver(voiceEnd) }
         voiceEnd = nil
         playingVoice = nil
     }
 
-    /// Main and selfie streams as one, the window where it was (M06).
+    /// Puts the moment in exactly these collections (the ••• menu's Add to collection).
+    func setCollections(_ collections: Set<UUID>, for id: UUID) {
+        do {
+            try CollectionStore(context: library.context).place(id, in: collections)
+            try library.context.save()
+        } catch {
+            library.context.rollback()
+            logger.error("Saving collections failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// The video as seen (both streams in one file) in a temporary file, for the share sheet.
+    func exportVideo(_ id: UUID) async -> URL? {
+        guard let composed = await composedVideo(id),
+              let session = AVAssetExportSession(asset: composed.asset, presetName: AVAssetExportPresetHighestQuality) else { return nil }
+        session.videoComposition = composed.videoComposition
+        let url = FileManager.default.temporaryDirectory.appending(path: "MimoDays-\(id.uuidString.prefix(8)).mp4")
+        try? FileManager.default.removeItem(at: url)
+        do {
+            try await session.export(to: url, as: .mp4)
+            return url
+        } catch {
+            logger.error("Exporting the video failed: \(error.localizedDescription, privacy: .public)")
+            return nil
+        }
+    }
+
+    /// The player's two streams, kept apart: the main one with its sound, and the selfie one on the main
+    /// one's timeline (its start offset applied, silent) for the live window over it.
+    func playerItems(_ id: UUID) async -> (main: AVPlayerItem, selfie: AVPlayerItem?)? {
+        guard let source = moments[id]?.video, let mainURL = url(source.mainPath) else { return nil }
+        let mainAsset = AVURLAsset(url: mainURL)
+        var selfie: AVPlayerItem?
+        if source.layout != nil, let selfieURL = url(source.selfiePath) {
+            do {
+                let duration = try await mainAsset.load(.duration)
+                let stream = try await VideoComposer.selfieStream(selfieURL, offset: source.timing.selfieOffset, mainDuration: duration)
+                selfie = AVPlayerItem(asset: stream)
+            } catch {
+                logger.error("Reading the selfie stream failed: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+        return (AVPlayerItem(asset: mainAsset), selfie)
+    }
+
+    /// The player's window moved or changed size: kept on the moment, and used from now on for sharing.
+    func setWindow(_ layout: PiPLayout, for id: UUID) {
+        guard let moment = fetch(id), var video = moments[id]?.video, video.layout != layout else { return }
+        var saved = layout
+        saved.source = moment.pipLayout?.source ?? layout.source
+        moment.pipLayout = saved
+        moment.modifiedAt = Date()
+        do {
+            try library.context.save()
+        } catch {
+            library.context.rollback()
+            logger.error("Saving the selfie window failed: \(error.localizedDescription, privacy: .public)")
+            return
+        }
+        video.layout = saved
+        video.timing.window = saved.windowFrame(in: video.pixelSize)
+        moments[id]?.video = video
+    }
+
+    /// Main and selfie streams as one, the window where the player has it: what sharing exports.
     func composedVideo(_ id: UUID) async -> VideoComposer.Composed? {
         guard let source = moments[id]?.video, let main = url(source.mainPath) else { return nil }
         do {

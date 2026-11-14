@@ -186,7 +186,7 @@ struct DayView: View {
             .overlay(alignment: .topTrailing) {
                 if let selfie = moment.selfiePath {
                     SelfieWindow(media: model.image(selfie).map { .image(Image(uiImage: $0)) } ?? .placeholder)
-                        .frame(width: 48, height: 62)
+                        .frame(width: 48, height: SelfieWindowStyle.height(forWidth: 48))
                         .padding(.top, 10)
                         .padding(.trailing, 19)
                 }

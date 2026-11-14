@@ -50,10 +50,23 @@ jobs:
       - uses: actions/checkout@v4
       - name: Select Xcode 27.2
         run: sudo xcode-select -s /Applications/Xcode_27.2.app
+      # A run that stalls is sampled after 20 minutes, then stopped, so the stacks get uploaded.
       - name: Package tests
-        run: >
-          xcodebuild test -scheme MimoDaysKit-Package
-          -destination "$DESTINATION" -resultBundlePath results/Package.xcresult
+        run: |
+          mkdir -p results/samples
+          xcodebuild test -scheme MimoDaysKit-Package \
+            -destination "$DESTINATION" -resultBundlePath results/Package.xcresult &
+          tests=$!
+          (
+            sleep 1200
+            kill -0 "$tests" 2>/dev/null || exit 0
+            echo "::warning::Package tests still running after 20 minutes; sampling and stopping them"
+            for pid in $(pgrep -f 'xctest|MimoDaysKit'); do
+              sample "$pid" 5 -file "results/samples/sample-$pid.txt" >/dev/null 2>&1 || true
+            done
+            kill "$tests"
+          ) &
+          wait "$tests"
       - name: Upload results and snapshot diffs
         if: failure()
         uses: actions/upload-artifact@v4

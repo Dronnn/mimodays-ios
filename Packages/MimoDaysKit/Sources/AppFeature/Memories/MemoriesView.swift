@@ -11,6 +11,16 @@ struct MemoriesView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.calendar) private var calendar
+    /// M13: the moments ticked while selecting; nil when not selecting.
+    @State private var selection: Set<UUID>?
+    @State private var confirmsDelete = false
+    @State private var collects = false
+    @State private var collections: Set<UUID> = []
+
+    init(model: MemoriesModel, selection: Set<UUID>? = nil) {
+        self.model = model
+        _selection = State(initialValue: selection)
+    }
 
     var body: some View {
         ScrollView {
@@ -29,7 +39,8 @@ struct MemoriesView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 21)
                     .accessibilityIdentifier("memories.mode")
-                    if model.mode == .timeline { shortcuts.padding(.top, 12) }
+                    .disabled(selection != nil)
+                    if model.mode == .timeline, selection == nil { shortcuts.padding(.top, 12) }
                 }
                 switch model.mode {
                 case .timeline:
@@ -59,6 +70,30 @@ struct MemoriesView: View {
         // The title names the way back from a day; the bar itself stays hidden here.
         .navigationTitle(Text("Memories", bundle: .module))
         .toolbar(.hidden, for: .navigationBar)
+        .toolbar(selection == nil ? .automatic : .hidden, for: .tabBar)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if let selection { selectBar(selection) }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if let selection { selectActions(selection) }
+        }
+        .sheet(isPresented: $confirmsDelete) {
+            let chosen = selection ?? []
+            DeleteConfirmationSheet(
+                count: chosen.count, mediaType: model.mediaType(of: chosen), movieDrafts: model.movieDrafts(using: chosen)
+            ) {
+                if model.delete(chosen) { selection = nil }
+            }
+        }
+        .sheet(isPresented: $collects, onDismiss: {
+            guard let chosen = selection, !collections.isEmpty else { return }
+            model.collect(chosen, into: collections)
+            collections = []
+            selection = nil
+        }) {
+            CollectionPickerSheet(library: model.library, selection: $collections)
+        }
+        .onChange(of: model.mode) { selection = nil }
         .memoriesDestinations(thisYear: model.today / 10_000)
         .navigationDestination(for: MemoriesTabRoute.self) { route in
             switch route {
@@ -77,11 +112,41 @@ struct MemoriesView: View {
     /// Search and settings in cream circles, then "Memories" with its brush underline and apricot star.
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
-            HStack(spacing: 0) {
-                Spacer()
-                if !model.isEmpty {
-                    NavigationLink(value: MemoriesRoute.search) {
-                        Icon.glyphSearch.image
+            if selection == nil {
+                HStack(spacing: 0) {
+                    if model.isLoaded, !model.isEmpty, model.mode == .timeline {
+                        Button { selection = [] } label: {
+                            Text("Select", bundle: .module)
+                                .textStyle(.editorCancel)
+                                .foregroundStyle(ColorToken.textPrimary.color)
+                                .padding(.horizontal, 14)
+                                .frame(height: 40)
+                                .background(Capsule().fill(ColorToken.surfaceCard.color))
+                                .frame(minHeight: Size.minimumTapTarget)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.leading, 20)
+                        .accessibilityIdentifier("memories.select")
+                    }
+                    Spacer()
+                    if !model.isEmpty {
+                        NavigationLink(value: MemoriesRoute.search) {
+                            Icon.glyphSearch.image
+                                .resizable()
+                                .frame(width: 22, height: 22)
+                                .foregroundStyle(ColorToken.textPrimary.color)
+                                .frame(width: 40, height: 40)
+                                .background(Circle().fill(ColorToken.surfaceCard.color))
+                                .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
+                                .contentShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(Text("Search", bundle: .module))
+                        .accessibilityIdentifier("memories.search")
+                    }
+                    Button { router.open(.settings) } label: {
+                        Icon.glyphGear.image
                             .resizable()
                             .frame(width: 22, height: 22)
                             .foregroundStyle(ColorToken.textPrimary.color)
@@ -91,24 +156,11 @@ struct MemoriesView: View {
                             .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(Text("Search", bundle: .module))
-                    .accessibilityIdentifier("memories.search")
+                    .accessibilityLabel(Text("Settings", bundle: .module))
+                    .accessibilityIdentifier("settings")
                 }
-                Button { router.open(.settings) } label: {
-                    Icon.glyphGear.image
-                        .resizable()
-                        .frame(width: 22, height: 22)
-                        .foregroundStyle(ColorToken.textPrimary.color)
-                        .frame(width: 40, height: 40)
-                        .background(Circle().fill(ColorToken.surfaceCard.color))
-                        .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Settings", bundle: .module))
-                .accessibilityIdentifier("settings")
-            }
-            .padding(.trailing, 19)
+                .padding(.trailing, 19)
+                        }
             Text("Memories", bundle: .module)
                 .textStyle(.screenTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
@@ -208,8 +260,19 @@ struct MemoriesView: View {
                 .accessibilityAddTraits(.isHeader)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                 ForEach(items) { item in
-                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id))) {
-                        MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
+                    Group {
+                        if let selection {
+                            let isOn = selection.contains(item.id)
+                            Button { toggle(item.id) } label: {
+                                MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
+                                    .overlay { SelectionMark(isOn: isOn) }
+                            }
+                            .accessibilityAddTraits(isOn ? .isSelected : [])
+                        } else {
+                            NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id))) {
+                                MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
+                            }
+                        }
                     }
                     .buttonStyle(.plain)
                     .task { await model.load(item.id) }
@@ -219,6 +282,80 @@ struct MemoriesView: View {
         }
         .padding(.top, 9)
         .padding(.bottom, 5)
+    }
+
+    // MARK: Select (M13)
+
+    private func toggle(_ id: UUID) {
+        guard var chosen = selection else { return }
+        if chosen.remove(id) == nil { chosen.insert(id) }
+        selection = chosen
+    }
+
+    /// Cancel, "N selected", Select all (Deselect all once everything is ticked).
+    private func selectBar(_ chosen: Set<UUID>) -> some View {
+        let all = !model.allIDs.isEmpty && chosen.count == model.allIDs.count
+        return ZStack {
+            Group {
+                if chosen.isEmpty {
+                    Text("Select moments", bundle: .module)
+                } else {
+                    Text("\(chosen.count) selected", bundle: .module)
+                }
+            }
+            .textStyle(.editorTitle)
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityIdentifier("select.count")
+            HStack {
+                Button { selection = nil } label: {
+                    Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
+                }
+                .accessibilityIdentifier("select.cancel")
+                Spacer()
+                Button { selection = all ? [] : Set(model.allIDs) } label: {
+                    (all ? Text("Deselect all", bundle: .module) : Text("Select all", bundle: .module))
+                        .textStyle(.editorDone).foregroundStyle(ColorToken.textLink.color)
+                }
+                .accessibilityIdentifier("select.all")
+            }
+            .buttonStyle(.plain)
+            .frame(minHeight: Size.minimumTapTarget)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 4)
+        .background(ColorToken.canvas.color.ignoresSafeArea())
+    }
+
+    /// Collect and Delete; both wait for a tick.
+    private func selectActions(_ chosen: Set<UUID>) -> some View {
+        HStack {
+            Button { collects = true } label: { action(.glyphCollection, Text("Collect", bundle: .module), ColorToken.textPrimary) }
+                .accessibilityIdentifier("select.collect")
+            Spacer()
+            Button { confirmsDelete = true } label: { action(.glyphTrash, Text("Delete", bundle: .module), ColorToken.textLink) }
+                .accessibilityIdentifier("select.delete")
+        }
+        .buttonStyle(.plain)
+        .disabled(chosen.isEmpty)
+        .opacity(chosen.isEmpty ? 0.4 : 1)
+        .padding(.horizontal, 28)
+        .frame(minHeight: 56)
+        .background {
+            ColorToken.canvas.color
+                .overlay(alignment: .top) { ColorToken.separator.color.frame(height: 1) }
+                .ignoresSafeArea()
+        }
+    }
+
+    private func action(_ icon: Icon, _ title: Text, _ tint: ColorToken) -> some View {
+        VStack(spacing: 2) {
+            icon.image.resizable().scaledToFit().frame(width: 22, height: 22).accessibilityHidden(true)
+            title.textStyle(.tileBadge)
+        }
+        .foregroundStyle(tint.color)
+        .frame(minWidth: Size.minimumTapTarget, minHeight: Size.minimumTapTarget)
+        .contentShape(Rectangle())
     }
 
     /// "TODAY · WED, NOV 11", "YESTERDAY · TUE, NOV 10", "MON, NOV 9"; years only when it isn't this one.
@@ -273,6 +410,27 @@ struct MemoriesView: View {
         }
         .frame(maxWidth: 520)
         .frame(maxWidth: .infinity)
+    }
+}
+
+/// M13: an empty circle on each tile; a ticked one gets a coral check and a coral border.
+struct SelectionMark: View {
+    let isOn: Bool
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .strokeBorder(isOn ? ColorToken.actionCoral.color : .clear, lineWidth: 3)
+            .overlay(alignment: .bottomTrailing) {
+                ZStack {
+                    Circle().fill(isOn ? ColorToken.actionCoral.color : ColorToken.mediaScrim.color)
+                    Circle().strokeBorder(ColorToken.mediaFrame.color, lineWidth: 2)
+                    if isOn { Icon.glyphCheck.image.resizable().frame(width: 16, height: 16).foregroundStyle(ColorToken.mediaFrame.color) }
+                }
+                .frame(width: 26, height: 26)
+                .padding(7)
+            }
+            .environment(\.layoutDirection, .leftToRight)
+            .accessibilityHidden(true)
     }
 }
 

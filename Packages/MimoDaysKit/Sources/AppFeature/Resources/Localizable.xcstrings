@@ -145,6 +145,18 @@
         }
       }
     },
+    "%lld selected": {
+      "comment": "Select mode (M13) bar title: how many moments are ticked.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld selected"
+          }
+        }
+      }
+    },
     "%lld years ago": {
       "comment": "On this day (T06): how many years ago the moments are from.",
       "extractionState": "manual",
@@ -601,6 +613,18 @@
         }
       }
     },
+    "Collect": {
+      "comment": "Select mode (M13) bottom bar: adds the ticked moments to collections.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collect"
+          }
+        }
+      }
+    },
     "Collection detail: %@ · %@": {
       "comment": "Collection (M12): moment count, then the months it spans. Example: 24 moments · Mar – Nov 2026",
       "extractionState": "manual",
@@ -969,6 +993,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "favorite"
+          }
+        }
+      }
+    },
+    "Deselect all": {
+      "comment": "Select mode (M13): unticks every moment.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deselect all"
           }
         }
       }
@@ -2517,6 +2553,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "Search places"
+          }
+        }
+      }
+    },
+    "Select": {
+      "comment": "Memories (M01) header: starts choosing moments (M13).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select"
+          }
+        }
+      }
+    },
+    "Select all": {
+      "comment": "Select mode (M13): ticks every moment.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select all"
+          }
+        }
+      }
+    },
+    "Select moments": {
+      "comment": "Select mode (M13) bar title before anything is ticked.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select moments"
           }
         }
       }

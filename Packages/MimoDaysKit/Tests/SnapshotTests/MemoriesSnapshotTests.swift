@@ -84,6 +84,17 @@ struct MemoriesSnapshotTests {
         assertScreenSnapshots(of: screen(await memories()))
     }
 
+    /// M13: two moments ticked.
+    @Test func select() async throws {
+        try await populate()
+        let model = await memories()
+        let chosen = Set(model.allIDs.prefix(4).dropFirst(2))
+        assertScreenSnapshots(of: NavigationStack { MemoriesView(model: model, selection: chosen) }.environment(AppRouter()), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+            SnapshotVariant(.iPhone, .light, rightToLeft: true),
+        ])
+    }
+
     /// M02: November, today chosen.
     @Test func calendarMonth() async throws {
         try await populate()

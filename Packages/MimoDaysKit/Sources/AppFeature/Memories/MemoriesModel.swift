@@ -127,6 +127,42 @@ final class MemoriesModel {
 
     var library: MediaLibrary { MediaLibrary(context: context, store: store, thumbnails: thumbnails) }
 
+    // MARK: Select (M13)
+
+    /// The moment's kind when only one is chosen, for M15's words.
+    func mediaType(of ids: Set<UUID>) -> MediaType? {
+        guard ids.count == 1, let id = ids.first else { return nil }
+        return days.values.lazy.flatMap(\.self).first { $0.id == id }?.mediaType
+    }
+
+    func movieDrafts(using ids: Set<UUID>) -> Int {
+        (try? deletion.movieDrafts(using: ids)) ?? 0
+    }
+
+    /// Moves them to Recently deleted; false when that failed.
+    func delete(_ ids: Set<UUID>) -> Bool {
+        do {
+            try deletion.moveToRecentlyDeleted(ids)
+            return true
+        } catch {
+            logger.error("Deleting moments failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
+    /// Adds them, in timeline order, to each chosen collection.
+    func collect(_ ids: Set<UUID>, into collections: Set<UUID>) {
+        let ordered = allIDs.filter(ids.contains)
+        let store = CollectionStore(context: context)
+        do {
+            for collection in collections { try store.add(ordered, to: collection) }
+        } catch {
+            logger.error("Adding to a collection failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private var deletion: DeletionStore { DeletionStore(context: context, store: store) }
+
     // MARK: Calendar
 
     /// A month (yyyymm), with the day under it: today there, else its newest day with moments.

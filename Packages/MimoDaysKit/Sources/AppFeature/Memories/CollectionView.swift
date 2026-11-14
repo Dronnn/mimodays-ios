@@ -152,7 +152,7 @@ struct AddMomentsSheet: View {
                     ForEach(items) { item in
                         Button { toggle(item.id) } label: {
                             MemoryTile(item: item, detail: nil, image: images[item.id])
-                                .overlay(alignment: .bottomTrailing) { tick(chosen.contains(item.id)) }
+                                .overlay { SelectionMark(isOn: chosen.contains(item.id)) }
                         }
                         .buttonStyle(.plain)
                         .accessibilityAddTraits(chosen.contains(item.id) ? .isSelected : [])
@@ -180,17 +180,6 @@ struct AddMomentsSheet: View {
         }
         .tint(ColorToken.textLink.color)
         .task { fetch() }
-    }
-
-    private func tick(_ isOn: Bool) -> some View {
-        ZStack {
-            Circle().fill(isOn ? ColorToken.actionCoral.color : ColorToken.mediaScrim.color)
-            Circle().strokeBorder(ColorToken.mediaFrame.color, lineWidth: 2)
-            if isOn { Icon.glyphCheck.image.resizable().frame(width: 16, height: 16).foregroundStyle(ColorToken.mediaFrame.color) }
-        }
-        .frame(width: 26, height: 26)
-        .padding(7)
-        .accessibilityHidden(true)
     }
 
     private func toggle(_ id: UUID) {

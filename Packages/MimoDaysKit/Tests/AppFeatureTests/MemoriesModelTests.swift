@@ -126,6 +126,32 @@ struct MemoriesModelTests {
         #expect(model().favorites.map(\.id) == [newer, older])
     }
 
+    // MARK: Select (M13)
+
+    @Test func selectedMomentsGoToRecentlyDeletedTogether() async throws {
+        let a = try await save(at: Self.date(2026, 10, 2))
+        let b = try await save(at: Self.date(2026, 11, 1), video: true)
+        let c = try await save(at: Self.date(2026, 11, 9))
+        let model = model()
+        #expect(model.mediaType(of: [b]) == .video && model.mediaType(of: [a]) == .photo && model.mediaType(of: [a, b]) == nil)
+        #expect(model.movieDrafts(using: [a, b]) == 0)
+        #expect(model.delete([a, b]))
+        model.refresh()
+        #expect(model.allIDs == [c])
+        #expect(try context.fetchCount(FetchDescriptor<Moment>(predicate: #Predicate { $0.deletedAt != nil })) == 2)
+    }
+
+    @Test func selectedMomentsJoinEachChosenCollectionInTimelineOrder() async throws {
+        let older = try await save(at: Self.date(2026, 10, 2))
+        let newer = try await save(at: Self.date(2026, 11, 9))
+        let collections = CollectionStore(context: context)
+        let walks = try #require(try collections.create("Walks"))
+        let firsts = try #require(try collections.create("Firsts", with: [older]))
+        model().collect([older, newer], into: [walks, firsts])
+        #expect(try collections.collection(walks)?.orderedMoments.map(\.id) == [newer, older])
+        #expect(try collections.collection(firsts)?.orderedMoments.map(\.id) == [older, newer])
+    }
+
     // MARK: Calendar
 
     @Test func monthsAddAcrossYears() {

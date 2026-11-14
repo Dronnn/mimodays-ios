@@ -192,6 +192,29 @@ final class MemoriesUITests: XCTestCase {
         wait(for: [gone], timeout: 5)
     }
 
+    /// M13 → M15: two ticked moments are deleted together and select mode ends.
+    @MainActor
+    func testSelectedMomentsAreDeletedTogether() {
+        launch(.populated)
+        let select = app.buttons["memories.select"]
+        XCTAssertTrue(select.waitForExistence(timeout: 20))
+        select.tap()
+        let tiles = app.descendants(matching: .any).matching(identifier: "memories.tile")
+        XCTAssertTrue(tiles.firstMatch.waitForExistence(timeout: 5))
+        let before = tiles.count
+        tiles.element(boundBy: 0).tap()
+        tiles.element(boundBy: 1).tap()
+        XCTAssertTrue(app.staticTexts["2 selected"].waitForExistence(timeout: 5))
+        app.buttons["select.delete"].tap()
+        let confirm = app.buttons["delete.confirm"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        confirm.tap()
+        XCTAssertTrue(select.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["select.cancel"].exists)
+        let fewer = expectation(for: NSPredicate(format: "count < %d", before), evaluatedWith: tiles)
+        wait(for: [fewer], timeout: 5)
+    }
+
     @MainActor
     func testBeforeTheFirstMomentItLeadsToTheCamera() {
         launch(.empty)

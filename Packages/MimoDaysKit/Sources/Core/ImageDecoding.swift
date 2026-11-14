@@ -14,6 +14,12 @@ public enum ImageDecoding {
         }
     }
 
+    /// The same decode, waited for: only for callers on a queue of their own (a video compositor), never on the
+    /// Swift concurrency pool.
+    public static func thumbnailNow(_ url: URL, maxPixelSize: Int?) -> CGImage? {
+        queue.sync { decode(url, maxPixelSize: maxPixelSize, cacheImmediately: true) }
+    }
+
     private static func decode(_ url: URL, maxPixelSize: Int?, cacheImmediately: Bool) -> CGImage? {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, [kCGImageSourceShouldCache: false] as CFDictionary),
               CGImageSourceGetCount(source) > 0 else { return nil }

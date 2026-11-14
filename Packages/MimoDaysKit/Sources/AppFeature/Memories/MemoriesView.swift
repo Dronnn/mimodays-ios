@@ -29,6 +29,7 @@ struct MemoriesView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 21)
                     .accessibilityIdentifier("memories.mode")
+                    if model.mode == .timeline { shortcuts.padding(.top, 12) }
                 }
                 switch model.mode {
                 case .timeline:
@@ -59,6 +60,11 @@ struct MemoriesView: View {
         .navigationTitle(Text("Memories", bundle: .module))
         .toolbar(.hidden, for: .navigationBar)
         .memoriesDestinations(thisYear: model.today / 10_000)
+        .navigationDestination(for: MemoriesTabRoute.self) { route in
+            switch route {
+            case .favorites: FavoritesView(model: model)
+            }
+        }
         .task { model.refresh() }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
         .onChange(of: scenePhase) { _, phase in
@@ -126,6 +132,34 @@ struct MemoriesView: View {
                 .padding(.leading, 23)
                 .accessibilityAddTraits(.isHeader)
         }
+    }
+
+    /// Chips under the switch: Favorites; Collections and On this day join with their steps.
+    private var shortcuts: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 10) {
+                NavigationLink(value: MemoriesTabRoute.favorites) {
+                    HStack(spacing: 6) {
+                        Icon.glyphHeart.image
+                            .resizable()
+                            .frame(width: 15, height: 15)
+                            .accessibilityHidden(true)
+                        Text("Favorites", bundle: .module)
+                            .textStyle(.reviewChip)
+                    }
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .padding(.horizontal, 13)
+                    .frame(minHeight: 34)
+                    .background(ReviewChipBlob().fill(ColorToken.surfaceChip.color))
+                    .frame(minHeight: Size.minimumTapTarget)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("memories.favorites")
+            }
+            .padding(.horizontal, 20)
+        }
+        .scrollIndicators(.hidden)
     }
 
     // MARK: Months and days

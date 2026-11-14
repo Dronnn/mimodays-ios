@@ -1165,6 +1165,18 @@
         }
       }
     },
+    "No favorites yet": {
+      "comment": "Favorites (M10e): title when no moment has a heart yet.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No favorites yet"
+          }
+        }
+      }
+    },
     "No matches": {
       "comment": "Search (M09): title when nothing matches.",
       "extractionState": "manual",
@@ -2349,6 +2361,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Take photo"
+          }
+        }
+      }
+    },
+    "Tap the heart on any moment to keep it here.": {
+      "comment": "Favorites (M10e): how a moment gets here.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the heart on any moment to keep it here."
           }
         }
       }

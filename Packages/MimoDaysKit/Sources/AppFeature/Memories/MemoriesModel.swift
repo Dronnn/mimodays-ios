@@ -105,6 +105,13 @@ final class MemoriesModel {
     }
 
     var isEmpty: Bool { isLoaded && rows.isEmpty }
+    /// M10: favourites in timeline order.
+    var favorites: [MemoryItem] {
+        rows.flatMap { row -> [MemoryItem] in
+            guard case let .day(_, items) = row else { return [] }
+            return items.filter(\.isFavorite)
+        }
+    }
     /// Every moment in timeline order, for swiping in the viewer.
     private(set) var allIDs: [UUID] = []
     var now: Date { clock.now() }

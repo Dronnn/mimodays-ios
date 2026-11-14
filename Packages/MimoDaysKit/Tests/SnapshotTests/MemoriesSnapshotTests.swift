@@ -116,6 +116,29 @@ struct MemoriesSnapshotTests {
         )
     }
 
+    /// M10: every favourite, newest first. Only one in `populate()`, so a few more get a heart.
+    @Test func favorites() async throws {
+        try await populate()
+        for moment in try container.mainContext.fetch(FetchDescriptor<Moment>()).prefix(5) { moment.isFavorite = true }
+        try container.mainContext.save()
+        let model = await memories()
+        for item in model.favorites { await model.load(item.id) }
+        assertScreenSnapshots(
+            of: NavigationStack { FavoritesView(model: model) }.environment(AppRouter()),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPad, .light)]
+        )
+    }
+
+    /// M10e.
+    @Test func favoritesEmpty() async throws {
+        _ = try await save(at: Self.date(2026, 11, 11))
+        let model = await memories()
+        assertScreenSnapshots(
+            of: NavigationStack { FavoritesView(model: model) }.environment(AppRouter()),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)]
+        )
+    }
+
     /// Tile badges: favourite, a video's length, a voice note, all three.
     @Test func tiles() {
         func item(_ favorite: Bool, _ video: Bool) -> MemoryItem {

@@ -113,6 +113,19 @@ struct MemoriesModelTests {
         #expect(items.first?.isFavorite == true)
     }
 
+    /// M10: favourites only, newest first, across months.
+    @Test func favoritesListOnlyHeartsInTimelineOrder() async throws {
+        let older = try await save(at: Self.date(2026, 10, 2))
+        try await save(at: Self.date(2026, 11, 1))
+        let newer = try await save(at: Self.date(2026, 11, 9))
+        #expect(model().favorites.isEmpty)
+        for moment in try context.fetch(FetchDescriptor<Moment>()) where [older, newer].contains(moment.id) {
+            moment.isFavorite = true
+        }
+        try context.save()
+        #expect(model().favorites.map(\.id) == [newer, older])
+    }
+
     // MARK: Calendar
 
     @Test func monthsAddAcrossYears() {

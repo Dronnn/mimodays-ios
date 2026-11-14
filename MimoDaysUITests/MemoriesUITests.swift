@@ -110,6 +110,28 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(search.waitForExistence(timeout: 5))
     }
 
+    /// M05 → M10: a moment given a heart is in Favorites; M10e before that.
+    @MainActor
+    func testAHeartedMomentIsInFavorites() {
+        launch(.populated)
+        let chip = app.buttons["memories.favorites"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 20))
+        chip.tap()
+        XCTAssertTrue(app.staticTexts["No favorites yet"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        let tile = app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch
+        XCTAssertTrue(tile.waitForExistence(timeout: 10))
+        tile.tap()
+        let favorite = app.buttons["viewer.favorite"]
+        XCTAssertTrue(favorite.waitForExistence(timeout: 10))
+        favorite.tap()
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        chip.tap()
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["No favorites yet"].exists)
+    }
+
     @MainActor
     func testBeforeTheFirstMomentItLeadsToTheCamera() {
         launch(.empty)

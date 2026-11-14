@@ -25,11 +25,11 @@ struct MemoriesView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                header
+                if selection == nil { header }
                 if model.isEmpty {
                     emptyState
                         .padding(.top, 108)
-                } else if model.isLoaded {
+                } else if model.isLoaded, selection == nil {
                     SegmentedControl(selection: $model.mode, options: [.timeline, .calendar]) { mode in
                         switch mode {
                         case .timeline: Text("Timeline", bundle: .module)
@@ -39,16 +39,18 @@ struct MemoriesView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 21)
                     .accessibilityIdentifier("memories.mode")
-                    .disabled(selection != nil)
-                    if model.mode == .timeline, selection == nil { shortcuts.padding(.top, 12) }
+                    if model.mode == .timeline { shortcuts.padding(.top, 12) }
                 }
                 switch model.mode {
                 case .timeline:
                     ForEach(Array(model.rows.enumerated()), id: \.element.id) { index, row in
                         switch row {
                         case let .month(key, count):
-                            monthHeader(key, count: count, isFirst: index == 0)
-                                .padding(.top, index == 0 ? 22 : 18)
+                            // M13 lists days only.
+                            if selection == nil {
+                                monthHeader(key, count: count, isFirst: index == 0)
+                                    .padding(.top, index == 0 ? 22 : 18)
+                            }
                         case let .day(key, items):
                             day(key, items)
                         }
@@ -264,7 +266,7 @@ struct MemoriesView: View {
                         if let selection {
                             let isOn = selection.contains(item.id)
                             Button { toggle(item.id) } label: {
-                                MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
+                                MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id], leavesRoomForMark: true)
                                     .overlay { SelectionMark(isOn: isOn) }
                             }
                             .accessibilityAddTraits(isOn ? .isSelected : [])
@@ -333,7 +335,7 @@ struct MemoriesView: View {
             Button { collects = true } label: { action(.glyphCollection, Text("Collect", bundle: .module), ColorToken.textPrimary) }
                 .accessibilityIdentifier("select.collect")
             Spacer()
-            Button { confirmsDelete = true } label: { action(.glyphTrash, Text("Delete", bundle: .module), ColorToken.textLink) }
+            Button { confirmsDelete = true } label: { action(.glyphTrash, Text("Delete", bundle: .module), ColorToken.textPrimary) }
                 .accessibilityIdentifier("select.delete")
         }
         .buttonStyle(.plain)
@@ -440,6 +442,8 @@ struct MemoryTile: View {
     let item: MemoryItem
     let detail: TileDetail?
     let image: UIImage?
+    /// Select mode: the mic steps left of the selection circle (M13).
+    var leavesRoomForMark = false
 
     var body: some View {
         Color(hex: 0xC9B8AA)
@@ -482,6 +486,7 @@ struct MemoryTile: View {
                         .frame(width: 26, height: 26)
                         .background(Circle().fill(ColorToken.mediaScrim.color))
                         .padding(6)
+                        .padding(.trailing, leavesRoomForMark ? 29 : 0)
                 }
             }
             .environment(\.layoutDirection, .leftToRight)

@@ -151,7 +151,7 @@ struct AddMomentsSheet: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                     ForEach(items) { item in
                         Button { toggle(item.id) } label: {
-                            MemoryTile(item: item, detail: nil, image: images[item.id])
+                            MemoryTile(item: item, detail: nil, image: images[item.id], leavesRoomForMark: true)
                                 .overlay { SelectionMark(isOn: chosen.contains(item.id)) }
                         }
                         .buttonStyle(.plain)

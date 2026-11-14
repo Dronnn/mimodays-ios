@@ -37,9 +37,10 @@ final class TodayUITests: XCTestCase {
     @MainActor
     func testShowsTheLatestMomentThisMonthAndOnThisDay() {
         launch(.populated)
+        // The seed saves its moments one by one; the newest, in Yerevan, lands last.
         let hero = app.descendants(matching: .any)["today.hero"]
-        XCTAssertTrue(hero.waitForExistence(timeout: 10))
-        XCTAssertTrue(hero.label.contains("Yerevan"), hero.label)
+        let newest = expectation(for: NSPredicate(format: "label CONTAINS 'Yerevan'"), evaluatedWith: hero)
+        wait(for: [newest], timeout: 20)
         XCTAssertEqual(app.buttons["capture"].label, "Catch a moment")
         XCTAssertTrue(app.buttons["today.month"].exists)
         XCTAssertTrue(app.buttons["today.onThisDay"].exists)

@@ -2,10 +2,29 @@ import Core
 import DesignSystem
 import SwiftUI
 
+/// What `PlaceSheet` reads and sets.
+@MainActor
+protocol PlaceChoosing: AnyObject, Observable {
+    var place: ReviewPlace? { get }
+    /// A place or "No place" was picked.
+    var placeWasChosen: Bool { get }
+    /// This iPhone's city now; nil when it isn't offered.
+    var currentPlace: ReviewPlace? { get }
+    var isLocating: Bool { get }
+    var nearby: [PlaceSuggestion] { get }
+    func choose(_ place: ReviewPlace?)
+    func loadNearby() async
+    func searchPlaces(_ text: String) async -> [PlaceSuggestion]
+    func recentPlaces() -> [RecentPlace]
+}
+
+extension ReviewModel: PlaceChoosing {}
+
 /// `Sheet / Place` (C11): search, then the current city, places nearby, places used before, and No place.
 /// Without location access the current and nearby rows are left out; the rest still works.
-struct PlaceSheet: View {
-    let model: ReviewModel
+/// Review (C11) and Edit moment (M07) both choose with it.
+struct PlaceSheet<Model: PlaceChoosing>: View {
+    let model: Model
     let showsCurrent: Bool
     @State private var query = ""
     @State private var results: [PlaceSuggestion]?
@@ -15,7 +34,7 @@ struct PlaceSheet: View {
     @FocusState private var searches: Bool
     @Environment(\.dismiss) private var dismiss
 
-    init(model: ReviewModel, showsCurrent: Bool) {
+    init(model: Model, showsCurrent: Bool) {
         self.model = model
         self.showsCurrent = showsCurrent
         _recents = State(initialValue: model.recentPlaces())

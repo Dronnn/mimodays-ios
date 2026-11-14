@@ -35,6 +35,11 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphTrash
     /// C11 place picker: 24 pt search field glyph, 20 pt recent-place clock.
     case glyphSearch
+    /// Viewer toolbar (M05/M06).
+    case glyphShare
+    case glyphHeart
+    case glyphHeartFilled
+    case glyphPause
     case glyphClock
     /// 42×36 film frame on the Make my movie card (T02).
     case glyphFilm

@@ -44,6 +44,17 @@ enum MemoryRow: Equatable, Identifiable {
     }
 }
 
+enum MemoriesMode: Hashable {
+    case timeline
+    case calendar
+}
+
+/// The calendar shows a month (M02) or a whole year of dots (M03).
+enum CalendarScale: Hashable {
+    case month
+    case year
+}
+
 /// Memories (M01): every moment, grouped by month and by each moment's own local day.
 /// Rows are light; tiles fetch their thumbnail, length and voice note when they appear.
 @MainActor
@@ -55,6 +66,15 @@ final class MemoriesModel {
     private(set) var images: [UUID: UIImage] = [:]
     /// The day row at the top. Kept while the app runs, so leaving and coming back finds the same place.
     var scrolledRow: Int?
+    /// Moments by local day (yyyymmdd), newest first, for the calendar.
+    private(set) var days: [Int: [MemoryItem]] = [:]
+    var mode = MemoriesMode.timeline
+    var scale = CalendarScale.month
+    /// The month (yyyymm) or, at year scale, the year the calendar shows.
+    private(set) var shownMonth: Int
+    private(set) var shownYear: Int
+    /// The day under the calendar, yyyymmdd.
+    var selectedDay: Int?
 
     static let tilePixels = 360
     /// Decoded tiles kept at once; the oldest go first.
@@ -64,19 +84,72 @@ final class MemoriesModel {
     private let store: MediaStore
     private let thumbnails: ThumbnailPipeline
     private let clock: any DateProvider
+    private let calendar: () -> Calendar
     private var imageOrder: [UUID] = []
     private var loading: Set<UUID> = []
     private let logger = Logger(subsystem: "MimoDays", category: "Memories")
 
-    init(context: ModelContext, store: MediaStore, thumbnails: ThumbnailPipeline, clock: any DateProvider = SystemDateProvider()) {
+    init(
+        context: ModelContext, store: MediaStore, thumbnails: ThumbnailPipeline, clock: any DateProvider = SystemDateProvider(),
+        calendar: @escaping () -> Calendar = { .current }
+    ) {
         self.context = context
         self.store = store
         self.thumbnails = thumbnails
         self.clock = clock
+        self.calendar = calendar
+        let today = LocalDay(clock.now(), in: calendar().timeZone).key
+        shownMonth = today / 100
+        shownYear = today / 10_000
+        selectedDay = today
     }
 
     var isEmpty: Bool { isLoaded && rows.isEmpty }
+    /// Every moment in timeline order, for swiping in the viewer.
+    private(set) var allIDs: [UUID] = []
     var now: Date { clock.now() }
+    /// Today on this device, yyyymmdd.
+    var today: Int { LocalDay(clock.now(), in: calendar().timeZone).key }
+    var thisMonth: Int { today / 100 }
+    /// The first month with a moment; the calendar goes no further back.
+    var earliestMonth: Int { min(rows.last.map { $0.id > 999_999 ? $0.id / 100 : $0.id } ?? thisMonth, thisMonth) }
+
+    func dayModel(_ day: Int) -> DayModel {
+        DayModel(day: day, context: context, store: store, thumbnails: thumbnails)
+    }
+
+    var library: MediaLibrary { MediaLibrary(context: context, store: store, thumbnails: thumbnails) }
+
+    // MARK: Calendar
+
+    /// A month (yyyymm), with the day under it: today there, else its newest day with moments.
+    func show(month: Int) {
+        shownMonth = min(max(month, earliestMonth), thisMonth)
+        shownYear = shownMonth / 100
+        scale = .month
+        selectedDay = shownMonth == thisMonth ? today : days.keys.filter { $0 / 100 == shownMonth }.max()
+    }
+
+    func show(year: Int) {
+        shownYear = min(max(year, earliestMonth / 100), today / 10_000)
+        scale = .year
+    }
+
+    var canGoBack: Bool { scale == .month ? shownMonth > earliestMonth : shownYear > earliestMonth / 100 }
+    var canGoForward: Bool { scale == .month ? shownMonth < thisMonth : shownYear < today / 10_000 }
+
+    func step(_ direction: Int) {
+        switch scale {
+        case .month: show(month: Self.month(shownMonth, adding: direction))
+        case .year: show(year: shownYear + direction)
+        }
+    }
+
+    /// yyyymm plus or minus whole months.
+    static func month(_ key: Int, adding months: Int) -> Int {
+        let index = (key / 100) * 12 + (key % 100 - 1) + months
+        return (index / 12) * 100 + index % 12 + 1
+    }
 
     func refresh() {
         var descriptor = FetchDescriptor<Moment>(
@@ -92,6 +165,8 @@ final class MemoriesModel {
                 )
             }
             rows = Self.rows(items)
+            days = Dictionary(grouping: items, by: \.localDay)
+            allIDs = items.map(\.id)
         } catch {
             logger.error("Reading moments failed: \(error.localizedDescription, privacy: .public)")
         }

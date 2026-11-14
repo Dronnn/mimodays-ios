@@ -25,6 +25,30 @@
         }
       }
     },
+    "%lld days with moments": {
+      "comment": "On the year calendar, VoiceOver: how many days of a month have moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day with moments"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days with moments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld moments": {
       "comment": "On this day (T06): how many moments that day has.",
       "extractionState": "manual",
@@ -205,6 +229,18 @@
         }
       }
     },
+    "Add": {
+      "comment": "Edit moment: value of the Voice note row when the moment has none.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
+        }
+      }
+    },
     "Add a few words (optional)": {
       "comment": "Review (C07): placeholder of the one-line caption field",
       "extractionState": "manual",
@@ -213,6 +249,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Add a few words (optional)"
+          }
+        }
+      }
+    },
+    "Add a note": {
+      "comment": "Edit moment: placeholder of the longer note field.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a note"
           }
         }
       }
@@ -297,6 +345,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bottom right"
+          }
+        }
+      }
+    },
+    "Calendar": {
+      "comment": "Memories switch: moments on a month or year calendar.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calendar"
+          }
+        }
+      }
+    },
+    "Calendar day: %@ · %@": {
+      "comment": "VoiceOver label of a calendar day. First %@ is the date (Wednesday, November 11), second the count (3 moments).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "Calendar month: %@ · %@": {
+      "comment": "VoiceOver label of a month on the year calendar. First %@ is the month (November), second e.g. 12 days with moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@"
           }
         }
       }
@@ -445,6 +529,18 @@
         }
       }
     },
+    "Couldn't save the changes": {
+      "comment": "Edit moment: alert title when saving fails.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't save the changes"
+          }
+        }
+      }
+    },
     "Current location": {
       "comment": "Place: name shown for this iPhone's position when the city couldn't be looked up (offline)",
       "extractionState": "manual",
@@ -505,6 +601,30 @@
         }
       }
     },
+    "Day summary: %@ · %@": {
+      "comment": "Under a day's title. First %@ is the count (3 moments), second the places (Yerevan and Dilijan).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Delete voice note": {
+      "comment": "Edit moment: destructive action that removes the moment's voice note when saved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete voice note"
+          }
+        }
+      }
+    },
     "Description has voice note": {
       "comment": "VoiceOver: added to a moment's description when it has a voice note.",
       "extractionState": "manual",
@@ -513,6 +633,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "voice note"
+          }
+        }
+      }
+    },
+    "Description is favorite": {
+      "comment": "VoiceOver: added to a moment's description when it is a favorite, e.g. Photo, 2:37 PM, favorite.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "favorite"
+          }
+        }
+      }
+    },
+    "Discard changes": {
+      "comment": "Edit moment: destructive button that closes without saving.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard changes"
+          }
+        }
+      }
+    },
+    "Discard your changes?": {
+      "comment": "Edit moment: asked when Cancel is tapped after something changed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard your changes?"
           }
         }
       }
@@ -541,6 +697,30 @@
         }
       }
     },
+    "Edit": {
+      "comment": "Viewer toolbar button that opens Edit moment (M07).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit"
+          }
+        }
+      }
+    },
+    "Edit moment": {
+      "comment": "Title of the screen that edits a saved moment (M07).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit moment"
+          }
+        }
+      }
+    },
     "Enable reminders": {
       "comment": "Surprise schedule (onboarding O07): primary button, shows the system notification prompt",
       "extractionState": "manual",
@@ -549,6 +729,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Enable reminders"
+          }
+        }
+      }
+    },
+    "Favorite": {
+      "comment": "Moment viewer toolbar button that marks or unmarks a favorite, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorite"
           }
         }
       }
@@ -829,6 +1021,30 @@
         }
       }
     },
+    "Next month": {
+      "comment": "Calendar arrow, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next month"
+          }
+        }
+      }
+    },
+    "Next year": {
+      "comment": "Calendar arrow, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next year"
+          }
+        }
+      }
+    },
     "No memories yet": {
       "comment": "Memories title before the first moment is saved.",
       "extractionState": "manual",
@@ -945,6 +1161,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nothing is lost. Try again in a moment."
+          }
+        }
+      }
+    },
+    "Nothing was changed. Try again in a moment.": {
+      "comment": "Edit moment: alert message when saving fails; the stored moment is untouched.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing was changed. Try again in a moment."
           }
         }
       }
@@ -1093,6 +1321,18 @@
         }
       }
     },
+    "Pause": {
+      "comment": "Video player button, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        }
+      }
+    },
     "Pause voice note": {
       "comment": "Voice note card (C10): accessibility label of the play button while the voice note plays",
       "extractionState": "manual",
@@ -1125,6 +1365,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Photo"
+          }
+        }
+      }
+    },
+    "Photo with selfie": {
+      "comment": "VoiceOver label of the picture in the moment viewer when it has a selfie window.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo with selfie"
           }
         }
       }
@@ -1165,6 +1417,18 @@
         }
       }
     },
+    "Play": {
+      "comment": "Video player button, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play"
+          }
+        }
+      }
+    },
     "Play voice note": {
       "comment": "Voice note card (C10): accessibility label of the play button",
       "extractionState": "manual",
@@ -1177,6 +1441,30 @@
         }
       }
     },
+    "Playback position": {
+      "comment": "VoiceOver label of the video scrubber.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playback position"
+          }
+        }
+      }
+    },
+    "Plays it": {
+      "comment": "VoiceOver hint on a voice note that isn't playing.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plays it"
+          }
+        }
+      }
+    },
     "Plays the video": {
       "comment": "Review (C07): accessibility hint of a paused video; plays it with sound",
       "extractionState": "manual",
@@ -1185,6 +1473,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Plays the video"
+          }
+        }
+      }
+    },
+    "Previous month": {
+      "comment": "Calendar arrow, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous month"
+          }
+        }
+      }
+    },
+    "Previous year": {
+      "comment": "Calendar arrow, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous year"
           }
         }
       }
@@ -1417,6 +1729,18 @@
         }
       }
     },
+    "Selected day: %@ · %@": {
+      "comment": "The day chosen under the calendar. First %@ is the date (Wed, Nov 11), second the count (3 moments).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
     "Selfie window": {
       "comment": "Camera (C01): accessibility label of the button that shows or hides the front-camera window",
       "extractionState": "manual",
@@ -1453,6 +1777,18 @@
         }
       }
     },
+    "Share": {
+      "comment": "Moment viewer toolbar button, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        }
+      }
+    },
     "Show what you see and how you look in the same photo or video. Your face appears in a small picture-in-picture frame. A single camera works, too.": {
       "comment": "OB-03 body",
       "extractionState": "manual",
@@ -1461,6 +1797,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Show what you see and how you look in the same photo or video. Your face appears in a small picture-in-picture frame. A single camera works, too."
+          }
+        }
+      }
+    },
+    "Shows the whole year": {
+      "comment": "VoiceOver hint on the calendar's month title: tapping it shows the year.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shows the whole year"
           }
         }
       }
@@ -1501,6 +1849,30 @@
         }
       }
     },
+    "Sound off": {
+      "comment": "Video player sound button while muted, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sound off"
+          }
+        }
+      }
+    },
+    "Sound on": {
+      "comment": "Video player sound button while sound plays, VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sound on"
+          }
+        }
+      }
+    },
     "Spring": {
       "comment": "Season label under a sample movie clip",
       "extractionState": "manual",
@@ -1521,6 +1893,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Stop recording"
+          }
+        }
+      }
+    },
+    "Stops it": {
+      "comment": "VoiceOver hint on a playing voice note.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stops it"
           }
         }
       }
@@ -1765,6 +2149,18 @@
         }
       }
     },
+    "The photo and its time can't be changed.": {
+      "comment": "Edit moment: under the date, explains what stays fixed for a photo.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The photo and its time can't be changed."
+          }
+        }
+      }
+    },
     "The recording stopped at %@ when you left MimoDays. The part before is kept.": {
       "comment": "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the app went to the background",
       "extractionState": "manual",
@@ -1785,6 +2181,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "The recording stopped at %@. The part before is kept."
+          }
+        }
+      }
+    },
+    "The video and its time can't be changed.": {
+      "comment": "Edit moment: under the date, explains what stays fixed for a video.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The video and its time can't be changed."
           }
         }
       }
@@ -1881,6 +2289,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Three times a week, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "Timeline": {
+      "comment": "Memories switch: every moment as a list by day.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timeline"
           }
         }
       }
@@ -2149,6 +2569,18 @@
         }
       }
     },
+    "Voice note · %@": {
+      "comment": "Voice note in the moment viewer. %@ is its length, e.g. 0:12.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice note · %@"
+          }
+        }
+      }
+    },
     "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too.": {
       "comment": "OB-01 body",
       "extractionState": "manual",
@@ -2385,18 +2817,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "dog asleep"
-          }
-        }
-      }
-    },
-    "favorite": {
-      "comment": "VoiceOver: added to a moment's description when it is a favorite, e.g. Photo, 2:37 PM, favorite.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "favorite"
           }
         }
       }

@@ -15,6 +15,10 @@ struct MemoriesModelTests {
 
     private var context: ModelContext { container.mainContext }
 
+    init() {
+        clock.set(Self.date(2026, 11, 11, 14, 40))
+    }
+
     private static func date(_ year: Int, _ month: Int, _ day: Int, _ hour: Int = 12, _ minute: Int = 0) -> Date {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = .gmt
@@ -34,10 +38,16 @@ struct MemoriesModelTests {
     }
 
     private func model() -> MemoriesModel {
-        let model = MemoriesModel(context: context, store: store, thumbnails: ThumbnailPipeline(), clock: clock)
+        let model = MemoriesModel(context: context, store: store, thumbnails: ThumbnailPipeline(), clock: clock, calendar: { Self.utc })
         model.refresh()
         return model
     }
+
+    private static let utc: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .gmt
+        return calendar
+    }()
 
     private func item(_ day: Int, _ hour: Int = 12) -> MemoryItem {
         MemoryItem(
@@ -56,7 +66,7 @@ struct MemoriesModelTests {
     }
 
     @Test func anEmptyArchiveSaysSoOnlyOnceLoaded() {
-        let model = MemoriesModel(context: context, store: store, thumbnails: ThumbnailPipeline(), clock: clock)
+        let model = MemoriesModel(context: context, store: store, thumbnails: ThumbnailPipeline(), clock: clock, calendar: { Self.utc })
         #expect(!model.isEmpty)
         model.refresh()
         #expect(model.isEmpty)
@@ -101,5 +111,52 @@ struct MemoriesModelTests {
         try context.save()
         guard case let .day(_, items) = model().rows.last else { Issue.record("rows"); return }
         #expect(items.first?.isFavorite == true)
+    }
+
+    // MARK: Calendar
+
+    @Test func monthsAddAcrossYears() {
+        #expect(MemoriesModel.month(202611, adding: 1) == 202612)
+        #expect(MemoriesModel.month(202612, adding: 1) == 202701)
+        #expect(MemoriesModel.month(202601, adding: -1) == 202512)
+        #expect(MemoriesModel.month(202611, adding: -23) == 202412)
+    }
+
+    @Test func theCalendarOpensOnTodayAndStaysBetweenTheFirstMomentAndNow() async throws {
+        try await save(at: Self.date(2026, 9, 14))
+        try await save(at: Self.date(2026, 9, 20))
+        let model = model()
+        #expect(model.shownMonth == 202611 && model.selectedDay == 20261111)
+        #expect(model.earliestMonth == 202609 && !model.canGoForward && model.canGoBack)
+        model.step(-1)
+        model.step(-1)
+        // September: its newest day with moments is chosen.
+        #expect(model.shownMonth == 202609 && model.selectedDay == 20260920 && !model.canGoBack)
+        model.step(-1)
+        #expect(model.shownMonth == 202609)
+        model.show(month: 202703)
+        #expect(model.shownMonth == 202611)
+    }
+
+    @Test func theYearOpensAMonth() async throws {
+        try await save(at: Self.date(2025, 3, 2))
+        let model = model()
+        model.show(year: 2026)
+        #expect(model.scale == .year && model.canGoBack && !model.canGoForward)
+        model.step(-1)
+        #expect(model.shownYear == 2025 && !model.canGoBack)
+        model.show(month: 202503)
+        #expect(model.scale == .month && model.selectedDay == 20250302 && model.days[20250302]?.count == 1)
+    }
+
+    @Test func aDayListsItsMomentsOldestFirstWithItsPlaces() async throws {
+        let morning = try await save(at: Self.date(2026, 11, 11, 8))
+        let evening = try await save(at: Self.date(2026, 11, 11, 18))
+        try await save(at: Self.date(2026, 11, 10))
+        let day = model().dayModel(20261111)
+        await day.refresh()
+        #expect(day.moments.map(\.id) == [morning, evening])
+        #expect(day.places.isEmpty)
+        #expect(day.image(day.moments.first?.mainPath) != nil)
     }
 }

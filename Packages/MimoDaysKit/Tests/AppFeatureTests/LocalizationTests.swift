@@ -7,8 +7,13 @@ struct LocalizationTests {
     private static let missing = "\u{0}missing"
 
     /// Keys used directly as `Text("…", bundle: .module)`.
-    private static let literalKeys = ["Day label today: %@", "Day label yesterday: %@", "No memories yet",
-        "Moments you capture on Today show up here, grouped by day.", "favorite", "Description has voice note", "Today headline", "surprise", "Your first moment will live here.",
+    private static let literalKeys = ["Edit", "Edit moment", "Discard your changes?", "Discard changes", "Delete voice note",
+        "Couldn't save the changes", "Nothing was changed. Try again in a moment.", "The photo and its time can't be changed.",
+        "The video and its time can't be changed.", "Add a note", "Add", "Photo with selfie", "Share", "Favorite", "Voice note · %@", "Stops it", "Plays it", "Pause", "Play", "Sound off", "Sound on", "Playback position",
+        "Timeline", "Calendar", "Shows the whole year", "Calendar day: %@ · %@",
+        "Selected day: %@ · %@", "Calendar month: %@ · %@", "Next month", "Previous month", "Next year", "Previous year",
+        "Day summary: %@ · %@", "%lld days with moments", "Day label today: %@", "Day label yesterday: %@", "No memories yet",
+        "Moments you capture on Today show up here, grouped by day.", "Description is favorite", "Description has voice note", "Today headline", "surprise", "Your first moment will live here.",
         "what you see", "Catch a moment", "Catch your first moment", "Catch the surprise", "Your %@", "On this day",
         "Years ago and count: %@ · %@", "%lld years ago", "%lld moments", "Make my movie",
         "Your story starts with one moment", "%lld moments saved", "with selfie", "Yesterday, %@", "Day and time: %@ · %@",

@@ -24,24 +24,33 @@ struct MemoriesSnapshotTests {
         Self.stores.append(container)
     }
 
+    private static let utc: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .gmt
+        return calendar
+    }()
+
     private static func date(_ year: Int, _ month: Int, _ day: Int, _ hour: Int = 12, _ minute: Int = 0) -> Date {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = .gmt
         return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour, minute: minute))!
     }
 
-    private func save(at date: Date) async throws -> UUID {
+    private func save(at date: Date, place: String? = nil, caption: String = "") async throws -> UUID {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
         let photo = try await engine.capturePhoto(flash: false, silent: true)
         let capture = CaptureResult(media: .photo(photo), window: .init(), capturedAt: CaptureTime(instant: date, timeZone: .gmt))
         let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
         let saver = MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil })
-        return try await saver.save(MomentDraft(capture: capture, caption: "", window: window, promptID: nil, place: nil)).id
+        return try await saver.save(MomentDraft(
+            capture: capture, caption: caption, window: window, promptID: nil,
+            place: place.map { ReviewPlace(label: $0, latitude: 40.18, longitude: 44.51, precision: .city, source: .gps) }
+        )).id
     }
 
     private func memories() async -> MemoriesModel {
-        let model = MemoriesModel(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline(), clock: clock)
+        let model = MemoriesModel(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline(), clock: clock, calendar: { Self.utc })
         model.refresh()
         for case let .day(_, items) in model.rows {
             for item in items { await model.load(item.id) }
@@ -57,15 +66,54 @@ struct MemoriesSnapshotTests {
         assertScreenSnapshots(of: screen(await memories()))
     }
 
-    /// M01: today, Monday, Saturday and October; one favourite.
-    @Test func timeline() async throws {
+    /// Today, Monday, Saturday, Thursday and October; one favourite; a few earlier months.
+    private func populate() async throws {
         for (day, hours) in [(11, [14, 11, 8]), (9, [18, 9]), (7, [20, 16, 10]), (5, [12])] {
             for hour in hours { _ = try await save(at: Self.date(2026, 11, day, hour)) }
         }
         let favorite = try await save(at: Self.date(2026, 11, 9, 19))
         try container.mainContext.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == favorite })).first?.isFavorite = true
-        _ = try await save(at: Self.date(2026, 10, 30))
+        for (month, day) in [(10, 30), (10, 12), (9, 3), (6, 21), (3, 8)] {
+            _ = try await save(at: Self.date(2026, month, day))
+        }
+    }
+
+    /// M01.
+    @Test func timeline() async throws {
+        try await populate()
         assertScreenSnapshots(of: screen(await memories()))
+    }
+
+    /// M02: November, today chosen.
+    @Test func calendarMonth() async throws {
+        try await populate()
+        let model = await memories()
+        model.mode = .calendar
+        assertScreenSnapshots(of: screen(model), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+            SnapshotVariant(.iPhone, .light, rightToLeft: true), SnapshotVariant(.iPad, .light),
+        ])
+    }
+
+    /// M03: 2026 in dots.
+    @Test func calendarYear() async throws {
+        try await populate()
+        let model = await memories()
+        model.mode = .calendar
+        model.show(year: 2026)
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPad, .light)])
+    }
+
+    /// M04: a day in two places, with a caption.
+    @Test func day() async throws {
+        _ = try await save(at: Self.date(2026, 11, 11, 8, 5), place: "Yerevan", caption: "Breakfast chaos, as usual")
+        _ = try await save(at: Self.date(2026, 11, 11, 18, 42), place: "Dilijan")
+        let model = await memories().dayModel(20261111)
+        await model.refresh()
+        assertScreenSnapshots(
+            of: NavigationStack { DayView(model: model, thisYear: 2026) }.environment(AppRouter()),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
+        )
     }
 
     /// Tile badges: favourite, a video's length, a voice note, all three.

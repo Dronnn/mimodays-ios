@@ -55,6 +55,7 @@ public struct RootView: View {
         .environment(\.permissions, permissions)
         .environment(\.camera, camera)
         .environment(\.momentSaver, momentSaver)
+        .environment(\.mediaLibrary, memories.library)
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)

@@ -18,6 +18,10 @@ struct MomentSummary: Equatable, Identifiable {
     var selfiePath: String?
     /// The composed thumbnail grids and strips show.
     var thumbnailPath: String?
+    /// The one-line caption, if any.
+    var title: String?
+    /// Videos: the clip's length.
+    var duration: Double?
 
     init(_ moment: Moment) {
         id = moment.id
@@ -30,6 +34,8 @@ struct MomentSummary: Equatable, Identifiable {
         selfiePath = windowRole.flatMap { role in sources.first { $0.role == role } }?.relativePath
         mainPath = sources.first { $0.role != windowRole }?.relativePath
         thumbnailPath = moment.media.first { $0.role == .thumbnail }?.relativePath
+        title = moment.title
+        duration = moment.mediaType == .video ? moment.media.compactMap(\.duration).max() : nil
     }
 }
 

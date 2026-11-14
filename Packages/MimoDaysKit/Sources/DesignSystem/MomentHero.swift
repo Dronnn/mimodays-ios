@@ -210,11 +210,15 @@ private struct PersonGlyph: Shape {
     }
 }
 
-/// `Hero / PiP selfie`: cream rounded frame, tilted like every selfie window.
-struct SelfieWindow: View {
+/// `Hero / PiP selfie`: cream rounded frame, tilted like every selfie window. Scales with its width.
+public struct SelfieWindow: View {
     let media: HeroMedia
 
-    var body: some View {
+    public init(media: HeroMedia) {
+        self.media = media
+    }
+
+    public var body: some View {
         GeometryReader { proxy in
             let scale = proxy.size.width / 89
             RoundedRectangle(cornerRadius: 19 * scale)

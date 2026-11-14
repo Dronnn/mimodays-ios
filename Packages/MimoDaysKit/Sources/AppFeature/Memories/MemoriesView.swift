@@ -19,15 +19,31 @@ struct MemoriesView: View {
                 if model.isEmpty {
                     emptyState
                         .padding(.top, 108)
-                }
-                ForEach(Array(model.rows.enumerated()), id: \.element.id) { index, row in
-                    switch row {
-                    case let .month(key, count):
-                        monthHeader(key, count: count, isFirst: index == 0)
-                            .padding(.top, index == 0 ? 22 : 18)
-                    case let .day(key, items):
-                        day(key, items)
+                } else if model.isLoaded {
+                    SegmentedControl(selection: $model.mode, options: [.timeline, .calendar]) { mode in
+                        switch mode {
+                        case .timeline: Text("Timeline", bundle: .module)
+                        case .calendar: Text("Calendar", bundle: .module)
+                        }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 21)
+                    .accessibilityIdentifier("memories.mode")
+                }
+                switch model.mode {
+                case .timeline:
+                    ForEach(Array(model.rows.enumerated()), id: \.element.id) { index, row in
+                        switch row {
+                        case let .month(key, count):
+                            monthHeader(key, count: count, isFirst: index == 0)
+                                .padding(.top, index == 0 ? 22 : 18)
+                        case let .day(key, items):
+                            day(key, items)
+                        }
+                    }
+                case .calendar:
+                    MemoriesCalendarView(model: model)
+                        .padding(.top, 12)
                 }
             }
             .scrollTargetLayout()
@@ -39,7 +55,10 @@ struct MemoriesView: View {
         }
         .scrollPosition(id: $model.scrolledRow, anchor: .top)
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        // The title names the way back from a day; the bar itself stays hidden here.
+        .navigationTitle(Text("Memories", bundle: .module))
         .toolbar(.hidden, for: .navigationBar)
+        .memoriesDestinations(thisYear: model.today / 10_000)
         .task { model.refresh() }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
         .onChange(of: scenePhase) { _, phase in
@@ -131,8 +150,11 @@ struct MemoriesView: View {
                 .accessibilityAddTraits(.isHeader)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                 ForEach(items) { item in
-                    MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
-                        .task { await model.load(item.id) }
+                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id))) {
+                        MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
+                    }
+                    .buttonStyle(.plain)
+                    .task { await model.load(item.id) }
                 }
             }
             .padding(.horizontal, 20)
@@ -260,7 +282,7 @@ struct MemoryTile: View {
         var text = item.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module)
         text = text + Text(verbatim: ", ") + Text(item.capturedAt, format: clock)
         if item.origin == .randomPrompt { text = text + Text(verbatim: ", ") + Text("surprise", bundle: .module) }
-        if item.isFavorite { text = text + Text(verbatim: ", ") + Text("favorite", bundle: .module) }
+        if item.isFavorite { text = text + Text(verbatim: ", ") + Text("Description is favorite", bundle: .module) }
         if detail?.hasVoiceNote == true { text = text + Text(verbatim: ", ") + Text("Description has voice note", bundle: .module) }
         return text
     }

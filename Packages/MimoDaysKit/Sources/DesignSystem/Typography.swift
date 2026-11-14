@@ -125,6 +125,18 @@ public struct TextStyle: Equatable, Sendable {
     public static let emptyTitle = TextStyle(.fraunces, size: 26, weight: 650, relativeTo: .title1, maximumScale: 1.35)
     /// A month's moment count beside its title.
     public static let sectionCount = TextStyle(.nunito, size: 13, weight: 600, relativeTo: .footnote)
+    /// A calendar day's number on its cover photo, and without one (M02); the grid can't grow far.
+    public static let calendarDayOnPhoto = TextStyle(.nunito, size: 13, weight: 800, relativeTo: .caption1, maximumScale: 1.35)
+    public static let calendarDay = TextStyle(.nunito, size: 15, weight: 600, relativeTo: .subheadline, maximumScale: 1.35)
+    /// A month's short name over its dots (M03).
+    public static let calendarMonth = TextStyle(.fraunces, size: 16, weight: 650, relativeTo: .headline, maximumScale: 1.35)
+    /// A moment's time on a day (M04).
+    public static let dayTime = TextStyle(.nunito, size: 13, weight: 700, relativeTo: .footnote)
+    /// A moment's caption on a day (M04).
+    public static let dayCaption = TextStyle(.patrickHand, size: 20, relativeTo: .body)
+    /// The place and the date line under a moment in the viewer (M05).
+    public static let viewerPlace = TextStyle(.nunito, size: 14, weight: 700, relativeTo: .footnote)
+    public static let viewerMeta = TextStyle(.nunito, size: 14, weight: 500, relativeTo: .footnote)
     /// The video length on a grid tile; it sits on the picture, so it stops growing at 1.35x.
     public static let tileBadge = TextStyle(.nunito, size: 12, weight: 700, relativeTo: .caption2, maximumScale: 1.35)
 

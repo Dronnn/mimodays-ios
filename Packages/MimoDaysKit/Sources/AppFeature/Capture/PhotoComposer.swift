@@ -25,8 +25,14 @@ enum PhotoComposer {
     static func compose(mainURL: URL, selfieURL: URL, window: SelfieWindowFrame) async throws -> URL {
         guard let main = uprightImage(mainURL), let selfie = uprightImage(selfieURL) else { throw Failure.unreadable }
         let composed = compose(main: main, selfie: selfie, window: window)
-        return try write(composed)
+        return try await withCheckedThrowingContinuation { continuation in
+            encoding.async { continuation.resume(with: Result { try write(composed) }) }
+        }
     }
+
+    /// Encoding blocks its thread until the HEVC encoder is done. Several at once on Swift's cooperative threads
+    /// stalled the encoder and with it every one of those threads, so encodes run here, one at a time.
+    private static let encoding = DispatchQueue(label: "MimoDays.PhotoComposer.encoding", qos: .userInitiated)
 
     /// The window's frame in photo pixels and the points-to-pixels factor. The preview shows the photo
     /// aspect-filled and centred, so this inverts that.

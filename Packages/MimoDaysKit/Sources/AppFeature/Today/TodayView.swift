@@ -24,6 +24,8 @@ struct TodayView: View {
         .scrollBounceBehavior(.basedOnSize)
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
+        .navigationTitle(Text("Today", bundle: .module))
+        .memoriesDestinations(thisYear: Calendar.current.component(.year, from: model.now))
         .task { await model.refresh() }
         // A prompt fires or expires, a pause ends: the ribbon follows without a tap.
         .task(id: model.surpriseChangesAt) {
@@ -222,13 +224,16 @@ struct TodayView: View {
     @ViewBuilder
     private var hero: some View {
         if let latest = model.latest {
-            MomentHero(
-                photo: media(latest.mainPath, TodayModel.heroPixels),
-                selfie: latest.selfiePath.map { media($0, TodayModel.selfiePixels) },
-                caption: model.timeText(latest.captured),
-                place: latest.place.map { Text($0) },
-                tag: latest.origin == .randomPrompt ? Text("surprise", bundle: .module) : nil
-            )
+            NavigationLink(value: MemoriesRoute.moment(pager(from: latest.id))) {
+                MomentHero(
+                    photo: media(latest.mainPath, TodayModel.heroPixels),
+                    selfie: latest.selfiePath.map { media($0, TodayModel.selfiePixels) },
+                    caption: model.timeText(latest.captured),
+                    place: latest.place.map { Text($0) },
+                    tag: latest.origin == .randomPrompt ? Text("surprise", bundle: .module) : nil
+                )
+            }
+            .buttonStyle(.plain)
             .accessibilityLabel(describe(latest, withSelfie: latest.selfiePath != nil))
             .accessibilityIdentifier("today.hero")
         } else {
@@ -325,8 +330,11 @@ struct TodayView: View {
             HStack(spacing: 2) {
                 ForEach(Array(model.month.enumerated()), id: \.element.id) { index, moment in
                     let style = StripTile.styles[index % StripTile.styles.count]
-                    StripTile(image: model.image(moment.thumbnailPath, TodayModel.tilePixels), style: style)
-                        .accessibilityLabel(describe(moment, withSelfie: false))
+                    NavigationLink(value: MemoriesRoute.moment(pager(from: moment.id))) {
+                        StripTile(image: model.image(moment.thumbnailPath, TodayModel.tilePixels), style: style)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(describe(moment, withSelfie: false))
                 }
             }
             .padding(.horizontal, 15)
@@ -427,6 +435,13 @@ struct TodayView: View {
     }
 
     // MARK: Helpers
+
+    /// The latest moment, then this month's: what Today shows, to swipe through.
+    private func pager(from id: UUID) -> MomentPager {
+        var ids = model.latest.map { [$0.id] } ?? []
+        ids += model.month.map(\.id).filter { !ids.contains($0) }
+        return MomentPager(ids: ids, start: id)
+    }
 
     private func media(_ path: String?, _ size: Int) -> HeroMedia {
         model.image(path, size).map { .image(Image(uiImage: $0)) } ?? .placeholder

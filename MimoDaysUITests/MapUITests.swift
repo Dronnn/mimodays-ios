@@ -60,4 +60,48 @@ final class MapUITests: XCTestCase {
         movie.tap()
         XCTAssertTrue(app.tabBars.firstMatch.buttons.element(boundBy: 3).isSelected)
     }
+
+    /// 10.6: every place as a list, the way through the map without seeing it - a place, then one of its moments.
+    @MainActor
+    func testAllPlacesListsEveryPlaceAndOpensOne() {
+        launchOnMap()
+        let all = app.buttons["map.allPlaces"]
+        XCTAssertTrue(all.waitForExistence(timeout: 20))
+        all.tap()
+        let place = app.buttons["map.place"]
+        XCTAssertTrue(place.waitForExistence(timeout: 5))
+        XCTAssertTrue(place.label.contains("Yerevan"), place.label)
+        place.tap()
+        let tile = app.buttons["place.tile"]
+        XCTAssertTrue(tile.waitForExistence(timeout: 5))
+        tile.tap()
+        XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
+    }
+
+    /// VoiceOver's audit without contrast (checked against the design) and without MapKit's own Legal label, whose
+    /// small hit area is Apple's.
+    @MainActor
+    private func audit(_ types: XCUIAccessibilityAuditType = XCUIAccessibilityAuditType.all.subtracting(.contrast)) throws {
+        try app.performAccessibilityAudit(for: types) { issue in
+            issue.auditType == .hitRegion && issue.detailedDescription.contains("MKAttributionLabel")
+        }
+    }
+
+    /// The map, a place's sheet and its page pass VoiceOver's audit (contrast is checked against the design).
+    @MainActor
+    func testMapScreensPassAccessibilityAudit() throws {
+        launchOnMap()
+        let recent = app.buttons["map.recentPlace"]
+        XCTAssertTrue(recent.waitForExistence(timeout: 20))
+        try audit()
+        recent.tap()
+        let seeAll = app.buttons["place.seeAll"]
+        XCTAssertTrue(seeAll.waitForExistence(timeout: 5))
+        // P02 without the clipped-text check: it reports the sheet's texts as clipped although at the largest text
+        // size the sheet grows with them and shows them whole (run at AccessibilityXXXL, 2026-11-14).
+        try audit(XCUIAccessibilityAuditType.all.subtracting([.contrast, .textClipped]))
+        seeAll.tap()
+        XCTAssertTrue(app.buttons["place.tile"].waitForExistence(timeout: 5))
+        try audit()
+    }
 }

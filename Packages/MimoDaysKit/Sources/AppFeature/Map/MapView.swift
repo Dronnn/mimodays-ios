@@ -195,7 +195,7 @@ struct MapView: View {
             .id(retry)
             .ignoresSafeArea(edges: .bottom)
             .overlay(alignment: .topTrailing) { locateButton.padding(.top, 12).padding(.trailing, 16) }
-            .overlay(alignment: .bottom) { recentPlaces }
+            .overlay(alignment: .bottom) { RecentPlacesPanel(model: model) { selection = $0 } }
             .overlay {
                 if model.places.isEmpty { nothingMatches }
             }
@@ -230,66 +230,6 @@ struct MapView: View {
         } else {
             fitToken += 1
         }
-    }
-
-    /// P01's sheet: recent places, newest visit first; All places lists every one.
-    private var recentPlaces: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Capsule().fill(Color(hex: 0xCDBFB4)).frame(width: 36, height: 5).frame(maxWidth: .infinity).padding(.top, 8)
-            HStack(alignment: .firstTextBaseline) {
-                Text("Recent places", bundle: .module)
-                    .textStyle(.displaySection)
-                    .foregroundStyle(ColorToken.textPrimary.color)
-                    .accessibilityAddTraits(.isHeader)
-                Spacer()
-                NavigationLink(value: MapRoute.places) {
-                    Text("All places", bundle: .module).textStyle(.ribbonAction).foregroundStyle(ColorToken.textLink.color)
-                        .frame(minHeight: Size.minimumTapTarget)
-                }
-                .accessibilityIdentifier("map.allPlaces")
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 2)
-            ScrollView(.horizontal) {
-                HStack(alignment: .top, spacing: 19) {
-                    ForEach(model.recentPlaces.prefix(10)) { place in
-                        Button { selection = place.id } label: { recentPlace(place) }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("map.recentPlace")
-                    }
-                }
-                .padding(.horizontal, 20)
-            }
-            .scrollIndicators(.hidden)
-            .padding(.bottom, 14)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous)
-                .fill(ColorToken.surfaceSheet.color)
-                .shadow(color: Color(hex: 0x4B2938).opacity(0.12), radius: 10, y: -2)
-        }
-    }
-
-    private func recentPlace(_ place: MapPlace) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Color(hex: 0xC9B8AA)
-                .overlay {
-                    if let id = place.moments.first?.id, let image = model.images[id] { Image(uiImage: image).filling() }
-                }
-                .frame(width: 108, height: 66)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .task { if let id = place.moments.first?.id { await model.load(id) } }
-            HStack(spacing: 6) {
-                PlaceName(place: place).textStyle(.mapPlaceName).foregroundStyle(ColorToken.textPrimary.color).lineLimit(1)
-                Spacer(minLength: 0)
-                Text(place.moments.count, format: .number).textStyle(.sectionCount).foregroundStyle(ColorToken.textSecondary.color)
-            }
-            .frame(width: 108)
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Map marker: \(PlaceName.text(place)) · \(Text("\(place.moments.count) moments", bundle: .module))", bundle: .module))
-        .accessibilityAddTraits(.isButton)
     }
 
     private var nothingMatches: some View {
@@ -348,6 +288,90 @@ struct MapView: View {
             retry += 1
             fitToken += 1
         }
+    }
+}
+
+/// P01's sheet: recent places, newest visit first; All places lists every one.
+struct RecentPlacesPanel: View {
+    let model: MapModel
+    let select: (String) -> Void
+    /// A place's column, 108 pt as drawn; it widens with larger text so names keep whole words.
+    @ScaledMetric(relativeTo: .footnote) private var width: CGFloat = 108
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Capsule().fill(Color(hex: 0xCDBFB4)).frame(width: 36, height: 5).frame(maxWidth: .infinity).padding(.top, 8)
+            // Side by side as drawn; stacked when larger text doesn't leave room for both.
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline) {
+                    title
+                    Spacer()
+                    allPlaces
+                }
+                VStack(alignment: .leading, spacing: 0) {
+                    title
+                    allPlaces
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 2)
+            ScrollView(.horizontal) {
+                HStack(alignment: .top, spacing: 19) {
+                    ForEach(model.recentPlaces.prefix(10)) { place in
+                        Button { select(place.id) } label: { recentPlace(place) }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("map.recentPlace")
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+            .scrollIndicators(.hidden)
+            .padding(.bottom, 14)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous)
+                .fill(ColorToken.surfaceSheet.color)
+                .shadow(color: Color(hex: 0x4B2938).opacity(0.12), radius: 10, y: -2)
+        }
+    }
+
+    private func recentPlace(_ place: MapPlace) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Color(hex: 0xC9B8AA)
+                .overlay {
+                    if let id = place.moments.first?.id, let image = model.images[id] { Image(uiImage: image).filling() }
+                }
+                .frame(width: width, height: 66)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .task { if let id = place.moments.first?.id { await model.load(id) } }
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                // One line as drawn; a long name or larger text wraps rather than being cut off.
+                PlaceName(place: place).textStyle(.mapPlaceName).foregroundStyle(ColorToken.textPrimary.color)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                Text(place.moments.count, format: .number).textStyle(.sectionCount).foregroundStyle(ColorToken.textSecondary.color)
+            }
+            .frame(width: width)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Map marker: \(PlaceName.text(place)) · \(Text("\(place.moments.count) moments", bundle: .module))", bundle: .module))
+        .accessibilityAddTraits(.isButton)
+    }
+
+    private var title: some View {
+        Text("Recent places", bundle: .module)
+            .textStyle(.displaySection)
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    private var allPlaces: some View {
+        NavigationLink(value: MapRoute.places) {
+            Text("All places", bundle: .module).textStyle(.ribbonAction).foregroundStyle(ColorToken.textLink.color)
+                .frame(minHeight: Size.minimumTapTarget)
+        }
+        .accessibilityIdentifier("map.allPlaces")
     }
 }
 
@@ -579,6 +603,20 @@ struct PlacePreviewSheet: View {
     @State private var height: CGFloat = 380
 
     var body: some View {
+        ScrollView {
+            content
+                .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height = $0 }
+        }
+        // The detent is the content's height; a scroll view lets larger text go past it rather than be cut.
+        .scrollBounceBehavior(.basedOnSize)
+        .presentationDetents([.height(height)])
+        .presentationDragIndicator(.visible)
+        .presentationCornerRadius(28)
+        .presentationBackground(ColorToken.surfaceSheet.color)
+        .presentationBackgroundInteraction(.enabled(upThrough: .height(height)))
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
                 PlaceName(place: place)
@@ -626,12 +664,6 @@ struct PlacePreviewSheet: View {
         .padding(.horizontal, 20)
         .padding(.top, 26)
         .padding(.bottom, 12)
-        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height = $0 }
-        .presentationDetents([.height(height)])
-        .presentationDragIndicator(.visible)
-        .presentationCornerRadius(28)
-        .presentationBackground(ColorToken.surfaceSheet.color)
-        .presentationBackgroundInteraction(.enabled(upThrough: .height(height)))
     }
 
     private func preview(_ moment: MapMoment) -> some View {

@@ -66,6 +66,23 @@ struct MapSnapshotTests {
         )
     }
 
+    /// P01's Recent places panel; at larger text its header stacks.
+    @Test func recentPlaces() async throws {
+        try await save(2, at: "Lake Merritt")
+        try await save(1, at: "Grandma's")
+        let model = MapModel(library: library)
+        model.refresh()
+        for place in model.recentPlaces { if let id = place.moments.first?.id { await model.load(id) } }
+        assertScreenSnapshots(
+            of: NavigationStack {
+                RecentPlacesPanel(model: model) { _ in }
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .background(ColorToken.canvas.color.ignoresSafeArea())
+            },
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
+        )
+    }
+
     /// P04.
     @Test func filters() async throws {
         let ids = try await save(3, at: "Lake Merritt")

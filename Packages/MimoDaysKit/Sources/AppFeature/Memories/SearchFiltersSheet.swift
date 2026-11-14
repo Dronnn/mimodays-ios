@@ -20,7 +20,7 @@ struct SearchFiltersSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 Text("Filters", bundle: .module)
-                    .textStyle(.sheetTitle)
+                    .textStyle(.largeSheetTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .accessibilityAddTraits(.isHeader)
                     .padding(.horizontal, 4)

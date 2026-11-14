@@ -168,7 +168,7 @@ struct NewCollectionSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("New collection", bundle: .module)
-                .textStyle(.sheetTitle)
+                .textStyle(.largeSheetTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)
                 .padding(.horizontal, 4)

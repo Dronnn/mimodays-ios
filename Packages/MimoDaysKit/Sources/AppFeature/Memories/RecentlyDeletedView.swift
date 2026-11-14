@@ -22,7 +22,7 @@ struct DeleteConfirmationSheet: View {
                     Text("Delete these \(count) moments?", bundle: .module)
                 }
             }
-            .textStyle(.sheetTitle)
+            .textStyle(.largeSheetTitle)
             .foregroundStyle(ColorToken.textPrimary.color)
             .accessibilityAddTraits(.isHeader)
             Group {

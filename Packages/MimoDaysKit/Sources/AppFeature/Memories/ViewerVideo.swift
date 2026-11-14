@@ -121,13 +121,20 @@ struct VideoPage: View {
                 media(in: proxy.size)
             }
             .ignoresSafeArea()
-            LinearGradient(colors: [.clear, ColorToken.mediaScrim.color], startPoint: .top, endPoint: .bottom)
-                .frame(height: 360)
-                .ignoresSafeArea()
-                .allowsHitTesting(false)
             controls
                 .padding(.horizontal, 16)
                 .padding(.bottom, 12)
+                // The words may sit over the media's lower edge: it fades into the page's black above them.
+                .background {
+                    VStack(spacing: 0) {
+                        LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 96)
+                        Color.black
+                    }
+                    .padding(.top, -96)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                }
         }
         .sheet(isPresented: $adjustsSelfie) {
             SelfieWindowSheet(placement: $placement)

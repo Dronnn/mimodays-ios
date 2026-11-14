@@ -28,9 +28,19 @@ struct MemoriesCalendarView: View {
         VStack(spacing: 0) {
             navigationRow {
                 Button { model.show(year: model.shownMonth / 100) } label: {
-                    Text(MemoriesView.monthDate(model.shownMonth), format: Date.FormatStyle(timeZone: .gmt).month(.wide).year())
-                        .textStyle(.displaySection)
-                        .foregroundStyle(ColorToken.textPrimary.color)
+                    // The chevron hints that the title opens the whole year (9.30).
+                    HStack(spacing: 6) {
+                        Text(MemoriesView.monthDate(model.shownMonth), format: Date.FormatStyle(timeZone: .gmt).month(.wide).year())
+                            .textStyle(.displaySection)
+                            .foregroundStyle(ColorToken.textPrimary.color)
+                        Icon.glyphChevron.image
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                            .rotationEffect(.degrees(90))
+                            .foregroundStyle(ColorToken.textSecondary.color)
+                            .accessibilityHidden(true)
+                    }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityHint(Text("Shows the whole year", bundle: .module))

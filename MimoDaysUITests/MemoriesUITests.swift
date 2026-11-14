@@ -228,6 +228,35 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
     }
 
+    /// Flow 03 (doc 02): find an old moment by its place, edit it, see the change in the viewer.
+    @MainActor
+    func testFlow03FindAndEditAnOldMemory() {
+        launch(.populated)
+        let search = app.buttons["memories.search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 20))
+        search.tap()
+        let field = app.textFields["search.field"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.typeText("yere")
+        let place = app.buttons["search.place"]
+        XCTAssertTrue(place.waitForExistence(timeout: 10))
+        place.tap()
+        let result = app.descendants(matching: .any).matching(identifier: "search.result").firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 5))
+        result.tap()
+        let edit = app.buttons["viewer.edit"]
+        XCTAssertTrue(edit.waitForExistence(timeout: 10))
+        edit.tap()
+        let caption = app.textFields["edit.caption"]
+        XCTAssertTrue(caption.waitForExistence(timeout: 5))
+        caption.tap()
+        caption.typeText(" by the fountain")
+        app.buttons["edit.save"].tap()
+        let edited = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "by the fountain")).firstMatch
+        XCTAssertTrue(edited.waitForExistence(timeout: 5))
+        XCTAssertTrue(edit.exists)
+    }
+
     @MainActor
     func testBeforeTheFirstMomentItLeadsToTheCamera() {
         launch(.empty)

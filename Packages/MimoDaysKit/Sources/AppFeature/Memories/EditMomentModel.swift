@@ -1,3 +1,4 @@
+@preconcurrency import AVFoundation
 import Core
 import Foundation
 import Observation
@@ -13,12 +14,12 @@ import UIKit
 final class EditMomentModel: Identifiable, PlaceChoosing {
     /// The voice note as it will be saved: the one already kept, or a new recording waiting in a temporary file.
     enum Voice: Equatable {
-        case saved(duration: Double)
+        case saved(path: String, duration: Double)
         case recorded(ReviewVoiceNote)
 
         var duration: Double {
             switch self {
-            case let .saved(duration): duration
+            case let .saved(_, duration): duration
             case let .recorded(voice): voice.duration
             }
         }
@@ -38,6 +39,9 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     /// The collections it will be in.
     var collectionIDs: Set<UUID>
     private(set) var isSaving = false
+    /// The voice note playing from its row, and how far it is, in seconds.
+    private(set) var isPlayingVoice = false
+    private(set) var voiceTime: Double = 0
 
     // Choosing a place later: no current city or nearby places, only search (near where it was), recents and No place.
     let currentPlace: ReviewPlace? = nil
@@ -50,6 +54,9 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     private let voiceServices: VoiceServices
     private let places: PlaceServices
     private var transcription: Task<Void, Never>?
+    @ObservationIgnored private let voicePlayer = AVPlayer()
+    @ObservationIgnored private var voiceClock: Any?
+    @ObservationIgnored private var voiceEnd: (any NSObjectProtocol)?
     private let logger = Logger(subsystem: "MimoDays", category: "EditMoment")
 
     /// Nil when the moment is gone.
@@ -67,7 +74,7 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
         let place = moment.location.map {
             ReviewPlace(label: $0.placeLabel, latitude: $0.latitude, longitude: $0.longitude, precision: $0.precision, source: $0.source)
         }
-        let saved = moment.voiceNotes.first.map { Voice.saved(duration: $0.duration) }
+        let saved = moment.voiceNotes.first.map { Voice.saved(path: $0.relativePath, duration: $0.duration) }
         original = (moment.title ?? "", moment.note ?? "", moment.isFavorite, place, saved)
         caption = original.caption
         note = original.note
@@ -126,6 +133,7 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
             return
         }
         discardRecording()
+        stopVoice()
         voice = .recorded(ReviewVoiceNote(url: url, duration: read.duration, recordedAt: recordedAt))
         transcription = Task { [weak self, transcriber = voiceServices.transcriber] in
             let text = await transcriber.transcribe(url)
@@ -136,8 +144,46 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     }
 
     func removeVoice() {
+        stopVoice()
         discardRecording()
         voice = nil
+    }
+
+    /// Plays the voice note as it will be saved, or stops it.
+    func toggleVoice() {
+        if isPlayingVoice {
+            stopVoice()
+            return
+        }
+        let url: URL? = switch voice {
+        case let .saved(path, _): try? library.store.url(for: path)
+        case let .recorded(recorded): recorded.url
+        case nil: nil
+        }
+        guard let url else { return }
+        let item = AVPlayerItem(url: url)
+        voicePlayer.replaceCurrentItem(with: item)
+        voiceEnd = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.stopVoice() }
+        }
+        voiceClock = voicePlayer.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 10), queue: .main) { [weak self] time in
+            MainActor.assumeIsolated { self?.voiceTime = time.seconds }
+        }
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        isPlayingVoice = true
+        voicePlayer.play()
+    }
+
+    func stopVoice() {
+        voicePlayer.pause()
+        voicePlayer.replaceCurrentItem(with: nil)
+        if let voiceClock { voicePlayer.removeTimeObserver(voiceClock) }
+        voiceClock = nil
+        if let voiceEnd { NotificationCenter.default.removeObserver(voiceEnd) }
+        voiceEnd = nil
+        voiceTime = 0
+        isPlayingVoice = false
     }
 
     /// A recording that won't be kept: its temporary file goes.

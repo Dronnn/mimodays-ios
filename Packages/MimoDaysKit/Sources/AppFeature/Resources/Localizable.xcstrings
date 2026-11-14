@@ -2174,7 +2174,7 @@
       }
     },
     "Play voice note": {
-      "comment": "Voice note card (C10): accessibility label of the play button",
+      "comment": "Plays the voice note: the play button's accessibility label on the voice note card (C10), and an item in Edit moment's (M07) voice note menu",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2865,6 +2865,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Spring"
+          }
+        }
+      }
+    },
+    "Stop playing": {
+      "comment": "Edit moment (M07), voice note menu while the note plays: stops it",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop playing"
           }
         }
       }

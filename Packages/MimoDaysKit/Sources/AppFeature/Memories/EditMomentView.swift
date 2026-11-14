@@ -55,6 +55,7 @@ struct EditMomentView: View {
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .interactiveDismissDisabled(model.hasChanges)
         .task { await model.loadThumbnail() }
+        .onDisappear { model.stopVoice() }
         .confirmationDialog(Text("Discard your changes?", bundle: .module), isPresented: $confirmsDiscard, titleVisibility: .visible) {
             Button(role: .destructive) {
                 model.discardRecording()
@@ -63,6 +64,9 @@ struct EditMomentView: View {
             Button(role: .cancel) {} label: { Text("Keep editing", bundle: .module) }
         }
         .confirmationDialog(Text("Voice note", bundle: .module), isPresented: $choosesVoice, titleVisibility: .hidden) {
+            Button { model.toggleVoice() } label: {
+                model.isPlayingVoice ? Text("Stop playing", bundle: .module) : Text("Play voice note", bundle: .module)
+            }
             Button { recordVoice() } label: { Text("Record again", bundle: .module) }
             Button(role: .destructive) { model.removeVoice() } label: { Text("Delete voice note", bundle: .module) }
         }
@@ -203,7 +207,10 @@ struct EditMomentView: View {
         VStack(spacing: 0) {
             row(icon: .glyphMic, title: Text("Voice note", bundle: .module), id: "edit.voice") {
                 if let voice = model.voice {
-                    Text(Duration.seconds(voice.duration.rounded()), format: .time(pattern: .minuteSecond))
+                    // While it plays: the time left.
+                    let seconds = model.isPlayingVoice ? max(voice.duration - model.voiceTime, 0).rounded(.up) : voice.duration.rounded()
+                    Text(Duration.seconds(seconds), format: .time(pattern: .minuteSecond))
+                        .monospacedDigit()
                 } else {
                     Text("Add", bundle: .module)
                 }
@@ -327,6 +334,7 @@ struct EditMomentView: View {
 
     /// The system prompt the first time; once it is off, the way to Settings.
     private func recordVoice() {
+        model.stopVoice()
         Task {
             var status = await permissions.status(of: .microphone)
             if status == .notDetermined { status = await permissions.request(.microphone) }

@@ -90,7 +90,7 @@ struct EditMomentTests {
     @Test func aNewRecordingReplacesTheVoiceNoteAndItsFile() async throws {
         let edit = try edit(try await save(voice: true))
         let oldPath = try #require(try moment().voiceNotes.first?.relativePath)
-        #expect(edit.voice == .saved(duration: 1.2))
+        #expect(edit.voice?.duration == 1.2)
         let recording = try tone(seconds: 2)
         edit.addVoice(at: recording, recordedAt: .now)
         #expect(abs((edit.voice?.duration ?? 0) - 2) < 0.1 && edit.hasChanges)
@@ -100,6 +100,28 @@ struct EditMomentTests {
         #expect(store.fileExists(note.relativePath) && !store.fileExists(oldPath))
         #expect(!FileManager.default.fileExists(atPath: recording.path()))
         #expect(try container.mainContext.fetchCount(FetchDescriptor<MomentVoiceNote>()) == 1)
+    }
+
+    /// 9.14: the voice note plays from its row - the saved one, and a new recording before Save; recording
+    /// again or removing it stops it.
+    @Test func theVoiceNotePlaysFromItsRow() async throws {
+        let edit = try edit(try await save(voice: true))
+        edit.toggleVoice()
+        try await Task.sleep(for: .milliseconds(400))
+        #expect(edit.isPlayingVoice && edit.voiceTime > 0.1, "time \(edit.voiceTime)")
+        edit.toggleVoice()
+        #expect(!edit.isPlayingVoice && edit.voiceTime == 0)
+
+        edit.toggleVoice()
+        edit.addVoice(at: try tone(seconds: 2), recordedAt: .now)
+        #expect(!edit.isPlayingVoice)
+        edit.toggleVoice()
+        try await Task.sleep(for: .milliseconds(400))
+        #expect(edit.isPlayingVoice && edit.voiceTime > 0.1)
+        edit.removeVoice()
+        #expect(!edit.isPlayingVoice)
+        edit.toggleVoice()
+        #expect(!edit.isPlayingVoice)
     }
 
     @Test func aRemovedVoiceNoteLeavesNoFile() async throws {

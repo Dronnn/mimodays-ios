@@ -45,6 +45,15 @@ struct ViewerMoment: Equatable, Identifiable {
         var aspectRatio: CGFloat { pixelSize.height > 0 ? pixelSize.width / pixelSize.height : 9.0 / 16.0 }
     }
 
+    /// A photo's upright size and its selfie window as saved (9.28).
+    struct PhotoSource: Equatable {
+        var pixelSize: CGSize
+        /// Nil without a selfie.
+        var layout: PiPLayout?
+
+        var aspectRatio: CGFloat { pixelSize.height > 0 ? pixelSize.width / pixelSize.height : 3.0 / 4.0 }
+    }
+
     var id: UUID
     var captured: CaptureTime
     var origin: MomentOrigin
@@ -59,6 +68,7 @@ struct ViewerMoment: Equatable, Identifiable {
     var composedPath: String?
     var voice: Voice?
     var video: VideoSource?
+    var photo: PhotoSource?
     /// The collections it's in, by name (M05 chips).
     var collections: [CollectionLink]
 
@@ -83,6 +93,14 @@ struct ViewerMoment: Equatable, Identifiable {
         collections = moment.memberships.compactMap { $0.collection.map { CollectionLink(id: $0.id, title: $0.title) } }
             .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
         voice = moment.voiceNotes.first.map { Voice(path: $0.relativePath, duration: $0.duration, transcript: $0.transcript) }
+        if moment.mediaType == .photo, let main = moment.media.first(where: { $0.relativePath == summary.mainPath }) {
+            // Stored as encoded; EXIF orientations 5-8 turn it a quarter.
+            let encoded = CGSize(width: main.pixelWidth, height: main.pixelHeight)
+            photo = PhotoSource(
+                pixelSize: main.orientation >= 5 ? CGSize(width: encoded.height, height: encoded.width) : encoded,
+                layout: summary.selfiePath == nil ? nil : moment.pipLayout
+            )
+        }
         if moment.mediaType == .video, let main = moment.media.first(where: { $0.relativePath == summary.mainPath }) {
             let selfie = moment.media.first { $0.relativePath == summary.selfiePath }
             let pixelSize = CGSize(width: main.pixelWidth, height: main.pixelHeight)
@@ -284,7 +302,8 @@ final class MomentViewerModel {
 
     /// The player's window moved or changed size: kept on the moment, and used from now on for sharing.
     func setWindow(_ layout: PiPLayout, for id: UUID) {
-        guard let moment = fetch(id), var video = moments[id]?.video, video.layout != layout else { return }
+        guard let moment = fetch(id), let viewed = moments[id],
+              let current = viewed.video?.layout ?? viewed.photo?.layout, current != layout else { return }
         var saved = layout
         saved.source = moment.pipLayout?.source ?? layout.source
         moment.pipLayout = saved
@@ -296,47 +315,73 @@ final class MomentViewerModel {
             logger.error("Saving the selfie window failed: \(error.localizedDescription, privacy: .public)")
             return
         }
-        video.layout = saved
-        video.timing.window = saved.windowFrame(in: video.pixelSize)
-        moments[id]?.video = video
+        if var video = viewed.video {
+            video.layout = saved
+            video.timing.window = saved.windowFrame(in: video.pixelSize)
+            moments[id]?.video = video
+        } else {
+            moments[id]?.photo?.layout = saved
+        }
+        guard let changed = moments[id] else { return }
         let previous = thumbnailRefresh
-        let source = video
         thumbnailRefresh = Task {
             await previous?.value
-            await refreshThumbnail(id, source)
+            await recompose(changed)
         }
     }
 
-    /// The last thumbnail rebuild; each waits for the one before, so files are replaced in order.
+    /// The last rebuild of what grids and sharing show; each waits for the one before, so files are replaced
+    /// in order.
     private(set) var thumbnailRefresh: Task<Void, Never>?
 
-    /// Grids show the window where the player put it: the thumbnail is composed again and replaces the old one.
-    private func refreshThumbnail(_ id: UUID, _ source: ViewerMoment.VideoSource) async {
-        guard let main = url(source.mainPath),
-              let image = await MomentSaver.videoThumbnail(
-                  mainURL: main, selfieURL: url(source.selfiePath), selfieOffset: source.timing.selfieOffset, window: source.timing.window
-              ),
-              let media = fetch(id)?.media.first(where: { $0.role == .thumbnail }) else { return }
+    /// Grids and sharing show the window where the viewer put it: a video's thumbnail is composed again; a
+    /// photo's shared picture too, and its thumbnail from that. New files replace the old ones.
+    private func recompose(_ viewed: ViewerMoment) async {
         do {
-            let temporary = try CaptureFiles.temporaryURL("jpg")
-            defer { try? FileManager.default.removeItem(at: temporary) }
-            try ThumbnailPipeline.jpegData(image).write(to: temporary)
-            let file = try library.store.store(copyOf: temporary, in: .derived)
-            let old = media.relativePath
-            media.relativePath = file.relativePath
-            media.checksum = file.checksum
-            media.byteCount = file.byteCount
-            do {
-                try library.context.save()
-            } catch {
-                library.context.rollback()
-                try? library.store.remove(file.relativePath)
-                throw error
+            if let video = viewed.video {
+                guard let main = url(video.mainPath),
+                      let image = await MomentSaver.videoThumbnail(
+                          mainURL: main, selfieURL: url(video.selfiePath), selfieOffset: video.timing.selfieOffset, window: video.timing.window
+                      ) else { return }
+                try replace(.thumbnail, of: viewed.id, with: image)
+            } else if let photo = viewed.photo, let layout = photo.layout,
+                      let main = url(viewed.mainPath), let selfie = url(viewed.selfiePath) {
+                let composed = try await PhotoComposer.compose(mainURL: main, selfieURL: selfie, window: layout.windowFrame(in: photo.pixelSize))
+                defer { try? FileManager.default.removeItem(at: composed) }
+                moments[viewed.id]?.composedPath = try replace(.composedPreview, of: viewed.id, with: composed)
+                guard let image = await ReviewModel.still(composed, maxPixelSize: MomentSaver.thumbnailSize, at: 0)?.cgImage else { return }
+                try replace(.thumbnail, of: viewed.id, with: image)
             }
-            try? library.store.remove(old)
         } catch {
-            logger.error("Refreshing the thumbnail failed: \(error.localizedDescription, privacy: .public)")
+            logger.error("Recomposing after the window moved failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    private func replace(_ role: MediaRole, of id: UUID, with image: CGImage) throws {
+        let temporary = try CaptureFiles.temporaryURL("jpg")
+        defer { try? FileManager.default.removeItem(at: temporary) }
+        try ThumbnailPipeline.jpegData(image).write(to: temporary)
+        try replace(role, of: id, with: temporary)
+    }
+
+    /// Stores a copy of `file` as the moment's media of that role, then removes the old file. The new path.
+    @discardableResult
+    private func replace(_ role: MediaRole, of id: UUID, with file: URL) throws -> String? {
+        guard let media = fetch(id)?.media.first(where: { $0.role == role }) else { return nil }
+        let stored = try library.store.store(copyOf: file, in: .derived)
+        let old = media.relativePath
+        media.relativePath = stored.relativePath
+        media.checksum = stored.checksum
+        media.byteCount = stored.byteCount
+        do {
+            try library.context.save()
+        } catch {
+            library.context.rollback()
+            try? library.store.remove(stored.relativePath)
+            throw error
+        }
+        try? library.store.remove(old)
+        return stored.relativePath
     }
 
     /// Main and selfie streams as one, the window where the player has it: what sharing exports.

@@ -40,6 +40,7 @@ struct MomentViewer: View {
     @State private var preparingShare = false
     /// The status bar's height: the video's selfie window is laid out from it, as on the camera.
     @State private var screenTop: CGFloat = 0
+    @State private var screenWidth: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
 
     private var isVideo: Bool { model.currentMoment?.mediaType == .video }
@@ -91,6 +92,7 @@ struct MomentViewer: View {
         }
         // Outside the bars' insets: the screen's own.
         .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { screenTop = $0 }
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { screenWidth = $0 }
     }
 
     @ViewBuilder
@@ -174,14 +176,20 @@ struct MomentViewer: View {
                     .overlay {
                         if let image = model.image(moment.mainPath) { Image(uiImage: image).resizable().scaledToFill() }
                     }
-                    .aspectRatio(386 / 440, contentMode: .fit)
+                    // The whole photo, as taken and as shared (9.28), with its window where it was taken.
+                    .aspectRatio(moment.photo?.aspectRatio ?? 386 / 440, contentMode: .fit)
                     .clipShape(ViewerPhotoBlob())
-                    .overlay(alignment: .topTrailing) {
-                        if let selfie = moment.selfiePath {
-                            SelfieWindow(media: model.image(selfie).map { .image(Image(uiImage: $0)) } ?? .placeholder)
-                                .frame(width: 89, height: SelfieWindowStyle.height(forWidth: 89))
-                                .padding(.top, 10)
-                                .padding(.trailing, 24)
+                    .overlay {
+                        if let layout = moment.photo?.layout, screenWidth > 0 {
+                            GeometryReader { proxy in
+                                ViewerSelfieWindow(
+                                    model: model, momentID: moment.id, saved: layout, screenWidth: screenWidth, topInset: screenTop, shown: proxy.size
+                                ) {
+                                    if let image = model.image(moment.selfiePath) {
+                                        Image(uiImage: image).resizable().scaledToFill()
+                                    }
+                                }
+                            }
                         }
                     }
                     .environment(\.layoutDirection, .leftToRight)

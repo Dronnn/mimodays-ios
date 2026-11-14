@@ -200,6 +200,36 @@ struct MomentViewerTests {
         #expect(inside.g > inside.r, "mint selfie: \(inside)")
     }
 
+    /// 9.28: a photo's window moves like a video's - kept on the moment, and the shared picture and the
+    /// thumbnail are composed again with it; the old files go.
+    @Test func movingAPhotosWindowRecomposesWhatIsShared() async throws {
+        let id = try await save()
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        let photo = try #require(viewer.moments[id]?.photo)
+        #expect(photo.layout != nil && photo.pixelSize.width > 0)
+        let before = try #require(viewer.moments[id]?.composedPath)
+        let layout = SelfieWindowLayout.media(width: 402, aspectRatio: photo.aspectRatio, topInset: 62)
+        let moved = CameraSettings.SelfieWindow(corner: .bottomLeft, scale: .large)
+        viewer.setWindow(PiPLayout(layout.windowFrame(moved), source: .frontSource), for: id)
+        await viewer.thumbnailRefresh?.value
+
+        let composed = try #require(viewer.moments[id]?.composedPath)
+        let oldFile = try store.url(for: before)
+        #expect(composed != before && !FileManager.default.fileExists(atPath: oldFile.path))
+        let reread = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await reread.load(id)
+        let saved = try #require(reread.moments[id]?.photo?.layout)
+        #expect(layout.placement(nearest: saved) == moved && reread.moments[id]?.composedPath == composed)
+
+        let image = try #require(await ImageDecoding.thumbnail(try store.url(for: composed), maxPixelSize: nil))
+        #expect(CGSize(width: image.width, height: image.height) == photo.pixelSize)
+        let rect = PhotoComposer.placement(of: saved.windowFrame(in: photo.pixelSize), in: photo.pixelSize).rect
+        #expect(rect.midX < photo.pixelSize.width / 2 && rect.midY > photo.pixelSize.height / 2)
+        let inside = try Self.pixels(image)((Int(rect.midX), Int(rect.midY)))
+        #expect(inside.g > inside.r, "mint selfie: \(inside)")
+    }
+
     private static func pixels(_ image: CGImage) throws -> ((Int, Int)) -> (r: Int, g: Int, b: Int, luma: Double) {
         let width = image.width, height = image.height
         var data = [UInt8](repeating: 0, count: width * height * 4)

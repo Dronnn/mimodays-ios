@@ -110,8 +110,6 @@ struct VideoPage: View {
     /// The screen's top inset (status bar), which the camera's window layout counts from.
     let topInset: CGFloat
     @State private var playback: ViewerVideoPlayer?
-    @State private var placement = CameraSettings.SelfieWindow()
-    @State private var adjustsSelfie = false
     /// Playing before a scrub started.
     @State private var resumesAfterScrub: Bool?
 
@@ -135,9 +133,6 @@ struct VideoPage: View {
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
                 }
-        }
-        .sheet(isPresented: $adjustsSelfie) {
-            SelfieWindowSheet(placement: $placement)
         }
         .task(id: isCurrent) {
             guard isCurrent else {
@@ -181,37 +176,20 @@ struct VideoPage: View {
             .accessibilityLabel(Text("Video", bundle: .module))
             .accessibilityAddTraits(.isImage)
             if let layout = moment.video?.layout, size.width > 0 {
-                window(layout, reference: size.width, shown: shown)
+                ViewerSelfieWindow(model: model, momentID: moment.id, saved: layout, screenWidth: size.width, topInset: topInset, shown: shown) {
+                    ZStack {
+                        if let image = model.image(moment.selfiePath) {
+                            Image(uiImage: image).resizable().scaledToFill()
+                        }
+                        if let playback, playback.hasSelfie {
+                            PlayerLayerView(player: playback.selfie)
+                        }
+                    }
+                }
             }
         }
         .frame(width: size.width, height: size.height, alignment: .top)
         .background(Color.black)
-    }
-
-    private func window(_ saved: PiPLayout, reference width: CGFloat, shown: CGSize) -> some View {
-        let layout = SelfieWindowLayout.media(width: width, aspectRatio: shown.width / shown.height, topInset: topInset)
-        return AdjustableSelfieWindow(placement: $placement, showsSheet: $adjustsSelfie, layout: layout, id: "viewer.selfieWindow") {
-            ZStack {
-                if let image = model.image(moment.selfiePath) {
-                    Image(uiImage: image).resizable().scaledToFill()
-                }
-                if let playback, playback.hasSelfie {
-                    PlayerLayerView(player: playback.selfie)
-                }
-            }
-        }
-        .frame(width: layout.preview.width, height: layout.preview.height)
-        .scaleEffect(shown.width / layout.preview.width, anchor: .topLeading)
-        .frame(width: shown.width, height: shown.height, alignment: .topLeading)
-        .onAppear {
-            // What the player shows is what sharing exports: a saved layout off every corner (moments saved
-            // before 9.17) is kept as the corner and size it is shown at.
-            placement = layout.placement(nearest: saved)
-            model.setWindow(PiPLayout(layout.windowFrame(placement), source: saved.source), for: moment.id)
-        }
-        .onChange(of: placement) { _, new in
-            model.setWindow(PiPLayout(layout.windowFrame(new), source: saved.source), for: moment.id)
-        }
     }
 
     // MARK: Controls

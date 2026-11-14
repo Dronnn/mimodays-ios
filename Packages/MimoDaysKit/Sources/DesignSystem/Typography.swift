@@ -98,6 +98,8 @@ public struct TextStyle: Equatable, Sendable {
     public static let sheetTitle = TextStyle(.fraunces, size: 22, weight: 600, relativeTo: .title2, maximumScale: 1.35)
     /// Full sheet titles (M09 Filters, M11b New collection, M15 Delete).
     public static let largeSheetTitle = TextStyle(.fraunces, size: 24, weight: 600, relativeTo: .title2, maximumScale: 1.35)
+    /// The two lines on M16b's `Card / Deleted info`.
+    public static let infoCard = TextStyle(.nunito, size: 14, weight: 600, lineHeight: 1.2, relativeTo: .footnote)
     /// Sheet explanations (M15): Nunito 15, tighter than body copy.
     public static let sheetBody = TextStyle(.nunito, size: 15, weight: 500, lineHeight: 1.2, relativeTo: .subheadline)
     /// C09 "0:12 / 1:00".

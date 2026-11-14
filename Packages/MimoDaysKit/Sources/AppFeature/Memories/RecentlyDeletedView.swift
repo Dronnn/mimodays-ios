@@ -282,20 +282,22 @@ struct DeletedMomentView: View {
                         .accessibilityLabel(item.item.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module))
                         .padding(.horizontal, 8)
                         .task { await model.load(item, pixels: MomentViewerModel.photoPixels) }
-                    HStack(alignment: .top, spacing: 12) {
+                    // `Card / Deleted info`: 370x64, the clock centred 14 pt in, lines 18 pt apart.
+                    HStack(spacing: 10) {
                         Icon.glyphClock.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 1) {
                             let ago = DeletionStore.daysAgo(deletedAt: item.deletedAt, now: model.now)
                             ago == 0 ? Text("Deleted today.", bundle: .module) : Text("Deleted \(ago) days ago.", bundle: .module)
                             Text("Will be removed in \(model.daysLeft(item)) days.", bundle: .module)
                         }
-                        .textStyle(.rowCaption)
+                        .textStyle(.infoCard)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .foregroundStyle(ColorToken.textPrimary.color)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 14)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .frame(minHeight: 64)
                     .background(FieldBlob().fill(ColorToken.surfaceCard.color))
                     .accessibilityElement(children: .combine)
                     .padding(.horizontal, 16)

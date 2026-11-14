@@ -519,7 +519,7 @@ struct MovieExportFailed: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 0) {
-                    ExplainerArt(glyph: .glyphWarning, ink: .textLink).padding(.top, 116)
+                    ExplainerArt(glyph: .explainerWarning, ink: .textLink).padding(.top, 116)
                     Text("The movie couldn't be finished", bundle: .module)
                         .textStyle(TextStyle(.fraunces, size: 26, weight: 600, relativeTo: .title1, maximumScale: 1.35))
                         .foregroundStyle(ColorToken.textPrimary.color)

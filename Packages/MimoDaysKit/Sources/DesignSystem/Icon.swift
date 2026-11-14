@@ -65,6 +65,9 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphUndo
     case glyphDownload
     case glyphFolder
+    /// Backup, export and storage (E01-E09), drawn on a 20×20 canvas.
+    case glyphArchive
+    case glyphBell
     /// `Brand / Wordmark` on Today: the letters and the star, two layers on one 103.7×33 canvas.
     case brandWordmark
     case brandWordmarkStar
@@ -85,6 +88,10 @@ public enum Icon: String, CaseIterable, Sendable {
     case explainerClock
     case explainerCollection
     case explainerFilm
+    /// Backup and restore (E04p, E04, E08), and F14.
+    case explainerArchive
+    case explainerCheck
+    case explainerWarning
     /// Explainer art layers, all on the same 150×140 canvas.
     case artBlob
     case markStar

@@ -71,6 +71,18 @@
         }
       }
     },
+    "%@ used by MimoDays" : {
+      "comment" : "Storage (E09): total, as 6.0 GB used by MimoDays",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ used by MimoDays"
+          }
+        }
+      }
+    },
     "%@ · %@" : {
       "comment" : "New movie (F02): a period and how many moments it has, e.g. October 2026 · 38 moments",
       "extractionState" : "manual",
@@ -177,6 +189,60 @@
         }
       }
     },
+    "%lld are already here. %lld are new." : {
+      "comment" : "Restore (E07): how many of the backup's moments this iPhone has, and how many it doesn't",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$#@here@ %2$#@new@"
+          },
+          "substitutions" : {
+            "here" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg is already here."
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg are already here."
+                    }
+                  }
+                }
+              }
+            },
+            "new" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg is new."
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg are new."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld days" : {
       "comment" : "Recently deleted (M16/M16b) badge: days before a moment goes for good.",
       "extractionState" : "manual",
@@ -201,6 +267,30 @@
         }
       }
     },
+    "%lld days ago" : {
+      "comment" : "When the last backup was made, in days",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day ago"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days ago"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld days with moments" : {
       "comment" : "On the year calendar, VoiceOver: how many days of a month have moments.",
       "extractionState" : "manual",
@@ -218,6 +308,30 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld days with moments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld files are damaged" : {
+      "comment" : "Restore finished (E08): row for files that didn't match",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file is damaged"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files are damaged"
                 }
               }
             }
@@ -297,6 +411,30 @@
         }
       }
     },
+    "%lld moments are only on this iPhone." : {
+      "comment" : "Backup (E06): status card line before the first backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moment is only on this iPhone."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moments are only on this iPhone."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld moments from %lld days." : {
       "comment" : "Movies library (F01): suggestion card, how many moments over how many days",
       "extractionState" : "manual",
@@ -351,6 +489,30 @@
         }
       }
     },
+    "%lld moments packed" : {
+      "comment" : "Backup saved (E04): done step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moment packed"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moments packed"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld moments saved" : {
       "comment" : "Make my movie card subtitle (T02): how many moments are saved.",
       "extractionState" : "manual",
@@ -368,6 +530,104 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld moments saved"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld moments · %lld collections · %lld movie projects · %@" : {
+      "comment" : "Restore (E07): what the backup holds, then how its check went",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$#@moments@ · %2$#@collections@ · %3$#@projects@ · %4$@"
+          },
+          "substitutions" : {
+            "moments" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moment"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moments"
+                    }
+                  }
+                }
+              }
+            },
+            "collections" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg collection"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg collections"
+                    }
+                  }
+                }
+              }
+            },
+            "projects" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg movie project"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg movie projects"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld new moments since then are only on this iPhone." : {
+      "comment" : "Backup (E06): status card warning",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new moment since then is only on this iPhone."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new moments since then are only on this iPhone."
                 }
               }
             }
@@ -412,6 +672,40 @@
                     "stringUnit" : {
                       "state" : "translated",
                       "value" : "%arg clips"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld of %lld moments restored" : {
+      "comment" : "Restore finished (E08): title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld of %2$#@moments@"
+          },
+          "substitutions" : {
+            "moments" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moment restored"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moments restored"
                     }
                   }
                 }
@@ -469,6 +763,30 @@
         }
       }
     },
+    "%lld were already here" : {
+      "comment" : "Restore finished (E08): row for moments the iPhone had",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld was already here"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld were already here"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld years ago" : {
       "comment" : "On this day (T06): how many years ago the moments are from.",
       "extractionState" : "manual",
@@ -513,6 +831,18 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "%lld · %@" : {
+      "comment" : "Storage (E09): Recently deleted count and size, as 7 · 120 MB",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld · %2$@"
           }
         }
       }
@@ -697,6 +1027,18 @@
         }
       }
     },
+    "About %@ · %@ free" : {
+      "comment" : "Backup options (E03): estimated size and free space, as About 5.2 GB · 12 GB free",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About %1$@ · %2$@ free"
+          }
+        }
+      }
+    },
     "About %@." : {
       "comment" : "Export (F11): the movie's estimated size, as About 95 MB.",
       "extractionState" : "manual",
@@ -753,6 +1095,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add"
+          }
+        }
+      }
+    },
+    "Add %lld moments" : {
+      "comment" : "Restore (E07): button when adding what's missing",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Add %lld moment"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Add %lld moments"
+                }
+              }
+            }
           }
         }
       }
@@ -837,6 +1203,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add to collection"
+          }
+        }
+      }
+    },
+    "Add what's missing" : {
+      "comment" : "Restore (E07): option that keeps what's on the iPhone",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add what's missing"
           }
         }
       }
@@ -986,7 +1364,7 @@
       }
     },
     "Back" : {
-      "comment" : "Back button label in a navigation bar",
+      "comment" : "Back button label in a navigation bar; also a failed backup",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1005,6 +1383,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Back to the editor"
+          }
+        }
+      }
+    },
+    "Back up everything" : {
+      "comment" : "Backup options (E03): title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back up everything"
+          }
+        }
+      }
+    },
+    "Back up now" : {
+      "comment" : "Backup (E06): primary button that starts a backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back up now"
+          }
+        }
+      }
+    },
+    "Backup" : {
+      "comment" : "Settings and Storage (E09): row that opens Backup (E06); also E06's title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        }
+      }
+    },
+    "Backup from %@" : {
+      "comment" : "Restore (E07): card title with the backup's date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup from %@"
+          }
+        }
+      }
+    },
+    "Backup saved" : {
+      "comment" : "Backup saved (E04): title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup saved"
+          }
+        }
+      }
+    },
+    "Backups are files you keep. MimoDays never uploads them anywhere. If this iPhone is lost, a backup is the only way to get your moments back." : {
+      "comment" : "Backup (E06): note under the rows",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backups are files you keep. MimoDays never uploads them anywhere. If this iPhone is lost, a backup is the only way to get your moments back."
           }
         }
       }
@@ -1130,7 +1580,7 @@
       }
     },
     "Cancel" : {
-      "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12)",
+      "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12); also backup and restore",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1249,6 +1699,30 @@
         }
       }
     },
+    "Checking the backup" : {
+      "comment" : "Backup in progress (E04p) step, and Restore while it reads the file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking the backup"
+          }
+        }
+      }
+    },
+    "Choose a .mimodays file made with Back up now. A file that was cut off while copying can't be read either." : {
+      "comment" : "Restore: the file isn't a backup, message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a .mimodays file made with Back up now. A file that was cut off while copying can't be read either."
+          }
+        }
+      }
+    },
     "Choose another file" : {
       "comment" : "Movie editor (F09): menu action that swaps the music file",
       "extractionState" : "manual",
@@ -1285,6 +1759,18 @@
         }
       }
     },
+    "Choose where to save" : {
+      "comment" : "Backup in progress (E04p): last step, and the button that opens the save picker again",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose where to save"
+          }
+        }
+      }
+    },
     "Clear" : {
       "comment" : "Search (M08): clears the search field.",
       "extractionState" : "manual",
@@ -1293,6 +1779,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clear"
+          }
+        }
+      }
+    },
+    "Clear temporary files" : {
+      "comment" : "Storage (E09): button that deletes cache and temporary files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear temporary files"
           }
         }
       }
@@ -1365,6 +1863,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Collect"
+          }
+        }
+      }
+    },
+    "Collecting %lld moments" : {
+      "comment" : "Backup in progress (E04p): first step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Collecting %lld moment"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Collecting %lld moments"
+                }
+              }
+            }
           }
         }
       }
@@ -1461,6 +1983,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Create"
+          }
+        }
+      }
+    },
+    "Create backup" : {
+      "comment" : "Backup options (E03): primary button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create backup"
+          }
+        }
+      }
+    },
+    "Creating your backup" : {
+      "comment" : "Backup in progress (E04p): title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creating your backup"
           }
         }
       }
@@ -1593,6 +2139,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Days since the backup: today" : {
+      "comment" : "When the last backup was made: today",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "today"
+          }
+        }
+      }
+    },
+    "Days since the backup: yesterday" : {
+      "comment" : "When the last backup was made: yesterday",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yesterday"
           }
         }
       }
@@ -1898,7 +2468,7 @@
       }
     },
     "Done" : {
-      "comment" : "Closes the Settings sheet; also closes the editor sheets and the finished export (F13)",
+      "comment" : "Closes the Settings sheet; also closes the editor sheets and the finished export (F13); also backup and restore",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2017,6 +2587,18 @@
         }
       }
     },
+    "Every file checked and readable" : {
+      "comment" : "Backup saved (E04): done step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every file checked and readable"
+          }
+        }
+      }
+    },
     "Every moment is already in the movie." : {
       "comment" : "Replace sheet: shown when there's no other moment to choose",
       "extractionState" : "manual",
@@ -2025,6 +2607,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Every moment is already in the movie."
+          }
+        }
+      }
+    },
+    "Every moment is in it." : {
+      "comment" : "Backup (E06): status card line when nothing new was made since the last backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every moment is in it."
           }
         }
       }
@@ -2353,6 +2947,18 @@
         }
       }
     },
+    "In progress" : {
+      "comment" : "VoiceOver value of the step under way",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In progress"
+          }
+        }
+      }
+    },
     "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives." : {
       "comment" : "First moment saved (onboarding O10): body",
       "extractionState" : "manual",
@@ -2377,6 +2983,18 @@
         }
       }
     },
+    "Keep MimoDays open. If you leave, the backup pauses and continues when you come back." : {
+      "comment" : "Backup in progress (E04p): note",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep MimoDays open. If you leave, the backup pauses and continues when you come back."
+          }
+        }
+      }
+    },
     "Keep editing" : {
       "comment" : "Review (C07): button in the Retake confirmation that stays on review",
       "extractionState" : "manual",
@@ -2397,6 +3015,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Large"
+          }
+        }
+      }
+    },
+    "Last backup %@" : {
+      "comment" : "Backup (E06): status card title. %@: today, yesterday or 18 days ago",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last backup %@"
           }
         }
       }
@@ -2433,6 +3063,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Latest"
+          }
+        }
+      }
+    },
+    "Left as they are" : {
+      "comment" : "Restore finished (E08): detail of the already-here row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left as they are"
           }
         }
       }
@@ -2665,6 +3307,18 @@
         }
       }
     },
+    "Moments" : {
+      "comment" : "Storage (E09): row for photos, videos and selfie windows",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments"
+          }
+        }
+      }
+    },
     "Moments are deleted for good after 30 days. They are not shown anywhere else in the app." : {
       "comment" : "Recently deleted (M16) subtitle.",
       "extractionState" : "manual",
@@ -2733,6 +3387,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moments · %lld"
+          }
+        }
+      }
+    },
+    "Moments, notes and voice" : {
+      "comment" : "Backup options (E03): row with the size of the moments",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments, notes and voice"
+          }
+        }
+      }
+    },
+    "Monthly" : {
+      "comment" : "Backup reminder option",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly"
           }
         }
       }
@@ -2833,6 +3511,18 @@
         }
       }
     },
+    "Movie projects" : {
+      "comment" : "Backup options (E03): row with the size of the movie projects",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movie projects"
+          }
+        }
+      }
+    },
     "Movie title" : {
       "comment" : "Title sheet: placeholder of the title field",
       "extractionState" : "manual",
@@ -2905,6 +3595,18 @@
         }
       }
     },
+    "Never" : {
+      "comment" : "Backup reminder option, and E09's Backup row before any backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never"
+          }
+        }
+      }
+    },
     "New collection" : {
       "comment" : "Collections (M11): + button label, sheet title (M11b) and the picker's row that makes one.",
       "extractionState" : "manual",
@@ -2961,6 +3663,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Next year"
+          }
+        }
+      }
+    },
+    "No backup yet" : {
+      "comment" : "Backup (E06): status card title before the first backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No backup yet"
           }
         }
       }
@@ -3145,6 +3859,18 @@
         }
       }
     },
+    "Not enough space" : {
+      "comment" : "Restore: the backup wouldn't fit",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not enough space"
+          }
+        }
+      }
+    },
     "Not enough space to record. Free up some space on this iPhone and try again." : {
       "comment" : "Camera note: too little free storage to start a video.",
       "extractionState" : "manual",
@@ -3201,6 +3927,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Note"
+          }
+        }
+      }
+    },
+    "Nothing here is changed or removed" : {
+      "comment" : "Restore (E07): detail of Add what's missing",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing here is changed or removed"
           }
         }
       }
@@ -3277,6 +4015,18 @@
         }
       }
     },
+    "Nothing on this iPhone was changed. Try again." : {
+      "comment" : "Restore: any other failure, message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing on this iPhone was changed. Try again."
+          }
+        }
+      }
+    },
     "Nothing was changed. Try again in a moment." : {
       "comment" : "Edit moment: alert message when saving fails; the stored moment is untouched.",
       "extractionState" : "manual",
@@ -3285,6 +4035,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nothing was changed. Try again in a moment."
+          }
+        }
+      }
+    },
+    "Nothing was restored. This iPhone needs about %@ more free space." : {
+      "comment" : "Restore: not enough room. %@: how much more space is needed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing was restored. This iPhone needs about %@ more free space."
           }
         }
       }
@@ -3397,6 +4159,18 @@
         }
       }
     },
+    "One file with every moment, note, voice note, collection and movie project. Keep it in Files, on a Mac or on a drive. It can be restored on any iPhone with MimoDays." : {
+      "comment" : "Backup options (E03): what a backup is",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One file with every moment, note, voice note, collection and movie project. Keep it in Files, on a Mac or on a drive. It can be restored on any iPhone with MimoDays."
+          }
+        }
+      }
+    },
     "Open" : {
       "comment" : "Surprise ribbon action (T03): opens the camera to answer the surprise.",
       "extractionState" : "manual",
@@ -3441,6 +4215,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opens in"
+          }
+        }
+      }
+    },
+    "Packing files" : {
+      "comment" : "Backup in progress (E04p): step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Packing files"
+          }
+        }
+      }
+    },
+    "Packing files · %@" : {
+      "comment" : "Backup in progress (E04p): step with how far it got, as Packing files · 64%",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Packing files · %@"
           }
         }
       }
@@ -3866,7 +4664,7 @@
       }
     },
     "Recently deleted" : {
-      "comment" : "Recently deleted (M16) title, and its row at the bottom of Collections (M11).",
+      "comment" : "Recently deleted (M16) title, and its row at the bottom of Collections (M11).; also Storage (E09)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3957,6 +4755,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recover all"
+          }
+        }
+      }
+    },
+    "Remind me to back up" : {
+      "comment" : "Backup (E06): row that sets how often a backup reminder comes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind me to back up"
           }
         }
       }
@@ -4081,6 +4891,18 @@
         }
       }
     },
+    "Rendered movies" : {
+      "comment" : "Backup options (E03) and Storage (E09): finished movie files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendered movies"
+          }
+        }
+      }
+    },
     "Replace" : {
       "comment" : "Movie editor (F06): button that swaps the chosen clip for another moment",
       "extractionState" : "manual",
@@ -4093,6 +4915,18 @@
         }
       }
     },
+    "Replace everything" : {
+      "comment" : "Restore (E07): option that makes the iPhone match the backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace everything"
+          }
+        }
+      }
+    },
     "Replace with" : {
       "comment" : "Replace sheet: title",
       "extractionState" : "manual",
@@ -4101,6 +4935,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Replace with"
+          }
+        }
+      }
+    },
+    "Replace with %lld moments" : {
+      "comment" : "Restore (E07): button when replacing everything",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Replace with %lld moment"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Replace with %lld moments"
+                }
+              }
+            }
           }
         }
       }
@@ -4125,6 +4983,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reset to default"
+          }
+        }
+      }
+    },
+    "Restore" : {
+      "comment" : "Restore (E07, E08): navigation title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore"
+          }
+        }
+      }
+    },
+    "Restore from a backup" : {
+      "comment" : "Backup (E06): row that picks a backup file to restore",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore from a backup"
+          }
+        }
+      }
+    },
+    "Restoring your moments" : {
+      "comment" : "Restore: title while the moments are put back",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring your moments"
           }
         }
       }
@@ -4257,6 +5151,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saved"
+          }
+        }
+      }
+    },
+    "Saved to Files › %@" : {
+      "comment" : "Backup saved (E04): done step with the folder it went to",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to Files › %@"
           }
         }
       }
@@ -4609,6 +5515,18 @@
         }
       }
     },
+    "Show in Files" : {
+      "comment" : "Backup saved (E04): button that opens the folder in Files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in Files"
+          }
+        }
+      }
+    },
     "Show it at the start" : {
       "comment" : "Title sheet: toggle for showing the title at the start of the movie",
       "extractionState" : "manual",
@@ -4705,6 +5623,30 @@
         }
       }
     },
+    "Skipped moments" : {
+      "comment" : "Restore finished (E08): title of the list of moments left out",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped moments"
+          }
+        }
+      }
+    },
+    "Skipped. The rest of the backup is fine." : {
+      "comment" : "Restore finished (E08): detail of the damaged files row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped. The rest of the backup is fine."
+          }
+        }
+      }
+    },
     "Small" : {
       "comment" : "Selfie window sheet (C04): size option.",
       "extractionState" : "manual",
@@ -4725,6 +5667,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Something went wrong while making it.\nYour draft is safe."
+          }
+        }
+      }
+    },
+    "Something went wrong while packing it. Nothing was changed. Try again." : {
+      "comment" : "Backup failed: any other reason",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong while packing it. Nothing was changed. Try again."
           }
         }
       }
@@ -4869,6 +5823,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stops it"
+          }
+        }
+      }
+    },
+    "Storage" : {
+      "comment" : "Settings row and Storage (E09) title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage"
           }
         }
       }
@@ -5029,6 +5995,18 @@
         }
       }
     },
+    "Temporary files" : {
+      "comment" : "Storage (E09): row for cache and temporary files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporary files"
+          }
+        }
+      }
+    },
     "That one didn't come out. Try again." : {
       "comment" : "Camera note: a photo or video failed or its file was unreadable; nothing was kept.",
       "extractionState" : "manual",
@@ -5049,6 +6027,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "That surprise has passed. Catch a moment anyway?"
+          }
+        }
+      }
+    },
+    "The backup couldn't be made" : {
+      "comment" : "Backup failed: title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup couldn't be made"
+          }
+        }
+      }
+    },
+    "The backup couldn't be restored" : {
+      "comment" : "Restore: any other failure, title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup couldn't be restored"
           }
         }
       }
@@ -5245,6 +6247,18 @@
         }
       }
     },
+    "There isn't enough free space on this iPhone to make it. It needs about %@ more." : {
+      "comment" : "Backup failed: no room. %@: how much more space is needed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There isn't enough free space on this iPhone to make it. It needs about %@ more."
+          }
+        }
+      }
+    },
     "There isn't enough free space on this iPhone.\nIt needs about %@ more.\nYour draft is safe." : {
       "comment" : "Export failed (F14): no room. %@: how much more space is needed",
       "extractionState" : "manual",
@@ -5277,6 +6291,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days."
+          }
+        }
+      }
+    },
+    "This backup was made by a newer MimoDays. Update the app, then restore it." : {
+      "comment" : "Restore: newer backup, message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This backup was made by a newer MimoDays. Update the app, then restore it."
           }
         }
       }
@@ -5377,6 +6403,30 @@
         }
       }
     },
+    "This iPhone will match the backup exactly" : {
+      "comment" : "Restore (E07): detail of Replace everything",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This iPhone will match the backup exactly"
+          }
+        }
+      }
+    },
+    "This isn't a MimoDays backup" : {
+      "comment" : "Restore: the file isn't a backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This isn't a MimoDays backup"
+          }
+        }
+      }
+    },
     "This moment didn't save" : {
       "comment" : "Alert title when saving a moment failed for a reason other than space",
       "extractionState" : "manual",
@@ -5457,6 +6507,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Three times a week, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "Time for a backup" : {
+      "comment" : "Backup reminder notification title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time for a backup"
           }
         }
       }
@@ -5773,6 +6835,18 @@
         }
       }
     },
+    "Update MimoDays first" : {
+      "comment" : "Restore: the backup comes from a newer MimoDays",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update MimoDays first"
+          }
+        }
+      }
+    },
     "Used %lld times" : {
       "comment" : "Place sheet (C11): under a place earlier moments were saved with; the number of moments",
       "extractionState" : "manual",
@@ -5942,7 +7016,7 @@
       }
     },
     "Voice notes" : {
-      "comment" : "Movie editor (F09): slider for the voice notes",
+      "comment" : "Movie editor (F09): slider for the voice notes; also Storage (E09)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -5973,6 +7047,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too."
+          }
+        }
+      }
+    },
+    "Weekly" : {
+      "comment" : "Backup reminder option",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly"
           }
         }
       }
@@ -6277,6 +7363,18 @@
         }
       }
     },
+    "Your newest moments are only on this iPhone. A backup keeps them safe." : {
+      "comment" : "Backup reminder notification text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your newest moments are only on this iPhone. A backup keeps them safe."
+          }
+        }
+      }
+    },
     "Your next surprise is on its way" : {
       "comment" : "Surprise ribbon on Today (T02): a surprise is planned. No times or countdowns on purpose.",
       "extractionState" : "manual",
@@ -6345,6 +7443,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "bus window"
+          }
+        }
+      }
+    },
+    "can be made again" : {
+      "comment" : "Storage (E09): detail of the Rendered movies row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "can be made again"
+          }
+        }
+      }
+    },
+    "can be made again from projects" : {
+      "comment" : "Backup options (E03): why rendered movies are optional",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "can be made again from projects"
+          }
+        }
+      }
+    },
+    "checked, no problems" : {
+      "comment" : "Restore (E07): the backup was read and every file matched",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "checked, no problems"
           }
         }
       }
@@ -6441,6 +7575,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "now"
+          }
+        }
+      }
+    },
+    "photos, videos, selfie windows" : {
+      "comment" : "Storage (E09): detail of the Moments row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "photos, videos, selfie windows"
+          }
+        }
+      }
+    },
+    "previews and thumbnails" : {
+      "comment" : "Storage (E09): detail of the Temporary files row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "previews and thumbnails"
+          }
+        }
+      }
+    },
+    "some files are damaged" : {
+      "comment" : "Restore (E07): the backup was read and some files didn't match",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "some files are damaged"
           }
         }
       }

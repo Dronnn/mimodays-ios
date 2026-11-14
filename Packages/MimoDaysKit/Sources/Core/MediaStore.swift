@@ -59,6 +59,16 @@ public struct MediaStore: Sendable {
         return try describe(relativePath)
     }
 
+    /// Moves `source` (on the same volume, e.g. a file just unpacked from a backup) into `area` under a new name.
+    public func store(moving source: URL, in area: Area, fileExtension: String? = nil) throws -> StoredFile {
+        let relativePath = newRelativePath(area, fileExtension ?? source.pathExtension)
+        let destination = url(forUnchecked: relativePath)
+        try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try protect(source)
+        try FileManager.default.moveItem(at: source, to: destination)
+        return try describe(relativePath)
+    }
+
     /// Writes `data` into `area` atomically.
     public func store(_ data: Data, in area: Area, fileExtension: String) throws -> StoredFile {
         let relativePath = newRelativePath(area, fileExtension)

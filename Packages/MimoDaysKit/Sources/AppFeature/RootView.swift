@@ -149,21 +149,43 @@ public struct RootView: View {
     }
 }
 
+/// Settings until Phase 13 builds it: the archive's Backup and Storage.
 struct SettingsPlaceholderView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
-            ColorToken.surfaceSheet.color
-                .ignoresSafeArea()
-                .navigationTitle(Text("Settings", bundle: .module))
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button { dismiss() } label: { Text("Done", bundle: .module) }
-                            .accessibilityIdentifier("settings.done")
+            ScrollView {
+                DataCard {
+                    NavigationLink(value: DataRoute.backup) {
+                        DataIconRow(icon: .glyphArchive, title: Text("Backup", bundle: .module))
                     }
+                    .accessibilityIdentifier("settings.backup")
+                    DataSeparator(leading: 64)
+                    NavigationLink(value: DataRoute.storage) {
+                        DataIconRow(icon: .glyphFolder, title: Text("Storage", bundle: .module))
+                    }
+                    .accessibilityIdentifier("settings.storage")
                 }
+                .buttonStyle(.plain)
+                .padding(16)
+            }
+            .background(ColorToken.surfaceSheet.color.ignoresSafeArea())
+            .navigationTitle(Text("Settings", bundle: .module))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button { dismiss() } label: { Text("Done", bundle: .module) }
+                        .accessibilityIdentifier("settings.done")
+                }
+            }
+            .navigationDestination(for: DataRoute.self) { route in
+                switch route {
+                case .storage: StorageScreen()
+                case .backup: BackupScreen()
+                case .recentlyDeleted: RecentlyDeletedScreen()
+                }
+            }
         }
     }
 }

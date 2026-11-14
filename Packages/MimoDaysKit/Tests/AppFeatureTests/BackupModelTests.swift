@@ -60,6 +60,16 @@ struct BackupModelTests {
         #expect(try BackupArchive.check(destination).damaged.isEmpty)
     }
 
+    /// A real clock's time doesn't survive JSON's seconds-since-1970 to the last bit; the check must not care.
+    @Test func aBackupMadeAtAnOddInstantStillChecksOut() async throws {
+        let library = try await library(moments: 2)
+        let odd = Date(timeIntervalSinceReferenceDate: 816_091_200.4938267)
+        let model = BackupModel(library: library, now: { odd }, freeSpace: { nil }, scheduleReminder: { _, _ in })
+        model.start()
+        await model.waitForPacking()
+        #expect(model.phase == .working(.choosing, progress: 0))
+    }
+
     @Test func cancellingThrowsThePackedFileAway() async throws {
         let library = try await library(moments: 2)
         let model = model(library)

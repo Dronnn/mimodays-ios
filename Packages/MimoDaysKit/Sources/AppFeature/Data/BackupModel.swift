@@ -162,7 +162,9 @@ final class BackupModel {
             )
             update(.checking, 0)
             let check = try BackupArchive.check(url, isCancelled: { Task.isCancelled })
-            guard check.damaged.isEmpty, check.document == written else { throw BackupArchive.Failure.unreadable }
+            // Every file reads back with the checksum the manifest gives it. (Not the whole document: dates
+            // don't survive JSON's seconds-since-1970 to the last bit.)
+            guard check.damaged.isEmpty, check.document.files == written.files else { throw BackupArchive.Failure.unreadable }
             return written
         }.value
     }

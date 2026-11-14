@@ -397,6 +397,18 @@
         }
       }
     },
+    "Any": {
+      "comment": "Search filters (M08b), Collection row: no collection chosen, and the menu item that clears it",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Any"
+          }
+        }
+      }
+    },
     "Any time": {
       "comment": "Filters (M08b): no first day; also the button that clears it.",
       "extractionState": "manual",
@@ -657,6 +669,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Collect"
+          }
+        }
+      }
+    },
+    "Collection": {
+      "comment": "Search filters (M08b): title of the row that limits results to one collection",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collection"
           }
         }
       }

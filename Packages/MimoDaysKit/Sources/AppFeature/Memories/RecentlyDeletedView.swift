@@ -65,7 +65,7 @@ struct DeleteConfirmationSheet: View {
             } label: {
                 count == 1 ? Text("Delete moment", bundle: .module) : Text("Delete \(count) moments", bundle: .module)
             }
-            .buttonStyle(DestructiveSoftButtonStyle())
+            .buttonStyle(.destructive)
             .padding(.top, 22)
             .accessibilityIdentifier("delete.confirm")
             Button { dismiss() } label: { Text("Cancel", bundle: .module) }
@@ -84,22 +84,6 @@ struct DeleteConfirmationSheet: View {
     }
 
     @State private var height: CGFloat = 340
-}
-
-/// `Button / Destructive soft`: coral words on peach (M15 Delete moment).
-struct DestructiveSoftButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .textStyle(.rowTitle)
-            .foregroundStyle(ColorToken.textLink.color)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity, minHeight: 50)
-            .background { ColorToken.accentPeach.color.mask { Icon.shapeButton.image.resizable() } }
-            .opacity(configuration.isPressed ? 0.7 : 1)
-            .contentShape(Rectangle())
-    }
 }
 
 /// One moment in Recently deleted.

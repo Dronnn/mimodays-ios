@@ -206,13 +206,18 @@ private struct TextStyleModifier: ViewModifier {
     func body(content: Content) -> some View {
         let size = style.scaledSize(for: dynamicTypeSize)
         let font = style.ctFont(pointSize: size)
-        // SwiftUI can only add space between lines, so tighter-than-natural heights keep the font's own.
-        let extra = style.lineHeight.map { max(0, size * $0 - (CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font))) } ?? 0
-        content
+        let styled = content
             .font(Font(font))
             .tracking(style.tracking)
-            .lineSpacing(extra)
             .textCase(style.isUppercase ? .uppercase : nil)
+        if #available(iOS 26, *), let lineHeight = style.lineHeight {
+            // The design's line height exactly, tighter than the font's own too (Fraunces 38 at 0.98).
+            styled.lineHeight(.exact(points: size * lineHeight))
+        } else {
+            // Before iOS 26 SwiftUI can only add space between lines; tighter heights keep the font's own.
+            let natural = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
+            styled.lineSpacing(style.lineHeight.map { max(0, size * $0 - natural) } ?? 0)
+        }
     }
 }
 

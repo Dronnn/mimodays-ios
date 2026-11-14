@@ -11,14 +11,16 @@ import TestSupport
 struct SearchModelTests {
     private static func entry(
         day: Int = 20261018, video: Bool = false, favorite: Bool = false,
-        caption: String? = nil, note: String? = nil, transcript: String? = nil, voice: Bool? = nil, place: String? = nil
+        caption: String? = nil, note: String? = nil, transcript: String? = nil, voice: Bool? = nil, place: String? = nil,
+        collections: Set<UUID> = []
     ) -> SearchEntry {
         SearchEntry(
             item: MemoryItem(
                 id: UUID(), localDay: day, capturedAt: .now, timeZoneID: "UTC", mediaType: video ? .video : .photo,
                 origin: .manual, isFavorite: favorite
             ),
-            caption: caption, note: note, transcript: transcript, place: place, hasVoiceNote: voice ?? (transcript != nil)
+            caption: caption, note: note, transcript: transcript, place: place, hasVoiceNote: voice ?? (transcript != nil),
+            collections: collections
         )
     }
 
@@ -53,10 +55,11 @@ struct SearchModelTests {
         #expect(videos.map(\.id) == [video.item.id] && videos.first?.field == nil && videos.first?.text == "A video")
     }
 
-    @Test func filtersNarrowByKindDaysVoiceNoteFavoriteAndPlace() {
+    @Test func filtersNarrowByKindDaysVoiceNoteFavoriteCollectionAndPlace() {
+        let walks = UUID()
         let entries = [
             Self.entry(day: 20260101, caption: "a"),
-            Self.entry(day: 20260601, video: true, caption: "a", voice: true),
+            Self.entry(day: 20260601, video: true, caption: "a", voice: true, collections: [walks, UUID()]),
             Self.entry(day: 20261018, favorite: true, caption: "a", note: "written", place: "Yerevan"),
         ]
         func ids(_ filters: SearchFilters) -> [UUID] { SearchModel.hits(entries, query: "a", filters: filters).map(\.id) }
@@ -66,7 +69,8 @@ struct SearchModelTests {
         #expect(ids(SearchFilters(hasWrittenNote: true)) == [entries[2].item.id])
         #expect(ids(SearchFilters(favoritesOnly: true)) == [entries[2].item.id])
         #expect(ids(SearchFilters(place: "Yerevan")) == [entries[2].item.id])
-        #expect(SearchFilters(kind: .videos, hasVoiceNote: true, place: "Yerevan").count == 3)
+        #expect(ids(SearchFilters(collection: walks)) == [entries[1].item.id])
+        #expect(SearchFilters(kind: .videos, hasVoiceNote: true, collection: walks, place: "Yerevan").count == 4)
     }
 
     @Test func placesAreCountedWithTheirLatestYear() {
@@ -105,6 +109,10 @@ struct SearchModelTests {
             _ = try await saver.save(draft)
         }
         try container.mainContext.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.title == "Gone" })).first?.deletedAt = .now
+        let ducks = try #require(try container.mainContext.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.title == "Ducks" })).first)
+        let birds = MomentCollection(title: "Birds", sortOrder: 0)
+        container.mainContext.insert(birds)
+        container.mainContext.insert(CollectionMembership(collection: birds, moment: ducks, position: 0))
         let model = SearchModel(library: MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline()))
         model.refresh()
         #expect(model.entries.count == 2)
@@ -113,6 +121,9 @@ struct SearchModelTests {
         #expect(model.places.map(\.label) == ["Lake Merritt"])
         model.show(place: "Lake Merritt")
         #expect(model.query.isEmpty && model.hits.map(\.entry.caption) == ["Ducks"])
+        #expect(model.collections.map(\.title) == ["Birds"])
+        model.filters = SearchFilters(collection: birds.id)
+        #expect(model.hits.map(\.entry.caption) == ["Ducks"])
         #expect(model.filteredCount == 1)
         model.clearFilters()
         #expect(model.filters.isEmpty && !model.isSearching)

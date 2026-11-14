@@ -36,13 +36,10 @@ struct EditMomentView: View {
                     .padding(.top, 20)
                 Button { confirmsDelete = true } label: {
                     Text("Delete moment", bundle: .module)
-                        .textStyle(.rowTitle)
-                        .foregroundStyle(ColorToken.textLink.color)
-                        .frame(maxWidth: .infinity, minHeight: Size.minimumTapTarget)
-                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                .padding(.top, 20)
+                .buttonStyle(.destructive)
+                .padding(.horizontal, 4)
+                .padding(.top, 74)
                 .accessibilityIdentifier("edit.delete")
             }
             .padding(.horizontal, 16)

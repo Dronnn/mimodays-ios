@@ -22,6 +22,8 @@ public enum ColorToken: String, CaseIterable, Sendable {
     /// Row details, e.g. the time in a settings row.
     case textTertiary
     case textLink
+    /// Words on a destructive button (`Button / Destructive`): darker than the link, readable on peach.
+    case textDestructive
     case textOnCoral
     case actionCoral
     case actionCoralGradientStart

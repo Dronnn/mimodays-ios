@@ -105,10 +105,14 @@ struct EditMomentTests {
     /// 9.14: the voice note plays from its row - the saved one, and a new recording before Save; recording
     /// again or removing it stops it.
     @Test func theVoiceNotePlaysFromItsRow() async throws {
+        // The player can take a while to start while the whole suite runs.
+        func playing(_ edit: EditMomentModel) async throws -> Bool {
+            for _ in 0..<50 where edit.voiceTime <= 0.1 { try await Task.sleep(for: .milliseconds(50)) }
+            return edit.isPlayingVoice && edit.voiceTime > 0.1
+        }
         let edit = try edit(try await save(voice: true))
         edit.toggleVoice()
-        try await Task.sleep(for: .milliseconds(400))
-        #expect(edit.isPlayingVoice && edit.voiceTime > 0.1, "time \(edit.voiceTime)")
+        #expect(try await playing(edit), "time \(edit.voiceTime)")
         edit.toggleVoice()
         #expect(!edit.isPlayingVoice && edit.voiceTime == 0)
 
@@ -116,8 +120,7 @@ struct EditMomentTests {
         edit.addVoice(at: try tone(seconds: 2), recordedAt: .now)
         #expect(!edit.isPlayingVoice)
         edit.toggleVoice()
-        try await Task.sleep(for: .milliseconds(400))
-        #expect(edit.isPlayingVoice && edit.voiceTime > 0.1)
+        #expect(try await playing(edit))
         edit.removeVoice()
         #expect(!edit.isPlayingVoice)
         edit.toggleVoice()

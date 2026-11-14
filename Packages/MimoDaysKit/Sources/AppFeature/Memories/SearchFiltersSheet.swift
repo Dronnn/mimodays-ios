@@ -41,7 +41,8 @@ struct SearchFiltersSheet: View {
                 card {
                     toggleRow(Text("Has a voice note", bundle: .module), isOn: $model.filters.hasVoiceNote, id: "filters.voice")
                     toggleRow(Text("Has a written note", bundle: .module), isOn: $model.filters.hasWrittenNote, id: "filters.note")
-                    toggleRow(Text("Favorites only", bundle: .module), isOn: $model.filters.favoritesOnly, id: "filters.favorites", isLast: true)
+                    toggleRow(Text("Favorites only", bundle: .module), isOn: $model.filters.favoritesOnly, id: "filters.favorites")
+                    collectionRow
                 }
                 .padding(.top, 12)
             }
@@ -157,6 +158,47 @@ struct SearchFiltersSheet: View {
                 if let from = model.filters.from, from > key { model.filters.from = key }
             }
         }
+    }
+
+    // MARK: Collection
+
+    /// Any, or one collection, picked from a menu.
+    private var collectionRow: some View {
+        Menu {
+            Picker(selection: $model.filters.collection) {
+                Text("Any", bundle: .module).tag(UUID?.none)
+                ForEach(model.collections) { Text($0.title).tag(UUID?.some($0.id)) }
+            } label: {
+                Text("Collection", bundle: .module)
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Text("Collection", bundle: .module)
+                    .textStyle(.rowTitle)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                Spacer(minLength: 8)
+                Group {
+                    if let title = model.collections.first(where: { $0.id == model.filters.collection })?.title {
+                        Text(title)
+                    } else {
+                        Text("Any", bundle: .module)
+                    }
+                }
+                .textStyle(.rowCaption)
+                .foregroundStyle(ColorToken.textSecondary.color)
+                .lineLimit(1)
+                Icon.glyphChevron.image
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .flipsForRightToLeftLayoutDirection(true)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, 16)
+            .frame(minHeight: 52)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("filters.collection")
     }
 
     // MARK: Switches

@@ -37,6 +37,28 @@ public struct TextButtonStyle: ButtonStyle {
     }
 }
 
+/// `Button / Destructive`: dark coral words on the hand-cut peach shape, 52 pt tall (M07, M15, S08).
+public struct DestructiveButtonStyle: ButtonStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textStyle(.rowTitle)
+            .foregroundStyle(ColorToken.textDestructive.color)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 52)
+            .background { ColorToken.accentPeach.color.mask { Icon.shapeButton.image.resizable() } }
+            .opacity(configuration.isPressed ? 0.7 : 1)
+            .contentShape(Rectangle())
+    }
+}
+
+public extension ButtonStyle where Self == DestructiveButtonStyle {
+    static var destructive: DestructiveButtonStyle { DestructiveButtonStyle() }
+}
+
 public extension ButtonStyle where Self == PrimaryButtonStyle {
     static var primary: PrimaryButtonStyle { PrimaryButtonStyle() }
 }

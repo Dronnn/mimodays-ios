@@ -20,12 +20,14 @@ struct SearchFilters: Equatable {
     var hasVoiceNote = false
     var hasWrittenNote = false
     var favoritesOnly = false
+    /// Only moments in this collection.
+    var collection: UUID?
     /// A place picked from the Places section.
     var place: String?
 
     /// "Filters · N".
     var count: Int {
-        [kind != .all, from != nil, to != nil, hasVoiceNote, hasWrittenNote, favoritesOnly, place != nil].filter(\.self).count
+        [kind != .all, from != nil, to != nil, hasVoiceNote, hasWrittenNote, favoritesOnly, collection != nil, place != nil].filter(\.self).count
     }
 
     var isEmpty: Bool { count == 0 }
@@ -39,6 +41,7 @@ struct SearchEntry: Equatable {
     var transcript: String?
     var place: String?
     var hasVoiceNote: Bool
+    var collections: Set<UUID> = []
 }
 
 /// Where the words were found, in the order a row names it.
@@ -93,6 +96,14 @@ final class SearchModel {
     /// Dates in this year leave the year out.
     var thisYear: Int { LocalDay(clock.now(), in: calendar().timeZone).key / 10_000 }
 
+    /// M08b's Collection row: every collection, in the user's order.
+    struct CollectionChoice: Equatable, Identifiable {
+        var id: UUID
+        var title: String
+    }
+
+    private(set) var collections: [CollectionChoice] = []
+
     /// Something to look for: words or a filter.
     var isSearching: Bool { !Self.words(query).isEmpty || !filters.isEmpty }
 
@@ -103,7 +114,7 @@ final class SearchModel {
     /// Moments the current filters leave, before any words (M08b's "Show N moments").
     var filteredCount: Int { entries.count(where: { Self.passes($0, filters) }) }
 
-    /// Every moment, newest first, with its words. Three flat reads instead of a fault per moment.
+    /// Every moment, newest first, with its words and collections. Flat reads instead of a fault per moment.
     func refresh() {
         var descriptor = FetchDescriptor<Moment>(
             predicate: #Predicate { $0.deletedAt == nil },
@@ -118,6 +129,14 @@ final class SearchModel {
             for location in try library.context.fetch(FetchDescriptor<MomentLocation>(predicate: #Predicate { $0.placeLabel != nil })) {
                 if let id = location.moment?.id { places[id] = location.placeLabel }
             }
+            var memberships: [UUID: Set<UUID>] = [:]
+            for membership in try library.context.fetch(FetchDescriptor<CollectionMembership>()) {
+                if let moment = membership.moment?.id, let collection = membership.collection?.id {
+                    memberships[moment, default: []].insert(collection)
+                }
+            }
+            collections = try library.context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)]))
+                .map { CollectionChoice(id: $0.id, title: $0.title) }
             var voices: [UUID: String] = [:]
             for voice in try library.context.fetch(FetchDescriptor<MomentVoiceNote>()) {
                 if let id = voice.moment?.id { voices[id] = voice.transcript ?? "" }
@@ -130,7 +149,8 @@ final class SearchModel {
                     ),
                     caption: moment.title, note: moment.note,
                     transcript: voices[moment.id].flatMap { $0.isEmpty ? nil : $0 },
-                    place: places[moment.id], hasVoiceNote: voices[moment.id] != nil
+                    place: places[moment.id], hasVoiceNote: voices[moment.id] != nil,
+                    collections: memberships[moment.id] ?? []
                 )
             }
         } catch {
@@ -181,6 +201,7 @@ final class SearchModel {
         if filters.hasVoiceNote, !entry.hasVoiceNote { return false }
         if filters.hasWrittenNote, entry.note?.isEmpty ?? true { return false }
         if filters.favoritesOnly, !entry.item.isFavorite { return false }
+        if let collection = filters.collection, !entry.collections.contains(collection) { return false }
         if let place = filters.place, entry.place != place { return false }
         return true
     }

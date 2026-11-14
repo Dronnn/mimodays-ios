@@ -26,10 +26,8 @@ struct MemoriesView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
                 if selection == nil { header }
-                if model.isEmpty {
-                    emptyState
-                        .padding(.top, 108)
-                } else if model.isLoaded, selection == nil {
+                // M01e keeps the switch and the search too (9.16).
+                if model.isLoaded, selection == nil {
                     SegmentedControl(selection: $model.mode, options: [.timeline, .calendar]) { mode in
                         switch mode {
                         case .timeline: Text("Timeline", bundle: .module)
@@ -39,7 +37,11 @@ struct MemoriesView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 21)
                     .accessibilityIdentifier("memories.mode")
-                    if model.mode == .timeline { shortcuts.padding(.top, 12) }
+                    if model.mode == .timeline, !model.isEmpty { shortcuts.padding(.top, 12) }
+                }
+                if model.isEmpty, model.mode == .timeline {
+                    emptyState
+                        .padding(.top, 56)
                 }
                 switch model.mode {
                 case .timeline:
@@ -111,49 +113,45 @@ struct MemoriesView: View {
 
     // MARK: Header
 
-    /// Search and settings in cream circles, then "Memories" with its brush underline and apricot star.
+    /// Select (coral text), search and settings in ringed circles, then "Memories" with its brush underline and
+    /// apricot star.
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
             if selection == nil {
                 HStack(spacing: 0) {
+                    Spacer()
                     if model.isLoaded, !model.isEmpty, model.mode == .timeline {
                         Button { selection = [] } label: {
                             Text("Select", bundle: .module)
-                                .textStyle(.editorCancel)
-                                .foregroundStyle(ColorToken.textPrimary.color)
-                                .padding(.horizontal, 14)
-                                .frame(height: 40)
-                                .background(Capsule().fill(ColorToken.surfaceCard.color))
+                                .textStyle(.control)
+                                .foregroundStyle(ColorToken.textLink.color)
                                 .frame(minHeight: Size.minimumTapTarget)
                                 .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
-                        .padding(.leading, 20)
+                        .padding(.trailing, 14)
                         .accessibilityIdentifier("memories.select")
                     }
-                    Spacer()
-                    if !model.isEmpty {
-                        NavigationLink(value: MemoriesRoute.search) {
-                            Icon.glyphSearch.image
-                                .resizable()
-                                .frame(width: 22, height: 22)
-                                .foregroundStyle(ColorToken.textPrimary.color)
-                                .frame(width: 40, height: 40)
-                                .background(Circle().fill(ColorToken.surfaceCard.color))
-                                .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
-                                .contentShape(Circle())
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(Text("Search", bundle: .module))
-                        .accessibilityIdentifier("memories.search")
+                    NavigationLink(value: MemoriesRoute.search) {
+                        Icon.glyphSearch.image
+                            .resizable()
+                            .frame(width: 22, height: 22)
+                            .foregroundStyle(ColorToken.textPrimary.color)
+                            .frame(width: 40, height: 40)
+                            .overlay(Circle().strokeBorder(ColorToken.textPrimary.color, lineWidth: 1.3))
+                            .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Search", bundle: .module))
+                    .accessibilityIdentifier("memories.search")
                     Button { router.open(.settings) } label: {
                         Icon.glyphGear.image
                             .resizable()
                             .frame(width: 22, height: 22)
                             .foregroundStyle(ColorToken.textPrimary.color)
                             .frame(width: 40, height: 40)
-                            .background(Circle().fill(ColorToken.surfaceCard.color))
+                            .overlay(Circle().strokeBorder(ColorToken.textPrimary.color, lineWidth: 1.3))
                             .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
                             .contentShape(Circle())
                     }

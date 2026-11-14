@@ -284,6 +284,8 @@ enum MemoriesRoute: Hashable {
     case day(Int)
     /// A moment among others to swipe to (M05, M06).
     case moment(MomentPager)
+    /// M08.
+    case search
 }
 
 extension View {
@@ -293,6 +295,7 @@ extension View {
             switch route {
             case let .day(day): DayScreen(day: day, thisYear: thisYear)
             case let .moment(pager): MomentViewerScreen(pager: pager)
+            case .search: SearchScreen()
             }
         }
     }

@@ -139,6 +139,10 @@ public struct TextStyle: Equatable, Sendable {
     public static let viewerMeta = TextStyle(.nunito, size: 14, weight: 500, relativeTo: .footnote)
     /// The video length on a grid tile; it sits on the picture, so it stops growing at 1.35x.
     public static let tileBadge = TextStyle(.nunito, size: 12, weight: 700, relativeTo: .caption2, maximumScale: 1.35)
+    /// Search (M08): the words typed, Cancel, and where a moment matched.
+    public static let searchQuery = TextStyle(.nunito, size: 16, weight: 600, relativeTo: .body)
+    public static let searchCancel = TextStyle(.nunito, size: 16, weight: 700, relativeTo: .body, maximumScale: 1.35)
+    public static let searchMatch = TextStyle(.nunito, size: 12.5, weight: 700, relativeTo: .caption1)
 
     public static let all: [(name: String, style: TextStyle)] = [
         ("display.hero", .displayHero), ("display.title", .displayTitle), ("display.headline", .displayHeadline),

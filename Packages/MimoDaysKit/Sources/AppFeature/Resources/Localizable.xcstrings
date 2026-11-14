@@ -289,6 +289,30 @@
         }
       }
     },
+    "All": {
+      "comment": "Filters (M08b): segment for photos and videos.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All"
+          }
+        }
+      }
+    },
+    "Any time": {
+      "comment": "Filters (M08b): no first day; also the button that clears it.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Any time"
+          }
+        }
+      }
+    },
     "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties.": {
       "comment": "OB-02 body",
       "extractionState": "manual",
@@ -489,6 +513,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Catch your first moment"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "comment": "Search (M08): clears the search field.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
           }
         }
       }
@@ -745,6 +781,42 @@
         }
       }
     },
+    "Favorites only": {
+      "comment": "Filters (M08b): switch for favourite moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorites only"
+          }
+        }
+      }
+    },
+    "Filters": {
+      "comment": "Search (M08) chip that opens the filters, and the filters sheet title (M08b).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filters"
+          }
+        }
+      }
+    },
+    "Filters · %lld": {
+      "comment": "Search (M08/M09) chip with how many filters are on.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filters · %lld"
+          }
+        }
+      }
+    },
     "Find your memories by date or place. Turn a month, a year, or any part of your life into a movie made from real, little moments.": {
       "comment": "OB-05 body",
       "extractionState": "manual",
@@ -781,6 +853,18 @@
         }
       }
     },
+    "From": {
+      "comment": "Filters (M08b): the first day of the span.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From"
+          }
+        }
+      }
+    },
     "Give your moment a voice.": {
       "comment": "OB-04 title",
       "extractionState": "manual",
@@ -789,6 +873,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Give your moment a voice."
+          }
+        }
+      }
+    },
+    "Has a voice note": {
+      "comment": "Filters (M08b): switch for moments with a voice note.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Has a voice note"
+          }
+        }
+      }
+    },
+    "Has a written note": {
+      "comment": "Filters (M08b): switch for moments with a written note.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Has a written note"
           }
         }
       }
@@ -997,6 +1105,18 @@
         }
       }
     },
+    "Moments · %lld": {
+      "comment": "Search (M08): section of matching moments with how many there are.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moments · %lld"
+          }
+        }
+      }
+    },
     "Movies": {
       "comment": "Tab: movies made from moments",
       "extractionState": "manual",
@@ -1045,6 +1165,30 @@
         }
       }
     },
+    "No matches": {
+      "comment": "Search (M09): title when nothing matches.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No matches"
+          }
+        }
+      }
+    },
+    "No matches message: %@ %@": {
+      "comment": "Search (M09): what didn't match, then what search looks at.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "No memories yet": {
       "comment": "Memories title before the first moment is saved.",
       "extractionState": "manual",
@@ -1053,6 +1197,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "No memories yet"
+          }
+        }
+      }
+    },
+    "No moments match these filters.": {
+      "comment": "Search (M09): nothing matches the filters and no words were typed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No moments match these filters."
           }
         }
       }
@@ -1161,6 +1317,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nothing is lost. Try again in a moment."
+          }
+        }
+      }
+    },
+    "Nothing matches “%@” in photos.": {
+      "comment": "Search (M09): the typed words, with only photos chosen.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing matches “%@” in photos."
+          }
+        }
+      }
+    },
+    "Nothing matches “%@” in videos.": {
+      "comment": "Search (M09): the typed words, with only videos chosen.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing matches “%@” in videos."
+          }
+        }
+      }
+    },
+    "Nothing matches “%@” with these filters.": {
+      "comment": "Search (M09): the typed words, with filters on.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing matches “%@” with these filters."
+          }
+        }
+      }
+    },
+    "Nothing matches “%@”.": {
+      "comment": "Search (M09): the typed words, no filters on.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing matches “%@”."
           }
         }
       }
@@ -1381,6 +1585,18 @@
         }
       }
     },
+    "Photos": {
+      "comment": "Search (M08) chip and filters (M08b) segment: only photos.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photos"
+          }
+        }
+      }
+    },
     "Pick how often and when. The exact time is always a surprise.": {
       "comment": "Surprise schedule (onboarding O07): body under the headline",
       "extractionState": "manual",
@@ -1401,6 +1617,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Place"
+          }
+        }
+      }
+    },
+    "Place detail: %@ · %@": {
+      "comment": "Search (M08): a place row's moment count, then the year it was last visited when not this year. Example: 31 moments · 2024",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Places": {
+      "comment": "Search (M08): section of places whose name matches.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Places"
           }
         }
       }
@@ -1585,6 +1825,30 @@
         }
       }
     },
+    "Removes this place": {
+      "comment": "Search (M08): VoiceOver hint on the chip of a place picked from Places.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Removes this place"
+          }
+        }
+      }
+    },
+    "Reset": {
+      "comment": "Filters (M08b): turns every filter off.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
     "Reset to default": {
       "comment": "Selfie window sheet (C04): puts the window back in the top right at medium size.",
       "extractionState": "manual",
@@ -1717,6 +1981,54 @@
         }
       }
     },
+    "Search": {
+      "comment": "Memories (M01): VoiceOver label of the search button.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        }
+      }
+    },
+    "Search all moments": {
+      "comment": "Search (M09): turns the filters off and searches everything again.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search all moments"
+          }
+        }
+      }
+    },
+    "Search looks at notes, voice-note words and places.": {
+      "comment": "Search (M09): what search reads.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search looks at notes, voice-note words and places."
+          }
+        }
+      }
+    },
+    "Search moments": {
+      "comment": "Search (M08): placeholder of the search field.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search moments"
+          }
+        }
+      }
+    },
     "Search places": {
       "comment": "Place sheet (C11): placeholder of the search field",
       "extractionState": "manual",
@@ -1785,6 +2097,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Share"
+          }
+        }
+      }
+    },
+    "Show %lld moments": {
+      "comment": "Filters (M08b): closes the sheet; how many moments the filters leave.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Show %lld moment"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Show %lld moments"
+                }
+              }
+            }
           }
         }
       }
@@ -2305,6 +2641,18 @@
         }
       }
     },
+    "To": {
+      "comment": "Filters (M08b): the last day of the span.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To"
+          }
+        }
+      }
+    },
     "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today.": {
       "comment": "C13a body: camera access off",
       "extractionState": "manual",
@@ -2485,6 +2833,18 @@
         }
       }
     },
+    "Up to today": {
+      "comment": "Filters (M08b): button that clears the last day.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to today"
+          }
+        }
+      }
+    },
     "Used %lld times": {
       "comment": "Place sheet (C11): under a place earlier moments were saved with; the number of moments",
       "extractionState": "manual",
@@ -2533,6 +2893,18 @@
         }
       }
     },
+    "Videos": {
+      "comment": "Search (M08) chip and filters (M08b) segment: only videos.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Videos"
+          }
+        }
+      }
+    },
     "Videos will be silent. Turn on the microphone in Settings to add sound.": {
       "comment": "Camera note (C13b): video mode with sound on while the microphone is turned off in Settings.",
       "extractionState": "manual",
@@ -2553,6 +2925,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "View my moments"
+          }
+        }
+      }
+    },
+    "Voice": {
+      "comment": "Search (M08) chip: only moments with a voice note.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice"
           }
         }
       }
@@ -2829,6 +3213,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "kitchen table"
+          }
+        }
+      }
+    },
+    "matched in caption": {
+      "comment": "Search (M08): under a result, the words were found in its caption.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "matched in caption"
+          }
+        }
+      }
+    },
+    "matched in note": {
+      "comment": "Search (M08): under a result, the words were found in its written note.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "matched in note"
+          }
+        }
+      }
+    },
+    "matched in place": {
+      "comment": "Search (M08): under a result, the words were found in its place name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "matched in place"
+          }
+        }
+      }
+    },
+    "matched in voice note": {
+      "comment": "Search (M08): under a result, the words were found in what was said in its voice note.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "matched in voice note"
           }
         }
       }

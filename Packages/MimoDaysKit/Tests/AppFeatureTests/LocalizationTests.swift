@@ -7,7 +7,8 @@ struct LocalizationTests {
     private static let missing = "\u{0}missing"
 
     /// Keys used directly as `Text("…", bundle: .module)`.
-    private static let literalKeys = ["Edit", "Edit moment", "Discard your changes?", "Discard changes", "Delete voice note",
+    private static let literalKeys = ["Search moments", "Clear", "Removes this place", "Photos", "Videos", "Voice", "Filters", "Filters · %lld", "Places", "Moments · %lld", "Place detail: %@ · %@", "matched in caption", "matched in note", "matched in voice note", "matched in place", "No matches", "No moments match these filters.", "Nothing matches “%@” in photos.", "Nothing matches “%@” in videos.", "Nothing matches “%@”.", "Nothing matches “%@” with these filters.", "No matches message: %@ %@", "Search looks at notes, voice-note words and places.", "Search all moments", "Search", "All", "From", "To", "Any time", "Up to today", "Has a voice note", "Has a written note", "Favorites only", "Reset", "Show %lld moments",
+        "Edit", "Edit moment", "Discard your changes?", "Discard changes", "Delete voice note",
         "Couldn't save the changes", "Nothing was changed. Try again in a moment.", "The photo and its time can't be changed.",
         "The video and its time can't be changed.", "Add a note", "Add", "Photo with selfie", "Share", "Favorite", "Voice note · %@", "Stops it", "Plays it", "Pause", "Play", "Sound off", "Sound on", "Playback position",
         "Timeline", "Calendar", "Shows the whole year", "Calendar day: %@ · %@",

@@ -68,11 +68,26 @@ struct MemoriesView: View {
 
     // MARK: Header
 
-    /// Settings in a cream circle, then "Memories" with its brush underline and apricot star.
+    /// Search and settings in cream circles, then "Memories" with its brush underline and apricot star.
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
-            HStack {
+            HStack(spacing: 0) {
                 Spacer()
+                if !model.isEmpty {
+                    NavigationLink(value: MemoriesRoute.search) {
+                        Icon.glyphSearch.image
+                            .resizable()
+                            .frame(width: 22, height: 22)
+                            .foregroundStyle(ColorToken.textPrimary.color)
+                            .frame(width: 40, height: 40)
+                            .background(Circle().fill(ColorToken.surfaceCard.color))
+                            .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Search", bundle: .module))
+                    .accessibilityIdentifier("memories.search")
+                }
                 Button { router.open(.settings) } label: {
                     Icon.glyphGear.image
                         .resizable()

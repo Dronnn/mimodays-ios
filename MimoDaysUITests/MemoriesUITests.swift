@@ -81,6 +81,35 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertFalse(app.buttons["edit.save"].exists)
     }
 
+    /// M08: the newest seeded moment is in Yerevan; the place, its moment, the viewer, back, filters, Cancel.
+    @MainActor
+    func testSearchFindsAPlaceAndOpensItsMoment() {
+        launch(.populated)
+        let search = app.buttons["memories.search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 20))
+        search.tap()
+        let field = app.textFields["search.field"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.typeText("yere")
+        let place = app.buttons["search.place"]
+        XCTAssertTrue(place.waitForExistence(timeout: 10))
+        place.tap()
+        XCTAssertTrue(app.buttons["search.chip.place"].waitForExistence(timeout: 5))
+        let result = app.descendants(matching: .any).matching(identifier: "search.result").firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 5))
+        result.tap()
+        XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
+        app.navigationBars.buttons.firstMatch.tap()
+        let filters = app.buttons["search.filters"]
+        XCTAssertTrue(filters.waitForExistence(timeout: 5))
+        filters.tap()
+        let show = app.buttons["filters.show"]
+        XCTAssertTrue(show.waitForExistence(timeout: 5))
+        show.tap()
+        app.buttons["search.cancel"].tap()
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+    }
+
     @MainActor
     func testBeforeTheFirstMomentItLeadsToTheCamera() {
         launch(.empty)

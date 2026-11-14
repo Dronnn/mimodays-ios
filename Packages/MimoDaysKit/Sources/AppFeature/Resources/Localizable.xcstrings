@@ -1291,6 +1291,18 @@
         }
       }
     },
+    "An archive keeps everything together with a list of dates, notes and places that any computer can read." : {
+      "comment" : "Export (E02): what 'One archive (.zip)' makes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An archive keeps everything together with a list of dates, notes and places that any computer can read."
+          }
+        }
+      }
+    },
     "Any" : {
       "comment" : "Search filters (M08b), Collection row: no collection chosen, and the menu item that clears it",
       "extractionState" : "manual",
@@ -1323,6 +1335,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Any time"
+          }
+        }
+      }
+    },
+    "As you saw it" : {
+      "comment" : "Export sheet (E01) choice: the picture as shown in the app, with the selfie window in place",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As you saw it"
           }
         }
       }
@@ -1951,6 +1975,18 @@
         }
       }
     },
+    "Couldn't export" : {
+      "comment" : "Alert title when exporting moments fails",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't export"
+          }
+        }
+      }
+    },
     "Couldn't save the changes" : {
       "comment" : "Edit moment: alert title when saving fails.",
       "extractionState" : "manual",
@@ -2515,6 +2551,18 @@
         }
       }
     },
+    "Each moment as its own files, named by the date and time it was taken." : {
+      "comment" : "Export (E02): what 'Separate files' makes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each moment as its own files, named by the date and time it was taken."
+          }
+        }
+      }
+    },
     "Earliest" : {
       "comment" : "Surprise schedule (onboarding O07): row title, earliest time a surprise may arrive",
       "extractionState" : "manual",
@@ -2623,6 +2671,18 @@
         }
       }
     },
+    "Exact place" : {
+      "comment" : "Export sheet (E01) switch: write the moment's exact place into the files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exact place"
+          }
+        }
+      }
+    },
     "Exact place in the file" : {
       "comment" : "Export (F11): toggle that writes the place into the movie file",
       "extractionState" : "manual",
@@ -2631,6 +2691,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Exact place in the file"
+          }
+        }
+      }
+    },
+    "Exact places" : {
+      "comment" : "Export (E02) switch: write each moment's exact place into the files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exact places"
           }
         }
       }
@@ -2647,6 +2719,42 @@
         }
       }
     },
+    "Export %lld moments" : {
+      "comment" : "Export (E02) page title: how many selected moments will be exported",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Export %lld moment"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Export %lld moments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Export moment" : {
+      "comment" : "Export sheet (E01) title, from the moment viewer's Share",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export moment"
+          }
+        }
+      }
+    },
     "Export movie" : {
       "comment" : "Export (F11): screen title",
       "extractionState" : "manual",
@@ -2655,6 +2763,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export movie"
+          }
+        }
+      }
+    },
+    "Exporting %@" : {
+      "comment" : "Export (E02) button while the files are being made; %@ is how far, e.g. 40%",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporting %@"
           }
         }
       }
@@ -2955,6 +3075,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "In progress"
+          }
+        }
+      }
+    },
+    "Include" : {
+      "comment" : "Export (E02) section header above what goes into the export (shown in capitals)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Include"
           }
         }
       }
@@ -3303,6 +3435,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Memories"
+          }
+        }
+      }
+    },
+    "MimoDays %lld moments" : {
+      "comment" : "Export (E02): the exported archive's file and folder name; %lld is how many moments",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "MimoDays %lld moment"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "MimoDays %lld moments"
+                }
+              }
+            }
           }
         }
       }
@@ -3931,6 +4087,18 @@
         }
       }
     },
+    "Notes" : {
+      "comment" : "Export (E02) switch: include each moment's note as a text file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        }
+      }
+    },
     "Nothing here is changed or removed" : {
       "comment" : "Restore (E07): detail of Add what's missing",
       "extractionState" : "manual",
@@ -4147,6 +4315,18 @@
         }
       }
     },
+    "One archive (.zip)" : {
+      "comment" : "Export (E02) choice: everything in one .zip file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One archive (.zip)"
+          }
+        }
+      }
+    },
     "One day, it becomes a movie." : {
       "comment" : "OB-05 title",
       "extractionState" : "manual",
@@ -4167,6 +4347,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "One file with every moment, note, voice note, collection and movie project. Keep it in Files, on a Mac or on a drive. It can be restored on any iPhone with MimoDays."
+          }
+        }
+      }
+    },
+    "One photo with the selfie window, exactly as in MimoDays." : {
+      "comment" : "Export sheet (E01): what 'As you saw it' exports for a photo",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One photo with the selfie window, exactly as in MimoDays."
+          }
+        }
+      }
+    },
+    "One video with the selfie window, exactly as in MimoDays." : {
+      "comment" : "Export sheet (E01): what 'As you saw it' exports for a video",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One video with the selfie window, exactly as in MimoDays."
           }
         }
       }
@@ -4215,6 +4419,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opens in"
+          }
+        }
+      }
+    },
+    "Original camera files" : {
+      "comment" : "Export (E02) switch: also include the front and back camera files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original camera files"
           }
         }
       }
@@ -5371,6 +5587,30 @@
         }
       }
     },
+    "Separate files" : {
+      "comment" : "Export (E02) choice: every moment as its own files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separate files"
+          }
+        }
+      }
+    },
+    "Separate originals" : {
+      "comment" : "Export sheet (E01) choice: the front and back camera files, each on its own",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separate originals"
+          }
+        }
+      }
+    },
     "Set place" : {
       "comment" : "Without a place (P05b): bottom action before any moment is ticked.",
       "extractionState" : "manual",
@@ -6115,6 +6355,18 @@
         }
       }
     },
+    "The camera's own files, front and back separately." : {
+      "comment" : "Export sheet (E01): what 'Separate originals' exports",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The camera's own files, front and back separately."
+          }
+        }
+      }
+    },
     "The end is before the start. Pick a later end date." : {
       "comment" : "New movie (F03): error when the end date is before the start",
       "extractionState" : "manual",
@@ -6267,6 +6519,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "There isn't enough free space on this iPhone.\nIt needs about %@ more.\nYour draft is safe."
+          }
+        }
+      }
+    },
+    "There isn't enough free space on this iPhone. It needs about %@ more." : {
+      "comment" : "Alert when exporting moments needs more space; %@ is a size, e.g. 1.2 GB",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There isn't enough free space on this iPhone. It needs about %@ more."
           }
         }
       }
@@ -7435,6 +7699,30 @@
         }
       }
     },
+    "as a text file" : {
+      "comment" : "Export sheet (E01): under 'Note', how it's exported",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "as a text file"
+          }
+        }
+      }
+    },
+    "as an audio file" : {
+      "comment" : "Export sheet (E01): under 'Voice note', how it's exported",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "as an audio file"
+          }
+        }
+      }
+    },
     "bus window" : {
       "comment" : "Onboarding art caption on a sample photo (handwritten)",
       "extractionState" : "manual",
@@ -7503,6 +7791,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "every moment · %@"
+          }
+        }
+      }
+    },
+    "front and back separately" : {
+      "comment" : "Export (E02): under 'Original camera files'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "front and back separately"
+          }
+        }
+      }
+    },
+    "hidden unless you turn it on" : {
+      "comment" : "Export sheet (E01): under 'Exact place', it's off by default",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hidden unless you turn it on"
           }
         }
       }

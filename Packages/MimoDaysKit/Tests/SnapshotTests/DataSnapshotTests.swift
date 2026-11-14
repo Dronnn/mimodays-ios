@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// Backup, restore and storage: E03, E04p, E04, E06, E07, E08 and E09.
+/// Export, backup, restore and storage: E01, E02, E03, E04p, E04, E06, E07, E08 and E09.
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct DataSnapshotTests {
@@ -114,5 +114,41 @@ struct DataSnapshotTests {
         let model = RestoreModel(url: URL(filePath: "/tmp/x.mimodays"), library: library)
         model.phase = .failed(.newerVersion)
         assertScreenSnapshots(of: page(RestoreView(model: model, close: {})), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// E01: a photo with a voice note, a note and an exact place.
+    @Test func exportMoment() async throws {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let saver = MomentSaver(context: container.mainContext, store: store, clock: TestDateProvider(), freeBytes: { nil })
+        let capture = CaptureResult(
+            media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+            capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_791_374_400), timeZone: .gmt)
+        )
+        var draft = MomentDraft(
+            capture: capture, caption: "Lunch", window: nil, promptID: nil,
+            place: ReviewPlace(label: "Kentron", latitude: 40.1811, longitude: 44.5136, precision: .exact, source: .manual)
+        )
+        draft.note = "Soup"
+        let voice = FileManager.default.temporaryDirectory.appending(path: "\(UUID().uuidString).m4a")
+        try Data(repeating: 5, count: 3_000).write(to: voice)
+        draft.voice = ReviewVoiceNote(url: voice, duration: 1, recordedAt: .now, transcript: nil)
+        let moment = try await saver.save(draft)
+        let model = MomentExportModel(ids: [moment.id], library: library, freeSpace: { 12_000_000_000 })
+        assertScreenSnapshots(of: page(MomentExportSheet(model: model).frame(maxHeight: .infinity, alignment: .bottom)), variants: variants)
+    }
+
+    /// E02: twelve moments as one archive.
+    @Test func exportMoments() async throws {
+        try await fill(12)
+        let moments = try container.mainContext.fetch(FetchDescriptor<Moment>())
+        // Simulated captures differ in size from run to run; the board's 240 MB is 20 MB a moment.
+        for moment in moments {
+            for media in moment.media { media.byteCount = 20_000_000 }
+        }
+        let ids = moments.map(\.id)
+        let model = MomentExportModel(ids: ids, library: library, freeSpace: { 12_000_000_000 })
+        model.archive = true
+        assertScreenSnapshots(of: page(MomentsExportView(model: model, close: {})), variants: variants)
     }
 }

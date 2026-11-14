@@ -439,10 +439,18 @@ enum MovieFiles {
     enum Failure: Error { case notAllowed }
 
     static func saveToPhotos(_ url: URL) async throws {
+        try await saveToPhotos([url])
+    }
+
+    /// Each photo or video as its own item in Photos.
+    static func saveToPhotos(_ urls: [URL]) async throws {
         let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
         guard status == .authorized || status == .limited else { throw Failure.notAllowed }
         try await PHPhotoLibrary.shared().performChanges {
-            PHAssetCreationRequest.forAsset().addResource(with: .video, fileURL: url, options: nil)
+            for url in urls {
+                let isVideo = ["mp4", "mov", "m4v"].contains(url.pathExtension.lowercased())
+                PHAssetCreationRequest.forAsset().addResource(with: isVideo ? .video : .photo, fileURL: url, options: nil)
+            }
         }
     }
 }

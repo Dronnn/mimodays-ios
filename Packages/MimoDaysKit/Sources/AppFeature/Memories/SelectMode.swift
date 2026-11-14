@@ -105,7 +105,7 @@ struct SelectActionsBar<Actions: View>: View {
 }
 
 extension View {
-    /// M13's Collect, Movie and Delete under a selection of moments, with their sheets (Memories, Favorites).
+    /// M13's Collect, Movie, Export (E02) and Delete under a selection of moments, with their sheets (Memories, Favorites).
     func memoriesSelectActions(model: MemoriesModel, selection: Binding<Set<UUID>?>) -> some View {
         modifier(MemoriesSelectActions(model: model, selection: selection))
     }
@@ -118,6 +118,8 @@ private struct MemoriesSelectActions: ViewModifier {
     @State private var confirmsDelete = false
     @State private var collects = false
     @State private var collections: Set<UUID> = []
+    /// E02.
+    @State private var exporting: MomentExportModel?
 
     func body(content: Content) -> some View {
         content
@@ -134,6 +136,11 @@ private struct MemoriesSelectActions: ViewModifier {
                         } label: { action(.glyphFilm, Text("Movie", bundle: .module)) }
                             .accessibilityIdentifier("select.movie")
                         Spacer()
+                        Button { exporting = MomentExportModel(ids: Array(chosen), library: model.library) } label: {
+                            action(.glyphShare, Text("Export", bundle: .module))
+                        }
+                        .accessibilityIdentifier("select.export")
+                        Spacer()
                         Button { confirmsDelete = true } label: { action(.glyphTrash, Text("Delete", bundle: .module)) }
                             .accessibilityIdentifier("select.delete")
                     }
@@ -145,6 +152,12 @@ private struct MemoriesSelectActions: ViewModifier {
                     count: chosen.count, mediaType: model.mediaType(of: chosen), movieDrafts: model.movieDrafts(using: chosen)
                 ) {
                     if model.delete(chosen) { selection = nil }
+                }
+            }
+            .fullScreenCover(item: $exporting) { export in
+                MomentsExportView(model: export) {
+                    exporting = nil
+                    selection = nil
                 }
             }
             .sheet(isPresented: $collects, onDismiss: {

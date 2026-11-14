@@ -35,9 +35,8 @@ struct MomentViewer: View {
     @State private var deleting: ViewerMoment?
     /// The ••• menu's Add to collection, for this moment.
     @State private var collecting: CollectingMoment?
-    /// A video's composed file, ready to share.
-    @State private var sharing: SharedFile?
-    @State private var preparingShare = false
+    /// E01, from Share.
+    @State private var exporting: MomentExportModel?
     /// The status bar's height: the video's selfie window is laid out from it, as on the camera.
     @State private var screenTop: CGFloat = 0
     @State private var screenWidth: CGFloat = 0
@@ -83,7 +82,7 @@ struct MomentViewer: View {
             ))
             .onDisappear { model.setCollections(self.collecting?.selection ?? collecting.selection, for: collecting.id) }
         }
-        .sheet(item: $sharing) { ShareSheet(items: [$0.url]) }
+        .sheet(item: $exporting) { MomentExportSheet(model: $0) }
         .onChange(of: model.ids.isEmpty) { _, isEmpty in if isEmpty { dismiss() } }
         .onChange(of: model.current) { model.stopVoice() }
         .onDisappear { model.stopVoice() }
@@ -261,39 +260,16 @@ struct MomentViewer: View {
     private func actions(_ moment: ViewerMoment) -> some View {
         let tint = (isVideo ? ColorToken.mediaFrame : .textPrimary).color
         return HStack {
-            if moment.mediaType == .photo, let url = model.url(moment.composedPath) {
-                ShareLink(item: url) {
-                    Icon.glyphShare.image.resizable().frame(width: 24, height: 24).foregroundStyle(tint)
-                        .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
-                }
-                .accessibilityLabel(Text("Share", bundle: .module))
-                .accessibilityIdentifier("viewer.share")
-                .frame(maxWidth: .infinity)
-            } else if moment.mediaType == .video {
-                // The video is shared as seen: both streams in one file, made when asked for.
-                Button {
-                    preparingShare = true
-                    Task {
-                        sharing = await model.exportVideo(moment.id).map(SharedFile.init)
-                        preparingShare = false
-                    }
-                } label: {
-                    Group {
-                        if preparingShare {
-                            ProgressView().tint(tint)
-                        } else {
-                            Icon.glyphShare.image.resizable().frame(width: 24, height: 24).foregroundStyle(tint)
-                        }
-                    }
+            // E01: as seen or as the camera's files, with what the moment has.
+            Button { exporting = MomentExportModel(ids: [moment.id], library: model.library) } label: {
+                Icon.glyphShare.image.resizable().frame(width: 24, height: 24).foregroundStyle(tint)
                     .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
                     .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .disabled(preparingShare)
-                .accessibilityLabel(Text("Share", bundle: .module))
-                .accessibilityIdentifier("viewer.share")
-                .frame(maxWidth: .infinity)
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Share", bundle: .module))
+            .accessibilityIdentifier("viewer.share")
+            .frame(maxWidth: .infinity)
             Button { model.toggleFavorite(moment.id) } label: {
                 (moment.isFavorite ? Icon.glyphHeartFilled : .glyphHeart).image
                     .resizable()
@@ -464,12 +440,6 @@ struct VoicePill: View {
 struct CollectingMoment: Identifiable {
     let id: UUID
     var selection: Set<UUID>
-}
-
-/// A file handed to the share sheet.
-struct SharedFile: Identifiable {
-    let url: URL
-    var id: URL { url }
 }
 
 /// The system share sheet for files.

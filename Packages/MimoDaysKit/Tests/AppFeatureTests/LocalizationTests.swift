@@ -104,6 +104,15 @@ struct LocalizationTests {
         "%lld moments · %lld collections · %lld movie projects · %@", "%lld are already here. %lld are new.", "Add %lld moments",
         "Replace with %lld moments", "%lld of %lld moments restored", "%lld files are damaged", "%lld were already here",
         "Nothing was restored. This iPhone needs about %@ more free space.", "%@ used by MimoDays", "%lld · %@",
+        // Moment and selection export (Phase 12).
+        "MimoDays %lld moments", "Export %lld moments", "Export moment", "As you saw it", "Separate originals",
+        "The camera's own files, front and back separately.", "One video with the selfie window, exactly as in MimoDays.",
+        "One photo with the selfie window, exactly as in MimoDays.", "as an audio file", "as a text file", "Exact place",
+        "hidden unless you turn it on", "Separate files", "One archive (.zip)",
+        "An archive keeps everything together with a list of dates, notes and places that any computer can read.",
+        "Each moment as its own files, named by the date and time it was taken.", "Include", "Notes", "Original camera files",
+        "front and back separately", "Exact places", "Exporting %@", "Couldn't export",
+        "There isn't enough free space on this iPhone. It needs about %@ more.",
     ]
 
     private static var resourceKeys: [String] {

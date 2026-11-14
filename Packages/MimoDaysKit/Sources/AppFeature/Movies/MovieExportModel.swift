@@ -185,7 +185,7 @@ final class MovieExportModel {
     }
 
     /// "+37.8044-122.2712/".
-    static func iso6709(latitude: Double, longitude: Double) -> String {
+    nonisolated static func iso6709(latitude: Double, longitude: Double) -> String {
         String(format: "%+08.4f%+09.4f/", latitude, longitude)
     }
 

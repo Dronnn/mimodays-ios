@@ -18,6 +18,11 @@ struct ViewerSelfieWindow<Content: View>: View {
     @ViewBuilder let content: () -> Content
     @State private var placement = CameraSettings.SelfieWindow()
     @State private var adjustsSelfie = false
+    /// The window as saved when the viewer opened, and the placement picked from it. The screen's width and
+    /// insets settle over the first layout passes, so until the window is moved it is placed again from what was
+    /// saved at the start - never from a frame saved on the way with sizes that were not final yet.
+    @State private var opened: PiPLayout?
+    @State private var picked: CameraSettings.SelfieWindow?
 
     var body: some View {
         let layout = SelfieWindowLayout.media(width: screenWidth, aspectRatio: shown.width / shown.height, topInset: topInset)
@@ -25,11 +30,16 @@ struct ViewerSelfieWindow<Content: View>: View {
             .frame(width: layout.preview.width, height: layout.preview.height)
             .scaleEffect(shown.width / layout.preview.width, anchor: .topLeading)
             .frame(width: shown.width, height: shown.height, alignment: .topLeading)
-            .onAppear {
+            .onChange(of: [screenWidth, topInset, shown.width, shown.height], initial: true) {
+                guard picked == nil || placement == picked else { return }
                 // What the viewer shows is what sharing exports: a saved layout off every corner (moments saved
                 // before 9.17) is kept as the corner and size it is shown at.
-                placement = layout.placement(nearest: saved)
-                model.setWindow(PiPLayout(layout.windowFrame(placement), source: saved.source), for: momentID)
+                let original = opened ?? saved
+                let nearest = layout.placement(nearest: original)
+                opened = original
+                picked = nearest
+                placement = nearest
+                model.setWindow(PiPLayout(layout.windowFrame(nearest), source: saved.source), for: momentID)
             }
             .onChange(of: placement) { _, new in
                 model.setWindow(PiPLayout(layout.windowFrame(new), source: saved.source), for: momentID)

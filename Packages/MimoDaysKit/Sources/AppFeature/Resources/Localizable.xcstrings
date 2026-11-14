@@ -181,6 +181,18 @@
         }
       }
     },
+    "A collection only groups moments. Removing a moment from it, or deleting the collection, never deletes the moment.": {
+      "comment": "New collection (M11b): what a collection is.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A collection only groups moments. Removing a moment from it, or deleting the collection, never deletes the moment."
+          }
+        }
+      }
+    },
     "A little moment is happening.": {
       "comment": "Surprise notification title (also shown in onboarding art)",
       "extractionState": "manual",
@@ -261,6 +273,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Add a note"
+          }
+        }
+      }
+    },
+    "Add moments": {
+      "comment": "Collection (M12): opens the picker; also its title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add moments"
           }
         }
       }
@@ -553,6 +577,30 @@
         }
       }
     },
+    "Collection detail: %@ · %@": {
+      "comment": "Collection (M12): moment count, then the months it spans. Example: 24 moments · Mar – Nov 2026",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Collections": {
+      "comment": "Memories chip (M01), Collections title (M11), Edit moment row (M07) and the picker sheet.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collections"
+          }
+        }
+      }
+    },
     "Continue": {
       "comment": "Primary button on a permission explainer; shows the system prompt next",
       "extractionState": "manual",
@@ -573,6 +621,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Couldn't save the changes"
+          }
+        }
+      }
+    },
+    "Create": {
+      "comment": "New collection (M11b): makes it.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create"
           }
         }
       }
@@ -649,6 +709,18 @@
         }
       }
     },
+    "Delete collection": {
+      "comment": "Collection (M12) menu and confirmation button; the moments stay.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete collection"
+          }
+        }
+      }
+    },
     "Delete voice note": {
       "comment": "Edit moment: destructive action that removes the moment's voice note when saved.",
       "extractionState": "manual",
@@ -657,6 +729,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Delete voice note"
+          }
+        }
+      }
+    },
+    "Delete “%@”?": {
+      "comment": "Collection (M12): delete confirmation title with the collection's name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete “%@”?"
           }
         }
       }
@@ -877,6 +961,18 @@
         }
       }
     },
+    "Group moments that belong together, like a trip or someone's firsts.": {
+      "comment": "Collections: what collections are for, when there are none.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Group moments that belong together, like a trip or someone's firsts."
+          }
+        }
+      }
+    },
     "Has a voice note": {
       "comment": "Filters (M08b): switch for moments with a voice note.",
       "extractionState": "manual",
@@ -957,6 +1053,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives."
+          }
+        }
+      }
+    },
+    "Its moments stay in Memories.": {
+      "comment": "Collection (M12): delete confirmation message.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Its moments stay in Memories."
           }
         }
       }
@@ -1117,6 +1225,18 @@
         }
       }
     },
+    "More": {
+      "comment": "Collection (M12): VoiceOver label of the ••• menu.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More"
+          }
+        }
+      }
+    },
     "Movies": {
       "comment": "Tab: movies made from moments",
       "extractionState": "manual",
@@ -1129,6 +1249,18 @@
         }
       }
     },
+    "Name": {
+      "comment": "New collection / Rename: the name field.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        }
+      }
+    },
     "Nearby": {
       "comment": "Place sheet (C11): under a place close to where the iPhone is",
       "extractionState": "manual",
@@ -1137,6 +1269,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nearby"
+          }
+        }
+      }
+    },
+    "New collection": {
+      "comment": "Collections (M11): + button label, sheet title (M11b) and the picker's row that makes one.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New collection"
           }
         }
       }
@@ -1161,6 +1305,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Next year"
+          }
+        }
+      }
+    },
+    "No collections yet": {
+      "comment": "Collections: title when there are none.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No collections yet"
           }
         }
       }
@@ -1825,6 +1981,18 @@
         }
       }
     },
+    "Remove from collection": {
+      "comment": "Collection (M12): long-press action on a moment; the moment stays in Memories.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from collection"
+          }
+        }
+      }
+    },
     "Remove voice note": {
       "comment": "Voice note card (C10): accessibility label of the trash button",
       "extractionState": "manual",
@@ -1845,6 +2013,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Removes this place"
+          }
+        }
+      }
+    },
+    "Rename": {
+      "comment": "Collection (M12) menu.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename"
+          }
+        }
+      }
+    },
+    "Rename collection": {
+      "comment": "Collection (M12): rename alert title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename collection"
           }
         }
       }

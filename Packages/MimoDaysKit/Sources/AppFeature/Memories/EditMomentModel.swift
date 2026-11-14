@@ -25,6 +25,7 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     }
 
     let id: UUID
+    let library: MediaLibrary
     let captured: CaptureTime
     let mediaType: MediaType
     private(set) var thumbnail: UIImage?
@@ -34,6 +35,8 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     private(set) var place: ReviewPlace?
     private(set) var placeWasChosen = false
     private(set) var voice: Voice?
+    /// The collections it will be in.
+    var collectionIDs: Set<UUID>
     private(set) var isSaving = false
 
     // Choosing a place later: no current city or nearby places, only search (near where it was), recents and No place.
@@ -42,8 +45,8 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     let nearby: [PlaceSuggestion] = []
 
     private let original: (caption: String, note: String, isFavorite: Bool, place: ReviewPlace?, voice: Voice?)
+    private let originalCollections: Set<UUID>
     private let thumbnailPath: String?
-    private let library: MediaLibrary
     private let voiceServices: VoiceServices
     private let places: PlaceServices
     private var transcription: Task<Void, Never>?
@@ -71,11 +74,13 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
         isFavorite = original.isFavorite
         self.place = place
         self.voice = saved
+        originalCollections = Set(moment.memberships.compactMap(\.collection?.id))
+        collectionIDs = originalCollections
     }
 
     var hasChanges: Bool {
         caption != original.caption || note != original.note || isFavorite != original.isFavorite
-            || (placeWasChosen && place != original.place) || voice != original.voice
+            || (placeWasChosen && place != original.place) || voice != original.voice || collectionIDs != originalCollections
     }
 
     func loadThumbnail() async {
@@ -183,6 +188,9 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
                     transcript: transcript?.isEmpty == false ? transcript : nil
                 )]
             }
+        }
+        if collectionIDs != originalCollections {
+            try CollectionStore(context: library.context).place(id, in: collectionIDs)
         }
         moment.modifiedAt = Date()
         do {

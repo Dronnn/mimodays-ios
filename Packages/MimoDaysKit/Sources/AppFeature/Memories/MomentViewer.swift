@@ -124,6 +124,23 @@ struct MomentViewer: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 14)
                 }
+                if !moment.collections.isEmpty {
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8) {
+                            ForEach(moment.collections) { collection in
+                                NavigationLink(value: MemoriesRoute.collection(collection.id)) {
+                                    SearchChip(icon: .glyphCollection, title: Text(collection.title), isOn: false, id: "") {}
+                                        .allowsHitTesting(false)
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityIdentifier("viewer.collection")
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                    }
+                    .scrollIndicators(.hidden)
+                    .padding(.top, 10)
+                }
             }
             .padding(.bottom, 20)
             .frame(maxWidth: 620)

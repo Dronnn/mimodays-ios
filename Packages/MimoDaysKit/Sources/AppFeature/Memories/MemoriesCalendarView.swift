@@ -286,6 +286,9 @@ enum MemoriesRoute: Hashable {
     case moment(MomentPager)
     /// M08.
     case search
+    /// M11, M12.
+    case collections
+    case collection(UUID)
 }
 
 extension View {
@@ -296,6 +299,8 @@ extension View {
             case let .day(day): DayScreen(day: day, thisYear: thisYear)
             case let .moment(pager): MomentViewerScreen(pager: pager)
             case .search: SearchScreen()
+            case .collections: CollectionsScreen()
+            case let .collection(id): CollectionScreen(id: id)
             }
         }
     }

@@ -134,32 +134,41 @@ struct MemoriesView: View {
         }
     }
 
-    /// Chips under the switch: Favorites; Collections and On this day join with their steps.
+    /// Chips under the switch: Favorites, Collections; On this day joins with its step.
     private var shortcuts: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 10) {
                 NavigationLink(value: MemoriesTabRoute.favorites) {
-                    HStack(spacing: 6) {
-                        Icon.glyphHeart.image
-                            .resizable()
-                            .frame(width: 15, height: 15)
-                            .accessibilityHidden(true)
-                        Text("Favorites", bundle: .module)
-                            .textStyle(.reviewChip)
-                    }
-                    .foregroundStyle(ColorToken.textPrimary.color)
-                    .padding(.horizontal, 13)
-                    .frame(minHeight: 34)
-                    .background(ReviewChipBlob().fill(ColorToken.surfaceChip.color))
-                    .frame(minHeight: Size.minimumTapTarget)
-                    .contentShape(Rectangle())
+                    chip(.glyphHeart, Text("Favorites", bundle: .module))
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("memories.favorites")
+                NavigationLink(value: MemoriesRoute.collections) {
+                    chip(.glyphCollection, Text("Collections", bundle: .module))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("memories.collections")
             }
             .padding(.horizontal, 20)
         }
         .scrollIndicators(.hidden)
+    }
+
+    private func chip(_ icon: Icon, _ title: Text) -> some View {
+        HStack(spacing: 6) {
+            icon.image
+                .resizable()
+                .frame(width: 15, height: 15)
+                .accessibilityHidden(true)
+            title
+                .textStyle(.reviewChip)
+        }
+        .foregroundStyle(ColorToken.textPrimary.color)
+        .padding(.horizontal, 13)
+        .frame(minHeight: 34)
+        .background(ReviewChipBlob().fill(ColorToken.surfaceChip.color))
+        .frame(minHeight: Size.minimumTapTarget)
+        .contentShape(Rectangle())
     }
 
     // MARK: Months and days

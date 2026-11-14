@@ -1,9 +1,11 @@
 import Core
 import DesignSystem
+import Persistence
+import SwiftData
 import SwiftUI
 
-/// M07: Cancel, Edit moment, Save; the picture and its time (fixed), the caption and note, then voice note, place
-/// and favourite. Collections (9.8) and Delete moment (9.11) join with their steps.
+/// M07: Cancel, Edit moment, Save; the picture and its time (fixed), the caption and note, then voice note, place,
+/// collections and favourite. Delete moment (9.11) joins with its step.
 struct EditMomentView: View {
     @Bindable var model: EditMomentModel
     @Environment(\.dismiss) private var dismiss
@@ -12,6 +14,7 @@ struct EditMomentView: View {
     @State private var confirmsDiscard = false
     @State private var choosesVoice = false
     @State private var choosesPlace = false
+    @State private var choosesCollections = false
     @State private var recording: VoiceRecording?
     @State private var microphoneOff = false
     @State private var saveFailed = false
@@ -54,6 +57,9 @@ struct EditMomentView: View {
         }
         .sheet(isPresented: $choosesPlace) {
             PlaceSheet(model: model, showsCurrent: false)
+        }
+        .sheet(isPresented: $choosesCollections) {
+            CollectionPickerSheet(library: model.library, selection: $model.collectionIDs)
         }
         .sheet(isPresented: $microphoneOff) {
             PermissionExplainerView(screen: .microphoneOff) {
@@ -189,9 +195,27 @@ struct EditMomentView: View {
             } action: {
                 choosesPlace = true
             }
+            row(icon: .glyphCollection, title: Text("Collections", bundle: .module), id: "edit.collections") {
+                collectionNames
+            } action: {
+                choosesCollections = true
+            }
             favoriteRow
         }
         .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    /// "Lena's firsts", "Lena's firsts and Walks", or None.
+    @ViewBuilder
+    private var collectionNames: some View {
+        let names = ((try? model.library.context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)]))) ?? [])
+            .filter { model.collectionIDs.contains($0.id) }
+            .map(\.title)
+        if names.isEmpty {
+            Text("None", bundle: .module)
+        } else {
+            Text(names, format: .list(type: .and))
+        }
     }
 
     private var favoriteRow: some View {

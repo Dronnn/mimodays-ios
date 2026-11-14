@@ -53,6 +53,13 @@ struct ViewerMoment: Equatable, Identifiable {
     var composedPath: String?
     var voice: Voice?
     var video: VideoSource?
+    /// The collections it's in, by name (M05 chips).
+    var collections: [CollectionLink]
+
+    struct CollectionLink: Equatable, Identifiable {
+        var id: UUID
+        var title: String
+    }
 
     init(_ moment: Moment) {
         let summary = MomentSummary(moment)
@@ -67,6 +74,8 @@ struct ViewerMoment: Equatable, Identifiable {
         mainPath = summary.mainPath
         selfiePath = summary.selfiePath
         composedPath = moment.media.first { $0.role == .composedPreview }?.relativePath
+        collections = moment.memberships.compactMap { $0.collection.map { CollectionLink(id: $0.id, title: $0.title) } }
+            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
         voice = moment.voiceNotes.first.map { Voice(path: $0.relativePath, duration: $0.duration, transcript: $0.transcript) }
         if moment.mediaType == .video, let main = moment.media.first(where: { $0.relativePath == summary.mainPath }) {
             let selfie = moment.media.first { $0.relativePath == summary.selfiePath }

@@ -42,6 +42,9 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphPause
     /// Search (M08): the Filters chip.
     case glyphFilter
+    /// Collections (M01 chip, M07 row, M11 new, M12 add moments).
+    case glyphCollection
+    case glyphPlus
     case glyphClock
     /// 42×36 film frame on the Make my movie card (T02).
     case glyphFilm

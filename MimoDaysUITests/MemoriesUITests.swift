@@ -132,6 +132,34 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["No favorites yet"].exists)
     }
 
+    /// M11 → M11b → M12: a new collection, a moment added to it.
+    @MainActor
+    func testANewCollectionGetsAMoment() {
+        launch(.populated)
+        let chip = app.buttons["memories.collections"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 20))
+        chip.tap()
+        let create = app.buttons["collections.create"]
+        XCTAssertTrue(create.waitForExistence(timeout: 5))
+        create.tap()
+        let name = app.textFields["collection.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.typeText("Weekend trips")
+        app.buttons["collection.create"].tap()
+        let card = app.descendants(matching: .any).matching(identifier: "collections.card").firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        card.tap()
+        let add = app.buttons["collection.add"]
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.tap()
+        let pick = app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch
+        XCTAssertTrue(pick.waitForExistence(timeout: 5))
+        pick.tap()
+        app.buttons["addMoments.add"].tap()
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Weekend trips"].exists)
+    }
+
     @MainActor
     func testBeforeTheFirstMomentItLeadsToTheCamera() {
         launch(.empty)

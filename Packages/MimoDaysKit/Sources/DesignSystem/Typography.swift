@@ -100,6 +100,8 @@ public struct TextStyle: Equatable, Sendable {
     public static let largeSheetTitle = TextStyle(.fraunces, size: 24, weight: 600, relativeTo: .title2, maximumScale: 1.35)
     /// The words under a page's title (M16).
     public static let pageIntro = TextStyle(.nunito, size: 14, weight: 500, relativeTo: .footnote)
+    /// A pushed page's own title: a place (P03), Without a place (P05b).
+    public static let pageTitle = TextStyle(.fraunces, size: 32, weight: 600, tracking: -0.6, relativeTo: .title1, maximumScale: 1.35)
     /// The two lines on M16b's `Card / Deleted info`.
     public static let infoCard = TextStyle(.nunito, size: 14, weight: 600, lineHeight: 1.2, relativeTo: .footnote)
     /// Sheet explanations (M15): Nunito 15, tighter than body copy.

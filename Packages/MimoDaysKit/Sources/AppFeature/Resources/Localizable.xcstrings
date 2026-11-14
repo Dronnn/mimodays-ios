@@ -73,6 +73,30 @@
         }
       }
     },
+    "%lld filters": {
+      "comment": "Map (P01) date chip: how many other filters are on, after the period, e.g. \"All time · 2 filters\".",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld filter"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld filters"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld moments": {
       "comment": "On this day (T06): how many moments that day has.",
       "extractionState": "manual",
@@ -129,6 +153,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld of %lld characters"
+          }
+        }
+      }
+    },
+    "%lld places": {
+      "comment": "Map: VoiceOver name of a cluster of several places.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld place"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld places"
+                }
+              }
+            }
           }
         }
       }
@@ -349,6 +397,30 @@
         }
       }
     },
+    "Add places to %lld moments": {
+      "comment": "Map with no places yet (P05): opens Without a place.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Add a place to %lld moment"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Add places to %lld moments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Add sound to your videos?": {
       "comment": "C06c title: explainer shown before the system microphone prompt",
       "extractionState": "manual",
@@ -397,6 +469,30 @@
         }
       }
     },
+    "All places": {
+      "comment": "Map (P01): opens every place as a list - the map's accessible alternative; also that list's title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All places"
+          }
+        }
+      }
+    },
+    "All time": {
+      "comment": "Map (P01, P04): the date chip and period option when no dates narrow the map.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All time"
+          }
+        }
+      }
+    },
     "Any": {
       "comment": "Search filters (M08b), Collection row: no collection chosen, and the menu item that clears it",
       "extractionState": "manual",
@@ -405,6 +501,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Any"
+          }
+        }
+      }
+    },
+    "Any collection": {
+      "comment": "Map filters (P04): no collection narrows the map.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Any collection"
           }
         }
       }
@@ -765,6 +873,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Current location · city only"
+          }
+        }
+      }
+    },
+    "Custom": {
+      "comment": "Map filters (P04): a period with dates the person picks.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom"
           }
         }
       }
@@ -1441,6 +1561,18 @@
         }
       }
     },
+    "Make a movie of this place": {
+      "comment": "Place (P03): button at the bottom that makes a movie of this place's moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make a movie of this place"
+          }
+        }
+      }
+    },
     "Make my movie": {
       "comment": "Today card that leads to making a movie (T02).",
       "extractionState": "manual",
@@ -1473,6 +1605,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "Map"
+          }
+        }
+      }
+    },
+    "Map marker: %@ · %@": {
+      "comment": "VoiceOver label of a map marker or recent place: the place's name, how many moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "Map period: %@ – %@": {
+      "comment": "Map (P01) date chip for a custom period: first day – last day (\"Any time\"/\"Today\" when open).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "Map place summary: %@ · %@": {
+      "comment": "Place (P02, P03) under its name: how many moments · the months they span, e.g. \"12 moments · Aug – Nov 2026\".",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
           }
         }
       }
@@ -1533,6 +1701,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Moments from today will be here next year."
+          }
+        }
+      }
+    },
+    "Moments show up here when they have a place. Location is off, so new moments are saved without one.": {
+      "comment": "Map with no places yet (P05), while location is off.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moments show up here when they have a place. Location is off, so new moments are saved without one."
+          }
+        }
+      }
+    },
+    "Moments show up here when they have a place. New moments get one when you save them.": {
+      "comment": "Map with no places yet (P05), while location is on.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moments show up here when they have a place. New moments get one when you save them."
           }
         }
       }
@@ -1737,6 +1929,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "No places found"
+          }
+        }
+      }
+    },
+    "No places match these filters.": {
+      "comment": "Map (P01) when the filters leave no place.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No places match these filters."
+          }
+        }
+      }
+    },
+    "No places yet": {
+      "comment": "Map (P05) title before any moment has a place.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No places yet"
           }
         }
       }
@@ -2125,6 +2341,18 @@
         }
       }
     },
+    "Photos & videos": {
+      "comment": "Map filters (P04): kind option that shows both.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photos & videos"
+          }
+        }
+      }
+    },
     "Pick how often and when. The exact time is always a surprise.": {
       "comment": "Surprise schedule (onboarding O07): body under the headline",
       "extractionState": "manual",
@@ -2133,6 +2361,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pick how often and when. The exact time is always a surprise."
+          }
+        }
+      }
+    },
+    "Pick moments and give them a place by hand. Nothing is looked up automatically.": {
+      "comment": "Without a place (P05b): intro under the title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick moments and give them a place by hand. Nothing is looked up automatically."
           }
         }
       }
@@ -2277,6 +2517,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ready for your first little moment?"
+          }
+        }
+      }
+    },
+    "Recent places": {
+      "comment": "Map (P01): the sheet of places visited lately.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent places"
           }
         }
       }
@@ -2665,6 +2917,30 @@
         }
       }
     },
+    "See all %lld moments": {
+      "comment": "Place preview (P02): opens the place's moments (P03).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "See all %lld moment"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "See all %lld moments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Select": {
       "comment": "Memories (M01) header: starts choosing moments (M13).",
       "extractionState": "manual",
@@ -2721,6 +2997,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Selfie window"
+          }
+        }
+      }
+    },
+    "Set place": {
+      "comment": "Without a place (P05b): bottom action before any moment is ticked.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set place"
+          }
+        }
+      }
+    },
+    "Set place for %lld": {
+      "comment": "Without a place (P05b): bottom action for the ticked moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set place for %lld"
           }
         }
       }
@@ -2785,6 +3085,30 @@
         }
       }
     },
+    "Show all places": {
+      "comment": "Map (P01) locate button's VoiceOver label while it shows where you are: back to every place.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show all places"
+          }
+        }
+      }
+    },
+    "Show on the map": {
+      "comment": "Map filters (P04): title of the sheet.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show on the map"
+          }
+        }
+      }
+    },
     "Show the whole day": {
       "comment": "Viewer ••• menu item: open the day this moment belongs to.",
       "extractionState": "manual",
@@ -2805,6 +3129,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Show what you see and how you look in the same photo or video. Your face appears in a small picture-in-picture frame. A single camera works, too."
+          }
+        }
+      }
+    },
+    "Show where I am": {
+      "comment": "Map (P01) locate button's VoiceOver label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show where I am"
           }
         }
       }
@@ -3157,6 +3493,18 @@
         }
       }
     },
+    "The map can't be shown right now. Your places are all here.": {
+      "comment": "Map (P06) when the map can't load; the places are listed under it.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The map can't be shown right now. Your places are all here."
+          }
+        }
+      }
+    },
     "The microphone is turned off for MimoDays": {
       "comment": "Microphone off screen: title, shown when Voice note is tapped and microphone access is off in Settings",
       "extractionState": "manual",
@@ -3345,6 +3693,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "This moment is kept until you free up about %@. Nothing is lost."
+          }
+        }
+      }
+    },
+    "This year": {
+      "comment": "Map (P01, P04): the date chip and period option for this calendar year.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This year"
           }
         }
       }
@@ -3553,6 +3913,18 @@
         }
       }
     },
+    "Turn on location": {
+      "comment": "Map (P05): asks for location, or opens Settings when it was turned off.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on location"
+          }
+        }
+      }
+    },
     "Twice": {
       "comment": "Surprise schedule (onboarding O07): frequency option meaning twice a day, keep very short (segmented control)",
       "extractionState": "manual",
@@ -3573,6 +3945,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Twice a day, between %1$@ and %2$@. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "Unnamed place": {
+      "comment": "Map: a place saved without a name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unnamed place"
           }
         }
       }
@@ -3825,6 +4209,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Winter"
+          }
+        }
+      }
+    },
+    "Without a place": {
+      "comment": "Title of the screen listing moments that have no place (P05b).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Without a place"
           }
         }
       }

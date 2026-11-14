@@ -98,4 +98,25 @@ struct MapModelTests {
         model.filters = MapFilters()
         #expect(model.filtered.count == 3 && model.filters.isEmpty)
     }
+
+    /// P05b: only moments without coordinates (a name alone isn't a place on the map); a chosen place goes to the
+    /// ticked ones, which then join the map, and the choice is forgotten.
+    @Test func momentsWithoutAPlaceGetOneByHand() throws {
+        let located = try insert(Self.date(2026, 11, 1), at: (40.18, 44.51), place: "Yerevan")
+        let bare = try insert(Self.date(2026, 11, 2), at: nil)
+        let named = try insert(Self.date(2026, 11, 3), at: nil, place: "Grandma's")
+        let other = try insert(Self.date(2026, 11, 4), at: nil)
+        let unplaced = UnplacedModel(library: library, places: .simulated)
+        unplaced.refresh()
+        #expect(unplaced.items.map(\.id) == [other, named, bare])
+        #expect(!unplaced.items.contains { $0.id == located })
+
+        #expect(!unplaced.applyChosenPlace(to: [bare]))
+        unplaced.choose(ReviewPlace(label: "Lake Merritt", latitude: 37.80, longitude: -122.26, precision: .exact, source: .manual))
+        #expect(unplaced.applyChosenPlace(to: [bare, named]))
+        #expect(unplaced.items.map(\.id) == [other])
+        #expect(unplaced.place == nil && !unplaced.placeWasChosen)
+        let map = model()
+        #expect(map.place(map.places.first { $0.label == "Lake Merritt" }?.id ?? "")?.moments.count == 2)
+    }
 }

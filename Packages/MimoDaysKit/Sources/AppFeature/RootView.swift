@@ -108,7 +108,8 @@ public struct RootView: View {
                         switch tab {
                         case .today: TodayView(model: today)
                         case .memories: MemoriesView(model: memories)
-                        case .map, .movies:
+                        case .map: MapScreen()
+                        case .movies:
                             TabRootView(tab: tab)
                         }
                     }

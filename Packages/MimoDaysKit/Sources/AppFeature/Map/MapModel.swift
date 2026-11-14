@@ -75,6 +75,8 @@ final class MapModel {
     private(set) var unlocatedCount = 0
     private(set) var isLoaded = false
     private(set) var images: [UUID: UIImage] = [:]
+    /// A video's length, read with its picture (P02's `Badge / Video`).
+    private(set) var durations: [UUID: Double] = [:]
     var filters = MapFilters() {
         didSet { if filters.collection != oldValue.collection { readCollection() } }
     }
@@ -138,8 +140,9 @@ final class MapModel {
         guard images[id] == nil else { return }
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
-        guard let moment = try? library.context.fetch(descriptor).first,
-              let path = moment.media.first(where: { $0.role == .thumbnail })?.relativePath,
+        guard let moment = try? library.context.fetch(descriptor).first else { return }
+        if moment.mediaType == .video { durations[id] = moment.media.compactMap(\.duration).max() }
+        guard let path = moment.media.first(where: { $0.role == .thumbnail })?.relativePath,
               let url = try? library.store.url(for: path),
               let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: MemoriesModel.tilePixels) else { return }
         images[id] = UIImage(cgImage: image)

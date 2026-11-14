@@ -196,7 +196,7 @@ struct MemoriesView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("memories.favorites")
                 NavigationLink(value: MemoriesRoute.collections) {
-                    chip(.glyphCollection, Text("Collections", bundle: .module))
+                    chip(.glyphCollectionsChip, Text("Collections", bundle: .module))
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("memories.collections")
@@ -357,7 +357,7 @@ struct MemoriesView: View {
 
     private func action(_ icon: Icon, _ title: Text, _ tint: ColorToken) -> some View {
         VStack(spacing: 2) {
-            icon.image.resizable().scaledToFit().frame(width: 22, height: 22).accessibilityHidden(true)
+            icon.image.resizable().scaledToFit().frame(width: 24, height: 24).accessibilityHidden(true)
             title.textStyle(.tileBadge)
         }
         .foregroundStyle(tint.color)

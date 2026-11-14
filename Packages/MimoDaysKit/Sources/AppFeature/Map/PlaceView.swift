@@ -1,10 +1,11 @@
 import Core
 import DesignSystem
 import MapKit
+import Persistence
 import SwiftUI
 
 /// P03: one place - its name, how many moments and when, a strip of map around it, then its moments by month,
-/// newest first. Select collects or deletes as in Memories; Make a movie opens Movies (Phase 11 takes the place).
+/// newest first. Select collects or deletes as in Memories; Make a movie starts the wizard with this place.
 struct PlaceView: View {
     let model: MapModel
     let id: String
@@ -132,7 +133,7 @@ private struct PlaceContent: View {
 
     /// `Button / Secondary`: a movie of this place.
     private var movieButton: some View {
-        Button { router.open(.tab(.movies)) } label: {
+        Button { router.open(.newMovie(MovieSourceRule(kind: .place, momentIDs: place.moments.map(\.id)))) } label: {
             Label {
                 Text("Make a movie of this place", bundle: .module)
             } icon: {

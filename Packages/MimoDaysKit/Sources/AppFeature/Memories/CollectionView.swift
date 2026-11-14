@@ -19,10 +19,11 @@ private struct CollectionHost: View {
 }
 
 /// M12: the cover, the name, how many moments and when, Add moments, then its moments oldest first.
-/// ••• renames or deletes it; a long press takes one moment out. Make a movie joins with Movies (Phase 11).
+/// ••• renames or deletes it; a long press takes one moment out. Make a movie starts the wizard with this collection.
 struct CollectionView: View {
     let model: CollectionModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
     @State private var adds = false
     @State private var renames = false
     @State private var newTitle = ""
@@ -48,13 +49,13 @@ struct CollectionView: View {
                     .foregroundStyle(ColorToken.textSecondary.color)
                     .padding(.horizontal, 20)
                     .padding(.top, 4)
-                Button { adds = true } label: {
-                    Label { Text("Add moments", bundle: .module) } icon: { Icon.glyphPlus.image.resizable().frame(width: 18, height: 18) }
+                // `Button / Half`: Add moments and Make a movie side by side; stacked when they don't fit.
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) { actions }
+                    VStack(spacing: 8) { actions }
                 }
-                .buttonStyle(SoftButtonStyle())
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
-                .accessibilityIdentifier("collection.add")
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                     ForEach(model.items) { item in
                         NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.items.map(\.id), start: item.id))) {
@@ -123,6 +124,19 @@ struct CollectionView: View {
     }
 
     /// "24 moments · Mar – Nov 2026".
+    @ViewBuilder private var actions: some View {
+        Button { adds = true } label: {
+            Label { Text("Add moments", bundle: .module) } icon: { Icon.glyphPlus.image.resizable().frame(width: 18, height: 18) }
+        }
+        .buttonStyle(SoftButtonStyle())
+        .accessibilityIdentifier("collection.add")
+        Button { router.open(.newMovie(MovieSourceRule(kind: .collection, collectionID: model.id))) } label: {
+            Label { Text("Make a movie", bundle: .module) } icon: { Icon.glyphFilm.image.resizable().frame(width: 20, height: 20) }
+        }
+        .buttonStyle(SoftButtonStyle())
+        .accessibilityIdentifier("collection.movie")
+    }
+
     private var subtitle: Text {
         let count = Text("\(model.items.count) moments", bundle: .module)
         guard let span = model.span else { return count }

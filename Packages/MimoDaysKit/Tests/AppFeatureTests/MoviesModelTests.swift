@@ -194,6 +194,28 @@ struct MoviesModelTests {
         #expect(model.title == NewMovieModel.span(20260101, 20260505))
     }
 
+    @Test func aCollectionOpensWithItsMoments() async throws {
+        let ids = try await save([20260101, 20260202, 20260303, 20260404, 20260505, 20261010])
+        let id = try #require(try CollectionStore(context: context).create("Lena's firsts", with: Array(ids.prefix(5))))
+        let model = wizard(MovieSourceRule(kind: .collection, collectionID: id))
+        #expect(model.source == .collection(id))
+        model.loadChoices()
+        #expect(model.loadCandidates())
+        #expect(Set(model.candidates.map(\.id)) == Set(ids.prefix(5)))
+        #expect(model.title == "Lena's firsts")
+    }
+
+    @Test func aPlaceOpensWithItsMomentsAndName() async throws {
+        let ids = try await save([20260101, 20260202, 20260303, 20260404, 20260505])
+        for moment in try context.fetch(FetchDescriptor<Moment>()) {
+            moment.location = MomentLocation(latitude: 37.8, longitude: -122.27, precision: .city, source: .manual, placeLabel: "Oakland")
+        }
+        let model = wizard(MovieSourceRule(kind: .place, momentIDs: ids))
+        #expect(model.loadCandidates())
+        #expect(Set(model.candidates.map(\.id)) == Set(ids))
+        #expect(model.title == "Oakland")
+    }
+
     @Test func choosingMomentsByHandStartsWithNone() async throws {
         try await save([20260101, 20260202, 20260303, 20260404, 20260505, 20261010])
         let model = wizard()

@@ -84,9 +84,10 @@ private struct OnThisDayHost: View {
 }
 
 /// M14: the title with its star, "November 11 in earlier years", then each year's moments as cards with captions.
-/// "Make a movie of these" joins with Movies (Phase 11).
+/// "Make a movie of these" starts the wizard with every moment shown.
 struct OnThisDayView: View {
     let model: OnThisDayModel
+    @Environment(AppRouter.self) private var router
 
     var body: some View {
         ScrollView {
@@ -127,6 +128,15 @@ struct OnThisDayView: View {
                         .buttonStyle(.plain)
                         .padding(.top, 8)
                     }
+                }
+                if !model.years.isEmpty {
+                    Button { router.open(.newMovie(MovieSourceRule(kind: .onThisDay, momentIDs: model.ids))) } label: {
+                        Text("Make a movie of these", bundle: .module)
+                    }
+                    .buttonStyle(SoftButtonStyle())
+                    .padding(.horizontal, 20)
+                    .padding(.top, 32)
+                    .accessibilityIdentifier("onThisDay.movie")
                 }
             }
             .padding(.bottom, 24)

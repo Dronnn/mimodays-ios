@@ -385,6 +385,8 @@ struct SourceStep: View {
                 .accessibilityIdentifier("newMovie.capture")
         }
         .frame(maxWidth: .infinity)
+        // A container of its own, so its buttons keep their identifiers.
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("newMovie.tooFew")
     }
 }

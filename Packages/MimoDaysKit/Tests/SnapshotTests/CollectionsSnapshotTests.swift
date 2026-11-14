@@ -91,7 +91,7 @@ struct CollectionsSnapshotTests {
         model.refresh()
         await model.loadCover()
         for item in model.items { await model.load(item.id) }
-        assertScreenSnapshots(of: NavigationStack { CollectionView(model: model) }, variants: [
+        assertScreenSnapshots(of: NavigationStack { CollectionView(model: model) }.environment(AppRouter()), variants: [
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
             SnapshotVariant(.iPhone, .light, rightToLeft: true),
         ])

@@ -57,7 +57,7 @@ struct OnThisDaySnapshotTests {
     /// M14.
     @Test func years() async throws {
         let model = try await model([(2025, "First day at the new school"), (2023, "Rainy walk, muddy boots")])
-        assertScreenSnapshots(of: NavigationStack { OnThisDayView(model: model) }, variants: [
+        assertScreenSnapshots(of: NavigationStack { OnThisDayView(model: model) }.environment(AppRouter()), variants: [
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
             SnapshotVariant(.iPhone, .light, rightToLeft: true), SnapshotVariant(.iPad, .light),
         ])
@@ -65,6 +65,6 @@ struct OnThisDaySnapshotTests {
 
     @Test func empty() async throws {
         let model = try await model([])
-        assertScreenSnapshots(of: NavigationStack { OnThisDayView(model: model) }, variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
+        assertScreenSnapshots(of: NavigationStack { OnThisDayView(model: model) }.environment(AppRouter()), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
     }
 }

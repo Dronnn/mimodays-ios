@@ -1,7 +1,7 @@
 import Core
 import XCTest
 
-/// Map (P01-P03): flow 04, and flow 08 as far as Movies.
+/// Map (P01-P03): flow 04, and flow 08 into the movie wizard.
 final class MapUITests: XCTestCase {
     private var app: XCUIApplication!
 
@@ -47,7 +47,8 @@ final class MapUITests: XCTestCase {
         XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
     }
 
-    /// Flow 08 (doc 02) up to Movies: a place's moments make a movie.
+    /// Flow 08 (doc 02): a place's moments make a movie. The wizard opens on Movies with the place chosen;
+    /// the seed's Yerevan has one moment, so Next explains that a movie needs five (F16).
     @MainActor
     func testAPlaceMakesAMovie() {
         launchOnMap()
@@ -58,7 +59,13 @@ final class MapUITests: XCTestCase {
         let movie = app.buttons["place.movie"]
         XCTAssertTrue(movie.waitForExistence(timeout: 5))
         movie.tap()
-        XCTAssertTrue(app.tabBars.firstMatch.buttons.element(boundBy: 3).isSelected)
+        let next = app.buttons["newMovie.next"]
+        XCTAssertTrue(next.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["newMovie.source.place"].label.contains("Yerevan"), app.buttons["newMovie.source.place"].label)
+        attachScreenshot("F02 from a place")
+        next.tap()
+        XCTAssertTrue(app.buttons["newMovie.moreDates"].waitForExistence(timeout: 5))
+        attachScreenshot("F16")
     }
 
     /// 10.6: every place as a list, the way through the map without seeing it - a place, then one of its moments.

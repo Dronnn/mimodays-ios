@@ -1,4 +1,5 @@
 import DesignSystem
+import Persistence
 import SwiftUI
 
 /// M13's top bar while selecting: Cancel, "N selected", Select all (Deselect all once everything is ticked).
@@ -104,7 +105,7 @@ struct SelectActionsBar<Actions: View>: View {
 }
 
 extension View {
-    /// M13's Collect and Delete under a selection of moments, with their sheets (Memories, Favorites).
+    /// M13's Collect, Movie and Delete under a selection of moments, with their sheets (Memories, Favorites).
     func memoriesSelectActions(model: MemoriesModel, selection: Binding<Set<UUID>?>) -> some View {
         modifier(MemoriesSelectActions(model: model, selection: selection))
     }
@@ -113,6 +114,7 @@ extension View {
 private struct MemoriesSelectActions: ViewModifier {
     let model: MemoriesModel
     @Binding var selection: Set<UUID>?
+    @Environment(AppRouter.self) private var router
     @State private var confirmsDelete = false
     @State private var collects = false
     @State private var collections: Set<UUID> = []
@@ -125,6 +127,12 @@ private struct MemoriesSelectActions: ViewModifier {
                     SelectActionsBar(isEnabled: !chosen.isEmpty, inset: 28) {
                         Button { collects = true } label: { action(.glyphCollection, Text("Collect", bundle: .module)) }
                             .accessibilityIdentifier("select.collect")
+                        Spacer()
+                        Button {
+                            router.open(.newMovie(MovieSourceRule(kind: .selection, momentIDs: Array(chosen))))
+                            selection = nil
+                        } label: { action(.glyphFilm, Text("Movie", bundle: .module)) }
+                            .accessibilityIdentifier("select.movie")
                         Spacer()
                         Button { confirmsDelete = true } label: { action(.glyphTrash, Text("Delete", bundle: .module)) }
                             .accessibilityIdentifier("select.delete")

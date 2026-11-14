@@ -69,6 +69,20 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(tab(3).isSelected)
     }
 
+    /// T01: with nothing saved the movie card waits, dimmed, at the bottom - where T02 has it - 12 pt over the tab bar.
+    @MainActor
+    func testWithNothingYetTheMovieCardWaitsAtTheBottom() {
+        launch(.empty)
+        let movie = app.buttons["today.movie"]
+        XCTAssertTrue(movie.waitForExistence(timeout: 5))
+        XCTAssertFalse(movie.isEnabled)
+        XCTAssertEqual(app.tabBars.firstMatch.frame.minY - movie.frame.maxY, 12, accuracy: 2)
+        let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .original)
+        attachment.name = "today-empty"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     @MainActor
     func testCatchAMomentFromTodayShowsItThere() {
         launch(.empty)

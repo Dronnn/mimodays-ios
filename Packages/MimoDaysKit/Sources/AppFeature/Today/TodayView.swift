@@ -12,6 +12,7 @@ struct TodayView: View {
     @Environment(AppRouter.self) private var router
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var width: CGFloat = 0
+    @State private var height: CGFloat = 0
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -20,7 +21,10 @@ struct TodayView: View {
         ScrollView {
             if isWide { wide } else { narrow }
         }
-        .onGeometryChange(for: CGFloat.self, of: \.size.width) { width = $0 }
+        .onGeometryChange(for: CGSize.self, of: \.size) { size in
+            width = size.width
+            height = size.height
+        }
         .scrollBounceBehavior(.basedOnSize)
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
@@ -64,9 +68,11 @@ struct TodayView: View {
                     .padding(.horizontal, 22)
                 monthStrip
             }
-            // Every Today board has the movie right under this month; On this day (T06, no hi-fi board) follows it.
+            // Every Today board has the movie at the same spot, right under this month; with nothing yet (T01) that
+            // is the bottom of the screen. On this day (T06, no hi-fi board) follows it.
+            if model.isEmpty { Spacer(minLength: 8) }
             movieCard
-                .padding(.top, 8)
+                .padding(.top, model.isEmpty ? 0 : 8)
                 .padding(.horizontal, 18)
             if let onThisDay = model.onThisDay {
                 onThisDaySection(onThisDay)
@@ -76,9 +82,9 @@ struct TodayView: View {
         }
         // On iPhone the wordmark sits up level with the status bar's bottom, as drawn.
         .padding(.top, sizeClass == .compact ? -13 : 0)
-        .padding(.bottom, 16)
+        .padding(.bottom, 12)
         .frame(maxWidth: 520)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, minHeight: height, alignment: .top)
     }
 
     /// iPad landscape (X01): the hero on the left; the ribbon, On this day, this month and the movie on the right.
@@ -419,11 +425,14 @@ struct TodayView: View {
                 }
                 .padding(.leading, 18)
                 Spacer(minLength: 8)
-                Icon.glyphChevron.image
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundStyle(ColorToken.textPrimary.color)
-                    .flipsForRightToLeftLayoutDirection(true)
+                // Nothing to open yet: no chevron (T01).
+                if !model.isEmpty {
+                    Icon.glyphChevron.image
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(ColorToken.textPrimary.color)
+                        .flipsForRightToLeftLayoutDirection(true)
+                }
             }
             .padding(.leading, 23)
             .padding(.trailing, 12)
@@ -432,7 +441,8 @@ struct TodayView: View {
             .background(MovieBlob().fill(ColorToken.accentPeach.color))
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        // T01 dims the whole card to 0.6 once; the plain style would dim a disabled label again.
+        .buttonStyle(MovieCardButtonStyle())
         .disabled(model.isEmpty)
         .opacity(model.isEmpty ? 0.6 : 1)
         .accessibilityIdentifier("today.movie")
@@ -470,5 +480,11 @@ struct TodayView: View {
             .frame(width: width, height: height)
             .foregroundStyle(color.color)
             .accessibilityHidden(true)
+    }
+}
+
+private struct MovieCardButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.opacity(configuration.isPressed ? 0.7 : 1)
     }
 }

@@ -15,6 +15,8 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     private var stopReason: CaptureInterruption?
     private(set) var hasMicrophone = false
     private(set) var isRecording = false
+    /// Every change of the rear light, in order (tests).
+    public private(set) var torchChanges: [Bool] = []
     private var stopSignal: CheckedContinuation<Void, Never>?
     public nonisolated let events: AsyncStream<CaptureEvent>
     private let eventSink: AsyncStream<CaptureEvent>.Continuation
@@ -125,6 +127,10 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
     public func stopRecording() {
         signalStop()
+    }
+
+    public func setTorch(_ on: Bool) {
+        torchChanges.append(on)
     }
 
     private func signalStop() {

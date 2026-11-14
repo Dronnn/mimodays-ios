@@ -115,14 +115,19 @@ struct ReviewView: View {
                 .accessibilityHint(model.video == nil ? Text(verbatim: "") : model.playback == .playing ? Text("Pauses the video", bundle: .module) : Text("Plays the video", bundle: .module))
                 .accessibilityIdentifier("review.media")
 
-                if model.hasSelfie, model.playback == .stopped {
-                    let layout = SelfieWindowLayout(preview: size, topInset: topInset, bottomMargin: 20)
+                if model.hasSelfie, model.playback == .stopped, proxy.size.width > 0 {
+                    // Laid out as the camera did, on the media at full width, then drawn at the size it is shown:
+                    // what is saved is what was recorded, whatever the keyboard or the panel leaves of the media.
+                    let reference = CGSize(width: proxy.size.width, height: proxy.size.width / model.aspectRatio)
+                    let layout = SelfieWindowLayout(preview: reference, topInset: topInset)
                     AdjustableSelfieWindow(placement: $model.window, showsSheet: $adjustsSelfie, layout: layout, id: "review.selfieWindow") {
                         if let selfie = model.selfie {
                             Image(uiImage: selfie).resizable().scaledToFill()
                         }
                     }
-                    .frame(width: size.width, height: size.height)
+                    .frame(width: reference.width, height: reference.height)
+                    .scaleEffect(size.width / reference.width, anchor: .topLeading)
+                    .frame(width: size.width, height: size.height, alignment: .topLeading)
                     .onChange(of: layout.windowFrame(model.window), initial: true) { model.windowFrame = $1 }
                 }
             }

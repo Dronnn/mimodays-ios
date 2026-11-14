@@ -156,6 +156,17 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
     }
 
+    /// Rare lock failures leave the light as it was; the recording itself is unaffected.
+    public func setTorch(_ on: Bool) async {
+        let mode: AVCaptureDevice.TorchMode = on ? .on : .off
+        try? await onQueue {
+            guard let device = self.cameras[.back]?.input.device, device.hasTorch, device.isTorchModeSupported(mode) else { return }
+            try device.lockForConfiguration()
+            defer { device.unlockForConfiguration() }
+            device.torchMode = mode
+        }
+    }
+
     @MainActor
     public func previewLayer(for position: CameraPosition) -> CALayer? {
         previews[position]

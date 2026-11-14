@@ -343,12 +343,7 @@ final class ReviewModel {
 
     /// An upright still of a photo, or of a video at `seconds`.
     nonisolated static func still(_ url: URL, maxPixelSize: Int, at seconds: TimeInterval) async -> UIImage? {
-        if let source = CGImageSourceCreateWithURL(url as CFURL, nil), CGImageSourceGetCount(source) > 0,
-           let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
-               kCGImageSourceCreateThumbnailFromImageAlways: true,
-               kCGImageSourceCreateThumbnailWithTransform: true,
-               kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
-           ] as CFDictionary) {
+        if let image = await ImageDecoding.thumbnail(url, maxPixelSize: maxPixelSize) {
             return UIImage(cgImage: image)
         }
         let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))

@@ -76,7 +76,10 @@ final class CameraModel {
     var mode: CameraSettings.Mode {
         didSet { if mode != oldValue { Task { await refreshMicrophone() } } }
     }
-    var isFlashOn = false
+    /// Photos: the flash. Videos: the rear light while recording, also turned on or off mid-recording.
+    var isFlashOn = false {
+        didSet { if isRecording, isFlashOn != oldValue { Task { await engine.setTorch(isFlashOn) } } }
+    }
     /// The selfie window is shown and captured (dual setups only).
     private(set) var showsSelfie = true
     /// Dual setups: the front camera is the big one (↻).
@@ -228,12 +231,15 @@ final class CameraModel {
         phase = .recording(startedAt: capturedAt.instant)
         showsSingleCameraNote = false
         failure = nil
+        if isFlashOn { await engine.setTorch(true) }
         do {
             let recorded = arranged(try await engine.record(limit: settings.videoLength.duration))
+            await engine.setTorch(false)
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready
             onCapture(result(.video(video), selfie: video.selfieURL, at: capturedAt))
         } catch {
+            await engine.setTorch(false)
             phase = .ready
             failure = CaptureFailure(error)
         }

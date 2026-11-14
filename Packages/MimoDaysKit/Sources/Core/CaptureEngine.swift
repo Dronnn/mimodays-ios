@@ -167,6 +167,8 @@ public protocol CaptureEngine: AnyObject, Sendable {
     /// Records until `stopRecording()` is called or `limit` is reached, then returns the clip.
     func record(limit: Duration?) async throws -> CapturedVideo
     func stopRecording() async
+    /// The rear camera's light, for the flash button in video mode. Does nothing where there is none.
+    func setTorch(_ on: Bool) async
     /// Live preview of one camera for the UI to host; nil when that camera isn't in the setup.
     @MainActor func previewLayer(for position: CameraPosition) -> CALayer?
     /// Changes the camera screen should show. One listener.

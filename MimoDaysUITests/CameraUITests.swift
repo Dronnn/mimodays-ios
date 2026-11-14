@@ -63,6 +63,38 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(app.buttons["capture"].exists)
     }
 
+    /// 9.17/9.18: review shows the selfie window as the camera recorded it, the same share of the frame however
+    /// much of the screen the panel (a voice note card, the keyboard) leaves the media, so the saved video is
+    /// composed the way it was recorded.
+    @MainActor
+    func testReviewKeepsTheRecordedSelfieWindowWhenTheMediaShrinks() {
+        openCamera()
+        app.buttons["camera.mode.video"].tap()
+        app.buttons["camera.length.30"].tap()
+        app.buttons["camera.shutter"].tap()
+        let stop = app.buttons["camera.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        stop.tap()
+        let media = app.descendants(matching: .any)["review.media"]
+        let window = app.descendants(matching: .any)["review.selfieWindow"]
+        XCTAssertTrue(window.waitForExistence(timeout: 10))
+        let share = { window.frame.width / media.frame.width }
+        let before = share()
+        // The 112 pt medium window on the 402 pt camera, measured around its tilt: about 0.30 of the frame.
+        XCTAssertEqual(before, 0.30, accuracy: 0.02)
+
+        // A voice note card makes the panel taller and the media smaller (the keyboard does the same on a device).
+        app.buttons["review.voiceNote"].tap()
+        let stopVoice = app.buttons["voice.stop"]
+        XCTAssertTrue(stopVoice.waitForExistence(timeout: 5))
+        sleep(1)
+        stopVoice.tap()
+        XCTAssertTrue(app.buttons["review.voice.play"].waitForExistence(timeout: 5))
+        sleep(1)
+        XCTAssertLessThan(media.frame.width, app.frame.width, "the panel squeezes the media: \(media.frame)")
+        XCTAssertEqual(share(), before, accuracy: 0.01)
+    }
+
     /// C08: a note shows on its chip, Retake asks before dropping it, and Save keeps it.
     @MainActor
     func testANoteIsKeptAndRetakeAsksBeforeDroppingIt() {

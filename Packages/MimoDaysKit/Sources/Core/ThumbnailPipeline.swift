@@ -63,19 +63,13 @@ public actor ThumbnailPipeline {
         if type?.conforms(to: .movie) == true || type?.conforms(to: .audiovisualContent) == true {
             return try await videoFrame(url, maxPixelSize: maxPixelSize)
         }
-        return try imageThumbnail(url, maxPixelSize: maxPixelSize)
+        return try await imageThumbnail(url, maxPixelSize: maxPixelSize)
     }
 
-    private static func imageThumbnail(_ url: URL, maxPixelSize: Int) throws -> CGImage {
-        let options: [CFString: Any] = [
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceShouldCacheImmediately: true,
-            kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
-        ]
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, [kCGImageSourceShouldCache: false] as CFDictionary),
-              let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
-        else { throw ThumbnailError.unreadable(url.lastPathComponent) }
+    private static func imageThumbnail(_ url: URL, maxPixelSize: Int) async throws -> CGImage {
+        guard let image = await ImageDecoding.thumbnail(url, maxPixelSize: maxPixelSize, cacheImmediately: true) else {
+            throw ThumbnailError.unreadable(url.lastPathComponent)
+        }
         return image
     }
 

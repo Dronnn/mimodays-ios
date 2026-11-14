@@ -23,7 +23,9 @@ enum PhotoComposer {
     /// Reads both files upright (orientation and mirroring applied), composes, writes HEIC (JPEG where HEIC
     /// encoding isn't available). Runs off the main actor.
     static func compose(mainURL: URL, selfieURL: URL, window: SelfieWindowFrame) async throws -> URL {
-        guard let main = uprightImage(mainURL), let selfie = uprightImage(selfieURL) else { throw Failure.unreadable }
+        // Full size, EXIF orientation applied.
+        guard let main = await ImageDecoding.thumbnail(mainURL, maxPixelSize: nil),
+              let selfie = await ImageDecoding.thumbnail(selfieURL, maxPixelSize: nil) else { throw Failure.unreadable }
         let composed = compose(main: main, selfie: selfie, window: window)
         return try await withCheckedThrowingContinuation { continuation in
             encoding.async { continuation.resume(with: Result { try write(composed) }) }
@@ -54,20 +56,6 @@ enum PhotoComposer {
     }
 
     private static let context = CIContext(options: [.cacheIntermediates: false])
-
-    /// The full-size image with its EXIF orientation applied.
-    private static func uprightImage(_ url: URL) -> CGImage? {
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
-              let width = properties[kCGImagePropertyPixelWidth] as? Int,
-              let height = properties[kCGImagePropertyPixelHeight] as? Int else { return nil }
-        let options: [CFString: Any] = [
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: max(width, height),
-        ]
-        return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
-    }
 
     private static func write(_ image: CGImage) throws -> URL {
         for type in [UTType.heic, .jpeg] {

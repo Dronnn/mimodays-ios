@@ -83,6 +83,28 @@ struct CameraModelInterruptionTests {
         for _ in 0..<50 where model.interruption != nil { try await Task.sleep(for: .milliseconds(20)) }
         #expect(model.canCapture)
     }
+
+    /// 9.19: the flash button lights the rear camera while a video records, also when pressed mid-recording.
+    @Test func flashLightsTheRearCameraWhileRecording() async throws {
+        let engine = SimulatedCaptureEngine()
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.videoLength = .long
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { $0.discardFiles() }
+        )
+        await model.start()
+        model.isFlashOn = true
+        async let recording: Void = model.shutter()
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+        model.isFlashOn = false
+        model.isFlashOn = true
+        try await Task.sleep(for: .milliseconds(100))
+        await engine.stopRecording()
+        await recording
+        #expect(await engine.torchChanges == [true, false, true, false])
+    }
 }
 
 @MainActor

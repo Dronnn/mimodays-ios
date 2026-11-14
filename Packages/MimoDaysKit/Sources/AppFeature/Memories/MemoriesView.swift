@@ -188,7 +188,7 @@ struct MemoriesView: View {
         }
     }
 
-    /// Chips under the switch: Favorites, Collections; On this day joins with its step.
+    /// Chips under the switch: Favorites, Collections, On this day.
     private var shortcuts: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 10) {
@@ -202,6 +202,11 @@ struct MemoriesView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("memories.collections")
+                NavigationLink(value: MemoriesRoute.onThisDay) {
+                    chip(.glyphClock, Text("On this day", bundle: .module))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("memories.onThisDay")
             }
             .padding(.horizontal, 20)
         }

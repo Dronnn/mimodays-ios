@@ -372,7 +372,7 @@ struct TodayView: View {
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)
                 .padding(.leading, isWide ? 0 : 6)
-            Button { router.open(.tab(.memories)) } label: {
+            NavigationLink(value: MemoriesRoute.onThisDay) {
                 OnThisDayCard(
                     image: model.image(day.cover.mainPath, TodayModel.heroPixels),
                     caption: Text("Years ago and count: \(Text(yearsAgo(day.yearsAgo))) · \(Text("\(day.count) moments", bundle: .module))", bundle: .module)

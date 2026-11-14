@@ -215,6 +215,19 @@ final class MemoriesUITests: XCTestCase {
         wait(for: [fewer], timeout: 5)
     }
 
+    /// M01 → M14 → M05: the seed has a moment from a year ago today.
+    @MainActor
+    func testOnThisDayOpensAnEarlierYearsMoment() {
+        launch(.populated)
+        let chip = app.buttons["memories.onThisDay"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 20))
+        chip.tap()
+        let moment = app.descendants(matching: .any).matching(identifier: "onThisDay.moment").firstMatch
+        XCTAssertTrue(moment.waitForExistence(timeout: 10))
+        moment.tap()
+        XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
+    }
+
     @MainActor
     func testBeforeTheFirstMomentItLeadsToTheCamera() {
         launch(.empty)

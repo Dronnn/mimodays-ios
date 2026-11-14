@@ -181,6 +181,30 @@
         }
       }
     },
+    "%lld years back": {
+      "comment": "On this day (M14) year label, shown in capitals: how many years ago.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld year ago"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld years ago"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "3 a day": {
       "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
       "extractionState": "manual",
@@ -1453,6 +1477,18 @@
         }
       }
     },
+    "Moments from today will be here next year.": {
+      "comment": "On this day (M14) empty message.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moments from today will be here next year."
+          }
+        }
+      }
+    },
     "Moments you capture on Today show up here, grouped by day.": {
       "comment": "Memories body text before the first moment is saved.",
       "extractionState": "manual",
@@ -1789,6 +1825,18 @@
         }
       }
     },
+    "Nothing on this day yet": {
+      "comment": "On this day (M14) with no moments on this date in earlier years.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing on this day yet"
+          }
+        }
+      }
+    },
     "Nothing was changed. Try again in a moment.": {
       "comment": "Edit moment: alert message when saving fails; the stored moment is untouched.",
       "extractionState": "manual",
@@ -1845,6 +1893,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "On this day"
+          }
+        }
+      }
+    },
+    "On this day subtitle: %@": {
+      "comment": "On this day (M14) subtitle; the argument is today's month and day.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ in earlier years"
           }
         }
       }
@@ -3699,6 +3759,18 @@
     },
     "Years ago and count: %@ · %@": {
       "comment": "On this day card caption (T06): how long ago, then how many moments, e.g. \"One year ago · 3 moments\".",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Years ago and year: %@ · %@": {
+      "comment": "On this day (M14) year label: how many years ago, then the year (1 YEAR AGO · 2025).",
       "extractionState": "manual",
       "localizations": {
         "en": {

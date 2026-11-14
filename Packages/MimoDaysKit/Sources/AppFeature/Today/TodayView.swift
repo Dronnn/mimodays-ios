@@ -54,7 +54,7 @@ struct TodayView: View {
             greeting(oneLine: false)
                 .padding(.top, 18)
             heroAndCapture
-                .padding(.top, typeSize.isAccessibilitySize ? 32 : 26)
+                .padding(.top, typeSize.isAccessibilitySize ? 32 : 15)
             ribbon
                 .padding(.top, typeSize.isAccessibilitySize ? 20 : 3)
                 .frame(maxWidth: .infinity)
@@ -63,16 +63,16 @@ struct TodayView: View {
                     .padding(.top, 14)
                     .padding(.horizontal, 22)
                 monthStrip
-                    .padding(.top, 5)
             }
+            // Every Today board has the movie right under this month; On this day (T06, no hi-fi board) follows it.
+            movieCard
+                .padding(.top, 8)
+                .padding(.horizontal, 18)
             if let onThisDay = model.onThisDay {
                 onThisDaySection(onThisDay)
                     .padding(.top, 32)
                     .padding(.horizontal, 18)
             }
-            movieCard
-                .padding(.top, model.onThisDay == nil ? 13 : 28)
-                .padding(.horizontal, 18)
         }
         // On iPhone the wordmark sits up level with the status bar's bottom, as drawn.
         .padding(.top, sizeClass == .compact ? -13 : 0)
@@ -150,13 +150,20 @@ struct TodayView: View {
     private func greeting(oneLine: Bool) -> some View {
         let headline = String(localized: "Today headline", bundle: .module)
         let marks = !typeSize.isAccessibilitySize
-        return VStack(alignment: .leading, spacing: 3) {
+        // T02's 0.98 line height is tighter than Fraunces' own, which one text never draws: each line is its own
+        // text, stacked that close. At accessibility sizes lines wrap inside each text, so they keep the font's own.
+        let lines = oneLine ? [headline.replacingOccurrences(of: "\n", with: " ")] : headline.components(separatedBy: "\n")
+        return VStack(alignment: .leading, spacing: -3) {
             Text(model.now, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day())
                 .textStyle(.labelCaps)
                 .padding(.leading, 3)
-            Text(oneLine ? headline.replacingOccurrences(of: "\n", with: " ") : headline)
-                .textStyle(.displayHero)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: typeSize.isAccessibilitySize ? 0 : TextStyle.displayHero.lineGap(for: typeSize)) {
+                ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                    Text(line)
+                        .textStyle(.displayHero)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
                 .overlay(alignment: .bottomLeading) {
                     if marks, !oneLine {
                         Icon.markBrush.image
@@ -353,7 +360,7 @@ struct TodayView: View {
                     .aspectRatio(1, contentMode: .fit)
                     .overlay {
                         if let image = model.image(moment.thumbnailPath, TodayModel.tilePixels) {
-                            Image(uiImage: image).resizable().scaledToFill()
+                            Image(uiImage: image).filling()
                         }
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))

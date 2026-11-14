@@ -164,7 +164,7 @@ struct VideoPage: View {
         ZStack(alignment: .topLeading) {
             ZStack {
                 if let image = model.image(moment.mainPath) {
-                    Image(uiImage: image).resizable().scaledToFill()
+                    Image(uiImage: image).filling()
                 }
                 if let playback {
                     PlayerLayerView(player: playback.main)
@@ -179,7 +179,7 @@ struct VideoPage: View {
                 ViewerSelfieWindow(model: model, momentID: moment.id, saved: layout, screenWidth: size.width, topInset: topInset, shown: shown) {
                     ZStack {
                         if let image = model.image(moment.selfiePath) {
-                            Image(uiImage: image).resizable().scaledToFill()
+                            Image(uiImage: image).filling()
                         }
                         if let playback, playback.hasSelfie {
                             PlayerLayerView(player: playback.selfie)

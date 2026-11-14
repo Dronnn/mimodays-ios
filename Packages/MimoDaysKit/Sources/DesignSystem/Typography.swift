@@ -183,6 +183,15 @@ public struct TextStyle: Equatable, Sendable {
     }
 
     /// The Core Text font at `pointSize` with this style's variation axes.
+    /// The space between single-line texts stacked so their lines sit `lineHeight` apart - negative when that is
+    /// tighter than the font's own, which one text never draws (see TextStyleModifier).
+    public func lineGap(for dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+        guard let lineHeight else { return 0 }
+        let size = scaledSize(for: dynamicTypeSize)
+        let font = ctFont(pointSize: size)
+        return size * lineHeight - (CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font))
+    }
+
     public func ctFont(pointSize: CGFloat) -> CTFont {
         guard let base = family.descriptor else {
             return UIFont.systemFont(ofSize: pointSize) as CTFont
@@ -224,12 +233,13 @@ private struct TextStyleModifier: ViewModifier {
             .font(Font(font))
             .tracking(style.tracking)
             .textCase(style.isUppercase ? .uppercase : nil)
-        if #available(iOS 26, *), let lineHeight = style.lineHeight {
-            // The design's line height exactly, tighter than the font's own too (Fraunces 38 at 0.98).
-            styled.lineHeight(.exact(points: size * lineHeight))
+        let natural = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
+        if #available(iOS 26, *), let lineHeight = style.lineHeight, size * lineHeight >= natural {
+            // The design's line height exactly, as a multiple of the size so it follows the text at any size.
+            styled.lineHeight(.multiple(factor: lineHeight))
         } else {
-            // Before iOS 26 SwiftUI can only add space between lines; tighter heights keep the font's own.
-            let natural = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
+            // Lines are never tighter than the font's own: glyphs would reach past the text's bounds, which
+            // VoiceOver's audit reports as clipped. Before iOS 26 SwiftUI can only add space between lines.
             styled.lineSpacing(style.lineHeight.map { max(0, size * $0 - natural) } ?? 0)
         }
     }

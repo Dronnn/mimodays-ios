@@ -108,7 +108,7 @@ struct StripTile: View {
     var body: some View {
         Color(hex: 0xC9B8AA)
             .overlay {
-                if let image { Image(uiImage: image).resizable().scaledToFill() }
+                if let image { Image(uiImage: image).filling() }
             }
             .frame(width: style.size.width, height: style.size.height)
             .clipShape(style.shape)
@@ -132,7 +132,7 @@ struct OnThisDayCard: View {
                 .shadow(color: Color(hex: 0x4B2938).opacity(0.14), radius: 7, y: 4)
             Color(hex: 0x9C8573)
                 .overlay {
-                    if let image { Image(uiImage: image).resizable().scaledToFill() }
+                    if let image { Image(uiImage: image).filling() }
                 }
                 .overlay(alignment: .bottom) {
                     LinearGradient(colors: [.clear, Color(hex: 0x221821).opacity(0.5)], startPoint: .top, endPoint: .bottom)

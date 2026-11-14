@@ -24,13 +24,13 @@ struct MomentViewerTests {
     private var library: MediaLibrary { MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline()) }
 
     private func save(
-        video: Bool = false, multiCam: Bool = true,
+        video: Bool = false, length: Duration = .seconds(1), multiCam: Bool = true,
         caption: String = "", note: String = "", voice: Bool = false, place: String? = nil
     ) async throws -> UUID {
         let engine = SimulatedCaptureEngine(multiCam: multiCam)
         _ = await engine.start()
         let media: CaptureResult.Media = video
-            ? .video(try await engine.record(limit: .seconds(1)))
+            ? .video(try await engine.record(limit: length))
             : .photo(try await engine.capturePhoto(flash: false, silent: true))
         let capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_794_400_000), timeZone: .gmt))
         var draft = MomentDraft(
@@ -110,7 +110,8 @@ struct MomentViewerTests {
 
     /// 9.24: the two streams play together, and stop and seek together.
     @Test func bothStreamsPlayInStep() async throws {
-        let id = try await save(video: true)
+        // Long enough not to end while a busy test run keeps the checks below waiting past their sleeps.
+        let id = try await save(video: true, length: .seconds(4))
         let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await viewer.load(id)
         let items = try #require(await viewer.playerItems(id))

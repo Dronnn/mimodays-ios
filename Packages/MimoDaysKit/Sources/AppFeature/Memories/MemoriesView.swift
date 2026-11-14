@@ -389,7 +389,7 @@ struct MemoryTile: View {
         Color(hex: 0xC9B8AA)
             .aspectRatio(1, contentMode: .fit)
             .overlay {
-                if let image { Image(uiImage: image).resizable().scaledToFill() }
+                if let image { Image(uiImage: image).filling() }
             }
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(alignment: .topLeading) {

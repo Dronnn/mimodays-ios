@@ -122,7 +122,7 @@ struct ReviewView: View {
                     let reference = layout.preview
                     AdjustableSelfieWindow(placement: $model.window, showsSheet: $adjustsSelfie, layout: layout, id: "review.selfieWindow") {
                         if let selfie = model.selfie {
-                            Image(uiImage: selfie).resizable().scaledToFill()
+                            Image(uiImage: selfie).filling()
                         }
                     }
                     .frame(width: reference.width, height: reference.height)

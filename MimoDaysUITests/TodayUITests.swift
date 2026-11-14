@@ -59,8 +59,12 @@ final class TodayUITests: XCTestCase {
     func testTheMovieCardOpensMovies() {
         launch(.populated)
         let movie = app.buttons["today.movie"]
-        XCTAssertTrue(movie.waitForExistence(timeout: 10))
-        app.swipeUp()
+        // The seed saves its moments one by one; the card waits for the first.
+        let enabled = expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: movie)
+        wait(for: [enabled], timeout: 20)
+        // On the first screen as in T02; smaller phones scroll to it.
+        if !movie.isHittable { app.swipeUp() }
+        // On this day sits under the card; its cropped photo must not take the tap.
         movie.tap()
         XCTAssertTrue(tab(3).isSelected)
     }

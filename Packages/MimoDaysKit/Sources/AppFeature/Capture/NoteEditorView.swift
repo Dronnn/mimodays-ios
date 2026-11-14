@@ -93,7 +93,7 @@ struct NoteEditorView: View {
             .fill(CameraPalette.thumbnailPlaceholder)
             .overlay {
                 if let main = model.main {
-                    Image(uiImage: main).resizable().scaledToFill().clipShape(NoteThumbnailBlob())
+                    Image(uiImage: main).filling().clipShape(NoteThumbnailBlob())
                 }
             }
             .frame(width: 72, height: 92)

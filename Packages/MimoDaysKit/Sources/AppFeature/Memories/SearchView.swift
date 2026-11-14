@@ -239,7 +239,7 @@ struct SearchView: View {
         HStack(alignment: .top, spacing: 16) {
             Color(hex: 0xC9B8AA)
                 .overlay {
-                    if let image = model.images[hit.id] { Image(uiImage: image).resizable().scaledToFill() }
+                    if let image = model.images[hit.id] { Image(uiImage: image).filling() }
                 }
                 .frame(width: 76, height: 72)
                 .clipShape(NoteThumbnailBlob())

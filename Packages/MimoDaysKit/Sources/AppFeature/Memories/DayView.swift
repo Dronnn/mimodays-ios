@@ -179,7 +179,7 @@ struct DayView: View {
     private func picture(_ moment: MomentSummary) -> some View {
         Color(hex: 0x9C8573)
             .overlay {
-                if let image = model.image(moment.mainPath) { Image(uiImage: image).resizable().scaledToFill() }
+                if let image = model.image(moment.mainPath) { Image(uiImage: image).filling() }
             }
             .aspectRatio(370 / 250, contentMode: .fit)
             .clipShape(DayCardBlob())

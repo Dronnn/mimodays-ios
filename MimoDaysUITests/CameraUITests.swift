@@ -155,7 +155,9 @@ final class CameraUITests: XCTestCase {
         let text = app.textViews["note.text"]
         XCTAssertTrue(text.waitForExistence(timeout: 5))
         text.typeText("Lena on her bike")
-        XCTAssertEqual(app.staticTexts["note.count"].label, "16 of 500 characters")
+        // The counter follows the typing a moment later on a busy simulator.
+        let counted = expectation(for: NSPredicate(format: "label == '16 of 500 characters'"), evaluatedWith: app.staticTexts["note.count"])
+        wait(for: [counted], timeout: 5)
         app.buttons["note.done"].tap()
         XCTAssertTrue(note.waitForExistence(timeout: 5))
         XCTAssertEqual(note.value as? String, "Lena on her bike")

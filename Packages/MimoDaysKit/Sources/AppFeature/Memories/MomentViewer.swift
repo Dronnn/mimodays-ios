@@ -174,7 +174,7 @@ struct MomentViewer: View {
             VStack(alignment: .leading, spacing: 0) {
                 Color(hex: 0x9C8573)
                     .overlay {
-                        if let image = model.image(moment.mainPath) { Image(uiImage: image).resizable().scaledToFill() }
+                        if let image = model.image(moment.mainPath) { Image(uiImage: image).filling() }
                     }
                     // The whole photo, as taken and as shared (9.28), with its window where it was taken.
                     .aspectRatio(moment.photo?.aspectRatio ?? 386 / 440, contentMode: .fit)
@@ -186,7 +186,7 @@ struct MomentViewer: View {
                                     model: model, momentID: moment.id, saved: layout, screenWidth: screenWidth, topInset: screenTop, shown: proxy.size
                                 ) {
                                     if let image = model.image(moment.selfiePath) {
-                                        Image(uiImage: image).resizable().scaledToFill()
+                                        Image(uiImage: image).filling()
                                     }
                                 }
                             }

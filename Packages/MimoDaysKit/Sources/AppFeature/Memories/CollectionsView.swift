@@ -146,7 +146,7 @@ struct CollectionCard: View {
                     .rotationEffect(.degrees(8))
                     .offset(x: 10, y: -9)
                 Color(hex: 0xC9B8AA)
-                    .overlay { if let cover { Image(uiImage: cover).resizable().scaledToFill() } }
+                    .overlay { if let cover { Image(uiImage: cover).filling() } }
                     .clipShape(DayCardBlob())
                     .rotationEffect(.degrees(-1.5))
             }

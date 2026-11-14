@@ -139,7 +139,7 @@ struct EditMomentView: View {
                 .fill(CameraPalette.thumbnailPlaceholder)
                 .overlay {
                     if let thumbnail = model.thumbnail {
-                        Image(uiImage: thumbnail).resizable().scaledToFill().clipShape(NoteThumbnailBlob())
+                        Image(uiImage: thumbnail).filling().clipShape(NoteThumbnailBlob())
                     }
                 }
                 .frame(width: 94, height: 118)

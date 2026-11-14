@@ -112,7 +112,7 @@ public struct MomentHero: View {
     static func fill(_ media: HeroMedia, placeholder: UInt32) -> some View {
         switch media {
         case .placeholder: Color(hex: placeholder)
-        case let .image(image): image.resizable().scaledToFill()
+        case let .image(image): image.filling()
         }
     }
 }
@@ -279,7 +279,7 @@ public struct SelfieWindow: View {
     public var body: some View {
         SelfieFrame {
             if case let .image(image) = media {
-                image.resizable().scaledToFill()
+                image.filling()
             }
         }
     }

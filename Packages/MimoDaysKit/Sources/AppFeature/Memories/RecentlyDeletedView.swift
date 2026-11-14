@@ -306,7 +306,7 @@ struct DeletedMomentView: View {
             if let item = model.items.first(where: { $0.id == id }) {
                 VStack(spacing: 0) {
                     Color(hex: 0x9C8573)
-                        .overlay { if let image = model.images[id] { Image(uiImage: image).resizable().scaledToFill() } }
+                        .overlay { if let image = model.images[id] { Image(uiImage: image).filling() } }
                         .aspectRatio(386 / 440, contentMode: .fit)
                         .clipShape(ViewerPhotoBlob())
                         .overlay(alignment: .bottomLeading) { DaysLeftBadge(days: model.daysLeft(item)).padding(16) }

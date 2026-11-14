@@ -32,7 +32,7 @@ struct CollectionView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 Color(hex: 0x9C8573)
-                    .overlay { if let cover = model.cover { Image(uiImage: cover).resizable().scaledToFill() } }
+                    .overlay { if let cover = model.cover { Image(uiImage: cover).filling() } }
                     .frame(height: 190)
                     .clipShape(DayCardBlob())
                     .padding(.horizontal, 16)

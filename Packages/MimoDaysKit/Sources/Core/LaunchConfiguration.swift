@@ -6,6 +6,8 @@ public struct LaunchConfiguration: Equatable, Sendable {
     public enum Seed: String, CaseIterable, Sendable {
         case empty
         case populated
+        /// Enough moments this year for a movie.
+        case movie
     }
 
     /// A surprise notification tap the app simulates at launch (UI tests for flow 02).

@@ -68,6 +68,9 @@ public final class AppDependencies {
         if configuration.isUITesting, configuration.seed == .populated {
             seedMoments()
         }
+        if configuration.isUITesting, configuration.seed == .movie {
+            seedMovieMoments()
+        }
     }
 
     /// `-seed populated`: a few moments from the simulated camera, saved the normal way. The newest is from
@@ -91,6 +94,22 @@ public final class AppDependencies {
                 let place = index == dates.count - 1
                     ? ReviewPlace.current(city: "Yerevan", at: GeoPoint(latitude: 40.18111, longitude: 44.51361, horizontalAccuracy: 30)) : nil
                 _ = try? await momentSaver.save(MomentDraft(capture: capture, caption: "", window: window, promptID: nil, place: place))
+            }
+        }
+    }
+
+    /// `-seed movie`: eight moments an hour apart, ending now - enough this year for a movie (flow 05).
+    private func seedMovieMoments() {
+        let now = Date()
+        let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
+        Task {
+            let engine = SimulatedCaptureEngine()
+            _ = await engine.start()
+            for index in 0..<8 {
+                guard let photo = try? await engine.capturePhoto(flash: false, silent: true) else { continue }
+                let instant = now.addingTimeInterval(Double(index - 7) * 3600)
+                let capture = CaptureResult(media: .photo(photo), window: .init(), capturedAt: CaptureTime(instant: instant, timeZone: .current))
+                _ = try? await momentSaver.save(MomentDraft(capture: capture, caption: "", window: window, promptID: nil))
             }
         }
     }

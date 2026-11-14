@@ -28,6 +28,21 @@ struct MapFilters: Equatable {
 
     var count: Int { [kind != .all, from != nil, to != nil, favoritesOnly, collection != nil].filter(\.self).count }
     var isEmpty: Bool { count == 0 }
+
+    /// P04's first switch.
+    enum Period: Hashable {
+        case allTime
+        case thisYear
+        case custom
+    }
+
+    func period(thisYear: Int) -> Period {
+        switch (from, to) {
+        case (nil, nil): .allTime
+        case (thisYear * 10_000 + 101, nil): .thisYear
+        default: .custom
+        }
+    }
 }
 
 /// Moments taken at one place: same place name, or (without one) within about a kilometre.
@@ -78,6 +93,19 @@ final class MapModel {
     /// The filtered moments by place, the place with most moments first (the accessible list's order).
     var places: [MapPlace] { Self.places(filtered) }
 
+    /// P01's Recent places: the place visited last first.
+    var recentPlaces: [MapPlace] {
+        places.sorted { ($0.moments.first?.item.capturedAt ?? .distantPast) > ($1.moments.first?.item.capturedAt ?? .distantPast) }
+    }
+
+    func place(_ id: String) -> MapPlace? { places.first { $0.id == id } }
+
+    /// P04's "Show N moments" for filters not applied yet.
+    func count(with filters: MapFilters) -> Int {
+        let members = filters.collection == self.filters.collection ? collectionMembers : Self.members(of: filters.collection, in: library.context)
+        return moments.count { Self.passes($0, filters, members: members) }
+    }
+
     var hasLocatedMoments: Bool { !moments.isEmpty }
 
     func refresh() {
@@ -118,11 +146,12 @@ final class MapModel {
     }
 
     private func readCollection() {
-        guard let id = filters.collection else {
-            collectionMembers = nil
-            return
-        }
-        collectionMembers = Set((try? CollectionStore(context: library.context).collection(id))?.orderedMoments.map(\.id) ?? [])
+        collectionMembers = Self.members(of: filters.collection, in: library.context)
+    }
+
+    private static func members(of collection: UUID?, in context: ModelContext) -> Set<UUID>? {
+        guard let collection else { return nil }
+        return Set((try? CollectionStore(context: context).collection(collection))?.orderedMoments.map(\.id) ?? [])
     }
 
     // MARK: Grouping

@@ -46,6 +46,10 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphCollection
     case glyphPlus
     case glyphClock
+    /// 16×16, the Map date chip (P01).
+    case glyphCalendar
+    /// 22×22 arrow, the Map's locate button (P01).
+    case glyphLocate
     /// 42×36 film frame on the Make my movie card (T02).
     case glyphFilm
     /// 14×18 solid pin before the place on a hero caption.

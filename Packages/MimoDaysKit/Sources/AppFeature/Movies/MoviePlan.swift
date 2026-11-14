@@ -24,17 +24,27 @@ struct MoviePlan: Sendable, Equatable {
         var duration: Double
         /// How this clip comes in after the one before.
         var transition: MovieTransition
-        /// "Oct 3, 2026 · Yerevan" (F08), nil when neither is shown.
+        /// "Wed, Oct 7 · Oakland" (F08), nil when neither is shown.
         var caption: String?
         var voiceURL: URL?
         var soundOn: Bool
     }
 
+    /// The person's own audio file (F09), played from the start at `gain`, fading in and out.
+    struct Music: Sendable, Equatable {
+        var url: URL
+        var gain: Double
+    }
+
     var clips: [Clip]
     var aspectRatio: MovieAspectRatio
     var fit: MovieFit
-    /// F09's clip sound level, 0...1.
+    /// F08's title over the first clip; nil when it's off.
+    var title: String?
+    /// F09's levels, 0...1.
     var clipSoundLevel: Double
+    var voiceNoteLevel: Double
+    var music: Music?
 
     var duration: Double { clips.reduce(0) { $0 + $1.duration } }
 
@@ -42,18 +52,29 @@ struct MoviePlan: Sendable, Equatable {
     init(_ project: MovieProject, store: MediaStore) {
         aspectRatio = project.aspectRatio
         fit = project.fit
+        title = project.showsTitle ? project.title : nil
         clipSoundLevel = project.clipSoundLevel
+        voiceNoteLevel = project.voiceNoteLevel
+        music = project.audioTracks.first { $0.kind == .soundtrack }.flatMap { track in
+            (try? store.url(for: track.relativePath)).map { Music(url: $0, gain: track.gain) }
+        }
         clips = MovieStore.liveClips(of: project).compactMap { clip in
             guard let moment = clip.moment else { return nil }
             return Self.clip(clip, moment, showsDates: project.showsDates, showsPlaces: project.showsPlaces, store: store)
         }
     }
 
-    init(clips: [Clip], aspectRatio: MovieAspectRatio, fit: MovieFit, clipSoundLevel: Double) {
+    init(
+        clips: [Clip], aspectRatio: MovieAspectRatio, fit: MovieFit, title: String? = nil, clipSoundLevel: Double = 0.7,
+        voiceNoteLevel: Double = 1, music: Music? = nil
+    ) {
         self.clips = clips
         self.aspectRatio = aspectRatio
         self.fit = fit
+        self.title = title
         self.clipSoundLevel = clipSoundLevel
+        self.voiceNoteLevel = voiceNoteLevel
+        self.music = music
     }
 
     @MainActor
@@ -77,7 +98,7 @@ struct MoviePlan: Sendable, Equatable {
         }
         var parts: [String] = []
         if showsDates, let zone = TimeZone(identifier: summary.captured.timeZoneID) {
-            parts.append(summary.captured.instant.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, timeZone: zone)))
+            parts.append(summary.captured.instant.formatted(Date.FormatStyle(timeZone: zone).weekday(.abbreviated).month(.abbreviated).day()))
         }
         if showsPlaces, let place = summary.place { parts.append(place) }
         let voice = clip.includesVoiceNote ? moment.voiceNotes.first.flatMap { try? store.url(for: $0.relativePath) } : nil

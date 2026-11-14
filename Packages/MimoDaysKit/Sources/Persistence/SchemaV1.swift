@@ -307,8 +307,12 @@ public enum SchemaV1: VersionedSchema {
         /// F08: the day, and the place, on each clip.
         public var showsDates: Bool = true
         public var showsPlaces: Bool = true
+        /// F08: the movie's title over its first seconds.
+        public var showsTitle: Bool = true
         /// F09: the clips' own sound, 0...1.
         public var clipSoundLevel: Double = 0.7
+        /// F09: voice notes, 0...1.
+        public var voiceNoteLevel: Double = 1
         /// Seed of the automatic pick, so the same source picks the same moments again.
         public var selectionSeed: Int = 0
         /// The latest rendered file; nil for a draft. Kept apart from the edit decisions above.

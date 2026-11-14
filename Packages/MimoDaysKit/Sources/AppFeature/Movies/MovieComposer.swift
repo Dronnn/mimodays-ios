@@ -8,7 +8,7 @@ import UIKit
 
 /// A movie plan as one playable, exportable asset (11.7): clips back to back on one timeline, every frame drawn
 /// by `MovieCompositor` - the picture fitted to the movie's shape, the selfie window placed on the movie's frame,
-/// the caption, fades. Clip sound at the project's level, voice notes at full volume.
+/// the caption and title, fades. Clip sound, voice notes and music at the project's levels.
 enum MovieComposer {
     enum Failure: Error {
         case empty
@@ -30,6 +30,11 @@ enum MovieComposer {
 
     /// A fade dips through black: this long out of one clip, this long into the next.
     static let fadeSeconds = 0.4
+    /// The title shows this long, then fades.
+    static let titleSeconds = 2.5
+    static let musicFadeSeconds = 1.5
+    /// The caption's bottom edge above the frame's, in phone points.
+    static let captionBottom: CGFloat = 24
     private static let timescale: CMTimeScale = 600
 
     static func compose(_ plan: MoviePlan, renderSize: CGSize) async throws -> Composed {
@@ -101,9 +106,19 @@ enum MovieComposer {
             let next = plan.clips.indices.contains(index + 1) ? plan.clips[index + 1] : nil
             instructions.append(MovieClipInstruction(
                 timeRange: range, clip: clip, index: index, video: video, canvas: renderSize, fit: plan.fit,
-                fadeIn: index > 0 && clip.transition == .fade, fadeOut: next?.transition == .fade
+                fadeIn: index > 0 && clip.transition == .fade, fadeOut: next?.transition == .fade, title: index == 0 ? plan.title : nil
             ))
             cursor = cursor + length
+        }
+        // F09's music: from the start, as long as the movie or the song, fading in and out.
+        let musicAsset = plan.music.map { AVURLAsset(url: $0.url) }
+        var musicRamp: CMTimeRange?
+        if let musicAsset, let song = try await musicAsset.loadTracks(withMediaType: .audio).first,
+           let musicTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
+            let available = try await song.load(.timeRange)
+            let played = CMTimeRange(start: available.start, duration: CMTimeMinimum(available.duration, cursor))
+            try musicTrack.insertTimeRange(played, of: song, at: .zero)
+            musicRamp = CMTimeRange(start: .zero, duration: played.duration)
         }
         // Tracks nothing was put in would make players and exporters stumble.
         for track in [selfieTrack, soundTrack, voiceTrack] where track.segments.allSatisfy(\.isEmpty) {
@@ -119,7 +134,15 @@ enum MovieComposer {
         let audioMix = AVMutableAudioMix()
         audioMix.inputParameters = composition.tracks(withMediaType: .audio).map { track in
             let parameters = AVMutableAudioMixInputParameters(track: track)
-            parameters.setVolume(track.trackID == soundTrack.trackID ? Float(plan.clipSoundLevel) : 1, at: .zero)
+            switch track.trackID {
+            case soundTrack.trackID: parameters.setVolume(Float(plan.clipSoundLevel), at: .zero)
+            case voiceTrack.trackID: parameters.setVolume(Float(plan.voiceNoteLevel), at: .zero)
+            default:
+                guard let ramp = musicRamp, let gain = plan.music?.gain else { break }
+                let fade = CMTimeMinimum(time(musicFadeSeconds), CMTimeMultiplyByFloat64(ramp.duration, multiplier: 0.5))
+                parameters.setVolumeRamp(fromStartVolume: 0, toEndVolume: Float(gain), timeRange: CMTimeRange(start: .zero, duration: fade))
+                parameters.setVolumeRamp(fromStartVolume: Float(gain), toEndVolume: 0, timeRange: CMTimeRange(start: ramp.end - fade, duration: fade))
+            }
             return parameters
         }
         return Composed(asset: composition, videoComposition: videoComposition, audioMix: audioMix)
@@ -236,11 +259,14 @@ final class MovieClipInstruction: NSObject, AVVideoCompositionInstructionProtoco
     let fit: MovieFit
     let fadeIn: Bool
     let fadeOut: Bool
+    /// The movie's title, on the first clip only.
+    let title: String?
 
     init(
         timeRange: CMTimeRange, clip: MoviePlan.Clip, index: Int, video: Video?, canvas: CGSize, fit: MovieFit,
-        fadeIn: Bool, fadeOut: Bool
+        fadeIn: Bool, fadeOut: Bool, title: String? = nil
     ) {
+        self.title = title
         self.timeRange = timeRange
         self.clip = clip
         self.index = index
@@ -271,6 +297,7 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         var selfie: CIImage?
         var window: (art: SelfieWindowArt, box: CGRect)??
         let caption: CIImage?
+        var title: CIImage?
     }
 
     private let context = CIContext(options: [.cacheIntermediates: false])
@@ -323,6 +350,13 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
             }
         }
         if let caption = look.caption { frame = caption.composited(over: frame) }
+        if let title = look.title {
+            let shown = min(MovieComposer.titleSeconds, instruction.timeRange.duration.seconds)
+            let alpha = min(max((shown - seconds) / MovieComposer.fadeSeconds, 0), 1)
+            if alpha > 0 {
+                frame = title.applyingFilter("CIColorMatrix", parameters: ["inputAVector": CIVector(x: 0, y: 0, z: 0, w: alpha)]).composited(over: frame)
+            }
+        }
         let opacity = instruction.opacity(at: seconds)
         if opacity < 1 {
             let o = CGFloat(opacity)
@@ -341,6 +375,7 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         let clip = instruction.clip
         let canvas = instruction.canvas
         var look = Look(index: instruction.index, caption: clip.caption.flatMap { Self.caption($0, canvas: canvas) })
+        look.title = instruction.title.flatMap { Self.title($0, canvas: canvas) }
         if instruction.video == nil {
             // Enough pixels for Fill on any shape and the drift.
             let pixels = Int(max(canvas.width, canvas.height) * 1.5)
@@ -372,30 +407,62 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
             .composited(over: frame)
     }
 
-    /// F08's caption: Patrick Hand in cream, bottom left, with a soft shadow to read over any picture.
+    /// F08/F10 `Editor / Caption`: Patrick Hand 16 in cream on a plum pill at 55%, bottom left - drawn at the
+    /// phone's scale (402 pt across the short side).
     private static func caption(_ text: String, canvas: CGSize) -> CIImage? {
-        let short = min(canvas.width, canvas.height)
-        let margin = short * MovieComposer.marginScale
-        let font = TextStyle.dayCaption.ctFont(pointSize: short * 26 / 402) as UIFont
+        let unit = min(canvas.width, canvas.height) / 402
+        let font = TextStyle.dayCaption.ctFont(pointSize: 16 * unit) as UIFont
+        let attributed = NSAttributedString(string: text, attributes: [.font: font, .foregroundColor: cream])
+        let margin = 16 * unit
+        let padding = 14 * unit
+        let height = 30 * unit
+        let textSize = attributed.boundingRect(
+            with: CGSize(width: canvas.width - margin * 2 - padding * 2, height: height), options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine], context: nil
+        ).size
+        let size = CGSize(width: ceil(textSize.width + padding * 2), height: ceil(height))
+        let image = renderer(size).image { _ in
+            plum.withAlphaComponent(0.55).setFill()
+            UIBezierPath(roundedRect: CGRect(origin: .zero, size: size), cornerRadius: size.height / 2).fill()
+            attributed.draw(
+                with: CGRect(x: padding, y: (size.height - textSize.height) / 2, width: size.width - padding * 2, height: textSize.height),
+                options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine], context: nil
+            )
+        }
+        guard let cgImage = image.cgImage else { return nil }
+        return CIImage(cgImage: cgImage).transformed(by: CGAffineTransform(translationX: margin, y: MovieComposer.captionBottom * unit))
+    }
+
+    /// F08 "Title at the start": the movie's name in Fraunces over the first clip, centred, with a soft shadow.
+    private static func title(_ text: String, canvas: CGSize) -> CIImage? {
+        let unit = min(canvas.width, canvas.height) / 402
         let shadow = NSShadow()
-        shadow.shadowColor = UIColor.black.withAlphaComponent(0.45)
-        shadow.shadowBlurRadius = short * 6 / 402
-        shadow.shadowOffset = CGSize(width: 0, height: short * 1 / 402)
+        shadow.shadowColor = UIColor.black.withAlphaComponent(0.5)
+        shadow.shadowBlurRadius = 12 * unit
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
         let attributed = NSAttributedString(string: text, attributes: [
-            .font: font, .foregroundColor: UIColor(red: 0xFB / 255, green: 0xF6 / 255, blue: 0xEF / 255, alpha: 1), .shadow: shadow,
+            .font: TextStyle.displayTitle.ctFont(pointSize: 40 * unit) as UIFont, .foregroundColor: cream, .shadow: shadow, .paragraphStyle: paragraph,
         ])
-        let width = canvas.width - margin * 2
+        let width = canvas.width - 48 * unit
         let bounds = attributed.boundingRect(with: CGSize(width: width, height: .greatestFiniteMagnitude), options: [.usesLineFragmentOrigin], context: nil)
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        format.opaque = false
         let pad = shadow.shadowBlurRadius * 2
-        let size = CGSize(width: ceil(bounds.width + pad * 2), height: ceil(bounds.height + pad * 2))
-        let image = UIGraphicsImageRenderer(size: size, format: format).image { _ in
+        let size = CGSize(width: ceil(width + pad * 2), height: ceil(bounds.height + pad * 2))
+        let image = renderer(size).image { _ in
             attributed.draw(with: CGRect(x: pad, y: pad, width: width, height: bounds.height), options: [.usesLineFragmentOrigin], context: nil)
         }
         guard let cgImage = image.cgImage else { return nil }
-        return CIImage(cgImage: cgImage).transformed(by: CGAffineTransform(translationX: margin - pad, y: margin - pad))
+        return CIImage(cgImage: cgImage)
+            .transformed(by: CGAffineTransform(translationX: (canvas.width - size.width) / 2, y: (canvas.height - size.height) / 2))
+    }
+
+    private static let cream = UIColor(red: 0xFB / 255, green: 0xF6 / 255, blue: 0xEF / 255, alpha: 1)
+    private static let plum = UIColor(red: 0x2A / 255, green: 0x1B / 255, blue: 0x21 / 255, alpha: 1)
+
+    private static func renderer(_ size: CGSize) -> UIGraphicsImageRenderer {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = false
+        return UIGraphicsImageRenderer(size: size, format: format)
     }
 
     private static func upright(_ buffer: CVPixelBuffer, _ orientation: CGImagePropertyOrientation) -> CIImage {

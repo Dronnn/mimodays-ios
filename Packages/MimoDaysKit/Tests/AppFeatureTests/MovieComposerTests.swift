@@ -118,7 +118,8 @@ struct MovieComposerTests {
         #expect(plan.clips.map(\.momentID) == ids)
         #expect(plan.clips[0].duration == MovieSelection.photoSeconds)
         #expect(plan.clips[1].duration > 0.9 && plan.clips[1].duration < 1.2, "the 1 s video at 10 fps: \(plan.clips[1].duration)")
-        #expect(plan.clips[0].caption == "Nov 11, 2026")
+        #expect(plan.clips[0].caption == "Wed, Nov 11")
+        #expect(plan.title == "Test")
         #expect(plan.clips[0].selfieURL != nil && plan.clips[0].window != nil)
         #expect(!plan.clips[2].soundOn)
 
@@ -184,6 +185,37 @@ struct MovieComposerTests {
         #expect(pixel(hidden, spot.x, spot.y) == pixel(shown, spot.x, spot.y), "recorded top right: nothing top left")
         let warm = pixel(hidden, spot.x, spot.y)
         #expect(warm.r > warm.g)
+    }
+
+    @Test func theTitleIsOnTheFirstClipAndTheLevelsAndMusicFollowF09() async throws {
+        let ids = try await save(2)
+        let project = try project(ids)
+        project.voiceNoteLevel = 0.5
+        let voiceFile = try store.store(copyOf: Fixture.voiceNote.url, in: .originals, fileExtension: "m4a")
+        try #require(project.orderedClips[1].moment).voiceNotes.append(MomentVoiceNote(relativePath: voiceFile.relativePath, duration: 2, recordedAt: now))
+        let song = try store.store(copyOf: Fixture.voiceNote.url, in: .originals, fileExtension: "m4a")
+        project.audioTracks.append(MovieAudioTrack(kind: .soundtrack, relativePath: song.relativePath, gain: 0.8))
+        let composed = try await MovieComposer.compose(MoviePlan(project, store: store), renderSize: portrait)
+        let instructions = composed.videoComposition.instructions.compactMap { $0 as? MovieClipInstruction }
+        #expect(instructions.map(\.title) == ["Test", nil])
+
+        let parameters = composed.audioMix.inputParameters
+        #expect(parameters.count == 2, "voice notes and music")
+        var start: Float = -1
+        var end: Float = -1
+        var range = CMTimeRange.zero
+        let voice = try #require(parameters.first { $0.trackID == composed.asset.tracks(withMediaType: .audio).first?.trackID })
+        #expect(voice.getVolumeRamp(for: .zero, startVolume: &start, endVolume: &end, timeRange: &range) && start == 0.5)
+        let music = try #require(parameters.last)
+        #expect(music.getVolumeRamp(for: .zero, startVolume: &start, endVolume: &end, timeRange: &range))
+        #expect(start == 0 && end == 0.8, "fades in")
+        #expect(music.getVolumeRamp(for: CMTime(seconds: 1.9, preferredTimescale: 600), startVolume: &start, endVolume: &end, timeRange: &range))
+        #expect(start == 0.8 && end == 0 && abs(range.end.seconds - 2) < 0.05, "fades out where the 2 s song ends")
+
+        project.showsTitle = false
+        let untitled = try await MovieComposer.compose(MoviePlan(project, store: store), renderSize: portrait)
+        let titles = untitled.videoComposition.instructions.compactMap { ($0 as? MovieClipInstruction)?.title }
+        #expect(titles.isEmpty)
     }
 
     @Test func aVoiceNotePlaysWithItsClipAndTheMovieExports() async throws {

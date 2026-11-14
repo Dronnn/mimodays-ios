@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 /// `Surprise / Ribbon` (T02-T07): the mint oval with an apricot star. It hugs its words; with an action
-/// (Open, Resume, Turn on) it spans the width and the action sits on a cream pill at the end.
+/// (Open, Resume, Turn on), or T04's long line, it spans the width, and an action sits on a cream pill at the end.
 struct SurpriseRibbon: View {
     let status: SurpriseStatus
     let now: Date
@@ -17,16 +17,18 @@ struct SurpriseRibbon: View {
                 .foregroundStyle(ColorToken.accentApricot.color)
                 .accessibilityHidden(true)
             Text(message)
-                .textStyle(.hand)
+                .textStyle(status == .passed ? .handSmall : .hand)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .fixedSize(horizontal: false, vertical: true)
+                // The words fill the row up to the action, which never wraps.
+                .frame(maxWidth: isWide ? .infinity : nil, alignment: .leading)
             if let actionTitle {
-                Spacer(minLength: 4)
                 Button(action: action) {
                     Text(actionTitle)
                         .textStyle(.ribbonAction)
                         .foregroundStyle(ColorToken.textLink.color)
-                        .padding(.horizontal, 22)
+                        .fixedSize()
+                        .padding(.horizontal, 16)
                         .frame(minHeight: 30)
                         .background(ReviewChipBlob().fill(ColorToken.surfaceCard.color))
                         .padding(.vertical, 7)
@@ -37,15 +39,17 @@ struct SurpriseRibbon: View {
                 .accessibilityIdentifier("today.ribbon.action")
             }
         }
-        .padding(.leading, actionTitle == nil ? 21 : 16)
-        .padding(.trailing, actionTitle == nil ? 25 : 12)
+        .padding(.leading, isWide ? 16 : 21)
+        .padding(.trailing, actionTitle == nil ? (isWide ? 16 : 25) : 12)
         .padding(.vertical, 5)
-        .frame(minHeight: actionTitle == nil ? 32 : 40)
-        .frame(maxWidth: actionTitle == nil ? nil : .infinity)
+        .frame(minHeight: isWide ? 40 : 32)
+        .frame(maxWidth: isWide ? .infinity : nil, alignment: .leading)
         .background(RibbonBlob().fill(ColorToken.accentMint.color))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("today.ribbon")
     }
+
+    private var isWide: Bool { actionTitle != nil || status == .passed }
 
     private var message: LocalizedStringResource {
         switch status {

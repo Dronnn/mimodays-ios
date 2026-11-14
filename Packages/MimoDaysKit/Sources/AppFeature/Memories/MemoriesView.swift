@@ -201,7 +201,8 @@ struct MemoriesView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("memories.collections")
                 NavigationLink(value: MemoriesRoute.onThisDay) {
-                    chip(.glyphClock, Text("On this day", bundle: .module))
+                    // `Chip / On this day`: the apricot star mark, not a glyph.
+                    chip(.markStarSmall, Text("On this day", bundle: .module), size: CGSize(width: 16, height: 16.5), tint: ColorToken.accentApricot.color)
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("memories.onThisDay")
@@ -211,11 +212,12 @@ struct MemoriesView: View {
         .scrollIndicators(.hidden)
     }
 
-    private func chip(_ icon: Icon, _ title: Text) -> some View {
+    private func chip(_ icon: Icon, _ title: Text, size: CGSize = CGSize(width: 15, height: 15), tint: Color? = nil) -> some View {
         HStack(spacing: 6) {
             icon.image
                 .resizable()
-                .frame(width: 15, height: 15)
+                .frame(width: size.width, height: size.height)
+                .foregroundStyle(tint ?? ColorToken.textPrimary.color)
                 .accessibilityHidden(true)
             title
                 .textStyle(.reviewChip)
@@ -442,15 +444,39 @@ struct SelectionMark: View {
 /// `Badge / Voice`: a mic on a dark disc, offset like the favourite's heart - tiles and Day cards.
 struct VoiceBadge: View {
     var body: some View {
+        // The asset has room around the mic: drawn 27.3 pt so the mic itself is 14 x 20, as designed.
         Icon.glyphMic.image
             .resizable()
-            .scaledToFit()
+            .frame(width: 27.3, height: 27.3)
             .frame(width: 14, height: 20)
             .foregroundStyle(.white)
             .offset(x: MemoryTile.badgeOffset, y: MemoryTile.badgeOffset)
             .frame(width: 26, height: 26)
             .background(Circle().fill(ColorToken.mediaScrim.color))
             .accessibilityHidden(true)
+    }
+}
+
+/// `Badge / Video`: a play triangle and the length on a dark capsule - tiles and Day cards.
+struct VideoBadge: View {
+    let duration: Double
+
+    var body: some View {
+        HStack(spacing: 3) {
+            // The asset has room around the triangle: drawn 14.7 pt so the triangle itself is 7.2 x 8.8.
+            Icon.glyphPlay.image
+                .resizable()
+                .frame(width: 14.7, height: 14.7)
+                .offset(x: -1.2)
+                .frame(width: 9, height: 10)
+            Text(Duration.seconds(duration.rounded()), format: .time(pattern: .minuteSecond))
+                .textStyle(.tileBadge)
+        }
+        .foregroundStyle(.white)
+        .padding(.leading, 9)
+        .padding(.trailing, 8)
+        .frame(height: 22)
+        .background(Capsule().fill(ColorToken.mediaScrim.color))
     }
 }
 
@@ -487,16 +513,8 @@ struct MemoryTile: View {
             }
             .overlay(alignment: .bottomLeading) {
                 if let duration = detail?.duration {
-                    HStack(spacing: 4) {
-                        Icon.glyphPlay.image.resizable().frame(width: 7.2, height: 8.8)
-                        Text(Duration.seconds(duration.rounded()), format: .time(pattern: .minuteSecond))
-                            .textStyle(.tileBadge)
-                    }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 9)
-                    .frame(height: 22)
-                    .background(Capsule().fill(ColorToken.mediaScrim.color))
-                    .padding(7)
+                    VideoBadge(duration: duration)
+                        .padding(7)
                 }
             }
             .overlay(alignment: .bottomTrailing) {

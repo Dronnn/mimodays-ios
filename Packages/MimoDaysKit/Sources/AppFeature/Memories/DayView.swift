@@ -193,16 +193,8 @@ struct DayView: View {
             }
             .overlay(alignment: .bottomLeading) {
                 if let duration = moment.duration {
-                    HStack(spacing: 4) {
-                        Icon.glyphPlay.image.resizable().frame(width: 7.2, height: 8.8)
-                        Text(Duration.seconds(duration.rounded()), format: .time(pattern: .minuteSecond))
-                            .textStyle(.tileBadge)
-                    }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 9)
-                    .frame(height: 22)
-                    .background(Capsule().fill(ColorToken.mediaScrim.color))
-                    .padding(.leading, 14)
+                    VideoBadge(duration: duration)
+                        .padding(.leading, 14)
                     .padding(.bottom, 10)
                 }
             }

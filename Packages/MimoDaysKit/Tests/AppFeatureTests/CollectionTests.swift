@@ -89,13 +89,14 @@ struct CollectionTests {
         let id = try #require(try collections.create("Firsts", with: [older, newer]))
         let model = CollectionsModel(library: library)
         model.refresh()
-        let newerThumbnail = try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == newer })).first?
-            .media.first { $0.role == .thumbnail }?.relativePath
-        #expect(model.collections.first?.count == 2 && model.collections.first?.coverPath == newerThumbnail)
+        // The cover is the newest moment's own picture, without the selfie window.
+        let newerMoment = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == newer })).first)
+        let newerCover = try #require(MomentSummary(newerMoment).mainPath)
+        #expect(model.collections.first?.count == 2 && model.collections.first?.coverPath == newerCover)
         try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == newer })).first?.deletedAt = .now
         try context.save()
         model.refresh()
-        #expect(model.collections.first?.count == 1 && model.collections.first?.coverPath != newerThumbnail)
+        #expect(model.collections.first?.count == 1 && model.collections.first?.coverPath != newerCover)
 
         let detail = CollectionModel(id: id, library: library)
         detail.refresh()

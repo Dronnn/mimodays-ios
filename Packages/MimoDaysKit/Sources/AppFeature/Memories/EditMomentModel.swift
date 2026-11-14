@@ -54,7 +54,7 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     private let voiceServices: VoiceServices
     private let places: PlaceServices
     private var transcription: Task<Void, Never>?
-    @ObservationIgnored private let voicePlayer = AVPlayer()
+    @ObservationIgnored let voicePlayer = AVPlayer()
     @ObservationIgnored private var voiceClock: Any?
     @ObservationIgnored private var voiceEnd: (any NSObjectProtocol)?
     private let logger = Logger(subsystem: "MimoDays", category: "EditMoment")

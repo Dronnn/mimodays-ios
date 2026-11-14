@@ -35,7 +35,7 @@ struct DeleteConfirmationSheet: View {
                     Text("They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days.", bundle: .module)
                 }
             }
-            .textStyle(.body)
+            .textStyle(.sheetBody)
             .foregroundStyle(ColorToken.textBody.color)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.top, 10)

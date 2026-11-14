@@ -72,6 +72,8 @@ public struct TextStyle: Equatable, Sendable {
     public static let labelCaps = TextStyle(.inter, size: 11.5, weight: 600, tracking: 2.2, isUppercase: true, relativeTo: .caption2)
     /// Captions, notes and ribbons only; never body text or actions.
     public static let hand = TextStyle(.patrickHand, size: 17, relativeTo: .callout)
+    /// T04's longer ribbon line, one size down so it stays on one line.
+    public static let handSmall = TextStyle(.patrickHand, size: 16, relativeTo: .callout)
     // Camera (C01-C05): controls sit on a fixed layout, so they stop growing at 1.35x.
     public static let cameraMode = TextStyle(.nunito, size: 13, weight: 800, tracking: 1.5, isUppercase: true, relativeTo: .caption1, maximumScale: 1.35)
     public static let cameraChip = TextStyle(.nunito, size: 13, weight: 700, relativeTo: .caption1, maximumScale: 1.35)
@@ -92,6 +94,8 @@ public struct TextStyle: Equatable, Sendable {
     public static let noteCount = TextStyle(.nunito, size: 13, weight: 500, relativeTo: .caption1)
     /// Bottom sheet titles (C04, C09).
     public static let sheetTitle = TextStyle(.fraunces, size: 22, weight: 600, relativeTo: .title2, maximumScale: 1.35)
+    /// Sheet explanations (M15): Nunito 15, tighter than body copy.
+    public static let sheetBody = TextStyle(.nunito, size: 15, weight: 500, lineHeight: 1.2, relativeTo: .subheadline)
     /// C09 "0:12 / 1:00".
     public static let voiceTimer = TextStyle(.nunito, size: 16, weight: 700, relativeTo: .callout)
     /// C09 "Tap to stop".

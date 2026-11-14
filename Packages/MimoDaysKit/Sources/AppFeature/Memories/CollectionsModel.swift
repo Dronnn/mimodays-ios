@@ -149,7 +149,8 @@ final class CollectionsModel {
         let cover = alive.first { $0.id == collection.coverMomentID } ?? alive.max { $0.capturedAt < $1.capturedAt }
         return CollectionSummary(
             id: collection.id, title: collection.title, count: alive.count,
-            coverPath: cover?.media.first { $0.role == .thumbnail }?.relativePath
+            // The picture alone, as designed: a composed thumbnail's window would be cut by the wide crop.
+            coverPath: cover.flatMap { MomentSummary($0).mainPath ?? $0.media.first { $0.role == .thumbnail }?.relativePath }
         )
     }
 

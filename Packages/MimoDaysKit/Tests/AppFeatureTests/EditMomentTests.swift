@@ -1,3 +1,4 @@
+@preconcurrency import AVFoundation
 @testable import AppFeature
 @testable import Core
 import Foundation
@@ -103,24 +104,22 @@ struct EditMomentTests {
     }
 
     /// 9.14: the voice note plays from its row - the saved one, and a new recording before Save; recording
-    /// again or removing it stops it.
+    /// again or removing it stops it. (CI simulators have no audio output, so this checks what is loaded.)
     @Test func theVoiceNotePlaysFromItsRow() async throws {
-        // The player can take a while to start while the whole suite runs.
-        func playing(_ edit: EditMomentModel) async throws -> Bool {
-            for _ in 0..<50 where edit.voiceTime <= 0.1 { try await Task.sleep(for: .milliseconds(50)) }
-            return edit.isPlayingVoice && edit.voiceTime > 0.1
-        }
+        func loaded(_ edit: EditMomentModel) -> URL? { (edit.voicePlayer.currentItem?.asset as? AVURLAsset)?.url }
         let edit = try edit(try await save(voice: true))
+        let saved = try store.url(for: try #require(try moment().voiceNotes.first?.relativePath))
         edit.toggleVoice()
-        #expect(try await playing(edit), "time \(edit.voiceTime)")
+        #expect(edit.isPlayingVoice && loaded(edit) == saved)
         edit.toggleVoice()
-        #expect(!edit.isPlayingVoice && edit.voiceTime == 0)
+        #expect(!edit.isPlayingVoice && loaded(edit) == nil)
 
         edit.toggleVoice()
-        edit.addVoice(at: try tone(seconds: 2), recordedAt: .now)
-        #expect(!edit.isPlayingVoice)
+        let recording = try tone(seconds: 2)
+        edit.addVoice(at: recording, recordedAt: .now)
+        #expect(!edit.isPlayingVoice && loaded(edit) == nil)
         edit.toggleVoice()
-        #expect(try await playing(edit))
+        #expect(edit.isPlayingVoice && loaded(edit) == recording)
         edit.removeVoice()
         #expect(!edit.isPlayingVoice)
         edit.toggleVoice()

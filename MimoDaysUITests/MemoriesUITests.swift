@@ -160,6 +160,38 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Weekend trips"].exists)
     }
 
+    /// M05 → M15 → M11 → M16 → M16b: a deleted moment waits in Recently deleted and comes back with Recover.
+    @MainActor
+    func testADeletedMomentCanBeRecovered() {
+        launch(.populated)
+        let tile = app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch
+        XCTAssertTrue(tile.waitForExistence(timeout: 20))
+        tile.tap()
+        let delete = app.buttons["viewer.delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 10))
+        delete.tap()
+        let confirm = app.buttons["delete.confirm"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        confirm.tap()
+        XCTAssertTrue(delete.waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        let chip = app.buttons["memories.collections"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 10))
+        chip.tap()
+        let row = app.buttons["collections.recentlyDeleted"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+        let deleted = app.buttons["deleted.tile"].firstMatch
+        XCTAssertTrue(deleted.waitForExistence(timeout: 5))
+        deleted.tap()
+        let recover = app.buttons["deleted.recover"]
+        XCTAssertTrue(recover.waitForExistence(timeout: 5))
+        recover.tap()
+        XCTAssertTrue(app.staticTexts["Recently deleted"].waitForExistence(timeout: 5))
+        let gone = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: deleted)
+        wait(for: [gone], timeout: 5)
+    }
+
     @MainActor
     func testBeforeTheFirstMomentItLeadsToTheCamera() {
         launch(.empty)

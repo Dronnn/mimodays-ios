@@ -289,6 +289,9 @@ enum MemoriesRoute: Hashable {
     /// M11, M12.
     case collections
     case collection(UUID)
+    /// M16, M16b.
+    case recentlyDeleted
+    case deletedMoment(UUID)
 }
 
 extension View {
@@ -301,6 +304,8 @@ extension View {
             case .search: SearchScreen()
             case .collections: CollectionsScreen()
             case let .collection(id): CollectionScreen(id: id)
+            case .recentlyDeleted: RecentlyDeletedScreen()
+            case let .deletedMoment(id): DeletedMomentScreen(id: id)
             }
         }
     }

@@ -18,7 +18,7 @@ private struct CollectionsHost: View {
 }
 
 /// M11: every collection as a stacked cover with its name and count; + makes a new one (M11b).
-/// Recently deleted joins with 9.11.
+/// Recently deleted sits at the bottom while it holds anything.
 struct CollectionsView: View {
     let model: CollectionsModel
     @State private var makesNew = false
@@ -47,6 +47,9 @@ struct CollectionsView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 16)
                 }
+                if model.deletedCount > 0 {
+                    recentlyDeleted.padding(.top, 24)
+                }
             }
             .padding(.bottom, 24)
             .frame(maxWidth: 1180)
@@ -71,6 +74,26 @@ struct CollectionsView: View {
         .sheet(isPresented: $makesNew) {
             NewCollectionSheet { model.create($0) }
         }
+    }
+
+    private var recentlyDeleted: some View {
+        NavigationLink(value: MemoriesRoute.recentlyDeleted) {
+            HStack(spacing: 12) {
+                Icon.glyphTrash.image.resizable().scaledToFit().frame(width: 20, height: 20).accessibilityHidden(true)
+                Text("Recently deleted", bundle: .module).textStyle(.rowTitle)
+                Spacer(minLength: 8)
+                Text(model.deletedCount, format: .number).textStyle(.rowCaption).foregroundStyle(ColorToken.textSecondary.color)
+                Icon.glyphChevron.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
+            }
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .padding(.horizontal, 18)
+            .frame(minHeight: 56)
+            .background(FieldBlob().fill(ColorToken.surfaceCard.color))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 20)
+        .accessibilityIdentifier("collections.recentlyDeleted")
     }
 
     private var empty: some View {

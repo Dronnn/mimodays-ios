@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import os
 import SwiftUI
 import UIKit
 
@@ -65,7 +66,9 @@ public struct RootView: View {
             }
         }
         .onChange(of: scenePhase, initial: true) { _, phase in
-            if phase == .active { refreshSurprises() }
+            guard phase == .active else { return }
+            refreshSurprises()
+            purgeRecentlyDeleted()
         }
         // Midnight, a clock change or a new time zone: hours follow the device.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
@@ -74,6 +77,16 @@ public struct RootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
             NSTimeZone.resetSystemTimeZone()
             refreshSurprises()
+        }
+    }
+
+    /// Moments in Recently deleted longer than 30 days go for good.
+    private func purgeRecentlyDeleted() {
+        let library = memories.library
+        do {
+            try DeletionStore(context: library.context, store: library.store).purgeExpired()
+        } catch {
+            Logger(subsystem: "MimoDays", category: "Deletion").error("Purging Recently deleted failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 

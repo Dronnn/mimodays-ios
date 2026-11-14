@@ -25,6 +25,30 @@
         }
       }
     },
+    "%lld days": {
+      "comment": "Recently deleted (M16/M16b) badge: days before a moment goes for good.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld days with moments": {
       "comment": "On the year calendar, VoiceOver: how many days of a month have moments.",
       "extractionState": "manual",
@@ -709,6 +733,78 @@
         }
       }
     },
+    "Delete": {
+      "comment": "Viewer (M05/M06) trash button, for VoiceOver.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        }
+      }
+    },
+    "Delete %lld moments": {
+      "comment": "Delete sheet (M15) button for several moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld moment"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld moments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Delete %lld moments for good?": {
+      "comment": "Recently deleted (M16): confirmation before Delete all.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld moment for good?"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld moments for good?"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Delete all": {
+      "comment": "Recently deleted (M16) bottom bar: deletes everything in it for good.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete all"
+          }
+        }
+      }
+    },
     "Delete collection": {
       "comment": "Collection (M12) menu and confirmation button; the moments stay.",
       "extractionState": "manual",
@@ -717,6 +813,78 @@
           "stringUnit": {
             "state": "translated",
             "value": "Delete collection"
+          }
+        }
+      }
+    },
+    "Delete moment": {
+      "comment": "Delete sheet (M15) button, and the button at the bottom of Edit moment (M07).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete moment"
+          }
+        }
+      }
+    },
+    "Delete now": {
+      "comment": "Deleted moment (M16b): deletes it for good.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete now"
+          }
+        }
+      }
+    },
+    "Delete these %lld moments?": {
+      "comment": "Delete sheet (M15) title for several selected moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld moment?"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete these %lld moments?"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Delete this moment for good?": {
+      "comment": "Deleted moment (M16b): confirmation before Delete now.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this moment for good?"
+          }
+        }
+      }
+    },
+    "Delete this moment?": {
+      "comment": "Delete sheet (M15) title for one moment.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this moment?"
           }
         }
       }
@@ -741,6 +909,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "Delete “%@”?"
+          }
+        }
+      }
+    },
+    "Deleted %lld days ago.": {
+      "comment": "Deleted moment (M16b): how long ago it was deleted.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Deleted %lld day ago."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Deleted %lld days ago."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Deleted today.": {
+      "comment": "Deleted moment (M16b): deleted earlier today.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deleted today."
           }
         }
       }
@@ -1197,6 +1401,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Memories"
+          }
+        }
+      }
+    },
+    "Moments are deleted for good after 30 days. They are not shown anywhere else in the app.": {
+      "comment": "Recently deleted (M16) subtitle.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moments are deleted for good after 30 days. They are not shown anywhere else in the app."
           }
         }
       }
@@ -1921,6 +2137,18 @@
         }
       }
     },
+    "Recently deleted": {
+      "comment": "Recently deleted (M16) title, and its row at the bottom of Collections (M11).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recently deleted"
+          }
+        }
+      }
+    },
     "Record again": {
       "comment": "Review after a recording stopped early (C13d): text button that drops the clip and goes back to the camera",
       "extractionState": "manual",
@@ -1981,6 +2209,30 @@
         }
       }
     },
+    "Recover": {
+      "comment": "Deleted moment (M16b) primary button: brings it back.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recover"
+          }
+        }
+      }
+    },
+    "Recover all": {
+      "comment": "Recently deleted (M16) bottom bar: brings everything back.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recover all"
+          }
+        }
+      }
+    },
     "Remove from collection": {
       "comment": "Collection (M12): long-press action on a moment; the moment stays in Memories.",
       "extractionState": "manual",
@@ -2001,6 +2253,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Remove voice note"
+          }
+        }
+      }
+    },
+    "Removed in %lld days": {
+      "comment": "Recently deleted badge, for VoiceOver.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Removed in %lld day"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Removed in %lld days"
+                }
+              }
+            }
           }
         }
       }
@@ -2713,6 +2989,18 @@
         }
       }
     },
+    "The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days.": {
+      "comment": "Delete sheet (M15) body for a photo.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days."
+          }
+        }
+      }
+    },
     "The recording stopped at %@ when you left MimoDays. The part before is kept.": {
       "comment": "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the app went to the background",
       "extractionState": "manual",
@@ -2745,6 +3033,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "The video and its time can't be changed."
+          }
+        }
+      }
+    },
+    "The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days.": {
+      "comment": "Delete sheet (M15) body for a video.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days."
+          }
+        }
+      }
+    },
+    "They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days.": {
+      "comment": "Delete sheet (M15) body for several moments.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days."
+          }
+        }
+      }
+    },
+    "This can't be undone.": {
+      "comment": "Confirmation message before deleting moments for good.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This can't be undone."
           }
         }
       }
@@ -3085,6 +3409,54 @@
         }
       }
     },
+    "Used in %lld movie drafts. It will be skipped there.": {
+      "comment": "Delete sheet (M15): the moment is in movie drafts.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Used in a movie draft. It will be skipped there."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Used in %lld movie drafts. It will be skipped there."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Used in %lld movie drafts. They will be skipped there.": {
+      "comment": "Delete sheet (M15): some of the selected moments are in movie drafts.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Used in a movie draft. They will be skipped there."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Used in %lld movie drafts. They will be skipped there."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Video": {
       "comment": "Camera mode switch (shown uppercase) and the camera settings Opens in option; review (C07) accessibility label of a video Also the first word of a moment's VoiceOver description, e.g. \"Video, Yesterday, 6:42 PM\".",
       "extractionState": "manual",
@@ -3213,6 +3585,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "When should MimoDays surprise you?"
+          }
+        }
+      }
+    },
+    "Will be removed in %lld days.": {
+      "comment": "Deleted moment (M16b): how long until it goes for good.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Will be removed in %lld day."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Will be removed in %lld days."
+                }
+              }
+            }
           }
         }
       }

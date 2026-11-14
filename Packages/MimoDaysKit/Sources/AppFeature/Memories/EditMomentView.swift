@@ -5,9 +5,11 @@ import SwiftData
 import SwiftUI
 
 /// M07: Cancel, Edit moment, Save; the picture and its time (fixed), the caption and note, then voice note, place,
-/// collections and favourite. Delete moment (9.11) joins with its step.
+/// collections and favourite, and Delete moment at the bottom.
 struct EditMomentView: View {
     @Bindable var model: EditMomentModel
+    /// After the moment moved to Recently deleted.
+    var onDelete: () -> Void = {}
     @Environment(\.dismiss) private var dismiss
     @Environment(\.permissions) private var permissions
     @Environment(\.openURL) private var openURL
@@ -18,6 +20,8 @@ struct EditMomentView: View {
     @State private var recording: VoiceRecording?
     @State private var microphoneOff = false
     @State private var saveFailed = false
+    @State private var confirmsDelete = false
+    @State private var deleted = false
 
     var body: some View {
         ScrollView {
@@ -30,6 +34,16 @@ struct EditMomentView: View {
                     .padding(.top, 10)
                 rows
                     .padding(.top, 20)
+                Button { confirmsDelete = true } label: {
+                    Text("Delete moment", bundle: .module)
+                        .textStyle(.rowTitle)
+                        .foregroundStyle(ColorToken.textLink.color)
+                        .frame(maxWidth: .infinity, minHeight: Size.minimumTapTarget)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 20)
+                .accessibilityIdentifier("edit.delete")
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 24)
@@ -54,6 +68,16 @@ struct EditMomentView: View {
         }
         .sheet(item: $recording) { recording in
             VoiceRecordingSheet(recording: recording) { model.addVoice(at: $0.url, recordedAt: $0.startedAt) }
+        }
+        .sheet(isPresented: $confirmsDelete, onDismiss: {
+            // Closes once the sheet has gone, not while it is still on top.
+            guard deleted else { return }
+            dismiss()
+            onDelete()
+        }) {
+            DeleteConfirmationSheet(count: 1, mediaType: model.mediaType, movieDrafts: model.movieDrafts) {
+                deleted = model.delete()
+            }
         }
         .sheet(isPresented: $choosesPlace) {
             PlaceSheet(model: model, showsCurrent: false)

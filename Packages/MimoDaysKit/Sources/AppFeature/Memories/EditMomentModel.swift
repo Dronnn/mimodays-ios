@@ -141,6 +141,23 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     }
 
     /// A recording that won't be kept: its temporary file goes.
+    /// Movie drafts that use it (M15's note).
+    var movieDrafts: Int { (try? deletionStore.movieDrafts(using: [id])) ?? 0 }
+
+    /// Drops what was recorded here and moves the moment to Recently deleted; false when that failed.
+    func delete() -> Bool {
+        discardRecording()
+        do {
+            try deletionStore.moveToRecentlyDeleted([id])
+            return true
+        } catch {
+            logger.error("Deleting the moment failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
+    private var deletionStore: DeletionStore { DeletionStore(context: library.context, store: library.store) }
+
     func discardRecording() {
         transcription?.cancel()
         transcription = nil

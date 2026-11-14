@@ -31,6 +31,9 @@ struct MomentViewer: View {
     @Environment(\.camera) private var camera
     /// M07 while it is open.
     @State private var editing: EditMomentModel?
+    /// M15 while it is open, for this moment.
+    @State private var deleting: ViewerMoment?
+    @Environment(\.dismiss) private var dismiss
 
     private var isVideo: Bool { model.currentMoment?.mediaType == .video }
 
@@ -67,7 +70,15 @@ struct MomentViewer: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let moment = model.currentMoment { actions(moment) }
         }
-        .fullScreenCover(item: $editing) { EditMomentView(model: $0) }
+        .fullScreenCover(item: $editing) { edit in
+            EditMomentView(model: edit) { model.removeFromPager(edit.id) }
+        }
+        .sheet(item: $deleting) { moment in
+            DeleteConfirmationSheet(count: 1, mediaType: moment.mediaType, movieDrafts: model.movieDrafts(moment.id)) {
+                model.delete(moment.id)
+            }
+        }
+        .onChange(of: model.ids.isEmpty) { _, isEmpty in if isEmpty { dismiss() } }
         .onChange(of: model.current) { model.stopVoice() }
         .onDisappear { model.stopVoice() }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
@@ -172,7 +183,7 @@ struct MomentViewer: View {
 
     // MARK: Actions
 
-    /// Share, favourite and edit; deleting arrives with its own step.
+    /// Share, favourite, edit and delete.
     private func actions(_ moment: ViewerMoment) -> some View {
         let tint = (isVideo ? ColorToken.mediaFrame : .textPrimary).color
         return HStack {
@@ -210,6 +221,21 @@ struct MomentViewer: View {
             .buttonStyle(.plain)
             .accessibilityLabel(Text("Edit", bundle: .module))
             .accessibilityIdentifier("viewer.edit")
+            .frame(maxWidth: .infinity)
+            Button {
+                model.stopVoice()
+                deleting = moment
+            } label: {
+                Icon.glyphTrash.image
+                    .resizable()
+                    .frame(width: 24, height: 24)
+                    .foregroundStyle(tint)
+                    .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Delete", bundle: .module))
+            .accessibilityIdentifier("viewer.delete")
             .frame(maxWidth: .infinity)
         }
         .padding(.top, 6)

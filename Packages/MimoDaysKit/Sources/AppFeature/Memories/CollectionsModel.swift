@@ -121,6 +121,8 @@ struct CollectionSummary: Equatable, Identifiable {
 final class CollectionsModel {
     private(set) var collections: [CollectionSummary] = []
     private(set) var isLoaded = false
+    /// Moments in Recently deleted (M16's row at the bottom of M11).
+    private(set) var deletedCount = 0
     private(set) var covers: [UUID: UIImage] = [:]
 
     let library: MediaLibrary
@@ -135,6 +137,7 @@ final class CollectionsModel {
     func refresh() {
         do {
             collections = try library.context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)])).map(Self.summary)
+            deletedCount = try library.context.fetchCount(FetchDescriptor<Moment>(predicate: #Predicate { $0.deletedAt != nil }))
         } catch {
             logger.error("Reading collections failed: \(error.localizedDescription, privacy: .public)")
         }

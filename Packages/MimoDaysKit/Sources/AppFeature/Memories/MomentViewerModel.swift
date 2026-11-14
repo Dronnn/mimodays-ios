@@ -95,7 +95,8 @@ struct ViewerMoment: Equatable, Identifiable {
 @MainActor
 @Observable
 final class MomentViewerModel {
-    let ids: [UUID]
+    /// Shrinks as moments are deleted from here.
+    private(set) var ids: [UUID]
     /// The moment on screen.
     var current: UUID?
     private(set) var moments: [UUID: ViewerMoment] = [:]
@@ -162,6 +163,33 @@ final class MomentViewerModel {
             logger.error("Saving the favourite failed: \(error.localizedDescription, privacy: .public)")
         }
     }
+
+    /// Movie drafts that use the moment (M15's note).
+    func movieDrafts(_ id: UUID) -> Int {
+        (try? deletionStore.movieDrafts(using: [id])) ?? 0
+    }
+
+    /// Moves the moment to Recently deleted and shows the next one, or the one before when it was last.
+    func delete(_ id: UUID) {
+        stopVoice()
+        do {
+            try deletionStore.moveToRecentlyDeleted([id])
+        } catch {
+            logger.error("Deleting the moment failed: \(error.localizedDescription, privacy: .public)")
+            return
+        }
+        removeFromPager(id)
+    }
+
+    /// After Edit moment deleted it.
+    func removeFromPager(_ id: UUID) {
+        guard let index = ids.firstIndex(of: id) else { return }
+        ids.remove(at: index)
+        moments[id] = nil
+        if current == id { current = ids.isEmpty ? nil : ids[min(index, ids.count - 1)] }
+    }
+
+    private var deletionStore: DeletionStore { DeletionStore(context: library.context, store: library.store) }
 
     /// Plays the voice note, or stops it when it's the one playing.
     func toggleVoice(_ id: UUID) {

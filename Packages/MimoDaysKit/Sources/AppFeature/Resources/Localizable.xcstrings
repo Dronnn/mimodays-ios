@@ -3494,13 +3494,13 @@
       }
     },
     "The map can't be shown right now. Your places are all here.": {
-      "comment": "Map (P06) when the map can't load; the places are listed under it.",
+      "comment": "Map (P06) when the map can't load; the places are listed under it. Two lines, as drawn.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The map can't be shown right now. Your places are all here."
+            "value": "The map can't be shown right now.\nYour places are all here."
           }
         }
       }

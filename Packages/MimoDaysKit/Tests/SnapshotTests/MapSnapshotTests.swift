@@ -68,9 +68,14 @@ struct MapSnapshotTests {
 
     /// P04.
     @Test func filters() async throws {
-        try await save(3, at: "Lake Merritt")
+        let ids = try await save(3, at: "Lake Merritt")
+        let summer = try #require(try CollectionStore(context: container.mainContext).create("Summer 2026", with: ids))
         let model = MapModel(library: library)
         model.refresh()
+        // As drawn: a custom period and a collection.
+        model.filters.from = 20260601
+        model.filters.to = 20260831
+        model.filters.collection = summer
         assertScreenSnapshots(
             of: MapFiltersSheet(model: model, thisYear: 2026).background(ColorToken.surfaceSheet.color.ignoresSafeArea()),
             variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
@@ -100,6 +105,17 @@ struct MapSnapshotTests {
                 .padding(.top, 44)
                 .background(ColorToken.canvas.color.ignoresSafeArea()),
             variants: [SnapshotVariant(.iPhone, .light)]
+        )
+    }
+
+    /// P06: the drawn grid, the card and Try again, then every place.
+    @Test func unavailable() async throws {
+        try await save(3, at: "Lake Merritt")
+        let model = MapModel(library: library)
+        model.refresh()
+        assertScreenSnapshots(
+            of: NavigationStack { MapUnavailableView(model: model) {}.background(ColorToken.canvas.color.ignoresSafeArea()) },
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
         )
     }
 

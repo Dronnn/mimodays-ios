@@ -116,6 +116,8 @@ public struct TextStyle: Equatable, Sendable {
     public static let searchField = TextStyle(.patrickHand, size: 17, relativeTo: .body)
     /// Second line of a list row ("Nearby", "Used 4 times") and the note under a list.
     public static let rowCaption = TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote)
+    /// A setting's value at a row's end: From/To dates, the collection (M08b, P04).
+    public static let rowValue = TextStyle(.nunito, size: 15, weight: 500, relativeTo: .subheadline)
     /// Retake sits on the photo, so it stops growing at 1.35x like the camera controls.
     public static let reviewRetake = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
     // Today (T01-T07).

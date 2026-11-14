@@ -343,35 +343,78 @@ struct MapView: View {
 
     /// The map didn't load: say so plainly and list every place instead.
     private var cannotLoad: some View {
+        MapUnavailableView(model: model) {
+            failed = false
+            retry += 1
+            fitToken += 1
+        }
+    }
+}
+
+/// P06: `Map / Unavailable` - a drawn grid where the map would be, the card saying so and Try again - then PLACES.
+struct MapUnavailableView: View {
+    let model: MapModel
+    let retry: () -> Void
+
+    var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 12) {
-                    Icon.glyphInfo.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
-                    Text("The map can't be shown right now. Your places are all here.", bundle: .module)
-                        .textStyle(.rowCaption)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Spacer(minLength: 0)
-                }
-                .foregroundStyle(ColorToken.textPrimary.color)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(FieldBlob().fill(ColorToken.surfaceCard.color))
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                Button {
-                    failed = false
-                    retry += 1
-                    fitToken += 1
-                } label: { Text("Try again", bundle: .module) }
-                    .buttonStyle(.text)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(.horizontal, 20)
-                    .accessibilityIdentifier("map.retry")
+                MapUnavailableGrid()
+                    .frame(height: 330)
+                    .overlay(alignment: .top) {
+                        HStack(spacing: 10) {
+                            Icon.glyphInfo.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
+                            Text("The map can't be shown right now. Your places are all here.", bundle: .module)
+                                .textStyle(.infoCard)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 0)
+                        }
+                        .foregroundStyle(ColorToken.textPrimary.color)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                        .frame(minHeight: 64)
+                        .background(FieldBlob().fill(ColorToken.surfaceCard.color))
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
+                    }
+                    .overlay(alignment: .bottomTrailing) {
+                        Button(action: retry) {
+                            Text("Try again", bundle: .module)
+                                .textStyle(.control)
+                                .foregroundStyle(ColorToken.textLink.color)
+                                .frame(minHeight: Size.minimumTapTarget)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 4)
+                        .accessibilityIdentifier("map.retry")
+                    }
                 PlacesList(model: model)
-                    .padding(.top, 12)
+                    .padding(.top, 20)
             }
             .padding(.bottom, 24)
         }
+    }
+}
+
+/// The unavailable map's drawing: thin lines every 67 pt across and 55 pt down on a sand ground.
+private struct MapUnavailableGrid: View {
+    var body: some View {
+        Canvas { context, size in
+            var lines = Path()
+            for x in stride(from: 67.0, to: size.width, by: 67) {
+                lines.move(to: CGPoint(x: x, y: 0))
+                lines.addLine(to: CGPoint(x: x, y: size.height))
+            }
+            for y in stride(from: 55.0, to: size.height, by: 55) {
+                lines.move(to: CGPoint(x: 0, y: y))
+                lines.addLine(to: CGPoint(x: size.width, y: y))
+            }
+            context.stroke(lines, with: .color(Color(hex: 0xDDCFC1)), lineWidth: 1.5)
+        }
+        .background(Color(hex: 0xEADFD3))
+        .accessibilityHidden(true)
     }
 }
 
@@ -467,13 +510,13 @@ struct PlacesList: View {
                         HStack(spacing: 14) {
                             Icon.glyphPin.image
                                 .resizable()
-                                .frame(width: 18, height: 18)
+                                .frame(width: 20, height: 20)
                                 .frame(width: 36, height: 36)
                                 .background(Circle().fill(ColorToken.accentPeach.color))
                                 .accessibilityHidden(true)
                             PlaceName(place: place).textStyle(.rowTitle)
                             Spacer(minLength: 8)
-                            Text(place.moments.count, format: .number).textStyle(.rowCaption).foregroundStyle(ColorToken.textSecondary.color)
+                            Text(place.moments.count, format: .number).textStyle(.rowValue).foregroundStyle(ColorToken.textTertiary.color)
                             Icon.glyphChevron.image
                                 .resizable()
                                 .frame(width: 20, height: 20)

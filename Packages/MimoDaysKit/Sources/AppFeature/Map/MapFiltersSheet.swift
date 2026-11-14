@@ -38,7 +38,7 @@ struct MapFiltersSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 Text("Show on the map", bundle: .module)
-                    .textStyle(.sheetTitle)
+                    .textStyle(.largeSheetTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .accessibilityAddTraits(.isHeader)
                     .padding(.horizontal, 4)
@@ -136,8 +136,8 @@ struct MapFiltersSheet: View {
                         Text("Any collection", bundle: .module)
                     }
                 }
-                .textStyle(.rowCaption)
-                .foregroundStyle(ColorToken.textSecondary.color)
+                .textStyle(.rowValue)
+                .foregroundStyle(ColorToken.textTertiary.color)
                 .lineLimit(1)
                 Icon.glyphChevron.image
                     .resizable()
@@ -179,8 +179,8 @@ struct MapFiltersSheet: View {
                         Text("Today", bundle: .module)
                     }
                 }
-                .textStyle(.rowCaption)
-                .foregroundStyle(ColorToken.textSecondary.color)
+                .textStyle(.rowValue)
+                .foregroundStyle(ColorToken.textTertiary.color)
                 Icon.glyphChevron.image
                     .resizable()
                     .frame(width: 20, height: 20)

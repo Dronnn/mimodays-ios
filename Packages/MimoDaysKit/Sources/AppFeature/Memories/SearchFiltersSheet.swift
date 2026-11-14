@@ -104,8 +104,8 @@ struct SearchFiltersSheet: View {
                         Text("Today", bundle: .module)
                     }
                 }
-                .textStyle(.rowCaption)
-                .foregroundStyle(ColorToken.textSecondary.color)
+                .textStyle(.rowValue)
+                .foregroundStyle(ColorToken.textTertiary.color)
                 Icon.glyphChevron.image
                     .frame(width: 20, height: 20)
                     .foregroundStyle(ColorToken.textPrimary.color)
@@ -184,8 +184,8 @@ struct SearchFiltersSheet: View {
                         Text("Any", bundle: .module)
                     }
                 }
-                .textStyle(.rowCaption)
-                .foregroundStyle(ColorToken.textSecondary.color)
+                .textStyle(.rowValue)
+                .foregroundStyle(ColorToken.textTertiary.color)
                 .lineLimit(1)
                 Icon.glyphChevron.image
                     .frame(width: 20, height: 20)

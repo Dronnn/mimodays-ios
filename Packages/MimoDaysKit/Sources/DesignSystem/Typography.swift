@@ -155,6 +155,24 @@ public struct TextStyle: Equatable, Sendable {
     /// The place and the date line under a moment in the viewer (M05).
     public static let viewerPlace = TextStyle(.nunito, size: 14, weight: 700, relativeTo: .footnote)
     public static let viewerMeta = TextStyle(.nunito, size: 14, weight: 500, relativeTo: .footnote)
+    // Movies (F01).
+    /// "October is ready" on a suggestion card.
+    public static let suggestionTitle = TextStyle(.fraunces, size: 19, weight: 600, relativeTo: .title3, maximumScale: 1.35)
+    /// `Button / Small primary`: "Make it".
+    public static let buttonSmall = TextStyle(.fraunces, size: 16, weight: 600, relativeTo: .callout, maximumScale: 1.35)
+    /// A quiet action beside a small button: "Not now".
+    public static let smallAction = TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35)
+    /// A wizard step's question: "What's it about?" (F02-F05).
+    public static let wizardQuestion = TextStyle(.fraunces, size: 28, weight: 600, tracking: -0.4, relativeTo: .title1, maximumScale: 1.35)
+    /// F03's days, and a chosen one on its coral disc; the grid can't grow far.
+    public static let calendarDay16 = TextStyle(.nunito, size: 16, weight: 600, relativeTo: .body, maximumScale: 1.35)
+    public static let calendarChosenDay = TextStyle(.nunito, size: 16, weight: 800, relativeTo: .body, maximumScale: 1.35)
+    /// The chosen shape's name under its frame (F04).
+    public static let shapeLabelOn = TextStyle(.nunito, size: 13, weight: 700, relativeTo: .footnote)
+    /// A section in a tab's library: "Drafts", "Movies".
+    public static let librarySection = TextStyle(.fraunces, size: 21, weight: 600, relativeTo: .title3, maximumScale: 1.35)
+    /// "Draft" on a draft's cover; it sits on the picture.
+    public static let coverBadge = TextStyle(.nunito, size: 12, weight: 800, relativeTo: .caption2, maximumScale: 1.35)
     /// The video length on a grid tile; it sits on the picture, so it stops growing at 1.35x.
     public static let tileBadge = TextStyle(.nunito, size: 12, weight: 700, relativeTo: .caption2, maximumScale: 1.35)
     /// Search (M08): the words typed, Cancel, and where a moment matched.

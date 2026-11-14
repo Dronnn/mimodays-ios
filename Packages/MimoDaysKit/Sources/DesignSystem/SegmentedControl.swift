@@ -8,13 +8,18 @@ public struct SegmentedControl<Value: Hashable>: View {
     @Binding var selection: Value
     let options: [Value]
     let fitsLabels: Bool
+    /// 14 in most places; F04/F05 draw 15.
+    let labelSize: CGFloat
     let label: (Value) -> Text
     @Namespace private var pill
 
-    public init(selection: Binding<Value>, options: [Value], fitsLabels: Bool = false, label: @escaping (Value) -> Text) {
+    public init(
+        selection: Binding<Value>, options: [Value], fitsLabels: Bool = false, labelSize: CGFloat = 14, label: @escaping (Value) -> Text
+    ) {
         _selection = selection
         self.options = options
         self.fitsLabels = fitsLabels
+        self.labelSize = labelSize
         self.label = label
     }
 
@@ -27,7 +32,7 @@ public struct SegmentedControl<Value: Hashable>: View {
                     withAnimation(.snappy) { selection = option }
                 } label: {
                     label(option)
-                        .textStyle(TextStyle(.nunito, size: 14, weight: isSelected ? 700 : 600, relativeTo: .subheadline, maximumScale: 1.35))
+                        .textStyle(TextStyle(.nunito, size: labelSize, weight: isSelected ? 700 : 600, relativeTo: .subheadline, maximumScale: 1.35))
                         .foregroundStyle((isSelected ? ColorToken.textLink : .textPrimary).color)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 6)

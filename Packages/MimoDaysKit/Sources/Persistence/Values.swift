@@ -99,6 +99,8 @@ public enum MovieSourceKind: String, Codable, CaseIterable, Sendable {
     case collection
     case selection
     case onThisDay
+    /// The moments at one place on the map (`momentIDs`).
+    case place
 }
 
 /// Which moments a movie is built from.

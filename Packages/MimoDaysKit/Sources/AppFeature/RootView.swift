@@ -109,8 +109,7 @@ public struct RootView: View {
                         case .today: TodayView(model: today)
                         case .memories: MemoriesView(model: memories)
                         case .map: MapScreen()
-                        case .movies:
-                            TabRootView(tab: tab)
+                        case .movies: MoviesScreen()
                         }
                     }
                 } label: {
@@ -142,39 +141,6 @@ public struct RootView: View {
             }
         }
         .animation(.snappy, value: showsSavedToast)
-    }
-}
-
-/// Root of Map and Movies until their phases build the real screens.
-struct TabRootView: View {
-    let tab: MainTab
-    @Environment(AppRouter.self) private var router
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.sectionGap) {
-                Text(tab.title)
-                    .textStyle(.displayTitle)
-                    .foregroundStyle(ColorToken.textPrimary.color)
-                    .accessibilityAddTraits(.isHeader)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, Spacing.screenMargin)
-            .padding(.top, 8)
-        }
-        .background(ColorToken.canvas.color)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button { router.open(.settings) } label: {
-                    Icon.glyphGear.image
-                        .foregroundStyle(ColorToken.textPrimary.color)
-                        .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
-                }
-                .accessibilityLabel(Text("Settings", bundle: .module))
-                .accessibilityIdentifier("settings")
-            }
-        }
-        .toolbarBackground(ColorToken.canvas.color, for: .navigationBar)
     }
 }
 

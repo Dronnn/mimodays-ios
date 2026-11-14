@@ -13,6 +13,52 @@
         }
       }
     },
+    "%@ has %lld moments. A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips.": {
+      "comment": "New movie (F16): why there's no movie. %@: the source, e.g. Last month; then its moment count",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ has %#@moments@. A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips."
+          },
+          "substitutions": {
+            "moments": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg moment"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg moments"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%@ is ready": {
+      "comment": "Movies library (F01): suggestion card title. %@: a month's name, e.g. October",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is ready"
+          }
+        }
+      }
+    },
     "%@ of %@": {
       "comment": "Voice note sheet (C09): accessibility value of the stop button, e.g. \"12 seconds of 1 minute\". First: time recorded, second: the limit",
       "extractionState": "manual",
@@ -25,6 +71,30 @@
         }
       }
     },
+    "%@ · %@": {
+      "comment": "New movie (F02): a period and how many moments it has, e.g. October 2026 · 38 moments",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ · %@ · %@": {
+      "comment": "Movies library (F01): a movie's length, shape and when it was made, e.g. 1:02 · 9:16 · Oct 1",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@ · %3$@"
+          }
+        }
+      }
+    },
     "%@ · Surprise": {
       "comment": "Origin of a moment, after its time in lists and review: \"8:05 AM · Surprise\". The moment answered a surprise notification",
       "extractionState": "manual",
@@ -33,6 +103,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ · Surprise"
+          }
+        }
+      }
+    },
+    "%@, the whole year": {
+      "comment": "New movie: title of a movie of last year. %@: the year, e.g. 2025",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, the whole year"
           }
         }
       }
@@ -109,6 +191,30 @@
         }
       }
     },
+    "%lld minutes": {
+      "comment": "New movie (F04): a custom length",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minute"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minutes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld moments": {
       "comment": "On this day (T06): how many moments that day has.",
       "extractionState": "manual",
@@ -126,6 +232,60 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld moments"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld moments from %lld days.": {
+      "comment": "Movies library (F01): suggestion card, how many moments over how many days",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%#@moments@ from %#@days@."
+          },
+          "substitutions": {
+            "moments": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg moment"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg moments"
+                    }
+                  }
+                }
+              }
+            },
+            "days": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg day"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg days"
+                    }
+                  }
                 }
               }
             }
@@ -265,6 +425,30 @@
         }
       }
     },
+    "16:9 · TV": {
+      "comment": "New movie (F04): wide shape option",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16:9 · TV"
+          }
+        }
+      }
+    },
+    "1:1 · Square": {
+      "comment": "New movie (F04): square shape option",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1:1 · Square"
+          }
+        }
+      }
+    },
     "3 a day": {
       "comment": "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
       "extractionState": "manual",
@@ -289,6 +473,30 @@
         }
       }
     },
+    "3 to 5 min": {
+      "comment": "New movie (F04): Short's length",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 to 5 min"
+          }
+        }
+      }
+    },
+    "9:16 · Phone": {
+      "comment": "New movie (F04): tall shape option",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "9:16 · Phone"
+          }
+        }
+      }
+    },
     "A call stopped the recording at %@. The part before the call is kept.": {
       "comment": "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; a call or another app took the camera",
       "extractionState": "manual",
@@ -297,6 +505,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "A call stopped the recording at %@. The part before the call is kept."
+          }
+        }
+      }
+    },
+    "A collection": {
+      "comment": "New movie (F02): source row that lists collections",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A collection"
           }
         }
       }
@@ -349,6 +569,18 @@
         }
       }
     },
+    "A place": {
+      "comment": "New movie (F02): source row that lists places",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A place"
+          }
+        }
+      }
+    },
     "A surprise moment is ready": {
       "comment": "Surprise ribbon on Today (T03): a surprise notification fired and can still be answered.",
       "extractionState": "manual",
@@ -357,6 +589,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "A surprise moment is ready"
+          }
+        }
+      }
+    },
+    "About %lld minutes.": {
+      "comment": "Movies library (F01): suggestion card, how long the movie would be",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "About %lld minute."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "About %lld minutes."
+                }
+              }
+            }
           }
         }
       }
@@ -505,6 +761,18 @@
         }
       }
     },
+    "All · %lld": {
+      "comment": "New movie (F05): switch option showing every moment, with the count",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All · %lld"
+          }
+        }
+      }
+    },
     "Any": {
       "comment": "Search filters (M08b), Collection row: no collection chosen, and the menu item that clears it",
       "extractionState": "manual",
@@ -597,6 +865,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bottom right"
+          }
+        }
+      }
+    },
+    "Build the movie": {
+      "comment": "New movie (F05): button that makes the draft",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Build the movie"
           }
         }
       }
@@ -721,6 +1001,18 @@
         }
       }
     },
+    "Catch a moment now": {
+      "comment": "New movie (F16): button that opens the camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catch a moment now"
+          }
+        }
+      }
+    },
     "Catch the surprise": {
       "comment": "Label under Today's capture button while a surprise can be answered (T03).",
       "extractionState": "manual",
@@ -741,6 +1033,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Catch your first moment"
+          }
+        }
+      }
+    },
+    "Choose moments": {
+      "comment": "New movie (F02): source row for picking moments by hand",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose moments"
+          }
+        }
+      }
+    },
+    "Choose more dates": {
+      "comment": "New movie (F16): button back to the date picker",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose more dates"
           }
         }
       }
@@ -897,6 +1213,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Custom"
+          }
+        }
+      }
+    },
+    "Dates": {
+      "comment": "New movie (F02): source row that opens the date picker",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dates"
           }
         }
       }
@@ -1237,6 +1565,30 @@
         }
       }
     },
+    "Draft": {
+      "comment": "Movies library (F01): badge on a draft's cover",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Draft"
+          }
+        }
+      }
+    },
+    "Drafts": {
+      "comment": "Movies library (F01): section of movies not made yet",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drafts"
+          }
+        }
+      }
+    },
     "Earliest": {
       "comment": "Surprise schedule (onboarding O07): row title, earliest time a surprise may arrive",
       "extractionState": "manual",
@@ -1269,6 +1621,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Edit moment"
+          }
+        }
+      }
+    },
+    "Edited %@": {
+      "comment": "Movies library (F01): when a draft was last edited. %@: e.g. '2 days ago' or 'Oct 2'",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edited %@"
           }
         }
       }
@@ -1317,6 +1681,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Favorites only"
+          }
+        }
+      }
+    },
+    "Fill the frame": {
+      "comment": "New movie (F04): crop photos and videos to the movie's shape",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fill the frame"
           }
         }
       }
@@ -1389,6 +1765,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "From"
+          }
+        }
+      }
+    },
+    "Full": {
+      "comment": "New movie (F04): length option",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Full"
           }
         }
       }
@@ -1537,6 +1925,30 @@
         }
       }
     },
+    "Last month": {
+      "comment": "New movie (F02): source row, and F16's sentence subject",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last month"
+          }
+        }
+      }
+    },
+    "Last year": {
+      "comment": "New movie (F02): source row, and F16's sentence subject",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last year"
+          }
+        }
+      }
+    },
     "Latest": {
       "comment": "Surprise schedule (onboarding O07): row title, latest time a surprise may arrive",
       "extractionState": "manual",
@@ -1545,6 +1957,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Latest"
+          }
+        }
+      }
+    },
+    "Length": {
+      "comment": "New movie (F04): section title (shown in capitals); back button to step 2",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Length"
           }
         }
       }
@@ -1573,6 +1997,18 @@
         }
       }
     },
+    "Make a movie": {
+      "comment": "Movies empty state (F01e): button that starts a new movie",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make a movie"
+          }
+        }
+      }
+    },
     "Make a movie of this place": {
       "comment": "Place (P03): button at the bottom that makes a movie of this place's moments.",
       "extractionState": "manual",
@@ -1581,6 +2017,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Make a movie of this place"
+          }
+        }
+      }
+    },
+    "Make it": {
+      "comment": "Movies library (F01): suggestion card button that makes the suggested movie",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make it"
           }
         }
       }
@@ -1777,6 +2225,42 @@
         }
       }
     },
+    "Movie period: these dates": {
+      "comment": "New movie (F05): 'spread evenly across these dates'",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "these dates"
+          }
+        }
+      }
+    },
+    "Movie period: this collection": {
+      "comment": "New movie (F05): 'spread evenly across this collection'",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "this collection"
+          }
+        }
+      }
+    },
+    "Movie period: this place": {
+      "comment": "New movie (F05): 'spread evenly across this place'",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "this place"
+          }
+        }
+      }
+    },
     "Movies": {
       "comment": "Tab: movies made from moments",
       "extractionState": "manual",
@@ -1825,6 +2309,30 @@
         }
       }
     },
+    "New movie": {
+      "comment": "Movies: the + button's label, and the wizard bar's title (F02-F05)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New movie"
+          }
+        }
+      }
+    },
+    "Next": {
+      "comment": "New movie wizard (F02-F04): button to the next step",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next"
+          }
+        }
+      }
+    },
     "Next month": {
       "comment": "Calendar arrow, VoiceOver label.",
       "extractionState": "manual",
@@ -1857,6 +2365,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "No collections yet"
+          }
+        }
+      }
+    },
+    "No collections yet. Make one in Memories.": {
+      "comment": "New movie: the list of collections is empty",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No collections yet. Make one in Memories."
           }
         }
       }
@@ -1909,6 +2429,18 @@
         }
       }
     },
+    "No moments have a place yet.": {
+      "comment": "New movie: the list of places is empty",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No moments have a place yet."
+          }
+        }
+      }
+    },
     "No moments match these filters.": {
       "comment": "Search (M09): nothing matches the filters and no words were typed.",
       "extractionState": "manual",
@@ -1917,6 +2449,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "No moments match these filters."
+          }
+        }
+      }
+    },
+    "No movies yet": {
+      "comment": "Movies empty state (F01e): title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No movies yet"
           }
         }
       }
@@ -2013,6 +2557,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Not enough space to save"
+          }
+        }
+      }
+    },
+    "Not enough yet": {
+      "comment": "New movie (F16): title when the source has too few moments",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not enough yet"
           }
         }
       }
@@ -2365,6 +2921,42 @@
         }
       }
     },
+    "Photos and videos that don't match the shape": {
+      "comment": "New movie (F04): label over Fill the frame / Show all of it",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photos and videos that don't match the shape"
+          }
+        }
+      }
+    },
+    "Pick a day": {
+      "comment": "New movie (F03): From/To before a day is picked",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a day"
+          }
+        }
+      }
+    },
+    "Pick a start and an end": {
+      "comment": "New movie (F02): detail of the Dates row before dates are picked",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a start and an end"
+          }
+        }
+      }
+    },
     "Pick how often and when. The exact time is always a surprise.": {
       "comment": "Surprise schedule (onboarding O07): body under the headline",
       "extractionState": "manual",
@@ -2385,6 +2977,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pick moments and give them a place by hand. Nothing is looked up automatically."
+          }
+        }
+      }
+    },
+    "Picked · %lld": {
+      "comment": "New movie (F05): switch option showing only the picked moments, with the count",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picked · %lld"
           }
         }
       }
@@ -2517,6 +3121,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Previous year"
+          }
+        }
+      }
+    },
+    "Quick": {
+      "comment": "New movie (F04): length option",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quick"
           }
         }
       }
@@ -3061,6 +3677,18 @@
         }
       }
     },
+    "Shape": {
+      "comment": "New movie (F04): section title (shown in capitals)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shape"
+          }
+        }
+      }
+    },
     "Share": {
       "comment": "Moment viewer toolbar button, VoiceOver label.",
       "extractionState": "manual",
@@ -3069,6 +3697,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Share"
+          }
+        }
+      }
+    },
+    "Short": {
+      "comment": "New movie (F04): length option",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Short"
           }
         }
       }
@@ -3093,6 +3733,18 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Show all of it": {
+      "comment": "New movie (F04): show whole photos and videos inside the movie's shape",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show all of it"
           }
         }
       }
@@ -3229,6 +3881,18 @@
         }
       }
     },
+    "Source": {
+      "comment": "New movie: back button to step 1",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source"
+          }
+        }
+      }
+    },
     "Spring": {
       "comment": "Season label under a sample movie clip",
       "extractionState": "manual",
@@ -3237,6 +3901,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Spring"
+          }
+        }
+      }
+    },
+    "Step %lld of 3": {
+      "comment": "New movie wizard: which step this is (shown in capitals)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Step %lld of 3"
           }
         }
       }
@@ -3397,6 +4073,18 @@
         }
       }
     },
+    "Tap the moments you want in the movie. It needs at least 5.": {
+      "comment": "New movie (F05): intro when choosing moments by hand",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the moments you want in the movie. It needs at least 5."
+          }
+        }
+      }
+    },
     "Tap to stop": {
       "comment": "Camera (C03): handwritten hint above the stop button while recording; voice note sheet (C09): hint under the stop button",
       "extractionState": "manual",
@@ -3501,6 +4189,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "The camera turns on only while this screen is open, and only you start a recording. Nothing is captured in the background or sent anywhere."
+          }
+        }
+      }
+    },
+    "The end is before the start. Pick a later end date.": {
+      "comment": "New movie (F03): error when the end date is before the start",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The end is before the start. Pick a later end date."
           }
         }
       }
@@ -3613,6 +4313,18 @@
         }
       }
     },
+    "These dates": {
+      "comment": "New movie (F16): sentence subject for picked dates",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These dates"
+          }
+        }
+      }
+    },
     "They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days.": {
       "comment": "Delete sheet (M15) body for several moments.",
       "extractionState": "manual",
@@ -3633,6 +4345,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "This can't be undone."
+          }
+        }
+      }
+    },
+    "This choice": {
+      "comment": "New movie (F16): sentence subject for moments chosen by hand",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This choice"
+          }
+        }
+      }
+    },
+    "This collection": {
+      "comment": "New movie (F16): sentence subject for a collection",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This collection"
           }
         }
       }
@@ -3705,6 +4441,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "This moment is kept until you free up about %@. Nothing is lost."
+          }
+        }
+      }
+    },
+    "This place": {
+      "comment": "New movie (F16): sentence subject for a place",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This place"
           }
         }
       }
@@ -3897,6 +4645,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Try the camera. Save the photo or video only if you like it."
+          }
+        }
+      }
+    },
+    "Turn a month, a trip or a whole year of moments into a short film.": {
+      "comment": "Movies empty state (F01e): what a movie is",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn a month, a trip or a whole year of moments into a short film."
           }
         }
       }
@@ -4153,6 +4913,18 @@
         }
       }
     },
+    "We picked %lld of %lld, spread evenly across %@. Tap to add or remove.": {
+      "comment": "New movie (F05): intro. Picked count, all count, the period (e.g. October)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We picked %1$lld of %2$lld, spread evenly across %3$@. Tap to add or remove."
+          }
+        }
+      }
+    },
     "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too.": {
       "comment": "OB-01 body",
       "extractionState": "manual",
@@ -4161,6 +4933,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "We take photos of birthdays and big adventures. But most of life happens on ordinary days. MimoDays helps you remember those, too."
+          }
+        }
+      }
+    },
+    "What's it about?": {
+      "comment": "New movie (F02): step 1 question",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's it about?"
           }
         }
       }
@@ -4185,6 +4969,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "When should MimoDays surprise you?"
+          }
+        }
+      }
+    },
+    "Which collection?": {
+      "comment": "New movie: question on the list of collections",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which collection?"
+          }
+        }
+      }
+    },
+    "Which dates?": {
+      "comment": "New movie (F03): question",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which dates?"
+          }
+        }
+      }
+    },
+    "Which moments?": {
+      "comment": "New movie (F05): question",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which moments?"
+          }
+        }
+      }
+    },
+    "Which place?": {
+      "comment": "New movie: question on the list of places",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which place?"
           }
         }
       }
@@ -4405,6 +5237,18 @@
         }
       }
     },
+    "about 1 min": {
+      "comment": "New movie (F04): Quick's length",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "about 1 min"
+          }
+        }
+      }
+    },
     "an ordinary afternoon": {
       "comment": "Onboarding art caption on a sample photo (handwritten)",
       "extractionState": "manual",
@@ -4437,6 +5281,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "dog asleep"
+          }
+        }
+      }
+    },
+    "every moment · %@": {
+      "comment": "New movie (F04): Full's length. %@: how long, e.g. 2:40",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "every moment · %@"
           }
         }
       }
@@ -4581,6 +5437,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "you"
+          }
+        }
+      }
+    },
+    "you choose": {
+      "comment": "New movie (F04): Custom's length",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "you choose"
           }
         }
       }

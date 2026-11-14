@@ -2,6 +2,7 @@ import Core
 import DesignSystem
 import Foundation
 import Observation
+import Persistence
 
 public enum MainTab: String, CaseIterable, Hashable, Sendable {
     case today
@@ -34,6 +35,14 @@ public enum Route: Equatable, Sendable {
     case settings
     /// Opens the camera. `promptID` is set when answering a surprise.
     case capture(promptID: UUID?)
+    /// Starts a movie (F02) on Movies, from a source chosen elsewhere when there is one (a place, a selection).
+    case newMovie(MovieSourceRule?)
+}
+
+/// A movie wizard to show, maybe with its source already chosen.
+public struct NewMovieRequest: Equatable, Identifiable, Sendable {
+    public var id = UUID()
+    public var source: MovieSourceRule?
 }
 
 /// What the camera was opened for.
@@ -53,6 +62,7 @@ public final class AppRouter {
     public var selectedTab: MainTab
     public var isSettingsPresented = false
     public var capture: CaptureRequest?
+    public var newMovie: NewMovieRequest?
 
     public init(selectedTab: MainTab = .today) {
         self.selectedTab = selectedTab
@@ -66,9 +76,14 @@ public final class AppRouter {
         case .settings:
             capture = nil
             isSettingsPresented = true
+        case let .newMovie(source):
+            dismissAll()
+            selectedTab = .movies
+            newMovie = NewMovieRequest(source: source)
         case let .capture(promptID):
             // A surprise wins over whatever is on screen; Capture lives on Today.
             isSettingsPresented = false
+            newMovie = nil
             selectedTab = .today
             capture = CaptureRequest(promptID: promptID)
         }
@@ -77,6 +92,7 @@ public final class AppRouter {
     public func dismissAll() {
         isSettingsPresented = false
         capture = nil
+        newMovie = nil
     }
 
     // MARK: Parsing

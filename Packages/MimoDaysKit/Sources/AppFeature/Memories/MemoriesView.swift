@@ -317,9 +317,11 @@ struct MemoriesView: View {
 /// M13: an empty circle on each tile; a ticked one gets a coral check and a coral border.
 struct SelectionMark: View {
     let isOn: Bool
+    /// F05's smaller tiles have 10.
+    var cornerRadius: CGFloat = 12
 
     var body: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             .strokeBorder(isOn ? ColorToken.actionCoral.color : .clear, lineWidth: 3)
             .overlay(alignment: .bottomTrailing) {
                 ZStack {
@@ -382,6 +384,9 @@ struct MemoryTile: View {
     let image: UIImage?
     /// Select mode: the mic steps left of the selection circle (M13).
     var leavesRoomForMark = false
+    /// F05's small tiles: the video's length goes top left, clear of the selection circle (the mic steps aside too);
+    /// they don't show the favourite heart, which lives there.
+    var videoBadgeAtTop = false
     /// The tile badges' deliberate offset of their glyph from the disc's centre (design: 5 pt right and down).
     static let badgeOffset: CGFloat = 5
 
@@ -393,7 +398,7 @@ struct MemoryTile: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(alignment: .topLeading) {
-                if item.isFavorite {
+                if item.isFavorite, !videoBadgeAtTop {
                     // `Badge / Favorite`: the heart sits 5 pt right of and below the disc's centre, past its
                     // edge - on purpose, never centred (Andrew, 2026-11-14).
                     HeartShape()
@@ -405,17 +410,17 @@ struct MemoryTile: View {
                         .padding(7)
                 }
             }
-            .overlay(alignment: .bottomLeading) {
+            .overlay(alignment: videoBadgeAtTop ? .topLeading : .bottomLeading) {
                 if let duration = detail?.duration {
                     VideoBadge(duration: duration)
-                        .padding(7)
+                        .padding(videoBadgeAtTop ? 6 : 7)
                 }
             }
             .overlay(alignment: .bottomTrailing) {
                 if detail?.hasVoiceNote == true {
                     VoiceBadge()
                         .padding(7)
-                        .padding(.trailing, leavesRoomForMark ? 29 : 0)
+                        .padding(.trailing, leavesRoomForMark || videoBadgeAtTop ? 29 : 0)
                 }
             }
             .environment(\.layoutDirection, .leftToRight)

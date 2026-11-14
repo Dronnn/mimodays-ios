@@ -146,6 +146,20 @@ struct MemoriesSnapshotTests {
         )
     }
 
+    /// M10 after Select: M13's bar on top, Collect and Delete below, two ticked.
+    @Test func favoritesSelect() async throws {
+        try await populate()
+        for moment in try container.mainContext.fetch(FetchDescriptor<Moment>()).prefix(5) { moment.isFavorite = true }
+        try container.mainContext.save()
+        let model = await memories()
+        for item in model.favorites { await model.load(item.id) }
+        let ticked = Set(model.favorites.prefix(2).map(\.id))
+        assertScreenSnapshots(
+            of: NavigationStack { FavoritesView(model: model, selection: ticked) }.environment(AppRouter()),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)]
+        )
+    }
+
     /// M10e.
     @Test func favoritesEmpty() async throws {
         _ = try await save(at: Self.date(2026, 11, 11))

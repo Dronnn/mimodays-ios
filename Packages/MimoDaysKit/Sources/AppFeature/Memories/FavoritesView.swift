@@ -9,9 +9,16 @@ enum MemoriesTabRoute: Hashable {
 }
 
 /// M10/M10e: every favourite, newest first, in the timeline's tiles. Taking the heart off in the viewer takes it
-/// off here too.
+/// off here too. Select works as in M13.
 struct FavoritesView: View {
     let model: MemoriesModel
+    /// The moments ticked while selecting; nil when not selecting.
+    @State private var selection: Set<UUID>?
+
+    init(model: MemoriesModel, selection: Set<UUID>? = nil) {
+        self.model = model
+        _selection = State(initialValue: selection)
+    }
 
     var body: some View {
         let favorites = model.favorites
@@ -29,10 +36,18 @@ struct FavoritesView: View {
                 } else {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                         ForEach(favorites) { item in
-                            NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: favorites.map(\.id), start: item.id))) {
-                                MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
+                            Group {
+                                if selection != nil {
+                                    SelectableTile(selection: $selection, id: item.id) {
+                                        MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id], leavesRoomForMark: true)
+                                    }
+                                } else {
+                                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: favorites.map(\.id), start: item.id))) {
+                                        MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
-                            .buttonStyle(.plain)
                             .task { await model.load(item.id) }
                         }
                     }
@@ -50,6 +65,16 @@ struct FavoritesView: View {
         // The big title in the page says it; the bar keeps only the way back.
         .toolbar(removing: .title)
         .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar(selection == nil ? .automatic : .hidden, for: .navigationBar)
+        .toolbar {
+            if !favorites.isEmpty, selection == nil {
+                ToolbarItem(placement: .topBarTrailing) { SelectButton(selection: $selection, id: "favorites.select") }
+            }
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if selection != nil { SelectBar(selection: $selection, all: favorites.map(\.id)) }
+        }
+        .memoriesSelectActions(model: model, selection: $selection)
     }
 
     /// M10e.

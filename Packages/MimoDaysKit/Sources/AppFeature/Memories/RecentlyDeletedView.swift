@@ -150,10 +150,19 @@ private struct RecentlyDeletedHost: View {
     var body: some View { RecentlyDeletedView(model: model) }
 }
 
-/// M16: the grid with days left on each tile; Delete all and Recover all at the bottom.
+/// M16: the grid with days left on each tile; Delete all and Recover all at the bottom - or, after Select, Delete
+/// and Recover for the ticked ones.
 struct RecentlyDeletedView: View {
     let model: RecentlyDeletedModel
-    @State private var confirmsDeleteAll = false
+    /// The moments ticked while selecting; nil when not selecting.
+    @State private var selection: Set<UUID>?
+    /// What Delete would remove for good, while its confirmation is up.
+    @State private var deleting: Set<UUID>?
+
+    init(model: RecentlyDeletedModel, selection: Set<UUID>? = nil) {
+        self.model = model
+        _selection = State(initialValue: selection)
+    }
 
     var body: some View {
         ScrollView {
@@ -165,18 +174,25 @@ struct RecentlyDeletedView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 4)
                 Text("Moments are deleted for good after 30 days. They are not shown anywhere else in the app.", bundle: .module)
-                    .textStyle(.rowCaption)
+                    .textStyle(.pageIntro)
                     .foregroundStyle(ColorToken.textSecondary.color)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 20)
+                    // M16's text box is 350 wide.
+                    .padding(.leading, 20)
+                    .padding(.trailing, 32)
                     .padding(.top, 6)
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                     ForEach(model.items) { item in
-                        NavigationLink(value: MemoriesRoute.deletedMoment(item.id)) {
-                            MemoryTile(item: item.item, detail: nil, image: model.images[item.id])
-                                .overlay(alignment: .bottomLeading) { DaysLeftBadge(days: model.daysLeft(item)).padding(7) }
+                        let tile = MemoryTile(item: item.item, detail: nil, image: model.images[item.id])
+                            .overlay(alignment: .bottomLeading) { DaysLeftBadge(days: model.daysLeft(item)).padding(7) }
+                        Group {
+                            if selection != nil {
+                                SelectableTile(selection: $selection, id: item.id) { tile }
+                            } else {
+                                NavigationLink(value: MemoriesRoute.deletedMoment(item.id)) { tile }
+                                    .buttonStyle(.plain)
+                            }
                         }
-                        .buttonStyle(.plain)
                         .accessibilityIdentifier("deleted.tile")
                         .task { await model.load(item) }
                     }
@@ -189,42 +205,58 @@ struct RecentlyDeletedView: View {
             .frame(maxWidth: .infinity)
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if selection != nil { SelectBar(selection: $selection, all: model.items.map(\.id)) }
+        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if !model.items.isEmpty {
-                HStack {
-                    Button { confirmsDeleteAll = true } label: {
-                        Text("Delete all", bundle: .module).textStyle(.rowTitle).foregroundStyle(ColorToken.textLink.color)
-                    }
-                    .accessibilityIdentifier("deleted.deleteAll")
-                    Spacer()
-                    Button { model.recover(Set(model.items.map(\.id))) } label: {
-                        Text("Recover all", bundle: .module).textStyle(.rowTitle).foregroundStyle(ColorToken.textPrimary.color)
-                    }
-                    .accessibilityIdentifier("deleted.recoverAll")
-                }
-                .buttonStyle(.plain)
-                .padding(.horizontal, 20)
-                .frame(minHeight: 56)
-                .background {
-                    ColorToken.canvas.color
-                        .overlay(alignment: .top) { ColorToken.separator.color.frame(height: 1) }
-                        .ignoresSafeArea()
-                }
-            }
+            if !model.items.isEmpty { actions }
         }
         .navigationTitle(Text("Recently deleted", bundle: .module))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(removing: .title)
         .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar(selection == nil ? .automatic : .hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
+        .toolbar {
+            if !model.items.isEmpty, selection == nil {
+                ToolbarItem(placement: .topBarTrailing) { SelectButton(selection: $selection, id: "deleted.select") }
+            }
+        }
         .task { model.refresh() }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
         .confirmationDialog(
-            Text("Delete \(model.items.count) moments for good?", bundle: .module), isPresented: $confirmsDeleteAll, titleVisibility: .visible
+            Text("Delete \(deleting?.count ?? 0) moments for good?", bundle: .module),
+            isPresented: Binding { deleting != nil } set: { if !$0 { deleting = nil } }, titleVisibility: .visible
         ) {
-            Button(role: .destructive) { model.deleteForever(Set(model.items.map(\.id))) } label: { Text("Delete all", bundle: .module) }
+            Button(role: .destructive) {
+                model.deleteForever(deleting ?? [])
+                selection = nil
+            } label: {
+                selection == nil ? Text("Delete all", bundle: .module) : Text("Delete", bundle: .module)
+            }
         } message: {
             Text("This can't be undone.", bundle: .module)
+        }
+    }
+
+    /// Delete all and Recover all; while selecting, Delete and Recover for the ticked ones.
+    private var actions: some View {
+        SelectActionsBar(isEnabled: selection?.isEmpty != true, inset: 20) {
+            let chosen = selection ?? Set(model.items.map(\.id))
+            Button { deleting = chosen } label: {
+                (selection == nil ? Text("Delete all", bundle: .module) : Text("Delete", bundle: .module))
+                    .textStyle(.rowTitle).foregroundStyle(ColorToken.textLink.color)
+            }
+            .accessibilityIdentifier(selection == nil ? "deleted.deleteAll" : "deleted.deleteSelected")
+            Spacer()
+            Button {
+                model.recover(chosen)
+                selection = nil
+            } label: {
+                (selection == nil ? Text("Recover all", bundle: .module) : Text("Recover", bundle: .module))
+                    .textStyle(.rowTitle).foregroundStyle(ColorToken.textPrimary.color)
+            }
+            .accessibilityIdentifier(selection == nil ? "deleted.recoverAll" : "deleted.recoverSelected")
         }
     }
 }

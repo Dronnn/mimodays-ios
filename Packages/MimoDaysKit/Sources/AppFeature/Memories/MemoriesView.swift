@@ -13,9 +13,6 @@ struct MemoriesView: View {
     @Environment(\.calendar) private var calendar
     /// M13: the moments ticked while selecting; nil when not selecting.
     @State private var selection: Set<UUID>?
-    @State private var confirmsDelete = false
-    @State private var collects = false
-    @State private var collections: Set<UUID> = []
 
     init(model: MemoriesModel, selection: Set<UUID>? = nil) {
         self.model = model
@@ -76,27 +73,9 @@ struct MemoriesView: View {
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(selection == nil ? .automatic : .hidden, for: .tabBar)
         .safeAreaInset(edge: .top, spacing: 0) {
-            if let selection { selectBar(selection) }
+            if selection != nil { SelectBar(selection: $selection, all: model.allIDs) }
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if let selection { selectActions(selection) }
-        }
-        .sheet(isPresented: $confirmsDelete) {
-            let chosen = selection ?? []
-            DeleteConfirmationSheet(
-                count: chosen.count, mediaType: model.mediaType(of: chosen), movieDrafts: model.movieDrafts(using: chosen)
-            ) {
-                if model.delete(chosen) { selection = nil }
-            }
-        }
-        .sheet(isPresented: $collects, onDismiss: {
-            guard let chosen = selection, !collections.isEmpty else { return }
-            model.collect(chosen, into: collections)
-            collections = []
-            selection = nil
-        }) {
-            CollectionPickerSheet(library: model.library, selection: $collections)
-        }
+        .memoriesSelectActions(model: model, selection: $selection)
         .onChange(of: model.mode) { selection = nil }
         .memoriesDestinations(thisYear: model.today / 10_000)
         .navigationDestination(for: MemoriesTabRoute.self) { route in
@@ -121,16 +100,8 @@ struct MemoriesView: View {
                 HStack(spacing: 0) {
                     Spacer()
                     if model.isLoaded, !model.isEmpty, model.mode == .timeline {
-                        Button { selection = [] } label: {
-                            Text("Select", bundle: .module)
-                                .textStyle(.control)
-                                .foregroundStyle(ColorToken.textLink.color)
-                                .frame(minHeight: Size.minimumTapTarget)
-                                .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.trailing, 14)
-                        .accessibilityIdentifier("memories.select")
+                        SelectButton(selection: $selection, id: "memories.select")
+                            .padding(.trailing, 14)
                     }
                     NavigationLink(value: MemoriesRoute.search) {
                         Icon.glyphSearch.image
@@ -268,13 +239,10 @@ struct MemoriesView: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                 ForEach(items) { item in
                     Group {
-                        if let selection {
-                            let isOn = selection.contains(item.id)
-                            Button { toggle(item.id) } label: {
+                        if selection != nil {
+                            SelectableTile(selection: $selection, id: item.id) {
                                 MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id], leavesRoomForMark: true)
-                                    .overlay { SelectionMark(isOn: isOn) }
                             }
-                            .accessibilityAddTraits(isOn ? .isSelected : [])
                         } else {
                             NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id))) {
                                 MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
@@ -289,80 +257,6 @@ struct MemoriesView: View {
         }
         .padding(.top, 9)
         .padding(.bottom, 5)
-    }
-
-    // MARK: Select (M13)
-
-    private func toggle(_ id: UUID) {
-        guard var chosen = selection else { return }
-        if chosen.remove(id) == nil { chosen.insert(id) }
-        selection = chosen
-    }
-
-    /// Cancel, "N selected", Select all (Deselect all once everything is ticked).
-    private func selectBar(_ chosen: Set<UUID>) -> some View {
-        let all = !model.allIDs.isEmpty && chosen.count == model.allIDs.count
-        return ZStack {
-            Group {
-                if chosen.isEmpty {
-                    Text("Select moments", bundle: .module)
-                } else {
-                    Text("\(chosen.count) selected", bundle: .module)
-                }
-            }
-            .textStyle(.editorTitle)
-            .foregroundStyle(ColorToken.textPrimary.color)
-            .accessibilityAddTraits(.isHeader)
-            .accessibilityIdentifier("select.count")
-            HStack {
-                Button { selection = nil } label: {
-                    Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
-                }
-                .accessibilityIdentifier("select.cancel")
-                Spacer()
-                Button { selection = all ? [] : Set(model.allIDs) } label: {
-                    (all ? Text("Deselect all", bundle: .module) : Text("Select all", bundle: .module))
-                        .textStyle(.editorDone).foregroundStyle(ColorToken.textLink.color)
-                }
-                .accessibilityIdentifier("select.all")
-            }
-            .buttonStyle(.plain)
-            .frame(minHeight: Size.minimumTapTarget)
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 4)
-        .background(ColorToken.canvas.color.ignoresSafeArea())
-    }
-
-    /// Collect and Delete; both wait for a tick.
-    private func selectActions(_ chosen: Set<UUID>) -> some View {
-        HStack {
-            Button { collects = true } label: { action(.glyphCollection, Text("Collect", bundle: .module), ColorToken.textPrimary) }
-                .accessibilityIdentifier("select.collect")
-            Spacer()
-            Button { confirmsDelete = true } label: { action(.glyphTrash, Text("Delete", bundle: .module), ColorToken.textPrimary) }
-                .accessibilityIdentifier("select.delete")
-        }
-        .buttonStyle(.plain)
-        .disabled(chosen.isEmpty)
-        .opacity(chosen.isEmpty ? 0.4 : 1)
-        .padding(.horizontal, 28)
-        .frame(minHeight: 56)
-        .background {
-            ColorToken.canvas.color
-                .overlay(alignment: .top) { ColorToken.separator.color.frame(height: 1) }
-                .ignoresSafeArea()
-        }
-    }
-
-    private func action(_ icon: Icon, _ title: Text, _ tint: ColorToken) -> some View {
-        VStack(spacing: 2) {
-            icon.image.resizable().scaledToFit().frame(width: 24, height: 24).accessibilityHidden(true)
-            title.textStyle(.tileBadge)
-        }
-        .foregroundStyle(tint.color)
-        .frame(minWidth: Size.minimumTapTarget, minHeight: Size.minimumTapTarget)
-        .contentShape(Rectangle())
     }
 
     /// "TODAY · WED, NOV 11", "YESTERDAY · TUE, NOV 10", "MON, NOV 9"; years only when it isn't this one.

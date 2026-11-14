@@ -75,6 +75,15 @@ struct DeletionSnapshotTests {
         ])
     }
 
+    /// M16 after Select: Delete and Recover for the ticked ones.
+    @Test func recentlyDeletedSelect() async throws {
+        let model = try await deleted(7)
+        let ticked = Set(model.items.prefix(3).map(\.id))
+        assertScreenSnapshots(of: NavigationStack { RecentlyDeletedView(model: model, selection: ticked) }, variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark),
+        ])
+    }
+
     /// M16b.
     @Test func deletedMoment() async throws {
         let model = try await deleted(1)

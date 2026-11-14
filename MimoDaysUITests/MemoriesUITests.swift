@@ -238,6 +238,42 @@ final class MemoriesUITests: XCTestCase {
         wait(for: [fewer], timeout: 5)
     }
 
+    /// M13 → M11 → M16: two deleted moments are ticked in Recently deleted and come back together.
+    @MainActor
+    func testSelectedDeletedMomentsAreRecoveredTogether() {
+        launch(.populated)
+        let select = app.buttons["memories.select"]
+        XCTAssertTrue(select.waitForExistence(timeout: 20))
+        select.tap()
+        let tiles = app.descendants(matching: .any).matching(identifier: "memories.tile")
+        XCTAssertTrue(tiles.firstMatch.waitForExistence(timeout: 5))
+        tiles.element(boundBy: 0).tap()
+        tiles.element(boundBy: 1).tap()
+        app.buttons["select.delete"].tap()
+        let confirm = app.buttons["delete.confirm"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        confirm.tap()
+        let chip = app.buttons["memories.collections"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 10))
+        chip.tap()
+        let row = app.buttons["collections.recentlyDeleted"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+        let deletedSelect = app.buttons["deleted.select"]
+        XCTAssertTrue(deletedSelect.waitForExistence(timeout: 5))
+        deletedSelect.tap()
+        let deleted = app.buttons.matching(identifier: "deleted.tile")
+        XCTAssertTrue(deleted.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(deleted.count, 2)
+        deleted.element(boundBy: 0).tap()
+        deleted.element(boundBy: 1).tap()
+        XCTAssertTrue(app.staticTexts["2 selected"].waitForExistence(timeout: 5))
+        app.buttons["deleted.recoverSelected"].tap()
+        let gone = expectation(for: NSPredicate(format: "count == 0"), evaluatedWith: deleted)
+        wait(for: [gone], timeout: 5)
+        XCTAssertFalse(app.buttons["select.cancel"].exists)
+    }
+
     /// M01 → M14 → M05: the seed has a moment from a year ago today.
     @MainActor
     func testOnThisDayOpensAnEarlierYearsMoment() {

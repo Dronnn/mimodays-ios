@@ -36,17 +36,23 @@ struct MemoriesSnapshotTests {
         return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour, minute: minute))!
     }
 
-    private func save(at date: Date, place: String? = nil, caption: String = "") async throws -> UUID {
+    private func save(at date: Date, place: String? = nil, caption: String = "", voice: Bool = false) async throws -> UUID {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
         let photo = try await engine.capturePhoto(flash: false, silent: true)
         let capture = CaptureResult(media: .photo(photo), window: .init(), capturedAt: CaptureTime(instant: date, timeZone: .gmt))
         let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
         let saver = MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil })
-        return try await saver.save(MomentDraft(
+        var draft = MomentDraft(
             capture: capture, caption: caption, window: window, promptID: nil,
             place: place.map { ReviewPlace(label: $0, latitude: 40.18, longitude: 44.51, precision: .city, source: .gps) }
-        )).id
+        )
+        if voice {
+            let url = FileManager.default.temporaryDirectory.appending(path: "voice-\(UUID().uuidString).m4a")
+            try SimulatedVoiceRecorder.writeTone(to: url, seconds: 1.2)
+            draft.voice = ReviewVoiceNote(url: url, duration: 1.2, recordedAt: date, transcript: nil)
+        }
+        return try await saver.save(draft).id
     }
 
     private func memories() async -> MemoriesModel {
@@ -115,10 +121,10 @@ struct MemoriesSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPad, .light)])
     }
 
-    /// M04: a day in two places, with a caption.
+    /// M04: a day in two places, with a caption; the evening one has a voice note (its mic badge, 9.29).
     @Test func day() async throws {
         _ = try await save(at: Self.date(2026, 11, 11, 8, 5), place: "Yerevan", caption: "Breakfast chaos, as usual")
-        _ = try await save(at: Self.date(2026, 11, 11, 18, 42), place: "Dilijan")
+        _ = try await save(at: Self.date(2026, 11, 11, 18, 42), place: "Dilijan", voice: true)
         let model = await memories().dayModel(20261111)
         await model.refresh()
         assertScreenSnapshots(

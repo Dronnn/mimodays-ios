@@ -22,6 +22,7 @@ struct MomentSummary: Equatable, Identifiable {
     var title: String?
     /// Videos: the clip's length.
     var duration: Double?
+    var hasVoiceNote = false
 
     init(_ moment: Moment) {
         id = moment.id
@@ -36,6 +37,7 @@ struct MomentSummary: Equatable, Identifiable {
         thumbnailPath = moment.media.first { $0.role == .thumbnail }?.relativePath
         title = moment.title
         duration = moment.mediaType == .video ? moment.media.compactMap(\.duration).max() : nil
+        hasVoiceNote = !moment.voiceNotes.isEmpty
     }
 }
 

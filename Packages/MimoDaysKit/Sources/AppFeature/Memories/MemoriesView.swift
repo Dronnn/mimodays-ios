@@ -441,6 +441,21 @@ struct SelectionMark: View {
     }
 }
 
+/// `Badge / Voice`: a mic on a dark disc, offset like the favourite's heart - tiles and Day cards.
+struct VoiceBadge: View {
+    var body: some View {
+        Icon.glyphMic.image
+            .resizable()
+            .scaledToFit()
+            .frame(width: 14, height: 20)
+            .foregroundStyle(.white)
+            .offset(x: MemoryTile.badgeOffset, y: MemoryTile.badgeOffset)
+            .frame(width: 26, height: 26)
+            .background(Circle().fill(ColorToken.mediaScrim.color))
+            .accessibilityHidden(true)
+    }
+}
+
 /// `Moment / Tile`: the composed thumbnail, its selfie window included, with a heart for a favourite,
 /// a mic for a voice note and the length of a video.
 struct MemoryTile: View {
@@ -488,15 +503,7 @@ struct MemoryTile: View {
             }
             .overlay(alignment: .bottomTrailing) {
                 if detail?.hasVoiceNote == true {
-                    // `Badge / Voice`: offset like the favourite's heart.
-                    Icon.glyphMic.image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 14, height: 20)
-                        .foregroundStyle(.white)
-                        .offset(x: Self.badgeOffset, y: Self.badgeOffset)
-                        .frame(width: 26, height: 26)
-                        .background(Circle().fill(ColorToken.mediaScrim.color))
+                    VoiceBadge()
                         .padding(7)
                         .padding(.trailing, leavesRoomForMark ? 29 : 0)
                 }

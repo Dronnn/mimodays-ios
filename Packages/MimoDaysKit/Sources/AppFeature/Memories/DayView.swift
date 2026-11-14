@@ -206,10 +206,23 @@ struct DayView: View {
                     .padding(.bottom, 10)
                 }
             }
+            .overlay(alignment: .bottomTrailing) {
+                if moment.hasVoiceNote {
+                    VoiceBadge()
+                        .padding(.trailing, 19)
+                        .padding(.bottom, 10)
+                }
+            }
             .environment(\.layoutDirection, .leftToRight)
             .accessibilityElement()
-            .accessibilityLabel(moment.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module))
+            .accessibilityLabel(pictureLabel(moment))
             .accessibilityAddTraits(.isImage)
+    }
+
+    /// "Video, voice note".
+    private func pictureLabel(_ moment: MomentSummary) -> Text {
+        let kind = moment.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module)
+        return moment.hasVoiceNote ? kind + Text(verbatim: ", ") + Text("Description has voice note", bundle: .module) : kind
     }
 
     private func time(_ captured: CaptureTime) -> Text {

@@ -149,9 +149,10 @@ public struct RootView: View {
     }
 }
 
-/// Settings until Phase 13 builds it: the archive's Backup and Storage.
+/// Settings until Phase 13 builds it: Backup, Storage and Import from Photos.
 struct SettingsPlaceholderView: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var importsPhotos = false
 
     var body: some View {
         NavigationStack {
@@ -166,6 +167,11 @@ struct SettingsPlaceholderView: View {
                         DataIconRow(icon: .glyphFolder, title: Text("Storage", bundle: .module))
                     }
                     .accessibilityIdentifier("settings.storage")
+                    DataSeparator(leading: 64)
+                    Button { importsPhotos = true } label: {
+                        DataIconRow(icon: .glyphDownload, title: Text("Import from Photos", bundle: .module))
+                    }
+                    .accessibilityIdentifier("settings.import")
                 }
                 .buttonStyle(.plain)
                 .padding(16)
@@ -179,6 +185,7 @@ struct SettingsPlaceholderView: View {
                         .accessibilityIdentifier("settings.done")
                 }
             }
+            .photoImport(isPresented: $importsPhotos)
             .navigationDestination(for: DataRoute.self) { route in
                 switch route {
                 case .storage: StorageScreen()

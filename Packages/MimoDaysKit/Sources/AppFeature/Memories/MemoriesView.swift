@@ -13,6 +13,8 @@ struct MemoriesView: View {
     @Environment(\.calendar) private var calendar
     /// M13: the moments ticked while selecting; nil when not selecting.
     @State private var selection: Set<UUID>?
+    /// E05 from M01e.
+    @State private var importsPhotos = false
 
     init(model: MemoriesModel, selection: Set<UUID>? = nil) {
         self.model = model
@@ -76,6 +78,7 @@ struct MemoriesView: View {
             if selection != nil { SelectBar(selection: $selection, all: model.allIDs) }
         }
         .memoriesSelectActions(model: model, selection: $selection)
+        .photoImport(isPresented: $importsPhotos)
         .onChange(of: model.mode) { selection = nil }
         .memoriesDestinations(thisYear: model.today / 10_000)
         .navigationDestination(for: MemoriesTabRoute.self) { route in
@@ -285,7 +288,7 @@ struct MemoriesView: View {
 
     // MARK: Empty
 
-    /// M01e: what will be here, and the one way to start.
+    /// M01e: what will be here, and the ways to start.
     private var emptyState: some View {
         VStack(spacing: 0) {
             ExplainerArt(glyph: .tabMemories)
@@ -308,6 +311,11 @@ struct MemoriesView: View {
             .padding(.horizontal, 20)
             .padding(.top, 21)
             .accessibilityIdentifier("memories.capture")
+            Button { importsPhotos = true } label: { Text("Import from Photos", bundle: .module) }
+                .buttonStyle(.text)
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
+                .accessibilityIdentifier("memories.import")
         }
         .frame(maxWidth: 520)
         .frame(maxWidth: .infinity)

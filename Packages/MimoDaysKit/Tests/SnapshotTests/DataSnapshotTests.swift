@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// Export, backup, restore and storage: E01, E02, E03, E04p, E04, E06, E07, E08 and E09.
+/// Export, import, backup, restore and storage: E01, E02, E03, E04p, E04, E06, E07, E08 and E09.
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct DataSnapshotTests {
@@ -150,5 +150,22 @@ struct DataSnapshotTests {
         let model = MomentExportModel(ids: ids, library: library, freeSpace: { 12_000_000_000 })
         model.archive = true
         assertScreenSnapshots(of: page(MomentsExportView(model: model, close: {})), variants: variants)
+    }
+
+    /// E05: eight picked, one of them a ten-second video, one already here.
+    @Test func photoImport() {
+        let model = PhotoImportModel(
+            library: library, saver: MomentSaver(context: container.mainContext, store: store, freeBytes: { nil }), lookup: SimulatedPlaceLookup()
+        )
+        let time = CaptureTime(instant: Date(timeIntervalSince1970: 1_794_408_125), timeZone: .gmt)
+        model.picked = (0..<8).map { index in
+            PhotoImportModel.Picked(
+                id: index, url: URL(filePath: "/tmp/\(index).jpg"), isVideo: index == 3, capturedAt: time, point: nil, checksum: "\(index)",
+                duration: index == 3 ? 10 : nil, hasAudio: false
+            )
+        }
+        model.skipped = [6]
+        model.phase = .ready
+        assertScreenSnapshots(of: page(PhotoImportView(model: model, close: {}, imported: {})), variants: variants)
     }
 }

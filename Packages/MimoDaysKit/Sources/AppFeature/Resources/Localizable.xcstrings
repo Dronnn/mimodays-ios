@@ -715,6 +715,54 @@
         }
       }
     },
+    "%lld photos" : {
+      "comment" : "Import from Photos (E05) title when only photos were picked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld photo"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld photos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld photos and videos" : {
+      "comment" : "Import from Photos (E05) title when photos and videos were picked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld photos and videos"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld photos and videos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld places" : {
       "comment" : "Map: VoiceOver name of a cluster of several places.",
       "extractionState" : "manual",
@@ -759,6 +807,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld selected"
+          }
+        }
+      }
+    },
+    "%lld skipped" : {
+      "comment" : "Import from Photos (E05): how many picked files are skipped because they're already in MimoDays",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld skipped"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld skipped"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld videos" : {
+      "comment" : "Import from Photos (E05) title when only videos were picked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld video"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld videos"
+                }
+              }
+            }
           }
         }
       }
@@ -1287,6 +1383,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allow MimoDays to add to your photos in Settings."
+          }
+        }
+      }
+    },
+    "Already in MimoDays" : {
+      "comment" : "Import from Photos (E05) row: picked files that are already moments",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already in MimoDays"
           }
         }
       }
@@ -2563,6 +2671,18 @@
         }
       }
     },
+    "Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos." : {
+      "comment" : "Import from Photos (E05): what happens to the picked files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos."
+          }
+        }
+      }
+    },
     "Earliest" : {
       "comment" : "Surprise schedule (onboarding O07): row title, earliest time a surprise may arrive",
       "extractionState" : "manual",
@@ -3043,6 +3163,42 @@
         }
       }
     },
+    "Import" : {
+      "comment" : "Import from Photos page (E05) title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import"
+          }
+        }
+      }
+    },
+    "Import %lld" : {
+      "comment" : "Import from Photos (E05) button: how many picked files will become moments",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import %lld"
+          }
+        }
+      }
+    },
+    "Import from Photos" : {
+      "comment" : "Button on the empty Memories screen (M01e) and row in Settings: bring photos and videos in from the Photos app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Photos"
+          }
+        }
+      }
+    },
     "Imported from Photos, %@" : {
       "comment" : "VoiceOver: a moment imported from Photos, then its date",
       "extractionState" : "manual",
@@ -3063,6 +3219,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imported · %@"
+          }
+        }
+      }
+    },
+    "Importing %@" : {
+      "comment" : "Import from Photos (E05) button while importing; %@ is how far, e.g. 40%",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing %@"
           }
         }
       }
@@ -3135,6 +3303,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keep editing"
+          }
+        }
+      }
+    },
+    "Keep the place from Photos" : {
+      "comment" : "Import from Photos (E05) switch: keep where each photo was taken",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the place from Photos"
           }
         }
       }
@@ -5899,6 +6079,18 @@
         }
       }
     },
+    "Some files couldn't be imported" : {
+      "comment" : "Alert title when some picked files couldn't be imported",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some files couldn't be imported"
+          }
+        }
+      }
+    },
     "Something went wrong while making it.\nYour draft is safe." : {
       "comment" : "Export failed (F14): message for any other failure",
       "extractionState" : "manual",
@@ -6423,6 +6615,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The movie couldn't be finished"
+          }
+        }
+      }
+    },
+    "The others are in Memories. Try the rest again from Photos." : {
+      "comment" : "Alert message when some picked files couldn't be imported",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The others are in Memories. Try the rest again from Photos."
           }
         }
       }
@@ -7767,6 +7971,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "checked, no problems"
+          }
+        }
+      }
+    },
+    "city level" : {
+      "comment" : "Import from Photos (E05): under 'Keep the place from Photos', only the city is kept",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "city level"
           }
         }
       }

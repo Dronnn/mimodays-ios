@@ -113,6 +113,11 @@ struct LocalizationTests {
         "Each moment as its own files, named by the date and time it was taken.", "Include", "Notes", "Original camera files",
         "front and back separately", "Exact places", "Exporting %@", "Couldn't export",
         "There isn't enough free space on this iPhone. It needs about %@ more.",
+        // Import from Photos (Phase 12).
+        "Import", "Import from Photos", "Import %lld", "Importing %@", "%lld photos", "%lld videos", "%lld photos and videos",
+        "Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos.",
+        "Keep the place from Photos", "city level", "Already in MimoDays", "%lld skipped", "Some files couldn't be imported",
+        "The others are in Memories. Try the rest again from Photos.",
     ]
 
     private static var resourceKeys: [String] {

@@ -23,6 +23,8 @@ struct MomentDraft {
     var voice: ReviewVoiceNote?
     /// C11; nil means no place.
     var place: ReviewPlace?
+    /// E05 marks what came from Photos; nil means a surprise or a manual capture, by `promptID`.
+    var origin: MomentOrigin?
 }
 
 enum SaveError: Error, Equatable {
@@ -74,7 +76,7 @@ struct MomentSaver {
             }
 
             let moment = Moment(
-                captured: capture.capturedAt, origin: draft.promptID == nil ? .manual : .randomPrompt,
+                captured: capture.capturedAt, origin: draft.origin ?? (draft.promptID == nil ? .manual : .randomPrompt),
                 mediaType: isPhoto ? .photo : .video, promptID: draft.promptID, createdAt: clock.now()
             )
             let caption = draft.caption.trimmingCharacters(in: .whitespacesAndNewlines)

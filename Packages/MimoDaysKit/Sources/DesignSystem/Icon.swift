@@ -68,6 +68,10 @@ public enum Icon: String, CaseIterable, Sendable {
     case explainerCameraOff
     case explainerSparkle
     case explainerBell
+    case explainerSearch
+    case explainerHeart
+    case explainerClock
+    case explainerCollection
     /// Explainer art layers, all on the same 150×140 canvas.
     case artBlob
     case markStar

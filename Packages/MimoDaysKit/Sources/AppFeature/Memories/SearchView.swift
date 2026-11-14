@@ -35,11 +35,13 @@ struct SearchView: View {
         VStack(alignment: .leading, spacing: 0) {
             searchBar
                 .padding(.top, 8)
-            chips
+            let findsNothing = model.isSearching && hits.isEmpty && places.isEmpty && model.isLoaded
+            // With nothing found, only the filters that narrowed it stay (M09).
+            chips(onlyActive: findsNothing && !model.filters.isEmpty)
                 .padding(.top, 8)
             if !model.isSearching {
                 Spacer()
-            } else if hits.isEmpty, places.isEmpty, model.isLoaded {
+            } else if findsNothing {
                 noMatches
                     .padding(.top, 56)
                 Spacer()
@@ -112,21 +114,27 @@ struct SearchView: View {
         .padding(.horizontal, 16)
     }
 
-    private var chips: some View {
+    private func chips(onlyActive: Bool) -> some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
                 if let place = model.filters.place {
                     SearchChip(icon: .glyphPin, title: Text(place), isOn: true, id: "search.chip.place") { model.filters.place = nil }
                         .accessibilityHint(Text("Removes this place", bundle: .module))
                 }
-                SearchChip(title: Text("Photos", bundle: .module), isOn: model.filters.kind == .photos, id: "search.chip.photos") {
-                    model.filters.kind = model.filters.kind == .photos ? .all : .photos
+                if !onlyActive || model.filters.kind == .photos {
+                    SearchChip(title: Text("Photos", bundle: .module), isOn: model.filters.kind == .photos, id: "search.chip.photos") {
+                        model.filters.kind = model.filters.kind == .photos ? .all : .photos
+                    }
                 }
-                SearchChip(title: Text("Videos", bundle: .module), isOn: model.filters.kind == .videos, id: "search.chip.videos") {
-                    model.filters.kind = model.filters.kind == .videos ? .all : .videos
+                if !onlyActive || model.filters.kind == .videos {
+                    SearchChip(title: Text("Videos", bundle: .module), isOn: model.filters.kind == .videos, id: "search.chip.videos") {
+                        model.filters.kind = model.filters.kind == .videos ? .all : .videos
+                    }
                 }
-                SearchChip(icon: .glyphMic, title: Text("Voice", bundle: .module), isOn: model.filters.hasVoiceNote, id: "search.chip.voice") {
-                    model.filters.hasVoiceNote.toggle()
+                if !onlyActive || model.filters.hasVoiceNote {
+                    SearchChip(icon: .glyphMic, title: Text("Voice", bundle: .module), isOn: model.filters.hasVoiceNote, id: "search.chip.voice") {
+                        model.filters.hasVoiceNote.toggle()
+                    }
                 }
                 let count = model.filters.count
                 SearchChip(
@@ -286,19 +294,19 @@ struct SearchView: View {
 
     private var noMatches: some View {
         VStack(spacing: 0) {
-            ExplainerArt(glyph: .glyphSearch)
+            ExplainerArt(glyph: .explainerSearch)
             Text("No matches", bundle: .module)
                 .textStyle(.emptyTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .padding(.top, 16)
                 .accessibilityAddTraits(.isHeader)
             noMatchesMessage
-                .textStyle(.body)
+                .textStyle(.emptyBody)
                 .foregroundStyle(ColorToken.textBody.color)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 8)
-                .padding(.horizontal, 34)
+                .padding(.horizontal, 58)
             if !model.filters.isEmpty {
                 Button { model.clearFilters() } label: {
                     Text("Search all moments", bundle: .module)
@@ -343,8 +351,7 @@ struct SearchChip: View {
                         .accessibilityHidden(true)
                 }
                 title
-                    .textStyle(.reviewChip)
-                    .fontWeight(isOn ? .bold : nil)
+                    .textStyle(isOn ? .reviewChipOn : .reviewChip)
                     .lineLimit(1)
             }
             .foregroundStyle((isOn ? ColorToken.textLink : .textPrimary).color)

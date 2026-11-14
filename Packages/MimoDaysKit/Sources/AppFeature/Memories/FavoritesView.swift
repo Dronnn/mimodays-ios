@@ -55,14 +55,14 @@ struct FavoritesView: View {
     /// M10e.
     private var empty: some View {
         VStack(spacing: 0) {
-            ExplainerArt(glyph: .glyphHeart)
+            ExplainerArt(glyph: .explainerHeart)
             Text("No favorites yet", bundle: .module)
                 .textStyle(.emptyTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .padding(.top, 16)
                 .accessibilityAddTraits(.isHeader)
             Text("Tap the heart on any moment to keep it here.", bundle: .module)
-                .textStyle(.body)
+                .textStyle(.emptyBody)
                 .foregroundStyle(ColorToken.textBody.color)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

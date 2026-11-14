@@ -82,6 +82,8 @@ public struct TextStyle: Equatable, Sendable {
     // Review (C07, C13d).
     public static let reviewField = TextStyle(.patrickHand, size: 18, relativeTo: .body)
     public static let reviewChip = TextStyle(.nunito, size: 14, weight: 600, relativeTo: .subheadline)
+    /// A search chip that is on (M09).
+    public static let reviewChipOn = TextStyle(.nunito, size: 14, weight: 700, relativeTo: .subheadline)
     public static let reviewMeta = TextStyle(.nunito, size: 14, weight: 500, relativeTo: .footnote)
     public static let reviewNote = TextStyle(.nunito, size: 15, weight: 500, lineHeight: 1.2, relativeTo: .subheadline)
     /// C08 note text.
@@ -128,6 +130,8 @@ public struct TextStyle: Equatable, Sendable {
     /// A tab's own big title: "Memories".
     public static let screenTitle = TextStyle(.fraunces, size: 36, weight: 650, relativeTo: .largeTitle, maximumScale: 1.35)
     /// "No memories yet".
+    /// The words under an empty state's title (M09, M10e).
+    public static let emptyBody = TextStyle(.nunito, size: 15, weight: 500, lineHeight: 1.4, relativeTo: .subheadline)
     public static let emptyTitle = TextStyle(.fraunces, size: 26, weight: 650, relativeTo: .title1, maximumScale: 1.35)
     /// A month's moment count beside its title.
     public static let sectionCount = TextStyle(.nunito, size: 13, weight: 600, relativeTo: .footnote)

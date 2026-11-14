@@ -182,7 +182,7 @@ struct OnThisDayView: View {
 
     private var empty: some View {
         VStack(spacing: 0) {
-            ExplainerArt(glyph: .glyphClock)
+            ExplainerArt(glyph: .explainerClock)
             Text("Nothing on this day yet", bundle: .module)
                 .textStyle(.emptyTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)

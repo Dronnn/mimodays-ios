@@ -51,6 +51,10 @@ struct CollectionsSnapshotTests {
     /// M11.
     @Test func list() async throws {
         let ids = try await save(6)
+        // One moment in Recently deleted, so its row shows at the bottom as in M11.
+        let deleted = try #require(try await save(1).first)
+        try container.mainContext.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == deleted })).first?.deletedAt = .now
+        try container.mainContext.save()
         let collections = CollectionStore(context: container.mainContext)
         try collections.create("Walks", with: Array(ids.prefix(2)))
         try collections.create("Grandma", with: [ids[2]])

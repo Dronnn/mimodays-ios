@@ -48,7 +48,7 @@ struct CollectionsView: View {
                     .padding(.top, 16)
                 }
                 if model.deletedCount > 0 {
-                    recentlyDeleted.padding(.top, 24)
+                    recentlyDeleted.padding(.top, 5)
                 }
             }
             .padding(.bottom, 24)
@@ -78,21 +78,29 @@ struct CollectionsView: View {
 
     private var recentlyDeleted: some View {
         NavigationLink(value: MemoriesRoute.recentlyDeleted) {
-            HStack(spacing: 12) {
-                Icon.glyphTrash.image.resizable().scaledToFit().frame(width: 20, height: 20).accessibilityHidden(true)
+            // M11's list card: the trash on a peach disc, the count and a chevron.
+            HStack(spacing: 14) {
+                Icon.glyphTrash.image
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .frame(width: 36, height: 36)
+                    .background(ColorToken.accentPeach.color, in: Circle())
+                    .accessibilityHidden(true)
                 Text("Recently deleted", bundle: .module).textStyle(.rowTitle)
                 Spacer(minLength: 8)
-                Text(model.deletedCount, format: .number).textStyle(.rowCaption).foregroundStyle(ColorToken.textSecondary.color)
-                Icon.glyphChevron.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
+                HStack(spacing: 6) {
+                    Text(model.deletedCount, format: .number).textStyle(.sheetBody).foregroundStyle(ColorToken.textSecondary.color)
+                    Icon.glyphChevron.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
+                }
             }
             .foregroundStyle(ColorToken.textPrimary.color)
-            .padding(.horizontal, 18)
-            .frame(minHeight: 56)
-            .background(FieldBlob().fill(ColorToken.surfaceCard.color))
+            .padding(.horizontal, 14)
+            .frame(minHeight: 64)
+            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .accessibilityIdentifier("collections.recentlyDeleted")
     }
 
@@ -128,7 +136,8 @@ struct CollectionCard: View {
     let cover: UIImage?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 3) {
+        // Spacing measured on M11: name 9 pt under the cover, count 20 pt under the name, 19 pt to the next cover.
+        VStack(alignment: .leading, spacing: 0) {
             ZStack {
                 // The card behind peeks out at the top right, as in M11.
                 DayCardBlob()
@@ -142,7 +151,7 @@ struct CollectionCard: View {
                     .rotationEffect(.degrees(-1.5))
             }
             .aspectRatio(1, contentMode: .fit)
-            .padding(.bottom, 12)
+            .padding(.bottom, 4)
             .accessibilityHidden(true)
             Text(summary.title)
                 .textStyle(.rowTitle)
@@ -151,8 +160,9 @@ struct CollectionCard: View {
             Text("\(summary.count) moments", bundle: .module)
                 .textStyle(.rowCaption)
                 .foregroundStyle(ColorToken.textSecondary.color)
+                .padding(.top, -2)
         }
-        .padding(.bottom, 8)
+        .padding(.bottom, 10)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("collections.card")
     }

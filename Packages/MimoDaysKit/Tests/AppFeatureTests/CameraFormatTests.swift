@@ -81,6 +81,24 @@ struct CameraFormatTests {
         #expect(await engine.captureHolds == [.landscapeLeft, .landscapeRight, .upright])
     }
 
+    /// The test matrix's sideways video: each recording is turned the way the phone is held when it starts.
+    @Test func eachVideoIsTurnedTheWayThePhoneIsHeld() async throws {
+        let engine = SimulatedCaptureEngine()
+        var taken: [CaptureResult] = []
+        let (model, sensor) = await camera(.landscape, hold: .landscapeLeft, mode: .video, engine: engine) { taken.append($0) }
+        for hold in [DeviceHold.landscapeLeft, .landscapeRight] {
+            sensor.set(hold)
+            await settle { model.hold == hold }
+            async let recording: Void = model.shutter()
+            while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+            await model.shutter()
+            await recording
+        }
+        #expect(await engine.captureHolds.suffix(2) == [.landscapeLeft, .landscapeRight])
+        #expect(taken.map(\.format) == [.landscape, .landscape])
+        taken.forEach { $0.discardFiles() }
+    }
+
     @Test func theFormatStaysFixedWhileRecording() async throws {
         let engine = SimulatedCaptureEngine()
         var taken: [CaptureResult] = []

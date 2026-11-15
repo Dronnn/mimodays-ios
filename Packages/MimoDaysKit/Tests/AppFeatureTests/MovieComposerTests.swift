@@ -24,16 +24,19 @@ struct MovieComposerTests {
     private let portrait = MovieAspectRatio.portrait9x16.renderSize(.p720)
 
     /// Simulated-camera moments, both cameras; `videos` indexes are 1 s videos.
-    private func save(_ count: Int, videos: Set<Int> = []) async throws -> [UUID] {
+    private func save(_ count: Int, videos: Set<Int> = [], format: CaptureFormat = .portrait) async throws -> [UUID] {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
+        // 16:9 is recorded with the phone sideways.
+        if format == .landscape { await engine.setCaptureHold(.landscapeLeft) }
         let saver = MomentSaver(context: context, store: store, clock: TestDateProvider(), freeBytes: { nil })
         var ids: [UUID] = []
         for index in 0..<count {
             let media: CaptureResult.Media = videos.contains(index)
                 ? .video(try await engine.record(limit: .seconds(1)))
                 : .photo(try await engine.capturePhoto(flash: false, silent: true))
-            let capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: now, timeZone: .gmt))
+            var capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: now, timeZone: .gmt))
+            capture.format = format
             let draft = MomentDraft(
                 capture: capture, caption: "",
                 window: SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536)),
@@ -333,6 +336,26 @@ struct MovieComposerTests {
         [ClipCameraLayout.window, .swapped, .sideBySide, .selfieOnly, .mainOnly]
     ))
     func thePreviewIsTheExport(_ shape: MovieAspectRatio, _ layout: ClipCameraLayout) async throws {
+        try await expectPreviewIsExport(shape, layout)
+    }
+
+    /// The test matrix's moment shapes: square and sideways wide moments, a video clip then a photo, in a movie of
+    /// another shape - preview and export agree there too.
+    @Test(arguments: zip(
+        [CaptureFormat.square, .landscape, .landscape, .square],
+        [MovieAspectRatio.portrait9x16, .portrait9x16, .landscape16x9, .square1x1]
+    ))
+    func thePreviewIsTheExportForEveryMomentShape(_ format: CaptureFormat, _ shape: MovieAspectRatio) async throws {
+        let ids = try await save(2, videos: [0], format: format)
+        let project = try project(ids, shape: shape)
+        project.orderedClips[0].cameraLayout = .swapped
+        let size = shape.renderSize(.p720)
+        let composed = try await MovieComposer.compose(MoviePlan(project, store: store), renderSize: size)
+        let end = try await composed.asset.load(.duration).seconds
+        try await expectExportMatches(composed, at: [0.5, end - 0.5], "\(format) in \(shape)")
+    }
+
+    private func expectPreviewIsExport(_ shape: MovieAspectRatio, _ layout: ClipCameraLayout) async throws {
         let ids = try await save(2)
         let project = try carded(ids, look: .overClip)
         project.aspectRatio = shape
@@ -340,6 +363,13 @@ struct MovieComposerTests {
         project.orderedClips[1].transition = .atmosphere
         let size = shape.renderSize(.p720)
         let composed = try await MovieComposer.compose(MoviePlan(project, store: store), renderSize: size)
+        let card = MovieSelection.photoSeconds + 1.5
+        let lead = MovieSelection.photoSeconds + 3 + 2
+        try await expectExportMatches(composed, at: [1.0, card, lead], "\(shape) \(layout)")
+    }
+
+    /// Exports `composed` and compares the preview's frames with the file's at `times`.
+    private func expectExportMatches(_ composed: MovieComposer.Composed, at times: [Double], _ name: String) async throws {
         let url = FileManager.default.temporaryDirectory.appending(path: "preview-\(UUID().uuidString).mp4")
         defer { try? FileManager.default.removeItem(at: url) }
         let session = try #require(AVAssetExportSession(asset: composed.asset, presetName: AVAssetExportPresetHighestQuality))
@@ -348,16 +378,14 @@ struct MovieComposerTests {
         let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
         generator.requestedTimeToleranceBefore = .zero
         generator.requestedTimeToleranceAfter = .zero
-        let card = MovieSelection.photoSeconds + 1.5
-        let lead = MovieSelection.photoSeconds + 3 + 2
-        for seconds in [1.0, card, lead] {
+        for seconds in times {
             let preview = try await frame(composed, at: seconds)
             let exported = try await generator.image(at: CMTime(seconds: seconds, preferredTimescale: 600)).image
             #expect(exported.width == preview.width && exported.height == preview.height)
             for (x, y) in [(0.15, 0.2), (0.5, 0.5), (0.8, 0.8)] {
                 let a = pixel(preview, Int(Double(preview.width) * x), Int(Double(preview.height) * y))
                 let b = pixel(exported, Int(Double(exported.width) * x), Int(Double(exported.height) * y))
-                #expect(abs(a.r - b.r) < 24 && abs(a.g - b.g) < 24 && abs(a.b - b.b) < 24, "\(shape) \(layout) at \(seconds) s (\(x), \(y)): \(a) vs \(b)")
+                #expect(abs(a.r - b.r) < 24 && abs(a.g - b.g) < 24 && abs(a.b - b.b) < 24, "\(name) at \(seconds) s (\(x), \(y)): \(a) vs \(b)")
             }
         }
     }

@@ -27,7 +27,10 @@ struct ViewerSnapshotTests {
 
     private var library: MediaLibrary { MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline()) }
 
-    private func save(video: Bool, format: CaptureFormat = .portrait) async throws -> UUID {
+    private func save(
+        video: Bool, format: CaptureFormat = .portrait,
+        note: String = "Lena caught a flake on her glove and wouldn't come in until it melted."
+    ) async throws -> UUID {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
         // 16:9 is recorded with the phone sideways.
@@ -47,7 +50,7 @@ struct ViewerSnapshotTests {
             promptID: nil,
             place: ReviewPlace(label: "Yerevan", latitude: 40.18, longitude: 44.51, precision: .city, source: .gps)
         )
-        draft.note = "Lena caught a flake on her glove and wouldn't come in until it melted."
+        draft.note = note
         let url = root.appending(path: "voice-\(UUID().uuidString).m4a")
         try SimulatedVoiceRecorder.writeTone(to: url, seconds: 12)
         draft.voice = ReviewVoiceNote(url: url, duration: 12, recordedAt: .now, transcript: nil)
@@ -108,8 +111,8 @@ struct ViewerSnapshotTests {
     }
 
     /// A card on its own page, turned to `angle`.
-    private func page(video: Bool, format: CaptureFormat = .portrait, angle: Double, bare: Bool = false) async throws -> some View {
-        let id = bare ? try await saveBare() : try await save(video: video, format: format)
+    private func page(video: Bool, format: CaptureFormat = .portrait, angle: Double, bare: Bool = false, note: String? = nil) async throws -> some View {
+        let id = bare ? try await saveBare() : try await save(video: video, format: format, note: note ?? "Lena caught a flake on her glove and wouldn't come in until it melted.")
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)
         let moment = try #require(model.moments[id])
@@ -143,6 +146,14 @@ struct ViewerSnapshotTests {
         assertScreenSnapshots(of: try await page(video: true, angle: 180), variants: [
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
             SnapshotVariant(.iPhone, .light, rightToLeft: true),
+        ])
+    }
+
+    /// A note longer than the back: it scrolls, the live window after the last line.
+    @Test func backLongNote() async throws {
+        let note = String(repeating: "Lena caught a flake on her glove and wouldn't come in until it melted. Then another, and another. ", count: 6)
+        assertScreenSnapshots(of: try await page(video: false, angle: 180, note: note), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
         ])
     }
 

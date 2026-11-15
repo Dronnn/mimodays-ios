@@ -29,6 +29,8 @@ public struct RootView: View {
     @State private var mosaic: MemoriesModel
     /// U16: which home side shows, and the turn between them.
     @State private var homeTurn: HomeTurn
+    /// U40: Mosaic pieces grow into their Memory Card; the stack's destinations need it too.
+    @Namespace private var mosaicZoom
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// C12 toast after a save.
     @State private var showsSavedToast = false
@@ -198,6 +200,7 @@ public struct RootView: View {
                             case .movies: EmptyView()
                             }
                         }
+                        .environment(\.mosaicZoom, tab == .today ? mosaicZoom : nil)
                     }
                 } label: {
                     Label { Text(tab.title) } icon: { tab.icon.image }

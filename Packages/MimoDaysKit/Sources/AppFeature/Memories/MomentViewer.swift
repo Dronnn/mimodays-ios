@@ -8,12 +8,24 @@ import SwiftUI
 struct MomentViewerScreen: View {
     let pager: MomentPager
     @Environment(\.mediaLibrary) private var library
+    @Environment(\.mosaicZoom) private var mosaicZoom
 
     var body: some View {
         if let library {
-            MomentViewerHost(model: MomentViewerModel(pager: pager, library: library))
+            if pager.origin == .mosaic, let mosaicZoom {
+                // U40: the piece grows into the card, the Mosaic dimming behind; closing shrinks it back.
+                MomentViewerHost(model: MomentViewerModel(pager: pager, library: library))
+                    .navigationTransition(.zoom(sourceID: pager.start, in: mosaicZoom))
+            } else {
+                MomentViewerHost(model: MomentViewerModel(pager: pager, library: library))
+            }
         }
     }
+}
+
+extension EnvironmentValues {
+    /// The Mosaic's pieces, which a Memory Card opened from them grows out of (U40).
+    @Entry var mosaicZoom: Namespace.ID?
 }
 
 private struct MomentViewerHost: View {

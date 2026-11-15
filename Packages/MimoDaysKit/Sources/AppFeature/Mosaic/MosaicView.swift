@@ -10,6 +10,7 @@ struct MosaicView: View {
     let model: MemoriesModel
     @State private var width: CGFloat = 0
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.mosaicZoom) private var zoom
 
     /// A month: yyyymm and its moments, newest first.
     struct Month: Identifiable, Equatable {
@@ -137,6 +138,7 @@ struct MosaicView: View {
         NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id, origin: .mosaic))) {
             MosaicPiece(item: item, detail: model.details[item.id], image: model.images[item.id])
                 .frame(width: tile.frame.width, height: tile.frame.height)
+                .modifier(ZoomSource(id: item.id, namespace: zoom))
         }
         .buttonStyle(.plain)
         .rotationEffect(.degrees(tile.tilt))
@@ -209,5 +211,19 @@ struct MosaicPiece: View {
         return item.isFavorite
             ? Text("\(kind) from \(time), favorite", bundle: .module)
             : Text("\(kind) from \(time)", bundle: .module)
+    }
+}
+
+/// The piece a Memory Card grows out of (U40), where there is a namespace for it.
+private struct ZoomSource: ViewModifier {
+    let id: UUID
+    let namespace: Namespace.ID?
+
+    func body(content: Content) -> some View {
+        if let namespace {
+            content.matchedTransitionSource(id: id, in: namespace) { $0.clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)) }
+        } else {
+            content
+        }
     }
 }

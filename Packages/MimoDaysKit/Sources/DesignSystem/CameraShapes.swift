@@ -1,4 +1,4 @@
-// Generated from Penpot `Camera / Last moment` (C01) and `Chip / A little surprise` (C01s). Regenerate instead of editing by hand.
+// Generated from Penpot `Camera / Last moment` (C01), `Chip / A little surprise` (C01s) and `Camera / Selfie window (landscape)` (U04). Regenerate instead of editing by hand.
 import SwiftUI
 
 /// Hand-cut outline of the camera's last-moment thumbnail (48×48 in the design); stretches to any rect.
@@ -124,6 +124,48 @@ public struct ChipBlob: Shape {
         path.addCurve(to: p(0.7476, 0.0097), control1: p(0.8163, 0.0391), control2: p(0.7844, 0.0162))
         path.addCurve(to: p(0.6118, 0.0000), control1: p(0.7109, 0.0000), control2: p(0.6933, 0.0000))
         path.addCurve(to: p(0.2604, 0.0097), control1: p(0.5303, 0.0000), control2: p(0.3291, 0.0032))
+        path.closeSubpath()
+        return path
+    }
+}
+
+/// U04 `Camera / Selfie window (landscape)`: the hand-cut frame of the sideways selfie window, upright (the window's
+/// -5.4° tilt is applied by the view); 158×112 in the design, stretches to any rect.
+public struct LandscapeSelfieBlob: Shape {
+    public init() {}
+
+    public func path(in rect: CGRect) -> Path {
+        func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+            CGPoint(x: rect.minX + x * rect.width, y: rect.minY + y * rect.height)
+        }
+        var path = Path()
+        path.move(to: p(0.1275, 0.0300))
+        path.addCurve(to: p(0.3118, 0.0674), control1: p(0.1661, 0.0250), control2: p(0.2504, 0.0658))
+        path.addCurve(to: p(0.4961, 0.0395), control1: p(0.3733, 0.0690), control2: p(0.4347, 0.0421))
+        path.addCurve(to: p(0.6804, 0.0520), control1: p(0.5576, 0.0370), control2: p(0.6190, 0.0582))
+        path.addCurve(to: p(0.8647, 0.0030), control1: p(0.7419, 0.0459), control2: p(0.8218, 0.0059))
+        path.addCurve(to: p(0.9378, 0.0343), control1: p(0.9076, 0.0000), control2: p(0.9164, 0.0169))
+        path.addCurve(to: p(0.9931, 0.1068), control1: p(0.9592, 0.0515), control2: p(0.9862, 0.0776))
+        path.addCurve(to: p(0.9790, 0.2094), control1: p(1.0000, 0.1360), control2: p(0.9832, 0.1585))
+        path.addCurve(to: p(0.9678, 0.4122), control1: p(0.9748, 0.2603), control2: p(0.9690, 0.3445))
+        path.addCurve(to: p(0.9721, 0.6149), control1: p(0.9667, 0.4797), control2: p(0.9706, 0.5474))
+        path.addCurve(to: p(0.9772, 0.8178), control1: p(0.9737, 0.6826), control2: p(0.9792, 0.7713))
+        path.addCurve(to: p(0.9598, 0.8937), control1: p(0.9751, 0.8642), control2: p(0.9693, 0.8716))
+        path.addCurve(to: p(0.9202, 0.9507), control1: p(0.9503, 0.9159), control2: p(0.9360, 0.9397))
+        path.addCurve(to: p(0.8647, 0.9596), control1: p(0.9044, 0.9617), control2: p(0.9047, 0.9517))
+        path.addCurve(to: p(0.6804, 0.9979), control1: p(0.8248, 0.9674), control2: p(0.7419, 0.9957))
+        path.addCurve(to: p(0.4961, 0.9726), control1: p(0.6190, 1.0000), control2: p(0.5576, 0.9755))
+        path.addCurve(to: p(0.3118, 0.9808), control1: p(0.4347, 0.9698), control2: p(0.3733, 0.9782))
+        path.addCurve(to: p(0.1275, 0.9886), control1: p(0.2504, 0.9834), control2: p(0.1680, 0.9925))
+        path.addCurve(to: p(0.0690, 0.9579), control1: p(0.0870, 0.9849), control2: p(0.0861, 0.9728))
+        path.addCurve(to: p(0.0250, 0.8997), control1: p(0.0519, 0.9431), control2: p(0.0327, 0.9231))
+        path.addCurve(to: p(0.0228, 0.8178), control1: p(0.0173, 0.8763), control2: p(0.0254, 0.8652))
+        path.addCurve(to: p(0.0094, 0.6149), control1: p(0.0202, 0.7703), control2: p(0.0126, 0.6826))
+        path.addCurve(to: p(0.0035, 0.4122), control1: p(0.0062, 0.5474), control2: p(0.0000, 0.4797))
+        path.addCurve(to: p(0.0303, 0.2094), control1: p(0.0070, 0.3445), control2: p(0.0234, 0.2542))
+        path.addCurve(to: p(0.0450, 0.1434), control1: p(0.0372, 0.1645), control2: p(0.0366, 0.1621))
+        path.addCurve(to: p(0.0807, 0.0972), control1: p(0.0534, 0.1247), control2: p(0.0669, 0.1161))
+        path.addCurve(to: p(0.1275, 0.0300), control1: p(0.0945, 0.0783), control2: p(0.0890, 0.0349))
         path.closeSubpath()
         return path
     }

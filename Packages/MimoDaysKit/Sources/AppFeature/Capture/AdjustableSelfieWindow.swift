@@ -59,8 +59,8 @@ struct AdjustableSelfieWindow<Content: View>: View {
 }
 
 /// The signature window: `content` in a cream frame tilted -5.4°, with a drag handle below (C01, C07).
-/// `sideways` lays it on its side (16:9, U04): in review a quarter turn; in the camera, whose layer is turned with
-/// the phone by `turn`, the upright frame turned back. Either way the picture shows as the camera recorded it.
+/// `sideways` lays it on its side (16:9): in review a quarter turn; in the camera, whose layer is turned with the
+/// phone by `turn`, U04's hand-cut landscape frame. Either way the picture shows as the camera recorded it.
 struct SelfieWindowView<Content: View>: View {
     let scale: CameraSettings.SelfieWindow.Scale
     let showsHandle: Bool
@@ -70,8 +70,24 @@ struct SelfieWindowView<Content: View>: View {
 
     var body: some View {
         let frame = SelfieWindowLayout.frameSize(scale)
-        let frameTurn: Angle = sideways ? (turn == .zero ? .degrees(90) : -turn) : .zero
-        VStack(spacing: 6) {
+        if sideways, turn != .zero {
+            // U04: the camera's layer is already on its side, so the window is drawn landscape in it, in its hand-cut
+            // frame and without the handle; the picture turns back to how the camera sees it.
+            CameraPalette.selfiePlaceholder
+                .overlay { TurnedPicture(angle: -turn, content: content) }
+                .clipShape(LandscapeSelfieBlob())
+                .overlay { LandscapeSelfieBlob().stroke(CameraPalette.cream, lineWidth: 3.5) }
+                .shadow(color: .black.opacity(SelfieWindowStyle.shadowOpacity), radius: SelfieWindowStyle.shadowBlur / 2, y: SelfieWindowStyle.shadowY)
+                .frame(width: frame.height, height: frame.width)
+                .rotationEffect(Size.selfieWindowTilt)
+        } else {
+            upright(frame)
+        }
+    }
+
+    private func upright(_ frame: CGSize) -> some View {
+        let frameTurn: Angle = sideways ? .degrees(90) : .zero
+        return VStack(spacing: 6) {
             SelfieFrame(placeholder: CameraPalette.selfiePlaceholder, tilted: false) {
                 TurnedPicture(angle: -(frameTurn + turn), content: content)
             }

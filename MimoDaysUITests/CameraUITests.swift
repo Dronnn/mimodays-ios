@@ -56,6 +56,44 @@ final class CameraUITests: XCTestCase {
         XCTAssertFalse(shutter.isEnabled)
     }
 
+    /// The test matrix's capture-to-card cells: a 1:1 photo, then a 16:9 one taken with the phone sideways, each
+    /// saved and opened as a card of its own shape.
+    @MainActor
+    func testASquareAndASidewaysWideMomentOpenInTheirShapes() {
+        openCamera()
+        defer { XCUIDevice.shared.orientation = .portrait }
+        let shutter = app.buttons["camera.shutter"]
+        let save = app.buttons["review.save"]
+        let hero = app.descendants(matching: .any)["today.hero"]
+
+        app.buttons["camera.format.square"].tap()
+        shutter.tap()
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        XCTAssertTrue(hero.waitForExistence(timeout: 10))
+        sleep(1)
+        hero.tap()
+        var card = app.shown("viewer.media")?.frame ?? .zero
+        XCTAssertEqual(card.width / max(card.height, 1), 1, accuracy: 0.05, "a 1:1 card: \(card)")
+        app.buttons["viewer.back"].tap()
+
+        app.buttons["capture"].tap()
+        app.buttons["camera.format.landscape"].tap()
+        XCUIDevice.shared.orientation = .landscapeLeft
+        let enabled = expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: shutter)
+        wait(for: [enabled], timeout: 5)
+        shutter.tap()
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        XCUIDevice.shared.orientation = .portrait
+        save.tap()
+        XCTAssertTrue(hero.waitForExistence(timeout: 10))
+        sleep(1)
+        hero.tap()
+        card = app.shown("viewer.media")?.frame ?? .zero
+        XCTAssertEqual(card.width / max(card.height, 1), 16.0 / 9, accuracy: 0.08, "a 16:9 card: \(card)")
+        XCTAssertNotNil(app.shown("viewer.selfieWindow"))
+    }
+
     /// Flow 03 up to review: a photo to review and Retake back to the camera, then a video recorded, stopped
     /// and reviewed, on the simulated engine.
     @MainActor

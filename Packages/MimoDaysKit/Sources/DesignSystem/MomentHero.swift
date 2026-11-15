@@ -58,7 +58,8 @@ public struct MomentHero: View {
                 if let selfie {
                     SelfieWindow(media: selfie)
                         .frame(width: 89 * scale, height: SelfieWindowStyle.height(forWidth: 89 * scale))
-                        .position(x: proxy.size.width - 72.9 * scale, y: 37 * scale)
+                        // U10: centred where the design has it, the top edge 12 pt over the hero's.
+                        .position(x: proxy.size.width - 70.9 * scale, y: 47.2 * scale)
                 }
             }
         }

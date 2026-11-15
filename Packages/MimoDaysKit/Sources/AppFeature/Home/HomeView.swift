@@ -20,7 +20,7 @@ struct HomeView: View {
                 .modifier(HomeFace(angle: turn.flip.angle, side: .today, reduceMotion: reduceMotion))
                 .allowsHitTesting(side == .today)
                 .accessibilityHidden(side != .today)
-            MosaicView(model: mosaic)
+            MosaicView(model: mosaic, isFacing: side == .mosaic)
                 .modifier(HomeFace(angle: turn.flip.angle, side: .mosaic, reduceMotion: reduceMotion))
                 .allowsHitTesting(side == .mosaic)
                 .accessibilityHidden(side != .mosaic)

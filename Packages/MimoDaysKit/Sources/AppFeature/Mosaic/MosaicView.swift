@@ -1,3 +1,4 @@
+@preconcurrency import AVFoundation
 import Core
 import DesignSystem
 import SwiftData
@@ -8,9 +9,17 @@ import SwiftUI
 struct MosaicView: View {
     /// Its own tiles source, newest first whatever Memories is set to.
     let model: MemoriesModel
+    /// The home's side facing the person: only then do the pieces move.
+    var isFacing = true
     @State private var width: CGFloat = 0
+    @State private var isShown = false
+    @State private var loops = MosaicLoops()
     @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.mosaicZoom) private var zoom
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// U16: pieces drift and videos loop on the side shown, not behind a Memory Card; Reduce Motion keeps them still.
+    private var isLive: Bool { isFacing && isShown && !reduceMotion }
 
     /// A month: yyyymm and its moments, newest first.
     struct Month: Identifiable, Equatable {
@@ -47,6 +56,8 @@ struct MosaicView: View {
         .scrollBounceBehavior(.basedOnSize)
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .task { model.refresh() }
+        .onAppear { isShown = true }
+        .onDisappear { isShown = false }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
         .accessibilityIdentifier("mosaic")
     }
@@ -136,7 +147,10 @@ struct MosaicView: View {
 
     private func piece(_ item: MemoryItem, _ tile: MosaicLayout.Tile) -> some View {
         NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id, origin: .mosaic))) {
-            MosaicPiece(item: item, detail: model.details[item.id], image: model.images[item.id])
+            MosaicPiece(
+                item: item, detail: model.details[item.id], image: model.images[item.id], isLive: isLive, loops: loops,
+                loopItems: { [model] in await model.loopItems($0) }
+            )
                 .frame(width: tile.frame.width, height: tile.frame.height)
                 .modifier(ZoomSource(id: item.id, namespace: zoom))
         }
@@ -172,12 +186,18 @@ struct MosaicPiece: View {
     let item: MemoryItem
     let detail: TileDetail?
     let image: UIImage?
+    /// U16: photos drift (Ken Burns, 12 s), pictures move against the scroll, videos loop while on screen.
+    var isLive = false
+    var loops: MosaicLoops?
+    var loopItems: (ViewerMoment.VideoSource) async -> (main: AVPlayerItem, selfie: AVPlayerItem?)? = { _ in nil }
+    @State private var isOnScreen = false
+    @State private var drifts = false
+
+    private var moves: Bool { isLive && isOnScreen }
 
     var body: some View {
         Color(hex: 0xC9B8AA)
-            .overlay {
-                if let image { Image(uiImage: image).filling() }
-            }
+            .overlay { picture }
             .clipShape(MemoryCardOutline())
             .overlay { MemoryCardOutline().strokeBorder(ColorToken.mediaFrame.color, lineWidth: 4) }
             .background {
@@ -200,9 +220,34 @@ struct MosaicPiece: View {
                 }
             }
             .contentShape(MemoryCardOutline())
+            .onScrollVisibilityChange(threshold: 0.3) { visible in
+                isOnScreen = visible
+                if item.mediaType == .video { loops?.setOnScreen(item.id, visible) }
+            }
+            .onChange(of: moves && item.mediaType == .photo, initial: true) { _, on in
+                withAnimation(on ? .easeInOut(duration: 12).repeatForever(autoreverses: true) : .easeOut(duration: 0.6)) { drifts = on }
+            }
+            .onDisappear { loops?.setOnScreen(item.id, false) }
             .accessibilityElement()
             .accessibilityLabel(label)
             .accessibilityAddTraits(.isButton)
+    }
+
+    /// A little larger than the piece, so the drift and the parallax never show its edge.
+    private var picture: some View {
+        ZStack {
+            if let image { Image(uiImage: image).filling() }
+            if moves, let video = detail?.video, loops?.plays(item.id) == true {
+                MosaicLoop(video: video) { await loopItems(video) }
+            }
+        }
+        .scaleEffect(drifts ? 1.14 : isLive ? 1.06 : 1, anchor: driftAnchor)
+        .modifier(MosaicParallax(isOn: isLive))
+    }
+
+    /// Each photo drifts towards its own corner, from its id.
+    private var driftAnchor: UnitPoint {
+        [.topLeading, .topTrailing, .bottomLeading, .bottomTrailing, .center][Int(item.id.uuid.0) % 5]
     }
 
     private var label: Text {

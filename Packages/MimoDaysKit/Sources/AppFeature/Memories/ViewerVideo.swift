@@ -34,9 +34,13 @@ final class ViewerVideoPlayer {
 
     private var timeObserver: Any?
     private var endObserver: (any NSObjectProtocol)?
+    /// A Mosaic piece's loop (U16): no sound, and other apps' sound left alone.
+    private let isSilent: Bool
 
-    init(duration: Double) {
+    init(duration: Double, silent: Bool = false) {
         self.duration = duration
+        isSilent = silent
+        main.isMuted = silent
         selfie.isMuted = true
         // Started together at one host time, which needs players that don't wait on their own.
         main.automaticallyWaitsToMinimizeStalling = false
@@ -44,7 +48,7 @@ final class ViewerVideoPlayer {
     }
 
     private func applySound() {
-        main.isMuted = isMuted || isOnBack
+        main.isMuted = isSilent || isMuted || isOnBack
         main.volume = isDucked ? 0.2 : 1
     }
 
@@ -79,7 +83,7 @@ final class ViewerVideoPlayer {
     /// Both streams start at the same host time from the main one's position.
     func play() {
         guard isReady else { return }
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+        if !isSilent { try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback) }
         start(at: main.currentTime())
         isPlaying = true
     }

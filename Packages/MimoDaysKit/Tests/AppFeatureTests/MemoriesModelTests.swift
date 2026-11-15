@@ -105,6 +105,21 @@ struct MemoriesModelTests {
         #expect(model.images[video] != nil)
     }
 
+    /// U16: a video piece loops its two streams, pictures only, so other apps' sound plays on.
+    @Test func aVideoPieceLoopsBothStreamsWithoutSound() async throws {
+        let video = try await save(at: Self.date(2026, 11, 10), video: true)
+        let model = model()
+        await model.load(video)
+        let source = try #require(model.details[video]?.video)
+        let items = try #require(await model.loopItems(source))
+        let selfie = try #require(items.selfie)
+        #expect(source.timing.window != nil)
+        for item in [items.main, selfie] {
+            #expect(try await item.asset.loadTracks(withMediaType: .video).count == 1)
+            #expect(try await item.asset.loadTracks(withMediaType: .audio).isEmpty)
+        }
+    }
+
     @Test func favoritesAreMarkedOnTheirItems() async throws {
         let id = try await save(at: Self.date(2026, 11, 9))
         try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first?.isFavorite = true

@@ -18,7 +18,8 @@ jobs:
   app:
     name: App (unit + UI)
     runs-on: xcode-27
-    timeout-minutes: 40
+    # The UI suite alone takes 40+ minutes on hosted runners (20-150 s a test).
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode 27.2

@@ -153,9 +153,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             guard self.session.canAddInput(input) else { throw CaptureError.configurationFailed }
             self.session.addInputWithNoConnections(input)
             self.microphone = input
-            if let main = self.setup?.positions.first, let movie = self.cameras[main]?.movie {
-                try self.connectMicrophone(to: movie)
-            }
+            for (position, camera) in self.cameras { try self.connectMicrophone(to: camera.movie, position) }
         }
     }
 
@@ -395,7 +393,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             let level = CapturePressurePolicy.Level(device.systemPressureState.level)
             engine.queue.async { engine.pressureChanged(level, on: position) }
         }
-        if microphone != nil, position == setup?.positions.first ?? .back { try connectMicrophone(to: movie) }
+        if microphone != nil { try connectMicrophone(to: movie, position) }
     }
 
     /// Portrait, and mirrored for the front camera, the way people see themselves.
@@ -409,13 +407,20 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
     }
 
-    private func connectMicrophone(to movie: AVCaptureMovieFileOutput) throws {
+    /// Each camera's stream records the microphone facing its way, so whichever stream ends up the main one after a
+    /// swap has the sound (Andrew, 2026-11-15). The first camera may fall back to the plain microphone; the second
+    /// goes without sound rather than fail the camera.
+    private func connectMicrophone(to movie: AVCaptureMovieFileOutput, _ position: CameraPosition) throws {
         guard let microphone else { return }
-        let port = microphone.ports(for: .audio, sourceDeviceType: microphone.device.deviceType, sourceDevicePosition: .back).first
-            ?? microphone.ports.first { $0.mediaType == .audio }
-        guard let port else { throw CaptureError.configurationFailed }
-        let connection = AVCaptureConnection(inputPorts: [port], output: movie)
-        guard session.canAddConnection(connection) else { throw CaptureError.configurationFailed }
+        let isFirst = position == setup?.positions.first ?? .back
+        let avPosition: AVCaptureDevice.Position = position == .back ? .back : .front
+        let port = microphone.ports(for: .audio, sourceDeviceType: microphone.device.deviceType, sourceDevicePosition: avPosition).first
+            ?? (isFirst ? microphone.ports.first { $0.mediaType == .audio } : nil)
+        let connection = port.map { AVCaptureConnection(inputPorts: [$0], output: movie) }
+        guard let connection, session.canAddConnection(connection) else {
+            if isFirst { throw CaptureError.configurationFailed }
+            return
+        }
         session.addConnection(connection)
     }
 

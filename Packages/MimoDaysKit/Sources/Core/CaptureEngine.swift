@@ -48,7 +48,7 @@ public struct CapturedVideo: Codable, Equatable, Sendable {
     public var duration: TimeInterval
     /// How much later the selfie stream started than the main one, in seconds (negative: earlier).
     public var selfieOffset: TimeInterval
-    /// Microphone audio, in the main stream only.
+    /// Microphone audio, in each stream (its own side's microphone); playback takes the main stream's.
     public var hasAudio: Bool
     /// Why the recording ended early; the part before is kept (C13d). Nil for a stop or the time limit.
     public var interruption: CaptureInterruption?

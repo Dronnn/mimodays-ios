@@ -19,6 +19,18 @@ final class MemoriesUITests: XCTestCase {
         app.tabBars.firstMatch.buttons.element(boundBy: 1).tap()
     }
 
+    /// The element `id` on the card on screen; the pager keeps its neighbours too.
+    @MainActor
+    private func onScreen(_ id: String, timeout: TimeInterval = 10) -> XCUIElement? {
+        let deadline = Date.now.addingTimeInterval(timeout)
+        repeat {
+            let shown = app.descendants(matching: .any).matching(identifier: id).allElementsBoundByIndex.first { $0.exists && $0.isHittable }
+            if let shown { return shown }
+            RunLoop.current.run(until: Date.now.addingTimeInterval(0.2))
+        } while Date.now < deadline
+        return nil
+    }
+
     @MainActor
     func testSavedMomentsAreInTheTimeline() {
         launch(.populated)
@@ -85,6 +97,26 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(tile.waitForExistence(timeout: 5))
     }
 
+    /// U35: Flip turns the card over to its back and round to the front again; a swipe still changes moment.
+    @MainActor
+    func testTheCardFlipsOverAndBackAndASwipeStillMovesOn() {
+        launch(.populated)
+        let tile = app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch
+        XCTAssertTrue(tile.waitForExistence(timeout: 20))
+        tile.tap()
+        XCTAssertNotNil(onScreen("viewer.media"))
+        let flip = onScreen("card.flip")
+        XCTAssertNotNil(flip)
+        flip?.tap()
+        // The front leaves VoiceOver's reach once the back faces up.
+        XCTAssertNil(onScreen("viewer.media", timeout: 3), "the front is still showing")
+        onScreen("card.flip")?.tap()
+        XCTAssertNotNil(onScreen("viewer.media"))
+        app.swipeLeft()
+        XCTAssertNotNil(onScreen("viewer.media"))
+        XCTAssertTrue(app.buttons["viewer.favorite"].exists)
+    }
+
     /// M05 → M07 → M05: a caption added in Edit moment shows in the viewer.
     @MainActor
     func testEditingAddsACaption() {
@@ -100,6 +132,10 @@ final class MemoriesUITests: XCTestCase {
         caption.tap()
         caption.typeText("Snow day")
         app.buttons["edit.save"].tap()
+        // The words are on the card's back (U30).
+        let flip = onScreen("card.flip")
+        XCTAssertNotNil(flip)
+        flip?.tap()
         XCTAssertTrue(app.staticTexts["Snow day"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["edit.save"].exists)
     }
@@ -311,6 +347,7 @@ final class MemoriesUITests: XCTestCase {
         caption.tap()
         caption.typeText(" by the fountain")
         app.buttons["edit.save"].tap()
+        onScreen("card.flip")?.tap()
         let edited = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "by the fountain")).firstMatch
         XCTAssertTrue(edited.waitForExistence(timeout: 5))
         XCTAssertTrue(edit.exists)

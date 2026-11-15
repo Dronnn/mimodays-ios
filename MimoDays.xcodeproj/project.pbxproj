@@ -479,6 +479,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = MimoDays;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "MimoDays uses the camera to capture your moments.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "MimoDays uses Face ID to unlock the app when App Lock is on.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MimoDays saves where a moment happened, so you can find it on your map.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MimoDays uses the microphone to add sound to your videos and record voice notes.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MimoDays saves the photos, videos and movies you export to your library.";
@@ -518,6 +519,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = MimoDays;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "MimoDays uses the camera to capture your moments.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "MimoDays uses Face ID to unlock the app when App Lock is on.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MimoDays saves where a moment happened, so you can find it on your map.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MimoDays uses the microphone to add sound to your videos and record voice notes.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MimoDays saves the photos, videos and movies you export to your library.";

@@ -1,6 +1,7 @@
 import Core
 import DesignSystem
 import os
+import SwiftData
 import SwiftUI
 import UIKit
 
@@ -17,6 +18,9 @@ public struct RootView: View {
     private let momentSaver: MomentSaver
     private let memoriesPreferences: MemoriesPreferences
     private let moviePreferences: MoviePreferences
+    private let privacyPreferences: PrivacyPreferences
+    private let appLock: AppLock
+    private let eraser: AppEraser
     @State private var today: TodayModel
     @State private var memories: MemoriesModel
     /// C12 toast after a save.
@@ -40,12 +44,14 @@ public struct RootView: View {
         )
         memoriesPreferences = dependencies.memoriesPreferences
         moviePreferences = dependencies.moviePreferences
+        privacyPreferences = dependencies.privacyPreferences
+        appLock = dependencies.appLock
+        eraser = dependencies.eraser
         memories.mode = memoriesPreferences.value.opensIn.memoriesMode
         memories.newestFirst = memoriesPreferences.value.newestFirst
         CaptureTime.followsDeviceTimeZone = memoriesPreferences.value.days == .thisIPhone
         _memories = State(initialValue: memories)
-        let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
-        let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
+        let flow = Self.onboardingFlow(context: dependencies.modelContainer.mainContext, permissions: dependencies.permissions, surprises: surprises)
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
     }
 
@@ -66,7 +72,13 @@ public struct RootView: View {
         .environment(\.momentSaver, momentSaver)
         .environment(memoriesPreferences)
         .environment(moviePreferences)
+        .environment(privacyPreferences)
+        .environment(appLock)
+        .environment(\.appEraser, eraser)
+        .environment(\.didEraseEverything, startOver)
         .environment(\.mediaLibrary, memories.library)
+        // S05: the lock screen sits in its own window, over sheets too.
+        .background(AppLockWindow(lock: appLock, isLocked: appLock.isLocked))
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)
@@ -87,7 +99,9 @@ public struct RootView: View {
             relabelDays(days)
         }
         .onChange(of: scenePhase, initial: true) { _, phase in
+            if phase == .background { appLock.didEnterBackground() }
             guard phase == .active else { return }
+            Task { await appLock.didBecomeActive() }
             refreshSurprises()
             purgeRecentlyDeleted()
             // The iPhone may be in another zone now.
@@ -102,6 +116,22 @@ public struct RootView: View {
             refreshSurprises()
             if memoriesPreferences.value.days == .thisIPhone { relabelDays(.thisIPhone) }
         }
+    }
+
+    private static func onboardingFlow(context: ModelContext, permissions: any PermissionService, surprises: SurpriseCoordinator) -> OnboardingFlow {
+        OnboardingFlow(permissions: permissions, store: SwiftDataOnboardingStore(context: context)) { await surprises.settingsChanged() }
+    }
+
+    /// S08: everything is gone, so MimoDays starts again from onboarding with nothing open.
+    private func startOver() {
+        router.isSettingsPresented = false
+        router.capture = nil
+        router.newMovie = nil
+        router.moviesPath = []
+        router.selectedTab = .today
+        memories.refresh()
+        Task { await today.refresh() }
+        onboarding = Self.onboardingFlow(context: memories.library.context, permissions: permissions, surprises: surprises)
     }
 
     /// S09: every moment's day for the chosen time zone; Memories reads them again when any moved.

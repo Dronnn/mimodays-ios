@@ -12,13 +12,18 @@ struct ReviewPlace: Codable, Equatable {
     var precision: LocationPrecision
     var source: LocationSource
 
-    /// This iPhone's position at city level (Andrew, 2026-11-13): the city's name and the fix rounded to about 1 km.
-    /// The exact fix is never kept.
-    static func current(city: String?, at fix: GeoPoint) -> ReviewPlace {
-        ReviewPlace(
-            label: city, latitude: (fix.latitude * 100).rounded() / 100, longitude: (fix.longitude * 100).rounded() / 100,
-            precision: .city, source: .gps
-        )
+    /// This iPhone's position: by default at city level (Andrew, 2026-11-13), the city's name and the fix rounded
+    /// to about 1 km, so the exact fix is not kept; as measured only when S05's Precision is Exact.
+    static func current(city: String?, at fix: GeoPoint, precision: PrivacySettings.PlacePrecision = .city) -> ReviewPlace {
+        switch precision {
+        case .city:
+            ReviewPlace(
+                label: city, latitude: (fix.latitude * 100).rounded() / 100, longitude: (fix.longitude * 100).rounded() / 100,
+                precision: .city, source: .gps
+            )
+        case .exact:
+            ReviewPlace(label: city, latitude: fix.latitude, longitude: fix.longitude, precision: .exact, source: .gps)
+        }
     }
 
     /// A place picked by name, nearby or from a search: where that place is.
@@ -65,6 +70,8 @@ struct PlaceServices {
     var location: any LocationProvider
     var lookup: any PlaceLookup
     var recents: @MainActor () -> [RecentPlace]
+    /// S05: whether a new moment gets this iPhone's place, and how exactly.
+    var privacy: @MainActor () -> PrivacySettings = { PrivacySettings() }
 
     @MainActor static var simulated: PlaceServices {
         PlaceServices(location: SimulatedLocationProvider(), lookup: SimulatedPlaceLookup(), recents: { [] })

@@ -1339,6 +1339,42 @@
         }
       }
     },
+    "After 1 hour" : {
+      "comment" : "Privacy settings (S05): Lock after choice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After 1 hour"
+          }
+        }
+      }
+    },
+    "After 1 minute" : {
+      "comment" : "Privacy settings (S05): Lock after choice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After 1 minute"
+          }
+        }
+      }
+    },
+    "After 15 minutes" : {
+      "comment" : "Privacy settings (S05): Lock after choice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After 15 minutes"
+          }
+        }
+      }
+    },
     "All" : {
       "comment" : "Filters (M08b): segment for photos and videos.",
       "extractionState" : "manual",
@@ -1471,6 +1507,18 @@
         }
       }
     },
+    "App Lock" : {
+      "comment" : "Privacy settings (S05): section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Lock"
+          }
+        }
+      }
+    },
     "As you saw it" : {
       "comment" : "Export sheet (E01) choice: the picture as shown in the app, with the selfie window in place",
       "extractionState" : "manual",
@@ -1563,6 +1611,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Back up everything"
+          }
+        }
+      }
+    },
+    "Back up first" : {
+      "comment" : "Delete all data (S08): button that opens Backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back up first"
           }
         }
       }
@@ -1719,6 +1779,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Camera"
+          }
+        }
+      }
+    },
+    "Camera and microphone" : {
+      "comment" : "Privacy statement (S05): section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera and microphone"
           }
         }
       }
@@ -1959,6 +2031,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choosing where to save"
+          }
+        }
+      }
+    },
+    "City" : {
+      "comment" : "Privacy settings (S05): Precision: the city and a position rounded to about 1 km",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "City"
           }
         }
       }
@@ -2503,6 +2587,30 @@
         }
       }
     },
+    "Delete all data: the word to type" : {
+      "comment" : "S08: the word typed to confirm deleting everything. Translate it; keep it one short, uppercase word.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DELETE"
+          }
+        }
+      }
+    },
+    "Delete all data?" : {
+      "comment" : "Delete all data (S08): title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all data?"
+          }
+        }
+      }
+    },
     "Delete collection" : {
       "comment" : "Collection (M12) menu and confirmation button; the moments stay.",
       "extractionState" : "manual",
@@ -2511,6 +2619,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete collection"
+          }
+        }
+      }
+    },
+    "Delete everything" : {
+      "comment" : "Delete all data (S08): button that deletes everything",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete everything"
           }
         }
       }
@@ -2911,6 +3031,30 @@
         }
       }
     },
+    "Everything stays on this iPhone. No account, no ads, no tracking, no analytics." : {
+      "comment" : "Privacy settings (S05): note at the bottom",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything stays on this iPhone. No account, no ads, no tracking, no analytics."
+          }
+        }
+      }
+    },
+    "Exact" : {
+      "comment" : "Privacy settings (S05): Precision: the position as measured",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exact"
+          }
+        }
+      }
+    },
     "Exact place" : {
       "comment" : "Export sheet (E01) switch: write the moment's exact place into the files",
       "extractionState" : "manual",
@@ -3031,6 +3175,30 @@
         }
       }
     },
+    "Exports and backups" : {
+      "comment" : "Privacy statement (S05): section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exports and backups"
+          }
+        }
+      }
+    },
+    "Face ID reason: delete all data" : {
+      "comment" : "Why Face ID is asked for: to delete everything in MimoDays",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all data"
+          }
+        }
+      }
+    },
     "Fade" : {
       "comment" : "Movie editor (F06): transition option, a cross-fade into the next clip; also the Movies & export settings (S06) Transitions value",
       "extractionState" : "manual",
@@ -3075,6 +3243,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favorites only"
+          }
+        }
+      }
+    },
+    "Files leave MimoDays only when you share, export or back up. Exports leave out the exact place and voice notes unless you include them." : {
+      "comment" : "Privacy statement (S05): what leaves the app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files leave MimoDays only when you share, export or back up. Exports leave out the exact place and voice notes unless you include them."
           }
         }
       }
@@ -3279,6 +3459,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hidden"
+          }
+        }
+      }
+    },
+    "How MimoDays uses your data" : {
+      "comment" : "Privacy settings (S05): row and title of the privacy statement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How MimoDays uses your data"
           }
         }
       }
@@ -3535,6 +3727,18 @@
         }
       }
     },
+    "Leaving the app" : {
+      "comment" : "Privacy settings (S05): Lock after: as soon as you leave the app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leaving the app"
+          }
+        }
+      }
+    },
     "Left as they are" : {
       "comment" : "Restore finished (E08): detail of the already-here row",
       "extractionState" : "manual",
@@ -3567,6 +3771,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Let MimoDays use the camera"
+          }
+        }
+      }
+    },
+    "Lock after" : {
+      "comment" : "Privacy settings (S05): how long the app may be away before it locks",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock after"
+          }
+        }
+      }
+    },
+    "Lock with %@" : {
+      "comment" : "Privacy settings (S05): App Lock switch. %@: Face ID, Touch ID, Optic ID or 'your passcode'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock with %@"
+          }
+        }
+      }
+    },
+    "Locked" : {
+      "comment" : "Lock screen (L02): under the app name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locked"
           }
         }
       }
@@ -3807,6 +4047,30 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all." : {
+      "comment" : "Privacy statement (S05): location use",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
+          }
+        }
+      }
+    },
+    "MimoDays uses them only while the camera is open or you record a voice note. A surprise never opens the camera by itself." : {
+      "comment" : "Privacy statement (S05): camera and microphone use",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays uses them only while the camera is open or you record a voice note. A surprise never opens the camera by itself."
           }
         }
       }
@@ -4215,6 +4479,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Next year"
+          }
+        }
+      }
+    },
+    "No ads, no tracking, no analytics, and nothing is sold or shared." : {
+      "comment" : "Privacy statement (S05): what the app never does",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No ads, no tracking, no analytics, and nothing is sold or shared."
           }
         }
       }
@@ -4651,6 +4927,18 @@
         }
       }
     },
+    "Nothing was deleted. Try again." : {
+      "comment" : "Delete all data (S08): after Face ID was cancelled or deleting failed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing was deleted. Try again."
+          }
+        }
+      }
+    },
     "Nothing was restored. This iPhone needs about %@ more free space." : {
       "comment" : "Restore: not enough room. %@: how much more space is needed",
       "extractionState" : "manual",
@@ -4759,6 +5047,18 @@
         }
       }
     },
+    "On this iPhone" : {
+      "comment" : "Privacy statement (S05): section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this iPhone"
+          }
+        }
+      }
+    },
     "Once a day" : {
       "comment" : "Surprise schedule (onboarding O07): frequency option, keep very short (segmented control)",
       "extractionState" : "manual",
@@ -4851,6 +5151,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open"
+          }
+        }
+      }
+    },
+    "Open Recently deleted" : {
+      "comment" : "Why Face ID is asked for: to open Recently deleted",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Recently deleted"
           }
         }
       }
@@ -5299,6 +5611,18 @@
         }
       }
     },
+    "Precision" : {
+      "comment" : "Privacy settings (S05): how exact a saved place is",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Precision"
+          }
+        }
+      }
+    },
     "Previous month" : {
       "comment" : "Calendar arrow, VoiceOver label.",
       "extractionState" : "manual",
@@ -5331,6 +5655,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Privacy"
+          }
+        }
+      }
+    },
+    "Privacy & App Lock" : {
+      "comment" : "Settings (S01): row that opens Privacy",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy & App Lock"
+          }
+        }
+      }
+    },
+    "Privacy row: delete all data" : {
+      "comment" : "Privacy settings (S05): row that opens Delete all data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all data…"
           }
         }
       }
@@ -5415,6 +5763,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recently deleted"
+          }
+        }
+      }
+    },
+    "Recently deleted always asks for %@ when App Lock is on." : {
+      "comment" : "Privacy settings (S05): note under App Lock. %@: Face ID, Touch ID, Optic ID or 'your passcode'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recently deleted always asks for %@ when App Lock is on."
           }
         }
       }
@@ -5527,6 +5887,18 @@
         }
       }
     },
+    "Remove all places…" : {
+      "comment" : "Privacy settings (S05): removes the place from every moment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove all places…"
+          }
+        }
+      }
+    },
     "Remove from collection" : {
       "comment" : "Collection (M12): long-press action on a moment; the moment stays in Memories.",
       "extractionState" : "manual",
@@ -5547,6 +5919,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove music"
+          }
+        }
+      }
+    },
+    "Remove places" : {
+      "comment" : "Privacy settings (S05): confirmation button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove all places"
+          }
+        }
+      }
+    },
+    "Remove the place from %lld moments?" : {
+      "comment" : "Privacy settings (S05): confirmation title before removing every place",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Remove the place from %lld moment?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Remove the place from %lld moments?"
+                }
+              }
+            }
           }
         }
       }
@@ -5871,6 +6279,18 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Save a place with moments" : {
+      "comment" : "Privacy settings (S05): switch: new moments keep where they were taken",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save a place with moments"
           }
         }
       }
@@ -7039,6 +7459,18 @@
         }
       }
     },
+    "The moments stay. This can't be undone." : {
+      "comment" : "Privacy settings (S05): confirmation message before removing every place",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The moments stay. This can't be undone."
+          }
+        }
+      }
+    },
     "The movie couldn't be finished" : {
       "comment" : "Export failed (F14): title",
       "extractionState" : "manual",
@@ -7375,6 +7807,80 @@
         }
       }
     },
+    "This removes %lld moments, %lld collections, %lld movie projects and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched." : {
+      "comment" : "Delete all data (S08): what goes; the number of moments, collections and movie projects",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes %1$#@moments@, %2$#@collections@, %3$#@projects@ and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched."
+          },
+          "substitutions" : {
+            "moments" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moment"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moments"
+                    }
+                  }
+                }
+              }
+            },
+            "collections" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg collection"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg collections"
+                    }
+                  }
+                }
+              }
+            },
+            "projects" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg movie project"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg movie projects"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "This year" : {
       "comment" : "Map (P01, P04): the date chip and period option for this calendar year.",
       "extractionState" : "manual",
@@ -7687,6 +8193,18 @@
         }
       }
     },
+    "Turn on App Lock" : {
+      "comment" : "Why Face ID is asked for: to turn App Lock on",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on App Lock"
+          }
+        }
+      }
+    },
     "Turn on little surprises" : {
       "comment" : "Surprise ribbon on Today (T07): notifications are off or surprises were never turned on.",
       "extractionState" : "manual",
@@ -7735,6 +8253,18 @@
         }
       }
     },
+    "Type %@ to confirm" : {
+      "comment" : "Delete all data (S08): above the field. %@: the word to type, e.g. DELETE",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type %@ to confirm"
+          }
+        }
+      }
+    },
     "Undo" : {
       "comment" : "Movie editor: button that takes back the last change",
       "extractionState" : "manual",
@@ -7743,6 +8273,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Undo"
+          }
+        }
+      }
+    },
+    "Unlock MimoDays" : {
+      "comment" : "Why Face ID is asked for: to open the locked app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock MimoDays"
+          }
+        }
+      }
+    },
+    "Unlock with %@" : {
+      "comment" : "Lock screen (L02): button. %@: Face ID, Touch ID, Optic ID or 'your passcode'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock with %@"
           }
         }
       }
@@ -8055,6 +8609,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Weekly"
+          }
+        }
+      }
+    },
+    "What MimoDays never does" : {
+      "comment" : "Privacy statement (S05): section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What MimoDays never does"
           }
         }
       }
@@ -8403,6 +8969,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your own audio file from Files. Fades in and out."
+          }
+        }
+      }
+    },
+    "Your photos, videos, voice notes, notes, places, collections and movies are kept in MimoDays on this iPhone. There is no account and no MimoDays server." : {
+      "comment" : "Privacy statement (S05): what is kept where",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your photos, videos, voice notes, notes, places, collections and movies are kept in MimoDays on this iPhone. There is no account and no MimoDays server."
           }
         }
       }
@@ -8763,6 +9341,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "you choose"
+          }
+        }
+      }
+    },
+    "your passcode" : {
+      "comment" : "What unlocks the app when the iPhone has no Face ID, as in 'Lock with your passcode'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "your passcode"
           }
         }
       }

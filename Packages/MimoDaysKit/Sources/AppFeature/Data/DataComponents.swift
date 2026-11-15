@@ -25,10 +25,11 @@ struct DataRowLabel: View {
     let title: Text
     var detail: Text?
     var detailColor = ColorToken.textSecondary
+    var titleColor = ColorToken.textPrimary
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            title.textStyle(.rowTitle).foregroundStyle(ColorToken.textPrimary.color)
+            title.textStyle(.rowTitle).foregroundStyle(titleColor.color)
             if let detail {
                 detail.textStyle(.meta).foregroundStyle(detailColor.color)
             }
@@ -57,6 +58,7 @@ struct DataIconRow: View {
     var value: Text?
     var opens = true
     var iconInk = ColorToken.textPrimary
+    var titleColor = ColorToken.textPrimary
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
@@ -72,7 +74,7 @@ struct DataIconRow: View {
                 .accessibilityHidden(true)
                 .padding(.trailing, 14)
             VStack(alignment: .leading, spacing: 3) {
-                DataRowLabel(title: title, detail: detail)
+                DataRowLabel(title: title, detail: detail, titleColor: titleColor)
                 if stacksValue, let value { value.textStyle(.rowValue).foregroundStyle(ColorToken.textTertiary.color) }
             }
             Spacer(minLength: 8)

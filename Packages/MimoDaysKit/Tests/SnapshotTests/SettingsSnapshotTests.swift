@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// Settings: S01, S02, S03, S06 and S09.
+/// Settings: S01, S02, S03, S05, S06, S08 and S09, and the lock screen.
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct SettingsSnapshotTests {
@@ -81,5 +81,33 @@ struct SettingsSnapshotTests {
     @Test func movies() {
         var defaults = MovieDefaults()
         assertScreenSnapshots(of: page(MovieSettingsView(defaults: Binding { defaults } set: { defaults = $0 })), variants: variants)
+    }
+
+    /// S05 with App Lock on, as the board shows it.
+    @Test func privacy() {
+        var settings = PrivacySettings()
+        settings.appLock = true
+        assertScreenSnapshots(
+            of: page(PrivacySettingsView(
+                settings: Binding { settings } set: { settings = $0 }, biometry: .faceID, placeCount: 3, turnOnLock: { true }, removePlaces: {}
+            )),
+            variants: variants
+        )
+    }
+
+    /// S05 "How MimoDays uses your data".
+    @Test func dataUse() {
+        assertScreenSnapshots(of: page(DataUseView()), variants: variants)
+    }
+
+    /// S08 halfway through typing DELETE.
+    @Test func deleteAll() {
+        let counts = AppEraser.Counts(moments: 312, collections: 6, movies: 3)
+        assertScreenSnapshots(of: page(DeleteAllView(counts: counts, erase: { false }, typed: "DEL")), variants: variants)
+    }
+
+    /// L02.
+    @Test func lockScreen() {
+        assertScreenSnapshots(of: AppLockView(biometry: .faceID) {}, variants: variants)
     }
 }

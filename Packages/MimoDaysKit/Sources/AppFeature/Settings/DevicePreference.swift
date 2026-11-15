@@ -13,11 +13,13 @@ final class DevicePreference<Value: Codable & Equatable & Sendable> {
 
     @ObservationIgnored private let key: String
     @ObservationIgnored private let defaults: UserDefaults?
+    @ObservationIgnored private let initial: Value
     private static var logger: Logger { Logger(subsystem: "MimoDays", category: "Settings") }
 
     init(key: String, defaults: UserDefaults?, initial: Value) {
         self.key = key
         self.defaults = defaults
+        self.initial = initial
         guard let data = defaults?.data(forKey: key) else {
             value = initial
             return
@@ -28,6 +30,12 @@ final class DevicePreference<Value: Codable & Equatable & Sendable> {
             Self.logger.error("Reading the \(key, privacy: .public) setting failed: \(error.localizedDescription, privacy: .public)")
             value = initial
         }
+    }
+
+    /// Back to the first-launch value, with nothing left in UserDefaults (S08).
+    func reset() {
+        value = initial
+        defaults?.removeObject(forKey: key)
     }
 
     private func save() {

@@ -9,6 +9,11 @@ enum SettingsRoute: Hashable {
     case camera
     case memories
     case movies
+    case privacy
+    /// S05 "How MimoDays uses your data".
+    case dataUse
+    /// S08.
+    case deleteAll
 }
 
 /// The Settings sheet: S01 and everything under it.
@@ -40,6 +45,9 @@ private struct SettingsHost: View {
                     case .camera: CameraSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     case .memories: MemoriesSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     case .movies: MovieSettingsScreen().toolbar(.hidden, for: .navigationBar)
+                    case .privacy: PrivacySettingsScreen().toolbar(.hidden, for: .navigationBar)
+                    case .dataUse: DataUseView().toolbar(.hidden, for: .navigationBar)
+                    case .deleteAll: DeleteAllScreen().toolbar(.hidden, for: .navigationBar)
                     }
                 }
                 .navigationDestination(for: DataRoute.self) { route in
@@ -93,6 +101,9 @@ struct SettingsView: View {
                         link(SettingsRoute.memories, .glyphCollection, Text("Memories", bundle: .module), id: "settings.memories")
                         DataSeparator(leading: 64)
                         link(SettingsRoute.movies, .glyphFilm, Text("Movies & export", bundle: .module), id: "settings.movies")
+                    }
+                    DataCard {
+                        link(SettingsRoute.privacy, .glyphLock, Text("Privacy & App Lock", bundle: .module), id: "settings.privacy")
                     }
                     DataCard {
                         link(DataRoute.storage, .glyphFolder, Text("Storage", bundle: .module), value: model.storageBytes.map { Text(StorageView.bytes($0)) }, id: "settings.storage")

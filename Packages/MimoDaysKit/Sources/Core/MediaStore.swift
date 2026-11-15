@@ -112,6 +112,16 @@ public struct MediaStore: Sendable {
             .sorted()
     }
 
+    /// Every stored file goes; the empty areas stay (S08 Delete all data).
+    public func removeAll() throws {
+        for area in Area.allCases {
+            let folder = root.appendingPathComponent(area.rawValue, isDirectory: true)
+            for item in try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil) {
+                try FileManager.default.removeItem(at: item)
+            }
+        }
+    }
+
     public func clearCache() throws {
         let cache = root.appendingPathComponent(Area.cache.rawValue, isDirectory: true)
         for item in try FileManager.default.contentsOfDirectory(at: cache, includingPropertiesForKeys: nil) {

@@ -17,6 +17,19 @@ public final class AppDependencies {
     let thumbnails = ThumbnailPipeline()
     let memoriesPreferences: MemoriesPreferences
     let moviePreferences: MoviePreferences
+    let privacyPreferences: PrivacyPreferences
+    let appLock: AppLock
+    /// S08 Delete all data.
+    let eraser: AppEraser
+
+    /// UI tests fake the location permission, so the fix and the lookups are faked too.
+    private static func places(_ configuration: LaunchConfiguration, context: ModelContext, privacy: PrivacyPreferences) -> PlaceServices {
+        var places = configuration.isUITesting ? PlaceServices.simulated : PlaceServices(
+            location: SystemLocationProvider(), lookup: MapKitPlaceLookup(), recents: { RecentPlace.load(from: context) }
+        )
+        places.privacy = { privacy.value }
+        return places
+    }
 
     /// The simulator has no microphone worth testing with, and UI tests need a fixed transcript.
     private static func voice(simulated: Bool) -> VoiceServices {
@@ -39,6 +52,8 @@ public final class AppDependencies {
         skipsOnboarding = configuration.skipsOnboarding
         memoriesPreferences = .memories(configuration.isUITesting ? nil : .standard)
         moviePreferences = .movies(configuration.isUITesting ? nil : .standard)
+        let privacyPreferences = PrivacyPreferences.privacy(configuration.isUITesting ? nil : .standard)
+        self.privacyPreferences = privacyPreferences
         // UI tests keep notification requests in memory so nothing is left on the simulator.
         let notifications: any NotificationScheduler = configuration.isUITesting
             ? InMemoryNotificationScheduler() : SystemNotificationScheduler()
@@ -57,17 +72,25 @@ public final class AppDependencies {
             settings: cameraSettings,
             drafts: ReviewDraftStore(root: Self.reviewRoot(configuration)),
             voice: Self.voice(simulated: simulatedCamera),
-            // UI tests fake the location permission, so the fix and the lookups are faked too.
-            places: configuration.isUITesting ? .simulated : PlaceServices(
-                location: SystemLocationProvider(), lookup: MapKitPlaceLookup(),
-                recents: { [context = modelContainer.mainContext] in RecentPlace.load(from: context) }
-            )
+            places: Self.places(configuration, context: modelContainer.mainContext, privacy: privacyPreferences)
         )
         do {
             momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))
         } catch {
             fatalError("MimoDays can't open its media folder: \(error)")
         }
+        appLock = AppLock(settings: { privacyPreferences.value })
+        let memoriesPreferences = self.memoriesPreferences
+        let moviePreferences = self.moviePreferences
+        eraser = AppEraser(
+            context: modelContainer.mainContext, store: momentSaver.store, notifications: notifications, drafts: camera.drafts,
+            resetSettings: {
+                memoriesPreferences.reset()
+                moviePreferences.reset()
+                privacyPreferences.reset()
+                cameraSettings.save(CameraSettings())
+            }
+        )
         UNUserNotificationCenter.current().delegate = notificationTaps
         if configuration.isUITesting, let tap = configuration.surpriseTap {
             simulate(tap)

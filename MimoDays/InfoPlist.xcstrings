@@ -37,6 +37,18 @@
         }
       }
     },
+    "NSFaceIDUsageDescription" : {
+      "comment" : "System Face ID permission prompt, shown the first time App Lock asks",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays uses Face ID to unlock the app when App Lock is on."
+          }
+        }
+      }
+    },
     "NSLocationWhenInUseUsageDescription" : {
       "comment" : "System location permission prompt (while using the app)",
       "extractionState" : "manual",

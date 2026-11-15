@@ -146,14 +146,16 @@ final class ReviewModel {
 
     // MARK: Place
 
-    /// One fix and its city, once per review. Call only with location allowed.
+    /// One fix and its city, once per review. Call only with location allowed. With S05's Save a place off,
+    /// this iPhone's position isn't asked for at all; a place can still be picked by name.
     func locate() async {
-        guard fix == nil, !isLocating else { return }
+        let privacy = places.privacy()
+        guard privacy.savesPlace, fix == nil, !isLocating else { return }
         isLocating = true
         defer { isLocating = false }
         guard let fix = try? await places.location.currentLocation() else { return }
         self.fix = fix
-        currentPlace = ReviewPlace.current(city: await places.lookup.city(at: fix), at: fix)
+        currentPlace = ReviewPlace.current(city: await places.lookup.city(at: fix), at: fix, precision: privacy.precision)
         if fillsPlace, !placeWasChosen, place == nil { place = currentPlace }
     }
 

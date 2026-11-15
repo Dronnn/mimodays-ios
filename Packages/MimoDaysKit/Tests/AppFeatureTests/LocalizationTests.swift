@@ -122,6 +122,10 @@ struct LocalizationTests {
         // Settings (Phase 13); the plain Text keys are found by the source scan.
         "Not before", "Not after", "Until %@", "Selfie window size in a phrase: small",
         "Selfie window size in a phrase: medium", "Selfie window size in a phrase: large",
+        "Lock with %@", "Recently deleted always asks for %@ when App Lock is on.", "Remove the place from %lld moments?", "Unlock with %@",
+        "your passcode", "Unlock MimoDays", "Turn on App Lock", "Open Recently deleted", "Face ID reason: delete all data", "Privacy row: delete all data", "Type %@ to confirm",
+        "Delete all data: the word to type",
+        "This removes %lld moments, %lld collections, %lld movie projects and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched.",
     ]
 
     private static var resourceKeys: [String] {

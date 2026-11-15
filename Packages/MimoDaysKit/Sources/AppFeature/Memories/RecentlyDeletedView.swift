@@ -140,8 +140,23 @@ final class RecentlyDeletedModel {
 
 struct RecentlyDeletedScreen: View {
     @Environment(\.mediaLibrary) private var library
+    @Environment(AppLock.self) private var lock: AppLock?
+    /// S05: with App Lock on, Recently deleted asks for Face ID every time it opens.
+    @State private var unlocked = false
+
     var body: some View {
-        if let library { RecentlyDeletedHost(model: RecentlyDeletedModel(library: library)) }
+        if let library {
+            if let lock, lock.isEnabled, !unlocked {
+                AppLockView(biometry: lock.biometry) { Task { await ask(lock) } }
+                    .task { await ask(lock) }
+            } else {
+                RecentlyDeletedHost(model: RecentlyDeletedModel(library: library))
+            }
+        }
+    }
+
+    private func ask(_ lock: AppLock) async {
+        unlocked = await lock.confirm(String(localized: "Open Recently deleted", bundle: .module, comment: "Why Face ID is asked for: to open Recently deleted"))
     }
 }
 

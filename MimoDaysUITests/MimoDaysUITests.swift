@@ -54,6 +54,32 @@ final class MimoDaysUITests: XCTestCase {
         XCTAssertTrue(tab(2).isSelected)
     }
 
+    /// S05 → S08: typing DELETE and Delete everything bring back onboarding.
+    @MainActor
+    func testDeleteAllDataStartsOver() {
+        app = XCUIApplication()
+        app.launchArguments = LaunchConfiguration(isUITesting: true, skipsOnboarding: true, seed: .populated, permissions: .granted).arguments
+        app.launch()
+        XCTAssertTrue(app.buttons["settings"].firstMatch.waitForExistence(timeout: 10))
+        app.buttons["settings"].firstMatch.tap()
+        let privacy = app.buttons["settings.privacy"]
+        XCTAssertTrue(privacy.waitForExistence(timeout: 5))
+        privacy.tap()
+        let deleteAll = app.buttons["privacySettings.deleteAll"]
+        XCTAssertTrue(deleteAll.waitForExistence(timeout: 5))
+        deleteAll.tap()
+        let delete = app.buttons["deleteAll.delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 5))
+        XCTAssertFalse(delete.isEnabled)
+        let field = app.textFields["deleteAll.field"]
+        field.tap()
+        field.typeText("DELETE")
+        XCTAssertTrue(delete.isEnabled)
+        delete.tap()
+        XCTAssertTrue(app.buttons["onboarding.skip"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["settings.done"].exists)
+    }
+
     @MainActor
     func testOpensAndClosesCamera() {
         launch()

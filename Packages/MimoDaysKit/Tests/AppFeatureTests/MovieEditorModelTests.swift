@@ -10,7 +10,7 @@ import TestSupport
 /// 11.8, 11.9: the editor's changes are kept as they're made, Undo steps back through them, and the movie follows.
 @MainActor
 struct MovieEditorModelTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private let clock = TestDateProvider(Date(timeIntervalSince1970: 1_794_398_400))
 

@@ -12,7 +12,7 @@ import TestSupport
 @MainActor
 @Suite(.tags(.snapshot))
 struct MoviesSnapshotTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private let defaults = UserDefaults(suiteName: "MoviesSnapshots-\(UUID().uuidString)")!
     /// The view's `.task` can still run after a test returns; its store must outlive the test.

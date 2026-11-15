@@ -12,7 +12,7 @@ import TestSupport
 @MainActor
 @Suite(.tags(.snapshot))
 struct DeletionSnapshotTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private static let now = Date(timeIntervalSince1970: 1_794_422_520)
 

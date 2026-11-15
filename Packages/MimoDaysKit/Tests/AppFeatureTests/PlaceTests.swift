@@ -93,7 +93,7 @@ struct PlaceTests {
     }
 
     @Test func savingWritesTheLocationAsChosen() async throws {
-        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let container = try TestStore.container()
         let store = try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "PlaceTests-media-\(UUID().uuidString)"))
         let review = ReviewModel(capture: try await capture(), places: places(location: fix))
         await review.locate()
@@ -109,7 +109,7 @@ struct PlaceTests {
     }
 
     @Test func recentPlacesAreTheMostUsedNamedOnes() throws {
-        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let container = try TestStore.container()
         let context = container.mainContext
         func moment(_ label: String?, day: Double) {
             let moment = Moment(captured: CaptureTime(instant: Date(timeIntervalSince1970: day * 86_400), timeZone: .gmt), origin: .manual, mediaType: .photo, createdAt: .now)

@@ -11,7 +11,7 @@ import TestSupport
 /// on the movie's frame, captions, fades, clip sound and voice notes.
 @MainActor
 struct MovieComposerTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private let now = Date(timeIntervalSince1970: 1_794_398_400) // Nov 11, 2026, noon UTC
 

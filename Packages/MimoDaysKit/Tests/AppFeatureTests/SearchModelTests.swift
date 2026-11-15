@@ -85,7 +85,7 @@ struct SearchModelTests {
     }
 
     @Test func theStoreIsReadWithPlacesAndVoiceNoteWords() async throws {
-        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let container = try TestStore.container()
         let root = FileManager.default.temporaryDirectory.appending(path: "Search-\(UUID().uuidString)")
         let store = try MediaStore(root: root)
         let engine = SimulatedCaptureEngine()

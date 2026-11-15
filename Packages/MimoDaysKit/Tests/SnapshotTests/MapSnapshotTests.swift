@@ -13,7 +13,7 @@ import TestSupport
 @MainActor
 @Suite(.tags(.snapshot))
 struct MapSnapshotTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
 
     /// The view's `.task` can still run after a test returns; its store must outlive the test.

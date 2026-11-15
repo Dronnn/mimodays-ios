@@ -18,7 +18,7 @@ struct SurpriseCoordinatorTests {
         }
     }
 
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let notifications = FakeNotificationScheduler()
     private let device = DeviceCalendar("Europe/Berlin")
     private let clock: TestDateProvider
@@ -352,7 +352,7 @@ struct SurpriseCoordinatorTests {
 @MainActor
 struct OnboardingSurprisesTests {
     typealias DeviceCalendar = SurpriseCoordinatorTests.DeviceCalendar
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let notifications = FakeNotificationScheduler()
 
     private func flow(answer: PermissionStatus) -> OnboardingFlow {

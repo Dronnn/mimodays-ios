@@ -12,7 +12,7 @@ import TestSupport
 @MainActor
 @Suite(.tags(.snapshot))
 struct MovieEditorSnapshotTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private static var stores: [ModelContainer] = []
 

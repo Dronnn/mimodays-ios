@@ -9,7 +9,7 @@ import TestSupport
 /// 9.11 Delete (M15) and Recently deleted (M16/M16b): 30 days to change your mind, then gone with its files.
 @MainActor
 struct DeletionTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private static let day: TimeInterval = 86_400
 

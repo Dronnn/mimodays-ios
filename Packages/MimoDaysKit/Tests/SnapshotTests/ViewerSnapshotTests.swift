@@ -12,7 +12,7 @@ import TestSupport
 @MainActor
 @Suite(.tags(.snapshot))
 struct ViewerSnapshotTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let root = FileManager.default.temporaryDirectory.appending(path: "ViewerSnapshots-\(UUID().uuidString)")
     private let store: MediaStore
     private let clock = TestDateProvider()

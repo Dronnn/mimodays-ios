@@ -11,7 +11,7 @@ import TestSupport
 /// The moment viewer (M05, M06): what it reads, favourites, voice notes and composed video.
 @MainActor
 struct MomentViewerTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let root = FileManager.default.temporaryDirectory.appending(path: "Viewer-\(UUID().uuidString)")
     private let store: MediaStore
     private let clock = TestDateProvider()

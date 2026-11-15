@@ -9,7 +9,7 @@ import TestSupport
 /// 11.2-11.4, 11.6, 11.12: the library (F01) and the wizard (F02-F05, F16). Today is Nov 11, 2026.
 @MainActor
 struct MoviesModelTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private let defaults = UserDefaults(suiteName: "MoviesModelTests-\(UUID().uuidString)")!
 

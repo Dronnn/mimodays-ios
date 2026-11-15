@@ -80,7 +80,7 @@ struct SurpriseStatusTests {
 /// What Today reads from the store, and its actions.
 @MainActor
 struct TodayModelTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store = try! MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "TodayModel-\(UUID().uuidString)"))
     private let clock = TestDateProvider()
 

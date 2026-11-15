@@ -9,7 +9,7 @@ import TestSupport
 /// 10.x Map: located moments, grouped into places, narrowed by P04's filters.
 @MainActor
 struct MapModelTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
 
     init() throws {

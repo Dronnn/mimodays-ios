@@ -16,7 +16,7 @@ struct BackupTests {
 
     /// A library on its own store, like a separate iPhone.
     private func library() throws -> MediaLibrary {
-        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let container = try TestStore.container()
         Self.containers.append(container)
         let store = try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "Backup-\(UUID().uuidString)"))
         return MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline())

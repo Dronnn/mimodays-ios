@@ -11,7 +11,7 @@ import TestSupport
 @MainActor
 @Suite(.timeLimit(.minutes(2)))
 struct ArchivePerformanceTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private static let count = 10_000
     private static let places = ["Yerevan", "Lake Merritt", "Grandma's garden", "Tbilisi", "The beach", "School"]

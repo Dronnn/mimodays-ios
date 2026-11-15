@@ -9,7 +9,7 @@ import TestSupport
 /// 13.5 (S06): new movies and exports start with what Settings says.
 @MainActor
 struct MovieDefaultsTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store = try! MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "MovieDefaults-\(UUID().uuidString)"))
 
     private var context: ModelContext { container.mainContext }

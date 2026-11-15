@@ -9,7 +9,7 @@ import TestSupport
 /// 11.1 A movie project is its edit decisions; a rendered file is made from it and can go without the project going.
 @MainActor
 struct MovieStoreTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private let now = Date(timeIntervalSince1970: 1_794_000_000)
 

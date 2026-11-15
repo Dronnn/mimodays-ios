@@ -10,7 +10,7 @@ import UIKit
 /// 13.6 (S05): the privacy settings are kept and decide what a new moment keeps of where it was taken.
 @MainActor
 struct PrivacySettingsTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let fix = GeoPoint(latitude: 40.181112, longitude: 44.513617, horizontalAccuracy: 12)
 
     private var context: ModelContext { container.mainContext }
@@ -171,7 +171,7 @@ struct AppLockTests {
 /// 13.9 (S08): Delete all data leaves nothing behind and onboarding starts again.
 @MainActor
 struct DeleteAllTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store = try! MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "DeleteAll-\(UUID().uuidString)"))
     private let drafts = ReviewDraftStore(root: FileManager.default.temporaryDirectory.appending(path: "DeleteAllDrafts-\(UUID().uuidString)"))
 

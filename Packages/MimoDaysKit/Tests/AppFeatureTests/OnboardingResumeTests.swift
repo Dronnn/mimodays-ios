@@ -4,6 +4,7 @@ import Foundation
 import Persistence
 import SwiftData
 import Testing
+import TestSupport
 
 /// Resuming after the app closes mid-onboarding (Andrew, 2026-11-13: same screen, results kept).
 @MainActor
@@ -73,7 +74,7 @@ struct OnboardingResumeTests {
     }
 
     @Test func swiftDataStoreRoundTrips() throws {
-        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let container = try TestStore.container()
         let store = SwiftDataOnboardingStore(context: container.mainContext)
         #expect(store.load() == OnboardingRecord())
 

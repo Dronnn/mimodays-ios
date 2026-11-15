@@ -9,7 +9,7 @@ import TestSupport
 /// 13.4 (S09): the Memories settings are kept, sort the timeline, and decide each moment's day.
 @MainActor
 struct MemoriesSettingsTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store = try! MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "MemoriesSettings-\(UUID().uuidString)"))
 
     private var context: ModelContext { container.mainContext }

@@ -10,7 +10,7 @@ import TestSupport
 /// 9.5 Edit moment (M07): words, favourite, place and voice note change only on Save; files follow the store.
 @MainActor
 struct EditMomentTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let root = FileManager.default.temporaryDirectory.appending(path: "Edit-\(UUID().uuidString)")
     private let store: MediaStore
 

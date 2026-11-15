@@ -16,7 +16,7 @@ struct MomentSaverTests {
     private let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
 
     init() throws {
-        container = try MimoDaysStore.makeContainer(inMemory: true)
+        container = try TestStore.container()
         root = FileManager.default.temporaryDirectory.appending(path: "MomentSaverTests-\(UUID().uuidString)")
         store = try MediaStore(root: root)
     }

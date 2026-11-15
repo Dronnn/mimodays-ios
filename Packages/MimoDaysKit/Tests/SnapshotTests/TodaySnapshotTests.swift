@@ -13,7 +13,7 @@ import TestSupport
 @MainActor
 @Suite(.tags(.snapshot))
 struct TodaySnapshotTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store = try! MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "TodaySnapshots-\(UUID().uuidString)"))
     private let clock = TestDateProvider()
     private let schedule = SurpriseSchedule()

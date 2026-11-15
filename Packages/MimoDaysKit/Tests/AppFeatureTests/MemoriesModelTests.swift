@@ -9,7 +9,7 @@ import TestSupport
 /// Memories (M01): grouping by each moment's own local day, and what a tile reads.
 @MainActor
 struct MemoriesModelTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store = try! MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "Memories-\(UUID().uuidString)"))
     private let clock = TestDateProvider()
 

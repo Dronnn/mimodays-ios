@@ -10,7 +10,7 @@ import TestSupport
 @MainActor
 @Suite(.serialized)
 struct SettingsModelTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
     private let notifications = FakeNotificationScheduler()
     private let clock = TestDateProvider()

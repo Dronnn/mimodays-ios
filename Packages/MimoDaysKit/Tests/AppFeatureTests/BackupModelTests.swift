@@ -15,7 +15,7 @@ struct BackupModelTests {
     private static var containers: [ModelContainer] = []
 
     private func library(moments count: Int) async throws -> MediaLibrary {
-        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let container = try TestStore.container()
         Self.containers.append(container)
         let store = try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "BackupModel-\(UUID().uuidString)"))
         let library = MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline())

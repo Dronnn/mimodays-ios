@@ -9,7 +9,7 @@ import TestSupport
 /// 9.8 Collections (M11/M12): a collection only groups moments; nothing done to it ever deletes one.
 @MainActor
 struct CollectionTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
 
     init() throws {

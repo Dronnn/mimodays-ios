@@ -132,7 +132,7 @@ struct VoiceNoteTests {
     }
 
     @Test func savingKeepsTheVoiceNoteAsItsOwnFile() async throws {
-        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let container = try TestStore.container()
         let store = try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "VoiceNoteTests-media-\(UUID().uuidString)"))
         let review = try await review()
         let recording = try record(6, into: review)

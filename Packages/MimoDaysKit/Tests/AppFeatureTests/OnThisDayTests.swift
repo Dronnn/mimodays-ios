@@ -9,7 +9,7 @@ import TestSupport
 /// 9.10 On this day (M14): today's month and day in every earlier year, nearest first, each year oldest first.
 @MainActor
 struct OnThisDayTests {
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let store: MediaStore
 
     init() throws {

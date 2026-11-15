@@ -456,6 +456,8 @@ private struct ModeSwitch: View {
         } else {
             HStack(alignment: .top, spacing: 0) {
                 item(.photo, CameraSettings.Mode.photo.label, id: "camera.mode.photo")
+                    // A long word still keeps its distance from the next; inside the 90 pt in English.
+                    .padding(.trailing, 16)
                     .frame(minWidth: 90, alignment: .leading)
                 item(.video, CameraSettings.Mode.video.label, id: "camera.mode.video")
             }
@@ -469,6 +471,8 @@ private struct ModeSwitch: View {
                 title
                     .textStyle(.cameraMode)
                     .foregroundStyle(CameraPalette.cream.opacity(mode == value ? 1 : 0.5))
+                    // Long translations keep the whole word: the bar has the room.
+                    .fixedSize()
                 if !isVertical {
                     Circle()
                         .fill(CameraPalette.coral)

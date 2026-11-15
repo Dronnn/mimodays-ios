@@ -123,10 +123,13 @@ struct MovieEditorView: View {
                         Text("Movies", bundle: .module)
                             .textStyle(.editorCancel)
                             .foregroundStyle(ColorToken.textLink.color)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     }
                     .padding(.leading, 8)
                     .padding(.trailing, 12)
-                    .frame(minHeight: Size.minimumTapTarget)
+                    // Inside the 96 pt the title leaves, however long the translation.
+                    .frame(maxWidth: 96, minHeight: Size.minimumTapTarget, alignment: .leading)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -136,8 +139,10 @@ struct MovieEditorView: View {
                     Text("Export", bundle: .module)
                         .textStyle(TextStyle(.nunito, size: 17, weight: 700, relativeTo: .body, maximumScale: 1.35))
                         .foregroundStyle(ColorToken.textLink.color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                         .padding(.horizontal, 20)
-                        .frame(minHeight: Size.minimumTapTarget)
+                        .frame(maxWidth: 96, minHeight: Size.minimumTapTarget, alignment: .trailing)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -455,7 +460,9 @@ struct PeachButtonStyle: ButtonStyle {
         configuration.label
             .textStyle(TextStyle(.nunito, size: 15, weight: 800, relativeTo: .subheadline, maximumScale: 1.35))
             .foregroundStyle(ColorToken.textPrimary.color)
-            .lineLimit(1)
+            // Long translations wrap rather than lose letters.
+            .lineLimit(2)
+            .multilineTextAlignment(.center)
             .minimumScaleFactor(0.8)
             .padding(.horizontal, 10)
             .frame(maxWidth: .infinity, minHeight: 44)

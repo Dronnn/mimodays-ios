@@ -77,8 +77,11 @@ struct SearchSnapshotTests {
         return model
     }
 
+    /// Memories with the search on (M08 lives there, under the system field).
     private func screen(_ model: SearchModel) -> some View {
-        NavigationStack { SearchView(model: model) }
+        let memories = MemoriesModel(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline())
+        return NavigationStack { MemoriesView(model: memories, search: model) }
+            .environment(AppRouter())
     }
 
     /// M08.

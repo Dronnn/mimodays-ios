@@ -3,87 +3,34 @@ import DesignSystem
 import SwiftData
 import SwiftUI
 
-/// Keeps search's model while it's on screen.
-struct SearchScreen: View {
-    @Environment(\.mediaLibrary) private var library
+/// M08's field and Cancel at the top of Memories while searching (Andrew, 2026-11-15): the search circle grows into
+/// the field, Cancel comes in from the side.
+struct SearchBar: View {
+    @Binding var query: String
+    var isFocused: FocusState<Bool>.Binding
+    /// The search circle and its glyph in the header, which the field and its glyph grow from.
+    let namespace: Namespace.ID
+    let cancel: () -> Void
 
     var body: some View {
-        if let library {
-            SearchHost(model: SearchModel(library: library))
-        }
-    }
-}
-
-private struct SearchHost: View {
-    @State var model: SearchModel
-
-    var body: some View {
-        SearchView(model: model)
-    }
-}
-
-/// M08/M09: the field and Cancel, chips for the kind, voice notes and filters, then matching places and moments.
-struct SearchView: View {
-    @Bindable var model: SearchModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var showsFilters = false
-    @FocusState private var isFocused: Bool
-
-    var body: some View {
-        let hits = model.hits
-        let places = model.places
-        VStack(alignment: .leading, spacing: 0) {
-            searchBar
-                .padding(.top, 8)
-            let findsNothing = model.isSearching && hits.isEmpty && places.isEmpty && model.isLoaded
-            // With nothing found, only the filters that narrowed it stay (M09).
-            chips(onlyActive: findsNothing && !model.filters.isEmpty)
-                .padding(.top, 8)
-            if !model.isSearching {
-                Spacer()
-            } else if findsNothing {
-                noMatches
-                    .padding(.top, 56)
-                Spacer()
-            } else {
-                results(hits, places: places)
-            }
-        }
-        .frame(maxWidth: 720)
-        .frame(maxWidth: .infinity)
-        .background(ColorToken.canvas.color.ignoresSafeArea())
-        .toolbar(.hidden, for: .navigationBar)
-        .toolbar(.hidden, for: .tabBar)
-        .task {
-            model.refresh()
-            if !model.isSearching { isFocused = true }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
-        .sheet(isPresented: $showsFilters) {
-            SearchFiltersSheet(model: model)
-        }
-    }
-
-    // MARK: Field and chips
-
-    private var searchBar: some View {
         HStack(spacing: 14) {
             HStack(spacing: 8) {
                 Icon.glyphSearch.image
                     .resizable()
                     .frame(width: 20, height: 20)
+                    .matchedGeometryEffect(id: SearchMorph.glyph, in: namespace)
                     .accessibilityHidden(true)
-                TextField(text: $model.query) {
+                TextField(text: $query) {
                     Text("Search moments", bundle: .module).foregroundStyle(ColorToken.textTertiary.color)
                 }
                 .textStyle(.searchQuery)
                 .tint(ColorToken.actionCoral.color)
-                .focused($isFocused)
+                .focused(isFocused)
                 .submitLabel(.search)
                 .autocorrectionDisabled()
                 .accessibilityIdentifier("search.field")
-                if !model.query.isEmpty {
-                    Button { model.query = "" } label: {
+                if !query.isEmpty {
+                    Button { query = "" } label: {
                         Icon.glyphClose.image
                             .resizable()
                             .frame(width: 11, height: 11)
@@ -101,20 +48,40 @@ struct SearchView: View {
             .padding(.leading, 12)
             .padding(.trailing, 4)
             .frame(minHeight: 40)
-            .background(FieldBlob().fill(ColorToken.surfaceChip.color))
-            Button { dismiss() } label: {
+            .background {
+                FieldBlob()
+                    .fill(ColorToken.surfaceChip.color)
+                    .matchedGeometryEffect(id: SearchMorph.shape, in: namespace)
+            }
+            Button(action: cancel) {
                 Text("Cancel", bundle: .module)
                     .textStyle(.searchCancel)
                     .foregroundStyle(ColorToken.textLink.color)
                     .frame(minHeight: Size.minimumTapTarget)
             }
             .buttonStyle(.plain)
+            .transition(.move(edge: .trailing).combined(with: .opacity))
             .accessibilityIdentifier("search.cancel")
         }
         .padding(.horizontal, 16)
     }
+}
 
-    private func chips(onlyActive: Bool) -> some View {
+/// What the search circle and the field share while one turns into the other.
+enum SearchMorph: Hashable {
+    case shape
+    case glyph
+}
+
+/// M08's chips under the field: the kind, voice notes and filters. With nothing found, only the filters that
+/// narrowed it stay (M09).
+struct SearchChips: View {
+    @Bindable var model: SearchModel
+    /// Opens M08b.
+    let showFilters: () -> Void
+
+    var body: some View {
+        let onlyActive = model.findsNothing && !model.filters.isEmpty
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
                 if let place = model.filters.place {
@@ -140,48 +107,54 @@ struct SearchView: View {
                 SearchChip(
                     icon: .glyphFilter,
                     title: count == 0 ? Text("Filters", bundle: .module) : Text("Filters · \(count)", bundle: .module),
-                    isOn: count > 0, id: "search.filters"
-                ) {
-                    isFocused = false
-                    showsFilters = true
-                }
+                    isOn: count > 0, id: "search.filters", action: showFilters
+                )
             }
             .padding(.horizontal, 16)
         }
         .scrollIndicators(.hidden)
     }
+}
+
+/// M08/M09 in Memories' list: matching places and moments, or nothing found.
+struct SearchResults: View {
+    @Bindable var model: SearchModel
+
+    var body: some View {
+        if model.findsNothing {
+            noMatches
+                .padding(.top, 56)
+        } else if model.isSearching {
+            results(model.hits, places: model.places)
+        }
+    }
 
     // MARK: Results
 
+    @ViewBuilder
     private func results(_ hits: [SearchHit], places: [PlaceHit]) -> some View {
         let ids = hits.map(\.id)
-        return ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                if !places.isEmpty {
-                    sectionTitle(Text("Places", bundle: .module))
-                        .padding(.top, 14)
-                    VStack(spacing: 0) {
-                        ForEach(Array(places.enumerated()), id: \.element.id) { index, place in
-                            placeRow(place, isLast: index == places.count - 1)
-                        }
-                    }
-                    .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-                    .padding(.horizontal, 16)
-                    .padding(.top, 6)
-                }
-                sectionTitle(Text("Moments · \(hits.count)", bundle: .module))
-                    .padding(.top, places.isEmpty ? 14 : 24)
-                ForEach(hits) { hit in
-                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: ids, start: hit.id, origin: .search))) {
-                        resultRow(hit)
-                    }
-                    .buttonStyle(.plain)
-                    .task { await model.load(hit.id) }
+        if !places.isEmpty {
+            sectionTitle(Text("Places", bundle: .module))
+                .padding(.top, 14)
+            VStack(spacing: 0) {
+                ForEach(Array(places.enumerated()), id: \.element.id) { index, place in
+                    placeRow(place, isLast: index == places.count - 1)
                 }
             }
-            .padding(.bottom, 24)
+            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .padding(.horizontal, 16)
+            .padding(.top, 6)
         }
-        .scrollDismissesKeyboard(.immediately)
+        sectionTitle(Text("Moments · \(hits.count)", bundle: .module))
+            .padding(.top, places.isEmpty ? 14 : 24)
+        ForEach(hits) { hit in
+            NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: ids, start: hit.id, origin: .search))) {
+                resultRow(hit)
+            }
+            .buttonStyle(.plain)
+            .task { await model.load(hit.id) }
+        }
     }
 
     private func sectionTitle(_ text: Text) -> some View {

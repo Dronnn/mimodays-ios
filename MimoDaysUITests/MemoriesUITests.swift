@@ -24,7 +24,11 @@ final class MemoriesUITests: XCTestCase {
     private func onScreen(_ id: String, timeout: TimeInterval = 10) -> XCUIElement? {
         let deadline = Date.now.addingTimeInterval(timeout)
         repeat {
-            let shown = app.descendants(matching: .any).matching(identifier: id).allElementsBoundByIndex.first { $0.exists && $0.isHittable }
+            // Neighbours off screen are skipped: asking whether one is hittable fails the test.
+            let screen = app.frame
+            let shown = app.descendants(matching: .any).matching(identifier: id).allElementsBoundByIndex.first {
+                $0.exists && screen.contains(CGPoint(x: $0.frame.midX, y: $0.frame.midY)) && $0.isHittable
+            }
             if let shown { return shown }
             RunLoop.current.run(until: Date.now.addingTimeInterval(0.2))
         } while Date.now < deadline
@@ -97,7 +101,8 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(tile.waitForExistence(timeout: 5))
     }
 
-    /// U35: Flip turns the card over to its back and round to the front again; a swipe still changes moment.
+    /// U35: a tap on the selfie window swaps the cameras; the folded corner turns the card over to its back and round
+    /// to the front again; a swipe still changes moment.
     /// Both sides pass VoiceOver's audit (contrast is checked against the design).
     @MainActor
     func testTheCardFlipsOverAndBackAndASwipeStillMovesOn() throws {
@@ -107,13 +112,20 @@ final class MemoriesUITests: XCTestCase {
         tile.tap()
         XCTAssertNotNil(onScreen("viewer.media"))
         try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast))
-        let flip = onScreen("card.flip")
+        // A tap on the selfie window swaps the cameras, another swaps them back.
+        let window = try XCTUnwrap(onScreen("viewer.selfieWindow"))
+        XCTAssertFalse(window.isSelected)
+        window.tap()
+        XCTAssertTrue(onScreen("viewer.selfieWindow")?.isSelected == true, "the cameras didn't swap")
+        onScreen("viewer.selfieWindow")?.tap()
+        XCTAssertTrue(onScreen("viewer.selfieWindow")?.isSelected == false, "the cameras didn't swap back")
+        let flip = onScreen("card.fold")
         XCTAssertNotNil(flip)
         flip?.tap()
         // The front leaves VoiceOver's reach once the back faces up.
         XCTAssertNil(onScreen("viewer.media", timeout: 3), "the front is still showing")
         try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast))
-        onScreen("card.flip")?.tap()
+        onScreen("card.fold")?.tap()
         XCTAssertNotNil(onScreen("viewer.media"))
         app.swipeLeft()
         XCTAssertNotNil(onScreen("viewer.media"))
@@ -136,7 +148,7 @@ final class MemoriesUITests: XCTestCase {
         caption.typeText("Snow day")
         app.buttons["edit.save"].tap()
         // The words are on the card's back (U30).
-        let flip = onScreen("card.flip")
+        let flip = onScreen("card.fold")
         XCTAssertNotNil(flip)
         flip?.tap()
         XCTAssertTrue(app.staticTexts["Snow day"].waitForExistence(timeout: 5))
@@ -350,7 +362,7 @@ final class MemoriesUITests: XCTestCase {
         caption.tap()
         caption.typeText(" by the fountain")
         app.buttons["edit.save"].tap()
-        onScreen("card.flip")?.tap()
+        onScreen("card.fold")?.tap()
         let edited = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "by the fountain")).firstMatch
         XCTAssertTrue(edited.waitForExistence(timeout: 5))
         XCTAssertTrue(edit.exists)

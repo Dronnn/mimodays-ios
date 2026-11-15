@@ -111,6 +111,9 @@ final class SearchModel {
 
     var places: [PlaceHit] { Self.places(entries, query: query, filters: filters) }
 
+    /// M09: searching, and neither a place nor a moment matches.
+    var findsNothing: Bool { isSearching && isLoaded && hits.isEmpty && places.isEmpty }
+
     /// Moments the current filters leave, before any words (M08b's "Show N moments").
     var filteredCount: Int { entries.count(where: { Self.passes($0, filters) }) }
 

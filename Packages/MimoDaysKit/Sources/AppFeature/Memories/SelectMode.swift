@@ -25,7 +25,7 @@ struct SelectBar: View {
             .accessibilityAddTraits(.isHeader)
             .accessibilityIdentifier("select.count")
             HStack {
-                Button { selection = nil } label: {
+                Button { withAnimation(.snappy) { selection = nil } } label: {
                     Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
                 }
                 .accessibilityIdentifier("select.cancel")
@@ -51,7 +51,7 @@ struct SelectButton: View {
     let id: String
 
     var body: some View {
-        Button { selection = [] } label: {
+        Button { withAnimation(.snappy) { selection = [] } } label: {
             Text("Select", bundle: .module)
                 .textStyle(.control)
                 .foregroundStyle(ColorToken.textLink.color)

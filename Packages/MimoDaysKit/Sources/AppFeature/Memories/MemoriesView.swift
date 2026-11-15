@@ -15,18 +15,30 @@ struct MemoriesView: View {
     @State private var selection: Set<UUID>?
     /// E05 from M01e.
     @State private var importsPhotos = false
+    /// M08/M09 here rather than on a screen of its own (Andrew, 2026-11-15).
+    @State private var search: SearchModel
+    @State private var isSearching: Bool
+    @State private var showsFilters = false
+    @FocusState private var isSearchFocused: Bool
+    @Namespace private var searchSpace
 
-    init(model: MemoriesModel, selection: Set<UUID>? = nil) {
+    init(model: MemoriesModel, selection: Set<UUID>? = nil, search: SearchModel? = nil) {
         self.model = model
         _selection = State(initialValue: selection)
+        _search = State(initialValue: search ?? SearchModel(library: model.library))
+        _isSearching = State(initialValue: search != nil)
     }
 
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                if selection == nil { header }
+                if selection == nil, !isSearching {
+                    header
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+                if isSearching { SearchResults(model: search) }
                 // M01e keeps the switch and the search too (9.16).
-                if model.isLoaded, selection == nil {
+                if model.isLoaded, selection == nil, !isSearching {
                     SegmentedControl(selection: $model.mode, options: [.timeline, .calendar]) { mode in
                         switch mode {
                         case .timeline: Text("Timeline", bundle: .module)
@@ -36,47 +48,48 @@ struct MemoriesView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 21)
                     .accessibilityIdentifier("memories.mode")
-                    if model.mode == .timeline, !model.isEmpty { shortcuts.padding(.top, 12) }
-                }
-                if model.isEmpty, model.mode == .timeline {
-                    emptyState
-                        .padding(.top, 56)
-                }
-                switch model.mode {
-                case .timeline:
-                    ForEach(Array(model.rows.enumerated()), id: \.element.id) { index, row in
-                        switch row {
-                        case let .month(key, count):
-                            // M13 lists days only.
-                            if selection == nil {
-                                monthHeader(key, count: count, isFirst: index == 0)
-                                    .padding(.top, index == 0 ? 22 : 18)
-                            }
-                        case let .day(key, items):
-                            day(key, items)
-                        }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    if model.mode == .timeline, !model.isEmpty {
+                        shortcuts
+                            .padding(.top, 12)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
                     }
-                case .calendar:
-                    MemoriesCalendarView(model: model)
-                        .padding(.top, 12)
+                }
+                // The results take the list's place; until then the moments stay under the field.
+                if !(isSearching && search.isSearching) {
+                    if model.isEmpty, model.mode == .timeline {
+                        emptyState
+                            .padding(.top, 56)
+                    } else {
+                        moments
+                    }
                 }
             }
             .scrollTargetLayout()
             // On iPhone the buttons sit level with the status bar's bottom, as drawn.
-            .padding(.top, sizeClass == .compact ? -9 : 0)
+            .padding(.top, sizeClass == .compact && !isSearching ? -9 : 0)
             .padding(.bottom, 24)
             .frame(maxWidth: 1180)
             .frame(maxWidth: .infinity)
         }
         .scrollPosition(id: $model.scrolledRow, anchor: .top)
+        .scrollDismissesKeyboard(isSearching ? .immediately : .automatic)
         .background(ColorToken.canvas.color.ignoresSafeArea())
         // The title names the way back from a day; the bar itself stays hidden here.
         .navigationTitle(Text("Memories", bundle: .module))
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(selection == nil ? .automatic : .hidden, for: .tabBar)
         .safeAreaInset(edge: .top, spacing: 0) {
-            if selection != nil { SelectBar(selection: $selection, all: model.allIDs) }
+            if selection != nil {
+                SelectBar(selection: $selection, all: model.allIDs)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            } else if isSearching {
+                searchBar
+            }
         }
+        .sheet(isPresented: $showsFilters) { SearchFiltersSheet(model: search) }
+        // Into and out of selecting, however it's left (Cancel, a delete, the mode switch).
+        .animation(.snappy, value: selection == nil)
         .memoriesSelectActions(model: model, selection: $selection)
         .photoImport(isPresented: $importsPhotos)
         .onChange(of: model.mode) { selection = nil }
@@ -87,11 +100,68 @@ struct MemoriesView: View {
             }
         }
         .task { model.refresh() }
-        .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
+        .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
+            model.refresh()
+            if isSearching { search.refresh() }
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { model.refresh() }
         }
     }
+
+    /// The timeline or the calendar.
+    @ViewBuilder
+    private var moments: some View {
+        switch model.mode {
+        case .timeline:
+            ForEach(Array(model.rows.enumerated()), id: \.element.id) { index, row in
+                switch row {
+                case let .month(key, count):
+                    // M13 lists days only.
+                    if selection == nil {
+                        monthHeader(key, count: count, isFirst: index == 0)
+                            .padding(.top, index == 0 ? 22 : 18)
+                    }
+                case let .day(key, items):
+                    day(key, items)
+                }
+            }
+        case .calendar:
+            MemoriesCalendarView(model: model)
+                .padding(.top, 12)
+        }
+    }
+
+    // MARK: Search
+
+    /// The field and Cancel, the chips under them; the list scrolls beneath.
+    private var searchBar: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SearchBar(query: $search.query, isFocused: $isSearchFocused, namespace: searchSpace, cancel: endSearch)
+            SearchChips(model: search) {
+                isSearchFocused = false
+                showsFilters = true
+            }
+            .transition(.opacity.combined(with: .offset(y: -10)))
+        }
+        .padding(.bottom, 8)
+        .background(ColorToken.canvas.color.ignoresSafeArea())
+        .onAppear { isSearchFocused = true }
+    }
+
+    private func startSearch() {
+        search.refresh()
+        withAnimation(Self.searchMotion) { isSearching = true }
+    }
+
+    private func endSearch() {
+        isSearchFocused = false
+        withAnimation(Self.searchMotion) { isSearching = false }
+        search.query = ""
+        search.filters = SearchFilters()
+    }
+
+    private static let searchMotion = Animation.smooth(duration: 0.4)
 
     // MARK: Header
 
@@ -106,13 +176,18 @@ struct MemoriesView: View {
                         SelectButton(selection: $selection, id: "memories.select")
                             .padding(.trailing, 14)
                     }
-                    NavigationLink(value: MemoriesRoute.search) {
+                    Button(action: startSearch) {
                         Icon.glyphSearch.image
                             .resizable()
                             .frame(width: 22, height: 22)
+                            .matchedGeometryEffect(id: SearchMorph.glyph, in: searchSpace)
                             .foregroundStyle(ColorToken.textPrimary.color)
                             .frame(width: 40, height: 40)
-                            .overlay(Circle().strokeBorder(ColorToken.textPrimary.color, lineWidth: 1.3))
+                            .background {
+                                Circle()
+                                    .strokeBorder(ColorToken.textPrimary.color, lineWidth: 1.3)
+                                    .matchedGeometryEffect(id: SearchMorph.shape, in: searchSpace)
+                            }
                             .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
                             .contentShape(Circle())
                     }

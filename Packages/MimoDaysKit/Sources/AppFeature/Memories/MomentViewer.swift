@@ -68,7 +68,12 @@ struct MomentViewer: View {
         .background(SwipeBackEnabler())
         .safeAreaInset(edge: .top, spacing: 0) { topBar }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if let moment = model.currentMoment { actions(moment) }
+            if let moment = model.currentMoment {
+                VStack(spacing: 0) {
+                    position
+                    actions(moment)
+                }
+            }
         }
         .fullScreenCover(item: $editing) { edit in
             EditMomentView(model: edit) { model.removeFromPager(edit.id) }
@@ -111,7 +116,41 @@ struct MomentViewer: View {
 
     // MARK: Bar
 
-    /// `Navigation / Back bar`: ‹ and the moment's day ("Nov 11"), its time, the ••• menu.
+    /// Back to where the card was opened from (U42).
+    private func backLabel(_ moment: ViewerMoment) -> Text {
+        switch model.origin {
+        case .day: Self.day(moment.captured)
+        case .today: Text("Today", bundle: .module)
+        case .onThisDay: Text("On this day", bundle: .module)
+        case .favorites: Text("Favorites", bundle: .module)
+        case .search: Text("Search", bundle: .module)
+        case let .collection(title): Text(title)
+        case .place: Text("Map", bundle: .module)
+        }
+    }
+
+    /// From the Map: which of the place's moments this is (U41).
+    @ViewBuilder
+    private var position: some View {
+        if case let .place(name) = model.origin, model.ids.count > 1,
+           let index = model.current.flatMap({ model.ids.firstIndex(of: $0) }) {
+            Group {
+                if let name {
+                    Text("\(index + 1) of \(model.ids.count) at \(name)", bundle: .module)
+                } else {
+                    Text("\(index + 1) of \(model.ids.count)", bundle: .module)
+                }
+            }
+            .textStyle(.noteMeta)
+            .foregroundStyle(ColorToken.textSecondary.color)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
+            .accessibilityIdentifier("viewer.position")
+        }
+    }
+
+    /// `Navigation / Back bar`: ‹ and where it was opened from ("Nov 11", "Map"), its time, the ••• menu.
     private var topBar: some View {
         let ink = ColorToken.textPrimary.color
         return ZStack {
@@ -130,9 +169,10 @@ struct MomentViewer: View {
                             .foregroundStyle(ink)
                             .flipsForRightToLeftLayoutDirection(true)
                         if let moment = model.currentMoment {
-                            Self.day(moment.captured)
+                            backLabel(moment)
                                 .textStyle(.editorCancel)
                                 .foregroundStyle(ColorToken.textLink.color)
+                                .lineLimit(1)
                         }
                     }
                     .frame(minHeight: Size.minimumTapTarget)

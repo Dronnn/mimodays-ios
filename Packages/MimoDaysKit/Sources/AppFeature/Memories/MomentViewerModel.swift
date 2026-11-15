@@ -21,8 +21,23 @@ extension EnvironmentValues {
 
 /// The viewer is opened on one moment among others it can swipe to, in the order they were shown.
 struct MomentPager: Hashable {
+    /// Where the card was opened from (U42): its back label, and the Map's "2 of 5 at Kentron".
+    enum Origin: Hashable {
+        /// The calendar, a day, the timeline: the moment's day.
+        case day
+        case today
+        case onThisDay
+        case favorites
+        case search
+        /// A collection, by its title.
+        case collection(String)
+        /// A place on the Map, by its name when it has one.
+        case place(String?)
+    }
+
     var ids: [UUID]
     var start: UUID
+    var origin = Origin.day
 }
 
 /// One moment as the viewer shows it (M05, M06).
@@ -143,12 +158,14 @@ final class MomentViewerModel {
     static let voiceBars = 22
 
     let library: MediaLibrary
+    let origin: MomentPager.Origin
     private var voiceEnd: (any NSObjectProtocol)?
     private let logger = Logger(subsystem: "MimoDays", category: "Viewer")
 
     init(pager: MomentPager, library: MediaLibrary) {
         ids = pager.ids
         current = pager.start
+        origin = pager.origin
         self.library = library
     }
 

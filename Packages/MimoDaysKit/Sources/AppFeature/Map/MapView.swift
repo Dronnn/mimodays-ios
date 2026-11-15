@@ -652,7 +652,7 @@ struct PlacePreviewSheet: View {
                 .padding(.top, 4)
             HStack(spacing: 6) {
                 ForEach(Array(place.moments.prefix(4).enumerated()), id: \.element.id) { index, moment in
-                    Button { open(MomentPager(ids: place.moments.map(\.id), start: moment.id)) } label: { preview(moment, index: index) }
+                    Button { open(MomentPager(ids: place.moments.map(\.id), start: moment.id, origin: .place(place.label))) } label: { preview(moment, index: index) }
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("place.preview")
                 }

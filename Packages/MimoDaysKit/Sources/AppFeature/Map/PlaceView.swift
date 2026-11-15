@@ -121,7 +121,7 @@ private struct PlaceContent: View {
                     MemoryTile(item: moment.item, detail: tiles.details[moment.id], image: tiles.images[moment.id], leavesRoomForMark: true)
                 }
             } else {
-                Button { openMoment = MomentPager(ids: ids, start: moment.id) } label: {
+                Button { openMoment = MomentPager(ids: ids, start: moment.id, origin: .place(place.label)) } label: {
                     MemoryTile(item: moment.item, detail: tiles.details[moment.id], image: tiles.images[moment.id])
                 }
                 .buttonStyle(.plain)

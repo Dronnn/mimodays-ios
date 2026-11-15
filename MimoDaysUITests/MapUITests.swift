@@ -45,6 +45,8 @@ final class MapUITests: XCTestCase {
         attachScreenshot("P03")
         tile.tap()
         XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
+        // U41: back to the Map, which of the place's moments this is.
+        attachScreenshot("U41")
     }
 
     /// Flow 08 (doc 02): a place's moments make a movie. The wizard opens on Movies with the place chosen;

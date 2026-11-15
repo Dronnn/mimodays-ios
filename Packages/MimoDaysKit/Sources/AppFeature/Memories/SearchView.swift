@@ -172,7 +172,7 @@ struct SearchView: View {
                 sectionTitle(Text("Moments · \(hits.count)", bundle: .module))
                     .padding(.top, places.isEmpty ? 14 : 24)
                 ForEach(hits) { hit in
-                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: ids, start: hit.id))) {
+                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: ids, start: hit.id, origin: .search))) {
                         resultRow(hit)
                     }
                     .buttonStyle(.plain)

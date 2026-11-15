@@ -42,7 +42,7 @@ struct FavoritesView: View {
                                         MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id], leavesRoomForMark: true)
                                     }
                                 } else {
-                                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: favorites.map(\.id), start: item.id))) {
+                                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: favorites.map(\.id), start: item.id, origin: .favorites))) {
                                         MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
                                     }
                                     .buttonStyle(.plain)

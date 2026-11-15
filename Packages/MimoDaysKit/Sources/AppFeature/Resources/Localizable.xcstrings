@@ -635,6 +635,14 @@
         }
       }
     },
+    "%lld of %lld" : {
+      "comment" : "Memory Card opened from an unnamed place on the Map (U41): which of its moments this is, e.g. \"2 of 5\".",
+      "extractionState" : "manual"
+    },
+    "%lld of %lld at %@" : {
+      "comment" : "Memory Card opened from the Map (U41): which of the place's moments this is, and the place's name, e.g. \"2 of 5 at Kentron\".",
+      "extractionState" : "manual"
+    },
     "%lld of %lld characters" : {
       "comment" : "Note editor (C08): VoiceOver reading of the counter, e.g. 86 of 500 characters",
       "extractionState" : "manual",
@@ -3392,7 +3400,7 @@
       }
     },
     "Favorites" : {
-      "comment" : "Memories chip (M01) and Favorites title (M10).",
+      "comment" : "Memories chip (M01) and Favorites title (M10). Also the Memory Card's back label when opened from there (U42).",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -4232,7 +4240,7 @@
       }
     },
     "Map" : {
-      "comment" : "Tab: moments on a map",
+      "comment" : "Tab: moments on a map Also the Memory Card's back label when opened from there (U42).",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -5408,7 +5416,7 @@
       }
     },
     "On this day" : {
-      "comment" : "Today section title for moments from the same day in earlier years (T06).",
+      "comment" : "Today section title for moments from the same day in earlier years (T06). Also the Memory Card's back label when opened from there (U42).",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -6884,7 +6892,7 @@
       }
     },
     "Search" : {
-      "comment" : "Memories (M01): VoiceOver label of the search button.",
+      "comment" : "Memories (M01): VoiceOver label of the search button. Also the Memory Card's back label when opened from there (U42).",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -8746,7 +8754,7 @@
       }
     },
     "Today" : {
-      "comment" : "Tab: today's capture screen",
+      "comment" : "Tab: today's capture screen Also the Memory Card's back label when opened from there (U42).",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

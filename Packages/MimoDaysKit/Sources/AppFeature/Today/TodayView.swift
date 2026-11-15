@@ -461,7 +461,7 @@ struct TodayView: View {
     private func pager(from id: UUID) -> MomentPager {
         var ids = model.latest.map { [$0.id] } ?? []
         ids += model.month.map(\.id).filter { !ids.contains($0) }
-        return MomentPager(ids: ids, start: id)
+        return MomentPager(ids: ids, start: id, origin: .today)
     }
 
     private func media(_ path: String?, _ size: Int) -> HeroMedia {

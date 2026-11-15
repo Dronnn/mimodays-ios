@@ -105,6 +105,44 @@ public struct MemoryCardFlipCorner: View {
     }
 }
 
+/// U20-U23 `Selfie window`: the hand-cut frame of the selfie window on a Memory Card, upright (the window's -5.4°
+/// tilt is applied by the view); 97×125 in the design, stretches to any rect.
+public struct CardSelfieBlob: Shape {
+    public init() {}
+
+    public func path(in rect: CGRect) -> Path {
+        func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+            CGPoint(x: rect.minX + x * rect.width, y: rect.minY + y * rect.height)
+        }
+        var path = Path()
+        path.move(to: p(0.1796, 0.0057))
+        path.addCurve(to: p(0.4872, 0.0090), control1: p(0.2436, 0.0000), control2: p(0.3847, 0.0032))
+        path.addCurve(to: p(0.7948, 0.0405), control1: p(0.5898, 0.0147), control2: p(0.7325, 0.0325))
+        path.addCurve(to: p(0.8612, 0.0568), control1: p(0.8572, 0.0484), control2: p(0.8407, 0.0484))
+        path.addCurve(to: p(0.9178, 0.0911), control1: p(0.8817, 0.0652), control2: p(0.9021, 0.0761))
+        path.addCurve(to: p(0.9549, 0.1464), control1: p(0.9334, 0.1060), control2: p(0.9468, 0.0981))
+        path.addCurve(to: p(0.9664, 0.3809), control1: p(0.9630, 0.1947), control2: p(0.9646, 0.3028))
+        path.addCurve(to: p(0.9652, 0.6154), control1: p(0.9681, 0.4591), control2: p(0.9600, 0.5373))
+        path.addCurve(to: p(0.9981, 0.8499), control1: p(0.9706, 0.6936), control2: p(0.9960, 0.7972))
+        path.addCurve(to: p(0.9773, 0.9321), control1: p(1.0000, 0.9027), control2: p(0.9936, 0.9084))
+        path.addCurve(to: p(0.9001, 0.9922), control1: p(0.9610, 0.9558), control2: p(0.9306, 0.9852))
+        path.addCurve(to: p(0.7948, 0.9737), control1: p(0.8697, 0.9990), control2: p(0.8636, 0.9744))
+        path.addCurve(to: p(0.4872, 0.9877), control1: p(0.7260, 0.9730), control2: p(0.5898, 0.9835))
+        path.addCurve(to: p(0.1796, 0.9983), control1: p(0.3847, 0.9918), control2: p(0.2467, 1.0000))
+        path.addCurve(to: p(0.0851, 0.9775), control1: p(0.1126, 0.9966), control2: p(0.1123, 0.9901))
+        path.addCurve(to: p(0.0169, 0.9232), control1: p(0.0580, 0.9651), control2: p(0.0305, 0.9444))
+        path.addCurve(to: p(0.0040, 0.8499), control1: p(0.0034, 0.9019), control2: p(0.0062, 0.9013))
+        path.addCurve(to: p(0.0040, 0.6154), control1: p(0.0018, 0.7986), control2: p(0.0000, 0.6936))
+        path.addCurve(to: p(0.0281, 0.3809), control1: p(0.0080, 0.5373), control2: p(0.0244, 0.4591))
+        path.addCurve(to: p(0.0260, 0.1464), control1: p(0.0318, 0.3028), control2: p(0.0221, 0.1951))
+        path.addCurve(to: p(0.0518, 0.0888), control1: p(0.0299, 0.0977), control2: p(0.0389, 0.1060))
+        path.addCurve(to: p(0.1033, 0.0433), control1: p(0.0646, 0.0716), control2: p(0.0819, 0.0571))
+        path.addCurve(to: p(0.1796, 0.0057), control1: p(0.1246, 0.0294), control2: p(0.1157, 0.0114))
+        path.closeSubpath()
+        return path
+    }
+}
+
 /// The fold: the corner's triangle, rounded where the card's corner was.
 struct FlipCornerFold: Shape {
     func path(in rect: CGRect) -> Path {

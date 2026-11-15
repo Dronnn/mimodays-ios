@@ -11,9 +11,8 @@ struct MemoryCardPage: View {
     let model: MomentViewerModel
     let moment: ViewerMoment
     let isCurrent: Bool
-    /// The screen's width and top inset: the camera's window layout counts from them.
+    /// The screen's width: the window's layout counts from it.
     let screenWidth: CGFloat
-    let screenTop: CGFloat
     /// Opens Edit moment (the back's "+" links).
     let edit: () -> Void
     /// Moves to the next (+1) or previous (-1) moment (VoiceOver).
@@ -30,14 +29,13 @@ struct MemoryCardPage: View {
 
     /// `angle` starts it turned: snapshots of the back and of a flip half done.
     init(
-        model: MomentViewerModel, moment: ViewerMoment, isCurrent: Bool, screenWidth: CGFloat, screenTop: CGFloat,
+        model: MomentViewerModel, moment: ViewerMoment, isCurrent: Bool, screenWidth: CGFloat,
         angle: Double = 0, edit: @escaping () -> Void, step: @escaping (Int) -> Void
     ) {
         self.model = model
         self.moment = moment
         self.isCurrent = isCurrent
         self.screenWidth = screenWidth
-        self.screenTop = screenTop
         self.edit = edit
         self.step = step
         _flip = State(initialValue: MemoryCardFlip(angle: angle))
@@ -50,7 +48,7 @@ struct MemoryCardPage: View {
     /// The saved window, at the corner and size of the camera's layout nearest it; a move is saved on the moment.
     private var window: MemoryCardFront.Window? {
         guard hasWindow, screenWidth > 0, let saved = savedLayout else { return nil }
-        let layout = MemoryCardGeometry.windowLayout(format: moment.format, screenWidth: screenWidth, topInset: screenTop)
+        let layout = MemoryCardGeometry.windowLayout(format: moment.format, screenWidth: screenWidth)
         return MemoryCardFront.Window(
             layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow",
             move: { [model, id = moment.id] placement in

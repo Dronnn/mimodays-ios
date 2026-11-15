@@ -34,10 +34,19 @@ enum MemoryCardGeometry {
         return CGSize(width: width, height: width / aspectRatio)
     }
 
-    /// The selfie window's layout on a card: the camera's for the format at the screen's width (as review lays
-    /// it out), drawn scaled to the card. What is saved does not depend on the card's size.
-    static func windowLayout(format: CaptureFormat, screenWidth: CGFloat, topInset: CGFloat) -> SelfieWindowLayout {
-        SelfieWindowLayout.media(width: screenWidth, format: format, topInset: topInset)
+    /// The selfie window's layout on a card (U20-U23), laid out on the screen's width and drawn scaled to the card:
+    /// what is saved does not depend on the card's size. A 9:16 card keeps the window in its corners, 14 pt under
+    /// the top edge and 26 pt in from the side of the 359 pt design card (before the tilt), the bottom corners clear
+    /// of the video's controls; 1:1 and 16:9 as the camera frames them. Review and the card share it, so the saved
+    /// moment has the window where the card shows it.
+    static func windowLayout(format: CaptureFormat, screenWidth: CGFloat) -> SelfieWindowLayout {
+        var layout = SelfieWindowLayout.media(width: screenWidth, format: format, topInset: 0)
+        guard format == .portrait else { return layout }
+        let scale = screenWidth / 359
+        layout.topMargin = 14 * scale
+        layout.leftMargin = 26 * scale
+        layout.rightMargin = 26 * scale
+        return layout
     }
 
     /// The window's frame on a card of `card` size, for `placement` in `layout`.

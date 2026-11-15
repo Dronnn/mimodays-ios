@@ -51,7 +51,6 @@ struct MomentViewer: View {
     /// E01, from Share.
     @State private var exporting: MomentExportModel?
     /// The status bar's height and the screen's width: the selfie window is laid out from them, as on the camera.
-    @State private var screenTop: CGFloat = 0
     @State private var screenWidth: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
 
@@ -110,7 +109,6 @@ struct MomentViewer: View {
             Task { await model.reload() }
         }
         // Outside the bars' insets: the screen's own.
-        .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { screenTop = $0 }
         .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { screenWidth = $0 }
     }
 
@@ -118,7 +116,7 @@ struct MomentViewer: View {
     private func page(_ id: UUID) -> some View {
         if let moment = model.moments[id] {
             MemoryCardPage(
-                model: model, moment: moment, isCurrent: model.current == id, screenWidth: screenWidth, screenTop: screenTop,
+                model: model, moment: moment, isCurrent: model.current == id, screenWidth: screenWidth,
                 edit: { edit(id) }, step: { model.step($0) }
             )
         } else {

@@ -4,7 +4,7 @@ import Persistence
 import SwiftUI
 
 /// U20-U24: the Memory Card's front. The photo, or both video streams from their own files, in the moment's shape,
-/// with the selfie window (tilted -5.4°, hand-cut) where it was recorded. The window is dragged to a corner or
+/// with the selfie window (tilted -5.4°, hand-cut) in its corner. The window is dragged to a corner or
 /// resized with touch and hold, and saved on the moment. Swapping grows the window's stream into the card while the
 /// card's shrinks into the window: frame, size, tilt and edge move together and the players keep running.
 /// A video's controls sit on a scrim at the bottom; tapping the card hides or shows them.
@@ -78,7 +78,7 @@ struct MemoryCardFront: View {
             .id(reduceMotion && swapped)
             .transition(.opacity)
             if isVideo, controlsShown {
-                MemoryCardVideoControls(playback: playback, fallbackDuration: pictures.duration)
+                MemoryCardVideoControls(playback: playback, fallbackDuration: pictures.duration, foldOnRight: cornerOnRight)
                     .frame(width: size.width, height: size.height, alignment: .bottom)
                     .transition(.opacity)
             }
@@ -119,12 +119,14 @@ struct MemoryCardFront: View {
         let inWindow = window != nil && (stream == .selfie) != swapped
         let offset = inWindow ? drag ?? .zero : .zero
         let rect = inWindow ? window!.offsetBy(dx: offset.width, dy: offset.height) : bounds
+        // The card's outline, or the window's own hand-cut frame with its 4 pt cream edge inside it.
+        let shape = inWindow ? AnyShape(CardSelfieBlob()) : AnyShape(MemoryCardOutline())
         return content(stream)
             .frame(width: rect.width, height: rect.height)
-            .clipShape(MemoryCardOutline())
-            .overlay { MemoryCardOutline().strokeBorder(ColorToken.mediaFrame.color, lineWidth: inWindow ? 4 : 0) }
+            .clipShape(shape)
+            .overlay { shape.stroke(ColorToken.mediaFrame.color, lineWidth: inWindow ? 8 : 0).clipShape(shape) }
             .background {
-                MemoryCardOutline()
+                shape
                     .fill(ColorToken.mediaFrame.color)
                     .shadow(color: Color(hex: 0x2A1B21).opacity(inWindow ? 0.25 : 0), radius: 10, y: 8)
             }
@@ -255,10 +257,12 @@ private struct PictureAccess: ViewModifier {
 }
 
 /// U20: the video's controls on a soft scrim inside the card: the scrubber, the time on each side, pause in the
-/// middle and the sound beside the total.
+/// middle and the sound beside the total. The times keep clear of the folded corner, on whichever side it is.
 struct MemoryCardVideoControls: View {
     let playback: ViewerVideoPlayer?
     let fallbackDuration: Double
+    /// The card's folded corner: right, left, or none (review).
+    var foldOnRight: Bool?
     /// Playing before a scrub started.
     @State private var resumesAfterScrub: Bool?
 
@@ -284,6 +288,9 @@ struct MemoryCardVideoControls: View {
                         .accessibilityHidden(true)
                 }
                 .textStyle(.scrubTime)
+                // U20: the total ends 32 pt from the card's edge, over the fold's crease.
+                .padding(.leading, foldOnRight == false ? 10 : 0)
+                .padding(.trailing, foldOnRight == true ? 10 : 0)
                 Button { playback?.toggle() } label: {
                     (playback?.isPlaying == true ? Icon.glyphPause : .glyphPlay).image
                         .resizable()
@@ -299,7 +306,7 @@ struct MemoryCardVideoControls: View {
         }
         .foregroundStyle(ColorToken.mediaFrame.color)
         .padding(.horizontal, 22)
-        .padding(.bottom, 14)
+        .padding(.bottom, 20)
         .padding(.top, 40)
         .background {
             LinearGradient(

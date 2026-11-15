@@ -107,9 +107,9 @@ struct ReviewView: View {
                 height: max(0, proxy.size.height - topInset - chrome)
             )
             let card = MemoryCardGeometry.card(aspectRatio: model.aspectRatio, in: slot)
-            // Laid out as the camera did on the full width, then drawn at the card's size: what is saved is what
-            // was recorded, whatever the keyboard or the panel leaves of the card.
-            let layout = MemoryCardGeometry.windowLayout(format: model.capture.format, screenWidth: proxy.size.width, topInset: topInset)
+            // Laid out on the full width, then drawn at the card's size: what is saved is what the card shows,
+            // whatever the keyboard or the panel leaves of the card.
+            let layout = MemoryCardGeometry.windowLayout(format: model.capture.format, screenWidth: proxy.size.width)
             VStack(alignment: .leading, spacing: 0) {
                 RetakeButton(action: retake)
                     .frame(height: Self.retakeRow)

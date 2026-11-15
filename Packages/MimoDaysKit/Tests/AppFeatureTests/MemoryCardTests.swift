@@ -63,7 +63,7 @@ struct MemoryCardTests {
     }
 
     @Test func theWindowKeepsItsShareOfTheCardAtAnySize() {
-        let layout = MemoryCardGeometry.windowLayout(format: .portrait, screenWidth: 402, topInset: 62)
+        let layout = MemoryCardGeometry.windowLayout(format: .portrait, screenWidth: 402)
         let placement = CameraSettings.SelfieWindow(corner: .bottomLeft, scale: .large)
         let full = MemoryCardGeometry.windowFrame(placement, layout: layout, card: layout.preview)
         let half = MemoryCardGeometry.windowFrame(placement, layout: layout, card: CGSize(width: layout.preview.width / 2, height: layout.preview.height / 2))

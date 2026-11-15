@@ -90,7 +90,7 @@ struct ViewerSnapshotTests {
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)
         let moment = try #require(model.moments[id])
-        return MemoryCardPage(model: model, moment: moment, isCurrent: false, screenWidth: 402, screenTop: 62, angle: angle, edit: {}, step: { _ in })
+        return MemoryCardPage(model: model, moment: moment, isCurrent: false, screenWidth: 402, angle: angle, edit: {}, step: { _ in })
             .frame(width: 359)
             .padding(.top, 108)
             .padding(.bottom, 84)
@@ -135,7 +135,7 @@ struct ViewerSnapshotTests {
         await model.load(id)
         let moment = try #require(model.moments[id])
         let card = MemoryCardGeometry.card(aspectRatio: moment.format.aspectRatio, in: CGSize(width: 359, height: 562))
-        let layout = MemoryCardGeometry.windowLayout(format: .portrait, screenWidth: 402, topInset: 62)
+        let layout = MemoryCardGeometry.windowLayout(format: .portrait, screenWidth: 402)
         let saved = try #require(moment.photo?.layout)
         let front = MemoryCardFront(
             pictures: MemoryCardFront.Pictures(main: model.image(moment.mainPath), selfie: model.image(moment.selfiePath), isVideo: false),

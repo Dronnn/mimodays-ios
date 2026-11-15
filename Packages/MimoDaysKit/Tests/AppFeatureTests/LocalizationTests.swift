@@ -104,6 +104,7 @@ struct LocalizationTests {
         "%lld moments · %lld collections · %lld movie projects · %@", "%lld are already here. %lld are new.", "Add %lld moments",
         "Replace with %lld moments", "%lld of %lld moments restored", "%lld files are damaged", "%lld were already here",
         "Nothing was restored. This iPhone needs about %@ more free space.", "%@ used by MimoDays", "%lld · %@",
+        "Choosing where to save",
         // Moment and selection export (Phase 12).
         "MimoDays %lld moments", "Export %lld moments", "Export moment", "As you saw it", "Separate originals",
         "The camera's own files, front and back separately.", "One video with the selfie window, exactly as in MimoDays.",
@@ -141,6 +142,26 @@ struct LocalizationTests {
     @Test(arguments: resourceKeys + literalKeys)
     func everyUsedKeyIsInTheCatalog(key: String) {
         #expect(Bundle.module.localizedString(forKey: key, value: Self.missing, table: nil) != Self.missing)
+    }
+
+    /// Every plain `Text("…", bundle: .module)` in AppFeature, so a new key can't be forgotten in `literalKeys`.
+    @Test func everyLiteralInTheSourcesIsInTheCatalog() throws {
+        let sources = URL(filePath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appending(path: "Sources/AppFeature")
+        let files = try #require(FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil))
+        var keys: Set<String> = []
+        for case let url as URL in files where url.pathExtension == "swift" {
+            let text = try String(contentsOf: url, encoding: .utf8)
+            for match in text.matches(of: /Text\("((?:[^"\\]|\\[^(])*)", bundle: \.module/) {
+                keys.insert(String(match.1).replacing("\\\"", with: "\"").replacing("\\n", with: "\n"))
+            }
+        }
+        #expect(keys.count > 100)
+        for key in keys.sorted() {
+            let isInCatalog = Bundle.module.localizedString(forKey: key, value: Self.missing, table: nil) != Self.missing
+            #expect(isInCatalog, "not in the catalog: \(key)")
+        }
     }
 
     /// Translators need a comment for every string, and English must be complete.

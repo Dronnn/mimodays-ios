@@ -46,8 +46,9 @@ final class BackupUITests: XCTestCase {
         XCTAssertTrue(move.waitForExistence(timeout: 60))
         attachScreenshot("E04p picker")
         move.tap()
+        // On CI each query can take half a minute while Files' picker goes away.
         let done = app.buttons["backup.done"]
-        XCTAssertTrue(done.waitForExistence(timeout: 20))
+        XCTAssertTrue(done.waitForExistence(timeout: 90))
         attachScreenshot("E04")
         done.tap()
 

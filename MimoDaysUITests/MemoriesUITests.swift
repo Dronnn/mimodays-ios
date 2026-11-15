@@ -98,18 +98,21 @@ final class MemoriesUITests: XCTestCase {
     }
 
     /// U35: Flip turns the card over to its back and round to the front again; a swipe still changes moment.
+    /// Both sides pass VoiceOver's audit (contrast is checked against the design).
     @MainActor
-    func testTheCardFlipsOverAndBackAndASwipeStillMovesOn() {
+    func testTheCardFlipsOverAndBackAndASwipeStillMovesOn() throws {
         launch(.populated)
         let tile = app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch
         XCTAssertTrue(tile.waitForExistence(timeout: 20))
         tile.tap()
         XCTAssertNotNil(onScreen("viewer.media"))
+        try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast))
         let flip = onScreen("card.flip")
         XCTAssertNotNil(flip)
         flip?.tap()
         // The front leaves VoiceOver's reach once the back faces up.
         XCTAssertNil(onScreen("viewer.media", timeout: 3), "the front is still showing")
+        try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast))
         onScreen("card.flip")?.tap()
         XCTAssertNotNil(onScreen("viewer.media"))
         app.swipeLeft()

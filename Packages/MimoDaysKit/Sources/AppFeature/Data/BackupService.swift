@@ -215,6 +215,17 @@ struct BackupService {
                 new.clipAudioRaw = clip.clipAudio
                 new.clipVolume = clip.clipVolume
                 new.includesVoiceNote = clip.includesVoiceNote
+                new.cameraLayoutRaw = clip.cameraLayout
+                new.pipFrame = clip.pipFrame
+                new.atmosphere = clip.atmosphere
+                context.insert(new)
+            }
+            for card in record.textCards ?? [] {
+                let new = MovieTextCard(id: card.id, project: project, position: card.position, text: card.text, duration: card.duration)
+                new.lookRaw = card.look
+                new.transitionRaw = card.transition
+                new.atmosphere = card.atmosphere
+                new.voiceNoteID = card.voiceNoteID
                 context.insert(new)
             }
             for track in record.audioTracks {

@@ -75,6 +75,16 @@ struct MovieStore {
             new.clipAudio = clip.clipAudio
             new.clipVolume = clip.clipVolume
             new.includesVoiceNote = clip.includesVoiceNote
+            new.cameraLayout = clip.cameraLayout
+            new.pipFrame = clip.pipFrame
+            new.atmosphere = clip.atmosphere
+            context.insert(new)
+        }
+        for card in project.textCards {
+            let new = MovieTextCard(project: copy, position: card.position, text: card.text, look: card.look, duration: card.duration)
+            new.transition = card.transition
+            new.atmosphere = card.atmosphere
+            new.voiceNoteID = card.voiceNoteID
             context.insert(new)
         }
         for track in project.audioTracks {

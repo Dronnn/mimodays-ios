@@ -12,7 +12,7 @@ public enum SchemaV1: VersionedSchema {
             Moment.self, MomentMedia.self, MomentVoiceNote.self, MomentLocation.self,
             SurpriseSchedule.self, SurprisePrompt.self,
             MomentCollection.self, CollectionMembership.self,
-            MovieProject.self, MovieClip.self, MovieAudioTrack.self,
+            MovieProject.self, MovieClip.self, MovieTextCard.self, MovieAudioTrack.self,
             ExportJob.self, BackupManifest.self, AppPreferences.self,
         ]
     }
@@ -37,6 +37,7 @@ public enum SchemaV1: VersionedSchema {
         public var tags: [String]
         public var isFavorite: Bool
         public var pipLayout: PiPLayout?
+        public var captureFormatRaw: String = CaptureFormat.portrait.rawValue
         public var createdAt: Date
         public var modifiedAt: Date
         /// Set while in Recently Deleted (kept 30 days).
@@ -79,6 +80,11 @@ public enum SchemaV1: VersionedSchema {
         public var status: MomentStatus {
             get { MomentStatus(rawValue: statusRaw) ?? .needsRepair }
             set { statusRaw = newValue.rawValue }
+        }
+
+        public var captureFormat: CaptureFormat {
+            get { CaptureFormat(rawValue: captureFormatRaw) ?? .portrait }
+            set { captureFormatRaw = newValue.rawValue }
         }
     }
 
@@ -321,6 +327,8 @@ public enum SchemaV1: VersionedSchema {
         public var updatedAt: Date
         @Relationship(deleteRule: .cascade, inverse: \MovieClip.project) public var clips: [MovieClip] = []
         @Relationship(deleteRule: .cascade, inverse: \MovieAudioTrack.project) public var audioTracks: [MovieAudioTrack] = []
+        /// U51; they share `position` with the clips.
+        @Relationship(deleteRule: .cascade, inverse: \MovieTextCard.project) public var textCards: [MovieTextCard] = []
 
         public init(
             id: UUID = UUID(), title: String, sourceRule: MovieSourceRule, aspectRatio: MovieAspectRatio,
@@ -372,6 +380,12 @@ public enum SchemaV1: VersionedSchema {
         public var clipVolume: Double
         /// F09: the moment's voice note plays over its clip.
         public var includesVoiceNote: Bool = true
+        /// U52; nil uses the layout saved with the moment.
+        public var cameraLayoutRaw: String?
+        /// U52: where the window sits and how big it is; nil keeps the moment's. The camera layout picks what's in it.
+        public var pipFrame: PiPLayout?
+        /// U53: settings for the Atmosphere transition into this clip; nil uses the defaults.
+        public var atmosphere: MovieAtmosphere?
         public var project: MovieProject?
         public var moment: Moment?
 
@@ -391,6 +405,48 @@ public enum SchemaV1: VersionedSchema {
         public var selfiePlacement: MovieSelfiePlacement? {
             get { selfiePlacementRaw.flatMap(MovieSelfiePlacement.init(rawValue:)) }
             set { selfiePlacementRaw = newValue?.rawValue }
+        }
+
+        public var transition: MovieTransition {
+            get { MovieTransition(rawValue: transitionRaw) ?? .cut }
+            set { transitionRaw = newValue.rawValue }
+        }
+
+        public var cameraLayout: ClipCameraLayout? {
+            get { cameraLayoutRaw.flatMap(ClipCameraLayout.init(rawValue:)) }
+            set { cameraLayoutRaw = newValue?.rawValue }
+        }
+    }
+
+    /// U51: a card of text before the first clip or between clips.
+    @Model
+    public final class MovieTextCard {
+        @Attribute(.unique) public var id: UUID
+        /// Shared with the clips' `position`.
+        public var position: Int
+        public var text: String
+        public var lookRaw: String
+        /// Seconds on screen.
+        public var duration: Double
+        public var transitionRaw: String = MovieTransition.cut.rawValue
+        /// Settings for the Atmosphere transition into this card; nil uses the defaults.
+        public var atmosphere: MovieAtmosphere?
+        /// A moment's voice note that plays over the card.
+        public var voiceNoteID: UUID?
+        public var project: MovieProject?
+
+        public init(id: UUID = UUID(), project: MovieProject, position: Int, text: String, look: TextCardLook = .paper, duration: Double = 3) {
+            self.id = id
+            self.project = project
+            self.position = position
+            self.text = text
+            lookRaw = look.rawValue
+            self.duration = duration
+        }
+
+        public var look: TextCardLook {
+            get { TextCardLook(rawValue: lookRaw) ?? .paper }
+            set { lookRaw = newValue.rawValue }
         }
 
         public var transition: MovieTransition {

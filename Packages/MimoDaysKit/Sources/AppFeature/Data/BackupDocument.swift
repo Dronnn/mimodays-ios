@@ -44,6 +44,8 @@ struct BackupDocument: Codable, Equatable {
         var tags: [String]
         var isFavorite: Bool
         var pipLayout: PiPLayout?
+        /// Missing in archives from before formats: portrait.
+        var captureFormat: String?
         var createdAt: Date
         var modifiedAt: Date
         var media: [MediaRecord]
@@ -124,6 +126,8 @@ struct BackupDocument: Codable, Equatable {
         var updatedAt: Date
         var clips: [ClipRecord]
         var audioTracks: [AudioTrackRecord]
+        /// Missing in archives from before text cards.
+        var textCards: [TextCardRecord]?
     }
 
     struct ClipRecord: Codable, Equatable {
@@ -137,6 +141,20 @@ struct BackupDocument: Codable, Equatable {
         var clipAudio: String
         var clipVolume: Double
         var includesVoiceNote: Bool
+        var cameraLayout: String?
+        var pipFrame: PiPLayout?
+        var atmosphere: MovieAtmosphere?
+    }
+
+    struct TextCardRecord: Codable, Equatable {
+        var id: UUID
+        var position: Int
+        var text: String
+        var look: String
+        var duration: Double
+        var transition: String
+        var atmosphere: MovieAtmosphere?
+        var voiceNoteID: UUID?
     }
 
     struct AudioTrackRecord: Codable, Equatable {
@@ -181,6 +199,7 @@ extension BackupDocument.MomentRecord {
         tags = moment.tags
         isFavorite = moment.isFavorite
         pipLayout = moment.pipLayout
+        captureFormat = moment.captureFormatRaw
         createdAt = moment.createdAt
         modifiedAt = moment.modifiedAt
         media = moment.media.sorted { $0.roleRaw < $1.roleRaw }.map {
@@ -213,6 +232,7 @@ extension BackupDocument.MomentRecord {
         moment.tags = tags
         moment.isFavorite = isFavorite
         moment.pipLayout = pipLayout
+        moment.captureFormatRaw = captureFormat ?? CaptureFormat.portrait.rawValue
         moment.modifiedAt = modifiedAt
         moment.media = media.map {
             MomentMedia(
@@ -275,7 +295,14 @@ extension BackupDocument.MovieRecord {
             return .init(
                 momentID: moment.id, position: clip.position, trimStart: clip.trimStart, trimEnd: clip.trimEnd, crop: clip.crop,
                 selfiePlacement: clip.selfiePlacementRaw, transition: clip.transitionRaw, clipAudio: clip.clipAudioRaw,
-                clipVolume: clip.clipVolume, includesVoiceNote: clip.includesVoiceNote
+                clipVolume: clip.clipVolume, includesVoiceNote: clip.includesVoiceNote, cameraLayout: clip.cameraLayoutRaw,
+                pipFrame: clip.pipFrame, atmosphere: clip.atmosphere
+            )
+        }
+        textCards = project.textCards.sorted { $0.position < $1.position }.map {
+            .init(
+                id: $0.id, position: $0.position, text: $0.text, look: $0.lookRaw, duration: $0.duration, transition: $0.transitionRaw,
+                atmosphere: $0.atmosphere, voiceNoteID: $0.voiceNoteID
             )
         }
         audioTracks = project.audioTracks.map {

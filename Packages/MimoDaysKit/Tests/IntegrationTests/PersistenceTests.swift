@@ -15,7 +15,7 @@ struct PersistenceTests {
     }
 
     @Test func schemaHoldsEveryEntityOfVersionOne() {
-        #expect(SchemaV1.models.count == 14)
+        #expect(SchemaV1.models.count == 15)
         #expect(SchemaV1.versionIdentifier == Schema.Version(1, 0, 0))
         #expect(MimoDaysMigrationPlan.schemas.count == 1)
     }
@@ -91,11 +91,58 @@ struct PersistenceTests {
         project.audioTracks.append(track)
         try context.save()
 
+        context.insert(MovieTextCard(project: project, position: 1, text: "First ride"))
+        try context.save()
+
         context.delete(project)
         try context.save()
         #expect(try context.fetchCount(FetchDescriptor<MovieClip>()) == 0)
+        #expect(try context.fetchCount(FetchDescriptor<MovieTextCard>()) == 0)
         #expect(try context.fetchCount(FetchDescriptor<MovieAudioTrack>()) == 0)
         #expect(try context.fetchCount(FetchDescriptor<Moment>()) == 1)
+    }
+
+    @Test func formatsLayoutsAtmosphereAndTextCardsReopenFromDisk() throws {
+        let url = FileManager.default.temporaryDirectory.appending(path: "\(UUID().uuidString).store")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let voiceID = UUID()
+        do {
+            let context = ModelContext(try MimoDaysStore.makeContainer(url: url))
+            let moment = makeMoment(type: .video)
+            #expect(moment.captureFormat == .portrait)
+            moment.captureFormat = .landscape
+            context.insert(moment)
+            let project = MovieProject(title: "November", sourceRule: MovieSourceRule(kind: .dateRange, start: .distantPast, end: .now), aspectRatio: .landscape16x9, length: .short)
+            context.insert(project)
+            let clip = MovieClip(project: project, moment: moment, position: 1)
+            #expect(clip.cameraLayout == nil && clip.pipFrame == nil && clip.atmosphere == nil)
+            clip.cameraLayout = .swapped
+            clip.pipFrame = PiPLayout(centerX: 0.3, centerY: 0.7, scale: 0.4)
+            clip.atmosphere = MovieAtmosphere(lead: 3, leadsWith: .voiceComment)
+            context.insert(clip)
+            let card = MovieTextCard(project: project, position: 0, text: "Lena's first ride", look: .plum, duration: 5)
+            card.voiceNoteID = voiceID
+            context.insert(card)
+            try context.save()
+        }
+
+        let context = ModelContext(try MimoDaysStore.makeContainer(url: url))
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>()).first)
+        #expect(moment.captureFormat == .landscape)
+        let project = try #require(try context.fetch(FetchDescriptor<MovieProject>()).first)
+        let clip = try #require(project.clips.first)
+        #expect(clip.cameraLayout == .swapped)
+        #expect(clip.pipFrame == PiPLayout(centerX: 0.3, centerY: 0.7, scale: 0.4))
+        #expect(clip.atmosphere == MovieAtmosphere(lead: 3, leadsWith: .voiceComment))
+        let card = try #require(project.textCards.first)
+        #expect(card.text == "Lena's first ride" && card.look == .plum && card.duration == 5 && card.position == 0)
+        #expect(card.voiceNoteID == voiceID && card.transition == .cut)
+    }
+
+    @Test func atmosphereLeadStaysWithinItsRange() {
+        #expect(MovieAtmosphere().lead == 2)
+        #expect(MovieAtmosphere(lead: 0.1).lead == 0.5)
+        #expect(MovieAtmosphere(lead: 9).lead == 5)
     }
 
     @Test func exportsLeavePlaceAndVoiceOutByDefault() {

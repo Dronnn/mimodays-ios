@@ -65,6 +65,14 @@ struct BackupTests {
             aspectRatio: .portrait9x16, fit: .fill, momentIDs: moments.prefix(3).map(\.id)
         )
         project.orderedClips[1].transition = .fade
+        moments[1].captureFormat = .square
+        project.orderedClips[2].cameraLayout = .sideBySide
+        project.orderedClips[2].pipFrame = PiPLayout(centerX: 0.25, centerY: 0.75, scale: 0.35)
+        project.orderedClips[2].atmosphere = MovieAtmosphere(lead: 2.5, leadsWith: .voiceComment)
+        let card = MovieTextCard(project: project, position: 3, text: "The end", look: .plum, duration: 5)
+        card.transition = .fade
+        card.voiceNoteID = moments[0].voiceNotes.first?.id
+        library.context.insert(card)
         let song = try library.store.store(Data(repeating: 3, count: 2_000), in: .originals, fileExtension: "m4a")
         let track = MovieAudioTrack(kind: .soundtrack, relativePath: song.relativePath, gain: 0.8)
         track.name = "Song"
@@ -129,6 +137,9 @@ struct BackupTests {
         }
         let project = try #require(try newPhone.context.fetch(FetchDescriptor<MovieProject>()).first)
         #expect(project.orderedClips.count == 3)
+        #expect(project.orderedClips[2].cameraLayout == .sideBySide)
+        #expect(project.textCards.map(\.text) == ["The end"])
+        #expect(try newPhone.context.fetch(FetchDescriptor<Moment>()).filter { $0.captureFormat == .square }.count == 1)
         #expect(project.status == .rendered)
         #expect(newPhone.store.fileExists(try #require(project.render).relativePath))
         #expect(project.audioTracks.first.map { newPhone.store.fileExists($0.relativePath) } == true)
@@ -200,6 +211,24 @@ struct BackupTests {
         let hitsAMoment = check.document.moments.contains { !Set($0.paths).isDisjoint(with: check.damaged) }
         #expect(outcome.restored == (hitsAMoment ? 2 : 3))
         #expect(outcome.damagedFiles == (hitsAMoment ? 1 : 0))
+    }
+
+    @Test func anArchiveFromBeforeFormatsAndTextCardsStillReads() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let document = BackupService(library: phone, now: { [clock] in clock.now() }).plan(includesRenders: true).document
+        let newKeys: Set<String> = ["captureFormat", "textCards", "cameraLayout", "pipFrame", "atmosphere"]
+        func strip(_ value: Any) -> Any {
+            if let object = value as? [String: Any] { return object.filter { !newKeys.contains($0.key) }.mapValues(strip) }
+            if let array = value as? [Any] { return array.map(strip) }
+            return value
+        }
+        let json = try JSONSerialization.jsonObject(with: try BackupDocument.encoder().encode(document))
+        let old = try BackupDocument.decoder().decode(BackupDocument.self, from: try JSONSerialization.data(withJSONObject: strip(json)))
+        #expect(old.moments.count == document.moments.count)
+        #expect(old.moments.allSatisfy { $0.captureFormat == nil && $0.moment(paths: [:]).captureFormat == .portrait })
+        #expect(old.movies.first?.textCards == nil)
+        #expect(old.movies.first?.clips.allSatisfy { $0.cameraLayout == nil && $0.pipFrame == nil && $0.atmosphere == nil } == true)
     }
 
     @Test func anythingElseIsNotABackup() throws {

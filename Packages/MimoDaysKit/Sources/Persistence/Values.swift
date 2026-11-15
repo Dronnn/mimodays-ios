@@ -51,7 +51,7 @@ public struct PiPLayout: Codable, Equatable, Hashable, Sendable {
 
     public var centerX: Double
     public var centerY: Double
-    /// Width as a fraction of the rear frame width.
+    /// The window's short side as a fraction of the frame's short side: its width on portrait and square, its height on landscape.
     public var scale: Double
     public var shape: Shape
     /// Degrees; the design tilts the window -5.4.
@@ -70,6 +70,16 @@ public struct PiPLayout: Codable, Equatable, Hashable, Sendable {
         self.rotation = rotation
         self.source = source
     }
+}
+
+/// The shape a moment was recorded in (U01-U07). The full sensor frame is kept; the format crops it on screen and in exports.
+public enum CaptureFormat: String, Codable, CaseIterable, Sendable {
+    /// 9:16 with the phone upright. Every moment from before formats existed.
+    case portrait
+    /// 16:9 with the phone sideways.
+    case landscape
+    /// 1:1 with the phone upright, cropped from the portrait frame.
+    case square
 }
 
 public enum SurpriseFrequency: String, Codable, CaseIterable, Sendable {
@@ -184,6 +194,46 @@ public struct MovieRender: Codable, Equatable, Hashable, Sendable {
         self.resolution = resolution
         self.byteCount = byteCount
     }
+}
+
+/// How a clip shows its two cameras in a movie (U52). A clip without one uses the layout saved with the moment.
+/// "Main" is the stream recorded full-frame, "selfie" the one recorded in the window.
+public enum ClipCameraLayout: String, Codable, CaseIterable, Sendable {
+    /// The selfie in the window over the main stream, as recorded.
+    case window
+    /// The main stream in the window over the selfie.
+    case swapped
+    case mainOnly
+    case selfieOnly
+    case sideBySide
+}
+
+/// U53 Atmosphere: the sound starts first, then the picture fades in.
+public struct MovieAtmosphere: Codable, Equatable, Hashable, Sendable {
+    public enum Lead: String, Codable, CaseIterable, Sendable {
+        case clipSound
+        case voiceComment
+    }
+
+    /// Seconds the sound may lead the picture.
+    public static let leadRange: ClosedRange<Double> = 0.5...5
+
+    /// Seconds the sound starts before the picture, within `leadRange`.
+    public var lead: Double
+    public var leadsWith: Lead
+
+    public init(lead: Double = 2, leadsWith: Lead = .clipSound) {
+        self.lead = min(max(lead, Self.leadRange.lowerBound), Self.leadRange.upperBound)
+        self.leadsWith = leadsWith
+    }
+}
+
+/// U51: how a text card looks.
+public enum TextCardLook: String, Codable, CaseIterable, Sendable {
+    case paper
+    case plum
+    /// Over the first frame of the clip after it.
+    case overClip
 }
 
 public enum ClipAudio: String, Codable, CaseIterable, Sendable {

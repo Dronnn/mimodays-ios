@@ -99,6 +99,13 @@ struct MovieStoreTests {
         project.orderedClips[0].transition = .fade
         project.orderedClips[1].selfiePlacement = .hidden
         project.orderedClips[1].trimStart = 0.5
+        project.orderedClips[1].cameraLayout = .sideBySide
+        project.orderedClips[1].pipFrame = PiPLayout(centerX: 0.2, centerY: 0.2, scale: 0.3)
+        project.orderedClips[1].atmosphere = MovieAtmosphere(lead: 1)
+        let card = MovieTextCard(project: project, position: 2, text: "The end", look: .overClip, duration: 2)
+        card.transition = .fade
+        card.voiceNoteID = UUID()
+        project.textCards.append(card)
         try movies.attach(try render("movie"), to: project)
 
         let copy = try movies.duplicate(project)
@@ -109,6 +116,13 @@ struct MovieStoreTests {
         #expect(copy.orderedClips.map(\.transition) == [.fade, .cut])
         #expect(copy.orderedClips[1].selfiePlacement == .hidden)
         #expect(copy.orderedClips[1].trimStart == 0.5)
+        #expect(copy.orderedClips[1].cameraLayout == .sideBySide)
+        #expect(copy.orderedClips[1].pipFrame == PiPLayout(centerX: 0.2, centerY: 0.2, scale: 0.3))
+        #expect(copy.orderedClips[1].atmosphere == MovieAtmosphere(lead: 1))
+        let copiedCard = try #require(copy.textCards.first)
+        #expect(copy.textCards.count == 1 && copiedCard.id != card.id)
+        #expect(copiedCard.text == "The end" && copiedCard.look == .overClip && copiedCard.duration == 2 && copiedCard.position == 2)
+        #expect(copiedCard.transition == .fade && copiedCard.voiceNoteID == card.voiceNoteID)
         #expect(copy.orderedClips.compactMap(\.moment?.id) == project.orderedClips.compactMap(\.moment?.id))
     }
 

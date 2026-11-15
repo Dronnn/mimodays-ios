@@ -143,7 +143,9 @@ struct MemoryCardFront: View {
         return content(stream)
             .frame(width: rect.width, height: rect.height)
             .clipShape(shape)
-            .overlay { shape.stroke(ColorToken.mediaFrame.color, lineWidth: 8 * share).clipShape(shape) }
+            // A fill masked by the stroke: a stroke reaches 4 pt past the frame, and VoiceOver's (and the tests')
+            // bounds of the window with it.
+            .overlay { ColorToken.mediaFrame.color.mask { shape.stroke(lineWidth: 8 * share) }.clipShape(shape) }
             .background {
                 shape
                     .fill(ColorToken.mediaFrame.color)

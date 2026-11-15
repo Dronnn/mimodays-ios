@@ -118,21 +118,23 @@ struct MomentViewerTests {
         let player = ViewerVideoPlayer(duration: 1)
         await player.load(main: items.main, selfie: items.selfie)
         #expect(player.isReady && player.hasSelfie, "main \(items.main.status.rawValue) \(String(describing: items.main.error)), selfie \(String(describing: items.selfie?.status.rawValue)) \(String(describing: items.selfie?.error))")
+        // Seeking first, while paused: a busy run can stretch the sleeps below past the clip's end, and the end
+        // rewinds both streams to the start.
+        player.seek(to: 0.1)
+        for _ in 0..<40 where abs(player.selfie.currentTime().seconds - 0.1) >= 0.02 {
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        #expect(abs(player.selfie.currentTime().seconds - 0.1) < 0.02)
+        #expect(abs(player.main.currentTime().seconds - 0.1) < 0.02)
         player.play()
         try await Task.sleep(for: .milliseconds(400))
         #expect(player.isPlaying)
         #expect(player.main.rate == 1 && player.selfie.rate == 1)
         let drift = abs(player.main.currentTime().seconds - player.selfie.currentTime().seconds)
         #expect(drift < 0.05, "drift \(drift)")
-        #expect(player.main.currentTime().seconds > 0.2)
+        #expect(player.main.currentTime().seconds > 0.3)
         player.pause()
-        player.seek(to: 0.1)
-        // A busy run can take longer than a fixed sleep to finish the seek.
-        for _ in 0..<40 where abs(player.selfie.currentTime().seconds - 0.1) >= 0.02 {
-            try await Task.sleep(for: .milliseconds(50))
-        }
-        #expect(abs(player.selfie.currentTime().seconds - 0.1) < 0.02)
-        #expect(abs(player.main.currentTime().seconds - 0.1) < 0.02)
+        #expect(player.main.rate == 0 && player.selfie.rate == 0)
         player.stop()
     }
 

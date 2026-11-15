@@ -31,10 +31,19 @@ struct CameraSnapshotTests {
     }
 
     /// The camera with every permission granted, so nothing asks the system.
-    private func screen(_ model: CameraModel, adjustsSelfie: Bool = false, windowHold: DeviceHold? = nil) -> some View {
-        CameraView(model: model, adjustsSelfie: adjustsSelfie, windowHold: windowHold, onClose: {})
+    private func screen(_ model: CameraModel, adjustsSelfie: Bool = false, windowHold: DeviceHold? = nil, last: Bool = false) -> some View {
+        CameraView(model: model, adjustsSelfie: adjustsSelfie, windowHold: windowHold, lastCapture: last ? Self.lastCapture : nil, onClose: {})
             .environment(\.permissions, PresetPermissionService(status: .granted))
     }
+
+    /// DG.1: a warm last capture, as on U01.
+    private static let lastCapture = LastCapture(
+        image: UIGraphicsImageRenderer(size: CGSize(width: 60, height: 60)).image { context in
+            UIColor(red: 0.85, green: 0.55, blue: 0.40, alpha: 1).setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 60, height: 60))
+        },
+        open: {}
+    )
 
     @Test func photo() async {
         assertScreenSnapshots(of: screen(await camera()))
@@ -45,7 +54,7 @@ struct CameraSnapshotTests {
     }
 
     @Test func videoIdle() async {
-        assertScreenSnapshots(of: screen(await camera(mode: .video)), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: screen(await camera(mode: .video), last: true), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     /// 7.5 s into a 10 s clip: "00:07 / 00:10".
@@ -57,17 +66,17 @@ struct CameraSnapshotTests {
 
     /// U02: 1:1, phone upright.
     @Test func square() async {
-        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .square)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .square), last: true), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
     /// U03: 16:9 picked with the phone upright: the shape, the hint and the dimmed shutter with its reason.
     @Test func landscapePickedUpright() async {
-        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .landscape)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .landscape), last: true), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
     /// U04: 16:9 with the top of the phone to the left: the layout turned, the window on its side.
     @Test func landscapeSideways() async {
-        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .landscape, hold: .landscapeLeft)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .light, rightToLeft: true)])
+        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .landscape, hold: .landscapeLeft), last: true), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .light, rightToLeft: true)])
     }
 
     /// The top to the right: the shutter's column stays on the phone's bottom edge, so the design is mirrored.
@@ -84,7 +93,7 @@ struct CameraSnapshotTests {
 
     /// U06: 9:16 picked with the phone sideways: the 9:16 shape, the hint and the reason in the column.
     @Test func portraitPickedSideways() async {
-        assertScreenSnapshots(of: screen(await camera(mode: .video, hold: .landscapeLeft)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+        assertScreenSnapshots(of: screen(await camera(mode: .video, hold: .landscapeLeft), last: true), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
     /// iPad: the window turns with the device, so the camera lays its sideways design out as it is (Andrew, 2026-11-15).

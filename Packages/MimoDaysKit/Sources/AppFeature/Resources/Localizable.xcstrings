@@ -1111,18 +1111,6 @@
         }
       }
     },
-    "1:1 records upright" : {
-      "comment" : "Camera (U06): under 'Turn your phone upright' when the square format is picked",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1:1 records upright"
-          }
-        }
-      }
-    },
     "1:1 · Square" : {
       "comment" : "New movie (F04): square shape option",
       "extractionState" : "manual",
@@ -1183,14 +1171,14 @@
         }
       }
     },
-    "9:16 records upright" : {
+    "9:16 and 1:1 record upright" : {
       "comment" : "Camera (U06): under 'Turn your phone upright'",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "9:16 records upright"
+            "value" : "9:16 and 1:1 record upright"
           }
         }
       }
@@ -2379,6 +2367,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clear temporary files"
+          }
+        }
+      }
+    },
+    "Last moment" : {
+      "comment" : "Camera (U01): VoiceOver label of the last capture's thumbnail, which opens it",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last moment"
           }
         }
       }

@@ -3,6 +3,7 @@ import DesignSystem
 import Foundation
 import Observation
 import Persistence
+import SwiftUI
 
 public enum MainTab: String, CaseIterable, Hashable, Sendable {
     case today
@@ -75,6 +76,8 @@ public final class AppRouter {
     public var newMovie: NewMovieRequest?
     /// What's pushed on Movies.
     var moviesPath: [MovieRoute] = []
+    /// What's pushed on Today (the camera's last capture opens there).
+    var todayPath = NavigationPath()
 
     public init(selectedTab: MainTab = .today) {
         self.selectedTab = selectedTab

@@ -430,12 +430,7 @@ struct TodayView: View {
 
     // MARK: Helpers
 
-    /// The latest moment, then this month's: what Today shows, to swipe through.
-    private func pager(from id: UUID) -> MomentPager {
-        var ids = model.latest.map { [$0.id] } ?? []
-        ids += model.month.map(\.id).filter { !ids.contains($0) }
-        return MomentPager(ids: ids, start: id, origin: .today)
-    }
+    private func pager(from id: UUID) -> MomentPager { model.pager(from: id) }
 
     private func media(_ path: String?, _ size: Int) -> HeroMedia {
         model.image(path, size).map { .image(Image(uiImage: $0)) } ?? .placeholder

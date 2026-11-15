@@ -118,6 +118,13 @@ final class TodayModel {
         return Text("Day and time: \(Text(time.instant, format: day)) · \(Text(time.instant, format: clock))", bundle: .module)
     }
 
+    /// The latest moment, then this month's: what Today shows, to swipe through.
+    func pager(from id: UUID) -> MomentPager {
+        var ids = latest.map { [$0.id] } ?? []
+        ids += month.map(\.id).filter { !ids.contains($0) }
+        return MomentPager(ids: ids, start: id, origin: .today)
+    }
+
     func image(_ path: String?, _ maxPixelSize: Int) -> UIImage? {
         path.flatMap { images[ImageKey(path: $0, maxPixelSize: maxPixelSize)] }
     }

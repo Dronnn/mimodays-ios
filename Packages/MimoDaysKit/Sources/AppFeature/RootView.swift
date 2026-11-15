@@ -146,6 +146,7 @@ public struct RootView: View {
         router.capture = nil
         router.newMovie = nil
         router.moviesPath = []
+        router.todayPath = NavigationPath()
         router.selectedTab = .today
         home.reset()
         memories.refresh()
@@ -182,6 +183,19 @@ public struct RootView: View {
         Task { await surprises.refresh() }
     }
 
+    /// DG.1: the latest moment for the camera's thumbnail; a tap closes the camera and opens it on Today.
+    private var lastCapture: LastCapture? {
+        guard let latest = today.latest else { return nil }
+        let image = today.image(latest.thumbnailPath, TodayModel.tilePixels) ?? today.image(latest.mainPath, TodayModel.heroPixels)
+        return LastCapture(image: image) { [router, today] in
+            router.capture = nil
+            router.selectedTab = .today
+            var path = NavigationPath()
+            path.append(MemoriesRoute.moment(today.pager(from: latest.id)))
+            router.todayPath = path
+        }
+    }
+
     private var tabs: some View {
         @Bindable var router = router
         return TabView(selection: $router.selectedTab) {
@@ -190,16 +204,19 @@ public struct RootView: View {
                     if tab == .movies {
                         // Movies' screens are opened from outside the tab too (a new movie, its export's Done).
                         NavigationStack(path: $router.moviesPath) { MoviesScreen() }
+                    } else if tab == .today {
+                        // The camera's last capture opens on Today.
+                        NavigationStack(path: $router.todayPath) { HomeView(today: today, mosaic: mosaic) }
+                            .environment(\.mosaicZoom, mosaicZoom)
                     } else {
                         NavigationStack {
                             switch tab {
-                            case .today: HomeView(today: today, mosaic: mosaic)
                             case .memories: MemoriesView(model: memories)
                             case .map: MapScreen()
-                            case .movies: EmptyView()
+                            case .today, .movies: EmptyView()
                             }
                         }
-                        .environment(\.mosaicZoom, tab == .today ? mosaicZoom : nil)
+                        .environment(\.mosaicZoom, nil)
                     }
                 } label: {
                     Label { Text(tab.title) } icon: { tab.icon.image }
@@ -213,7 +230,7 @@ public struct RootView: View {
             SettingsScreen(surprises: surprises)
         }
         .fullScreenCover(item: $router.capture) { request in
-            CaptureFlowView(request: request) { saved in
+            CaptureFlowView(request: request, lastCapture: lastCapture) { saved in
                 if let promptID = saved.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
                 showsSavedToast = true
             }
@@ -237,6 +254,7 @@ public struct RootView: View {
 /// Camera access first (C06 explainer → system prompt, or C13a when it's off), then the camera, then review (C07).
 struct CaptureFlowView: View {
     let request: CaptureRequest
+    var lastCapture: LastCapture?
     /// After the save, before the flow closes.
     var onSaved: @MainActor (SavedCapture) -> Void = { _ in }
     @Environment(\.permissions) private var permissions
@@ -274,7 +292,7 @@ struct CaptureFlowView: View {
                         try await save(review)
                     }
                 } else if let camera {
-                    CameraView(model: camera) { dismiss() }
+                    CameraView(model: camera, lastCapture: lastCapture) { dismiss() }
                 } else {
                     CameraPalette.background.ignoresSafeArea()
                 }

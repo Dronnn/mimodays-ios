@@ -205,6 +205,14 @@ struct CameraChrome {
             return box(CGPoint(x: x, y: Self.shutterLine), CGSize(width: side, height: side))
         }
 
+        /// U01: the last capture, across the shutter from the flip button; sideways at the top of the column (U04, U06).
+        var lastCapture: CGRect {
+            let side: CGFloat = 52
+            if sideways { return box(CGPoint(x: line, y: 50), CGSize(width: side, height: side)) }
+            let x = isRightToLeft ? size.width - 60 : 60
+            return box(CGPoint(x: x, y: Self.shutterLine), CGSize(width: side, height: side))
+        }
+
         /// C03 "Tap to stop", upright only: sideways the column has no room (U05).
         var tapToStop: CGRect {
             CGRect(x: 0, y: 16, width: size.width, height: 28)

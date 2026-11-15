@@ -147,13 +147,12 @@ struct RotateHint: View {
     private func body(_ format: CaptureFormat) -> Text {
         switch format {
         case .landscape: Text("16:9 records in landscape", bundle: .module, comment: "Camera (U03): under 'Turn your phone sideways'")
-        case .portrait: Text("9:16 records upright", bundle: .module, comment: "Camera (U06): under 'Turn your phone upright'")
-        case .square: Text("1:1 records upright", bundle: .module, comment: "Camera (U06): under 'Turn your phone upright' when the square format is picked")
+        case .portrait, .square: Text("9:16 and 1:1 record upright", bundle: .module, comment: "Camera (U06): under 'Turn your phone upright'")
         }
     }
 }
 
-/// `Glyph / Rotate to landscape` (and its mirror for upright): the phone in both positions and a coral turn arrow.
+/// `Glyph / Rotate to landscape` (and its mirror for upright): the phone now (dashed), where it goes, and a coral turn arrow.
 private struct RotateGlyph: View {
     let toLandscape: Bool
 
@@ -165,7 +164,8 @@ private struct RotateGlyph: View {
             }
             let from = toLandscape ? rect(8, 5, 22, 38) : rect(18, 35, 40, 22)
             let to = toLandscape ? rect(18, 35, 40, 22) : rect(8, 5, 22, 38)
-            context.stroke(from, with: .color(CameraPalette.cream.opacity(0.45)), lineWidth: 3 * scale)
+            // Where the phone is now, dashed; where it goes, solid.
+            context.stroke(from, with: .color(CameraPalette.cream.opacity(0.6)), style: StrokeStyle(lineWidth: 2.5 * scale, lineCap: .round, dash: [2 * scale, 4 * scale]))
             context.stroke(to, with: .color(CameraPalette.cream), lineWidth: 3 * scale)
             var arrow = Path()
             arrow.move(to: CGPoint(x: 38 * scale, y: 7 * scale))

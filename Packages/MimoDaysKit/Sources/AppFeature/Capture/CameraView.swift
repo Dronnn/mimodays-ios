@@ -8,6 +8,8 @@ import SwiftUI
 struct CameraView: View {
     @State var model: CameraModel
     let onClose: () -> Void
+    /// U01: the latest moment, bottom left; nil before the first one.
+    let lastCapture: LastCapture?
     @State private var showsSettings = false
     /// C04: the selfie window sheet is open.
     @State private var adjustsSelfie: Bool
@@ -26,8 +28,9 @@ struct CameraView: View {
     /// Snapshots set the window's turn; the app reads it from the scene.
     private let fixedWindowHold: DeviceHold?
 
-    init(model: CameraModel, adjustsSelfie: Bool = false, windowHold: DeviceHold? = nil, onClose: @escaping () -> Void) {
+    init(model: CameraModel, adjustsSelfie: Bool = false, windowHold: DeviceHold? = nil, lastCapture: LastCapture? = nil, onClose: @escaping () -> Void) {
         _model = State(initialValue: model)
+        self.lastCapture = lastCapture
         _adjustsSelfie = State(initialValue: adjustsSelfie)
         _windowHold = State(initialValue: windowHold ?? .upright)
         fixedWindowHold = windowHold
@@ -142,7 +145,8 @@ struct CameraView: View {
     private func overPreview(_ turn: CameraTurn, _ chrome: CameraChrome, shape: CGRect, windowArea: CGRect, insideShape: Bool) -> some View {
         let direction = layoutDirection
         return ZStack {
-            if let selfie = model.selfiePosition {
+            // U03/U06: while the phone is held the wrong way the hint has the preview to itself.
+            if let selfie = model.selfiePosition, !model.needsRotation {
                 let chipBottom = model.isSurprise ? chipHeight.map { chrome.surpriseChip.minY + $0 } : nil
                 AdjustableSelfieWindow(
                     placement: $model.settings.selfieWindow, showsSheet: $adjustsSelfie,
@@ -259,7 +263,10 @@ struct CameraView: View {
                         .opacity(model.needsRotation ? 0.35 : 1)
                         .accessibilityHint(model.needsRotation ? rotateHint : Text(verbatim: ""))
                         .turned(bar.shutter(84), turn, direction: direction)
-                    // Last capture thumbnail arrives with saved moments (Phase 7).
+                    if let lastCapture {
+                        LastCaptureButton(capture: lastCapture)
+                            .turned(bar.lastCapture, turn, direction: direction)
+                    }
                     FlipButton { Task { await model.flip() } }
                         .turned(bar.flip, turn, direction: direction)
                     if model.needsRotation {
@@ -307,6 +314,36 @@ private struct RoundButton: View {
         .accessibilityLabel(label)
         .accessibilityValue(isOn.map { $0 ? Text("On", bundle: .module) : Text("Off", bundle: .module) } ?? Text(verbatim: ""))
         .accessibilityIdentifier(id)
+    }
+}
+
+/// The latest moment and how to open it (DG.1).
+struct LastCapture {
+    var image: UIImage?
+    var open: () -> Void
+}
+
+/// U01: the last moment in an uneven cream frame; a tap closes the camera and opens it.
+private struct LastCaptureButton: View {
+    let capture: LastCapture
+
+    var body: some View {
+        Button(action: capture.open) {
+            ZStack {
+                CameraPalette.cream.opacity(0.16)
+                if let image = capture.image {
+                    Image(uiImage: image).resizable().scaledToFill()
+                }
+            }
+            .frame(width: 50, height: 50)
+            .clipShape(ThumbnailBlob())
+            .overlay { ThumbnailBlob().stroke(CameraPalette.cream, lineWidth: 2) }
+            .frame(width: Size.minimumTapTarget + 8, height: Size.minimumTapTarget + 8)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Last moment", bundle: .module, comment: "Camera (U01): VoiceOver label of the last capture's thumbnail, which opens it"))
+        .accessibilityIdentifier("camera.lastCapture")
     }
 }
 

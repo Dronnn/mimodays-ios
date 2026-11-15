@@ -44,7 +44,7 @@ struct SurpriseSettingsView: View {
                     .padding(.top, 20)
                     DataCard {
                         Button { pausing = true } label: {
-                            valueRow(Text("Pause surprises", bundle: .module), value: pauseValue)
+                            SettingsValueRow(title: Text("Pause surprises", bundle: .module), value: pauseValue)
                         }
                         .disabled(!model.surprisesOn)
                         .accessibilityIdentifier("surprises.pause")
@@ -88,23 +88,9 @@ struct SurpriseSettingsView: View {
                 Text("Time to catch it", bundle: .module)
             }
         } label: {
-            valueRow(Text("Time to catch it", bundle: .module), value: Text(Self.minutes(model.expiryMinutes)))
+            SettingsValueRow(title: Text("Time to catch it", bundle: .module), value: Text(Self.minutes(model.expiryMinutes)))
         }
         .accessibilityIdentifier("surprises.expiry")
-    }
-
-    private func valueRow(_ title: Text, value: Text) -> some View {
-        HStack(spacing: 6) {
-            title.textStyle(.rowTitle).foregroundStyle(ColorToken.textPrimary.color)
-            Spacer(minLength: 8)
-            value.textStyle(.rowDetail).foregroundStyle(ColorToken.textTertiary.color)
-            DataChevron()
-        }
-        .padding(.leading, 16)
-        .padding(.trailing, 14)
-        .frame(minHeight: Size.rowHeight)
-        .contentShape(Rectangle())
-        .accessibilityElement(children: .combine)
     }
 
     private func sectionLabel(_ text: Text) -> some View {

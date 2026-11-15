@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// Settings: S01 and S02.
+/// Settings: S01, S02 and S03.
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct SettingsSnapshotTests {
@@ -61,5 +61,13 @@ struct SettingsSnapshotTests {
     @Test func surprisesWithoutNotifications() async {
         let model = await model(notifications: .denied)
         assertScreenSnapshots(of: page(SurpriseSettingsView(model: model)), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// S03.
+    @Test func camera() {
+        var settings = CameraSettings()
+        assertScreenSnapshots(
+            of: page(CameraSettingsView(settings: Binding { settings } set: { settings = $0 }, access: .allowed)), variants: variants
+        )
     }
 }

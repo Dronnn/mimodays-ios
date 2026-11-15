@@ -6,6 +6,7 @@ import SwiftUI
 /// Where S01's rows lead.
 enum SettingsRoute: Hashable {
     case surprises
+    case camera
 }
 
 /// The Settings sheet: S01 and everything under it.
@@ -34,6 +35,7 @@ private struct SettingsHost: View {
                 .navigationDestination(for: SettingsRoute.self) { route in
                     switch route {
                     case .surprises: SurpriseSettingsView(model: model).toolbar(.hidden, for: .navigationBar)
+                    case .camera: CameraSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     }
                 }
                 .navigationDestination(for: DataRoute.self) { route in
@@ -81,6 +83,8 @@ struct SettingsView: View {
                         .padding(.bottom, -3)
                     DataCard {
                         link(SettingsRoute.surprises, .glyphBell, Text("Surprises", bundle: .module), value: surprisesValue, id: "settings.surprises")
+                        DataSeparator(leading: 64)
+                        link(SettingsRoute.camera, .glyphCamera, Text("Camera", bundle: .module), id: "settings.camera")
                     }
                     DataCard {
                         link(DataRoute.storage, .glyphFolder, Text("Storage", bundle: .module), value: model.storageBytes.map { Text(StorageView.bytes($0)) }, id: "settings.storage")

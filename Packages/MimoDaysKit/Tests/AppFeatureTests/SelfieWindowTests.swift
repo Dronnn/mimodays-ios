@@ -85,6 +85,18 @@ struct SelfieWindowSettingsTests {
         #expect(UserDefaultsCameraSettingsStore(defaults: defaults).load().selfieWindow == .init(corner: .bottomLeft, scale: .large))
     }
 
+    /// S03 added the video quality: settings saved before it keep everything else and get 1080p.
+    @Test func settingsSavedBeforeVideoQualityStillLoad() throws {
+        let defaults = try #require(UserDefaults(suiteName: "CameraSettingsUpgradeTests"))
+        defaults.removePersistentDomain(forName: "CameraSettingsUpgradeTests")
+        let saved = #"{"opensIn":"video","videoLength":30,"recordsSound":false,"cameraSounds":true,"selfieWindow":{"corner":"bottomLeft","scale":"small"}}"#
+        defaults.set(Data(saved.utf8), forKey: "cameraSettings")
+        let settings = UserDefaultsCameraSettingsStore(defaults: defaults).load()
+        #expect(settings.opensIn == .video && settings.videoLength == .medium && !settings.recordsSound && settings.cameraSounds)
+        #expect(settings.selfieWindow == .init(corner: .bottomLeft, scale: .small))
+        #expect(settings.videoQuality == .hd1080)
+    }
+
     @Test func theCameraKeepsWhatTheUserChose() async {
         let store = InMemoryCameraSettingsStore()
         let model = CameraModel(

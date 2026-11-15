@@ -18,6 +18,19 @@ struct CameraSettings: Codable, Equatable, Sendable {
         var duration: Duration { .seconds(rawValue) }
     }
 
+    /// The largest video format the camera may use. Two cameras at once never get more than 1080p.
+    enum VideoQuality: String, Codable, CaseIterable, Sendable {
+        case hd720
+        case hd1080
+
+        var maxFormatWidth: Int32 {
+            switch self {
+            case .hd720: 1280
+            case .hd1080: 1920
+            }
+        }
+    }
+
     /// Where the selfie window sits and how big it is (C04). Medium in the top right by default.
     struct SelfieWindow: Codable, Equatable, Sendable {
         enum Corner: String, Codable, CaseIterable, Sendable {
@@ -51,9 +64,23 @@ struct CameraSettings: Codable, Equatable, Sendable {
 
     var opensIn = Mode.photo
     var videoLength = VideoLength.short
+    var videoQuality = VideoQuality.hd1080
     var recordsSound = true
     var cameraSounds = false
     var selfieWindow = SelfieWindow()
+
+    init() {}
+
+    /// Settings saved by an earlier version lack the newer keys; those keep their defaults.
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        opensIn = try container.decodeIfPresent(Mode.self, forKey: .opensIn) ?? opensIn
+        videoLength = try container.decodeIfPresent(VideoLength.self, forKey: .videoLength) ?? videoLength
+        videoQuality = try container.decodeIfPresent(VideoQuality.self, forKey: .videoQuality) ?? videoQuality
+        recordsSound = try container.decodeIfPresent(Bool.self, forKey: .recordsSound) ?? recordsSound
+        cameraSounds = try container.decodeIfPresent(Bool.self, forKey: .cameraSounds) ?? cameraSounds
+        selfieWindow = try container.decodeIfPresent(SelfieWindow.self, forKey: .selfieWindow) ?? selfieWindow
+    }
 }
 
 @MainActor

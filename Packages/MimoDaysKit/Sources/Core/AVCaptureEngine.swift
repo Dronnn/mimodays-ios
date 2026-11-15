@@ -10,6 +10,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private let queue = DispatchQueue(label: "MimoDays.capture")
     private let session: AVCaptureSession
     private let isMultiCam: Bool
+    /// The video quality setting: no camera format wider than this.
+    private let maxFormatWidth: Int32
     private let previews: [CameraPosition: AVCaptureVideoPreviewLayer]
 
     // Touched on `queue` only.
@@ -35,10 +37,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     }
 
     @MainActor
-    public init() {
+    public init(maxFormatWidth: Int32 = CapturePressurePolicy.dualFormatWidths[0]) {
         let isMultiCam = AVCaptureMultiCamSession.isMultiCamSupported
         let session = isMultiCam ? AVCaptureMultiCamSession() : AVCaptureSession()
         self.isMultiCam = isMultiCam
+        self.maxFormatWidth = maxFormatWidth
         self.session = session
         (events, eventSink) = AsyncStream.makeStream()
         previews = Dictionary(uniqueKeysWithValues: CameraPosition.allCases.map { position in
@@ -125,9 +128,9 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             defer { self.session.commitConfiguration() }
             self.removeCamera(position)
             do {
-                try self.addCamera(position.other)
+                try self.addCamera(position.other, formatWidth: self.maxFormatWidth)
             } catch {
-                try? self.addCamera(position)
+                try? self.addCamera(position, formatWidth: self.maxFormatWidth)
                 throw error
             }
             self.setup = flipped
@@ -265,7 +268,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             try configure(.single(.back), formatWidth: nil)
             return .single(.back)
         }
-        for width in CapturePressurePolicy.dualFormatWidths {
+        for width in CapturePressurePolicy.dualFormatWidths where width <= maxFormatWidth {
             try configure(.dual, formatWidth: width)
             if multiCam.hardwareCost <= 1 {
                 for frameRate in [30, 24, 15] where multiCam.systemPressureCost > 1 {
@@ -275,14 +278,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             }
             removeAllCameras()
         }
-        try configure(.single(.back), formatWidth: CapturePressurePolicy.dualFormatWidths[0])
+        try configure(.single(.back), formatWidth: maxFormatWidth)
         return .single(.back)
     }
 
     private func configure(_ setup: CameraSetup, formatWidth: Int32?) throws {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
-        if !isMultiCam { session.sessionPreset = .high }
+        if !isMultiCam { session.sessionPreset = maxFormatWidth < 1920 ? .hd1280x720 : .high }
         do {
             for position in setup.positions { try addCamera(position, formatWidth: formatWidth) }
         } catch {
@@ -332,7 +335,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         eventSink.yield(.setupChanged(.single(.back)))
     }
 
-    private func addCamera(_ position: CameraPosition, formatWidth: Int32? = CapturePressurePolicy.dualFormatWidths[0]) throws {
+    private func addCamera(_ position: CameraPosition, formatWidth: Int32?) throws {
         let avPosition: AVCaptureDevice.Position = position == .back ? .back : .front
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: avPosition) else {
             throw CaptureError.cameraUnavailable

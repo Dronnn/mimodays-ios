@@ -120,7 +120,8 @@ struct LocalizationTests {
         "Keep the place from Photos", "city level", "Already in MimoDays", "%lld skipped", "Some files couldn't be imported",
         "The others are in Memories. Try the rest again from Photos.",
         // Settings (Phase 13); the plain Text keys are found by the source scan.
-        "Not before", "Not after", "Until %@",
+        "Not before", "Not after", "Until %@", "Selfie window size in a phrase: small",
+        "Selfie window size in a phrase: medium", "Selfie window size in a phrase: large",
     ]
 
     private static var resourceKeys: [String] {

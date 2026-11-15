@@ -45,9 +45,12 @@ public final class AppDependencies {
         #else
         let simulatedCamera = configuration.usesFakeCamera
         #endif
+        let cameraSettings: any CameraSettingsStore = configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore()
         camera = CameraServices(
-            makeEngine: { @MainActor () -> any CaptureEngine in simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine() },
-            settings: configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore(),
+            makeEngine: { @MainActor () -> any CaptureEngine in
+                simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine(maxFormatWidth: cameraSettings.load().videoQuality.maxFormatWidth)
+            },
+            settings: cameraSettings,
             drafts: ReviewDraftStore(root: Self.reviewRoot(configuration)),
             voice: Self.voice(simulated: simulatedCamera),
             // UI tests fake the location permission, so the fix and the lookups are faked too.

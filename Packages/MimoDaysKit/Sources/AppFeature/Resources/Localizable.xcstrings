@@ -1387,6 +1387,18 @@
         }
       }
     },
+    "Allowed" : {
+      "comment" : "Camera settings (S03): Permissions value, camera and microphone are allowed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allowed"
+          }
+        }
+      }
+    },
     "Already in MimoDays" : {
       "comment" : "Import from Photos (E05) row: picked files that are already moments",
       "extractionState" : "manual",
@@ -1688,13 +1700,25 @@
       }
     },
     "Camera" : {
-      "comment" : "Camera settings sheet: title",
+      "comment" : "Camera settings: the camera's settings sheet title, the Settings (S01) row and the title of its screen (S03)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Camera"
+          }
+        }
+      }
+    },
+    "Camera only" : {
+      "comment" : "Camera settings (S03): Permissions value, the camera is allowed but the microphone is not",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera only"
           }
         }
       }
@@ -2103,6 +2127,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copies saved to Photos or Files stay there."
+          }
+        }
+      }
+    },
+    "Corner" : {
+      "comment" : "Camera settings (S03): selfie window menu section, which corner the window sits in",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corner"
           }
         }
       }
@@ -4267,6 +4303,18 @@
         }
       }
     },
+    "Not asked yet" : {
+      "comment" : "Camera settings (S03): Permissions value, MimoDays hasn't asked for the camera yet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not asked yet"
+          }
+        }
+      }
+    },
     "Not before" : {
       "comment" : "Surprise settings (S02): the earliest time a surprise may come",
       "extractionState" : "manual",
@@ -4687,6 +4735,18 @@
         }
       }
     },
+    "Opens iOS Settings for MimoDays." : {
+      "comment" : "Camera settings (S03): note under the Permissions row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens iOS Settings for MimoDays."
+          }
+        }
+      }
+    },
     "Opens in" : {
       "comment" : "Camera settings: section title, which mode the camera opens in (Photo/Video)",
       "extractionState" : "manual",
@@ -4803,6 +4863,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pauses the video"
+          }
+        }
+      }
+    },
+    "Permissions" : {
+      "comment" : "Camera settings (S03): row that opens iOS Settings for camera and microphone access",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissions"
           }
         }
       }
@@ -5876,7 +5948,7 @@
       }
     },
     "Selfie window" : {
-      "comment" : "Camera (C01): accessibility label of the button that shows or hides the front-camera window",
+      "comment" : "Camera (C01): accessibility label of the button that shows or hides the front-camera window; also the camera settings (S03) row for where the window sits and how big it is",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -5895,6 +5967,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Selfie window for this clip"
+          }
+        }
+      }
+    },
+    "Selfie window size in a phrase: large" : {
+      "comment" : "Camera settings (S03): selfie window size inside a phrase, e.g. Top right, large",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "large"
+          }
+        }
+      }
+    },
+    "Selfie window size in a phrase: medium" : {
+      "comment" : "Camera settings (S03): selfie window size inside a phrase, e.g. Top right, medium",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "medium"
+          }
+        }
+      }
+    },
+    "Selfie window size in a phrase: small" : {
+      "comment" : "Camera settings (S03): selfie window size inside a phrase, e.g. Top right, small",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "small"
           }
         }
       }
@@ -6159,6 +6267,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shows the whole year"
+          }
+        }
+      }
+    },
+    "Size" : {
+      "comment" : "Camera settings (S03): selfie window menu section, how big the window is",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
           }
         }
       }
@@ -7623,6 +7743,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Video length"
+          }
+        }
+      }
+    },
+    "Video quality" : {
+      "comment" : "Camera settings (S03): row and menu title for the video resolution (720p or 1080p)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video quality"
           }
         }
       }

@@ -16,7 +16,7 @@ struct DataSeparator: View {
     var leading: CGFloat = 16
 
     var body: some View {
-        ColorToken.separator.color.opacity(0.12).frame(height: 1).padding(.leading, leading)
+        ColorToken.separator.color.frame(height: 1).padding(.leading, leading)
     }
 }
 

@@ -253,4 +253,78 @@ struct MovieEditorModelTests {
         #expect(copy.showsTitle == false)
         #expect(copy.voiceNoteLevel == 0.3)
     }
+
+    // MARK: U50-U54
+
+    @Test func aCardGoesInFirstMovesBetweenClipsAndUndoes() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        model.addCard()
+        #expect(model.items.count == 3 && model.selectedCard != nil && model.selected == 0)
+        #expect(model.plan.clips.map(\.isCard) == [true, false, false])
+        model.move(from: 0, to: 1)
+        #expect(model.items[1].card != nil)
+        #expect(model.plan.clips.map(\.isCard) == [false, true, false])
+        #expect(order(model) == ids)
+        model.undo()
+        #expect(model.items[0].card != nil)
+        model.undo()
+        #expect(model.items.count == 2 && model.project.textCards.isEmpty)
+    }
+
+    @Test func aCardsWordsLookAndLengthAreKept() async throws {
+        let ids = try await save(1)
+        let model = try editor(ids)
+        model.addCard()
+        model.setCardText(String(repeating: "a", count: 80))
+        #expect(model.selectedCard?.text.count == MovieEditorModel.cardLimit)
+        model.setCardText("   ")
+        #expect(model.selectedCard?.text.count == MovieEditorModel.cardLimit, "blank words are ignored")
+        model.setCardLook(.plum)
+        model.setCardDuration(5)
+        #expect(model.plan.clips[0].duration == 5)
+        guard case let .card(text, look) = model.plan.clips[0].media else { Issue.record("not a card"); return }
+        #expect(text.count == MovieEditorModel.cardLimit && look == .plum)
+        #expect(model.canRemove, "a card can go even with one clip")
+        model.remove()
+        #expect(model.items.count == 1 && model.project.textCards.isEmpty)
+    }
+
+    @Test func theTransitionDotAndAtmosphereAreKept() async throws {
+        let ids = try await save(3)
+        let model = try editor(ids)
+        model.setTransition(.atmosphere, at: 2)
+        model.setAtmosphere(MovieAtmosphere(lead: 1, leadsWith: .voiceComment), at: 2)
+        #expect(model.transition(at: 2) == .atmosphere)
+        #expect(model.atmosphere(at: 2) == MovieAtmosphere(lead: 1, leadsWith: .voiceComment))
+        #expect(model.plan.clips[2].lead == 1)
+        model.undo()
+        #expect(model.atmosphere(at: 2) == MovieAtmosphere())
+        model.undo()
+        #expect(model.transition(at: 2) == .cut && model.plan.clips[2].lead == nil)
+    }
+
+    @Test func camerasWindowAndSoundArePerClip() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        model.select(1)
+        model.setCameraLayout(.sideBySide)
+        #expect(model.plan.clips[1].layout == .sideBySide && model.plan.clips[0].layout == nil)
+        model.setPlacement(.topLeft)
+        let frame = PiPLayout(centerX: 0.3, centerY: 0.7, scale: 0.35)
+        model.setWindow(frame)
+        #expect(model.clips[1].pipFrame == frame && model.clips[1].selfiePlacement == nil)
+        #expect(model.plan.clips[1].window == frame)
+        #expect(model.clips[1].cameraLayout == .sideBySide, "a chosen layout stays")
+        model.setClipSound(false)
+        #expect(!model.plan.clips[1].soundOn)
+        model.beginLevelChange()
+        model.setClipVolume(1.4)
+        #expect(model.clips[1].clipVolume == 1)
+        model.setClipVolume(0.4)
+        model.endLevelChange()
+        #expect(model.plan.clips[1].volume == 0.4)
+        for _ in 0..<5 { model.undo() }
+        #expect(model.clips[1].cameraLayout == nil && model.clips[1].pipFrame == nil && model.clips[1].clipAudio != .muted)
+    }
 }

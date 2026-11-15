@@ -2,32 +2,57 @@ import Core
 import CoreGraphics
 import Foundation
 import Persistence
+import SwiftData
 
-/// A movie as the composer plays it: every clip still in the project, with its files, timing and overlays (11.7).
-/// Read from the store on the main actor, then composed anywhere.
+/// A movie as the composer plays it: every clip still in the project and its text cards (U51) in play order, with
+/// their files, timing and overlays (11.7). Read from the store on the main actor, then composed anywhere; the editor's
+/// stage and the exporter compose the same plan, so the preview is the export.
 struct MoviePlan: Sendable, Equatable {
     struct Clip: Sendable, Equatable {
         enum Media: Sendable, Equatable {
             case photo
             /// `start` seconds into the main stream; the selfie stream started `selfieOffset` later than it.
             case video(start: Double, selfieOffset: Double, hasAudio: Bool)
+            /// U51: words on paper or plum, or over the first frame of the clip after it.
+            case card(text: String, look: TextCardLook)
         }
 
+        /// The moment's id; a text card's own id.
         var momentID: UUID
         var media: Media
-        var mainURL: URL
+        /// Nil for a text card.
+        var mainURL: URL?
         var selfieURL: URL?
-        /// The selfie window where it was recorded, relative to the main picture; nil without a selfie.
+        /// The selfie window: where it was recorded, or where it was put in the editor (U52), relative to the main
+        /// picture; nil without a selfie.
         var window: PiPLayout?
         /// F07's override; nil keeps the recorded spot.
         var placement: MovieSelfiePlacement?
+        /// U52: which camera goes where; nil is the window as recorded.
+        var layout: ClipCameraLayout?
         var duration: Double
         /// How this clip comes in after the one before.
         var transition: MovieTransition
+        /// U53, with `.atmosphere`: how long the sound leads and which.
+        var atmosphere: MovieAtmosphere?
         /// "Wed, Oct 7 · Oakland" (F08), nil when neither is shown.
         var caption: String?
         var voiceURL: URL?
         var soundOn: Bool
+        /// U52: this clip's own sound, 0...1, on top of the movie's level.
+        var volume: Double = 1
+        /// The main picture's upright size in pixels: where the window goes on the stage (U52).
+        var pictureSize: CGSize?
+
+        var isCard: Bool {
+            if case .card = media { true } else { false }
+        }
+
+        /// U53: seconds of sound before the picture, never more than half the item.
+        var lead: Double? {
+            guard transition == .atmosphere else { return nil }
+            return min(atmosphere?.lead ?? MovieAtmosphere().lead, duration / 2)
+        }
     }
 
     /// The person's own audio file (F09), played from the start at `gain`, fading in and out.
@@ -62,10 +87,14 @@ struct MoviePlan: Sendable, Equatable {
         music = project.audioTracks.first { $0.kind == .soundtrack }.flatMap { track in
             (try? store.url(for: track.relativePath)).map { Music(url: $0, gain: track.gain) }
         }
-        clips = MovieStore.liveClips(of: project).compactMap { clip in
-            guard let moment = clip.moment else { return nil }
-            return Self.clip(clip, moment, showsDates: project.showsDates, showsPlaces: project.showsPlaces, store: store)
+        let clips: [(Int, Clip)] = MovieStore.liveClips(of: project).compactMap { clip in
+            guard let moment = clip.moment,
+                  let planned = Self.clip(clip, moment, showsDates: project.showsDates, showsPlaces: project.showsPlaces, store: store)
+            else { return nil }
+            return (clip.position, planned)
         }
+        let cards = project.textCards.map { ($0.position, Self.card($0, store: store)) }
+        self.clips = (clips + cards).sorted { $0.0 < $1.0 }.map(\.1)
     }
 
     init(
@@ -109,9 +138,30 @@ struct MoviePlan: Sendable, Equatable {
         let voice = clip.includesVoiceNote ? moment.voiceNotes.first.flatMap { try? store.url(for: $0.relativePath) } : nil
         return Clip(
             momentID: moment.id, media: media, mainURL: mainURL, selfieURL: selfieURL,
-            window: selfieURL == nil ? nil : moment.pipLayout, placement: clip.selfiePlacement, duration: duration,
-            transition: clip.transition, caption: parts.isEmpty ? nil : parts.joined(separator: " · "),
-            voiceURL: voice, soundOn: clip.clipAudio != .muted
+            window: selfieURL == nil ? nil : clip.pipFrame ?? moment.pipLayout, placement: clip.selfiePlacement,
+            layout: selfieURL == nil ? nil : clip.cameraLayout, duration: duration, transition: clip.transition,
+            atmosphere: clip.atmosphere, caption: parts.isEmpty ? nil : parts.joined(separator: " · "),
+            voiceURL: voice, soundOn: clip.clipAudio != .muted, volume: clip.clipVolume,
+            pictureSize: moment.media.first { $0.relativePath == mainPath }.map { media in
+                // Photos keep their EXIF turn: 5-8 lie on their side.
+                (5...8).contains(media.orientation) && moment.mediaType == .photo
+                    ? CGSize(width: media.pixelHeight, height: media.pixelWidth) : CGSize(width: media.pixelWidth, height: media.pixelHeight)
+            }
+        )
+    }
+
+    /// U51: the card for as long as it's set to show, with the voice comment picked for it.
+    @MainActor
+    private static func card(_ card: MovieTextCard, store: MediaStore) -> Clip {
+        var voice: URL?
+        if let id = card.voiceNoteID,
+           let note = try? card.modelContext?.fetch(FetchDescriptor<MomentVoiceNote>(predicate: #Predicate { $0.id == id })).first {
+            voice = try? store.url(for: note.relativePath)
+        }
+        return Clip(
+            momentID: card.id, media: .card(text: card.text, look: card.look), mainURL: nil, selfieURL: nil, window: nil,
+            placement: nil, layout: nil, duration: card.duration, transition: card.transition, atmosphere: card.atmosphere,
+            caption: nil, voiceURL: voice, soundOn: false
         )
     }
 }

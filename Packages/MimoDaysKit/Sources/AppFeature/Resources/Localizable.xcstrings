@@ -95,6 +95,18 @@
         }
       }
     },
+    "%@ s" : {
+      "comment" : "U53: seconds, e.g. 2.0 s",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ s"
+          }
+        }
+      }
+    },
     "%@ used by MimoDays" : {
       "comment" : "Storage (E09): total, as 6.0 GB used by MimoDays",
       "extractionState" : "manual",
@@ -1231,6 +1243,18 @@
         }
       }
     },
+    "A few words" : {
+      "comment" : "U51: a new text card's words, until they're changed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A few words"
+          }
+        }
+      }
+    },
     "A little moment is happening." : {
       "comment" : "Surprise notification title (also shown in onboarding art)",
       "extractionState" : "manual",
@@ -1419,6 +1443,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add a note"
+          }
+        }
+      }
+    },
+    "Add a text card" : {
+      "comment" : "U50 Text tool: button that adds a text card before the first clip",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a text card"
           }
         }
       }
@@ -1747,6 +1783,42 @@
         }
       }
     },
+    "Atmosphere" : {
+      "comment" : "U53: a transition, the sound starts first and the picture fades in",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atmosphere"
+          }
+        }
+      }
+    },
+    "Atmosphere · %@ of %@ lead" : {
+      "comment" : "U54: how far the sound has led, e.g. Atmosphere · 1.4 s of 2.0 s lead",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atmosphere · %@ of %@ lead"
+          }
+        }
+      }
+    },
+    "Atmosphere · sound first" : {
+      "comment" : "U53: badge on the editor stage while the sound leads the picture",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atmosphere · sound first"
+          }
+        }
+      }
+    },
     "Audio" : {
       "comment" : "Movie editor: tool bar tab for sound levels and music (F09)",
       "extractionState" : "manual",
@@ -1875,6 +1947,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Backups are files you keep. MimoDays never uploads them anywhere. If this iPhone is lost, a backup is the only way to get your moments back."
+          }
+        }
+      }
+    },
+    "Between %@ and %@" : {
+      "comment" : "U53: the transition sheet's title, e.g. Between clip 1 and clip 2",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Between %@ and %@"
           }
         }
       }
@@ -2035,6 +2119,18 @@
         }
       }
     },
+    "Cameras" : {
+      "comment" : "U50: button that opens the clip's cameras and sound sheet (U52)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cameras"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12); also backup and restore",
       "extractionState" : "manual",
@@ -2055,18 +2151,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Caption"
-          }
-        }
-      }
-    },
-    "Captions" : {
-      "comment" : "Movie editor: tool bar tab for date, place and title captions (F08)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Captions"
           }
         }
       }
@@ -2139,6 +2223,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Catch your first moment"
+          }
+        }
+      }
+    },
+    "Change" : {
+      "comment" : "U51: button that picks another voice comment to play over the card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change"
           }
         }
       }
@@ -2287,6 +2383,42 @@
         }
       }
     },
+    "Transition title: clip %lld" : {
+      "comment" : "U53: a clip in the transition sheet's title, e.g. clip 2",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "clip %lld"
+          }
+        }
+      }
+    },
+    "Clip %lld" : {
+      "comment" : "U52: title of the clip sheet. %lld: the clip's number",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip %lld"
+          }
+        }
+      }
+    },
+    "Clip %lld · %@ · %@" : {
+      "comment" : "U50: the chosen clip, when it was taken, and how long it plays, e.g. Clip 2 · Nov 11, 6:42 PM · 0:06",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip %lld · %@ · %@"
+          }
+        }
+      }
+    },
     "Clip %lld of %lld" : {
       "comment" : "Movie editor timeline: VoiceOver label of a clip tile",
       "extractionState" : "manual",
@@ -2299,14 +2431,14 @@
         }
       }
     },
-    "Clip %lld of %lld · %@ · %@ s" : {
-      "comment" : "Editor: which clip is chosen, its day, and how many seconds it plays",
+    "Clip sound" : {
+      "comment" : "U53 Lead with: the clip's own sound leads the picture",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clip %1$lld of %2$lld · %3$@ · %4$@ s"
+            "value" : "Clip sound"
           }
         }
       }
@@ -3139,6 +3271,18 @@
         }
       }
     },
+    "Drag the window in the preview to place it; pinch to resize. The movie uses exactly this." : {
+      "comment" : "U52: footnote under the camera layouts",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag the window in the preview to place it; pinch to resize. The movie uses exactly this."
+          }
+        }
+      }
+    },
     "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts." : {
       "comment" : "Help & about (S07): Selfie window help",
       "extractionState" : "manual",
@@ -3219,6 +3363,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit"
+          }
+        }
+      }
+    },
+    "Edit card" : {
+      "comment" : "U50: button that opens the text card sheet (U51)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit card"
           }
         }
       }
@@ -4099,6 +4255,18 @@
         }
       }
     },
+    "Lead with" : {
+      "comment" : "U53: which sound starts first, the clip's or the voice comment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lead with"
+          }
+        }
+      }
+    },
     "Leaving the app" : {
       "comment" : "Privacy settings (S05): Lock after: as soon as you leave the app",
       "extractionState" : "manual",
@@ -4207,14 +4375,26 @@
         }
       }
     },
-    "Long-press and drag a clip to move it." : {
-      "comment" : "Movie editor (F06): hint under the clip tools",
+    "Long-press and drag to move. Tap a dot between two to change how one leads into the next." : {
+      "comment" : "U50: hint under the editor timeline",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Long-press and drag a clip to move it."
+            "value" : "Long-press and drag to move. Tap a dot between two to change how one leads into the next."
+          }
+        }
+      }
+    },
+    "Look" : {
+      "comment" : "U51: the text card's look (Paper, Plum, Over clip)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look"
           }
         }
       }
@@ -4227,6 +4407,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Look around. This could be a memory."
+          }
+        }
+      }
+    },
+    "Main" : {
+      "comment" : "U52: only the main camera",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Main"
           }
         }
       }
@@ -4791,6 +4983,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Music"
+          }
+        }
+      }
+    },
+    "muted" : {
+      "comment" : "U50: a clip whose own sound is off",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "muted"
           }
         }
       }
@@ -5491,6 +5695,18 @@
         }
       }
     },
+    "On screen" : {
+      "comment" : "U51: how many seconds a text card shows (2, 3 or 5 s)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On screen"
+          }
+        }
+      }
+    },
     "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file." : {
       "comment" : "Help & about (S07): Moving to a new iPhone help",
       "extractionState" : "manual",
@@ -5755,6 +5971,30 @@
         }
       }
     },
+    "Original sound" : {
+      "comment" : "U52: toggle for the clip's own recorded sound",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original sound"
+          }
+        }
+      }
+    },
+    "Over clip" : {
+      "comment" : "U51: a text card over the next clip's first frame",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over clip"
+          }
+        }
+      }
+    },
     "Packing files" : {
       "comment" : "Backup in progress (E04p): step",
       "extractionState" : "manual",
@@ -5787,6 +6027,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Page %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Paper" : {
+      "comment" : "U51: a text card on cream paper",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paper"
           }
         }
       }
@@ -5995,6 +6247,18 @@
         }
       }
     },
+    "Picture" : {
+      "comment" : "U50: the editor lane with the clips and text cards",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture"
+          }
+        }
+      }
+    },
     "Place" : {
       "comment" : "Review (C07): chip that picks where the moment happened, until a place is picked; also the title of the place sheet (C11)",
       "extractionState" : "manual",
@@ -6127,6 +6391,18 @@
         }
       }
     },
+    "Plays over this clip · %@ · clip sound dips while it plays" : {
+      "comment" : "U52: footnote under the voice comment toggle. %@: the comment's length, e.g. 0:12",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plays over this clip · %@ · clip sound dips while it plays"
+          }
+        }
+      }
+    },
     "Plays the video" : {
       "comment" : "Review (C07): accessibility hint of a paused video; plays it with sound",
       "extractionState" : "manual",
@@ -6135,6 +6411,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plays the video"
+          }
+        }
+      }
+    },
+    "Plum" : {
+      "comment" : "U51: a text card on dark plum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plum"
           }
         }
       }
@@ -7135,6 +7423,18 @@
         }
       }
     },
+    "Selfie" : {
+      "comment" : "U52: only the selfie camera",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selfie"
+          }
+        }
+      }
+    },
     "Selfie window" : {
       "comment" : "Camera (C01): accessibility label of the button that shows or hides the front-camera window; also the camera settings (S03) row for where the window sits and how big it is",
       "extractionState" : "manual",
@@ -7447,6 +7747,18 @@
         }
       }
     },
+    "Shown before the first clip. Drag it on the timeline to move it between clips." : {
+      "comment" : "U51: footnote at the bottom of the text card sheet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shown before the first clip. Drag it on the timeline to move it between clips."
+          }
+        }
+      }
+    },
     "Shows for %@ s" : {
       "comment" : "Trim sheet: how many seconds a photo shows, as Shows for 2.5 s",
       "extractionState" : "manual",
@@ -7467,6 +7779,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shows the whole year"
+          }
+        }
+      }
+    },
+    "Side by side" : {
+      "comment" : "U52: both cameras, each filling half",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Side by side"
           }
         }
       }
@@ -7591,6 +7915,18 @@
         }
       }
     },
+    "Sound comes first, then the picture fades in." : {
+      "comment" : "U53: what the Atmosphere transition does",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound comes first, then the picture fades in."
+          }
+        }
+      }
+    },
     "Sound from clips" : {
       "comment" : "Movie editor (F09): slider for the sound recorded with the clips",
       "extractionState" : "manual",
@@ -7599,6 +7935,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sound from clips"
+          }
+        }
+      }
+    },
+    "Sound leads by" : {
+      "comment" : "U53: slider label, how many seconds the sound starts before the picture",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound leads by"
+          }
+        }
+      }
+    },
+    "Sound leads by %@, then the picture fades in" : {
+      "comment" : "U50: the chosen transition in the meta line. %@: seconds, e.g. 2.0 s",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound leads by %@, then the picture fades in"
           }
         }
       }
@@ -7867,6 +8227,18 @@
         }
       }
     },
+    "Swapped" : {
+      "comment" : "U52: the main camera in the window over the selfie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swapped"
+          }
+        }
+      }
+    },
     "Switch camera" : {
       "comment" : "Camera (C01): accessibility label of ↻; swaps the big camera, or switches cameras on single-camera iPhones",
       "extractionState" : "manual",
@@ -7959,6 +8331,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Temporary files"
+          }
+        }
+      }
+    },
+    "Text" : {
+      "comment" : "Editor tool: captions and text cards",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        }
+      }
+    },
+    "Text card" : {
+      "comment" : "U51: title of the text card sheet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text card"
+          }
+        }
+      }
+    },
+    "Text card · %lld s" : {
+      "comment" : "U50: a chosen text card and its seconds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text card · %lld s"
+          }
+        }
+      }
+    },
+    "Text card: %@" : {
+      "comment" : "U50 VoiceOver: a text card on the timeline. %@: its words",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text card: %@"
           }
         }
       }
@@ -8131,6 +8551,18 @@
         }
       }
     },
+    "The fade-in time follows the lead (%@)." : {
+      "comment" : "U53: footnote, the picture fades in over 0.6 of the lead. %@: seconds, e.g. 1.2 s",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The fade-in time follows the lead (%@)."
+          }
+        }
+      }
+    },
     "The map can't be shown right now. Your places are all here." : {
       "comment" : "Map (P06) when the map can't load; the places are listed under it. Two lines, as drawn.",
       "extractionState" : "manual",
@@ -8191,6 +8623,18 @@
         }
       }
     },
+    "The next one starts straight away." : {
+      "comment" : "U53: what the Cut transition does",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The next one starts straight away."
+          }
+        }
+      }
+    },
     "The others are in Memories. Try the rest again from Photos." : {
       "comment" : "Alert message when some picked files couldn't be imported",
       "extractionState" : "manual",
@@ -8223,6 +8667,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days."
+          }
+        }
+      }
+    },
+    "The picture dips through black." : {
+      "comment" : "U53: what the Fade transition does",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The picture dips through black."
           }
         }
       }
@@ -8283,6 +8739,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The shutter works once the phone is upright"
+          }
+        }
+      }
+    },
+    "the start" : {
+      "comment" : "U53: before the first item",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "the start"
+          }
+        }
+      }
+    },
+    "the text card" : {
+      "comment" : "U53: a text card in the title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "the text card"
           }
         }
       }
@@ -8937,14 +9417,14 @@
         }
       }
     },
-    "Transition" : {
-      "comment" : "Movie editor (F06): the chosen clip's transition, Cut or Fade",
+    "Transition into item %lld" : {
+      "comment" : "U50 VoiceOver: the dot before an item on the timeline. %lld: the item's number",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Transition"
+            "value" : "Transition into item %lld"
           }
         }
       }
@@ -9237,6 +9717,18 @@
         }
       }
     },
+    "Up to %lld characters" : {
+      "comment" : "U51: footnote under the card's text field",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to %lld characters"
+          }
+        }
+      }
+    },
     "Up to today" : {
       "comment" : "Filters (M08b): button that clears the last day.",
       "extractionState" : "manual",
@@ -9441,6 +9933,42 @@
         }
       }
     },
+    "Voice comment" : {
+      "comment" : "U52/U53: a moment's voice comment (toggle and Lead with option)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice comment"
+          }
+        }
+      }
+    },
+    "Voice comment from %@ · %@" : {
+      "comment" : "A subheading that displays the voice comment's date and duration. The first argument is the date of the voice comment. The second argument is the duration of the voice comment.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice comment from %@ · %@"
+          }
+        }
+      }
+    },
+    "Voice comments" : {
+      "comment" : "U50: the editor lane with the voice comments",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice comments"
+          }
+        }
+      }
+    },
     "Voice note" : {
       "comment" : "Review: chip that records a voice note (C07), and the title of the recording sheet (C09)",
       "extractionState" : "manual",
@@ -9473,6 +10001,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voice notes"
+          }
+        }
+      }
+    },
+    "Voice over this card" : {
+      "comment" : "U51: toggle that plays a voice comment over the card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice over this card"
+          }
+        }
+      }
+    },
+    "Volume" : {
+      "comment" : "U52: the clip's own sound volume slider",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume"
           }
         }
       }
@@ -9653,6 +10205,18 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Window" : {
+      "comment" : "U52: the selfie in its window over the main camera",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window"
           }
         }
       }

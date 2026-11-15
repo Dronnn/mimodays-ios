@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// The movie editor F06-F09 (the stage's player doesn't draw offscreen), the export F11-F14 and the movie page F15.
+/// The movie editor F06-F09 and U50-U54 (the stage's player doesn't draw offscreen), the export F11-F14 and the movie page F15.
 @MainActor
 @Suite(.tags(.snapshot))
 struct MovieEditorSnapshotTests {
@@ -79,7 +79,7 @@ struct MovieEditorSnapshotTests {
 
     /// F08.
     @Test func captions() async throws {
-        let model = try await editor(.captions)
+        let model = try await editor(.text)
         assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
@@ -87,6 +87,44 @@ struct MovieEditorSnapshotTests {
     @Test func audio() async throws {
         let model = try await editor(.audio)
         assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// U50: a text card first, an Atmosphere dot, a muted clip; the playhead in the lead shows U54's badge.
+    @Test func timeline() async throws {
+        let model = try await editor(.clips)
+        model.addCard()
+        model.setTransition(.atmosphere, at: 2)
+        model.select(3)
+        model.setClipSound(false)
+        model.select(2)
+        model.seek(to: model.starts[2] + 0.3)
+        assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
+    }
+
+    private func sheet(_ view: some View) -> some View {
+        page(view.background(ColorToken.canvas.color.ignoresSafeArea()))
+    }
+
+    /// U51.
+    @Test func cardSheet() async throws {
+        let model = try await editor(.text)
+        model.addCard()
+        model.setCardText("The long way home")
+        assertScreenSnapshots(of: sheet(CardSheet(model: model)), variants: variants)
+    }
+
+    /// U52.
+    @Test func clipSheet() async throws {
+        let model = try await editor(.clips)
+        model.setCameraLayout(.sideBySide)
+        assertScreenSnapshots(of: sheet(ClipSheet(model: model)), variants: variants)
+    }
+
+    /// U53.
+    @Test func transitionSheet() async throws {
+        let model = try await editor(.clips)
+        model.setTransition(.atmosphere, at: 2)
+        assertScreenSnapshots(of: sheet(TransitionSheet(model: model, index: 2)), variants: variants)
     }
 
     /// F11.

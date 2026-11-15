@@ -63,6 +63,37 @@ final class MoviesUITests: XCTestCase {
         XCTAssertTrue(export.waitForExistence(timeout: 10))
         XCTAssertEqual(app.buttons.matching(identifier: "editor.clip").count, 8)
         attachScreenshot("F06")
+
+        // U52: the clip's cameras.
+        app.buttons["editor.cameras"].tap()
+        let swapped = app.buttons["clip.layout.swapped"]
+        XCTAssertTrue(swapped.waitForExistence(timeout: 5))
+        swapped.tap()
+        XCTAssertTrue(swapped.isSelected)
+        attachScreenshot("U52")
+        app.buttons["sheet.done"].tap()
+
+        // U53: the dot before the second clip.
+        let dot = app.buttons["editor.transition.1"]
+        XCTAssertTrue(dot.waitForExistence(timeout: 5))
+        dot.tap()
+        let atmosphere = app.buttons["Atmosphere"]
+        XCTAssertTrue(atmosphere.waitForExistence(timeout: 5))
+        atmosphere.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["transition.lead"].waitForExistence(timeout: 5))
+        attachScreenshot("U53")
+        app.buttons["sheet.done"].tap()
+
+        // U51: a new text card goes in first and opens its sheet.
+        app.buttons["editor.tool.text"].tap()
+        app.buttons["editor.addCard"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["card.text"].waitForExistence(timeout: 5))
+        attachScreenshot("U51")
+        app.buttons["sheet.done"].tap()
+        XCTAssertTrue(app.buttons["editor.card"].waitForExistence(timeout: 5))
+        app.buttons["editor.tool.clips"].tap()
+        XCTAssertTrue(app.buttons["editor.editCard"].waitForExistence(timeout: 5))
+        attachScreenshot("U50 with a card")
         export.tap()
 
         let start = app.buttons["export.start"]

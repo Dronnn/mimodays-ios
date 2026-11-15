@@ -35,6 +35,12 @@ enum MovieComposer {
     static let musicFadeSeconds = 1.5
     /// The caption's bottom edge above the frame's, in phone points.
     static let captionBottom: CGFloat = 24
+    /// U53: the picture fades in over this share of the lead, once the lead is over.
+    static let atmosphereFade = 0.6
+    /// U52: a clip's sound dips to this while a voice comment plays over it.
+    static let voiceDip = 0.3
+    /// Volume changes glide this long, so they don't click.
+    static let volumeGlide = 0.15
     private static let timescale: CMTimeScale = 600
 
     static func compose(_ plan: MoviePlan, renderSize: CGSize) async throws -> Composed {
@@ -53,18 +59,30 @@ enum MovieComposer {
         let fillerRange = try await filler.load(.timeRange)
 
         var instructions: [MovieClipInstruction] = []
+        /// The clips' sound level over time: (when, volume), in order.
+        var soundLevels: [(CMTime, Double)] = []
+        var cards: [Int: CIImage] = [:]
         var cursor = CMTime.zero
+        // The title opens the first clip; a text card before it speaks for itself.
+        let titled = plan.clips.firstIndex { !$0.isCard }
         for (index, clip) in plan.clips.enumerated() {
             let length = time(clip.duration)
             let range = CMTimeRange(start: cursor, duration: length)
+            let lead = clip.lead.map(time)
             var video: MovieClipInstruction.Video?
+            var voiceAt = cursor
             switch clip.media {
-            case .photo:
-                // The compositor draws the still; the blank clip's frames are never read.
+            case .photo, .card:
+                // The compositor draws the still or the card; the blank clip's frames are never read.
                 try mainTrack.insertTimeRange(fillerRange, of: filler, at: cursor)
                 mainTrack.scaleTimeRange(CMTimeRange(start: cursor, duration: fillerRange.duration), toDuration: length)
+                if case let .card(text, look) = clip.media {
+                    let still = look == .overClip ? await firstFrame(after: index, in: plan, canvas: renderSize) : nil
+                    cards[index] = cardImage(text, look: look, still: still, canvas: renderSize)
+                }
             case let .video(start, selfieOffset, hasAudio):
-                let asset = AVURLAsset(url: clip.mainURL)
+                guard let mainURL = clip.mainURL else { throw Failure.compositionFailed }
+                let asset = AVURLAsset(url: mainURL)
                 guard let source = try await asset.loadTracks(withMediaType: .video).first else { throw Failure.compositionFailed }
                 let sourceRange = CMTimeRange(start: time(start), duration: length)
                 // The file's length can run a frame past its video; that last bit is stretched over, not left black.
@@ -92,6 +110,20 @@ enum MovieComposer {
                     let part = sourceRange.intersection(available)
                     if part.duration > .zero { try soundTrack.insertTimeRange(part, of: audio, at: cursor + (part.start - sourceRange.start)) }
                 }
+                // U52/U53: the clip's own level; silent while a voice comment leads, dipped while one plays.
+                let level = plan.clipSoundLevel * clip.volume
+                let voiceLeads = lead != nil && clip.atmosphere?.leadsWith == .voiceComment && clip.voiceURL != nil
+                if let lead, !voiceLeads, hasAudio, clip.soundOn { voiceAt = cursor + lead }
+                let audibleFrom = voiceLeads ? cursor + (lead ?? .zero) : cursor
+                var voiceRange: CMTimeRange?
+                if let voiceURL = clip.voiceURL, let seconds = try? await AVURLAsset(url: voiceURL).load(.duration).seconds {
+                    voiceRange = CMTimeRange(start: voiceAt, end: CMTimeMinimum(voiceAt + time(seconds), cursor + length))
+                }
+                let edges = Set([cursor, audibleFrom, voiceRange?.start, voiceRange?.end].compactMap(\.self).filter { $0 < cursor + length })
+                for edge in edges.sorted() {
+                    let volume = edge < audibleFrom ? 0 : voiceRange.map { $0.containsTime(edge) } == true ? level * voiceDip : level
+                    soundLevels.append((edge, volume))
+                }
                 video = .init(
                     mainTrackID: mainTrack.trackID, selfieTrackID: selfieTrackID,
                     mainOrientation: .init(try await source.load(.preferredTransform)), selfieOrientation: selfieOrientation
@@ -101,12 +133,16 @@ enum MovieComposer {
             if let voiceAsset, let voice = try await voiceAsset.loadTracks(withMediaType: .audio).first {
                 // A note longer than its clip stops with it.
                 let available = try await voice.load(.timeRange)
-                try voiceTrack.insertTimeRange(CMTimeRange(start: available.start, duration: CMTimeMinimum(available.duration, length)), of: voice, at: cursor)
+                let room = cursor + length - voiceAt
+                if room > .zero {
+                    try voiceTrack.insertTimeRange(CMTimeRange(start: available.start, duration: CMTimeMinimum(available.duration, room)), of: voice, at: voiceAt)
+                }
             }
             let next = plan.clips.indices.contains(index + 1) ? plan.clips[index + 1] : nil
             instructions.append(MovieClipInstruction(
                 timeRange: range, clip: clip, index: index, video: video, canvas: renderSize, fit: plan.fit,
-                fadeIn: index > 0 && clip.transition == .fade, fadeOut: next?.transition == .fade, title: index == 0 ? plan.title : nil
+                fadeIn: index > 0 && clip.transition == .fade, fadeOut: next?.transition == .fade, title: index == titled ? plan.title : nil,
+                card: cards[index], lead: clip.lead, backdrop: lead == nil ? nil : cards[index - 1]
             ))
             cursor = cursor + length
         }
@@ -135,7 +171,7 @@ enum MovieComposer {
         audioMix.inputParameters = composition.tracks(withMediaType: .audio).map { track in
             let parameters = AVMutableAudioMixInputParameters(track: track)
             switch track.trackID {
-            case soundTrack.trackID: parameters.setVolume(Float(plan.clipSoundLevel), at: .zero)
+            case soundTrack.trackID: glide(parameters, through: soundLevels)
             case voiceTrack.trackID: parameters.setVolume(Float(plan.voiceNoteLevel), at: .zero)
             default:
                 guard let ramp = musicRamp, let gain = plan.music?.gain else { break }
@@ -146,6 +182,97 @@ enum MovieComposer {
             return parameters
         }
         return Composed(asset: composition, videoComposition: videoComposition, audioMix: audioMix)
+    }
+
+    /// Volume steps as short glides; one closer than a glide to the next is set at once.
+    private static func glide(_ parameters: AVMutableAudioMixInputParameters, through levels: [(CMTime, Double)]) {
+        var volume: Double?
+        for (index, (at, level)) in levels.enumerated() {
+            defer { volume = level }
+            guard let from = volume else {
+                parameters.setVolume(Float(level), at: at)
+                continue
+            }
+            guard from != level else { continue }
+            let next = levels.indices.contains(index + 1) ? levels[index + 1].0 : .positiveInfinity
+            let length = CMTimeMinimum(time(volumeGlide), next - at)
+            if length > .zero {
+                parameters.setVolumeRamp(fromStartVolume: Float(from), toEndVolume: Float(level), timeRange: CMTimeRange(start: at, duration: length))
+            } else {
+                parameters.setVolume(Float(level), at: at)
+            }
+        }
+    }
+
+    // MARK: Text cards (U51)
+
+    /// The first picture of the first clip after `index`, filling the movie's frame: an "Over clip" card's ground.
+    private static func firstFrame(after index: Int, in plan: MoviePlan, canvas: CGSize) async -> CGImage? {
+        guard let clip = plan.clips.dropFirst(index + 1).first(where: { !$0.isCard }), let url = clip.mainURL else { return nil }
+        let pixels = Int(max(canvas.width, canvas.height))
+        switch clip.media {
+        case let .video(start, _, _):
+            let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
+            generator.appliesPreferredTrackTransform = true
+            generator.maximumSize = CGSize(width: pixels, height: pixels)
+            generator.requestedTimeToleranceBefore = .zero
+            generator.requestedTimeToleranceAfter = time(0.1)
+            return try? await generator.image(at: time(start)).image
+        case .photo, .card:
+            return ImageDecoding.thumbnailNow(url, maxPixelSize: pixels)
+        }
+    }
+
+    /// `Editor / Text card`: the words in Fraunces, centred, on paper, on plum, or on the next clip's first frame
+    /// under a soft shade. Drawn once per composition at the movie's size.
+    static func cardImage(_ text: String, look: TextCardLook, still: CGImage?, canvas: CGSize) -> CIImage? {
+        let unit = min(canvas.width, canvas.height) / 402
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        var attributes: [NSAttributedString.Key: Any] = [
+            .font: TextStyle.displayTitle.ctFont(pointSize: 44 * unit) as UIFont, .paragraphStyle: paragraph,
+            .foregroundColor: look == .paper ? plum : cream,
+        ]
+        if look == .overClip {
+            let shadow = NSShadow()
+            shadow.shadowColor = UIColor.black.withAlphaComponent(0.5)
+            shadow.shadowBlurRadius = 12 * unit
+            attributes[.shadow] = shadow
+        }
+        let words = NSAttributedString(string: text, attributes: attributes)
+        let width = canvas.width - 64 * unit
+        let bounds = words.boundingRect(with: CGSize(width: width, height: .greatestFiniteMagnitude), options: [.usesLineFragmentOrigin], context: nil)
+        let image = renderer(canvas).image { context in
+            let frame = CGRect(origin: .zero, size: canvas)
+            switch look {
+            case .paper: paper.setFill()
+            case .plum: plum.setFill()
+            case .overClip: UIColor.black.setFill()
+            }
+            context.fill(frame)
+            if look == .overClip, let still {
+                let rect = pictureRect(source: CGSize(width: still.width, height: still.height), canvas: canvas, fit: .fill)
+                UIImage(cgImage: still).draw(in: rect)
+                UIColor.black.withAlphaComponent(0.25).setFill()
+                context.fill(frame, blendMode: .normal)
+            }
+            words.draw(
+                with: CGRect(x: (canvas.width - width) / 2, y: (canvas.height - bounds.height) / 2, width: width, height: bounds.height),
+                options: [.usesLineFragmentOrigin], context: nil
+            )
+        }
+        return image.cgImage.map { CIImage(cgImage: $0) }
+    }
+
+    private static let cream = UIColor(red: 0xFB / 255, green: 0xF6 / 255, blue: 0xEF / 255, alpha: 1)
+    private static let paper = UIColor(red: 0xF3 / 255, green: 0xE8 / 255, blue: 0xDE / 255, alpha: 1)
+    private static let plum = UIColor(red: 0x4B / 255, green: 0x29 / 255, blue: 0x38 / 255, alpha: 1)
+
+    private static func renderer(_ size: CGSize) -> UIGraphicsImageRenderer {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        return UIGraphicsImageRenderer(size: size, format: format)
     }
 
     /// A one-second black 16x16 clip, written once per launch.
@@ -261,12 +388,21 @@ final class MovieClipInstruction: NSObject, AVVideoCompositionInstructionProtoco
     let fadeOut: Bool
     /// The movie's title, on the first clip only.
     let title: String?
+    /// U51: the whole frame of a text card.
+    let card: CIImage?
+    /// U53: seconds of sound before the picture fades in.
+    let lead: Double?
+    /// U53: what shows during the lead: the card before, or black.
+    let backdrop: CIImage?
 
     init(
         timeRange: CMTimeRange, clip: MoviePlan.Clip, index: Int, video: Video?, canvas: CGSize, fit: MovieFit,
-        fadeIn: Bool, fadeOut: Bool, title: String? = nil
+        fadeIn: Bool, fadeOut: Bool, title: String? = nil, card: CIImage? = nil, lead: Double? = nil, backdrop: CIImage? = nil
     ) {
         self.title = title
+        self.card = card
+        self.lead = lead
+        self.backdrop = backdrop
         self.timeRange = timeRange
         self.clip = clip
         self.index = index
@@ -285,6 +421,13 @@ final class MovieClipInstruction: NSObject, AVVideoCompositionInstructionProtoco
         if fadeIn { value = min(value, seconds / MovieComposer.fadeSeconds) }
         if fadeOut { value = min(value, (length - seconds) / MovieComposer.fadeSeconds) }
         return min(max(value, 0), 1)
+    }
+
+    /// U53: how much of the picture shows over the backdrop: none during the lead, then fading in.
+    func emergence(at seconds: Double) -> Double {
+        guard let lead else { return 1 }
+        let fade = max(lead * MovieComposer.atmosphereFade, 0.01)
+        return min(max((seconds - lead) / fade, 0), 1)
     }
 }
 
@@ -329,8 +472,23 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
             selfie = look.selfie
         }
 
+        // U52: which camera is the picture and which goes in the window.
+        switch instruction.clip.layout {
+        case .swapped:
+            if let main = picture, let other = selfie { (picture, selfie) = (other, main) }
+        case .selfieOnly:
+            if let other = selfie { picture = other }
+            selfie = nil
+        case .mainOnly: selfie = nil
+        case .sideBySide, .window, nil: break
+        }
+
         var frame = CIImage(color: .black).cropped(to: bounds)
-        if let picture {
+        if let card = instruction.card {
+            frame = card.composited(over: frame)
+        } else if instruction.clip.layout == .sideBySide, let picture, let selfie {
+            frame = Self.sideBySide(picture, selfie, canvas: canvas).composited(over: frame)
+        } else if let picture {
             let rect = MovieComposer.pictureRect(source: picture.extent.size, canvas: canvas, fit: instruction.fit)
             // Photos drift in a little over their seconds, so a still doesn't sit dead (doc 01).
             let zoom = instruction.video == nil ? 1 + 0.04 * seconds / max(instruction.timeRange.duration.seconds, 0.1) : 1
@@ -357,6 +515,12 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
                 frame = title.applyingFilter("CIColorMatrix", parameters: ["inputAVector": CIVector(x: 0, y: 0, z: 0, w: alpha)]).composited(over: frame)
             }
         }
+        let emergence = instruction.emergence(at: seconds)
+        if emergence < 1 {
+            let backdrop = (instruction.backdrop ?? CIImage(color: .black)).cropped(to: bounds)
+            frame = frame.applyingFilter("CIColorMatrix", parameters: ["inputAVector": CIVector(x: 0, y: 0, z: 0, w: emergence)])
+                .composited(over: backdrop)
+        }
         let opacity = instruction.opacity(at: seconds)
         if opacity < 1 {
             let o = CGFloat(opacity)
@@ -369,6 +533,24 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         request.finish(withComposedVideoFrame: output)
     }
 
+    /// U52 "Side by side": the two cameras each filling half the frame, top and bottom (side by side when wide).
+    private static func sideBySide(_ main: CIImage, _ selfie: CIImage, canvas: CGSize) -> CIImage {
+        let wide = canvas.width > canvas.height
+        let half = wide ? CGSize(width: canvas.width / 2, height: canvas.height) : CGSize(width: canvas.width, height: canvas.height / 2)
+        // Core Image counts from the bottom: the main camera takes the top (or the left) half.
+        let slots = wide ? [CGPoint.zero, CGPoint(x: half.width, y: 0)] : [CGPoint(x: 0, y: half.height), .zero]
+        var result = CIImage.empty()
+        for (image, slot) in zip([main, selfie], slots) {
+            let rect = MovieComposer.pictureRect(source: image.extent.size, canvas: half, fit: .fill)
+            let scaled = image.transformed(by: CGAffineTransform(scaleX: rect.width / image.extent.width, y: rect.height / image.extent.height))
+            let placed = scaled
+                .transformed(by: CGAffineTransform(translationX: slot.x + rect.minX - scaled.extent.minX, y: slot.y + (half.height - rect.maxY) - scaled.extent.minY))
+                .cropped(to: CGRect(origin: slot, size: half))
+            result = placed.composited(over: result)
+        }
+        return result
+    }
+
     /// The clip's look, made on its first frame.
     private func look(for instruction: MovieClipInstruction) -> Look {
         if let look = current.withLock({ $0 }), look.index == instruction.index { return look }
@@ -379,8 +561,10 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         if instruction.video == nil {
             // Enough pixels for Fill on any shape and the drift.
             let pixels = Int(max(canvas.width, canvas.height) * 1.5)
-            look.picture = ImageDecoding.thumbnailNow(clip.mainURL, maxPixelSize: pixels).map { CIImage(cgImage: $0) }
-            look.selfie = clip.selfieURL.flatMap { ImageDecoding.thumbnailNow($0, maxPixelSize: 800) }.map { CIImage(cgImage: $0) }
+            look.picture = clip.mainURL.flatMap { ImageDecoding.thumbnailNow($0, maxPixelSize: pixels) }.map { CIImage(cgImage: $0) }
+            // The selfie fills the frame when it's the picture (U52), else it's only the window.
+            let selfiePixels = [ClipCameraLayout.window, nil].contains(clip.layout) || clip.layout == .mainOnly ? 800 : pixels
+            look.selfie = clip.selfieURL.flatMap { ImageDecoding.thumbnailNow($0, maxPixelSize: selfiePixels) }.map { CIImage(cgImage: $0) }
         }
         current.withLock { [look] in $0 = look }
         return look

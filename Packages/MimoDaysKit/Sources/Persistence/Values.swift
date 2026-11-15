@@ -160,6 +160,8 @@ public enum MovieFit: String, Codable, CaseIterable, Sendable {
 public enum MovieTransition: String, Codable, CaseIterable, Sendable {
     case cut
     case fade
+    /// U53: the item's sound starts first, then its picture fades in (`MovieAtmosphere`).
+    case atmosphere
 }
 
 /// Where a clip's selfie window goes in the movie (F07). A clip without one keeps it where it was recorded.

@@ -68,7 +68,7 @@ struct TrimSheet: View {
             switch model.selectedPlan?.media {
             case .photo: photo
             case .video: video
-            case nil: EmptyView()
+            case .card, nil: EmptyView()
             }
             Spacer(minLength: 0)
         }
@@ -119,10 +119,13 @@ struct TrimSheet: View {
         switch plan.media {
         case .photo:
             end = plan.duration
+        case .card:
+            return
         case let .video(clipStart, _, _):
+            guard let url = plan.mainURL else { return }
             start = clipStart
             end = clipStart + plan.duration
-            let asset = AVURLAsset(url: plan.mainURL)
+            let asset = AVURLAsset(url: url)
             let total = (try? await asset.load(.duration).seconds) ?? end
             length = max(total, end)
             frames = await Self.frames(of: asset, length: length ?? end)

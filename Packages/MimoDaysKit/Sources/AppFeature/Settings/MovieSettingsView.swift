@@ -49,7 +49,7 @@ struct MovieSettingsView: View {
                         DataSeparator()
                         Menu {
                             Picker(selection: $defaults.transition) {
-                                ForEach(MovieTransition.allCases, id: \.self) { transitionTitle($0).tag($0) }
+                                ForEach([MovieTransition.cut, .fade], id: \.self) { transitionTitle($0).tag($0) }
                             } label: {
                                 Text("Transitions", bundle: .module)
                             }
@@ -110,6 +110,8 @@ struct MovieSettingsView: View {
         switch transition {
         case .cut: Text("Cut", bundle: .module)
         case .fade: Text("Fade", bundle: .module)
+        // A per-item choice in the editor (U53), not a default.
+        case .atmosphere: Text("Atmosphere", bundle: .module)
         }
     }
 }

@@ -34,12 +34,19 @@ struct MovieEditorView: View {
     @State private var choosingMusic = false
     @State private var musicOptions = false
     @State private var previewing = false
+    /// U52: the window while a finger moves it on the stage, in movie pixels.
+    @State private var movingWindow: CGRect?
 
-    enum Sheet: String, Identifiable {
+    enum Sheet: Identifiable, Hashable {
         case trim
         case replace
         case title
-        var id: String { rawValue }
+        case clip
+        case card
+        /// U53: into the item at this index.
+        case transition(Int)
+
+        var id: Self { self }
     }
 
     /// The panel under the strip, as tall as drawn; it scrolls when larger text needs more.
@@ -52,7 +59,11 @@ struct MovieEditorView: View {
                 .padding(.top, 8)
             transport
                 .padding(.top, 8)
-            MovieTimeline(model: model, trim: { sheet = .trim })
+            MovieTimeline(model: model, transition: { index in
+                model.select(index)
+                sheet = .transition(index)
+            })
+            .padding(.top, 8)
             ScrollView {
                 panel.frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -69,6 +80,9 @@ struct MovieEditorView: View {
             case .trim: TrimSheet(model: model)
             case .replace: ReplaceSheet(model: model)
             case .title: TitleSheet(model: model)
+            case .clip: ClipSheet(model: model)
+            case .card: CardSheet(model: model)
+            case let .transition(index): TransitionSheet(model: model, index: index)
             }
         }
         .fileImporter(isPresented: $choosingMusic, allowedContentTypes: [.audio]) { result in
@@ -127,7 +141,7 @@ struct MovieEditorView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled(model.clips.isEmpty)
+                .disabled(model.items.isEmpty)
                 .accessibilityIdentifier("editor.export")
             }
         }
@@ -145,6 +159,8 @@ struct MovieEditorView: View {
                     .frame(width: size.width, height: size.height)
                     .background(Color.black)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay { if sheet == .clip { windowHandle(size) } }
+                    .overlay(alignment: .bottom) { if let lead = model.leadProgress { leadBadge(lead) } }
                 if model.failed {
                     Text("This movie can't play right now.", bundle: .module)
                         .textStyle(.pageIntro)
@@ -164,6 +180,74 @@ struct MovieEditorView: View {
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { previewing = true }
         .accessibilityIdentifier("editor.stage")
+    }
+
+    /// U54: while an Atmosphere's sound leads, the sound drawn in the dark and a coral pill naming it.
+    private func leadBadge(_ lead: (elapsed: Double, lead: Double)) -> some View {
+        VStack(spacing: 0) {
+            Spacer()
+            Image(systemName: "waveform")
+                .font(.system(size: 34, weight: .light))
+                .foregroundStyle(ColorToken.mediaFrame.color.opacity(0.9))
+            Spacer()
+            Text("Atmosphere · sound first", bundle: .module)
+                .textStyle(TextStyle(.nunito, size: 13, weight: 800, relativeTo: .footnote, maximumScale: 1.2))
+                .foregroundStyle(ColorToken.mediaFrame.color)
+                .padding(.horizontal, 12)
+                .frame(minHeight: 30)
+                .background(Capsule().fill(ColorToken.actionCoral.color))
+                .padding(.bottom, 14)
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    /// U52: the clip's window as the movie draws it, dashed in coral; drag to move it, pinch to resize.
+    @ViewBuilder
+    private func windowHandle(_ stage: CGSize) -> some View {
+        if let plan = model.selectedPlan, plan.selfieURL != nil, [nil, .window, .swapped].contains(plan.layout) {
+            let canvas = model.project.aspectRatio.renderSize(MovieEditorModel.previewResolution)
+            let scale = stage.width / canvas.width
+            let picture = MovieComposer.pictureRect(source: plan.pictureSize ?? canvas, canvas: canvas, fit: model.project.fit)
+            if let rect = movingWindow ?? MovieComposer.windowRect(window: plan.window, placement: plan.placement, picture: picture, canvas: canvas) {
+                RoundedRectangle(cornerRadius: 12 * scale * 3, style: .continuous)
+                    .strokeBorder(ColorToken.actionCoral.color, style: StrokeStyle(lineWidth: 2, dash: [7, 5]))
+                    .frame(width: rect.width * scale, height: rect.height * scale)
+                    .rotationEffect(.degrees(-5.4))
+                    .contentShape(Rectangle())
+                    .position(x: rect.midX * scale, y: rect.midY * scale)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { drag in
+                                let base = MovieComposer.windowRect(window: plan.window, placement: plan.placement, picture: picture, canvas: canvas) ?? rect
+                                movingWindow = base.offsetBy(dx: drag.translation.width / scale, dy: drag.translation.height / scale)
+                            }
+                            .onEnded { _ in placeWindow(picture: picture, canvas: canvas) }
+                            .simultaneously(with: MagnifyGesture()
+                                .onChanged { pinch in
+                                    let base = movingWindow ?? rect
+                                    let width = min(max(base.width * pinch.magnification, canvas.width * 0.15), canvas.width * 0.5)
+                                    let height = width * base.height / base.width
+                                    movingWindow = CGRect(x: base.midX - width / 2, y: base.midY - height / 2, width: width, height: height)
+                                }
+                                .onEnded { _ in placeWindow(picture: picture, canvas: canvas) })
+                    )
+                    .accessibilityElement()
+                    .accessibilityLabel(Text("Selfie window", bundle: .module))
+                    .accessibilityIdentifier("editor.window")
+            }
+        }
+    }
+
+    /// The moved window kept as a share of the picture, the way the movie reads it.
+    private func placeWindow(picture: CGRect, canvas: CGSize) {
+        guard let rect = movingWindow, let window = model.selectedPlan?.window, picture.width > 0, picture.height > 0 else { return }
+        var frame = window
+        frame.centerX = Double((rect.midX - picture.minX) / picture.width)
+        frame.centerY = Double((rect.midY - picture.minY) / picture.height)
+        frame.scale = Double(rect.width / min(canvas.width, canvas.height))
+        model.setWindow(frame)
+        movingWindow = nil
     }
 
     /// The movie's frame inside the stage, as large as fits.
@@ -226,9 +310,12 @@ struct MovieEditorView: View {
     @ViewBuilder
     private var panel: some View {
         switch model.tool {
-        case .clips: ClipsPanel(model: model, trim: { sheet = .trim }, replace: { sheet = .replace })
+        case .clips: ClipsPanel(model: model, open: { sheet = $0 })
         case .shape: ShapePanel(model: model)
-        case .captions: CaptionsPanel(model: model, title: { sheet = .title })
+        case .text: CaptionsPanel(model: model, title: { sheet = .title }, addCard: {
+                model.addCard()
+                sheet = .card
+            })
         case .audio: AudioPanel(model: model, music: {
                 if model.music == nil { choosingMusic = true } else { musicOptions = true }
             })
@@ -275,7 +362,7 @@ extension MovieEditorModel.Tool {
         switch self {
         case .clips: .glyphScissors
         case .shape: .glyphCrop
-        case .captions: .glyphText
+        case .text: .glyphText
         case .audio: .glyphMusic
         }
     }
@@ -284,7 +371,7 @@ extension MovieEditorModel.Tool {
         switch self {
         case .clips: Text("Clips", bundle: .module)
         case .shape: Text("Shape", bundle: .module)
-        case .captions: Text("Captions", bundle: .module)
+        case .text: Text("Text", bundle: .module, comment: "Editor tool: captions and text cards")
         case .audio: Text("Audio", bundle: .module)
         }
     }
@@ -294,8 +381,7 @@ extension MovieEditorModel.Tool {
 
 struct ClipsPanel: View {
     let model: MovieEditorModel
-    let trim: () -> Void
-    let replace: () -> Void
+    let open: (MovieEditorView.Sheet) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -307,57 +393,75 @@ struct ClipsPanel: View {
                     .padding(.top, 4)
                     .accessibilityIdentifier("editor.clipMeta")
             }
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 8) { actions }
-                VStack(spacing: 8) { actions }
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 11)
-            HStack(spacing: 12) {
-                Text("Transition", bundle: .module)
-                    .textStyle(.rowTitle)
-                    .foregroundStyle(ColorToken.textPrimary.color)
-                Spacer(minLength: 0)
-                SegmentedControl(
-                    selection: Binding(get: { model.selectedClip?.transition ?? .cut }, set: model.setTransition),
-                    options: MovieTransition.allCases, labelSize: 15
-                ) { transition in
-                    switch transition {
-                    case .cut: Text("Cut", bundle: .module)
-                    case .fade: Text("Fade", bundle: .module)
-                    }
+            HStack(spacing: 8) { actions }
+                .padding(.horizontal, 16)
+                .padding(.top, 10)
+            HStack(spacing: 20) {
+                if model.selectedClip != nil {
+                    quiet(Text("Replace", bundle: .module), id: "editor.replace") { open(.replace) }
                 }
-                .frame(width: 200)
-                .accessibilityIdentifier("editor.transition")
+                quiet(Text("Remove", bundle: .module), id: "editor.remove", action: model.remove)
+                    .disabled(!model.canRemove)
+                Spacer()
             }
-            .padding(.leading, 18)
-            .padding(.trailing, 16)
-            .padding(.top, 14)
-            Text("Long-press and drag a clip to move it.", bundle: .module)
+            .padding(.horizontal, 18)
+            .padding(.top, 6)
+            Text("Long-press and drag to move. Tap a dot between two to change how one leads into the next.", bundle: .module)
                 .textStyle(TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote))
                 .foregroundStyle(ColorToken.textSecondary.color)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 18)
-                .padding(.top, 16)
+                .padding(.top, 4)
         }
     }
 
     @ViewBuilder
     private var actions: some View {
-        Button(action: trim) { Label { Text("Trim", bundle: .module) } icon: { glyph(.glyphScissors) } }
-            .buttonStyle(ThirdButtonStyle())
-            .accessibilityIdentifier("editor.trim")
-        Button(action: replace) { Label { Text("Replace", bundle: .module) } icon: { glyph(.glyphRefresh) } }
-            .buttonStyle(ThirdButtonStyle())
-            .accessibilityIdentifier("editor.replace")
-        Button(action: model.remove) { Label { Text("Remove", bundle: .module) } icon: { glyph(.glyphTrash) } }
-            .buttonStyle(ThirdButtonStyle())
-            .disabled(!model.canRemove)
-            .accessibilityIdentifier("editor.remove")
+        if model.selectedCard != nil {
+            Button { open(.card) } label: { Text("Edit card", bundle: .module) }
+                .buttonStyle(PeachButtonStyle())
+                .accessibilityIdentifier("editor.editCard")
+        } else {
+            Button { open(.clip) } label: { Text("Cameras", bundle: .module) }
+                .buttonStyle(PeachButtonStyle())
+                .accessibilityIdentifier("editor.cameras")
+            Button { open(.clip) } label: { Text("Sound", bundle: .module) }
+                .buttonStyle(PeachButtonStyle())
+                .accessibilityIdentifier("editor.sound")
+            Button { open(.trim) } label: { Text("Trim", bundle: .module) }
+                .buttonStyle(PeachButtonStyle())
+                .accessibilityIdentifier("editor.trim")
+        }
     }
 
-    private func glyph(_ icon: Icon) -> some View {
-        icon.image.resizable().frame(width: 20, height: 20)
+    private func quiet(_ title: Text, id: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            title
+                .textStyle(TextStyle(.nunito, size: 14, weight: 700, relativeTo: .subheadline))
+                .foregroundStyle(ColorToken.textLink.color)
+                .frame(minHeight: Size.minimumTapTarget)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(id)
+    }
+}
+
+/// U50's Cameras / Sound / Trim: a word in plum on a peach pill.
+struct PeachButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textStyle(TextStyle(.nunito, size: 15, weight: 800, relativeTo: .subheadline, maximumScale: 1.35))
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .padding(.horizontal, 10)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(Capsule().fill(ColorToken.accentPeach.color))
+            .opacity(isEnabled ? (configuration.isPressed ? 0.7 : 1) : 0.45)
+            .contentShape(Capsule())
     }
 }
 
@@ -388,15 +492,23 @@ private struct ThirdLabelStyle: LabelStyle {
 }
 
 extension MovieEditorModel {
-    /// "Clip 3 of 24 · Wed, Oct 7 · 2.5 s".
+    /// "Clip 2 · Nov 11, 6:42 PM · 0:06", "Text card · 3 s"; during an Atmosphere lead "Atmosphere · 1.4 s of 2.0 s lead" (U54).
     var selectedMeta: String? {
+        if let lead = leadProgress {
+            return String(
+                localized: "Atmosphere · \(TransitionSheet.seconds(lead.elapsed)) of \(TransitionSheet.seconds(lead.lead)) lead", bundle: .module,
+                comment: "U54: how far the sound has led, e.g. Atmosphere · 1.4 s of 2.0 s lead"
+            )
+        }
+        if let card = selectedCard {
+            return String(localized: "Text card · \(Int(card.duration)) s", bundle: .module, comment: "U50: a chosen text card and its seconds")
+        }
         guard let clip = selectedClip, let plan = selectedPlan, let moment = clip.moment else { return nil }
         let zone = TimeZone(identifier: moment.timeZoneID) ?? .current
-        let day = moment.capturedAt.formatted(Date.FormatStyle(timeZone: zone).weekday(.abbreviated).month(.abbreviated).day())
-        let length = plan.duration.formatted(.number.precision(.fractionLength(0...1)))
+        let when = moment.capturedAt.formatted(Date.FormatStyle(timeZone: zone).month(.abbreviated).day().hour().minute())
         return String(
-            localized: "Clip \(selected + 1) of \(clips.count) · \(day) · \(length) s", bundle: .module,
-            comment: "Editor: which clip is chosen, its day, and how many seconds it plays"
+            localized: "Clip \(selectedClipNumber) · \(when) · \(MovieEditorView.clock(plan.duration))", bundle: .module,
+            comment: "U50: the chosen clip, when it was taken, and how long it plays, e.g. Clip 2 · Nov 11, 6:42 PM · 0:06"
         )
     }
 }
@@ -498,8 +610,20 @@ extension MovieSelfiePlacement {
 struct CaptionsPanel: View {
     let model: MovieEditorModel
     let title: () -> Void
+    /// U51: a new text card before the first clip.
+    let addCard: () -> Void
 
     var body: some View {
+        VStack(spacing: 8) {
+            Button(action: addCard) { Label { Text("Add a text card", bundle: .module) } icon: { Icon.glyphPlus.image.resizable().frame(width: 20, height: 20) } }
+                .buttonStyle(ThirdButtonStyle())
+                .padding(.horizontal, 16)
+                .accessibilityIdentifier("editor.addCard")
+            captions
+        }
+    }
+
+    private var captions: some View {
         VStack(spacing: 0) {
             toggle(Text("Date on each clip", bundle: .module), isOn: model.project.showsDates, set: model.setShowsDates, id: "editor.dates")
             separator
@@ -571,7 +695,7 @@ struct AudioPanel: View {
                 .accessibilityIdentifier("editor.clipSound")
             row(
                 Text("Voice notes", bundle: .module),
-                detail: Text("\(model.voiceNoteCount) of \(model.clips.count) clips", bundle: .module, comment: "F09: how many clips have a voice note")
+                detail: Text("\(model.voiceNoteCount) of \(model.clipCount) clips", bundle: .module, comment: "F09: how many clips have a voice note")
             )
             .padding(.top, 10)
             LevelSlider(value: Binding(get: { model.project.voiceNoteLevel }, set: model.setVoiceNoteLevel), changing: changing)

@@ -241,4 +241,124 @@ struct MovieComposerTests {
         #expect(try await track.load(.naturalSize) == portrait)
         #expect(try await movie.loadTracks(withMediaType: .audio).count == 1)
     }
+
+    // MARK: Editor (U50-U55)
+
+    /// A card between two photos, by its shared position.
+    private func carded(_ ids: [UUID], look: TextCardLook) throws -> MovieProject {
+        let project = try project(ids)
+        project.orderedClips[1].position = 2
+        context.insert(MovieTextCard(project: project, position: 1, text: "The long way home", look: look, duration: 3))
+        return project
+    }
+
+    @Test func aTextCardPlaysInItsPlaceOnPaperOrPlum() async throws {
+        let ids = try await save(2)
+        let paper = MoviePlan(try carded(ids, look: .paper), store: store)
+        #expect(paper.clips.map(\.isCard) == [false, true, false])
+        #expect(paper.clips[1].duration == 3)
+        #expect(abs(paper.duration - (2 * MovieSelection.photoSeconds + 3)) < 0.01)
+        let composed = try await MovieComposer.compose(paper, renderSize: portrait)
+        let titles = composed.videoComposition.instructions.compactMap { $0 as? MovieClipInstruction }.map(\.title)
+        #expect(titles == ["Test", nil, nil])
+
+        // A card first: the title waits for the first clip instead of covering the card's words.
+        let first = try project(try await save(1))
+        context.insert(MovieTextCard(project: first, position: -1, text: "Hello", look: .plum))
+        let opened = try await MovieComposer.compose(MoviePlan(first, store: store), renderSize: portrait)
+        #expect(opened.videoComposition.instructions.compactMap { ($0 as? MovieClipInstruction)?.title } == ["Test"])
+        #expect(opened.videoComposition.instructions.compactMap { $0 as? MovieClipInstruction }.first?.card != nil)
+        let corner = pixel(try await frame(composed, at: 2.5 + 1.5), 20, 20)
+        #expect(abs(corner.r - 0xF3) < 8 && abs(corner.g - 0xE8) < 8 && abs(corner.b - 0xDE) < 8, "paper: \(corner)")
+
+        let ids2 = try await save(2)
+        let plum = try await MovieComposer.compose(MoviePlan(try carded(ids2, look: .plum), store: store), renderSize: portrait)
+        let dark = pixel(try await frame(plum, at: 2.5 + 1.5), 20, 20)
+        #expect(abs(dark.r - 0x4B) < 8 && abs(dark.g - 0x29) < 8 && abs(dark.b - 0x38) < 8, "plum: \(dark)")
+    }
+
+    @Test func atmosphereHoldsThePictureBackThenFadesItIn() async throws {
+        let ids = try await save(2)
+        let project = try project(ids)
+        project.orderedClips[1].transition = .atmosphere
+        project.orderedClips[1].atmosphere = MovieAtmosphere(lead: 1)
+        let plan = MoviePlan(project, store: store)
+        #expect(plan.clips[1].lead == 1)
+        #expect(plan.clips[0].lead == nil)
+        let composed = try await MovieComposer.compose(plan, renderSize: portrait)
+        let start = MovieSelection.photoSeconds
+        let held = brightness(try await frame(composed, at: start + 0.5), 100, 1000)
+        let fading = brightness(try await frame(composed, at: start + 1 + MovieComposer.atmosphereFade / 2), 100, 1000)
+        let shown = brightness(try await frame(composed, at: start + 1 + MovieComposer.atmosphereFade + 0.2), 100, 1000)
+        #expect(held < 20, "black while the sound leads: \(held)")
+        #expect(fading > held && fading < shown, "half way in: \(fading) of \(shown)")
+        #expect(shown > 150)
+
+        // A lead never takes more than half the clip.
+        project.orderedClips[1].atmosphere = MovieAtmosphere(lead: 5)
+        #expect(MoviePlan(project, store: store).clips[1].lead == MovieSelection.photoSeconds / 2)
+        let instruction = try #require(composed.videoComposition.instructions.compactMap { $0 as? MovieClipInstruction }.last)
+        #expect(instruction.emergence(at: 0.5) == 0 && instruction.emergence(at: 3) == 1)
+    }
+
+    @Test func theCameraLayoutSwapsOrSplitsThePicture() async throws {
+        let ids = try await save(1)
+        let project = try project(ids)
+        func shot(_ layout: ClipCameraLayout?) async throws -> CGImage {
+            project.orderedClips[0].cameraLayout = layout
+            return try await frame(try await MovieComposer.compose(MoviePlan(project, store: store), renderSize: portrait), at: 1)
+        }
+        let recorded = pixel(try await shot(nil), 100, 1000)
+        #expect(recorded.r > recorded.g, "the rear photo is the picture: \(recorded)")
+        for layout in [ClipCameraLayout.swapped, .selfieOnly] {
+            let mint = pixel(try await shot(layout), 100, 1000)
+            #expect(mint.g > mint.r, "\(layout): the selfie is the picture: \(mint)")
+        }
+        let split = try await shot(.sideBySide)
+        let top = pixel(split, 100, 300)
+        let bottom = pixel(split, 100, 1000)
+        #expect(top.r > top.g && bottom.g > bottom.r, "rear on top, selfie below: \(top) \(bottom)")
+
+        project.orderedClips[0].selfiePlacement = .hidden
+        let hidden = try await shot(nil)
+        project.orderedClips[0].selfiePlacement = nil
+        let main = try await shot(.mainOnly)
+        #expect(pixel(main, 560, 330) == pixel(hidden, 560, 330), "no window where it was recorded")
+    }
+
+    /// F.6/F.7: the editor's stage plays the same frames the export writes, on every shape and camera layout, with a
+    /// text card and an Atmosphere lead in the movie.
+    @Test(arguments: zip(
+        [MovieAspectRatio.portrait9x16, .landscape16x9, .square1x1, .portrait9x16, .landscape16x9],
+        [ClipCameraLayout.window, .swapped, .sideBySide, .selfieOnly, .mainOnly]
+    ))
+    func thePreviewIsTheExport(_ shape: MovieAspectRatio, _ layout: ClipCameraLayout) async throws {
+        let ids = try await save(2)
+        let project = try carded(ids, look: .overClip)
+        project.aspectRatio = shape
+        project.orderedClips[0].cameraLayout = layout
+        project.orderedClips[1].transition = .atmosphere
+        let size = shape.renderSize(.p720)
+        let composed = try await MovieComposer.compose(MoviePlan(project, store: store), renderSize: size)
+        let url = FileManager.default.temporaryDirectory.appending(path: "preview-\(UUID().uuidString).mp4")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let session = try #require(AVAssetExportSession(asset: composed.asset, presetName: AVAssetExportPresetHighestQuality))
+        session.videoComposition = composed.videoComposition
+        try await session.export(to: url, as: .mp4)
+        let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
+        generator.requestedTimeToleranceBefore = .zero
+        generator.requestedTimeToleranceAfter = .zero
+        let card = MovieSelection.photoSeconds + 1.5
+        let lead = MovieSelection.photoSeconds + 3 + 2
+        for seconds in [1.0, card, lead] {
+            let preview = try await frame(composed, at: seconds)
+            let exported = try await generator.image(at: CMTime(seconds: seconds, preferredTimescale: 600)).image
+            #expect(exported.width == preview.width && exported.height == preview.height)
+            for (x, y) in [(0.15, 0.2), (0.5, 0.5), (0.8, 0.8)] {
+                let a = pixel(preview, Int(Double(preview.width) * x), Int(Double(preview.height) * y))
+                let b = pixel(exported, Int(Double(exported.width) * x), Int(Double(exported.height) * y))
+                #expect(abs(a.r - b.r) < 24 && abs(a.g - b.g) < 24 && abs(a.b - b.b) < 24, "\(shape) \(layout) at \(seconds) s (\(x), \(y)): \(a) vs \(b)")
+            }
+        }
+    }
 }

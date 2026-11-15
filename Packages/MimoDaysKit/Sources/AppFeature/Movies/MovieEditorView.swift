@@ -387,10 +387,11 @@ extension MovieEditorModel.Tool {
 struct ClipsPanel: View {
     let model: MovieEditorModel
     let open: (MovieEditorView.Sheet) -> Void
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let meta = model.selectedMeta {
+            if let meta = model.selectedMeta(locale: locale) {
                 Text(meta)
                     .textStyle(.noteMeta)
                     .foregroundStyle(ColorToken.textSecondary.color)
@@ -500,7 +501,7 @@ private struct ThirdLabelStyle: LabelStyle {
 
 extension MovieEditorModel {
     /// "Clip 2 · Nov 11, 6:42 PM · 0:06", "Text card · 3 s"; during an Atmosphere lead "Atmosphere · 1.4 s of 2.0 s lead" (U54).
-    var selectedMeta: String? {
+    func selectedMeta(locale: Locale) -> String? {
         if let lead = leadProgress {
             return String(
                 localized: "Atmosphere · \(TransitionSheet.seconds(lead.elapsed)) of \(TransitionSheet.seconds(lead.lead)) lead", bundle: .module,
@@ -512,7 +513,7 @@ extension MovieEditorModel {
         }
         guard let clip = selectedClip, let plan = selectedPlan, let moment = clip.moment else { return nil }
         let zone = TimeZone(identifier: moment.timeZoneID) ?? .current
-        let when = moment.capturedAt.formatted(Date.FormatStyle(timeZone: zone).month(.abbreviated).day().hour().minute())
+        let when = moment.capturedAt.formatted(Date.FormatStyle(locale: locale, timeZone: zone).month(.abbreviated).day().hour().minute())
         return String(
             localized: "Clip \(selectedClipNumber) · \(when) · \(MovieEditorView.clock(plan.duration))", bundle: .module,
             comment: "U50: the chosen clip, when it was taken, and how long it plays, e.g. Clip 2 · Nov 11, 6:42 PM · 0:06"

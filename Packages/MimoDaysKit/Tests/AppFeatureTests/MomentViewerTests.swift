@@ -175,15 +175,23 @@ struct MomentViewerTests {
         player.isOnBack = true
         #expect(player.isPlaying && player.main.rate == 1, "the flip paused it")
         #expect(player.main.isMuted)
+        // Polled, not slept: a busy machine runs late, and a 1 s clip may already be round again.
         let onBack = player.main.currentTime().seconds
-        try await Task.sleep(for: .milliseconds(150))
-        #expect(player.main.currentTime().seconds > onBack, "the flip stopped or restarted it")
+        var moved = false
+        for _ in 0..<100 where !moved {
+            try await Task.sleep(for: .milliseconds(20))
+            moved = player.main.currentTime().seconds != onBack
+        }
+        #expect(moved, "the flip stopped it at \(onBack) s")
 
         // Past the end: round again, both streams.
         var looped = false
-        for _ in 0..<60 where !looped {
-            try await Task.sleep(for: .milliseconds(50))
-            looped = player.main.currentTime().seconds < onBack
+        var last = player.main.currentTime().seconds
+        for _ in 0..<200 where !looped {
+            try await Task.sleep(for: .milliseconds(25))
+            let now = player.main.currentTime().seconds
+            looped = now < last
+            last = now
         }
         #expect(looped, "no loop: \(player.main.currentTime().seconds) s")
         try await Task.sleep(for: .milliseconds(150))

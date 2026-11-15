@@ -134,6 +134,8 @@ final class TodayUITests: XCTestCase {
         let back = app.buttons["viewer.back"]
         XCTAssertTrue(back.waitForExistence(timeout: 10))
         XCTAssertTrue(back.staticTexts["Mosaic"].exists || back.label.contains("Back"))
+        // The Mosaic's card swaps and turns over as everywhere else.
+        app.swapAndFlipTheCard()
         back.tap()
         XCTAssertTrue(piece.waitForExistence(timeout: 5))
 

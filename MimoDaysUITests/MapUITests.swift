@@ -47,6 +47,8 @@ final class MapUITests: XCTestCase {
         XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
         // U41: back to the Map, which of the place's moments this is.
         attachScreenshot("U41")
+        // The Map's card swaps and turns over as everywhere else.
+        app.swapAndFlipTheCard()
     }
 
     /// Flow 08 (doc 02): a place's moments make a movie. The wizard opens on Movies with the place chosen;

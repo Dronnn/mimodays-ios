@@ -5,6 +5,8 @@ import Foundation
 /// three small ones, or a wide piece beside a tall one follow each other down the month; favorites and videos get
 /// the larger pieces. Every piece is a little smaller than its cell by an uneven amount and tilts up to 3°.
 /// The same moments always give the same layout: the choices come from the moments' ids, not from chance.
+/// A wide screen keeps the pieces at about the iPhone's size and puts blocks side by side in lanes (Andrew,
+/// 2026-11-15): two on iPad portrait, three in landscape, each block going to the lane that ends highest.
 enum MosaicLayout {
     /// What the layout needs of a moment.
     struct Moment: Equatable {
@@ -31,6 +33,13 @@ enum MosaicLayout {
     /// Between blocks.
     static let blockGap: CGFloat = 10
     static let maximumTilt = 3.0
+    /// The narrowest lane: one on any iPhone, two from about 700 pt.
+    static let minimumLaneWidth: CGFloat = 340
+
+    /// Lanes that fit across `width`.
+    static func lanes(width: CGFloat) -> Int {
+        max(1, Int((width - 2 * margin + gap) / (minimumLaneWidth + gap)))
+    }
 
     enum Block: Equatable {
         /// A big square piece and two small ones stacked beside it; mirrored puts the big one on the right.
@@ -87,11 +96,16 @@ enum MosaicLayout {
 
     /// The month laid out across `width` points.
     static func chapter(_ moments: [Moment], width: CGFloat) -> Chapter {
-        let unit = max(0, (width - 2 * margin - 2 * gap) / 3)
+        let count = lanes(width: width)
+        let lane = max(0, (width - 2 * margin - CGFloat(count - 1) * gap) / CGFloat(count))
+        let unit = max(0, (lane - 2 * gap) / 3)
         var tiles: [Tile] = []
-        var top: CGFloat = 0
+        var tops = [CGFloat](repeating: 0, count: count)
         var index = 0
         for block in blocks(moments) {
+            // The lane that ends highest, the leading one on a tie.
+            let column = tops.indices.min { tops[$0] < tops[$1] } ?? 0
+            let left = margin + CGFloat(column) * (lane + gap)
             var members = Array(moments[index..<index + block.count])
             index += block.count
             // The larger piece is the block's first cell: the first favorite or video moves there.
@@ -100,11 +114,11 @@ enum MosaicLayout {
             }
             let (cells, height) = cells(block, unit: unit)
             for (member, cell) in zip(members, cells) {
-                tiles.append(tile(member.id, in: cell.offsetBy(dx: margin, dy: top)))
+                tiles.append(tile(member.id, in: cell.offsetBy(dx: left, dy: tops[column])))
             }
-            top += height + blockGap
+            tops[column] += height + blockGap
         }
-        return Chapter(tiles: tiles, height: max(0, top - blockGap))
+        return Chapter(tiles: tiles, height: max(0, (tops.max() ?? 0) - blockGap))
     }
 
     /// The block's cells, larger piece first, and its height.

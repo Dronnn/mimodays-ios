@@ -70,6 +70,23 @@ struct MosaicLayoutTests {
         }
     }
 
+    @Test func anIPadPutsBlocksSideBySideAtAboutIPhoneSize() {
+        #expect(MosaicLayout.lanes(width: 402) == 1 && MosaicLayout.lanes(width: 375) == 1)
+        #expect(MosaicLayout.lanes(width: 820) == 2 && MosaicLayout.lanes(width: 744) == 2)
+        #expect(MosaicLayout.lanes(width: 1180) == 3 && MosaicLayout.lanes(width: 1366) == 3)
+        let month = moments(30, large: [0, 4, 11, 20])
+        for width in [820.0, 1180, 1366] {
+            let chapter = MosaicLayout.chapter(month, width: width)
+            #expect(chapter.tiles.count == 30)
+            #expect(chapter.tiles.allSatisfy { $0.frame.minX >= MosaicLayout.margin && $0.frame.maxX <= width - MosaicLayout.margin })
+            #expect(chapter.tiles.map(\.frame.width).max()! < 300, "pieces stay about iPhone size")
+            for (index, tile) in chapter.tiles.enumerated() {
+                #expect(chapter.tiles[(index + 1)...].allSatisfy { !$0.frame.intersects(tile.frame) })
+            }
+            #expect(chapter.height < MosaicLayout.chapter(month, width: 402).height)
+        }
+    }
+
     @Test func aFeatureBlockMatchesTheDesign() {
         // U13 on a 402 pt screen: the big piece about 2 of 3 columns, the small ones a column each.
         let (cells, height) = MosaicLayout.cells(.feature(mirrored: false), unit: (402 - 24 - 16) / 3)

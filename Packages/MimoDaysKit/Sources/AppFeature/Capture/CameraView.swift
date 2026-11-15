@@ -13,13 +13,13 @@ struct CameraView: View {
     @State private var adjustsSelfie: Bool
     /// The top safe-area inset, measured before the preview extends under the status bar.
     @State private var topInset: CGFloat = 0
-    @State private var chipBottom: CGFloat?
+    /// The surprise chip's height: a selfie window in its corner starts below it.
+    @State private var chipHeight: CGFloat?
     /// C06c, before the microphone prompt.
     @State private var explainsMicrophone = false
     @Environment(\.permissions) private var permissions
     @Environment(\.layoutDirection) private var layoutDirection
-
-    private typealias Corner = CameraSettings.SelfieWindow.Corner
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(model: CameraModel, adjustsSelfie: Bool = false, onClose: @escaping () -> Void) {
         _model = State(initialValue: model)
@@ -33,11 +33,15 @@ struct CameraView: View {
                 .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 28, bottomTrailingRadius: 28, style: .continuous))
                 .ignoresSafeArea(edges: .top)
             bottomBar
-                .frame(height: 140)
+                .frame(height: CameraChrome.Bar.height)
         }
         .background(CameraPalette.background.ignoresSafeArea())
         .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = $0 }
         .environment(\.colorScheme, .dark)
+        // U07: one spring as the phone turns; Reduce Motion cross-fades instead.
+        .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.35), value: model.layoutHold)
+        // Sideways the status bar would run down the buttons' column; the Camera app hides it too.
+        .statusBarHidden(model.layoutHold.isLandscape)
         .task { await model.start() }
         .onDisappear { Task { await model.stop() } }
         .sheet(isPresented: $showsSettings) {
@@ -68,160 +72,177 @@ struct CameraView: View {
         .accessibilityIdentifier("camera")
     }
 
+    /// With Reduce Motion the controls are replaced (and cross-fade) when the phone turns, instead of moving.
+    private var turnIdentity: DeviceHold {
+        reduceMotion ? model.layoutHold : .upright
+    }
+
+    /// Mid-recording the layout keeps the recording's hold; only the chips turn to stay readable (U07).
+    private func spin(_ turn: CameraTurn) -> Angle {
+        CameraTurn(hold: model.hold, screen: turn.screen).angle - turn.angle
+    }
+
     // MARK: Preview
 
     private var preview: some View {
         GeometryReader { proxy in
-            // 9:16 uses the whole preview, as before formats; 1:1 and 16:9 a frame inside it (U02, U03).
-            let shape = model.format == .portrait ? CGRect(origin: .zero, size: proxy.size) : FormatMask.frame(model.format, in: proxy.size)
-            // While the phone is held the wrong way the window stays where 9:16 has it (U03).
-            let windowArea = model.format == .portrait || model.needsRotation ? CGRect(origin: .zero, size: proxy.size) : shape
-            ZStack(alignment: .top) {
+            let turn = CameraTurn(hold: model.layoutHold, screen: proxy.size)
+            let chrome = CameraChrome(turn: turn, topInset: topInset, isRightToLeft: layoutDirection == .rightToLeft)
+            let whole = CGRect(origin: .zero, size: turn.size)
+            // The format's own way up fills the preview (9:16 upright, as before formats; 16:9 sideways);
+            // otherwise its shape is a frame inside it (U02, U03, U06).
+            let fills = model.format == (turn.hold.isLandscape ? .landscape : .portrait)
+            let shape = fills ? whole : FormatMask.frame(model.format, in: turn.size)
+            // While the phone is held the wrong way the window stays where the hold's own format has it (U03).
+            let windowArea = fills || model.needsRotation ? whole : shape
+            ZStack {
                 CameraPalette.previewPlaceholder
                 CameraPreview(engine: model.engine, position: model.mainPosition)
                     .accessibilityHidden(true)
-                if model.format != .portrait {
-                    FormatMask(frame: shape)
+                if !fills {
+                    FormatMask(frame: turn.rect(shape))
                 }
-                if let selfie = model.selfiePosition {
-                    let chip = model.isSurprise ? chipBottom.map { (corner: layoutDirection == .rightToLeft ? Corner.topRight : .topLeft, bottom: $0) } : nil
-                    let layout = windowArea == shape && model.format != .portrait
-                        ? SelfieWindowLayout(preview: shape.size, topInset: 0, bottomMargin: 17, topMargin: 17)
-                        : SelfieWindowLayout(preview: windowArea.size, topInset: topInset, chip: chip)
-                    AdjustableSelfieWindow(
-                        placement: $model.settings.selfieWindow, showsSheet: $adjustsSelfie,
-                        layout: layout, isEnabled: !model.isRecording, id: "camera.selfieWindow"
-                    ) {
-                        CameraPreview(engine: model.engine, position: selfie)
-                    }
-                    .frame(width: windowArea.width, height: windowArea.height)
-                    .position(x: windowArea.midX, y: windowArea.midY)
-                }
-                if model.needsRotation {
-                    RotateHint(format: model.format)
-                        .position(x: shape.midX, y: shape.midY)
-                        .transition(.opacity)
-                }
-                VStack(spacing: 0) {
-                    if model.isRecording {
-                        RecordingPill(model: model)
-                            .padding(.top, topInset - 6)
-                    } else {
-                        topBar
-                            .padding(.top, topInset - 8)
-                        if model.isSurprise {
-                            SurpriseChip()
-                                .onGeometryChange(for: CGFloat.self, of: { $0.frame(in: .named(Self.previewSpace)).maxY }) {
-                                    chipBottom = $0
-                                }
-                                .padding(.top, 16)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 16)
-                        }
-                    }
-                    Spacer(minLength: 0)
-                    if !model.isRecording {
-                        if let notice = model.notice {
-                            CameraNote(notice)
-                                .padding(.horizontal, 16)
-                                .padding(.bottom, model.mode == .video ? 17 : 20)
-                        }
-                        if model.notice == nil, model.showsSingleCameraNote {
-                            CameraNote(icon: .glyphInfo, text: Text("This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.", bundle: .module), id: "camera.singleNote")
-                                .padding(.horizontal, 16)
-                                .padding(.bottom, 20)
-                        }
-                        FormatPicker(selection: model.format) { format in
-                            withAnimation(.easeInOut(duration: 0.3)) { model.setFormat(format) }
-                        }
-                        .padding(.bottom, 16)
-                        if model.notice == nil, !model.showsSingleCameraNote, model.mode == .video {
-                            DurationPicker(selection: $model.settings.videoLength)
-                                .padding(.bottom, 16)
-                        }
-                    } else {
-                        FormatLockedChip(format: model.format)
-                            .padding(.bottom, 16)
-                    }
-                }
-                .animation(.easeInOut(duration: 0.2), value: model.needsRotation)
+                overPreview(turn, chrome, shape: shape, windowArea: windowArea, insideShape: !fills && windowArea == shape)
+                    .id(turnIdentity)
+                    .transition(.opacity)
             }
-            .coordinateSpace(.named(Self.previewSpace))
+            // Boxes are placed on the screen left to right; each lays itself out in the language's direction.
+            .environment(\.layoutDirection, .leftToRight)
         }
     }
 
-    private nonisolated static let previewSpace = "preview"
-
-    private var topBar: some View {
-        ZStack {
-            HStack {
-                RoundButton(icon: .glyphClose, label: Text("Close", bundle: .module), id: "capture.close", action: onClose)
-                Spacer()
-                RoundButton(icon: .glyphMore, label: Text("Camera settings", bundle: .module), id: "camera.more") {
-                    showsSettings = true
+    private func overPreview(_ turn: CameraTurn, _ chrome: CameraChrome, shape: CGRect, windowArea: CGRect, insideShape: Bool) -> some View {
+        let direction = layoutDirection
+        return ZStack {
+            if let selfie = model.selfiePosition {
+                let chipBottom = model.isSurprise ? chipHeight.map { chrome.surpriseChip.minY + $0 } : nil
+                AdjustableSelfieWindow(
+                    placement: $model.settings.selfieWindow, showsSheet: $adjustsSelfie,
+                    layout: chrome.selfieWindow(in: windowArea, insideShape: insideShape, chipBottom: chipBottom),
+                    isEnabled: !model.isRecording, turn: turn.angle, id: "camera.selfieWindow"
+                ) {
+                    CameraPreview(engine: model.engine, position: selfie)
                 }
+                .turned(windowArea, turn, direction: .leftToRight)
             }
-            HStack(spacing: 86) {
-                RoundButton(
-                    icon: .glyphFlash, label: Text("Flash", bundle: .module), id: "camera.flash",
-                    isOn: model.isFlashOn
-                ) { model.isFlashOn.toggle() }
-                if model.mode == .video {
-                    RoundButton(
-                        icon: model.microphoneOn ? .glyphSpeaker : .glyphMute,
-                        label: Text("Sound", bundle: .module), id: "camera.sound", isOn: model.microphoneOn
-                    ) { model.toggleSound() }
-                } else {
-                    RoundButton(
-                        icon: .glyphPiP, label: Text("Selfie window", bundle: .module), id: "camera.selfie",
-                        isOn: model.selfiePosition != nil
-                    ) { model.toggleSelfie() }
-                    .disabled(!model.canToggleSelfie)
-                    .opacity(model.canToggleSelfie ? 1 : 0.4)
+            if model.needsRotation {
+                RotateHint(format: model.format)
+                    .turned(CGRect(x: shape.midX - 150, y: shape.midY - 150, width: 300, height: 300), turn, direction: direction)
+                    .transition(.opacity)
+            }
+            if model.isRecording {
+                RecordingPill(model: model)
+                    .rotationEffect(spin(turn))
+                    .turned(chrome.timer, turn, direction: direction)
+                FormatLockedChip(format: model.format)
+                    .rotationEffect(spin(turn))
+                    .turned(chrome.lockChip, turn, direction: direction)
+            } else {
+                buttons(turn, chrome, direction)
+                if model.isSurprise {
+                    SurpriseChip()
+                        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { chipHeight = $0 }
+                        .turned(chrome.surpriseChip, turn, alignment: chrome.leading(.top), direction: direction)
                 }
+                pickersAndNotes(turn, chrome, direction)
             }
         }
-        .padding(.horizontal, 16)
+        .animation(.easeInOut(duration: 0.2), value: model.needsRotation)
+    }
+
+    @ViewBuilder
+    private func buttons(_ turn: CameraTurn, _ chrome: CameraChrome, _ direction: LayoutDirection) -> some View {
+        RoundButton(icon: .glyphClose, label: Text("Close", bundle: .module), id: "capture.close", action: onClose)
+            .turned(chrome.button(.close), turn, direction: direction)
+        RoundButton(
+            icon: .glyphFlash, label: Text("Flash", bundle: .module), id: "camera.flash",
+            isOn: model.isFlashOn
+        ) { model.isFlashOn.toggle() }
+            .turned(chrome.button(.flash), turn, direction: direction)
+        Group {
+            if model.mode == .video {
+                RoundButton(
+                    icon: model.microphoneOn ? .glyphSpeaker : .glyphMute,
+                    label: Text("Sound", bundle: .module), id: "camera.sound", isOn: model.microphoneOn
+                ) { model.toggleSound() }
+            } else {
+                RoundButton(
+                    icon: .glyphPiP, label: Text("Selfie window", bundle: .module), id: "camera.selfie",
+                    isOn: model.selfiePosition != nil
+                ) { model.toggleSelfie() }
+                    .disabled(!model.canToggleSelfie)
+                    .opacity(model.canToggleSelfie ? 1 : 0.4)
+            }
+        }
+        .turned(chrome.button(.middle), turn, direction: direction)
+        RoundButton(icon: .glyphMore, label: Text("Camera settings", bundle: .module), id: "camera.more") {
+            showsSettings = true
+        }
+        .turned(chrome.button(.more), turn, direction: direction)
+    }
+
+    /// The notes stand on the format picker; the 10/30/60 s picker shows in Video when there's no note.
+    @ViewBuilder
+    private func pickersAndNotes(_ turn: CameraTurn, _ chrome: CameraChrome, _ direction: LayoutDirection) -> some View {
+        let sideways = turn.hold.isLandscape
+        let withDuration = model.notice == nil && !model.showsSingleCameraNote && model.mode == .video
+        let picker = chrome.formatPicker(withDuration: withDuration)
+        if let notice = model.notice {
+            CameraNote(notice)
+                .turned(chrome.note(above: picker, gap: model.mode == .video ? 17 : 20), turn, alignment: .bottom, direction: direction)
+        } else if model.showsSingleCameraNote {
+            CameraNote(icon: .glyphInfo, text: Text("This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.", bundle: .module), id: "camera.singleNote")
+                .turned(chrome.note(above: picker, gap: 20), turn, alignment: .bottom, direction: direction)
+        }
+        FormatPicker(selection: model.format) { format in
+            withAnimation(.easeInOut(duration: 0.3)) { model.setFormat(format) }
+        }
+        .turned(picker, turn, alignment: Alignment(horizontal: sideways && withDuration ? chrome.physical(right: true) : .center, vertical: .center), direction: direction)
+        if withDuration {
+            DurationPicker(selection: $model.settings.videoLength)
+                .turned(chrome.durationPicker, turn, alignment: Alignment(horizontal: sideways ? chrome.physical(right: false) : .center, vertical: .center), direction: direction)
+        }
     }
 
     // MARK: Bottom
 
     private var bottomBar: some View {
-        VStack(spacing: 0) {
-            if model.isRecording {
-                Text("Tap to stop", bundle: .module)
-                    .textStyle(.hand)
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                    .foregroundStyle(CameraPalette.cream)
-                    .padding(.top, 16)
-                    .frame(height: 44, alignment: .top)
-                RecordButton(model: model)
-            } else {
-                ModeSwitch(mode: $model.mode)
-                    .padding(.top, 14)
-                    .frame(height: 48, alignment: .top)
-                ZStack {
+        GeometryReader { proxy in
+            let turn = CameraTurn(hold: model.layoutHold, screen: proxy.size)
+            let bar = CameraChrome.Bar(turn: turn, isRightToLeft: layoutDirection == .rightToLeft)
+            let sideways = turn.hold.isLandscape
+            let direction = layoutDirection
+            ZStack {
+                if model.isRecording {
+                    if !sideways {
+                        Text("Tap to stop", bundle: .module)
+                            .textStyle(.hand)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                            .foregroundStyle(CameraPalette.cream)
+                            .turned(bar.tapToStop, turn, alignment: .top, direction: direction)
+                    }
+                    RecordButton(model: model)
+                        .turned(bar.shutter(92), turn, direction: direction)
+                } else {
+                    ModeSwitch(mode: $model.mode, isVertical: sideways)
+                        .turned(bar.modeSwitch, turn, alignment: sideways ? .center : .top, direction: direction)
                     ShutterButton(mode: model.mode) { Task { await model.shutter() } }
                         .disabled(!model.canCapture)
                         .opacity(model.needsRotation ? 0.35 : 1)
                         .accessibilityHint(model.needsRotation ? rotateHint : Text(verbatim: ""))
-                    HStack {
-                        // Last capture thumbnail arrives with saved moments (Phase 7).
-                        Color.clear.frame(width: 48, height: 48)
-                        Spacer()
-                        FlipButton { Task { await model.flip() } }
+                        .turned(bar.shutter(84), turn, direction: direction)
+                    // Last capture thumbnail arrives with saved moments (Phase 7).
+                    FlipButton { Task { await model.flip() } }
+                        .turned(bar.flip, turn, direction: direction)
+                    if model.needsRotation {
+                        RotateReason(format: model.format, mode: model.mode, lines: sideways ? 3 : 1)
+                            .turned(bar.rotateReason, turn, alignment: sideways ? .top : .bottom, direction: direction)
                     }
-                    .padding(.horizontal, 36)
                 }
             }
-            Spacer(minLength: 0)
-        }
-        .overlay(alignment: .bottom) {
-            if model.needsRotation {
-                RotateReason(format: model.format, mode: model.mode)
-                    .padding(.horizontal, 16)
-                    .offset(y: 10)
-            }
+            .id(turnIdentity)
+            .transition(.opacity)
+            .environment(\.layoutDirection, .leftToRight)
         }
     }
 
@@ -357,15 +378,24 @@ private struct RecordingPill: View {
 /// PHOTO / VIDEO with a coral dot under the active one.
 private struct ModeSwitch: View {
     @Binding var mode: CameraSettings.Mode
+    /// Sideways (U04): one over the other in the shutter's column, without the dot.
+    var isVertical = false
 
     /// As in the design: labels start 90 pt apart in a centred 160 pt row.
     var body: some View {
-        HStack(alignment: .top, spacing: 0) {
-            item(.photo, CameraSettings.Mode.photo.label, id: "camera.mode.photo")
-                .frame(minWidth: 90, alignment: .leading)
-            item(.video, CameraSettings.Mode.video.label, id: "camera.mode.video")
+        if isVertical {
+            VStack(spacing: 0) {
+                item(.photo, CameraSettings.Mode.photo.label, id: "camera.mode.photo")
+                item(.video, CameraSettings.Mode.video.label, id: "camera.mode.video")
+            }
+        } else {
+            HStack(alignment: .top, spacing: 0) {
+                item(.photo, CameraSettings.Mode.photo.label, id: "camera.mode.photo")
+                    .frame(minWidth: 90, alignment: .leading)
+                item(.video, CameraSettings.Mode.video.label, id: "camera.mode.video")
+            }
+            .frame(minWidth: 160, alignment: .leading)
         }
-        .frame(minWidth: 160, alignment: .leading)
     }
 
     private func item(_ value: CameraSettings.Mode, _ title: Text, id: String) -> some View {
@@ -374,12 +404,15 @@ private struct ModeSwitch: View {
                 title
                     .textStyle(.cameraMode)
                     .foregroundStyle(CameraPalette.cream.opacity(mode == value ? 1 : 0.5))
-                Circle()
-                    .fill(CameraPalette.coral)
-                    .frame(width: 5, height: 5)
-                    .opacity(mode == value ? 1 : 0)
+                if !isVertical {
+                    Circle()
+                        .fill(CameraPalette.coral)
+                        .frame(width: 5, height: 5)
+                        .opacity(mode == value ? 1 : 0)
+                }
             }
-            .frame(minHeight: Size.minimumTapTarget, alignment: .top)
+            // Sideways each row spans the column, so the target stays wide where it is short.
+            .frame(minWidth: isVertical ? 124 : nil, minHeight: isVertical ? 24 : Size.minimumTapTarget, alignment: isVertical ? .center : .top)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

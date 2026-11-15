@@ -9,6 +9,8 @@ struct AdjustableSelfieWindow<Content: View>: View {
     @Binding var showsSheet: Bool
     let layout: SelfieWindowLayout
     var isEnabled = true
+    /// How far the camera turns this layer for a sideways hold; the picture inside turns back so it stays as the camera sees it.
+    var turn: Angle = .zero
     let id: String
     @ViewBuilder let content: () -> Content
     @GestureState(resetTransaction: Transaction(animation: .snappy)) private var drag: CGSize?
@@ -23,11 +25,11 @@ struct AdjustableSelfieWindow<Content: View>: View {
             if showsSheet || drag != nil {
                 let target = drag == nil ? placement.corner : layout.nearest(to: center, placement.scale)
                 ForEach(Corner.allCases, id: \.self) { corner in
-                    SelfieTarget(scale: placement.scale, isSelected: corner == target)
+                    SelfieTarget(size: layout.frameSize(placement.scale), isSelected: corner == target)
                         .position(layout.frameCenter(corner, placement.scale))
                 }
             }
-            SelfieWindowView(scale: placement.scale, showsHandle: isEnabled, content: content)
+            SelfieWindowView(scale: placement.scale, showsHandle: isEnabled, turn: turn, content: content)
                 .position(center)
                 .gesture(gesture, isEnabled: isEnabled)
                 .accessibilityElement(children: .ignore)
@@ -57,16 +59,21 @@ struct AdjustableSelfieWindow<Content: View>: View {
 }
 
 /// The signature window: `content` in a cream frame tilted -5.4°, with a drag handle below (C01, C07).
+/// With a `turn` (the camera held sideways, U04) the frame turns back inside the layer, so it lies on its side.
 struct SelfieWindowView<Content: View>: View {
     let scale: CameraSettings.SelfieWindow.Scale
     let showsHandle: Bool
+    var turn: Angle = .zero
     @ViewBuilder let content: () -> Content
 
     var body: some View {
         let frame = SelfieWindowLayout.frameSize(scale)
+        let sideways = turn != .zero
         VStack(spacing: 6) {
             SelfieFrame(placeholder: CameraPalette.selfiePlaceholder, tilted: false, content: content)
                 .frame(width: frame.width, height: frame.height)
+                .rotationEffect(-turn)
+                .frame(width: sideways ? frame.height : frame.width, height: sideways ? frame.width : frame.height)
             Capsule()
                 .fill(CameraPalette.cream.opacity(0.9))
                 .frame(width: 24, height: 4)
@@ -78,11 +85,11 @@ struct SelfieWindowView<Content: View>: View {
 
 /// C04 corner target: dashed, or a coral ring around the window where it lands.
 private struct SelfieTarget: View {
-    let scale: CameraSettings.SelfieWindow.Scale
+    let size: CGSize
     let isSelected: Bool
 
     var body: some View {
-        let frame = SelfieWindowLayout.frameSize(scale)
+        let frame = size
         Group {
             if isSelected {
                 RoundedRectangle(cornerRadius: 26, style: .continuous)

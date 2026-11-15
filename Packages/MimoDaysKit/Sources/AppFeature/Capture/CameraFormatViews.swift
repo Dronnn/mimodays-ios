@@ -182,14 +182,16 @@ private struct RotateGlyph: View {
 struct RotateReason: View {
     let format: CaptureFormat
     let mode: CameraSettings.Mode
+    /// One line under the shutter upright; a few short ones in the sideways column.
+    var lines = 1
 
     var body: some View {
         text
             .textStyle(TextStyle(.nunito, size: 12, weight: 600, relativeTo: .caption1, maximumScale: 1.35))
             .foregroundStyle(CameraPalette.cream.opacity(0.7))
             .multilineTextAlignment(.center)
-            // One line under the shutter at every size; the shutter's VoiceOver hint says the same.
-            .lineLimit(1)
+            // Fixed lines at every size; the shutter's VoiceOver hint says the same.
+            .lineLimit(lines)
             .minimumScaleFactor(0.7)
             .accessibilityIdentifier("camera.rotateReason")
     }

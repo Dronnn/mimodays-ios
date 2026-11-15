@@ -15,7 +15,7 @@ struct CameraSnapshotTests {
     private func camera(
         multiCam: Bool = true, surprise: Bool = false, mode: CameraSettings.Mode = .photo,
         selfieWindow: CameraSettings.SelfieWindow = .init(), microphone: PermissionStatus = .granted,
-        format: CaptureFormat = .portrait
+        format: CaptureFormat = .portrait, hold: DeviceHold = .upright
     ) async -> CameraModel {
         var settings = CameraSettings()
         settings.opensIn = mode
@@ -23,9 +23,10 @@ struct CameraSnapshotTests {
         settings.format = format
         let model = CameraModel(
             engine: SimulatedCaptureEngine(multiCam: multiCam), store: InMemoryCameraSettingsStore(settings),
-            isSurprise: surprise, microphoneStatus: { microphone }, onCapture: { _ in }
+            isSurprise: surprise, orientation: FixedOrientationSensor(hold), microphoneStatus: { microphone }, onCapture: { _ in }
         )
         await model.start()
+        for _ in 0..<50 where model.hold != hold { try? await Task.sleep(for: .milliseconds(20)) }
         return model
     }
 
@@ -62,6 +63,28 @@ struct CameraSnapshotTests {
     /// U03: 16:9 picked with the phone upright: the shape, the hint and the dimmed shutter with its reason.
     @Test func landscapePickedUpright() async {
         assertScreenSnapshots(of: screen(await camera(mode: .video, format: .landscape)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// U04: 16:9 with the top of the phone to the left: the layout turned, the window on its side.
+    @Test func landscapeSideways() async {
+        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .landscape, hold: .landscapeLeft)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .light, rightToLeft: true)])
+    }
+
+    /// The top to the right: the shutter's column stays on the phone's bottom edge, so the design is mirrored.
+    @Test func landscapeSidewaysTheOtherWay() async {
+        assertScreenSnapshots(of: screen(await camera(surprise: true, format: .landscape, hold: .landscapeRight)), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// U05: recording 16:9 sideways: the timer, the lock chip and the stop button.
+    @Test func landscapeRecording() async {
+        let model = await camera(mode: .video, format: .landscape, hold: .landscapeLeft)
+        model.phase = .recording(startedAt: Date().addingTimeInterval(-7.5))
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// U06: 9:16 picked with the phone sideways: the 9:16 shape, the hint and the reason in the column.
+    @Test func portraitPickedSideways() async {
+        assertScreenSnapshots(of: screen(await camera(mode: .video, hold: .landscapeLeft)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
     @Test func singleCamera() async {

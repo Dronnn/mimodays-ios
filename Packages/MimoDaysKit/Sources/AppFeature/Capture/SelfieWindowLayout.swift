@@ -22,6 +22,11 @@ struct SelfieWindowLayout {
     var bottomMargin: CGFloat = 125
     /// Space over the top corners, below the top inset. Inside a 1:1 or 16:9 frame the window keeps 17 pt from its edges (U02).
     var topMargin: CGFloat = 49.1
+    /// Space beside the left and right corners. Held sideways, the side with the buttons keeps clear of them (U04).
+    var leftMargin: CGFloat = 8.7
+    var rightMargin: CGFloat = 23.3
+    /// Held sideways the window lies on its side: 150 x 112 at the medium size (U04).
+    var sideways = false
 
     static func frameSize(_ scale: Scale) -> CGSize {
         CGSize(width: frame.width * scale.factor, height: frame.height * scale.factor)
@@ -33,10 +38,21 @@ struct SelfieWindowLayout {
         return CGSize(width: frame.width, height: frame.height + handleSpace)
     }
 
+    /// The frame at `scale` in this layout: upright, or on its side.
+    func frameSize(_ scale: Scale) -> CGSize {
+        let size = Self.frameSize(scale)
+        return sideways ? CGSize(width: size.height, height: size.width) : size
+    }
+
+    func windowSize(_ scale: Scale) -> CGSize {
+        let frame = frameSize(scale)
+        return CGSize(width: frame.width, height: frame.height + Self.handleSpace)
+    }
+
     /// Centre of the whole window (frame and handle).
     func center(_ corner: Corner, _ scale: Scale) -> CGPoint {
-        let size = Self.windowSize(scale)
-        let x = corner.isLeft ? 8.7 + size.width / 2 : preview.width - 23.3 - size.width / 2
+        let size = windowSize(scale)
+        let x = corner.isLeft ? leftMargin + size.width / 2 : preview.width - rightMargin - size.width / 2
         var top = topInset + topMargin
         if let chip, chip.corner == corner { top = max(top, chip.bottom + 12) }
         let y = corner.isTop ? top + size.height / 2 : preview.height - bottomMargin - size.height / 2
@@ -52,7 +68,7 @@ struct SelfieWindowLayout {
     /// The frame (without the handle) where the window sits, for composing the photo.
     func windowFrame(_ placement: CameraSettings.SelfieWindow) -> SelfieWindowFrame {
         let center = frameCenter(placement.corner, placement.scale)
-        let size = Self.frameSize(placement.scale)
+        let size = frameSize(placement.scale)
         let frame = CGRect(x: center.x - size.width / 2, y: center.y - size.height / 2, width: size.width, height: size.height)
         return SelfieWindowFrame(frame: frame, preview: preview)
     }

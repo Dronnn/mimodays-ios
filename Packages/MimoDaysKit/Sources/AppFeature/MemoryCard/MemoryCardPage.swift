@@ -143,7 +143,11 @@ struct MemoryCardPage: View {
                 .contentShape(Rectangle())
                 .highPriorityGesture(flipDrag(width: card.width))
                 .onTapGesture { flipOver() }
-                .accessibilityHidden(true)
+                // A hidden tap area still reaches the accessibility tree as an empty node: it says what it does.
+                .accessibilityElement()
+                .accessibilityLabel(Text("Flip card", bundle: .module))
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction { flipOver() }
         }
     }
 

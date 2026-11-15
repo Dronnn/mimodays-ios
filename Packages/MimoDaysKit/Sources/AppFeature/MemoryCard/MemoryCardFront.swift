@@ -43,6 +43,7 @@ struct MemoryCardFront: View {
     /// The VoiceOver actions; nil in Review, which has no neighbours and no back yet.
     let actions: MemoryCardActions?
     @State private var adjustsWindow = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @GestureState(resetTransaction: Transaction(animation: .snappy)) private var drag: CGSize?
 
     /// The card's face under the pictures, seen while they swap (U22).
@@ -66,13 +67,19 @@ struct MemoryCardFront: View {
                 .accessibilityAddTraits(.isImage)
                 .accessibilityIdentifier(pictures.id)
                 .modifier(CardActions(actions: actions))
-            picture(.main, bounds: bounds, window: frame)
-            if let frame {
-                if let window, adjustsWindow || drag != nil {
-                    targets(window.layout, window.placement)
+            ZStack(alignment: .topLeading) {
+                picture(.main, bounds: bounds, window: frame)
+                if let frame {
+                    if let window, adjustsWindow || drag != nil {
+                        targets(window.layout, window.placement)
+                    }
+                    picture(.selfie, bounds: bounds, window: frame)
                 }
-                picture(.selfie, bounds: bounds, window: frame)
             }
+            .frame(width: size.width, height: size.height, alignment: .topLeading)
+            // Reduce Motion: the swapped pictures cross-fade in place of moving (U35).
+            .id(reduceMotion && swapped)
+            .transition(.opacity)
             if isVideo, controlsShown {
                 MemoryCardVideoControls(playback: playback, fallbackDuration: pictures.duration)
                     .frame(width: size.width, height: size.height, alignment: .bottom)

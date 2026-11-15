@@ -1,4 +1,5 @@
 import Foundation
+import Synchronization
 
 /// A calendar day in the place a moment happened, independent of where the person is now.
 public struct LocalDay: Hashable, Comparable, Codable, Sendable {
@@ -62,8 +63,17 @@ public struct CaptureTime: Hashable, Codable, Sendable {
         CaptureTime(instant: clock.now(), timeZone: timeZone)
     }
 
-    /// Falls back to GMT if the stored identifier is unknown on this OS version.
-    public var timeZone: TimeZone { TimeZone(identifier: timeZoneID) ?? .gmt }
+    /// The zone times and days are shown in: where it was taken (GMT if the stored identifier is unknown on this
+    /// OS version), or the iPhone's zone when the person chose that (S09). `timeZoneID` always keeps where it was taken.
+    public var timeZone: TimeZone { Self.followsDeviceTimeZone ? .current : TimeZone(identifier: timeZoneID) ?? .gmt }
+
+    /// S09 "Days follow this iPhone's time zone", set by the app at launch and when the setting changes.
+    public static var followsDeviceTimeZone: Bool {
+        get { deviceZone.withLock { $0 } }
+        set { deviceZone.withLock { $0 = newValue } }
+    }
+
+    private static let deviceZone = Mutex(false)
 
     public var localDay: LocalDay { LocalDay(instant, in: timeZone) }
 

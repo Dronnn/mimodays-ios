@@ -1099,6 +1099,18 @@
         }
       }
     },
+    "A photo taken at 11 PM in New York stays on that day, even if you are in Tbilisi now." : {
+      "comment" : "Memories settings (S09): note explaining Days follow where you were",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A photo taken at 11 PM in New York stays on that day, even if you are in Tbilisi now."
+          }
+        }
+      }
+    },
     "A place" : {
       "comment" : "New movie (F02): source row that lists places",
       "extractionState" : "manual",
@@ -2343,6 +2355,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Days and times follow wherever this iPhone is now, so a photo taken late in the evening can move to the next day." : {
+      "comment" : "Memories settings (S09): note explaining Days follow this iPhone's time zone",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days and times follow wherever this iPhone is now, so a photo taken late in the evening can move to the next day."
+          }
+        }
+      }
+    },
+    "Days follow this iPhone's time zone" : {
+      "comment" : "Memories settings (S09): choice, a moment's day and time follow the iPhone's current time zone",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days follow this iPhone's time zone"
+          }
+        }
+      }
+    },
+    "Days follow where you were" : {
+      "comment" : "Memories settings (S09): choice, a moment's day and time are those of the place it was taken",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days follow where you were"
           }
         }
       }
@@ -3692,13 +3740,25 @@
       }
     },
     "Memories" : {
-      "comment" : "Tab: grid of all saved moments",
+      "comment" : "Tab: grid of all saved moments; also the Settings (S01) row and the title of the Memories settings (S09)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Memories"
+          }
+        }
+      }
+    },
+    "Memories opens in" : {
+      "comment" : "Memories settings (S09): section title, whether Memories opens on the timeline or the calendar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memories opens in"
           }
         }
       }
@@ -4047,6 +4107,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New movie"
+          }
+        }
+      }
+    },
+    "Newest first" : {
+      "comment" : "Memories settings (S09): switch, newest moments at the top of Memories",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Newest first"
           }
         }
       }
@@ -4599,6 +4671,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "On this day"
+          }
+        }
+      }
+    },
+    "On this day on Today" : {
+      "comment" : "Memories settings (S09): switch, show the On this day section on the Today screen",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this day on Today"
           }
         }
       }
@@ -7275,6 +7359,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Time to catch it"
+          }
+        }
+      }
+    },
+    "Time zones" : {
+      "comment" : "Memories settings (S09): section title for which time zone decides a moment's day",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time zones"
           }
         }
       }

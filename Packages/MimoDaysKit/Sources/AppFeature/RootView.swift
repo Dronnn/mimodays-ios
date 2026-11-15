@@ -15,6 +15,7 @@ public struct RootView: View {
     private let notificationTaps: SurpriseNotificationHandler
     private let camera: CameraServices
     private let momentSaver: MomentSaver
+    private let memoriesPreferences: MemoriesPreferences
     @State private var today: TodayModel
     @State private var memories: MemoriesModel
     /// C12 toast after a save.
@@ -33,9 +34,14 @@ public struct RootView: View {
             context: dependencies.modelContainer.mainContext, surprises: surprises, permissions: dependencies.permissions,
             store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
         ))
-        _memories = State(initialValue: MemoriesModel(
+        let memories = MemoriesModel(
             context: dependencies.modelContainer.mainContext, store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
-        ))
+        )
+        memoriesPreferences = dependencies.memoriesPreferences
+        memories.mode = memoriesPreferences.settings.opensIn.memoriesMode
+        memories.newestFirst = memoriesPreferences.settings.newestFirst
+        CaptureTime.followsDeviceTimeZone = memoriesPreferences.settings.days == .thisIPhone
+        _memories = State(initialValue: memories)
         let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
         let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
@@ -56,6 +62,7 @@ public struct RootView: View {
         .environment(\.permissions, permissions)
         .environment(\.camera, camera)
         .environment(\.momentSaver, momentSaver)
+        .environment(memoriesPreferences)
         .environment(\.mediaLibrary, memories.library)
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
@@ -65,10 +72,23 @@ public struct RootView: View {
                 router.open(.capture(promptID: draft.promptID))
             }
         }
+        // S09: Memories follows a change at once.
+        .onChange(of: memoriesPreferences.settings.opensIn) { _, mode in memories.mode = mode.memoriesMode }
+        .onChange(of: memoriesPreferences.settings.newestFirst) { _, newestFirst in
+            memories.newestFirst = newestFirst
+            memories.scrolledRow = nil
+            memories.refresh()
+        }
+        .onChange(of: memoriesPreferences.settings.days) { _, days in
+            CaptureTime.followsDeviceTimeZone = days == .thisIPhone
+            relabelDays(days)
+        }
         .onChange(of: scenePhase, initial: true) { _, phase in
             guard phase == .active else { return }
             refreshSurprises()
             purgeRecentlyDeleted()
+            // The iPhone may be in another zone now.
+            if memoriesPreferences.settings.days == .thisIPhone { relabelDays(.thisIPhone) }
         }
         // Midnight, a clock change or a new time zone: hours follow the device.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
@@ -77,6 +97,16 @@ public struct RootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
             NSTimeZone.resetSystemTimeZone()
             refreshSurprises()
+            if memoriesPreferences.settings.days == .thisIPhone { relabelDays(.thisIPhone) }
+        }
+    }
+
+    /// S09: every moment's day for the chosen time zone; Memories reads them again when any moved.
+    private func relabelDays(_ days: MemoriesSettings.Days) {
+        do {
+            if try MomentDays.relabel(memories.library.context, days: days) > 0 { memories.refresh() }
+        } catch {
+            Logger(subsystem: "MimoDays", category: "Settings").error("Relabelling days failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 

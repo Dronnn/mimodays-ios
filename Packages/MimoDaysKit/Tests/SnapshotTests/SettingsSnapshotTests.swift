@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// Settings: S01, S02 and S03.
+/// Settings: S01, S02, S03 and S09.
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct SettingsSnapshotTests {
@@ -69,5 +69,11 @@ struct SettingsSnapshotTests {
         assertScreenSnapshots(
             of: page(CameraSettingsView(settings: Binding { settings } set: { settings = $0 }, access: .allowed)), variants: variants
         )
+    }
+
+    /// S09.
+    @Test func memories() {
+        var settings = MemoriesSettings()
+        assertScreenSnapshots(of: page(MemoriesSettingsView(settings: Binding { settings } set: { settings = $0 })), variants: variants)
     }
 }

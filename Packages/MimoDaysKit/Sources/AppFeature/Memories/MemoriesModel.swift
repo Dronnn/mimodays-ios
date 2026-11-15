@@ -69,6 +69,8 @@ final class MemoriesModel {
     /// Moments by local day (yyyymmdd), newest first, for the calendar.
     private(set) var days: [Int: [MemoryItem]] = [:]
     var mode = MemoriesMode.timeline
+    /// S09 "Newest first"; off shows the oldest month and day at the top.
+    var newestFirst = true
     var scale = CalendarScale.month
     /// The month (yyyymm) or, at year scale, the year the calendar shows.
     private(set) var shownMonth: Int
@@ -209,7 +211,10 @@ final class MemoriesModel {
     func refresh() {
         var descriptor = FetchDescriptor<Moment>(
             predicate: #Predicate { $0.deletedAt == nil },
-            sortBy: [SortDescriptor(\.localDay, order: .reverse), SortDescriptor(\.capturedAt, order: .reverse)]
+            sortBy: [
+                SortDescriptor(\.localDay, order: newestFirst ? .reverse : .forward),
+                SortDescriptor(\.capturedAt, order: newestFirst ? .reverse : .forward),
+            ]
         )
         descriptor.propertiesToFetch = [\.id, \.localDay, \.capturedAt, \.timeZoneID, \.mediaTypeRaw, \.originRaw, \.isFavorite]
         do {
@@ -230,7 +235,7 @@ final class MemoriesModel {
         isLoaded = true
     }
 
-    /// Months, then days, from items sorted newest day first and newest first within a day.
+    /// Months, then days, from items sorted by day and by time within a day, either way round.
     static func rows(_ items: [MemoryItem]) -> [MemoryRow] {
         var rows: [MemoryRow] = []
         var start = 0

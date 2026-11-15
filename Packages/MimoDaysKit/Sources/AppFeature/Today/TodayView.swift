@@ -16,6 +16,7 @@ struct TodayView: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(MemoriesPreferences.self) private var memoriesPreferences: MemoriesPreferences?
 
     var body: some View {
         ScrollView {
@@ -74,7 +75,7 @@ struct TodayView: View {
             movieCard
                 .padding(.top, model.isEmpty ? 0 : 8)
                 .padding(.horizontal, 18)
-            if let onThisDay = model.onThisDay {
+            if showsOnThisDay, let onThisDay = model.onThisDay {
                 onThisDaySection(onThisDay)
                     .padding(.top, 32)
                     .padding(.horizontal, 18)
@@ -87,6 +88,9 @@ struct TodayView: View {
         .frame(maxWidth: .infinity, minHeight: height, alignment: .top)
     }
 
+    /// S09 "On this day on Today".
+    private var showsOnThisDay: Bool { memoriesPreferences?.settings.onThisDayOnToday ?? true }
+
     /// iPad landscape (X01): the hero on the left; the ribbon, On this day, this month and the movie on the right.
     private var wide: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -98,7 +102,7 @@ struct TodayView: View {
                     .frame(maxWidth: .infinity)
                 VStack(alignment: .leading, spacing: 24) {
                     ribbon
-                    if let onThisDay = model.onThisDay { onThisDaySection(onThisDay) }
+                    if showsOnThisDay, let onThisDay = model.onThisDay { onThisDaySection(onThisDay) }
                     if !model.month.isEmpty {
                         VStack(alignment: .leading, spacing: 10) {
                             monthHeader

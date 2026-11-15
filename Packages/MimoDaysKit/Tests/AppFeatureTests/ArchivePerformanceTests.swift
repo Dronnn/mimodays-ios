@@ -66,6 +66,23 @@ struct ArchivePerformanceTests {
         #expect(favorites < .seconds(1), "Favorites took \(favorites)")
     }
 
+    /// E.5: the Mosaic's months and every piece's place, for the whole archive; the screen only lays out the months
+    /// near it, so this is far more than one frame does.
+    @Test func mosaicLaysOutTheArchiveQuickly() {
+        let model = MemoriesModel(context: context, store: store, thumbnails: ThumbnailPipeline(), clock: TestDateProvider(Self.now), calendar: { Self.utc })
+        model.refresh()
+        let view = MosaicView(model: model)
+        var pieces = 0
+        let elapsed = time {
+            for month in view.months {
+                let moments = month.items.map { MosaicLayout.Moment(id: $0.id, prefersLarge: $0.isFavorite || $0.mediaType == .video) }
+                pieces += MosaicLayout.chapter(moments, width: 402).tiles.count
+            }
+        }
+        #expect(pieces == Self.count)
+        #expect(elapsed < .seconds(3), "Mosaic layout took \(elapsed)")
+    }
+
     @Test func searchIndexesAndAnswersQuickly() {
         let model = SearchModel(library: library, clock: TestDateProvider(Self.now), calendar: { Self.utc })
         let indexing = time { model.refresh() }

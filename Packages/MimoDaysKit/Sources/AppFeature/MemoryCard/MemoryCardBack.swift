@@ -60,7 +60,6 @@ struct MemoryCardBack: View {
                 .scaleEffect(x: cornerOnRight ? 1 : -1)
                 .padding(.trailing, 7)
                 .padding(.bottom, 10)
-                .accessibilityHidden(true)
         }
         .clipShape(MemoryCardOutline())
         .overlay { MemoryCardOutline().strokeBorder(ColorToken.borderSubtle.color, lineWidth: 3).allowsHitTesting(false) }
@@ -238,8 +237,5 @@ struct CardVoiceNote: View {
     }
 
     /// The capsule: the canvas's cream on the card's paper, a soft plum in the dark (U30, U34).
-    private static let fill = Color(UIColor { traits in
-        traits.userInterfaceStyle == .dark ? UIColor(red: 0x3A / 255, green: 0x30 / 255, blue: 0x36 / 255, alpha: 1)
-            : UIColor(red: 0xF3 / 255, green: 0xE8 / 255, blue: 0xDE / 255, alpha: 1)
-    })
+    private static let fill = Color.dynamic(light: 0xF3E8DE, dark: 0x3A3036)
 }

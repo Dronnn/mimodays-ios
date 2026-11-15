@@ -146,9 +146,6 @@ public struct TextStyle: Equatable, Sendable {
     public static let mosaicChapter = TextStyle(.fraunces, size: 20, weight: 600, lineHeight: 1.2, relativeTo: .title3, maximumScale: 1.35)
     /// "Your mosaic grows with every moment".
     public static let mosaicNoteTitle = TextStyle(.fraunces, size: 18, weight: 600, relativeTo: .headline, maximumScale: 1.35)
-    /// The first-time flip hint (U11).
-    public static let coachTitle = TextStyle(.nunito, size: 14, weight: 800, relativeTo: .subheadline)
-    public static let coachBody = TextStyle(.nunito, size: 13, weight: 600, relativeTo: .footnote)
     /// "No memories yet".
     /// The words under an empty state's title (M09, M10e).
     public static let emptyBody = TextStyle(.nunito, size: 15, weight: 500, lineHeight: 1.4, relativeTo: .subheadline)
@@ -195,7 +192,7 @@ public struct TextStyle: Equatable, Sendable {
     public static let voicePill = TextStyle(.nunito, size: 15, weight: 600, relativeTo: .subheadline)
     /// Elapsed and total time under the video scrubber (M06).
     public static let scrubTime = TextStyle(.nunito, size: 12, weight: 600, relativeTo: .caption2, maximumScale: 1.35)
-    /// "Swap cameras" and "Flip" under a Memory Card (U20).
+    /// Retake over the Review card, the Memory Card back's small actions (U20, U30).
     public static let cardButton = TextStyle(.nunito, size: 14, weight: 800, relativeTo: .subheadline, maximumScale: 1.35)
     /// The day on a Memory Card's back: "Wednesday, Nov 11" (U30).
     public static let cardBackDay = TextStyle(.fraunces, size: 24, weight: 600, relativeTo: .title2, maximumScale: 1.35)

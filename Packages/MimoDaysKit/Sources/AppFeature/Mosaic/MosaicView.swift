@@ -32,7 +32,8 @@ struct MosaicView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
+            // Lazy, so only the months near the screen are built and load their thumbnails (E.5).
+            LazyVStack(alignment: .leading, spacing: 0) {
                 HomeHeader()
                 title
                     .padding(.top, 13)

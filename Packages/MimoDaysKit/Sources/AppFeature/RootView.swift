@@ -28,10 +28,9 @@ public struct RootView: View {
     /// The home's other side (U13): its own tiles, always newest first.
     @State private var mosaic: MemoriesModel
     /// U16: which home side shows, and the turn between them.
-    @State private var homeTurn: HomeTurn
+    @State private var home: Home
     /// U40: Mosaic pieces grow into their Memory Card; the stack's destinations need it too.
     @Namespace private var mosaicZoom
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// C12 toast after a save.
     @State private var showsSavedToast = false
     @Environment(\.scenePhase) private var scenePhase
@@ -65,7 +64,7 @@ public struct RootView: View {
         _mosaic = State(initialValue: MemoriesModel(
             context: dependencies.modelContainer.mainContext, store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
         ))
-        _homeTurn = State(initialValue: HomeTurn(preferences: dependencies.homePreferences))
+        _home = State(initialValue: Home(preferences: dependencies.homePreferences))
         let flow = Self.onboardingFlow(context: dependencies.modelContainer.mainContext, permissions: dependencies.permissions, surprises: surprises)
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
     }
@@ -148,7 +147,7 @@ public struct RootView: View {
         router.newMovie = nil
         router.moviesPath = []
         router.selectedTab = .today
-        homeTurn.reset()
+        home.reset()
         memories.refresh()
         mosaic.refresh()
         Task { await today.refresh() }
@@ -209,10 +208,7 @@ public struct RootView: View {
         }
         .tabViewStyle(.sidebarAdaptable)
         .tint(ColorToken.textLink.color)
-        // U12: the whole screen turns between Today and the Mosaic, over the dark behind it.
-        .modifier(PageTurn(angle: reduceMotion ? 0 : homeTurn.flip.angle))
-        .background(Color(hex: 0x2A1B21).ignoresSafeArea())
-        .environment(homeTurn)
+        .environment(home)
         .sheet(isPresented: $router.isSettingsPresented) {
             SettingsScreen(surprises: surprises)
         }

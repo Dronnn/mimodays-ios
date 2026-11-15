@@ -1,17 +1,12 @@
 import DesignSystem
 import SwiftUI
 
-/// The home header (T02, U10, U13): the wordmark, the Today | Mosaic switch, settings. Dragging across it turns
-/// the page, as the corner does; vertical scrolling keeps working through it.
+/// The home header (T02, U10, U13): the wordmark, the Today | Mosaic switch, settings.
 struct HomeHeader: View {
     /// iPad landscape's tighter edges (X01).
     var isWide = false
     @Environment(AppRouter.self) private var router
-    @Environment(HomeTurn.self) private var turn: HomeTurn?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.layoutDirection) private var direction
-    /// The page's width: a whole width of drag is half a turn.
-    @State private var width: CGFloat = 402
+    @Environment(Home.self) private var home: Home?
 
     var body: some View {
         // The wordmark sets the height (T02); the switch sits level with it, 125 pt from its start (U10), and the gear
@@ -19,8 +14,8 @@ struct HomeHeader: View {
         wordmark
             .frame(maxWidth: .infinity, alignment: .leading)
             .overlay(alignment: .leading) {
-                if let turn {
-                    HomeSideSwitch(side: turn.target) { turn.show($0, reduceMotion: reduceMotion) }
+                if let home {
+                    HomeSideSwitch(side: home.side) { home.show($0) }
                         .padding(.leading, 125)
                         .padding(.top, 3)
                 }
@@ -28,9 +23,6 @@ struct HomeHeader: View {
             .overlay(alignment: .topTrailing) { settings }
         .padding(.leading, isWide ? 12 : 25)
         .padding(.trailing, isWide ? 8 : 19)
-        .contentShape(Rectangle())
-        .onGeometryChange(for: CGFloat.self, of: \.size.width) { width = $0 }
-        .simultaneousGesture(headerDrag, including: turn == nil ? .subviews : .all)
     }
 
     private var wordmark: some View {
@@ -61,22 +53,6 @@ struct HomeHeader: View {
         .accessibilityLabel(Text("Settings", bundle: .module))
         .accessibilityIdentifier("settings")
         .offset(y: 2)
-    }
-
-    /// Sideways only: a mostly vertical drag is the page's scroll.
-    private var headerDrag: some Gesture {
-        DragGesture(minimumDistance: 12)
-            .onChanged { value in
-                guard let turn, abs(value.translation.width) > abs(value.translation.height) else { return }
-                turn.drag(value.translation.width, width: width, cornerOnRight: direction == .leftToRight, reduceMotion: reduceMotion)
-            }
-            .onEnded { value in
-                guard let turn, abs(value.translation.width) > abs(value.translation.height) else { return }
-                turn.endDrag(
-                    value.translation.width, predicted: value.predictedEndTranslation.width,
-                    width: width, cornerOnRight: direction == .leftToRight, reduceMotion: reduceMotion
-                )
-            }
     }
 }
 
@@ -120,15 +96,8 @@ struct HomeSideSwitch: View {
     }
 
     /// U10/U13 in the light, U15 in the dark: a cream track with a plum thumb, a plum one with a coral thumb.
-    private static let track = dynamic(light: 0xF3E8DE, dark: 0x2E262C)
-    private static let thumbFill = dynamic(light: 0x4B2938, dark: 0xF2896A)
-    private static let onLabel = dynamic(light: 0xFBF6EF, dark: 0x211C24)
-    private static let offLabel = dynamic(light: 0x4B2938, dark: 0xF3E8DE)
-
-    private static func dynamic(light: UInt32, dark: UInt32) -> Color {
-        func color(_ hex: UInt32) -> UIColor {
-            UIColor(red: CGFloat(hex >> 16 & 0xFF) / 255, green: CGFloat(hex >> 8 & 0xFF) / 255, blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
-        }
-        return Color(UIColor { $0.userInterfaceStyle == .dark ? color(dark) : color(light) })
-    }
+    private static let track = Color.dynamic(light: 0xF3E8DE, dark: 0x2E262C)
+    private static let thumbFill = Color.dynamic(light: 0x4B2938, dark: 0xF2896A)
+    private static let onLabel = Color.dynamic(light: 0xFBF6EF, dark: 0x211C24)
+    private static let offLabel = Color.dynamic(light: 0x4B2938, dark: 0xF3E8DE)
 }

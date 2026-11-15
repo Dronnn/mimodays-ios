@@ -84,10 +84,10 @@ struct HomeSnapshotTests {
         let view = HomeView(today: await makeToday(), mosaic: await makeMosaic())
         return NavigationStack { view }
             .environment(AppRouter())
-            .environment(HomeTurn(preferences: preferences))
+            .environment(Home(preferences: preferences))
     }
 
-    /// U10: Today with the side switch and the page corner.
+    /// U10: Today with the side switch.
     @Test func today() async throws {
         try await populate(4)
         assertScreenSnapshots(of: await home(.today), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
@@ -100,18 +100,6 @@ struct HomeSnapshotTests {
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
             SnapshotVariant(.iPhone, .light, rightToLeft: true), SnapshotVariant(.iPad, .light), SnapshotVariant(.iPadLandscape, .light),
         ])
-    }
-
-    /// U11: the hint over the page corner.
-    @Test func flipHint() {
-        let view = ZStack(alignment: .bottomTrailing) {
-            ColorToken.canvas.color.ignoresSafeArea()
-            FlipHint {}
-                .padding(.trailing, 60)
-                .padding(.bottom, 60)
-            HomePageCorner()
-        }
-        assertScreenSnapshots(of: view, variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
     /// U14: the first few moments, and the note that it grows.

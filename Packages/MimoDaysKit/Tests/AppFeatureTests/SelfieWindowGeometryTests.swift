@@ -15,6 +15,23 @@ struct SelfieWindowGeometryTests {
         #expect(abs(saved.scale - 112.0 / 402.0) < 0.0001)
     }
 
+    /// C.5: on a 16:9 shape the window lies on its side; saved as short side over short side, it comes back the same.
+    @Test func onAWideShapeTheWindowLiesOnItsSideAndComesBack() {
+        let wide = SelfieWindowLayout.media(width: 402, format: .landscape, topInset: 62)
+        #expect(wide.sideways && wide.preview.height == 402)
+        for corner in CameraSettings.SelfieWindow.Corner.allCases {
+            let placement = CameraSettings.SelfieWindow(corner: corner, scale: .medium)
+            let frame = wide.windowFrame(placement)
+            #expect(frame.frame.width > frame.frame.height)
+            let saved = PiPLayout(frame, source: .frontSource)
+            #expect(abs(saved.scale - 112.0 / wide.preview.height) < 0.0001)
+            let back = saved.windowFrame(in: wide.preview).frame
+            #expect(abs(back.width - frame.frame.width) < 0.001 && abs(back.height - frame.frame.height) < 0.001)
+            #expect(abs(back.midX - frame.frame.midX) < 0.001 && abs(back.midY - frame.frame.midY) < 0.001)
+            #expect(wide.placement(nearest: saved) == placement)
+        }
+    }
+
     @Test func everyCornerAndSizeComesBackFromItsSavedLayout() {
         for corner in CameraSettings.SelfieWindow.Corner.allCases {
             for scale in CameraSettings.SelfieWindow.Scale.allCases {

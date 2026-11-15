@@ -57,7 +57,23 @@ struct ReviewModelTests {
         await review.load()
         #expect(review.main?.size == CGSize(width: 900, height: 1200))
         #expect(review.selfie != nil)
-        #expect(abs(review.aspectRatio - 0.75) < 0.001)
+        // 9:16, the middle of the 3:4 photo, as the camera showed it (C.5).
+        #expect(abs(review.aspectRatio - 9.0 / 16) < 0.001)
+    }
+
+    /// C.5: review shows the shape the moment was recorded in; a 16:9 photo taken sideways comes out wide.
+    @Test func reviewShowsTheRecordedShape() async throws {
+        let engine = await started()
+        await engine.setCaptureHold(.landscapeLeft)
+        let wide = try await engine.capturePhoto(flash: false, silent: true)
+        let review = ReviewModel(capture: CaptureResult(media: .photo(wide), window: .init(), capturedAt: time, format: .landscape))
+        defer { review.discard() }
+        await review.load()
+        #expect(review.main?.size == CGSize(width: 1200, height: 900))
+        #expect(abs(review.aspectRatio - 16.0 / 9) < 0.001)
+        let square = ReviewModel(capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: nil, capturedAt: time, format: .square))
+        defer { square.discard() }
+        #expect(square.aspectRatio == 1)
     }
 
     @Test func aVideoShowsItsFirstFramesAndPlaysComposed() async throws {

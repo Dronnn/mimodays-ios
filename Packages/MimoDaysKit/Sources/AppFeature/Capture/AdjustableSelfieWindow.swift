@@ -29,7 +29,7 @@ struct AdjustableSelfieWindow<Content: View>: View {
                         .position(layout.frameCenter(corner, placement.scale))
                 }
             }
-            SelfieWindowView(scale: placement.scale, showsHandle: isEnabled, turn: turn, content: content)
+            SelfieWindowView(scale: placement.scale, showsHandle: isEnabled, sideways: layout.sideways, turn: turn, content: content)
                 .position(center)
                 .gesture(gesture, isEnabled: isEnabled)
                 .accessibilityElement(children: .ignore)
@@ -59,27 +59,51 @@ struct AdjustableSelfieWindow<Content: View>: View {
 }
 
 /// The signature window: `content` in a cream frame tilted -5.4°, with a drag handle below (C01, C07).
-/// With a `turn` (the camera held sideways, U04) the frame turns back inside the layer, so it lies on its side.
+/// `sideways` lays it on its side (16:9, U04): in review a quarter turn; in the camera, whose layer is turned with
+/// the phone by `turn`, the upright frame turned back. Either way the picture shows as the camera recorded it.
 struct SelfieWindowView<Content: View>: View {
     let scale: CameraSettings.SelfieWindow.Scale
     let showsHandle: Bool
+    var sideways = false
     var turn: Angle = .zero
     @ViewBuilder let content: () -> Content
 
     var body: some View {
         let frame = SelfieWindowLayout.frameSize(scale)
-        let sideways = turn != .zero
+        let frameTurn: Angle = sideways ? (turn == .zero ? .degrees(90) : -turn) : .zero
         VStack(spacing: 6) {
-            SelfieFrame(placeholder: CameraPalette.selfiePlaceholder, tilted: false, content: content)
-                .frame(width: frame.width, height: frame.height)
-                .rotationEffect(-turn)
-                .frame(width: sideways ? frame.height : frame.width, height: sideways ? frame.width : frame.height)
+            SelfieFrame(placeholder: CameraPalette.selfiePlaceholder, tilted: false) {
+                TurnedPicture(angle: -(frameTurn + turn), content: content)
+            }
+            .frame(width: frame.width, height: frame.height)
+            .rotationEffect(frameTurn)
+            .frame(width: sideways ? frame.height : frame.width, height: sideways ? frame.width : frame.height)
             Capsule()
                 .fill(CameraPalette.cream.opacity(0.9))
                 .frame(width: 24, height: 4)
                 .opacity(showsHandle ? 1 : 0)
         }
         .rotationEffect(Size.selfieWindowTilt)
+    }
+}
+
+/// `content` laid out for its space turned by `angle` (a quarter turn swaps the sides), then turned into it.
+private struct TurnedPicture<Content: View>: View {
+    let angle: Angle
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        if angle == .zero {
+            content()
+        } else {
+            GeometryReader { proxy in
+                let quarter = abs(angle.degrees.truncatingRemainder(dividingBy: 180)) == 90
+                content()
+                    .frame(width: quarter ? proxy.size.height : proxy.size.width, height: quarter ? proxy.size.width : proxy.size.height)
+                    .rotationEffect(angle)
+                    .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+            }
+        }
     }
 }
 

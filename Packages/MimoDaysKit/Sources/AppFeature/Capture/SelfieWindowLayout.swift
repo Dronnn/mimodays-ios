@@ -91,12 +91,36 @@ extension SelfieWindowLayout {
         SelfieWindowLayout(preview: CGSize(width: width, height: width / max(aspectRatio, 0.01)), topInset: topInset)
     }
 
+    /// The camera's layout for a moment of `format` (C.5): 9:16 as above; 1:1 inside its frame (U02); 16:9 sideways
+    /// on the frame the phone held sideways shows, `width` being its short side (U04).
+    static func media(width: CGFloat, format: CaptureFormat, topInset: CGFloat) -> SelfieWindowLayout {
+        switch format {
+        case .portrait: media(width: width, aspectRatio: format.aspectRatio, topInset: topInset)
+        case .square: insideFrame(CGSize(width: width, height: width))
+        case .landscape: sideways(preview: CGSize(width: width * format.aspectRatio, height: width))
+        }
+    }
+
+    /// Inside a 1:1 or 16:9 frame on the upright camera: 17 pt from its top and bottom edges (U02).
+    static func insideFrame(_ size: CGSize) -> SelfieWindowLayout {
+        SelfieWindowLayout(preview: size, topInset: 0, bottomMargin: 17, topMargin: 17)
+    }
+
+    /// The phone held sideways (U04): on its side, clear of the buttons' column and of the pickers' row.
+    static func sideways(preview: CGSize, columnOnRight: Bool = false, chip: (corner: Corner, bottom: CGFloat)? = nil) -> SelfieWindowLayout {
+        let column = CameraChrome.sidewaysColumnSpace
+        return SelfieWindowLayout(
+            preview: preview, topInset: 0, chip: chip, bottomMargin: 60, topMargin: 17,
+            leftMargin: columnOnRight ? 8.7 : column, rightMargin: columnOnRight ? column : 23.3, sideways: true
+        )
+    }
+
     /// The corner and size closest to a saved window. Moments saved before 9.17, with odd layouts, land in
     /// the nearest corner at the nearest size.
     func placement(nearest layout: PiPLayout) -> CameraSettings.SelfieWindow {
-        let width = layout.scale * preview.width
+        let short = layout.scale * min(preview.width, preview.height)
         let scale = Scale.allCases.min {
-            abs(Self.frameSize($0).width - width) < abs(Self.frameSize($1).width - width)
+            abs(Self.frameSize($0).width - short) < abs(Self.frameSize($1).width - short)
         } ?? .medium
         // The saved centre is the frame's; the layout's corners are the whole window's (frame and handle).
         let center = CGPoint(x: layout.centerX * preview.width, y: layout.centerY * preview.height + Self.handleSpace / 2)

@@ -218,18 +218,20 @@ extension CaptureResult {
 }
 
 extension PiPLayout {
-    /// The window normalised to the main frame (the shown media has the frame's shape).
+    /// The window normalised to the shape it was put on: its centre by the shape's sides, its size as short side
+    /// over short side, as `MomentComposition` reads it.
     init(_ window: SelfieWindowFrame, source: MediaRole) {
         self.init(
             centerX: window.frame.midX / window.preview.width, centerY: window.frame.midY / window.preview.height,
-            scale: window.frame.width / window.preview.width, source: source
+            scale: min(window.frame.width, window.frame.height) / min(window.preview.width, window.preview.height), source: source
         )
     }
 
-    /// Back to a frame in a view of `size` (the main frame's shape), for composing on playback.
+    /// Back to a frame in a view of `size`, for composing on playback. On a wide shape the window lies on its side (U04).
     func windowFrame(in size: CGSize) -> SelfieWindowFrame {
-        let width = scale * size.width
-        let height = width * SelfieWindowLayout.frame.height / SelfieWindowLayout.frame.width
+        let short = scale * min(size.width, size.height)
+        let long = short * SelfieWindowLayout.frame.height / SelfieWindowLayout.frame.width
+        let (width, height) = size.width > size.height ? (long, short) : (short, long)
         let frame = CGRect(x: centerX * size.width - width / 2, y: centerY * size.height - height / 2, width: width, height: height)
         return SelfieWindowFrame(frame: frame, preview: size)
     }

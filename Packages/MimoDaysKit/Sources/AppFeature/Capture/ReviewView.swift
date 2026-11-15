@@ -27,7 +27,7 @@ struct ReviewView: View {
     @FocusState private var editsCaption: Bool
 
     var body: some View {
-        MediaThenPanel(aspectRatio: model.aspectRatio, topInset: topInset) {
+        MediaThenPanel(aspectRatio: model.aspectRatio, topInset: topInset, band: band) {
             media
             Group {
                 if let interruption = model.interruption {
@@ -89,10 +89,17 @@ struct ReviewView: View {
 
     // MARK: Media
 
-    /// The whole frame (aspect-fit) on a full-width band: dark sides when it is too tall for the width.
+    /// 1:1 and 16:9 start below the status bar on a dark band, like the camera's frame (Andrew, 2026-11-15);
+    /// 9:16 goes under it as before.
+    private var band: CGFloat {
+        model.capture.format == .portrait ? 0 : topInset
+    }
+
+    /// The recorded shape (the middle of the frame, as the camera showed it) on a full-width band: dark sides when
+    /// it is too tall for the width.
     private var media: some View {
         GeometryReader { proxy in
-            let width = min(proxy.size.width, proxy.size.height * model.aspectRatio)
+            let width = min(proxy.size.width, max(0, proxy.size.height - band) * model.aspectRatio)
             let size = CGSize(width: width, height: width / model.aspectRatio)
             ZStack(alignment: .topLeading) {
                 ZStack {
@@ -106,6 +113,8 @@ struct ReviewView: View {
                     }
                 }
                 .frame(width: size.width, height: size.height)
+                // The still fills the shape and is cut to it (C.5).
+                .clipped()
                 .contentShape(Rectangle())
                 .onTapGesture { togglePlayback() }
                 .accessibilityElement(children: .ignore)
@@ -118,7 +127,7 @@ struct ReviewView: View {
                 if model.hasSelfie, model.playback == .stopped, proxy.size.width > 0 {
                     // Laid out as the camera did, on the media at full width, then drawn at the size it is shown:
                     // what is saved is what was recorded, whatever the keyboard or the panel leaves of the media.
-                    let layout = SelfieWindowLayout.media(width: proxy.size.width, aspectRatio: model.aspectRatio, topInset: topInset)
+                    let layout = SelfieWindowLayout.media(width: proxy.size.width, format: model.capture.format, topInset: topInset)
                     let reference = layout.preview
                     AdjustableSelfieWindow(placement: $model.window, showsSheet: $adjustsSelfie, layout: layout, id: "review.selfieWindow") {
                         if let selfie = model.selfie {
@@ -132,13 +141,15 @@ struct ReviewView: View {
                 }
             }
             .frame(width: size.width, height: size.height)
+            .padding(.top, band)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .background(CameraPalette.background)
         .overlay(alignment: .topLeading) {
             RetakeButton(action: retake)
                 .padding(.leading, 16)
-                .padding(.top, topInset - 6)
+                // Below the band, on the shape's corner, for 1:1 and 16:9.
+                .padding(.top, band > 0 ? band + 12 : topInset - 6)
         }
         .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 28, bottomTrailingRadius: 28, style: .continuous))
         .environment(\.colorScheme, .dark)
@@ -147,7 +158,7 @@ struct ReviewView: View {
     @ViewBuilder
     private var still: some View {
         if let main = model.main {
-            Image(uiImage: main).resizable()
+            Image(uiImage: main).filling()
         } else {
             CameraPalette.previewPlaceholder
         }
@@ -361,6 +372,8 @@ private struct MediaThenPanel: Layout {
     let aspectRatio: CGFloat
     /// Under the status bar, which the media goes beneath.
     let topInset: CGFloat
+    /// Dark space over the media, when it starts below the status bar.
+    var band: CGFloat = 0
 
     func sizeThatFits(proposal: ProposedViewSize, subviews _: Subviews, cache _: inout ()) -> CGSize {
         proposal.replacingUnspecifiedDimensions()
@@ -369,7 +382,7 @@ private struct MediaThenPanel: Layout {
     func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
         guard subviews.count == 2 else { return }
         let panel = subviews[1].sizeThatFits(ProposedViewSize(width: bounds.width, height: nil)).height
-        let media = max(topInset, min(bounds.width / aspectRatio, bounds.height - panel))
+        let media = max(topInset, min(band + bounds.width / aspectRatio, bounds.height - panel))
         subviews[0].place(at: bounds.origin, proposal: ProposedViewSize(width: bounds.width, height: media))
         subviews[1].place(at: CGPoint(x: bounds.minX, y: bounds.minY + media), proposal: ProposedViewSize(width: bounds.width, height: panel))
     }
@@ -468,14 +481,14 @@ private struct PlayButton: View {
     }
 }
 
-/// The composed clip, whole frame (aspect-fit, like the still).
+/// The composed clip in the recorded shape (aspect-fill, like the still).
 private struct ReviewPlayerView: UIViewRepresentable {
     let player: AVPlayer
 
     func makeUIView(context _: Context) -> PlayerView {
         let view = PlayerView()
         view.playerLayer.player = player
-        view.playerLayer.videoGravity = .resizeAspect
+        view.playerLayer.videoGravity = .resizeAspectFill
         return view
     }
 

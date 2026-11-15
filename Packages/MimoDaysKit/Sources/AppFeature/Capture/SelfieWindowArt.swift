@@ -19,8 +19,9 @@ struct SelfieWindowArt: @unchecked Sendable {
         self.canvas = canvas
         let rect = PhotoComposer.placement(of: window, in: canvas).rect
         let style = SelfieWindowStyle.self
-        // Metrics scale with the window's own width, like `SelfieFrame`, whatever units the frame came in.
-        let scale = rect.width / style.size.width
+        // Metrics scale with the window's own short side, like `SelfieFrame`, whatever units the frame came in;
+        // a window on its side (16:9, U04) is the same frame turned.
+        let scale = min(rect.width, rect.height) / style.size.width
         let tilt = style.tilt.radians
         let outer = CGRect(x: -rect.width / 2, y: -rect.height / 2, width: rect.width, height: rect.height)
         let inner = outer.insetBy(dx: style.border * scale, dy: style.border * scale)

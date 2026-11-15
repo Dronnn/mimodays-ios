@@ -80,7 +80,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         guard isRunning, interruption == nil, let setup else { throw CaptureError.notRunning }
         let urls = try setup.positions.map { position in
             let url = try CaptureFiles.temporaryURL("jpg")
-            guard let data = SimulatedMedia.image(position).jpegData(compressionQuality: 0.8) else { throw CaptureError.photoFailed }
+            guard let data = SimulatedMedia.image(position, sideways: isSideways).jpegData(compressionQuality: 0.8) else { throw CaptureError.photoFailed }
             try data.write(to: url, options: .atomic)
             return url
         }
@@ -115,7 +115,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         var urls: [URL] = []
         do {
             for position in setup.positions {
-                urls.append(try await SimulatedMedia.writeClip(position, seconds: seconds))
+                urls.append(try await SimulatedMedia.writeClip(position, seconds: seconds, sideways: isSideways))
             }
         } catch {
             urls.forEach { try? FileManager.default.removeItem(at: $0) }
@@ -139,6 +139,9 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         captureHolds.append(hold)
     }
 
+    /// Captures made with the phone sideways come out wide, as the device's do.
+    private var isSideways: Bool { captureHolds.last?.isLandscape ?? false }
+
     private func signalStop() {
         stopSignal?.resume()
         stopSignal = nil
@@ -156,8 +159,9 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
 /// Plain generated frames: a warm gradient for the rear camera, a mint one for the front.
 enum SimulatedMedia {
-    static func size(_ position: CameraPosition) -> CGSize {
-        position == .back ? CGSize(width: 900, height: 1200) : CGSize(width: 360, height: 480)
+    static func size(_ position: CameraPosition, sideways: Bool = false) -> CGSize {
+        let size = position == .back ? CGSize(width: 900, height: 1200) : CGSize(width: 360, height: 480)
+        return sideways ? CGSize(width: size.height, height: size.width) : size
     }
 
     private static func colors(_ position: CameraPosition) -> [CGColor] {
@@ -166,8 +170,8 @@ enum SimulatedMedia {
             : [UIColor(red: 0.78, green: 0.93, blue: 0.86, alpha: 1).cgColor, UIColor(red: 0.36, green: 0.62, blue: 0.58, alpha: 1).cgColor]
     }
 
-    static func image(_ position: CameraPosition) -> UIImage {
-        let size = size(position)
+    static func image(_ position: CameraPosition, sideways: Bool = false) -> UIImage {
+        let size = size(position, sideways: sideways)
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         return UIGraphicsImageRenderer(size: size, format: format).image { context in
@@ -187,9 +191,10 @@ enum SimulatedMedia {
     }
 
     /// An H.264 clip at 10 fps, half the photo size.
-    static func writeClip(_ position: CameraPosition, seconds: Double) async throws -> URL {
+    static func writeClip(_ position: CameraPosition, seconds: Double, sideways: Bool = false) async throws -> URL {
         let url = try CaptureFiles.temporaryURL("mov")
-        let size = CGSize(width: size(position).width / 2, height: size(position).height / 2)
+        let full = size(position, sideways: sideways)
+        let size = CGSize(width: full.width / 2, height: full.height / 2)
         let writer = try AVAssetWriter(outputURL: url, fileType: .mov)
         let input = AVAssetWriterInput(mediaType: .video, outputSettings: [
             AVVideoCodecKey: AVVideoCodecType.h264, AVVideoWidthKey: size.width, AVVideoHeightKey: size.height,

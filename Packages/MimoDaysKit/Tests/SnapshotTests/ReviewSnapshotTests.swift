@@ -15,9 +15,13 @@ struct ReviewSnapshotTests {
     /// Nov 11, 2026, 2:37 PM in the snapshot time zone.
     private let time = CaptureTime(instant: Date(timeIntervalSince1970: 1_794_407_820), timeZone: .gmt)
 
-    private func review(video: Bool = false, interruption: CaptureInterruption? = nil, window: CameraSettings.SelfieWindow = .init()) async throws -> ReviewModel {
+    private func review(
+        video: Bool = false, interruption: CaptureInterruption? = nil, window: CameraSettings.SelfieWindow = .init(),
+        format: CaptureFormat = .portrait
+    ) async throws -> ReviewModel {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
+        await engine.setCaptureHold(format == .landscape ? .landscapeLeft : .upright)
         let media: CaptureResult.Media
         if video {
             var clip = try await engine.record(limit: .seconds(1))
@@ -27,9 +31,23 @@ struct ReviewSnapshotTests {
         } else {
             media = .photo(try await engine.capturePhoto(flash: false, silent: true))
         }
-        let model = ReviewModel(capture: CaptureResult(media: media, window: window, capturedAt: time))
+        let model = ReviewModel(capture: CaptureResult(media: media, window: window, capturedAt: time, format: format))
         await model.load()
         return model
+    }
+
+    /// C.5: a 16:9 photo taken sideways, the window on its side.
+    @Test func widePhoto() async throws {
+        let model = try await review(format: .landscape)
+        defer { model.discard() }
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// C.5: a 1:1 video, the middle of the frame.
+    @Test func squareVideo() async throws {
+        let model = try await review(video: true, format: .square)
+        defer { model.discard() }
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     private func screen(_ model: ReviewModel) -> some View {

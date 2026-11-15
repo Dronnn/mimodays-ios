@@ -272,10 +272,9 @@ final class ReviewModel {
     /// Whole seconds an interrupted recording kept ("Save 6 seconds", "at 0:06").
     var keptSeconds: Int { max(1, Int((video?.duration ?? 0).rounded())) }
 
-    /// Width / height of the main frame, upright; 3:4 until it has loaded.
+    /// Width / height of the shape it was recorded in (C.5): the middle of the main frame, as the camera showed it.
     var aspectRatio: CGFloat {
-        guard let main, main.size.height > 0 else { return 3.0 / 4.0 }
-        return main.size.width / main.size.height
+        capture.format.aspectRatio
     }
 
     /// First frames for the still view. The selfie is taken where it lines up with the main frame's start.

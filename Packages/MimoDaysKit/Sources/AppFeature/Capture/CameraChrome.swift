@@ -144,17 +144,8 @@ struct CameraChrome {
     /// The selfie window's layout over `area` (in the person's frame).
     func selfieWindow(in area: CGRect, insideShape: Bool, chipBottom: CGFloat?) -> SelfieWindowLayout {
         let chip = chipBottom.map { (corner: surpriseCorner, bottom: $0) }
-        if sideways {
-            // Clear of the buttons' column and the pickers' row (U04).
-            return SelfieWindowLayout(
-                preview: area.size, topInset: 0, chip: chip, bottomMargin: 60, topMargin: 17,
-                leftMargin: columnOnRight ? 8.7 : Self.sidewaysColumnSpace,
-                rightMargin: columnOnRight ? Self.sidewaysColumnSpace : 23.3, sideways: true
-            )
-        }
-        return insideShape
-            ? SelfieWindowLayout(preview: area.size, topInset: 0, bottomMargin: 17, topMargin: 17)
-            : SelfieWindowLayout(preview: area.size, topInset: topInset, chip: chip)
+        if sideways { return .sideways(preview: area.size, columnOnRight: columnOnRight, chip: chip) }
+        return insideShape ? .insideFrame(area.size) : SelfieWindowLayout(preview: area.size, topInset: topInset, chip: chip)
     }
 
     // MARK: The bar under the preview

@@ -127,8 +127,12 @@ struct MomentViewerTests {
         #expect(player.main.currentTime().seconds > 0.2)
         player.pause()
         player.seek(to: 0.1)
-        try await Task.sleep(for: .milliseconds(200))
+        // A busy run can take longer than a fixed sleep to finish the seek.
+        for _ in 0..<40 where abs(player.selfie.currentTime().seconds - 0.1) >= 0.02 {
+            try await Task.sleep(for: .milliseconds(50))
+        }
         #expect(abs(player.selfie.currentTime().seconds - 0.1) < 0.02)
+        #expect(abs(player.main.currentTime().seconds - 0.1) < 0.02)
         player.stop()
     }
 

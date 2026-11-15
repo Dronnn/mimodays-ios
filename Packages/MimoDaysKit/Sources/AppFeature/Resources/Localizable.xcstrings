@@ -7639,6 +7639,18 @@
         }
       }
     },
+    "Swap cameras" : {
+      "comment" : "Memory Card (U20): button under the card that grows the selfie window's camera into the card and shrinks the main one into the window; tap again to swap back",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap cameras"
+          }
+        }
+      }
+    },
     "Switch camera" : {
       "comment" : "Camera (C01): accessibility label of ↻; swaps the big camera, or switches cameras on single-camera iPhones",
       "extractionState" : "manual",

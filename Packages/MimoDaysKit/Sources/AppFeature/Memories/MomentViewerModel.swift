@@ -58,6 +58,8 @@ struct ViewerMoment: Equatable, Identifiable {
     var captured: CaptureTime
     var origin: MomentOrigin
     var mediaType: MediaType
+    /// The shape it was recorded in: the Memory Card takes it (U20).
+    var format: CaptureFormat
     var place: String?
     var title: String?
     var note: String?
@@ -83,6 +85,7 @@ struct ViewerMoment: Equatable, Identifiable {
         captured = summary.captured
         origin = moment.origin
         mediaType = moment.mediaType
+        format = moment.captureFormat
         place = summary.place
         title = moment.title
         note = moment.note.flatMap { $0.isEmpty ? nil : $0 }
@@ -137,7 +140,6 @@ final class MomentViewerModel {
     let voicePlayer = AVPlayer()
 
     static let photoPixels = 1600
-    static let selfiePixels = 400
     static let voiceBars = 22
 
     let library: MediaLibrary
@@ -168,7 +170,8 @@ final class MomentViewerModel {
         }
         let viewed = ViewerMoment(moment)
         moments[id] = viewed
-        for (path, size) in [(viewed.mainPath, Self.photoPixels), (viewed.selfiePath, Self.selfiePixels)] {
+        // The selfie as big as the main picture: swapped, it fills the card (U23).
+        for (path, size) in [(viewed.mainPath, Self.photoPixels), (viewed.selfiePath, Self.photoPixels)] {
             guard let path, images[path] == nil, let url = url(path),
                   let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: size) else { continue }
             images[path] = UIImage(cgImage: image)

@@ -24,8 +24,8 @@ private struct MomentViewerHost: View {
     }
 }
 
-/// M05 (photo) and M06 (video): one moment per page, swiping sideways to the others it was opened among.
-/// A photo sits on the cream canvas; a video fills the screen, with cream controls.
+/// The Memory Card everywhere a single moment opens (U20-U25, U42): one card per page on the cream canvas,
+/// swiping sideways to the others it was opened among, the neighbours peeking at the edges.
 struct MomentViewer: View {
     @Bindable var model: MomentViewerModel
     @Environment(\.camera) private var camera
@@ -38,28 +38,30 @@ struct MomentViewer: View {
     @State private var collecting: CollectingMoment?
     /// E01, from Share.
     @State private var exporting: MomentExportModel?
-    /// The status bar's height: the video's selfie window is laid out from it, as on the camera.
+    /// The status bar's height and the screen's width: the selfie window is laid out from them, as on the camera.
     @State private var screenTop: CGFloat = 0
     @State private var screenWidth: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
 
-    private var isVideo: Bool { model.currentMoment?.mediaType == .video }
-
     var body: some View {
-        ScrollView(.horizontal) {
-            LazyHStack(spacing: 0) {
-                ForEach(model.ids, id: \.self) { id in
-                    page(id)
-                        .containerRelativeFrame([.horizontal, .vertical])
-                        .task { await model.load(id) }
+        GeometryReader { proxy in
+            let slot = MemoryCardGeometry.slotWidth(screen: proxy.size.width)
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: MemoryCardGeometry.pageGap) {
+                    ForEach(model.ids, id: \.self) { id in
+                        page(id)
+                            .frame(width: slot, height: proxy.size.height)
+                            .task { await model.load(id) }
+                    }
                 }
+                .scrollTargetLayout()
             }
-            .scrollTargetLayout()
+            .contentMargins(.horizontal, (proxy.size.width - slot) / 2, for: .scrollContent)
+            .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne))
+            .scrollPosition(id: $model.current)
+            .scrollIndicators(.hidden)
         }
-        .scrollTargetBehavior(.paging)
-        .scrollPosition(id: $model.current)
-        .scrollIndicators(.hidden)
-        .background((isVideo ? Color.black : ColorToken.canvas.color).ignoresSafeArea())
+        .background(ColorToken.canvas.color.ignoresSafeArea())
         // M05/M06 draw their own bar: back with the day, the time, •••. Swiping back still works.
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
@@ -98,11 +100,7 @@ struct MomentViewer: View {
     @ViewBuilder
     private func page(_ id: UUID) -> some View {
         if let moment = model.moments[id] {
-            if moment.mediaType == .video {
-                VideoPage(model: model, moment: moment, isCurrent: model.current == id, topInset: screenTop)
-            } else {
-                photoPage(moment)
-            }
+            MemoryCardPage(model: model, moment: moment, isCurrent: model.current == id, screenWidth: screenWidth, screenTop: screenTop)
         } else {
             Color.clear
         }
@@ -110,9 +108,9 @@ struct MomentViewer: View {
 
     // MARK: Bar
 
-    /// `Navigation / Back bar`: ‹ and the moment's day ("Nov 11"), its time, the ••• menu. Cream on a video.
+    /// `Navigation / Back bar`: ‹ and the moment's day ("Nov 11"), its time, the ••• menu.
     private var topBar: some View {
-        let ink = (isVideo ? ColorToken.mediaFrame : .textPrimary).color
+        let ink = ColorToken.textPrimary.color
         return ZStack {
             if let moment = model.currentMoment {
                 Self.time(moment.captured, date: false)
@@ -131,7 +129,7 @@ struct MomentViewer: View {
                         if let moment = model.currentMoment {
                             Self.day(moment.captured)
                                 .textStyle(.editorCancel)
-                                .foregroundStyle((isVideo ? ColorToken.mediaFrame : .textLink).color)
+                                .foregroundStyle(ColorToken.textLink.color)
                         }
                     }
                     .frame(minHeight: Size.minimumTapTarget)
@@ -167,99 +165,11 @@ struct MomentViewer: View {
         .frame(height: 44)
     }
 
-    // MARK: Photo (M05)
-
-    private func photoPage(_ moment: ViewerMoment) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                Color(hex: 0x9C8573)
-                    .overlay {
-                        if let image = model.image(moment.mainPath) { Image(uiImage: image).filling() }
-                    }
-                    // The whole photo, as taken and as shared (9.28), with its window where it was taken.
-                    .aspectRatio(moment.photo?.aspectRatio ?? 386 / 440, contentMode: .fit)
-                    .clipShape(ViewerPhotoBlob())
-                    .overlay {
-                        if let layout = moment.photo?.layout, screenWidth > 0 {
-                            GeometryReader { proxy in
-                                ViewerSelfieWindow(
-                                    model: model, momentID: moment.id, saved: layout, screenWidth: screenWidth, topInset: screenTop, shown: proxy.size
-                                ) {
-                                    if let image = model.image(moment.selfiePath) {
-                                        Image(uiImage: image).filling()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .environment(\.layoutDirection, .leftToRight)
-                    .accessibilityElement()
-                    .accessibilityLabel(Text(moment.selfiePath == nil ? "Photo" : "Photo with selfie", bundle: .module))
-                    .accessibilityAddTraits(.isImage)
-                    .padding(.horizontal, 8)
-                    .padding(.top, 8)
-                meta(moment)
-                    .padding(.horizontal, 14)
-                    .padding(.top, 14)
-                MomentWords(moment: moment, onPhoto: false)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                if let voice = moment.voice {
-                    VoicePill(model: model, id: moment.id, voice: voice, onPhoto: false)
-                        .padding(.horizontal, 16)
-                        .padding(.top, 14)
-                }
-                if !moment.collections.isEmpty {
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 8) {
-                            ForEach(moment.collections) { collection in
-                                NavigationLink(value: MemoriesRoute.collection(collection.id)) {
-                                    SearchChip(icon: .glyphCollection, title: Text(collection.title), isOn: false, id: "") {}
-                                        .allowsHitTesting(false)
-                                }
-                                .buttonStyle(.plain)
-                                .accessibilityIdentifier("viewer.collection")
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                    }
-                    .scrollIndicators(.hidden)
-                    .padding(.top, 10)
-                }
-            }
-            .padding(.bottom, 20)
-            .frame(maxWidth: 620)
-            .frame(maxWidth: .infinity)
-        }
-    }
-
-    /// The place on the left, where it came from and when on the right.
-    private func meta(_ moment: ViewerMoment) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
-            if let place = moment.place {
-                HStack(spacing: 4) {
-                    Icon.glyphPin.image
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .alignmentGuide(.firstTextBaseline) { $0[.bottom] - 4 }
-                    Text(place)
-                        .textStyle(.viewerPlace)
-                }
-                .foregroundStyle(ColorToken.textPrimary.color)
-            }
-            Spacer(minLength: 8)
-            OriginLabel(origin: moment.origin, time: Self.time(moment.captured, date: true), order: .originFirst)
-                .textStyle(.viewerMeta)
-                .foregroundStyle(ColorToken.textSecondary.color)
-                .multilineTextAlignment(.trailing)
-        }
-    }
-
     // MARK: Actions
 
     /// Share, favourite, edit and delete.
     private func actions(_ moment: ViewerMoment) -> some View {
-        let tint = (isVideo ? ColorToken.mediaFrame : .textPrimary).color
+        let tint = ColorToken.textPrimary.color
         return HStack {
             // E01: as seen or as the camera's files, with what the moment has.
             Button { exporting = MomentExportModel(ids: [moment.id], library: model.library, exactPlace: moviePreferences?.value.exactPlaceInFiles ?? false) } label: {
@@ -317,9 +227,9 @@ struct MomentViewer: View {
         .padding(.bottom, 4)
         .frame(maxWidth: .infinity)
         .background {
-            (isVideo ? Color(hex: 0x1F1418).opacity(0.55) : ColorToken.canvas.color)
+            ColorToken.canvas.color
                 .overlay(alignment: .top) {
-                    Rectangle().fill((isVideo ? ColorToken.mediaFrame : .textPrimary).color.opacity(0.14)).frame(height: 0.6)
+                    Rectangle().fill(ColorToken.textPrimary.color.opacity(0.14)).frame(height: 0.6)
                 }
                 .ignoresSafeArea()
         }

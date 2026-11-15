@@ -5,7 +5,7 @@ import Observation
 import Persistence
 import SwiftUI
 
-/// Plays a saved video for the viewer: the main stream with its sound, and the selfie stream (when there is
+/// Plays a saved video on the Memory Card: the main stream with its sound, and the selfie stream (when there is
 /// one) in step with it for the live window. The two stay separate files; they become one only on export.
 @MainActor
 @Observable
@@ -43,12 +43,17 @@ final class ViewerVideoPlayer {
             MainActor.assumeIsolated { self?.time = time.seconds }
         }
         endObserver = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.pause()
-                self?.seek(to: 0)
-            }
+            // Round and round for as long as the card is on screen (U35).
+            MainActor.assumeIsolated { self?.loop() }
         }
         isReady = item.status == .readyToPlay
+    }
+
+    /// Back to the start without a stop: both streams from zero at one host time.
+    private func loop() {
+        guard isPlaying else { return seek(to: 0) }
+        time = 0
+        start(at: .zero)
     }
 
     func toggle() {
@@ -59,11 +64,14 @@ final class ViewerVideoPlayer {
     func play() {
         guard isReady else { return }
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-        let time = main.currentTime()
-        let start = CMTimeAdd(CMClockGetTime(CMClockGetHostTimeClock()), CMTime(value: 1, timescale: 20))
-        main.setRate(1, time: time, atHostTime: start)
-        if hasSelfie { selfie.setRate(1, time: time, atHostTime: start) }
+        start(at: main.currentTime())
         isPlaying = true
+    }
+
+    private func start(at time: CMTime) {
+        let hostTime = CMTimeAdd(CMClockGetTime(CMClockGetHostTimeClock()), CMTime(value: 1, timescale: 20))
+        main.setRate(1, time: time, atHostTime: hostTime)
+        if hasSelfie { selfie.setRate(1, time: time, atHostTime: hostTime) }
     }
 
     func pause() {
@@ -96,197 +104,6 @@ final class ViewerVideoPlayer {
         for _ in 0..<150 where item.status == .unknown {
             try? await Task.sleep(for: .milliseconds(20))
         }
-    }
-}
-
-/// M06: the whole video from the top edge, as the camera showed it, with the selfie window where it was
-/// recorded. The window moves and changes size as while recording; where it ends up is kept and is what
-/// sharing exports. Words, voice note, scrubber, pause and sound sit at the bottom in cream.
-/// It plays when its page is the one on screen and stops when swiped away.
-struct VideoPage: View {
-    let model: MomentViewerModel
-    let moment: ViewerMoment
-    let isCurrent: Bool
-    /// The screen's top inset (status bar), which the camera's window layout counts from.
-    let topInset: CGFloat
-    @State private var playback: ViewerVideoPlayer?
-    /// Playing before a scrub started.
-    @State private var resumesAfterScrub: Bool?
-
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            GeometryReader { proxy in
-                media(in: proxy.size)
-            }
-            .ignoresSafeArea()
-            controls
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-                // The words may sit over the media's lower edge: it fades into the page's black above them.
-                .background {
-                    VStack(spacing: 0) {
-                        LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom)
-                            .frame(height: 96)
-                        Color.black
-                    }
-                    .padding(.top, -96)
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
-                }
-        }
-        .task(id: isCurrent) {
-            guard isCurrent else {
-                playback?.stop()
-                playback = nil
-                return
-            }
-            guard playback == nil, let items = await model.playerItems(moment.id) else { return }
-            let player = ViewerVideoPlayer(duration: moment.video?.timing.duration ?? 0)
-            playback = player
-            await player.load(main: items.main, selfie: items.selfie)
-            player.play()
-        }
-        .onDisappear {
-            playback?.stop()
-            playback = nil
-        }
-    }
-
-    // MARK: Media
-
-    /// The main stream aspect-fit at the top, the selfie window laid out as the camera did and drawn at the
-    /// size the media has here.
-    @ViewBuilder
-    private func media(in size: CGSize) -> some View {
-        let aspectRatio = moment.video?.aspectRatio ?? 9.0 / 16.0
-        let width = min(size.width, size.height * aspectRatio)
-        let shown = CGSize(width: width, height: width / aspectRatio)
-        ZStack(alignment: .topLeading) {
-            ZStack {
-                if let image = model.image(moment.mainPath) {
-                    Image(uiImage: image).filling()
-                }
-                if let playback {
-                    PlayerLayerView(player: playback.main)
-                }
-            }
-            .frame(width: shown.width, height: shown.height)
-            .clipped()
-            .accessibilityElement()
-            .accessibilityLabel(Text("Video", bundle: .module))
-            .accessibilityAddTraits(.isImage)
-            if let layout = moment.video?.layout, size.width > 0 {
-                ViewerSelfieWindow(model: model, momentID: moment.id, saved: layout, screenWidth: size.width, topInset: topInset, shown: shown) {
-                    ZStack {
-                        if let image = model.image(moment.selfiePath) {
-                            Image(uiImage: image).filling()
-                        }
-                        if let playback, playback.hasSelfie {
-                            PlayerLayerView(player: playback.selfie)
-                        }
-                    }
-                }
-            }
-        }
-        .frame(width: size.width, height: size.height, alignment: .top)
-        .background(Color.black)
-    }
-
-    // MARK: Controls
-
-    private var controls: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            MomentWords(moment: moment, onPhoto: true)
-            if let voice = moment.voice {
-                VoicePill(model: model, id: moment.id, voice: voice, onPhoto: true)
-                    .padding(.top, 14)
-            }
-            scrubber
-                .padding(.top, 24)
-            ZStack {
-                Button { playback?.toggle() } label: {
-                    (playback?.isPlaying == true ? Icon.glyphPause : .glyphPlay).image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 40)
-                        .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text(playback?.isPlaying == true ? "Pause" : "Play", bundle: .module))
-                .accessibilityIdentifier("viewer.play")
-                HStack {
-                    Spacer()
-                    Button { playback?.isMuted.toggle() } label: {
-                        (playback?.isMuted == true ? Icon.glyphMute : .glyphSpeaker).image
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(playback?.isMuted == true ? "Sound off" : "Sound on", bundle: .module))
-                }
-            }
-            .padding(.top, 8)
-        }
-        .foregroundStyle(ColorToken.mediaFrame.color)
-    }
-
-    /// M06 scrubber: a 4 pt track, coral up to where it is, a 16 pt cream knob; drag anywhere on it to seek.
-    private var scrubber: some View {
-        let duration = max(playback?.duration ?? moment.video?.timing.duration ?? 0, 0.1)
-        let time = min(playback?.time ?? 0, duration)
-        return VStack(spacing: 6) {
-            GeometryReader { proxy in
-                let progress = CGFloat(time / duration)
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(ColorToken.mediaFrame.color.opacity(0.3))
-                        .frame(height: 4)
-                    Capsule()
-                        .fill(ColorToken.actionCoral.color)
-                        .frame(width: max(4, proxy.size.width * progress), height: 4)
-                    Circle()
-                        .fill(ColorToken.mediaFrame.color)
-                        .frame(width: 16, height: 16)
-                        .offset(x: proxy.size.width * progress - 8)
-                }
-                .frame(maxHeight: .infinity)
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            if resumesAfterScrub == nil {
-                                resumesAfterScrub = playback?.isPlaying ?? false
-                                playback?.pause()
-                            }
-                            let fraction = min(max(value.location.x / max(proxy.size.width, 1), 0), 1)
-                            playback?.seek(to: duration * fraction)
-                        }
-                        .onEnded { _ in
-                            if resumesAfterScrub == true { playback?.play() }
-                            resumesAfterScrub = nil
-                        }
-                )
-            }
-            .frame(height: Size.minimumTapTarget / 2)
-            .accessibilityElement()
-            .accessibilityLabel(Text("Playback position", bundle: .module))
-            .accessibilityValue(Text(Duration.seconds(time.rounded()), format: .time(pattern: .minuteSecond)))
-            .accessibilityAdjustableAction { direction in
-                let step = direction == .increment ? 5.0 : -5.0
-                playback?.seek(to: min(max(time + step, 0), duration))
-            }
-            HStack {
-                Text(Duration.seconds(time.rounded()), format: .time(pattern: .minuteSecond))
-                Spacer()
-                Text(Duration.seconds(duration.rounded()), format: .time(pattern: .minuteSecond))
-            }
-            .textStyle(.scrubTime)
-            .accessibilityHidden(true)
-        }
-        .environment(\.layoutDirection, .leftToRight)
     }
 }
 

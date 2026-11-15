@@ -183,6 +183,8 @@ public struct TextStyle: Equatable, Sendable {
     public static let voicePill = TextStyle(.nunito, size: 15, weight: 600, relativeTo: .subheadline)
     /// Elapsed and total time under the video scrubber (M06).
     public static let scrubTime = TextStyle(.nunito, size: 12, weight: 600, relativeTo: .caption2, maximumScale: 1.35)
+    /// "Swap cameras" and "Flip" under a Memory Card (U20).
+    public static let cardButton = TextStyle(.nunito, size: 14, weight: 800, relativeTo: .subheadline, maximumScale: 1.35)
     /// The count on a map marker (P01).
     public static let mapCount = TextStyle(.nunito, size: 12.5, weight: 800, relativeTo: .caption1, maximumScale: 1.2)
     /// A place's name in the map's sheet (P02).

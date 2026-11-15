@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// The moment viewer (M05 photo, M06 video), from moments saved off the simulated camera, pictures read before the snapshot.
+/// The Memory Card (U20-U24) in the moment viewer, from moments saved off the simulated camera, pictures read before the snapshot.
 @MainActor
 @Suite(.tags(.snapshot))
 struct ViewerSnapshotTests {
@@ -27,17 +27,20 @@ struct ViewerSnapshotTests {
 
     private var library: MediaLibrary { MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline()) }
 
-    private func save(video: Bool) async throws -> UUID {
+    private func save(video: Bool, format: CaptureFormat = .portrait) async throws -> UUID {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
+        // 16:9 is recorded with the phone sideways.
+        if format == .landscape { await engine.setCaptureHold(.landscapeLeft) }
         let media: CaptureResult.Media = video
             ? .video(try await engine.record(limit: .seconds(1)))
             : .photo(try await engine.capturePhoto(flash: false, silent: true))
         // Wed, Nov 11, 2026, 6:42 PM in Yerevan.
-        let capture = CaptureResult(
+        var capture = CaptureResult(
             media: media, window: .init(),
             capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_794_422_520), timeZone: TimeZone(identifier: "Asia/Yerevan")!)
         )
+        capture.format = format
         var draft = MomentDraft(
             capture: capture, caption: "First snow on the balcony",
             window: SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536)),
@@ -52,14 +55,14 @@ struct ViewerSnapshotTests {
         return try await saver.save(draft).id
     }
 
-    private func viewer(video: Bool) async throws -> some View {
-        let id = try await save(video: video)
+    private func viewer(video: Bool, format: CaptureFormat = .portrait) async throws -> some View {
+        let id = try await save(video: video, format: format)
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)
         return NavigationStack { MomentViewer(model: model) }
     }
 
-    /// M05.
+    /// U21.
     @Test func photo() async throws {
         assertScreenSnapshots(of: try await viewer(video: false), variants: [
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
@@ -67,9 +70,35 @@ struct ViewerSnapshotTests {
         ])
     }
 
-    /// M06, before it starts playing.
+    /// U20, before it starts playing.
     @Test func video() async throws {
         assertScreenSnapshots(of: try await viewer(video: true), variants: [SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// The card takes the moment's shape (Andrew, 2026-11-15): square, and wide with the window on its side.
+    @Test func square() async throws {
+        assertScreenSnapshots(of: try await viewer(video: false, format: .square), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func wide() async throws {
+        assertScreenSnapshots(of: try await viewer(video: true, format: .landscape), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPad, .light)])
+    }
+
+    /// U23: the cameras swapped, the main picture in the window.
+    @Test func swapped() async throws {
+        let id = try await save(video: false)
+        let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await model.load(id)
+        let moment = try #require(model.moments[id])
+        let card = MemoryCardGeometry.card(aspectRatio: moment.format.aspectRatio, in: CGSize(width: 359, height: 562))
+        let front = MemoryCardFront(
+            model: model, moment: moment, playback: nil, size: card,
+            windowLayout: MemoryCardGeometry.windowLayout(format: .portrait, screenWidth: 402, topInset: 62),
+            swapped: true, controlsShown: .constant(true)
+        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(ColorToken.canvas.color)
+        assertScreenSnapshots(of: front, variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     /// M07.

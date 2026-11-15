@@ -108,7 +108,7 @@ private struct TurnedPicture<Content: View>: View {
 }
 
 /// C04 corner target: dashed, or a coral ring around the window where it lands.
-private struct SelfieTarget: View {
+struct SelfieTarget: View {
     let size: CGSize
     let isSelected: Bool
 

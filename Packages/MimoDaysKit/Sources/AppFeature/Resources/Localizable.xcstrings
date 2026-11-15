@@ -3107,6 +3107,10 @@
         }
       }
     },
+    "Drag the corner or tap Mosaic" : {
+      "comment" : "First-time hint (U11): how to turn Today over to the Mosaic.",
+      "extractionState" : "manual"
+    },
     "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts." : {
       "comment" : "Help & about (S07): Selfie window help",
       "extractionState" : "manual",
@@ -9832,6 +9836,10 @@
           }
         }
       }
+    },
+    "Your moments have another side" : {
+      "comment" : "First-time hint over the page corner on Today, shown once after the 10th moment (U11).",
+      "extractionState" : "manual"
     },
     "Your moments. Your memories." : {
       "comment" : "OB-06 title",

@@ -102,6 +102,18 @@ struct HomeSnapshotTests {
         ])
     }
 
+    /// U11: the hint over the page corner.
+    @Test func flipHint() {
+        let view = ZStack(alignment: .bottomTrailing) {
+            ColorToken.canvas.color.ignoresSafeArea()
+            FlipHint {}
+                .padding(.trailing, 60)
+                .padding(.bottom, 60)
+            HomePageCorner()
+        }
+        assertScreenSnapshots(of: view, variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
     /// U14: the first few moments, and the note that it grows.
     @Test func mosaicFirstFew() async throws {
         try await populate(3, video: true)

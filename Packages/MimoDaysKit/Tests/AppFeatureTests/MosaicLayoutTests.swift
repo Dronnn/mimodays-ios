@@ -47,7 +47,7 @@ struct MosaicLayoutTests {
                 }
                 let blocks = MosaicLayout.blocks(month)
                 #expect(blocks.count == 1)
-                guard blocks != [.trio] else { continue }
+                #expect(blocks != [.trio], "a favorite or video never gets three small pieces")
                 let tiles = MosaicLayout.chapter(month, width: 402).tiles
                 let area = { (tile: MosaicLayout.Tile) in tile.frame.width * tile.frame.height }
                 #expect(tiles.max { area($0) < area($1) }?.id == month[count - 1].id)

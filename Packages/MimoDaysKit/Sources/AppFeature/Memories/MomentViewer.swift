@@ -121,6 +121,7 @@ struct MomentViewer: View {
         switch model.origin {
         case .day: Self.day(moment.captured)
         case .today: Text("Today", bundle: .module)
+        case .mosaic: Text("Mosaic", bundle: .module)
         case .onThisDay: Text("On this day", bundle: .module)
         case .favorites: Text("Favorites", bundle: .module)
         case .search: Text("Search", bundle: .module)

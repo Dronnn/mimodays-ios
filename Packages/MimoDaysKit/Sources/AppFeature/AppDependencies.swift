@@ -19,6 +19,8 @@ public final class AppDependencies {
     let moviePreferences: MoviePreferences
     let privacyPreferences: PrivacyPreferences
     let appearancePreferences: AppearancePreferences
+    /// U16: the home side last shown, and whether the flip hint was shown.
+    let homePreferences: HomePreferences
     let appLock: AppLock
     /// S08 Delete all data.
     let eraser: AppEraser
@@ -60,6 +62,8 @@ public final class AppDependencies {
         let privacyPreferences = PrivacyPreferences.privacy(configuration.isUITesting ? nil : .standard)
         self.privacyPreferences = privacyPreferences
         appearancePreferences = .appearance(configuration.isUITesting ? nil : .standard)
+        let homePreferences = HomePreferences.home(configuration.isUITesting ? nil : .standard)
+        self.homePreferences = homePreferences
         // UI tests keep notification requests in memory so nothing is left on the simulator.
         let notifications: any NotificationScheduler = configuration.isUITesting
             ? InMemoryNotificationScheduler() : SystemNotificationScheduler()
@@ -105,6 +109,7 @@ public final class AppDependencies {
                 moviePreferences.reset()
                 privacyPreferences.reset()
                 appearancePreferences.reset()
+                homePreferences.reset()
                 cameraSettings.save(CameraSettings())
             }
         )

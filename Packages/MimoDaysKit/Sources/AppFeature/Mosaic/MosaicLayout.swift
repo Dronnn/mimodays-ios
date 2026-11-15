@@ -80,12 +80,11 @@ enum MosaicLayout {
             } else {
                 let hasLarge = next.contains(where: \.prefersLarge)
                 let followsFeature = if case .feature = blocks.last { true } else { false }
-                if !followsFeature, roll < (hasLarge ? 70 : 35) {
-                    block = .feature(mirrored: mirrored)
-                } else if rest > 3, hasLarge, roll < 85 || followsFeature && roll < 60 {
-                    block = .wide(mirrored: mirrored)
+                if hasLarge {
+                    // A favorite or a video always gets a larger piece: never three small ones.
+                    block = rest > 3 && followsFeature || rest > 3 && roll >= 70 ? .wide(mirrored: mirrored) : .feature(mirrored: mirrored)
                 } else {
-                    block = .trio
+                    block = !followsFeature && roll < 35 ? .feature(mirrored: mirrored) : .trio
                 }
             }
             blocks.append(block)

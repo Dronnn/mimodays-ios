@@ -111,4 +111,38 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(done.waitForNonExistence(timeout: 5))
         XCTAssertTrue(tab(0).isSelected)
     }
+
+    /// U10-U16: Mosaic in the header turns the page to the Mosaic; a piece opens its Memory Card, back returns to the
+    /// Mosaic; dragging the page corner turns back to Today. Both sides pass the accessibility audit.
+    @MainActor
+    func testTheHomeTurnsToTheMosaicAndBack() throws {
+        launch(.populated)
+        let mosaicSwitch = app.buttons["home.mosaic"]
+        XCTAssertTrue(mosaicSwitch.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["home.today"].isSelected)
+        mosaicSwitch.tap()
+        let piece = app.buttons.matching(identifier: "mosaic.piece").firstMatch
+        XCTAssertTrue(piece.waitForExistence(timeout: 10))
+        XCTAssertTrue(mosaicSwitch.isSelected)
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "U13"
+        shot.lifetime = .keepAlways
+        add(shot)
+        try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast))
+
+        piece.tap()
+        let back = app.buttons["viewer.back"]
+        XCTAssertTrue(back.waitForExistence(timeout: 10))
+        XCTAssertTrue(back.staticTexts["Mosaic"].exists || back.label.contains("Back"))
+        back.tap()
+        XCTAssertTrue(piece.waitForExistence(timeout: 5))
+
+        let corner = app.buttons["home.corner"]
+        XCTAssertTrue(corner.exists)
+        corner.coordinate(withNormalizedOffset: CGVector(dx: 0.7, dy: 0.7))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0.85)))
+        let today = expectation(for: NSPredicate(format: "isSelected == true"), evaluatedWith: app.buttons["home.today"])
+        wait(for: [today], timeout: 5)
+        XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
+    }
 }

@@ -294,3 +294,73 @@ public struct MemoryCardBrushUnderline: Shape {
         return path
     }
 }
+
+/// `Home / Page corner` (U10, U13): the page's bottom trailing corner turned up, 60 pt, an arrow on the fold.
+/// Drawn for the trailing corner on the right; mirrored on the left. The same paper in the dark (U15).
+public struct HomePageCorner: View {
+    public init() {}
+
+    public var body: some View {
+        ZStack {
+            PageCornerUnder()
+                .fill(Color(hex: 0xE2D3C6))
+            PageCornerFold()
+                .fill(Color(hex: 0xF8D7C3))
+            PageCornerCrease()
+                .stroke(Color(hex: 0x4B2938).opacity(0.25), lineWidth: 1.5)
+            PageCornerArrow()
+                .stroke(Color(hex: 0xC9512B), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+        }
+        .frame(width: 60, height: 60)
+    }
+}
+
+/// The page under the fold.
+struct PageCornerUnder: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            path.move(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+            path.closeSubpath()
+        }
+    }
+}
+
+struct PageCornerFold: Shape {
+    func path(in rect: CGRect) -> Path {
+        let scale = rect.width / 60
+        func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: rect.minX + x * scale, y: rect.minY + y * scale) }
+        return Path { path in
+            path.move(to: p(60, 2))
+            path.addLine(to: p(2, 60))
+            path.addLine(to: p(40, 60))
+            path.addCurve(to: p(60, 40), control1: p(53.33, 60), control2: p(60, 53.33))
+            path.closeSubpath()
+        }
+    }
+}
+
+struct PageCornerCrease: Shape {
+    func path(in rect: CGRect) -> Path {
+        let scale = rect.width / 60
+        return Path { path in
+            path.move(to: CGPoint(x: rect.minX + 60 * scale, y: rect.minY + 2 * scale))
+            path.addLine(to: CGPoint(x: rect.minX + 2 * scale, y: rect.minY + 60 * scale))
+        }
+    }
+}
+
+struct PageCornerArrow: Shape {
+    func path(in rect: CGRect) -> Path {
+        let scale = rect.width / 60
+        func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: rect.minX + x * scale, y: rect.minY + y * scale) }
+        return Path { path in
+            path.move(to: p(38, 52))
+            path.addLine(to: p(44, 46))
+            path.move(to: p(43, 52))
+            path.addLine(to: p(49, 52))
+            path.addLine(to: p(49, 46))
+        }
+    }
+}

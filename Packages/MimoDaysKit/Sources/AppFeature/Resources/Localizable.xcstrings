@@ -13,6 +13,14 @@
         }
       }
     },
+    "%@ from %@" : {
+      "comment" : "VoiceOver label of a Mosaic piece: \"Video\" or \"Photo\", and when it was taken, e.g. \"Photo from November 11 at 2:37 PM\".",
+      "extractionState" : "manual"
+    },
+    "%@ from %@, favorite" : {
+      "comment" : "VoiceOver label of a favorite Mosaic piece: \"Video\" or \"Photo\", and when it was taken.",
+      "extractionState" : "manual"
+    },
     "%@ has %lld moments. A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips." : {
       "comment" : "New movie (F16): why there's no movie. %@: the source, e.g. Last month; then its moment count",
       "extractionState" : "manual",
@@ -530,6 +538,54 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld moments saved"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld moments since %@" : {
+      "comment" : "Mosaic (U13): how many moments, and the month of the first one, e.g. \"312 moments since June\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moment since %@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moments since %@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld moments so far" : {
+      "comment" : "Mosaic (U14): how many moments there are while there are fewer than ten.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moment so far"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moments so far"
                 }
               }
             }
@@ -3087,6 +3143,10 @@
         }
       }
     },
+    "Each one finds its place here, month by month. Tap any piece to open it." : {
+      "comment" : "Mosaic note body while there are fewer than ten moments (U14).",
+      "extractionState" : "manual"
+    },
     "Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos." : {
       "comment" : "Import from Photos (E05): what happens to the picked files",
       "extractionState" : "manual",
@@ -4514,6 +4574,10 @@
           }
         }
       }
+    },
+    "Mosaic" : {
+      "comment" : "Home switch (U10, U13): the home's other side, every moment as a mosaic; also the Memory Card's back label when opened from it (U42).",
+      "extractionState" : "manual"
     },
     "Move earlier" : {
       "comment" : "Movie editor timeline: VoiceOver action that moves a clip one place earlier",
@@ -7239,6 +7303,14 @@
         }
       }
     },
+    "Show Mosaic" : {
+      "comment" : "VoiceOver label of the home's page corner on Today: turns the page to the Mosaic (U16).",
+      "extractionState" : "manual"
+    },
+    "Show Today" : {
+      "comment" : "VoiceOver label of the home's page corner on the Mosaic: turns the page back to Today (U16).",
+      "extractionState" : "manual"
+    },
     "Show all" : {
       "comment" : "Movie editor (F07): fit option, the whole picture shows with bars",
       "extractionState" : "manual",
@@ -9772,6 +9844,14 @@
           }
         }
       }
+    },
+    "Your mosaic" : {
+      "comment" : "Mosaic title (U13).",
+      "extractionState" : "manual"
+    },
+    "Your mosaic grows with every moment" : {
+      "comment" : "Mosaic note while there are fewer than ten moments (U14).",
+      "extractionState" : "manual"
     },
     "Your movie is ready" : {
       "comment" : "Export (F13): title when the movie is done",

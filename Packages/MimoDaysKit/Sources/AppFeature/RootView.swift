@@ -25,6 +25,11 @@ public struct RootView: View {
     private let tipStore: any TipStore
     @State private var today: TodayModel
     @State private var memories: MemoriesModel
+    /// The home's other side (U13): its own tiles, always newest first.
+    @State private var mosaic: MemoriesModel
+    /// U16: which home side shows, and the turn between them.
+    @State private var homeTurn: HomeTurn
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// C12 toast after a save.
     @State private var showsSavedToast = false
     @Environment(\.scenePhase) private var scenePhase
@@ -55,6 +60,10 @@ public struct RootView: View {
         memories.newestFirst = memoriesPreferences.value.newestFirst
         CaptureTime.followsDeviceTimeZone = memoriesPreferences.value.days == .thisIPhone
         _memories = State(initialValue: memories)
+        _mosaic = State(initialValue: MemoriesModel(
+            context: dependencies.modelContainer.mainContext, store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
+        ))
+        _homeTurn = State(initialValue: HomeTurn(preferences: dependencies.homePreferences))
         let flow = Self.onboardingFlow(context: dependencies.modelContainer.mainContext, permissions: dependencies.permissions, surprises: surprises)
         _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
     }
@@ -137,7 +146,9 @@ public struct RootView: View {
         router.newMovie = nil
         router.moviesPath = []
         router.selectedTab = .today
+        homeTurn.reset()
         memories.refresh()
+        mosaic.refresh()
         Task { await today.refresh() }
         onboarding = Self.onboardingFlow(context: memories.library.context, permissions: permissions, surprises: surprises)
     }
@@ -181,7 +192,7 @@ public struct RootView: View {
                     } else {
                         NavigationStack {
                             switch tab {
-                            case .today: TodayView(model: today)
+                            case .today: HomeView(today: today, mosaic: mosaic)
                             case .memories: MemoriesView(model: memories)
                             case .map: MapScreen()
                             case .movies: EmptyView()
@@ -195,6 +206,10 @@ public struct RootView: View {
         }
         .tabViewStyle(.sidebarAdaptable)
         .tint(ColorToken.textLink.color)
+        // U12: the whole screen turns between Today and the Mosaic, over the dark behind it.
+        .modifier(PageTurn(angle: reduceMotion ? 0 : homeTurn.flip.angle))
+        .background(Color(hex: 0x2A1B21).ignoresSafeArea())
+        .environment(homeTurn)
         .sheet(isPresented: $router.isSettingsPresented) {
             SettingsScreen(surprises: surprises)
         }

@@ -137,6 +137,18 @@ public struct TextStyle: Equatable, Sendable {
     // Memories (M01).
     /// A tab's own big title: "Memories".
     public static let screenTitle = TextStyle(.fraunces, size: 36, weight: 650, relativeTo: .largeTitle, maximumScale: 1.35)
+    // Home (U10-U16).
+    /// "Today" / "Mosaic" on the home switch.
+    public static let homeSwitch = TextStyle(.nunito, size: 13, weight: 800, relativeTo: .caption1, maximumScale: 1.35)
+    /// "Your mosaic".
+    public static let mosaicTitle = TextStyle(.fraunces, size: 30, weight: 600, lineHeight: 1.2, relativeTo: .title1, maximumScale: 1.35)
+    /// A month's chapter: "November".
+    public static let mosaicChapter = TextStyle(.fraunces, size: 20, weight: 600, lineHeight: 1.2, relativeTo: .title3, maximumScale: 1.35)
+    /// "Your mosaic grows with every moment".
+    public static let mosaicNoteTitle = TextStyle(.fraunces, size: 18, weight: 600, relativeTo: .headline, maximumScale: 1.35)
+    /// The first-time flip hint (U11).
+    public static let coachTitle = TextStyle(.nunito, size: 14, weight: 800, relativeTo: .subheadline)
+    public static let coachBody = TextStyle(.nunito, size: 13, weight: 600, relativeTo: .footnote)
     /// "No memories yet".
     /// The words under an empty state's title (M09, M10e).
     public static let emptyBody = TextStyle(.nunito, size: 15, weight: 500, lineHeight: 1.4, relativeTo: .subheadline)

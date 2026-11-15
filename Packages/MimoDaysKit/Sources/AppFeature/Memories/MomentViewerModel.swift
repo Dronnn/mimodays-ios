@@ -26,6 +26,7 @@ struct MomentPager: Hashable {
         /// The calendar, a day, the timeline: the moment's day.
         case day
         case today
+        case mosaic
         case onThisDay
         case favorites
         case search

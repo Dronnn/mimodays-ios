@@ -124,36 +124,9 @@ struct TodayView: View {
 
     // MARK: Header
 
-    /// The wordmark sets the height; the gear hangs a little lower, beside it (T02).
+    /// The wordmark, the Today | Mosaic switch, settings (T02, U10).
     private var header: some View {
-        ZStack {
-            Icon.brandWordmark.image.resizable().foregroundStyle(ColorToken.textPrimary.color)
-            Icon.brandWordmarkStar.image.resizable().foregroundStyle(ColorToken.actionCoral.color)
-        }
-        .frame(width: 103.7, height: 33)
-        .environment(\.layoutDirection, .leftToRight)
-        .accessibilityElement()
-        .accessibilityLabel(Text(verbatim: "MimoDays"))
-        .accessibilityAddTraits(.isHeader)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(alignment: .topTrailing) {
-            Button { router.open(.settings) } label: {
-                Icon.glyphGear.image
-                    .resizable()
-                    .frame(width: 22, height: 22)
-                    .foregroundStyle(ColorToken.textPrimary.color)
-                    .frame(width: 40, height: 40)
-                    .overlay(Circle().strokeBorder(ColorToken.textPrimary.color, lineWidth: 1.3))
-                    .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Settings", bundle: .module))
-            .accessibilityIdentifier("settings")
-            .offset(y: 2)
-        }
-        .padding(.leading, isWide ? 12 : 25)
-        .padding(.trailing, isWide ? 8 : 19)
+        HomeHeader(isWide: isWide)
     }
 
     /// "WED, NOV 11" and "Your life, in little pieces." with its brush underline and apricot star.

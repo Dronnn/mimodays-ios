@@ -213,47 +213,6 @@ struct MemoryCardPage: View {
     }
 }
 
-/// The card turned about its vertical axis with perspective and a shade on the half turning away. Animatable, so the
-/// shade follows the angle through a flip.
-private struct CardTurn: ViewModifier, Animatable {
-    var angle: Double
-    let shadeFromLeading: Bool
-
-    nonisolated var animatableData: Double {
-        get { angle }
-        set { angle = newValue }
-    }
-
-    func body(content: Content) -> some View {
-        content
-            .overlay {
-                LinearGradient(
-                    colors: [.clear, Color.black.opacity(0.3 * abs(sin(angle * .pi / 180)))],
-                    startPoint: shadeFromLeading ? .leading : .trailing, endPoint: shadeFromLeading ? .trailing : .leading
-                )
-                .clipShape(MemoryCardOutline())
-                .allowsHitTesting(false)
-            }
-            .rotation3DEffect(.degrees(angle), axis: (x: 0, y: 1, z: 0), perspective: 0.45)
-    }
-}
-
-/// One side of the card, shown while it faces the person: the sides change over at 90° of the turn as it is drawn,
-/// not when the flip is asked for.
-private struct CardFace: ViewModifier, Animatable {
-    var angle: Double
-    let isBack: Bool
-
-    nonisolated var animatableData: Double {
-        get { angle }
-        set { angle = newValue }
-    }
-
-    func body(content: Content) -> some View {
-        content.opacity(MemoryCardFlip(angle: angle).showsBack == isBack ? 1 : 0)
-    }
-}
-
 /// What VoiceOver can do on a card (U25): flip it, swap its cameras, go to the next or previous moment.
 struct MemoryCardActions {
     let flip: () -> Void

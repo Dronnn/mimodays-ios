@@ -72,7 +72,9 @@ struct ViewerSnapshotTests {
 
     /// U20, before it starts playing.
     @Test func video() async throws {
-        assertScreenSnapshots(of: try await viewer(video: true), variants: [SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+        assertScreenSnapshots(of: try await viewer(video: true), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+        ])
     }
 
     /// The card takes the moment's shape (Andrew, 2026-11-15): square, and wide with the window on its side.
@@ -128,8 +130,8 @@ struct ViewerSnapshotTests {
         assertScreenSnapshots(of: try await page(video: false, angle: 180, bare: true), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
-    /// U23: the cameras swapped, the main picture in the window.
-    @Test func swapped() async throws {
+    /// A photo's card front on its own: `swapped`, part way through a swap, or with the window held `dragged`.
+    private func front(swapped: Bool = false, swapProgress: Double? = nil, dragged: CGSize? = nil) async throws -> some View {
         let id = try await save(video: false)
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)
@@ -137,19 +139,44 @@ struct ViewerSnapshotTests {
         let card = MemoryCardGeometry.card(aspectRatio: moment.format.aspectRatio, in: CGSize(width: 359, height: 562))
         let layout = MemoryCardGeometry.windowLayout(format: .portrait, screenWidth: 402)
         let saved = try #require(moment.photo?.layout)
-        let front = MemoryCardFront(
+        return MemoryCardFront(
             pictures: MemoryCardFront.Pictures(main: model.image(moment.mainPath), selfie: model.image(moment.selfiePath), isVideo: false),
             playback: nil, size: card,
             window: MemoryCardFront.Window(
                 layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow",
                 move: { _ in }, swap: {}
             ),
-            swapped: true, cornerOnRight: true, controlsShown: .constant(true),
-            actions: MemoryCardActions(flip: {}, swap: nil, step: { _ in })
+            swapped: swapped, cornerOnRight: true, controlsShown: .constant(true),
+            actions: MemoryCardActions(flip: {}, swap: nil, step: { _ in }),
+            heldDrag: dragged, swapProgress: swapProgress
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorToken.canvas.color)
-        assertScreenSnapshots(of: front, variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// U23: the cameras swapped, the main picture in the window.
+    @Test func swapped() async throws {
+        assertScreenSnapshots(of: try await front(swapped: true), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// U22: half way through the swap, the selfie growing into the card as the main picture shrinks into the window.
+    @Test func swapping() async throws {
+        assertScreenSnapshots(of: try await front(swapProgress: 0.5), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// U24: the window dragged down and left, the four corners showing, the one it would land on in coral.
+    @Test func dragging() async throws {
+        assertScreenSnapshots(of: try await front(dragged: CGSize(width: -200, height: 250)), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark),
+        ])
+    }
+
+    /// U41: opened from a place on the Map, the second of three there.
+    @Test func fromTheMap() async throws {
+        let ids = [try await save(video: false), try await save(video: false), try await save(video: false)]
+        let model = MomentViewerModel(pager: MomentPager(ids: ids, start: ids[1], origin: .place("Kentron")), library: library)
+        for id in ids { await model.load(id) }
+        assertScreenSnapshots(of: NavigationStack { MomentViewer(model: model) }, variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     /// M07.

@@ -44,12 +44,25 @@ struct MemoryCardFront: View {
     @Binding var controlsShown: Bool
     /// The VoiceOver actions; nil in Review, which has no neighbours and no back yet.
     let actions: MemoryCardActions?
+    /// A drag held part way, the corners showing: snapshots of U24.
+    var heldDrag: CGSize?
+    /// Part way from the recorded layout (0) to swapped (1): snapshots of U22. Otherwise the swap is 0 or 1 and
+    /// SwiftUI animates between them.
+    var swapProgress: Double?
     @State private var adjustsWindow = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @GestureState(resetTransaction: Transaction(animation: .snappy)) private var drag: CGSize?
+    @GestureState(resetTransaction: Transaction(animation: .snappy)) private var dragging: CGSize?
+
+    /// How far the window is dragged now.
+    private var drag: CGSize? { dragging ?? heldDrag }
 
     /// The card's face under the pictures, seen while they swap (U22).
     static let face = Color(hex: 0x2A1B21)
+
+    /// U22: the picture going into the window leads, so the one growing out of it shows under it on the way, not
+    /// only at the end. The grow is the swap's 0.5 s spring.
+    static let shrinkDuration = 0.3
+    static let growDuration = 0.5
 
     private enum Stream {
         case main
@@ -114,24 +127,34 @@ struct MemoryCardFront: View {
         return MemoryCardGeometry.windowFrame(window.placement, layout: window.layout, card: size)
     }
 
-    /// A stream framed where it is now: filling the card, or in the window with its cream edge, shadow and tilt.
+    /// A stream framed where it is now: filling the card, or in the window with its cream edge, shadow and tilt,
+    /// or part way between the two.
     private func picture(_ stream: Stream, bounds: CGRect, window: CGRect?) -> some View {
-        let inWindow = window != nil && (stream == .selfie) != swapped
+        // Where it ends up; part way through a swap, the swapped side.
+        let inWindow = window != nil && (stream == .selfie) != (swapped || swapProgress != nil)
+        // How far this stream is along, the one going into the window ahead, as its shorter spring has it.
+        let progress = swapProgress.map { inWindow ? min($0 * Self.growDuration / Self.shrinkDuration, 1) : $0 } ?? (swapped ? 1 : 0)
+        // 1 in the window, 0 filling the card.
+        let share = window == nil ? 0 : stream == .selfie ? 1 - progress : progress
         let offset = inWindow ? drag ?? .zero : .zero
-        let rect = inWindow ? window!.offsetBy(dx: offset.width, dy: offset.height) : bounds
+        let rect = Self.between(bounds, window?.offsetBy(dx: offset.width, dy: offset.height) ?? bounds, share)
         // The card's outline, or the window's own hand-cut frame with its 4 pt cream edge inside it.
-        let shape = inWindow ? AnyShape(CardSelfieBlob()) : AnyShape(MemoryCardOutline())
+        let shape = share > 0.5 ? AnyShape(CardSelfieBlob()) : AnyShape(MemoryCardOutline())
         return content(stream)
             .frame(width: rect.width, height: rect.height)
             .clipShape(shape)
-            .overlay { shape.stroke(ColorToken.mediaFrame.color, lineWidth: inWindow ? 8 : 0).clipShape(shape) }
+            .overlay { shape.stroke(ColorToken.mediaFrame.color, lineWidth: 8 * share).clipShape(shape) }
             .background {
                 shape
                     .fill(ColorToken.mediaFrame.color)
-                    .shadow(color: Color(hex: 0x2A1B21).opacity(inWindow ? 0.25 : 0), radius: 10, y: 8)
+                    .shadow(color: Color(hex: 0x2A1B21).opacity(0.25 * share), radius: 10, y: 8)
             }
-            .rotationEffect(.degrees(inWindow ? self.window?.rotation ?? 0 : 0))
+            .rotationEffect(.degrees((self.window?.rotation ?? 0) * share))
             .position(x: rect.midX, y: rect.midY)
+            .animation(
+                reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: inWindow ? Self.shrinkDuration : Self.growDuration),
+                value: swapped
+            )
             // The stream going into the window is on top, so it uncovers the one growing out of it.
             .zIndex(inWindow ? 1 : 0)
             .modifier(PictureAccess(
@@ -141,6 +164,12 @@ struct MemoryCardFront: View {
                 id: pictures.id, actions: actions
             ))
             .gesture(windowGesture, isEnabled: inWindow)
+    }
+
+    /// `from` moved `share` of the way to `to`.
+    private static func between(_ from: CGRect, _ to: CGRect, _ share: Double) -> CGRect {
+        func mix(_ a: CGFloat, _ b: CGFloat) -> CGFloat { a + (b - a) * share }
+        return CGRect(x: mix(from.minX, to.minX), y: mix(from.minY, to.minY), width: mix(from.width, to.width), height: mix(from.height, to.height))
     }
 
     /// The picture at its frame's size: its VoiceOver element has the frame's bounds, which tests measure the
@@ -170,7 +199,7 @@ struct MemoryCardFront: View {
             .onEnded { _ in adjustsWindow = true }
             .exclusively(
                 before: DragGesture(minimumDistance: 6)
-                    .updating($drag) { value, state, _ in state = value.translation }
+                    .updating($dragging) { value, state, _ in state = value.translation }
                     .onEnded { value in
                         guard let window, let frame = windowFrame else { return }
                         let windowLayout = window.layout, placement = window.placement

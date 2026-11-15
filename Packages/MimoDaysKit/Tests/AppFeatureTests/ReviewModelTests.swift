@@ -76,22 +76,20 @@ struct ReviewModelTests {
         #expect(square.aspectRatio == 1)
     }
 
-    @Test func aVideoShowsItsFirstFramesAndPlaysComposed() async throws {
+    @Test func aVideoShowsItsFirstFramesAndPlaysBothStreams() async throws {
         let review = try await video()
         defer { review.discard() }
         await review.load()
         #expect(review.main != nil && review.selfie != nil)
-        #expect(review.playback == .stopped)
-        review.windowFrame = SelfieWindowFrame(frame: CGRect(x: 270, y: 110, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
-        await review.togglePlayback()
-        #expect(review.playback == .playing)
-        #expect(review.player.currentItem?.videoComposition != nil)
-        await review.togglePlayback()
-        #expect(review.playback == .paused)
-        await review.togglePlayback()
-        #expect(review.playback == .playing)
+        #expect(review.playback == nil)
+        await review.startPlayback()
+        let playback = try #require(review.playback)
+        #expect(playback.isPlaying && playback.hasSelfie)
+        #expect(playback.main.currentItem != nil && playback.selfie.currentItem != nil)
+        playback.pause()
+        #expect(!playback.isPlaying)
         review.stopPlayback()
-        #expect(review.playback == .stopped && review.player.currentItem == nil)
+        #expect(review.playback == nil && playback.main.currentItem == nil)
     }
 
     @Test func theSavedTimingCarriesTheReviewWindow() async throws {

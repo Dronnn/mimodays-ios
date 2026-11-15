@@ -8,18 +8,40 @@ import SwiftUI
 /// resized with touch and hold, and saved on the moment. Swapping grows the window's stream into the card while the
 /// card's shrinks into the window: frame, size, tilt and edge move together and the players keep running.
 /// A video's controls sit on a scrim at the bottom; tapping the card hides or shows them.
+/// The viewer shows a saved moment on it; Review after capture shows the capture before Save (U42).
 struct MemoryCardFront: View {
-    let model: MomentViewerModel
-    let moment: ViewerMoment
+    /// The stills, under the players once a video plays.
+    struct Pictures {
+        let main: UIImage?
+        let selfie: UIImage?
+        let isVideo: Bool
+        /// The video's length until the player knows it.
+        var duration: Double = 0
+        /// The card's own element: "viewer.media", "review.media".
+        var id = "viewer.media"
+    }
+
+    /// The selfie window: the camera's layout for this shape, where the window is, and how a move is kept.
+    struct Window {
+        let layout: SelfieWindowLayout
+        let placement: CameraSettings.SelfieWindow
+        let rotation: Double
+        /// "viewer.selfieWindow", "review.selfieWindow".
+        let id: String
+        let move: (CameraSettings.SelfieWindow) -> Void
+    }
+
+    let pictures: Pictures
     let playback: ViewerVideoPlayer?
     let size: CGSize
-    /// The camera's window layout for this moment; nil without a selfie stream.
-    let windowLayout: SelfieWindowLayout?
+    /// Nil without a selfie stream.
+    let window: Window?
     let swapped: Bool
-    /// The folded corner's side: bottom trailing.
-    let cornerOnRight: Bool
+    /// The folded corner's side, bottom trailing; nil where the card can't turn yet (Review before Save).
+    let cornerOnRight: Bool?
     @Binding var controlsShown: Bool
-    let actions: MemoryCardActions
+    /// The VoiceOver actions; nil in Review, which has no neighbours and no back yet.
+    let actions: MemoryCardActions?
     @State private var adjustsWindow = false
     @GestureState(resetTransaction: Transaction(animation: .snappy)) private var drag: CGSize?
 
@@ -31,40 +53,37 @@ struct MemoryCardFront: View {
         case selfie
     }
 
-    private var savedLayout: PiPLayout? { moment.video?.layout ?? moment.photo?.layout }
-
-    /// The corner and size the saved window is shown at; a move saves it, which moves it here.
-    private var placement: CameraSettings.SelfieWindow? {
-        guard let windowLayout, let savedLayout else { return nil }
-        return windowLayout.placement(nearest: savedLayout)
-    }
-    private var isVideo: Bool { moment.mediaType == .video }
+    private var placement: CameraSettings.SelfieWindow? { window?.placement }
+    private var isVideo: Bool { pictures.isVideo }
 
     var body: some View {
         let bounds = CGRect(origin: .zero, size: size)
-        let window = windowFrame
+        let frame = windowFrame
         ZStack(alignment: .topLeading) {
             Self.face
                 .accessibilityElement()
-                .accessibilityLabel(Text(isVideo ? "Video" : moment.selfiePath == nil ? "Photo" : "Photo with selfie", bundle: .module))
+                .accessibilityLabel(Text(isVideo ? "Video" : window == nil ? "Photo" : "Photo with selfie", bundle: .module))
                 .accessibilityAddTraits(.isImage)
-                .memoryCardActions(actions)
-            picture(.main, bounds: bounds, window: window)
-            if let window {
-                if let windowLayout, let placement, adjustsWindow || drag != nil {
-                    targets(windowLayout, placement)
+                .accessibilityIdentifier(pictures.id)
+                .modifier(CardActions(actions: actions))
+            picture(.main, bounds: bounds, window: frame)
+            if let frame {
+                if let window, adjustsWindow || drag != nil {
+                    targets(window.layout, window.placement)
                 }
-                picture(.selfie, bounds: bounds, window: window)
+                picture(.selfie, bounds: bounds, window: frame)
             }
             if isVideo, controlsShown {
-                MemoryCardVideoControls(playback: playback, fallbackDuration: moment.video?.timing.duration ?? 0)
+                MemoryCardVideoControls(playback: playback, fallbackDuration: pictures.duration)
                     .frame(width: size.width, height: size.height, alignment: .bottom)
                     .transition(.opacity)
             }
-            MemoryCardFlipCorner()
-                .scaleEffect(x: cornerOnRight ? 1 : -1)
-                .position(x: cornerOnRight ? size.width - 29 : 29, y: size.height - 32)
-                .accessibilityHidden(true)
+            if let cornerOnRight {
+                MemoryCardFlipCorner()
+                    .scaleEffect(x: cornerOnRight ? 1 : -1)
+                    .position(x: cornerOnRight ? size.width - 29 : 29, y: size.height - 32)
+                    .accessibilityHidden(true)
+            }
         }
         .frame(width: size.width, height: size.height)
         .clipShape(MemoryCardOutline())
@@ -77,8 +96,8 @@ struct MemoryCardFront: View {
         // Corners are physical, as the camera records them.
         .environment(\.layoutDirection, .leftToRight)
         .sheet(isPresented: $adjustsWindow) {
-            if let placement {
-                SelfieWindowSheet(placement: Binding(get: { placement }, set: { new in withAnimation(.snappy) { save(new) } }))
+            if let window {
+                SelfieWindowSheet(placement: Binding(get: { window.placement }, set: { new in withAnimation(.snappy) { window.move(new) } }))
             }
         }
     }
@@ -87,8 +106,8 @@ struct MemoryCardFront: View {
 
     /// The window's frame on the card, before any drag; nil without a selfie window.
     private var windowFrame: CGRect? {
-        guard let windowLayout, let placement, moment.selfiePath != nil else { return nil }
-        return MemoryCardGeometry.windowFrame(placement, layout: windowLayout, card: size)
+        guard let window else { return nil }
+        return MemoryCardGeometry.windowFrame(window.placement, layout: window.layout, card: size)
     }
 
     /// A stream framed where it is now: filling the card, or in the window with its cream edge, shadow and tilt.
@@ -105,19 +124,18 @@ struct MemoryCardFront: View {
                     .fill(ColorToken.mediaFrame.color)
                     .shadow(color: Color(hex: 0x2A1B21).opacity(inWindow ? 0.25 : 0), radius: 10, y: 8)
             }
-            .rotationEffect(.degrees(inWindow ? savedLayout?.rotation ?? -5.4 : 0))
+            .rotationEffect(.degrees(inWindow ? self.window?.rotation ?? 0 : 0))
             .position(x: rect.midX, y: rect.midY)
             // The stream going into the window is on top, so it uncovers the one growing out of it.
             .zIndex(inWindow ? 1 : 0)
-            .modifier(WindowAccess(isWindow: inWindow, placement: placement) { adjustsWindow = true })
+            .modifier(WindowAccess(isWindow: inWindow, placement: placement, id: self.window?.id ?? "") { adjustsWindow = true })
             .gesture(windowGesture, isEnabled: inWindow)
     }
 
     @ViewBuilder
     private func content(_ stream: Stream) -> some View {
-        let path = stream == .main ? moment.mainPath : moment.selfiePath
         ZStack {
-            if let image = model.image(path) {
+            if let image = stream == .main ? pictures.main : pictures.selfie {
                 Image(uiImage: image).filling()
             }
             if let playback {
@@ -140,7 +158,8 @@ struct MemoryCardFront: View {
                 before: DragGesture(minimumDistance: 6)
                     .updating($drag) { value, state, _ in state = value.translation }
                     .onEnded { value in
-                        guard let windowLayout, let placement, let frame = windowFrame else { return }
+                        guard let window, let frame = windowFrame else { return }
+                        let windowLayout = window.layout, placement = window.placement
                         let scale = windowLayout.preview.width / max(size.width, 1)
                         // The layout's centres are the whole window's, the frame and the camera's handle below it.
                         let end = CGPoint(
@@ -150,7 +169,7 @@ struct MemoryCardFront: View {
                         var moved = placement
                         moved.corner = windowLayout.nearest(to: end, placement.scale)
                         guard moved != placement else { return }
-                        withAnimation(.snappy) { save(moved) }
+                        withAnimation(.snappy) { window.move(moved) }
                     }
             )
     }
@@ -173,9 +192,14 @@ struct MemoryCardFront: View {
         .allowsHitTesting(false)
     }
 
-    private func save(_ placement: CameraSettings.SelfieWindow) {
-        guard let windowLayout, let saved = savedLayout else { return }
-        model.setWindow(PiPLayout(windowLayout.windowFrame(placement), source: saved.source), for: moment.id)
+}
+
+/// The card's VoiceOver actions, where it has them.
+private struct CardActions: ViewModifier {
+    let actions: MemoryCardActions?
+
+    func body(content: Content) -> some View {
+        if let actions { content.memoryCardActions(actions) } else { content }
     }
 }
 
@@ -183,6 +207,7 @@ struct MemoryCardFront: View {
 private struct WindowAccess: ViewModifier {
     let isWindow: Bool
     let placement: CameraSettings.SelfieWindow?
+    let id: String
     let adjust: () -> Void
 
     func body(content: Content) -> some View {
@@ -192,7 +217,7 @@ private struct WindowAccess: ViewModifier {
                 .accessibilityLabel(Text("Selfie window", bundle: .module))
                 .accessibilityValue(Text(placement?.accessibilityValue ?? ""))
                 .accessibilityAction(named: Text("Adjust selfie window", bundle: .module), adjust)
-                .accessibilityIdentifier("viewer.selfieWindow")
+                .accessibilityIdentifier(id)
         } else {
             content
         }

@@ -1,16 +1,18 @@
-import AVFoundation
 import Core
 import DesignSystem
 import Persistence
 import SwiftUI
 
-/// C07 review, or C13d when a recording stopped early. The whole capture is shown (aspect-fit, never cropped);
-/// the selfie window can still be moved. Save is the one primary action, everything else is optional.
+/// C07 review, or C13d when a recording stopped early. The capture is the Memory Card's front on the canvas (U42):
+/// the selfie window can still be moved, the cameras swapped for a look, a video plays round and round; the card
+/// turns over only once saved. Save is the one primary action, everything else is optional.
 struct ReviewView: View {
     @State var model: ReviewModel
     let onRetake: () -> Void
     let onSave: () async throws -> Void
-    @State private var adjustsSelfie = false
+    /// Viewing only, as on a saved card.
+    @State private var swapped = false
+    @State private var controlsShown = true
     @State private var isSaving = false
     @State private var editsNote = false
     @State private var confirmsRetake = false
@@ -23,11 +25,12 @@ struct ReviewView: View {
     /// C13c, or the generic save failure.
     @State private var saveError: SaveError?
     @Environment(\.openURL) private var openURL
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var topInset: CGFloat = 0
     @FocusState private var editsCaption: Bool
 
     var body: some View {
-        MediaThenPanel(aspectRatio: model.aspectRatio, topInset: topInset, band: band) {
+        MediaThenPanel(aspectRatio: model.aspectRatio, topInset: topInset, chrome: chrome) {
             media
             Group {
                 if let interruption = model.interruption {
@@ -41,7 +44,10 @@ struct ReviewView: View {
         .ignoresSafeArea(.container, edges: .top)
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = $0 }
-        .task { await model.load() }
+        .task {
+            await model.load()
+            await model.startPlayback()
+        }
         .task {
             // Location is never asked for here: only after a tap on Place.
             guard await permissions.status(of: .location).isUsable else { return }
@@ -49,9 +55,6 @@ struct ReviewView: View {
             await model.locate()
         }
         .onDisappear { model.stopPlayback() }
-        .sheet(isPresented: $adjustsSelfie) {
-            SelfieWindowSheet(placement: $model.window)
-        }
         .fullScreenCover(isPresented: $editsNote) {
             NoteEditorView(model: model)
         }
@@ -89,84 +92,59 @@ struct ReviewView: View {
 
     // MARK: Media
 
-    /// 1:1 and 16:9 start below the status bar on a dark band, like the camera's frame (Andrew, 2026-11-15);
-    /// 9:16 goes under it as before.
-    private var band: CGFloat {
-        model.capture.format == .portrait ? 0 : topInset
+    /// Retake over the card, Swap cameras under it.
+    private var chrome: CGFloat {
+        Self.retakeRow + (model.hasSelfie ? MemoryCardGeometry.buttonsGap + MemoryCardGeometry.buttonsHeight : 0) + 12
     }
 
-    /// The recorded shape (the middle of the frame, as the camera showed it) on a full-width band: dark sides when
-    /// it is too tall for the width.
+    private static let retakeRow: CGFloat = 52
+
+    /// The card front in the recorded shape, as large as the panel leaves room for, with Retake above it.
     private var media: some View {
         GeometryReader { proxy in
-            let width = min(proxy.size.width, max(0, proxy.size.height - band) * model.aspectRatio)
-            let size = CGSize(width: width, height: width / model.aspectRatio)
-            ZStack(alignment: .topLeading) {
-                ZStack {
-                    if model.playback == .stopped {
-                        still
-                    } else {
-                        ReviewPlayerView(player: model.player)
-                    }
-                    if model.video != nil, model.playback != .playing {
-                        PlayButton()
-                    }
+            let slot = CGSize(
+                width: MemoryCardGeometry.slotWidth(screen: proxy.size.width),
+                height: max(0, proxy.size.height - topInset - chrome)
+            )
+            let card = MemoryCardGeometry.card(aspectRatio: model.aspectRatio, in: slot)
+            // Laid out as the camera did on the full width, then drawn at the card's size: what is saved is what
+            // was recorded, whatever the keyboard or the panel leaves of the card.
+            let layout = MemoryCardGeometry.windowLayout(format: model.capture.format, screenWidth: proxy.size.width, topInset: topInset)
+            VStack(alignment: .leading, spacing: 0) {
+                RetakeButton(action: retake)
+                    .frame(height: Self.retakeRow)
+                MemoryCardFront(
+                    pictures: MemoryCardFront.Pictures(
+                        main: model.main, selfie: model.selfie, isVideo: model.video != nil,
+                        duration: model.video?.duration ?? 0, id: "review.media"
+                    ),
+                    playback: model.playback, size: card,
+                    window: model.hasSelfie && proxy.size.width > 0
+                        ? MemoryCardFront.Window(
+                            layout: layout, placement: model.window, rotation: Size.selfieWindowTilt.degrees, id: "review.selfieWindow"
+                        ) { model.window = $0 }
+                        : nil,
+                    swapped: swapped, cornerOnRight: nil, controlsShown: $controlsShown, actions: nil
+                )
+                .background {
+                    MemoryCardOutline()
+                        .fill(ColorToken.mediaFrame.color)
+                        .shadow(color: ColorToken.textPrimary.color.opacity(0.16), radius: 9, y: 6)
                 }
-                .frame(width: size.width, height: size.height)
-                // The still fills the shape and is cut to it (C.5).
-                .clipped()
-                .contentShape(Rectangle())
-                .onTapGesture { togglePlayback() }
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(model.video == nil ? Text("Photo", bundle: .module) : Text("Video", bundle: .module))
-                .accessibilityAddTraits(model.video == nil ? .isImage : .isButton)
-                .accessibilityAction { togglePlayback() }
-                .accessibilityHint(model.video == nil ? Text(verbatim: "") : model.playback == .playing ? Text("Pauses the video", bundle: .module) : Text("Plays the video", bundle: .module))
-                .accessibilityIdentifier("review.media")
-
-                if model.hasSelfie, model.playback == .stopped, proxy.size.width > 0 {
-                    // Laid out as the camera did, on the media at full width, then drawn at the size it is shown:
-                    // what is saved is what was recorded, whatever the keyboard or the panel leaves of the media.
-                    let layout = SelfieWindowLayout.media(width: proxy.size.width, format: model.capture.format, topInset: topInset)
-                    let reference = layout.preview
-                    AdjustableSelfieWindow(placement: $model.window, showsSheet: $adjustsSelfie, layout: layout, id: "review.selfieWindow") {
-                        if let selfie = model.selfie {
-                            Image(uiImage: selfie).filling()
-                        }
-                    }
-                    .frame(width: reference.width, height: reference.height)
-                    .scaleEffect(size.width / reference.width, anchor: .topLeading)
-                    .frame(width: size.width, height: size.height, alignment: .topLeading)
-                    .onChange(of: layout.windowFrame(model.window), initial: true) { model.windowFrame = $1 }
+                .onChange(of: layout.windowFrame(model.window), initial: true) { model.windowFrame = $1 }
+                if model.hasSelfie {
+                    CardButton(glyph: .swapCameras, title: Text("Swap cameras", bundle: .module), id: "review.swap") { swap() }
+                        .accessibilityAddTraits(swapped ? .isSelected : [])
+                        .padding(.top, MemoryCardGeometry.buttonsGap)
                 }
             }
-            .frame(width: size.width, height: size.height)
-            .padding(.top, band)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .background(CameraPalette.background)
-        .overlay(alignment: .topLeading) {
-            RetakeButton(action: retake)
-                .padding(.leading, 16)
-                // Below the band, on the shape's corner, for 1:1 and 16:9.
-                .padding(.top, band > 0 ? band + 12 : topInset - 6)
-        }
-        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 28, bottomTrailingRadius: 28, style: .continuous))
-        .environment(\.colorScheme, .dark)
-    }
-
-    @ViewBuilder
-    private var still: some View {
-        if let main = model.main {
-            Image(uiImage: main).filling()
-        } else {
-            CameraPalette.previewPlaceholder
+            .padding(.top, topInset)
+            .frame(width: proxy.size.width, alignment: .top)
         }
     }
 
-    private func togglePlayback() {
-        guard model.video != nil else { return }
-        Task { await model.togglePlayback() }
+    private func swap() {
+        withAnimation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.5)) { swapped.toggle() }
     }
 
     private func retake() {
@@ -209,7 +187,7 @@ struct ReviewView: View {
                 microphoneOff = true
                 return
             }
-            model.stopPlayback()
+            model.playback?.pause()
             model.stopVoice()
             guard let recording = try? model.makeVoiceRecording(), recording.start() else { return }
             self.recording = recording
@@ -366,14 +344,14 @@ struct ReviewView: View {
 
 // MARK: - Pieces
 
-/// Media from the top edge, the panel right under it. The panel gets its height first; the media takes the rest,
-/// up to its own aspect height. Space left over (tall screens, the keyboard gone) stays below the panel.
+/// The card from under the status bar, the panel right under it. The panel gets its height first; the card takes
+/// the rest, up to the height of a card as wide as the screen allows. Space left over (tall screens, the keyboard
+/// gone) stays below the panel.
 private struct MediaThenPanel: Layout {
     let aspectRatio: CGFloat
-    /// Under the status bar, which the media goes beneath.
     let topInset: CGFloat
-    /// Dark space over the media, when it starts below the status bar.
-    var band: CGFloat = 0
+    /// Above and below the card: Retake, Swap cameras.
+    let chrome: CGFloat
 
     func sizeThatFits(proposal: ProposedViewSize, subviews _: Subviews, cache _: inout ()) -> CGSize {
         proposal.replacingUnspecifiedDimensions()
@@ -382,7 +360,8 @@ private struct MediaThenPanel: Layout {
     func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
         guard subviews.count == 2 else { return }
         let panel = subviews[1].sizeThatFits(ProposedViewSize(width: bounds.width, height: nil)).height
-        let media = max(topInset, min(band + bounds.width / aspectRatio, bounds.height - panel))
+        let card = MemoryCardGeometry.slotWidth(screen: bounds.width) / aspectRatio
+        let media = max(topInset, min(topInset + chrome + card, bounds.height - panel))
         subviews[0].place(at: bounds.origin, proposal: ProposedViewSize(width: bounds.width, height: media))
         subviews[1].place(at: CGPoint(x: bounds.minX, y: bounds.minY + media), proposal: ProposedViewSize(width: bounds.width, height: panel))
     }
@@ -448,54 +427,22 @@ private struct ReviewChip: View {
     }
 }
 
-/// 92×36 dark capsule over the photo.
+/// A peach capsule over the card, like the card's own buttons.
 private struct RetakeButton: View {
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Text("Retake", bundle: .module)
-                .textStyle(.reviewRetake)
-                .foregroundStyle(CameraPalette.cream)
+                .textStyle(.cardButton)
+                .foregroundStyle(ColorToken.textPrimary.color)
                 .padding(.horizontal, 21)
                 .frame(minHeight: 36)
-                .background(CameraPalette.controlScrim, in: Capsule())
+                .background(ColorToken.accentPeach.color, in: Capsule())
                 .frame(minHeight: Size.minimumTapTarget)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("review.retake")
-    }
-}
-
-/// 64 pt cream disc with a plum triangle.
-private struct PlayButton: View {
-    var body: some View {
-        Icon.glyphPlay.image
-            .frame(width: 30, height: 30)
-            .foregroundStyle(CameraPalette.chipText)
-            .frame(width: 64, height: 64)
-            .background(CameraPalette.cream.opacity(0.9), in: Circle())
-            .shadow(color: .black.opacity(0.2), radius: 7, y: 4)
-            .accessibilityHidden(true)
-    }
-}
-
-/// The composed clip in the recorded shape (aspect-fill, like the still).
-private struct ReviewPlayerView: UIViewRepresentable {
-    let player: AVPlayer
-
-    func makeUIView(context _: Context) -> PlayerView {
-        let view = PlayerView()
-        view.playerLayer.player = player
-        view.playerLayer.videoGravity = .resizeAspectFill
-        return view
-    }
-
-    func updateUIView(_: PlayerView, context _: Context) {}
-
-    final class PlayerView: UIView {
-        override static var layerClass: AnyClass { AVPlayerLayer.self }
-        var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
     }
 }

@@ -9,13 +9,6 @@ import UIKit
 @MainActor
 @Observable
 final class ReviewModel {
-    enum Playback: Equatable {
-        /// The first frame, with the adjustable selfie window over it.
-        case stopped
-        case playing
-        case paused
-    }
-
     /// One line (Andrew, 2026-11-13: a short caption; the longer note is C08).
     static let captionLimit = 80
     /// C08 counter: "86 / 500".
@@ -82,9 +75,8 @@ final class ReviewModel {
     var windowFrame: SelfieWindowFrame?
     private(set) var main: UIImage?
     private(set) var selfie: UIImage?
-    private(set) var playback = Playback.stopped
-    let player = AVPlayer()
-    private var endObserver: (any NSObjectProtocol)?
+    /// Both streams in step on the card, round and round, as the viewer plays them (U42).
+    private(set) var playback: ViewerVideoPlayer?
     /// C10 waveform, one level (0...1) per bar.
     private(set) var voiceLevels: [Float] = []
     private(set) var playsVoice = false
@@ -226,7 +218,7 @@ final class ReviewModel {
         }
     }
 
-    /// Play from the start, pause, or carry on. The video stops while the voice note plays.
+    /// Play from the start, pause, or carry on. The video pauses while the voice note plays.
     func toggleVoice() {
         guard let voice else { return }
         if playsVoice {
@@ -234,7 +226,7 @@ final class ReviewModel {
             playsVoice = false
             return
         }
-        stopPlayback()
+        playback?.pause()
         if voicePlayer.currentItem == nil {
             let item = AVPlayerItem(url: voice.url)
             if let voiceEndObserver { NotificationCenter.default.removeObserver(voiceEndObserver) }
@@ -285,33 +277,26 @@ final class ReviewModel {
         }
     }
 
-    /// Play from the start with sound, pause, or carry on.
-    func togglePlayback() async {
-        switch playback {
-        case .playing:
-            player.pause()
-            playback = .paused
-        case .paused:
-            player.play()
-            playback = .playing
-        case .stopped:
-            stopVoice()
-            guard let video, let composed = try? await VideoComposer.compose(
-                mainURL: video.mainURL, selfieURL: video.selfieURL, timing: timing(video)
-            ) else { return }
-            let item = composed.playerItem()
-            observeEnd(of: item)
-            player.replaceCurrentItem(with: item)
-            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-            player.play()
-            playback = .playing
+    /// Plays a video on the card from the start, with sound, once both streams are ready.
+    func startPlayback() async {
+        guard let video, playback == nil else { return }
+        let player = ViewerVideoPlayer(duration: video.duration)
+        playback = player
+        let main = AVURLAsset(url: video.mainURL)
+        var selfie: AVPlayerItem?
+        if let selfieURL = video.selfieURL, let duration = try? await main.load(.duration),
+           let stream = try? await VideoComposer.selfieStream(selfieURL, offset: video.selfieOffset, mainDuration: duration) {
+            selfie = AVPlayerItem(asset: stream)
         }
+        await player.load(main: AVPlayerItem(asset: main), selfie: selfie)
+        // Saved, retaken or recording a voice note meanwhile.
+        guard playback === player, !playsVoice else { return }
+        player.play()
     }
 
     func stopPlayback() {
-        player.pause()
-        player.replaceCurrentItem(with: nil)
-        playback = .stopped
+        playback?.stop()
+        playback = nil
     }
 
     /// What Save keeps.
@@ -333,13 +318,6 @@ final class ReviewModel {
             duration: video.duration, selfieOffset: video.selfieOffset, hasAudio: video.hasAudio,
             mainPosition: video.mainPosition, window: video.selfieURL == nil ? nil : windowFrame
         )
-    }
-
-    private func observeEnd(of item: AVPlayerItem) {
-        if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
-        endObserver = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.stopPlayback() }
-        }
     }
 
     /// An upright still of a photo, or of a video at `seconds`.

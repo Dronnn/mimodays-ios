@@ -43,8 +43,19 @@ struct MemoryCardPage: View {
         _flip = State(initialValue: MemoryCardFlip(angle: angle))
     }
 
-    private var hasWindow: Bool {
-        moment.selfiePath != nil && (moment.video?.layout ?? moment.photo?.layout) != nil
+    private var savedLayout: PiPLayout? { moment.video?.layout ?? moment.photo?.layout }
+
+    private var hasWindow: Bool { moment.selfiePath != nil && savedLayout != nil }
+
+    /// The saved window, at the corner and size of the camera's layout nearest it; a move is saved on the moment.
+    private var window: MemoryCardFront.Window? {
+        guard hasWindow, screenWidth > 0, let saved = savedLayout else { return nil }
+        let layout = MemoryCardGeometry.windowLayout(format: moment.format, screenWidth: screenWidth, topInset: screenTop)
+        return MemoryCardFront.Window(
+            layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow"
+        ) { [model, id = moment.id] placement in
+            model.setWindow(PiPLayout(layout.windowFrame(placement), source: saved.source), for: id)
+        }
     }
 
     /// The folded corner is bottom trailing.
@@ -101,10 +112,11 @@ struct MemoryCardPage: View {
         let showsBack = flip.showsBack
         return ZStack {
             MemoryCardFront(
-                model: model, moment: moment, playback: playback, size: card,
-                windowLayout: hasWindow && screenWidth > 0
-                    ? MemoryCardGeometry.windowLayout(format: moment.format, screenWidth: screenWidth, topInset: screenTop)
-                    : nil,
+                pictures: MemoryCardFront.Pictures(
+                    main: model.image(moment.mainPath), selfie: model.image(moment.selfiePath),
+                    isVideo: moment.mediaType == .video, duration: moment.video?.timing.duration ?? 0
+                ),
+                playback: playback, size: card, window: window,
                 swapped: swapped, cornerOnRight: cornerOnRight, controlsShown: $controlsShown,
                 actions: cardActions
             )

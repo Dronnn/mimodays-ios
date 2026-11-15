@@ -2911,6 +2911,30 @@
         }
       }
     },
+    "Donations" : {
+      "comment" : "Settings (S01) row and the Donations screen's title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donations"
+          }
+        }
+      }
+    },
+    "Donations are not available right now." : {
+      "comment" : "Donations (D01-D04): D04, when the App Store has no tips to offer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donations are not available right now."
+          }
+        }
+      }
+    },
     "Done" : {
       "comment" : "Closes the Settings sheet; also closes the editor sheets and the finished export (F13); also backup and restore",
       "extractionState" : "manual",
@@ -3735,6 +3759,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Its moments stay in Memories."
+          }
+        }
+      }
+    },
+    "Keep MimoDays independent." : {
+      "comment" : "Donations (D01-D04): headline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep MimoDays independent."
           }
         }
       }
@@ -5899,6 +5935,18 @@
         }
       }
     },
+    "Prices are set by the App Store for your country and charged to your Apple Account. Donations are optional, consumable tips. They do not unlock features." : {
+      "comment" : "Donations (D01-D04): fine print",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prices are set by the App Store for your country and charged to your Apple Account. Donations are optional, consumable tips. They do not unlock features."
+          }
+        }
+      }
+    },
     "Privacy" : {
       "comment" : "Export (F11): section title (shown in capitals)",
       "extractionState" : "manual",
@@ -7603,6 +7651,18 @@
         }
       }
     },
+    "Thank you!" : {
+      "comment" : "Donations (D01-D04): D03 title after a tip",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thank you!"
+          }
+        }
+      }
+    },
     "That one didn't come out. Try again." : {
       "comment" : "Camera note: a photo or video failed or its file was unreadable; nothing was kept.",
       "extractionState" : "manual",
@@ -7623,6 +7683,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "That surprise has passed. Catch a moment anyway?"
+          }
+        }
+      }
+    },
+    "The app is designed, built and maintained by one developer. If it helps you, a tip is appreciated. Every feature stays available either way." : {
+      "comment" : "Donations (D01-D04): why",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app is designed, built and maintained by one developer. If it helps you, a tip is appreciated. Every feature stays available either way."
           }
         }
       }
@@ -7863,6 +7935,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The selfie window"
+          }
+        }
+      }
+    },
+    "The tip didn't go through. Please try again." : {
+      "comment" : "Donations (D01-D04): after a failed purchase",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The tip didn't go through. Please try again."
           }
         }
       }
@@ -8285,6 +8369,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Timeline"
+          }
+        }
+      }
+    },
+    "Tip size: extraordinary" : {
+      "comment" : "Donations (D01-D04): tip tier name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraordinary"
+          }
+        }
+      }
+    },
+    "Tip size: generous" : {
+      "comment" : "Donations (D01-D04): tip tier name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generous"
+          }
+        }
+      }
+    },
+    "Tip size: large" : {
+      "comment" : "Donations (D01-D04): tip tier name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Large"
+          }
+        }
+      }
+    },
+    "Tip size: medium" : {
+      "comment" : "Donations (D01-D04): tip tier name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium"
+          }
+        }
+      }
+    },
+    "Tip size: patron" : {
+      "comment" : "Donations (D01-D04): tip tier name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patron"
+          }
+        }
+      }
+    },
+    "Tip size: small" : {
+      "comment" : "Donations (D01-D04): tip tier name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small"
           }
         }
       }
@@ -8913,6 +9069,30 @@
         }
       }
     },
+    "Waiting" : {
+      "comment" : "Donations (D01-D04): VoiceOver for a tile's price while it loads or its payment sheet is up",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting"
+          }
+        }
+      }
+    },
+    "Waiting for approval. The tip goes through once it's approved." : {
+      "comment" : "Donations (D01-D04): Ask to Buy: the purchase waits for a parent",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for approval. The tip goes through once it's approved."
+          }
+        }
+      }
+    },
     "We picked %lld of %lld, spread evenly across %@. Tap to add or remove." : {
       "comment" : "New movie (F05): intro. Picked count, all count, the period (e.g. October)",
       "extractionState" : "manual",
@@ -9353,6 +9533,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your story starts with one moment"
+          }
+        }
+      }
+    },
+    "Your support keeps the app going." : {
+      "comment" : "Donations (D01-D04): D03 message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your support keeps the app going."
           }
         }
       }

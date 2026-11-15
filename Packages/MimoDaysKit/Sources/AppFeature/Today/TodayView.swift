@@ -226,7 +226,7 @@ struct TodayView: View {
             } else {
                 Button(action: capture) {
                     HStack(spacing: 10) {
-                        Icon.glyphCamera.image.resizable().frame(width: 26, height: 20)
+                        Icon.cameraCapture.image.resizable().frame(width: 26, height: 20)
                         Text(captureTitle)
                     }
                 }
@@ -266,7 +266,7 @@ struct TodayView: View {
     /// `Capture / Button`: the 84 pt coral disk in a cream ring, half on the hero.
     private var captureRing: some View {
         Button(action: capture) {
-            Icon.glyphCamera.image
+            Icon.cameraCapture.image
                 .resizable()
                 .frame(width: 40.4, height: 31.1)
                 .foregroundStyle(ColorToken.textOnCoral.color)

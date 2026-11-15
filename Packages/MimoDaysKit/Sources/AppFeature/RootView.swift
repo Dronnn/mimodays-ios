@@ -22,6 +22,7 @@ public struct RootView: View {
     private let appearancePreferences: AppearancePreferences
     private let appLock: AppLock
     private let eraser: AppEraser
+    private let tipStore: any TipStore
     @State private var today: TodayModel
     @State private var memories: MemoriesModel
     /// C12 toast after a save.
@@ -49,6 +50,7 @@ public struct RootView: View {
         appearancePreferences = dependencies.appearancePreferences
         appLock = dependencies.appLock
         eraser = dependencies.eraser
+        tipStore = dependencies.tipStore
         memories.mode = memoriesPreferences.value.opensIn.memoriesMode
         memories.newestFirst = memoriesPreferences.value.newestFirst
         CaptureTime.followsDeviceTimeZone = memoriesPreferences.value.days == .thisIPhone
@@ -78,6 +80,7 @@ public struct RootView: View {
         .environment(appearancePreferences)
         .environment(appLock)
         .environment(\.appEraser, eraser)
+        .environment(\.tipStore, tipStore)
         .environment(\.didEraseEverything, startOver)
         .environment(\.mediaLibrary, memories.library)
         // S05: the lock screen sits in its own window, over sheets too.

@@ -22,6 +22,10 @@ public final class AppDependencies {
     let appLock: AppLock
     /// S08 Delete all data.
     let eraser: AppEraser
+    /// D01: StoreKit, or fixed US prices in UI tests.
+    let tipStore: any TipStore
+    /// Finishes tips approved later; lives as long as the app.
+    private let tipTransactions: Task<Void, Never>?
 
     /// UI tests fake the location permission, so the fix and the lookups are faked too.
     private static func places(_ configuration: LaunchConfiguration, context: ModelContext, privacy: PrivacyPreferences) -> PlaceServices {
@@ -82,6 +86,13 @@ public final class AppDependencies {
             fatalError("MimoDays can't open its media folder: \(error)")
         }
         appLock = AppLock(settings: { privacyPreferences.value })
+        if configuration.isUITesting {
+            tipStore = SampleTipStore()
+            tipTransactions = nil
+        } else {
+            tipStore = StoreKitTipStore()
+            tipTransactions = StoreKitTipStore.listenForTransactions()
+        }
         let memoriesPreferences = self.memoriesPreferences
         let moviePreferences = self.moviePreferences
         let appearancePreferences = self.appearancePreferences

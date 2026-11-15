@@ -3,10 +3,9 @@ import StoreKit
 import SwiftUI
 import UIKit
 
-/// Links that need a real address or ID before they show; nothing is made up meanwhile.
 enum AppLinks {
-    /// S07 "Send feedback": shown once there is somewhere for it to go.
-    static let feedback: URL? = nil
+    /// S07 "Send feedback".
+    static let feedback = URL(string: "mailto:hello@mrmaier.com")
 }
 
 /// S07 "How it works": one short page each.

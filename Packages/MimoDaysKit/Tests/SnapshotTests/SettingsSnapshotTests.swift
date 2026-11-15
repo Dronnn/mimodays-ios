@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// Settings: S01-S09, the help pages and the lock screen.
+/// Settings: S01-S09, the help pages, the lock screen and Donations (D01-D04).
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct SettingsSnapshotTests {
@@ -141,5 +141,43 @@ struct SettingsSnapshotTests {
         for article in HelpArticle.allCases {
             assertScreenSnapshots(of: page(HelpArticleView(article: article)), variants: [SnapshotVariant(.iPhone, .light)], testName: "helpArticle-\(article.rawValue)")
         }
+    }
+
+    /// Its payment sheet never answers, so the tile stays in D02.
+    private final class WaitingTipStore: TipStore {
+        func products() async throws -> [TipProduct] { try await SampleTipStore().products() }
+        func purchase(productID _: String) async throws -> PurchaseOutcome {
+            try await Task.sleep(for: .seconds(3600))
+            return .cancelled
+        }
+    }
+
+    /// D01.
+    @Test func donations() async {
+        let model = DonationsModel(store: SampleTipStore())
+        await model.load()
+        assertScreenSnapshots(of: page(DonationsView(model: model)), variants: variants)
+    }
+
+    /// D02: Medium's payment sheet is up.
+    @Test func donationsPaying() async {
+        let model = DonationsModel(store: WaitingTipStore())
+        await model.load()
+        let buying = Task { await model.buy(.medium) }
+        while model.purchasing == nil { await Task.yield() }
+        assertScreenSnapshots(of: page(DonationsView(model: model)), variants: [SnapshotVariant(.iPhone, .light)])
+        buying.cancel()
+    }
+
+    /// D03.
+    @Test func donationsThankYou() {
+        assertScreenSnapshots(of: ThankYouSheet(), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
+    }
+
+    /// D04.
+    @Test func donationsUnavailable() async {
+        let model = DonationsModel(store: FakeTipStore(products: []))
+        await model.load()
+        assertScreenSnapshots(of: page(DonationsView(model: model)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
     }
 }

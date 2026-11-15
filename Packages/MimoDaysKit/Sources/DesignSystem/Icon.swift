@@ -75,6 +75,13 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphHelp
     /// S07 Rate MimoDays.
     case glyphStar
+    /// D01 tip tiers: Small, Medium, Patron, Extraordinary (Large is glyphHeart, Generous glyphStar).
+    case glyphCup
+    case glyphBag
+    case glyphCrown
+    case glyphSparkle
+    /// `Icon / Camera (on coral)`: the hand-drawn camera in the capture disk, 40.4×31.1 (T01/T02).
+    case cameraCapture
     /// `Brand / Wordmark` on Today: the letters and the star, two layers on one 103.7×33 canvas.
     case brandWordmark
     case brandWordmarkStar

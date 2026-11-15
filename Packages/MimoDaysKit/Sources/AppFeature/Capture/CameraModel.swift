@@ -1,6 +1,7 @@
 import Core
 import Foundation
 import Observation
+import Persistence
 
 /// What the camera hands on to review (C07).
 struct CaptureResult: Codable, Equatable, Sendable {
@@ -14,6 +15,8 @@ struct CaptureResult: Codable, Equatable, Sendable {
     /// composed preview is made at save with where it ends up (Andrew, 2026-11-13).
     var window: CameraSettings.SelfieWindow?
     var capturedAt: CaptureTime
+    /// U01: the format it was recorded in.
+    var format = CaptureFormat.portrait
 
     var mainURL: URL {
         switch media {
@@ -90,6 +93,10 @@ final class CameraModel {
     private(set) var interruption: CaptureInterruption?
     /// C05 note, shown until the person flips or captures.
     private(set) var showsSingleCameraNote = false
+    /// How the phone is held (U01-U07).
+    private(set) var hold = DeviceHold.upright
+    /// The hold a recording started in; the layout keeps it until the recording ends (U05).
+    private(set) var recordingHold: DeviceHold?
     var settings: CameraSettings {
         didSet {
             store.save(settings)
@@ -99,6 +106,8 @@ final class CameraModel {
 
     let isSurprise: Bool
     let engine: any CaptureEngine
+    private let orientation: any OrientationSensor
+    private var holds: Task<Void, Never>?
     private let store: any CameraSettingsStore
     private let clock: any DateProvider
     private let microphoneStatus: @MainActor () async -> PermissionStatus
@@ -107,11 +116,13 @@ final class CameraModel {
 
     init(
         engine: any CaptureEngine, store: any CameraSettingsStore, isSurprise: Bool,
+        orientation: any OrientationSensor = FixedOrientationSensor(),
         clock: any DateProvider = SystemDateProvider(),
         microphoneStatus: @escaping @MainActor () async -> PermissionStatus,
         onCapture: @escaping @MainActor (CaptureResult) -> Void
     ) {
         self.engine = engine
+        self.orientation = orientation
         self.store = store
         self.isSurprise = isSurprise
         self.clock = clock
@@ -139,8 +150,25 @@ final class CameraModel {
 
     var canToggleSelfie: Bool { setup == .dual }
 
-    /// The shutter works: the camera is idle and not interrupted.
-    var canCapture: Bool { phase == .ready && interruption == nil }
+    /// The shutter works: the camera is idle, not interrupted, and held the way the format needs.
+    var canCapture: Bool { phase == .ready && interruption == nil && formatFitsHold }
+
+    var format: CaptureFormat { settings.format }
+
+    /// 16:9 needs the phone on its side; 9:16 and 1:1 need it upright (U03, U06).
+    var formatFitsHold: Bool { format == .landscape ? hold.isLandscape : !hold.isLandscape }
+
+    /// U03/U06: the rotate hint, while the phone is held the wrong way and nothing is recording.
+    var needsRotation: Bool { !formatFitsHold && !isRecording }
+
+    /// The hold the screen is laid out for: the recording's while one runs.
+    var layoutHold: DeviceHold { recordingHold ?? hold }
+
+    /// U01: changes the format; it stays fixed while recording (U05).
+    func setFormat(_ format: CaptureFormat) {
+        guard !isRecording, phase != .busy else { return }
+        settings.format = format
+    }
 
     var isRecording: Bool {
         if case .recording = phase { true } else { false }
@@ -168,6 +196,7 @@ final class CameraModel {
             phase = .ready
             await refreshMicrophone()
             listenForEvents()
+            listenForHolds()
         } catch {
             phase = .failed(error as? CaptureError ?? .cameraUnavailable)
         }
@@ -176,6 +205,8 @@ final class CameraModel {
     func stop() async {
         events?.cancel()
         events = nil
+        holds?.cancel()
+        holds = nil
         if isRecording { await engine.stopRecording() }
         await engine.stop()
     }
@@ -205,8 +236,8 @@ final class CameraModel {
     /// Shutter: a photo, or start/stop a video.
     func shutter() async {
         switch (mode, phase) {
-        case (.photo, .ready) where interruption == nil: await takePhoto()
-        case (.video, .ready) where interruption == nil: await record()
+        case (.photo, .ready) where canCapture: await takePhoto()
+        case (.video, .ready) where canCapture: await record()
         case (.video, .recording): await engine.stopRecording()
         default: break
         }
@@ -218,6 +249,7 @@ final class CameraModel {
         failure = nil
         do {
             let capturedAt = now
+            await engine.setCaptureHold(hold)
             let captured = arranged(try await engine.capturePhoto(flash: isFlashOn, silent: !settings.cameraSounds))
             guard let photo = MediaCheck.checked(captured) else { throw CaptureError.photoFailed }
             phase = .ready
@@ -231,6 +263,9 @@ final class CameraModel {
     private func record() async {
         let capturedAt = now
         phase = .recording(startedAt: capturedAt.instant)
+        recordingHold = hold
+        defer { recordingHold = nil }
+        await engine.setCaptureHold(hold)
         showsSingleCameraNote = false
         failure = nil
         if isFlashOn { await setTorch(true).value }
@@ -276,7 +311,7 @@ final class CameraModel {
 
     /// The window can't move while capturing, so the current placement is where it was.
     private func result(_ media: CaptureResult.Media, selfie: URL?, at time: CaptureTime) -> CaptureResult {
-        CaptureResult(media: media, window: selfie == nil ? nil : settings.selfieWindow, capturedAt: time)
+        CaptureResult(media: media, window: selfie == nil ? nil : settings.selfieWindow, capturedAt: time, format: format)
     }
 
     private func arranged(_ video: CapturedVideo) -> CapturedVideo {
@@ -303,6 +338,16 @@ final class CameraModel {
         guard phase != .starting else { return }
         microphone = await microphoneStatus()
         try? await engine.setMicrophone(mode == .video && microphoneOn)
+    }
+
+    private func listenForHolds() {
+        let stream = orientation.holds
+        holds = Task { [weak self] in
+            for await hold in stream {
+                guard let self else { return }
+                self.hold = hold
+            }
+        }
     }
 
     private func listenForEvents() {

@@ -84,6 +84,7 @@ struct MomentSaver {
             let note = draft.note.trimmingCharacters(in: .whitespacesAndNewlines)
             moment.note = note.isEmpty ? nil : note
             moment.pipLayout = window.map { PiPLayout($0, source: role(capture.mainPosition.other)) }
+            moment.captureFormat = capture.format
             let voiceNote = try draft.voice.map { voice in
                 let file = try store.store(copyOf: voice.url, in: .originals)
                 written.append(file.relativePath)

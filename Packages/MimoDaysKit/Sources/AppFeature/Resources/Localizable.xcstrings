@@ -943,6 +943,18 @@
         }
       }
     },
+    "16:9 records in landscape" : {
+      "comment" : "Camera (U03): under 'Turn your phone sideways'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:9 records in landscape"
+          }
+        }
+      }
+    },
     "16:9 · TV" : {
       "comment" : "New movie (F04): wide shape option",
       "extractionState" : "manual",
@@ -951,6 +963,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "16:9 · TV"
+          }
+        }
+      }
+    },
+    "1:1 records upright" : {
+      "comment" : "Camera (U06): under 'Turn your phone upright' when the square format is picked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1:1 records upright"
           }
         }
       }
@@ -1011,6 +1035,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "4K"
+          }
+        }
+      }
+    },
+    "9:16 records upright" : {
+      "comment" : "Camera (U06): under 'Turn your phone upright'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9:16 records upright"
           }
         }
       }
@@ -3463,6 +3499,18 @@
         }
       }
     },
+    "Format locked while recording: %@" : {
+      "comment" : "Camera (U05): spoken for the lock chip while a video records, e.g. 'Format locked while recording: Horizontal, 16 by 9'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format locked while recording: %@"
+          }
+        }
+      }
+    },
     "Free up space" : {
       "comment" : "Export failed (F14): button that opens Settings to make room",
       "extractionState" : "manual",
@@ -3579,6 +3627,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Higher contrast"
+          }
+        }
+      }
+    },
+    "Horizontal, 16 by 9" : {
+      "comment" : "Camera format pill, spoken: the wide 16:9 format",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horizontal, 16 by 9"
           }
         }
       }
@@ -6163,6 +6223,30 @@
         }
       }
     },
+    "Recording starts working once the phone is sideways" : {
+      "comment" : "Camera (U03): under the dimmed record button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording starts working once the phone is sideways"
+          }
+        }
+      }
+    },
+    "Recording starts working once the phone is upright" : {
+      "comment" : "Camera (U06): under the dimmed record button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording starts working once the phone is upright"
+          }
+        }
+      }
+    },
     "Recover" : {
       "comment" : "Deleted moment (M16b) primary button: brings it back.",
       "extractionState" : "manual",
@@ -7363,6 +7447,18 @@
         }
       }
     },
+    "Square, 1 by 1" : {
+      "comment" : "Camera format pill, spoken: the square 1:1 format",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Square, 1 by 1"
+          }
+        }
+      }
+    },
     "Start" : {
       "comment" : "Trim sheet: VoiceOver label of a video clip's start handle",
       "extractionState" : "manual",
@@ -7935,6 +8031,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The selfie window"
+          }
+        }
+      }
+    },
+    "The shutter works once the phone is sideways" : {
+      "comment" : "Camera: under the dimmed photo shutter when 16:9 is picked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shutter works once the phone is sideways"
+          }
+        }
+      }
+    },
+    "The shutter works once the phone is upright" : {
+      "comment" : "Camera: under the dimmed photo shutter when 9:16 or 1:1 is picked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shutter works once the phone is upright"
           }
         }
       }
@@ -8709,6 +8829,54 @@
         }
       }
     },
+    "Turn your phone sideways" : {
+      "comment" : "Camera (U03): 16:9 is picked and the phone is upright",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn your phone sideways"
+          }
+        }
+      }
+    },
+    "Turn your phone sideways to record 16:9." : {
+      "comment" : "Camera (U07): VoiceOver hint on the dimmed shutter while the phone is upright and 16:9 is picked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn your phone sideways to record 16:9."
+          }
+        }
+      }
+    },
+    "Turn your phone upright" : {
+      "comment" : "Camera (U06): 9:16 or 1:1 is picked and the phone is sideways",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn your phone upright"
+          }
+        }
+      }
+    },
+    "Turn your phone upright to record %@." : {
+      "comment" : "Camera (U07): VoiceOver hint on the dimmed shutter while the phone is sideways, e.g. 'Turn your phone upright to record 9:16.'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn your phone upright to record %@."
+          }
+        }
+      }
+    },
     "Twice" : {
       "comment" : "Surprise schedule (onboarding O07): frequency option meaning twice a day, keep very short (segmented control)",
       "extractionState" : "manual",
@@ -8945,6 +9113,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version %@"
+          }
+        }
+      }
+    },
+    "Vertical, 9 by 16" : {
+      "comment" : "Camera format pill, spoken: the tall 9:16 format",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vertical, 9 by 16"
           }
         }
       }

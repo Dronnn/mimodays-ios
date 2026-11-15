@@ -169,6 +169,8 @@ public protocol CaptureEngine: AnyObject, Sendable {
     func stopRecording() async
     /// The rear camera's light, for the flash button in video mode. Does nothing where there is none.
     func setTorch(_ on: Bool) async
+    /// How the next photo or recording is turned: upright, or landscape the way the phone is held. Previews stay upright.
+    func setCaptureHold(_ hold: DeviceHold) async
     /// Live preview of one camera for the UI to host; nil when that camera isn't in the setup.
     @MainActor func previewLayer(for position: CameraPosition) -> CALayer?
     /// Changes the camera screen should show. One listener.

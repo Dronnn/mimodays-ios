@@ -14,6 +14,8 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     /// Why the current recording is being stopped, when it isn't the person or the limit.
     private var stopReason: CaptureInterruption?
     private(set) var hasMicrophone = false
+    /// Every `setCaptureHold`, in order.
+    public private(set) var captureHolds: [DeviceHold] = []
     private(set) var isRecording = false
     /// Every change of the rear light, in order (tests).
     public private(set) var torchChanges: [Bool] = []
@@ -131,6 +133,10 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
     public func setTorch(_ on: Bool) {
         torchChanges.append(on)
+    }
+
+    public func setCaptureHold(_ hold: DeviceHold) {
+        captureHolds.append(hold)
     }
 
     private func signalStop() {

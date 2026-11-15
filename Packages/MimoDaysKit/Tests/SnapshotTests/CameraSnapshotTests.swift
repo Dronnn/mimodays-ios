@@ -2,6 +2,7 @@
 @testable import Core
 import DesignSystem
 import Foundation
+import Persistence
 import Testing
 import SnapshotTesting
 import SwiftUI
@@ -13,11 +14,13 @@ import TestSupport
 struct CameraSnapshotTests {
     private func camera(
         multiCam: Bool = true, surprise: Bool = false, mode: CameraSettings.Mode = .photo,
-        selfieWindow: CameraSettings.SelfieWindow = .init(), microphone: PermissionStatus = .granted
+        selfieWindow: CameraSettings.SelfieWindow = .init(), microphone: PermissionStatus = .granted,
+        format: CaptureFormat = .portrait
     ) async -> CameraModel {
         var settings = CameraSettings()
         settings.opensIn = mode
         settings.selfieWindow = selfieWindow
+        settings.format = format
         let model = CameraModel(
             engine: SimulatedCaptureEngine(multiCam: multiCam), store: InMemoryCameraSettingsStore(settings),
             isSurprise: surprise, microphoneStatus: { microphone }, onCapture: { _ in }
@@ -49,6 +52,16 @@ struct CameraSnapshotTests {
         let model = await camera(mode: .video)
         model.phase = .recording(startedAt: Date().addingTimeInterval(-7.5))
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// U02: 1:1, phone upright.
+    @Test func square() async {
+        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .square)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// U03: 16:9 picked with the phone upright: the shape, the hint and the dimmed shutter with its reason.
+    @Test func landscapePickedUpright() async {
+        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .landscape)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
     @Test func singleCamera() async {

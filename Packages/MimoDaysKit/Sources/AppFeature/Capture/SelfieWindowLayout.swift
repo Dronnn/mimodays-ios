@@ -20,6 +20,8 @@ struct SelfieWindowLayout {
     var chip: (corner: Corner, bottom: CGFloat)?
     /// Space under the bottom corners: the camera keeps clear of the 10/30/60 s picker; review has nothing there.
     var bottomMargin: CGFloat = 125
+    /// Space over the top corners, below the top inset. Inside a 1:1 or 16:9 frame the window keeps 17 pt from its edges (U02).
+    var topMargin: CGFloat = 49.1
 
     static func frameSize(_ scale: Scale) -> CGSize {
         CGSize(width: frame.width * scale.factor, height: frame.height * scale.factor)
@@ -35,7 +37,7 @@ struct SelfieWindowLayout {
     func center(_ corner: Corner, _ scale: Scale) -> CGPoint {
         let size = Self.windowSize(scale)
         let x = corner.isLeft ? 8.7 + size.width / 2 : preview.width - 23.3 - size.width / 2
-        var top = topInset + 49.1
+        var top = topInset + topMargin
         if let chip, chip.corner == corner { top = max(top, chip.bottom + 12) }
         let y = corner.isTop ? top + size.height / 2 : preview.height - bottomMargin - size.height / 2
         return CGPoint(x: x, y: y)

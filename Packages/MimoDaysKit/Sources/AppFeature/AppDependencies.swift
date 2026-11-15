@@ -75,6 +75,8 @@ public final class AppDependencies {
             makeEngine: { @MainActor () -> any CaptureEngine in
                 simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine(maxFormatWidth: cameraSettings.load().videoQuality.maxFormatWidth)
             },
+            // The simulator has no motion data; there the sensor follows the device orientation, which UI tests can set.
+            makeOrientation: { MotionOrientationSensor() },
             settings: cameraSettings,
             drafts: ReviewDraftStore(root: Self.reviewRoot(configuration)),
             voice: Self.voice(simulated: simulatedCamera),

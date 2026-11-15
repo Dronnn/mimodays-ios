@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import Persistence
 import SwiftUI
 import os
 
@@ -68,6 +69,8 @@ struct CameraSettings: Codable, Equatable, Sendable {
     var recordsSound = true
     var cameraSounds = false
     var selfieWindow = SelfieWindow()
+    /// U01: the recording format; remembered on this device.
+    var format = CaptureFormat.portrait
 
     init() {}
 
@@ -80,6 +83,7 @@ struct CameraSettings: Codable, Equatable, Sendable {
         recordsSound = try container.decodeIfPresent(Bool.self, forKey: .recordsSound) ?? recordsSound
         cameraSounds = try container.decodeIfPresent(Bool.self, forKey: .cameraSounds) ?? cameraSounds
         selfieWindow = try container.decodeIfPresent(SelfieWindow.self, forKey: .selfieWindow) ?? selfieWindow
+        format = try container.decodeIfPresent(CaptureFormat.self, forKey: .format) ?? format
     }
 }
 
@@ -134,6 +138,8 @@ final class InMemoryCameraSettingsStore: CameraSettingsStore {
 /// What the camera needs from the app: an engine for each time it opens, the settings and the review draft.
 struct CameraServices {
     var makeEngine: @MainActor () -> any CaptureEngine
+    /// How the phone is held, for the recording formats.
+    var makeOrientation: @MainActor () -> any OrientationSensor = { FixedOrientationSensor() }
     var settings: any CameraSettingsStore
     /// Where a capture in review waits, so it survives the app being closed.
     var drafts: ReviewDraftStore

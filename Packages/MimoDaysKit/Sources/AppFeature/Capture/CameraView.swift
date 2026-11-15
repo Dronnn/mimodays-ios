@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Persistence
 import SwiftUI
 
 /// The camera (C01 photo, C01s surprise, C02 video idle, C03 recording, C04 selfie window, C05 single camera).
@@ -71,19 +72,35 @@ struct CameraView: View {
 
     private var preview: some View {
         GeometryReader { proxy in
+            // 9:16 uses the whole preview, as before formats; 1:1 and 16:9 a frame inside it (U02, U03).
+            let shape = model.format == .portrait ? CGRect(origin: .zero, size: proxy.size) : FormatMask.frame(model.format, in: proxy.size)
+            // While the phone is held the wrong way the window stays where 9:16 has it (U03).
+            let windowArea = model.format == .portrait || model.needsRotation ? CGRect(origin: .zero, size: proxy.size) : shape
             ZStack(alignment: .top) {
                 CameraPalette.previewPlaceholder
                 CameraPreview(engine: model.engine, position: model.mainPosition)
                     .accessibilityHidden(true)
+                if model.format != .portrait {
+                    FormatMask(frame: shape)
+                }
                 if let selfie = model.selfiePosition {
                     let chip = model.isSurprise ? chipBottom.map { (corner: layoutDirection == .rightToLeft ? Corner.topRight : .topLeft, bottom: $0) } : nil
+                    let layout = windowArea == shape && model.format != .portrait
+                        ? SelfieWindowLayout(preview: shape.size, topInset: 0, bottomMargin: 17, topMargin: 17)
+                        : SelfieWindowLayout(preview: windowArea.size, topInset: topInset, chip: chip)
                     AdjustableSelfieWindow(
                         placement: $model.settings.selfieWindow, showsSheet: $adjustsSelfie,
-                        layout: SelfieWindowLayout(preview: proxy.size, topInset: topInset, chip: chip),
-                        isEnabled: !model.isRecording, id: "camera.selfieWindow"
+                        layout: layout, isEnabled: !model.isRecording, id: "camera.selfieWindow"
                     ) {
                         CameraPreview(engine: model.engine, position: selfie)
                     }
+                    .frame(width: windowArea.width, height: windowArea.height)
+                    .position(x: windowArea.midX, y: windowArea.midY)
+                }
+                if model.needsRotation {
+                    RotateHint(format: model.format)
+                        .position(x: shape.midX, y: shape.midY)
+                        .transition(.opacity)
                 }
                 VStack(spacing: 0) {
                     if model.isRecording {
@@ -113,12 +130,21 @@ struct CameraView: View {
                             CameraNote(icon: .glyphInfo, text: Text("This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.", bundle: .module), id: "camera.singleNote")
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 20)
-                        } else if model.mode == .video {
+                        }
+                        FormatPicker(selection: model.format) { format in
+                            withAnimation(.easeInOut(duration: 0.3)) { model.setFormat(format) }
+                        }
+                        .padding(.bottom, 16)
+                        if model.notice == nil, !model.showsSingleCameraNote, model.mode == .video {
                             DurationPicker(selection: $model.settings.videoLength)
                                 .padding(.bottom, 16)
                         }
+                    } else {
+                        FormatLockedChip(format: model.format)
+                            .padding(.bottom, 16)
                     }
                 }
+                .animation(.easeInOut(duration: 0.2), value: model.needsRotation)
             }
             .coordinateSpace(.named(Self.previewSpace))
         }
@@ -177,6 +203,8 @@ struct CameraView: View {
                 ZStack {
                     ShutterButton(mode: model.mode) { Task { await model.shutter() } }
                         .disabled(!model.canCapture)
+                        .opacity(model.needsRotation ? 0.35 : 1)
+                        .accessibilityHint(model.needsRotation ? rotateHint : Text(verbatim: ""))
                     HStack {
                         // Last capture thumbnail arrives with saved moments (Phase 7).
                         Color.clear.frame(width: 48, height: 48)
@@ -188,6 +216,20 @@ struct CameraView: View {
             }
             Spacer(minLength: 0)
         }
+        .overlay(alignment: .bottom) {
+            if model.needsRotation {
+                RotateReason(format: model.format, mode: model.mode)
+                    .padding(.horizontal, 16)
+                    .offset(y: 10)
+            }
+        }
+    }
+
+    /// VoiceOver on the dimmed shutter (U07).
+    private var rotateHint: Text {
+        model.format == .landscape
+            ? Text("Turn your phone sideways to record 16:9.", bundle: .module, comment: "Camera (U07): VoiceOver hint on the dimmed shutter while the phone is upright and 16:9 is picked")
+            : Text("Turn your phone upright to record \(model.format.label).", bundle: .module, comment: "Camera (U07): VoiceOver hint on the dimmed shutter while the phone is sideways, e.g. 'Turn your phone upright to record 9:16.'")
     }
 }
 

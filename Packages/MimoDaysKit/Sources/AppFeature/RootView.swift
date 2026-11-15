@@ -299,6 +299,7 @@ struct CaptureFlowView: View {
             let permissions = permissions
             camera = CameraModel(
                 engine: services.makeEngine(), store: services.settings, isSurprise: request.isSurprise,
+                orientation: services.makeOrientation(),
                 microphoneStatus: { await permissions.status(of: .microphone) },
                 onCapture: { capture in
                     let drafts = services.drafts

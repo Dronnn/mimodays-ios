@@ -73,6 +73,13 @@ struct MomentSaverTests {
         #expect(!FileManager.default.fileExists(atPath: capture.mainURL.path))
     }
 
+    @Test func theRecordingFormatIsKeptOnTheMoment() async throws {
+        #expect(try await saver().save(MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)).captureFormat == .portrait)
+        var capture = try await video()
+        capture.format = .landscape
+        #expect(try await saver().save(MomentDraft(capture: capture, caption: "", window: window, promptID: nil)).captureFormat == .landscape)
+    }
+
     @Test func aSwappedPhotoRemembersTheRearCameraIsInTheWindow() async throws {
         let moment = try await saver().save(MomentDraft(capture: try await photo(swapped: true), caption: "", window: window, promptID: nil))
         #expect(moment.title == nil && moment.note == nil)

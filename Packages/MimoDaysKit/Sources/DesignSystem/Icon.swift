@@ -73,6 +73,8 @@ public enum Icon: String, CaseIterable, Sendable {
     case glyphMoon
     case glyphPhotos
     case glyphHelp
+    /// S07 Rate MimoDays.
+    case glyphStar
     /// `Brand / Wordmark` on Today: the letters and the star, two layers on one 103.7×33 canvas.
     case brandWordmark
     case brandWordmarkStar

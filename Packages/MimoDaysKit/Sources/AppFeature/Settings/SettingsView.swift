@@ -11,6 +11,8 @@ enum SettingsRoute: Hashable {
     case movies
     case privacy
     case appearance
+    case help
+    case helpArticle(HelpArticle)
     /// S05 "How MimoDays uses your data".
     case dataUse
     /// S08.
@@ -48,6 +50,8 @@ private struct SettingsHost: View {
                     case .movies: MovieSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     case .privacy: PrivacySettingsScreen().toolbar(.hidden, for: .navigationBar)
                     case .appearance: AppearanceSettingsScreen().toolbar(.hidden, for: .navigationBar)
+                    case .help: HelpView().toolbar(.hidden, for: .navigationBar)
+                    case let .helpArticle(article): HelpArticleView(article: article).toolbar(.hidden, for: .navigationBar)
                     case .dataUse: DataUseView().toolbar(.hidden, for: .navigationBar)
                     case .deleteAll: DeleteAllScreen().toolbar(.hidden, for: .navigationBar)
                     }
@@ -119,6 +123,9 @@ struct SettingsView: View {
                             DataIconRow(icon: .glyphPhotos, title: Text("Import from Photos", bundle: .module))
                         }
                         .accessibilityIdentifier("settings.import")
+                    }
+                    DataCard {
+                        link(SettingsRoute.help, .glyphHelp, Text("Help & about", bundle: .module), id: "settings.help")
                     }
                 }
                 .buttonStyle(.plain)

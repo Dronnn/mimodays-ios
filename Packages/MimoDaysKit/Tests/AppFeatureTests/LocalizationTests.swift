@@ -124,7 +124,7 @@ struct LocalizationTests {
         "Selfie window size in a phrase: medium", "Selfie window size in a phrase: large",
         "Lock with %@", "Recently deleted always asks for %@ when App Lock is on.", "Remove the place from %lld moments?", "Unlock with %@",
         "your passcode", "Unlock MimoDays", "Turn on App Lock", "Open Recently deleted", "Face ID reason: delete all data", "Privacy row: delete all data", "Type %@ to confirm",
-        "Delete all data: the word to type",
+        "Delete all data: the word to type", "Version %@",
         "This removes %lld moments, %lld collections, %lld movie projects and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched.",
     ]
 

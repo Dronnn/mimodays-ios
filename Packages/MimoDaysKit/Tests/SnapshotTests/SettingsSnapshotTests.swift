@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// Settings: S01-S06, S08 and S09, and the lock screen.
+/// Settings: S01-S09, the help pages and the lock screen.
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct SettingsSnapshotTests {
@@ -129,5 +129,17 @@ struct SettingsSnapshotTests {
             )),
             variants: [SnapshotVariant(.iPhone, .light, highContrast: true), SnapshotVariant(.iPhone, .dark, highContrast: true)]
         )
+    }
+
+    /// S07.
+    @Test func help() {
+        assertScreenSnapshots(of: page(HelpView(version: "1.0 (12)")), variants: variants)
+    }
+
+    /// S07's help pages.
+    @Test func helpArticles() {
+        for article in HelpArticle.allCases {
+            assertScreenSnapshots(of: page(HelpArticleView(article: article)), variants: [SnapshotVariant(.iPhone, .light)], testName: "helpArticle-\(article.rawValue)")
+        }
     }
 }

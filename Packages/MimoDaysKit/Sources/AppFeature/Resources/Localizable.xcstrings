@@ -1555,6 +1555,18 @@
         }
       }
     },
+    "At a random time within your hours, MimoDays sends one notification: a little moment is happening. Open it while it's fresh and capture whatever is around you." : {
+      "comment" : "Help & about (S07): Surprises help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At a random time within your hours, MimoDays sends one notification: a little moment is happening. Open it while it's fresh and capture whatever is around you."
+          }
+        }
+      }
+    },
     "At a random time, MimoDays invites you to capture what is happening. The exact time is always a surprise." : {
       "comment" : "Surprise settings (S02): note under the Surprise me switch",
       "extractionState" : "manual",
@@ -1807,6 +1819,18 @@
         }
       }
     },
+    "Camera and microphone: for photos, videos and voice notes." : {
+      "comment" : "Help & about (S07): Permissions help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera and microphone: for photos, videos and voice notes."
+          }
+        }
+      }
+    },
     "Camera only" : {
       "comment" : "Camera settings (S03): Permissions value, the camera is allowed but the microphone is not",
       "extractionState" : "manual",
@@ -1995,6 +2019,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose another file"
+          }
+        }
+      }
+    },
+    "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for a day, a week or until you resume them." : {
+      "comment" : "Help & about (S07): Surprises help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for a day, a week or until you resume them."
           }
         }
       }
@@ -2911,6 +2947,18 @@
         }
       }
     },
+    "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts." : {
+      "comment" : "Help & about (S07): Selfie window help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts."
+          }
+        }
+      }
+    },
     "Duplicate" : {
       "comment" : "Movie page (F15): row that copies the project into a new draft",
       "extractionState" : "manual",
@@ -3475,6 +3523,18 @@
         }
       }
     },
+    "Help & about" : {
+      "comment" : "Settings (S01) row and the Help & about screen's title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help & about"
+          }
+        }
+      }
+    },
     "Hidden" : {
       "comment" : "Movie editor (F07): selfie window option, no selfie in this clip",
       "extractionState" : "manual",
@@ -3507,6 +3567,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "How MimoDays uses your data"
+          }
+        }
+      }
+    },
+    "How it works" : {
+      "comment" : "Help & about (S07): section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How it works"
           }
         }
       }
@@ -3835,6 +3907,18 @@
         }
       }
     },
+    "Location, if you allow it: to save where a moment happened." : {
+      "comment" : "Help & about (S07): Permissions help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location, if you allow it: to save where a moment happened."
+          }
+        }
+      }
+    },
     "Lock after" : {
       "comment" : "Privacy settings (S05): how long the app may be away before it locks",
       "extractionState" : "manual",
@@ -4135,6 +4219,18 @@
         }
       }
     },
+    "Missed one? Nothing happens. There are no streaks, scores or reminders about it." : {
+      "comment" : "Help & about (S07): Surprises help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Missed one? Nothing happens. There are no streaks, scores or reminders about it."
+          }
+        }
+      }
+    },
     "Moments" : {
       "comment" : "Storage (E09): row for photos, videos and selfie windows",
       "extractionState" : "manual",
@@ -4407,6 +4503,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Movies & export"
+          }
+        }
+      }
+    },
+    "Moving to a new iPhone" : {
+      "comment" : "Help & about (S07): help page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving to a new iPhone"
           }
         }
       }
@@ -5023,6 +5131,18 @@
         }
       }
     },
+    "Notifications, if you allow them: for surprises." : {
+      "comment" : "Help & about (S07): Permissions help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications, if you allow them: for surprises."
+          }
+        }
+      }
+    },
     "OK" : {
       "comment" : "Closes an alert",
       "extractionState" : "manual",
@@ -5055,6 +5175,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "On"
+          }
+        }
+      }
+    },
+    "On iPhones that can use both cameras at once, MimoDays captures what's in front of you and your face in a small window, in the same photo or video." : {
+      "comment" : "Help & about (S07): Selfie window help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On iPhones that can use both cameras at once, MimoDays captures what's in front of you and your face in a small window, in the same photo or video."
+          }
+        }
+      }
+    },
+    "On other iPhones, MimoDays uses one camera." : {
+      "comment" : "Help & about (S07): Selfie window help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On other iPhones, MimoDays uses one camera."
+          }
+        }
+      }
+    },
+    "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file." : {
+      "comment" : "Help & about (S07): Moving to a new iPhone help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file."
           }
         }
       }
@@ -5115,6 +5271,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "On this iPhone"
+          }
+        }
+      }
+    },
+    "On this iPhone, open Settings › Backup and make a backup. Save it to iCloud Drive, another place in Files, or a computer." : {
+      "comment" : "Help & about (S07): Moving to a new iPhone help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this iPhone, open Settings › Backup and make a backup. Save it to iCloud Drive, another place in Files, or a computer."
           }
         }
       }
@@ -5467,6 +5635,18 @@
         }
       }
     },
+    "Photos: to save what you export, and to import only the photos you pick." : {
+      "comment" : "Help & about (S07): Permissions help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos: to save what you export, and to import only the photos you pick."
+          }
+        }
+      }
+    },
     "Pick a day" : {
       "comment" : "New movie (F03): From/To before a day is picked",
       "extractionState" : "manual",
@@ -5755,6 +5935,18 @@
         }
       }
     },
+    "Privacy statement" : {
+      "comment" : "Help & about (S07): row that opens How MimoDays uses your data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy statement"
+          }
+        }
+      }
+    },
     "Progress" : {
       "comment" : "Export (F12): VoiceOver label of the progress bar",
       "extractionState" : "manual",
@@ -5799,6 +5991,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quick"
+          }
+        }
+      }
+    },
+    "Rate MimoDays" : {
+      "comment" : "Help & about (S07): row that asks for an App Store rating",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate MimoDays"
           }
         }
       }
@@ -6651,6 +6855,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "small"
+          }
+        }
+      }
+    },
+    "Send feedback" : {
+      "comment" : "Help & about (S07): row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send feedback"
           }
         }
       }
@@ -7639,6 +7855,18 @@
         }
       }
     },
+    "The selfie window" : {
+      "comment" : "Help & about (S07): help page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selfie window"
+          }
+        }
+      }
+    },
     "The video and its time can't be changed." : {
       "comment" : "Edit moment: under the date, explains what stays fixed for a video.",
       "extractionState" : "manual",
@@ -8553,6 +8781,18 @@
         }
       }
     },
+    "Version %@" : {
+      "comment" : "Help & about (S07): the app's version and build, e.g. 'Version 1.0 (12)'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        }
+      }
+    },
     "Video" : {
       "comment" : "Camera mode switch (shown uppercase) and the camera settings Opens in option; review (C07) accessibility label of a video Also the first word of a moment's VoiceOver description, e.g. \"Video, Yesterday, 6:42 PM\".",
       "extractionState" : "manual",
@@ -8901,6 +9141,18 @@
         }
       }
     },
+    "You can change any of them in iOS Settings." : {
+      "comment" : "Help & about (S07): Permissions help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can change any of them in iOS Settings."
+          }
+        }
+      }
+    },
     "You can leave this screen or lock the phone. We'll let you know when it's ready." : {
       "comment" : "Export (F12): note while the movie renders",
       "extractionState" : "manual",
@@ -9005,6 +9257,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your life, in little pieces."
+          }
+        }
+      }
+    },
+    "Your moments come back with their notes, voice notes, places, collections and movie drafts." : {
+      "comment" : "Help & about (S07): Moving to a new iPhone help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your moments come back with their notes, voice notes, places, collections and movie drafts."
           }
         }
       }

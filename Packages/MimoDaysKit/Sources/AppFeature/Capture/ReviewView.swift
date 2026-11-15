@@ -92,9 +92,9 @@ struct ReviewView: View {
 
     // MARK: Media
 
-    /// Retake over the card, Swap cameras under it.
+    /// Retake over the card; tapping the window swaps the cameras.
     private var chrome: CGFloat {
-        Self.retakeRow + (model.hasSelfie ? MemoryCardGeometry.buttonsGap + MemoryCardGeometry.buttonsHeight : 0) + 12
+        Self.retakeRow + 12
     }
 
     private static let retakeRow: CGFloat = 52
@@ -121,8 +121,9 @@ struct ReviewView: View {
                     playback: model.playback, size: card,
                     window: model.hasSelfie && proxy.size.width > 0
                         ? MemoryCardFront.Window(
-                            layout: layout, placement: model.window, rotation: Size.selfieWindowTilt.degrees, id: "review.selfieWindow"
-                        ) { model.window = $0 }
+                            layout: layout, placement: model.window, rotation: Size.selfieWindowTilt.degrees, id: "review.selfieWindow",
+                            move: { model.window = $0 }, swap: { swap() }
+                        )
                         : nil,
                     swapped: swapped, cornerOnRight: nil, controlsShown: $controlsShown, actions: nil
                 )
@@ -132,11 +133,6 @@ struct ReviewView: View {
                         .shadow(color: ColorToken.textPrimary.color.opacity(0.16), radius: 9, y: 6)
                 }
                 .onChange(of: layout.windowFrame(model.window), initial: true) { model.windowFrame = $1 }
-                if model.hasSelfie {
-                    CardButton(glyph: .swapCameras, title: Text("Swap cameras", bundle: .module), id: "review.swap") { swap() }
-                        .accessibilityAddTraits(swapped ? .isSelected : [])
-                        .padding(.top, MemoryCardGeometry.buttonsGap)
-                }
             }
             .padding(.top, topInset)
             .frame(width: proxy.size.width, alignment: .top)

@@ -21,7 +21,8 @@ struct MemoryCardFront: View {
         var id = "viewer.media"
     }
 
-    /// The selfie window: the camera's layout for this shape, where the window is, and how a move is kept.
+    /// The selfie window: the camera's layout for this shape, where the window is, how a move is kept, and the
+    /// cameras swapped when it is tapped (Andrew, 2026-11-15: no Swap cameras button).
     struct Window {
         let layout: SelfieWindowLayout
         let placement: CameraSettings.SelfieWindow
@@ -29,6 +30,7 @@ struct MemoryCardFront: View {
         /// "viewer.selfieWindow", "review.selfieWindow".
         let id: String
         let move: (CameraSettings.SelfieWindow) -> Void
+        let swap: () -> Void
     }
 
     let pictures: Pictures
@@ -62,11 +64,6 @@ struct MemoryCardFront: View {
         let frame = windowFrame
         ZStack(alignment: .topLeading) {
             Self.face
-                .accessibilityElement()
-                .accessibilityLabel(Text(isVideo ? "Video" : window == nil ? "Photo" : "Photo with selfie", bundle: .module))
-                .accessibilityAddTraits(.isImage)
-                .accessibilityIdentifier(pictures.id)
-                .modifier(CardActions(actions: actions))
             ZStack(alignment: .topLeading) {
                 picture(.main, bounds: bounds, window: frame)
                 if let frame {
@@ -89,7 +86,7 @@ struct MemoryCardFront: View {
                 MemoryCardFlipCorner()
                     .scaleEffect(x: cornerOnRight ? 1 : -1)
                     .position(x: cornerOnRight ? size.width - 29 : 29, y: size.height - 32)
-                    .accessibilityHidden(true)
+                // Drawing only, never a VoiceOver element: marking it hidden made an empty node the audit flags.
             }
         }
         .frame(width: size.width, height: size.height)
@@ -135,25 +132,33 @@ struct MemoryCardFront: View {
             .position(x: rect.midX, y: rect.midY)
             // The stream going into the window is on top, so it uncovers the one growing out of it.
             .zIndex(inWindow ? 1 : 0)
-            .modifier(WindowAccess(isWindow: inWindow, placement: placement, id: self.window?.id ?? "") { adjustsWindow = true })
+            .modifier(PictureAccess(
+                isWindow: inWindow, placement: placement, windowID: self.window?.id ?? "", adjust: { adjustsWindow = true },
+                swap: { self.window?.swap() }, isSwapped: swapped,
+                label: Text(isVideo ? "Video" : window == nil ? "Photo" : "Photo with selfie", bundle: .module),
+                id: pictures.id, actions: actions
+            ))
             .gesture(windowGesture, isEnabled: inWindow)
     }
 
-    @ViewBuilder
+    /// The picture at its frame's size: its VoiceOver element has the frame's bounds, which tests measure the
+    /// window against.
     private func content(_ stream: Stream) -> some View {
-        ZStack {
-            if let image = stream == .main ? pictures.main : pictures.selfie {
-                Image(uiImage: image).filling()
-            }
-            if let playback {
-                if stream == .main {
-                    PlayerLayerView(player: playback.main)
-                } else if playback.hasSelfie {
-                    PlayerLayerView(player: playback.selfie)
+        Color.clear
+            .overlay {
+                if let image = stream == .main ? pictures.main : pictures.selfie {
+                    FilledStill(image: image)
                 }
             }
-        }
-        .accessibilityHidden(true)
+            .overlay {
+                if let playback {
+                    if stream == .main {
+                        PlayerLayerView(player: playback.main)
+                    } else if playback.hasSelfie {
+                        PlayerLayerView(player: playback.selfie)
+                    }
+                }
+            }
     }
 
     // MARK: The window
@@ -179,6 +184,8 @@ struct MemoryCardFront: View {
                         withAnimation(.snappy) { window.move(moved) }
                     }
             )
+            // A tap, neither held nor moved, swaps the cameras.
+            .exclusively(before: TapGesture().onEnded { window?.swap() })
     }
 
     /// The four corners while the window is moved or resized, the one it will land on in coral.
@@ -210,12 +217,20 @@ private struct CardActions: ViewModifier {
     }
 }
 
-/// The window's VoiceOver element: where it is, and the touch-and-hold sheet as an action.
-private struct WindowAccess: ViewModifier {
+/// The pictures' VoiceOver elements: the window says where it is and has the touch-and-hold sheet as an action;
+/// the picture filling the card is the card's picture, with the card's actions. Each picture is inside its element:
+/// a picture outside one reached VoiceOver's audit as an empty image, however it was marked hidden.
+private struct PictureAccess: ViewModifier {
     let isWindow: Bool
     let placement: CameraSettings.SelfieWindow?
-    let id: String
+    let windowID: String
     let adjust: () -> Void
+    let swap: () -> Void
+    /// The window shows the main stream: VoiceOver hears it as selected, as the Swap cameras button was.
+    let isSwapped: Bool
+    let label: Text
+    let id: String
+    let actions: MemoryCardActions?
 
     func body(content: Content) -> some View {
         if isWindow {
@@ -223,10 +238,18 @@ private struct WindowAccess: ViewModifier {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("Selfie window", bundle: .module))
                 .accessibilityValue(Text(placement?.accessibilityValue ?? ""))
+                .accessibilityAddTraits(isSwapped ? [.isButton, .isSelected] : .isButton)
+                .accessibilityAction { swap() }
+                .accessibilityAction(named: Text("Swap cameras", bundle: .module), swap)
                 .accessibilityAction(named: Text("Adjust selfie window", bundle: .module), adjust)
-                .accessibilityIdentifier(id)
+                .accessibilityIdentifier(windowID)
         } else {
             content
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(label)
+                .accessibilityAddTraits(.isImage)
+                .accessibilityIdentifier(id)
+                .modifier(CardActions(actions: actions))
         }
     }
 }
@@ -323,5 +346,21 @@ struct MemoryCardVideoControls: View {
             let step = direction == .increment ? 5.0 : -5.0
             playback?.seek(to: min(max(time + step, 0), duration))
         }
+    }
+}
+
+/// A still filling its frame, cropped inside one drawing. A scaled-to-fill `Image` reaches past its frame, and the
+/// picture's VoiceOver element grew to it.
+private struct FilledStill: View {
+    let image: UIImage
+
+    var body: some View {
+        Canvas { context, size in
+            let scale = max(size.width / max(image.size.width, 1), size.height / max(image.size.height, 1))
+            let drawn = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+            let rect = CGRect(x: (size.width - drawn.width) / 2, y: (size.height - drawn.height) / 2, width: drawn.width, height: drawn.height)
+            context.draw(Image(uiImage: image), in: rect)
+        }
+        .allowsHitTesting(false)
     }
 }

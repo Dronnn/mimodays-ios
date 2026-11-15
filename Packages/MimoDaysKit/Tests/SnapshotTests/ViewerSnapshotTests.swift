@@ -140,7 +140,10 @@ struct ViewerSnapshotTests {
         let front = MemoryCardFront(
             pictures: MemoryCardFront.Pictures(main: model.image(moment.mainPath), selfie: model.image(moment.selfiePath), isVideo: false),
             playback: nil, size: card,
-            window: MemoryCardFront.Window(layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow") { _ in },
+            window: MemoryCardFront.Window(
+                layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow",
+                move: { _ in }, swap: {}
+            ),
             swapped: true, cornerOnRight: true, controlsShown: .constant(true),
             actions: MemoryCardActions(flip: {}, swap: nil, step: { _ in })
         )

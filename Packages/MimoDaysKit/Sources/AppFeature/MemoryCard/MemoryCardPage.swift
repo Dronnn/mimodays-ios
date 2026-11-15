@@ -52,10 +52,12 @@ struct MemoryCardPage: View {
         guard hasWindow, screenWidth > 0, let saved = savedLayout else { return nil }
         let layout = MemoryCardGeometry.windowLayout(format: moment.format, screenWidth: screenWidth, topInset: screenTop)
         return MemoryCardFront.Window(
-            layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow"
-        ) { [model, id = moment.id] placement in
-            model.setWindow(PiPLayout(layout.windowFrame(placement), source: saved.source), for: id)
-        }
+            layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow",
+            move: { [model, id = moment.id] placement in
+                model.setWindow(PiPLayout(layout.windowFrame(placement), source: saved.source), for: id)
+            },
+            swap: { swap() }
+        )
     }
 
     /// The folded corner is bottom trailing.
@@ -69,9 +71,6 @@ struct MemoryCardPage: View {
             VStack(alignment: .leading, spacing: 0) {
                 twoSided(card)
                     .padding(.horizontal, side)
-                buttons
-                    .padding(.leading, side)
-                    .padding(.top, MemoryCardGeometry.buttonsGap)
                 if let voice = moment.voice, !flip.showsBack {
                     // A little wider than the card: 370 pt under a 359 pt one (U20).
                     VoicePill(model: model, id: moment.id, voice: voice, onPhoto: false)
@@ -135,7 +134,7 @@ struct MemoryCardPage: View {
                 .fill(ColorToken.mediaFrame.color)
                 .shadow(color: ColorToken.textPrimary.color.opacity(0.16), radius: 9, y: 6)
         }
-        .modifier(CardTurn(angle: reduceMotion ? 0 : flip.angle, shadeFromLeading: cornerOnRight))
+        .modifier(CardTurn(angle: reduceMotion ? 0 : flip.angle, cornerOnRight: cornerOnRight))
         .overlay(alignment: .bottomTrailing) {
             // The fold's place, which stays put while the card turns under the finger.
             Color.clear
@@ -148,6 +147,7 @@ struct MemoryCardPage: View {
                 .accessibilityLabel(Text("Flip card", bundle: .module))
                 .accessibilityAddTraits(.isButton)
                 .accessibilityAction { flipOver() }
+                .accessibilityIdentifier("card.fold")
         }
     }
 
@@ -197,20 +197,6 @@ struct MemoryCardPage: View {
     private func swap() {
         withAnimation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.5)) { swapped.toggle() }
     }
-
-    // MARK: Under the card
-
-    private var buttons: some View {
-        HStack(spacing: 12) {
-            if hasWindow, !flip.showsBack {
-                CardButton(glyph: .swapCameras, title: Text("Swap cameras", bundle: .module), id: "card.swap") { swap() }
-                    .accessibilityAddTraits(swapped ? .isSelected : [])
-            }
-            CardButton(glyph: .flip, title: Text("Flip", bundle: .module), id: "card.flip") { flipOver() }
-                .accessibilityLabel(Text("Flip card", bundle: .module))
-        }
-        .frame(minHeight: MemoryCardGeometry.buttonsHeight)
-    }
 }
 
 /// What VoiceOver can do on a card (U25): flip it, swap its cameras, go to the next or previous moment.
@@ -227,31 +213,5 @@ extension View {
             .accessibilityAction(named: Text("Swap cameras", bundle: .module)) { actions.swap?() }
             .accessibilityAction(named: Text("Next moment", bundle: .module)) { actions.step(1) }
             .accessibilityAction(named: Text("Previous moment", bundle: .module)) { actions.step(-1) }
-    }
-}
-
-/// `Card / Button`: a peach capsule with a glyph and a short label (U20).
-struct CardButton: View {
-    let glyph: MemoryCardGlyph.Kind
-    let title: Text
-    let id: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                MemoryCardGlyph(glyph)
-                title
-                    .textStyle(.cardButton)
-                    .foregroundStyle(ColorToken.textPrimary.color)
-            }
-            .padding(.leading, 14)
-            .padding(.trailing, 16)
-            .frame(minHeight: MemoryCardGeometry.buttonsHeight)
-            .background(Capsule().fill(ColorToken.accentPeach.color))
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier(id)
     }
 }

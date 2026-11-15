@@ -9,13 +9,12 @@ enum MemoryCardGeometry {
     static let pageGap: CGFloat = 7
     /// Wide screens keep the card a card.
     static let maximumSlotWidth: CGFloat = 620
-    /// Under the card: the Swap cameras / Flip row 10 pt below it, then the voice pill 18 pt below that.
-    static let buttonsGap: CGFloat = 10
-    static let buttonsHeight: CGFloat = 40
+    /// Under the card: the voice pill 18 pt below it. No button row: the window swaps, the corner flips (Andrew,
+    /// 2026-11-15), and the card takes the room.
     static let pillGap: CGFloat = 18
     static let pillHeight: CGFloat = 52
     /// What every page keeps under its slot, voice note or not, so cards don't jump between pages.
-    static var belowCard: CGFloat { buttonsGap + buttonsHeight + pillGap + pillHeight }
+    static var belowCard: CGFloat { pillGap + pillHeight }
     /// The space over the card under the bar (U20: the bar ends at 98, the card starts at 108).
     static let topGap: CGFloat = 10
 

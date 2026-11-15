@@ -15,11 +15,27 @@
     },
     "%@ from %@" : {
       "comment" : "VoiceOver label of a Mosaic piece: \"Video\" or \"Photo\", and when it was taken, e.g. \"Photo from November 11 at 2:37 PM\".",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ from %@"
+          }
+        }
+      }
     },
     "%@ from %@, favorite" : {
       "comment" : "VoiceOver label of a favorite Mosaic piece: \"Video\" or \"Photo\", and when it was taken.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ from %@, favorite"
+          }
+        }
+      }
     },
     "%@ has %lld moments. A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips." : {
       "comment" : "New movie (F16): why there's no movie. %@: the source, e.g. Last month; then its moment count",
@@ -693,11 +709,27 @@
     },
     "%lld of %lld" : {
       "comment" : "Memory Card opened from an unnamed place on the Map (U41): which of its moments this is, e.g. \"2 of 5\".",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld of %lld"
+          }
+        }
+      }
     },
     "%lld of %lld at %@" : {
       "comment" : "Memory Card opened from the Map (U41): which of the place's moments this is, and the place's name, e.g. \"2 of 5 at Kentron\".",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld of %lld at %@"
+          }
+        }
+      }
     },
     "%lld of %lld characters" : {
       "comment" : "Note editor (C08): VoiceOver reading of the counter, e.g. 86 of 500 characters",
@@ -3107,10 +3139,6 @@
         }
       }
     },
-    "Drag the corner or tap Mosaic" : {
-      "comment" : "First-time hint (U11): how to turn Today over to the Mosaic.",
-      "extractionState" : "manual"
-    },
     "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts." : {
       "comment" : "Help & about (S07): Selfie window help",
       "extractionState" : "manual",
@@ -3149,7 +3177,15 @@
     },
     "Each one finds its place here, month by month. Tap any piece to open it." : {
       "comment" : "Mosaic note body while there are fewer than ten moments (U14).",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each one finds its place here, month by month. Tap any piece to open it."
+          }
+        }
+      }
     },
     "Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos." : {
       "comment" : "Import from Photos (E05): what happens to the picked files",
@@ -3579,18 +3615,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Flash"
-          }
-        }
-      }
-    },
-    "Flip" : {
-      "comment" : "Memory Card (U20, U30): button under the card that turns it over to its other side",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Flip"
           }
         }
       }
@@ -4581,7 +4605,15 @@
     },
     "Mosaic" : {
       "comment" : "Home switch (U10, U13): the home's other side, every moment as a mosaic; also the Memory Card's back label when opened from it (U42).",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mosaic"
+          }
+        }
+      }
     },
     "Move earlier" : {
       "comment" : "Movie editor timeline: VoiceOver action that moves a clip one place earlier",
@@ -7307,14 +7339,6 @@
         }
       }
     },
-    "Show Mosaic" : {
-      "comment" : "VoiceOver label of the home's page corner on Today: turns the page to the Mosaic (U16).",
-      "extractionState" : "manual"
-    },
-    "Show Today" : {
-      "comment" : "VoiceOver label of the home's page corner on the Mosaic: turns the page back to Today (U16).",
-      "extractionState" : "manual"
-    },
     "Show all" : {
       "comment" : "Movie editor (F07): fit option, the whole picture shows with bars",
       "extractionState" : "manual",
@@ -9837,10 +9861,6 @@
         }
       }
     },
-    "Your moments have another side" : {
-      "comment" : "First-time hint over the page corner on Today, shown once after the 10th moment (U11).",
-      "extractionState" : "manual"
-    },
     "Your moments. Your memories." : {
       "comment" : "OB-06 title",
       "extractionState" : "manual",
@@ -9855,11 +9875,27 @@
     },
     "Your mosaic" : {
       "comment" : "Mosaic title (U13).",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your mosaic"
+          }
+        }
+      }
     },
     "Your mosaic grows with every moment" : {
       "comment" : "Mosaic note while there are fewer than ten moments (U14).",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your mosaic grows with every moment"
+          }
+        }
+      }
     },
     "Your movie is ready" : {
       "comment" : "Export (F13): title when the movie is done",

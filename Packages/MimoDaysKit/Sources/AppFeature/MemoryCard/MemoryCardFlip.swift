@@ -41,11 +41,12 @@ struct MemoryCardFlip: Equatable {
     }
 }
 
-/// The card turned about its vertical axis with perspective and a shade on the half turning away. Animatable, so the
+/// The card turned about its vertical axis with perspective and a shade on the half turning away. The edge with the
+/// folded corner comes towards the person as the finger pulls it across (Andrew, 2026-11-15). Animatable, so the
 /// shade follows the angle through a flip.
 struct CardTurn: ViewModifier, Animatable {
     var angle: Double
-    let shadeFromLeading: Bool
+    let cornerOnRight: Bool
 
     nonisolated var animatableData: Double {
         get { angle }
@@ -55,14 +56,18 @@ struct CardTurn: ViewModifier, Animatable {
     func body(content: Content) -> some View {
         content
             .overlay {
+                // Darkest on the edge going away, opposite the corner.
                 LinearGradient(
                     colors: [.clear, Color.black.opacity(0.3 * abs(sin(angle * .pi / 180)))],
-                    startPoint: shadeFromLeading ? .leading : .trailing, endPoint: shadeFromLeading ? .trailing : .leading
+                    startPoint: cornerOnRight ? .trailing : .leading, endPoint: cornerOnRight ? .leading : .trailing
                 )
                 .clipShape(MemoryCardOutline())
                 .allowsHitTesting(false)
             }
-            .rotation3DEffect(.degrees(angle), axis: (x: 0, y: 1, z: 0), perspective: 0.45)
+            .rotation3DEffect(.degrees(cornerOnRight ? -angle : angle), axis: (x: 0, y: 1, z: 0), perspective: 0.45)
+            // Within a few degrees of edge-on the projection breaks down and a turned page flashed flat for a frame
+            // (home, 2026-11-15); it's only a sliver there, so it hides.
+            .opacity(abs(cos(angle * .pi / 180)) < sin(3 * .pi / 180) ? 0 : 1)
     }
 }
 

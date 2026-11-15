@@ -5,6 +5,7 @@ import UIKit
 
 @main
 struct MimoDaysApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     private let dependencies: AppDependencies
 
     init() {
@@ -19,5 +20,12 @@ struct MimoDaysApp: App {
         WindowGroup {
             RootView(dependencies: dependencies)
         }
+    }
+}
+
+/// Reports the orientations the app allows right now: upright only while capturing (C.3).
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_: UIApplication, supportedInterfaceOrientationsFor _: UIWindow?) -> UIInterfaceOrientationMask {
+        OrientationLock.mask
     }
 }

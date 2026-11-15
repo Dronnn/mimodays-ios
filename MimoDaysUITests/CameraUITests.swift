@@ -29,6 +29,33 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
     }
 
+    /// C.3/C.6: the screen stays upright while the camera turns its own controls with the phone, and 16:9 waits
+    /// for the phone on its side: the hint and the dimmed shutter, gone once it is sideways, back once upright.
+    @MainActor
+    func testTheCameraStaysUprightAndWaitsForTheRightHold() {
+        openCamera()
+        defer { XCUIDevice.shared.orientation = .portrait }
+        let shutter = app.buttons["camera.shutter"]
+        let hint = app.descendants(matching: .any)["camera.rotateHint"]
+        app.buttons["camera.format.landscape"].tap()
+        XCTAssertTrue(hint.waitForExistence(timeout: 3))
+        XCTAssertFalse(shutter.isEnabled)
+
+        XCUIDevice.shared.orientation = .landscapeLeft
+        XCTAssertTrue(hint.waitForNonExistence(timeout: 3))
+        XCTAssertTrue(shutter.isEnabled)
+        let window = app.windows.firstMatch.frame
+        XCTAssertGreaterThan(window.height, window.width, "the screen stays upright")
+        // The buttons are a column on the phone's top edge; Close is at the person's top left: the screen's top right.
+        let close = app.buttons["capture.close"].frame
+        XCTAssertGreaterThan(close.minX, window.midX)
+        XCTAssertLessThan(close.maxY, window.height * 0.15)
+
+        XCUIDevice.shared.orientation = .portrait
+        XCTAssertTrue(hint.waitForExistence(timeout: 3))
+        XCTAssertFalse(shutter.isEnabled)
+    }
+
     /// Flow 03 up to review: a photo to review and Retake back to the camera, then a video recorded, stopped
     /// and reviewed, on the simulated engine.
     @MainActor

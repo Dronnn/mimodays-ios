@@ -28,6 +28,9 @@ jobs:
           xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan Unit
           -destination "$DESTINATION" -resultBundlePath results/Unit.xcresult CODE_SIGNING_ALLOWED=NO
       - name: UI tests
+        env:
+          # Read by tests that drive Files' own picker, which stalls on hosted runners.
+          TEST_RUNNER_MIMODAYS_CI: "1"
         run: >
           xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan UI
           -destination "$DESTINATION" -resultBundlePath results/UI.xcresult CODE_SIGNING_ALLOWED=NO

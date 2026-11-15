@@ -16,7 +16,10 @@ struct MemoryCardFront: View {
     /// The camera's window layout for this moment; nil without a selfie stream.
     let windowLayout: SelfieWindowLayout?
     let swapped: Bool
+    /// The folded corner's side: bottom trailing.
+    let cornerOnRight: Bool
     @Binding var controlsShown: Bool
+    let actions: MemoryCardActions
     @State private var adjustsWindow = false
     @GestureState(resetTransaction: Transaction(animation: .snappy)) private var drag: CGSize?
 
@@ -45,6 +48,7 @@ struct MemoryCardFront: View {
                 .accessibilityElement()
                 .accessibilityLabel(Text(isVideo ? "Video" : moment.selfiePath == nil ? "Photo" : "Photo with selfie", bundle: .module))
                 .accessibilityAddTraits(.isImage)
+                .memoryCardActions(actions)
             picture(.main, bounds: bounds, window: window)
             if let window {
                 if let windowLayout, let placement, adjustsWindow || drag != nil {
@@ -57,6 +61,10 @@ struct MemoryCardFront: View {
                     .frame(width: size.width, height: size.height, alignment: .bottom)
                     .transition(.opacity)
             }
+            MemoryCardFlipCorner()
+                .scaleEffect(x: cornerOnRight ? 1 : -1)
+                .position(x: cornerOnRight ? size.width - 29 : 29, y: size.height - 32)
+                .accessibilityHidden(true)
         }
         .frame(width: size.width, height: size.height)
         .clipShape(MemoryCardOutline())

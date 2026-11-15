@@ -84,6 +84,50 @@ struct ViewerSnapshotTests {
         assertScreenSnapshots(of: try await viewer(video: true, format: .landscape), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPad, .light)])
     }
 
+    /// A card on its own page, turned to `angle`.
+    private func page(video: Bool, angle: Double, bare: Bool = false) async throws -> some View {
+        let id = bare ? try await saveBare() : try await save(video: video)
+        let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await model.load(id)
+        let moment = try #require(model.moments[id])
+        return MemoryCardPage(model: model, moment: moment, isCurrent: false, screenWidth: 402, screenTop: 62, angle: angle, edit: {}, step: { _ in })
+            .frame(width: 359)
+            .padding(.top, 108)
+            .padding(.bottom, 84)
+            .frame(maxWidth: .infinity)
+            .background(ColorToken.canvas.color)
+    }
+
+    /// A photo with nothing added: no caption, note, place or voice note.
+    private func saveBare() async throws -> UUID {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let capture = CaptureResult(
+            media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+            capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_794_422_520), timeZone: TimeZone(identifier: "Asia/Yerevan")!)
+        )
+        let draft = MomentDraft(
+            capture: capture, caption: "",
+            window: SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536)),
+            promptID: nil
+        )
+        let saver = MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil })
+        return try await saver.save(draft).id
+    }
+
+    /// U30, U34: the back.
+    @Test func back() async throws {
+        assertScreenSnapshots(of: try await page(video: true, angle: 180), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+            SnapshotVariant(.iPhone, .light, rightToLeft: true),
+        ])
+    }
+
+    /// U31: the back with only the basics, "+" links to add the rest.
+    @Test func backBasics() async throws {
+        assertScreenSnapshots(of: try await page(video: false, angle: 180, bare: true), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
     /// U23: the cameras swapped, the main picture in the window.
     @Test func swapped() async throws {
         let id = try await save(video: false)
@@ -94,7 +138,8 @@ struct ViewerSnapshotTests {
         let front = MemoryCardFront(
             model: model, moment: moment, playback: nil, size: card,
             windowLayout: MemoryCardGeometry.windowLayout(format: .portrait, screenWidth: 402, topInset: 62),
-            swapped: true, controlsShown: .constant(true)
+            swapped: true, cornerOnRight: true, controlsShown: .constant(true),
+            actions: MemoryCardActions(flip: {}, swap: nil, step: { _ in })
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorToken.canvas.color)

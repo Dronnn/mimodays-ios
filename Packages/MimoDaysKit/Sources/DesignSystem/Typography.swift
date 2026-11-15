@@ -185,6 +185,10 @@ public struct TextStyle: Equatable, Sendable {
     public static let scrubTime = TextStyle(.nunito, size: 12, weight: 600, relativeTo: .caption2, maximumScale: 1.35)
     /// "Swap cameras" and "Flip" under a Memory Card (U20).
     public static let cardButton = TextStyle(.nunito, size: 14, weight: 800, relativeTo: .subheadline, maximumScale: 1.35)
+    /// The day on a Memory Card's back: "Wednesday, Nov 11" (U30).
+    public static let cardBackDay = TextStyle(.fraunces, size: 24, weight: 600, relativeTo: .title2, maximumScale: 1.35)
+    /// A collection's name and "Still playing · 0:06" on a Memory Card's back (U30).
+    public static let cardBackSmall = TextStyle(.nunito, size: 13, weight: 700, relativeTo: .footnote)
     /// The count on a map marker (P01).
     public static let mapCount = TextStyle(.nunito, size: 12.5, weight: 800, relativeTo: .caption1, maximumScale: 1.2)
     /// A place's name in the map's sheet (P02).

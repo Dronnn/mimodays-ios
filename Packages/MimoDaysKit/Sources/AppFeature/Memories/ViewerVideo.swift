@@ -17,8 +17,19 @@ final class ViewerVideoPlayer {
     private(set) var time: Double = 0
     private(set) var duration: Double
     private(set) var isPlaying = false
+    /// The sound button.
     var isMuted = false {
-        didSet { main.isMuted = isMuted }
+        didSet { applySound() }
+    }
+
+    /// The card's back is showing: it plays on, silent (U35).
+    var isOnBack = false {
+        didSet { applySound() }
+    }
+
+    /// The voice note is playing over it.
+    var isDucked = false {
+        didSet { applySound() }
     }
 
     private var timeObserver: Any?
@@ -30,6 +41,11 @@ final class ViewerVideoPlayer {
         // Started together at one host time, which needs players that don't wait on their own.
         main.automaticallyWaitsToMinimizeStalling = false
         selfie.automaticallyWaitsToMinimizeStalling = false
+    }
+
+    private func applySound() {
+        main.isMuted = isMuted || isOnBack
+        main.volume = isDucked ? 0.2 : 1
     }
 
     func load(main item: AVPlayerItem, selfie selfieItem: AVPlayerItem?) async {

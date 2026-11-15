@@ -943,6 +943,42 @@
         }
       }
     },
+    "+ Add a place" : {
+      "comment" : "Memory Card back (U31): link where the place would be, when the moment has none; opens Edit moment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ Add a place"
+          }
+        }
+      }
+    },
+    "+ Record a voice note" : {
+      "comment" : "Memory Card back (U31): link where the voice note would be, when the moment has none; opens Edit moment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ Record a voice note"
+          }
+        }
+      }
+    },
+    "+ Write a note" : {
+      "comment" : "Memory Card back (U31): link under \"No note yet.\"; opens Edit moment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ Write a note"
+          }
+        }
+      }
+    },
     "16:9 records in landscape" : {
       "comment" : "Camera (U03): under 'Turn your phone sideways'",
       "extractionState" : "manual",
@@ -3475,6 +3511,30 @@
         }
       }
     },
+    "Flip" : {
+      "comment" : "Memory Card (U20, U30): button under the card that turns it over to its other side",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flip"
+          }
+        }
+      }
+    },
+    "Flip card" : {
+      "comment" : "Memory Card (U25): VoiceOver label of the Flip button and name of the action that turns the card over",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flip card"
+          }
+        }
+      }
+    },
     "For a week" : {
       "comment" : "Surprise settings (S02): pause choice, for seven days",
       "extractionState" : "manual",
@@ -4723,6 +4783,18 @@
         }
       }
     },
+    "Next moment" : {
+      "comment" : "Memory Card (U25): VoiceOver action that moves to the next moment in the list the card was opened from",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next moment"
+          }
+        }
+      }
+    },
     "Next month" : {
       "comment" : "Calendar arrow, VoiceOver label.",
       "extractionState" : "manual",
@@ -4875,6 +4947,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No movies yet"
+          }
+        }
+      }
+    },
+    "No note yet." : {
+      "comment" : "Memory Card back (U31): shown in the hand-written face where the note would be, when the moment has no caption or note",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No note yet."
           }
         }
       }
@@ -5967,6 +6051,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Precision"
+          }
+        }
+      }
+    },
+    "Previous moment" : {
+      "comment" : "Memory Card (U25): VoiceOver action that moves to the previous moment in the list the card was opened from",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous moment"
           }
         }
       }
@@ -7479,6 +7575,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Step %lld of 3"
+          }
+        }
+      }
+    },
+    "Still playing · %@" : {
+      "comment" : "Memory Card back (U30): beside the small live window of the front, while the video plays on; %@ is how far it is, e.g. 0:06",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still playing · %@"
           }
         }
       }

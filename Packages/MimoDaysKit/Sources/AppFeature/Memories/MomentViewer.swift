@@ -100,7 +100,10 @@ struct MomentViewer: View {
     @ViewBuilder
     private func page(_ id: UUID) -> some View {
         if let moment = model.moments[id] {
-            MemoryCardPage(model: model, moment: moment, isCurrent: model.current == id, screenWidth: screenWidth, screenTop: screenTop)
+            MemoryCardPage(
+                model: model, moment: moment, isCurrent: model.current == id, screenWidth: screenWidth, screenTop: screenTop,
+                edit: { edit(id) }, step: { model.step($0) }
+            )
         } else {
             Color.clear
         }

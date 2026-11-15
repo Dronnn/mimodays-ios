@@ -214,6 +214,12 @@ final class MomentViewerModel {
         removeFromPager(id)
     }
 
+    /// To the next (+1) or previous (-1) moment it was opened among, when there is one.
+    func step(_ offset: Int) {
+        guard let current, let index = ids.firstIndex(of: current), ids.indices.contains(index + offset) else { return }
+        withAnimation { self.current = ids[index + offset] }
+    }
+
     /// After Edit moment deleted it.
     func removeFromPager(_ id: UUID) {
         guard let index = ids.firstIndex(of: id) else { return }

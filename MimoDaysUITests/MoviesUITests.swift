@@ -31,12 +31,18 @@ final class MoviesUITests: XCTestCase {
         let new = app.buttons["movies.new"]
         XCTAssertTrue(new.waitForExistence(timeout: 10))
         attachScreenshot("F01")
-        new.tap()
-        // The seed's eight moments are saved in the background after launch.
+        // The seed's eight moments are saved in the background after launch, and F02 counts them when it
+        // opens: reopen it until they are all there.
         let thisYear = app.buttons["newMovie.source.thisYear"]
-        XCTAssertTrue(thisYear.waitForExistence(timeout: 5))
-        expectation(for: NSPredicate(format: "label CONTAINS '8 moments'"), evaluatedWith: thisYear)
-        waitForExpectations(timeout: 20)
+        let deadline = Date().addingTimeInterval(30)
+        while true {
+            new.tap()
+            XCTAssertTrue(thisYear.waitForExistence(timeout: 5))
+            if thisYear.label.contains("8 moments") || Date() > deadline { break }
+            app.buttons["newMovie.close"].tap()
+            XCTAssertTrue(new.waitForExistence(timeout: 5))
+        }
+        XCTAssertTrue(thisYear.label.contains("8 moments"), thisYear.label)
         thisYear.tap()
         attachScreenshot("F02")
         app.buttons["newMovie.next"].firstMatch.tap()

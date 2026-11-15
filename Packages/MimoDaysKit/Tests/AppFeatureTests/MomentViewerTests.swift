@@ -86,6 +86,26 @@ struct MomentViewerTests {
         #expect(viewer.playingVoice == nil)
     }
 
+    /// U35: a video's voice comment plays over the running video, which goes on, quieter, and comes back up after.
+    @Test func aVoiceCommentPlaysOverTheRunningVideo() async throws {
+        let id = try await save(video: true, length: .seconds(2), voice: true)
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        let items = try #require(await viewer.playerItems(id))
+        let player = ViewerVideoPlayer(duration: 2)
+        await player.load(main: items.main, selfie: items.selfie)
+        defer { player.stop() }
+        player.play()
+        viewer.toggleVoice(id)
+        #expect(viewer.playingVoice == id)
+        // What the card does on that change.
+        player.isDucked = viewer.playingVoice == id
+        #expect(player.isPlaying && player.main.volume < 1 && !player.main.isMuted)
+        viewer.toggleVoice(id)
+        player.isDucked = viewer.playingVoice == id
+        #expect(viewer.playingVoice == nil && player.main.volume == 1 && player.isPlaying)
+    }
+
     @Test func aVideoPlaysComposedFromItsStreams() async throws {
         let id = try await save(video: true)
         let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)

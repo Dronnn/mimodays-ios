@@ -96,6 +96,17 @@ struct CameraSnapshotTests {
         assertScreenSnapshots(of: screen(await camera(mode: .video, hold: .landscapeLeft), last: true), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
+    /// The test matrix's 1:1 cells: picked with the phone sideways (the hint, as for 9:16), and recording.
+    @Test func squarePickedSideways() async {
+        assertScreenSnapshots(of: screen(await camera(mode: .video, format: .square, hold: .landscapeLeft), last: true), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func squareRecording() async {
+        let model = await camera(mode: .video, format: .square)
+        model.phase = .recording(startedAt: Date().addingTimeInterval(-7.5))
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
     /// iPad: the window turns with the device, so the camera lays its sideways design out as it is (Andrew, 2026-11-15).
     @Test func iPadWindowTurned() async {
         let model = await camera(mode: .video, format: .landscape, hold: .landscapeLeft)

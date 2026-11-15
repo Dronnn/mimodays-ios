@@ -5,6 +5,7 @@ import Persistence
 import SwiftData
 import Testing
 import TestSupport
+import UIKit
 
 /// 13.6 (S05): the privacy settings are kept and decide what a new moment keeps of where it was taken.
 @MainActor
@@ -218,5 +219,41 @@ struct DeleteAllTests {
         #expect(!onboarding.load().isCompleted)
         #expect(privacy.value == PrivacySettings() && memories.value == MemoriesSettings())
         #expect(defaults.data(forKey: "privacySettings") == nil && defaults.data(forKey: "memoriesSettings") == nil)
+    }
+}
+
+/// 13.7 (S04): the appearance is kept and becomes the windows' style.
+@MainActor
+struct AppearanceSettingsTests {
+    @Test func settingsAreKeptAcrossLaunches() throws {
+        let defaults = try #require(UserDefaults(suiteName: "AppearanceSettingsTests"))
+        defaults.removePersistentDomain(forName: "AppearanceSettingsTests")
+        let preferences = AppearancePreferences.appearance(defaults)
+        #expect(preferences.value.appearance == .system && !preferences.value.higherContrast)
+        preferences.value.appearance = .dark
+        preferences.value.higherContrast = true
+        #expect(AppearancePreferences.appearance(defaults).value == preferences.value)
+        preferences.reset()
+        #expect(AppearancePreferences.appearance(defaults).value == AppearanceSettings())
+    }
+
+    @Test func eachChoiceIsAWindowStyle() {
+        var settings = AppearanceSettings()
+        #expect(settings.interfaceStyle == .unspecified)
+        settings.appearance = .light
+        #expect(settings.interfaceStyle == .light)
+        settings.appearance = .dark
+        #expect(settings.interfaceStyle == .dark)
+    }
+
+    @Test func higherContrastReachesTheWindow() {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        var settings = AppearanceSettings()
+        settings.appearance = .dark
+        settings.higherContrast = true
+        WindowAppearance.Anchor.apply(settings, to: window)
+        #expect(window.overrideUserInterfaceStyle == .dark && window.traitCollection.accessibilityContrast == .high)
+        WindowAppearance.Anchor.apply(AppearanceSettings(), to: window)
+        #expect(window.overrideUserInterfaceStyle == .unspecified && !window.traitOverrides.contains(UITraitAccessibilityContrast.self))
     }
 }

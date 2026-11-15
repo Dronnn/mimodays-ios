@@ -82,6 +82,15 @@ struct AppLockWindow: UIViewRepresentable {
             self.isLocked = isLocked
             guard let window_ else { return }
             if isLocked {
+                // S04's light, dark and contrast choice, as on the app's own window.
+                if let main = window {
+                    window_.overrideUserInterfaceStyle = main.overrideUserInterfaceStyle
+                    if main.traitOverrides.contains(UITraitAccessibilityContrast.self) {
+                        window_.traitOverrides.accessibilityContrast = main.traitOverrides.accessibilityContrast
+                    } else if window_.traitOverrides.contains(UITraitAccessibilityContrast.self) {
+                        window_.traitOverrides.remove(UITraitAccessibilityContrast.self)
+                    }
+                }
                 window_.makeKeyAndVisible()
             } else {
                 window_.isHidden = true

@@ -1519,6 +1519,18 @@
         }
       }
     },
+    "Appearance" : {
+      "comment" : "Settings (S01) row and the Appearance screen's title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
+          }
+        }
+      }
+    },
     "As you saw it" : {
       "comment" : "Export sheet (E01) choice: the picture as shown in the app, with the selfie window in place",
       "extractionState" : "manual",
@@ -2355,6 +2367,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cut"
+          }
+        }
+      }
+    },
+    "Dark" : {
+      "comment" : "Appearance settings (S04): theme choice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
           }
         }
       }
@@ -3463,6 +3487,18 @@
         }
       }
     },
+    "Higher contrast" : {
+      "comment" : "Appearance settings (S04): switch for the high-contrast colours",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Higher contrast"
+          }
+        }
+      }
+    },
     "How MimoDays uses your data" : {
       "comment" : "Privacy settings (S05): row and title of the privacy statement",
       "extractionState" : "manual",
@@ -3667,6 +3703,18 @@
         }
       }
     },
+    "Language" : {
+      "comment" : "Appearance settings (S04): row that opens iOS Settings to choose the app's language",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        }
+      }
+    },
     "Large" : {
       "comment" : "Selfie window sheet (C04): size option.",
       "extractionState" : "manual",
@@ -3771,6 +3819,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Let MimoDays use the camera"
+          }
+        }
+      }
+    },
+    "Light" : {
+      "comment" : "Appearance settings (S04): theme choice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
           }
         }
       }
@@ -5199,6 +5259,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opens iOS Settings for MimoDays."
+          }
+        }
+      }
+    },
+    "Opens iOS Settings, where each app can use its own language." : {
+      "comment" : "Appearance settings (S04): note under Language",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens iOS Settings, where each app can use its own language."
           }
         }
       }
@@ -7219,6 +7291,18 @@
         }
       }
     },
+    "System" : {
+      "comment" : "Appearance settings (S04): theme choice: follow iOS",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        }
+      }
+    },
     "Take photo" : {
       "comment" : "Camera (C01): accessibility label of the shutter in photo mode",
       "extractionState" : "manual",
@@ -7287,6 +7371,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Temporary files"
+          }
+        }
+      }
+    },
+    "Text size follows iOS Settings › Display & Brightness." : {
+      "comment" : "Appearance settings (S04): note under Higher contrast",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text size follows iOS Settings › Display & Brightness."
           }
         }
       }

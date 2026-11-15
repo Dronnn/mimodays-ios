@@ -19,6 +19,7 @@ public struct RootView: View {
     private let memoriesPreferences: MemoriesPreferences
     private let moviePreferences: MoviePreferences
     private let privacyPreferences: PrivacyPreferences
+    private let appearancePreferences: AppearancePreferences
     private let appLock: AppLock
     private let eraser: AppEraser
     @State private var today: TodayModel
@@ -45,6 +46,7 @@ public struct RootView: View {
         memoriesPreferences = dependencies.memoriesPreferences
         moviePreferences = dependencies.moviePreferences
         privacyPreferences = dependencies.privacyPreferences
+        appearancePreferences = dependencies.appearancePreferences
         appLock = dependencies.appLock
         eraser = dependencies.eraser
         memories.mode = memoriesPreferences.value.opensIn.memoriesMode
@@ -73,12 +75,15 @@ public struct RootView: View {
         .environment(memoriesPreferences)
         .environment(moviePreferences)
         .environment(privacyPreferences)
+        .environment(appearancePreferences)
         .environment(appLock)
         .environment(\.appEraser, eraser)
         .environment(\.didEraseEverything, startOver)
         .environment(\.mediaLibrary, memories.library)
         // S05: the lock screen sits in its own window, over sheets too.
         .background(AppLockWindow(lock: appLock, isLocked: appLock.isLocked))
+        // S04: light, dark and contrast for every window, sheets and the lock screen included.
+        .background(WindowAppearance(settings: appearancePreferences.value))
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)

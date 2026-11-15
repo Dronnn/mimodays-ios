@@ -10,6 +10,7 @@ enum SettingsRoute: Hashable {
     case memories
     case movies
     case privacy
+    case appearance
     /// S05 "How MimoDays uses your data".
     case dataUse
     /// S08.
@@ -46,6 +47,7 @@ private struct SettingsHost: View {
                     case .memories: MemoriesSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     case .movies: MovieSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     case .privacy: PrivacySettingsScreen().toolbar(.hidden, for: .navigationBar)
+                    case .appearance: AppearanceSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     case .dataUse: DataUseView().toolbar(.hidden, for: .navigationBar)
                     case .deleteAll: DeleteAllScreen().toolbar(.hidden, for: .navigationBar)
                     }
@@ -72,6 +74,7 @@ struct SettingsView: View {
     let model: SettingsModel
     let importPhotos: () -> Void
     let done: () -> Void
+    @Environment(AppearancePreferences.self) private var appearance: AppearancePreferences?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -104,6 +107,8 @@ struct SettingsView: View {
                     }
                     DataCard {
                         link(SettingsRoute.privacy, .glyphLock, Text("Privacy & App Lock", bundle: .module), id: "settings.privacy")
+                        DataSeparator(leading: 64)
+                        link(SettingsRoute.appearance, .glyphMoon, Text("Appearance", bundle: .module), value: appearanceValue, id: "settings.appearance")
                     }
                     DataCard {
                         link(DataRoute.storage, .glyphFolder, Text("Storage", bundle: .module), value: model.storageBytes.map { Text(StorageView.bytes($0)) }, id: "settings.storage")
@@ -135,6 +140,15 @@ struct SettingsView: View {
         guard model.surprisesOn else { return Text("Off", bundle: .module) }
         guard model.pause == .off else { return Text("Paused", bundle: .module) }
         return Text(model.reminders.frequency.label)
+    }
+
+    /// "System", "Light" or "Dark".
+    private var appearanceValue: Text {
+        switch appearance?.value.appearance ?? .system {
+        case .system: Text("System", bundle: .module)
+        case .light: Text("Light", bundle: .module)
+        case .dark: Text("Dark", bundle: .module)
+        }
     }
 
     /// "18 days ago", or "Never".

@@ -18,6 +18,7 @@ public final class AppDependencies {
     let memoriesPreferences: MemoriesPreferences
     let moviePreferences: MoviePreferences
     let privacyPreferences: PrivacyPreferences
+    let appearancePreferences: AppearancePreferences
     let appLock: AppLock
     /// S08 Delete all data.
     let eraser: AppEraser
@@ -54,6 +55,7 @@ public final class AppDependencies {
         moviePreferences = .movies(configuration.isUITesting ? nil : .standard)
         let privacyPreferences = PrivacyPreferences.privacy(configuration.isUITesting ? nil : .standard)
         self.privacyPreferences = privacyPreferences
+        appearancePreferences = .appearance(configuration.isUITesting ? nil : .standard)
         // UI tests keep notification requests in memory so nothing is left on the simulator.
         let notifications: any NotificationScheduler = configuration.isUITesting
             ? InMemoryNotificationScheduler() : SystemNotificationScheduler()
@@ -82,12 +84,14 @@ public final class AppDependencies {
         appLock = AppLock(settings: { privacyPreferences.value })
         let memoriesPreferences = self.memoriesPreferences
         let moviePreferences = self.moviePreferences
+        let appearancePreferences = self.appearancePreferences
         eraser = AppEraser(
             context: modelContainer.mainContext, store: momentSaver.store, notifications: notifications, drafts: camera.drafts,
             resetSettings: {
                 memoriesPreferences.reset()
                 moviePreferences.reset()
                 privacyPreferences.reset()
+                appearancePreferences.reset()
                 cameraSettings.save(CameraSettings())
             }
         )

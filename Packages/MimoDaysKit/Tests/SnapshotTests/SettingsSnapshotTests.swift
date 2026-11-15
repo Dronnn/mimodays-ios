@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// Settings: S01, S02, S03, S05, S06, S08 and S09, and the lock screen.
+/// Settings: S01-S06, S08 and S09, and the lock screen.
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct SettingsSnapshotTests {
@@ -109,5 +109,25 @@ struct SettingsSnapshotTests {
     /// L02.
     @Test func lockScreen() {
         assertScreenSnapshots(of: AppLockView(biometry: .faceID) {}, variants: variants)
+    }
+
+    /// S04.
+    @Test func appearance() {
+        var settings = AppearanceSettings()
+        assertScreenSnapshots(
+            of: page(AppearanceSettingsView(settings: Binding { settings } set: { settings = $0 }, language: "English")), variants: variants
+        )
+    }
+
+    /// S05 with Higher contrast: links, secondary words and the coral button get their darker colours.
+    @Test func privacyInHigherContrast() {
+        var settings = PrivacySettings()
+        settings.appLock = true
+        assertScreenSnapshots(
+            of: page(PrivacySettingsView(
+                settings: Binding { settings } set: { settings = $0 }, biometry: .faceID, placeCount: 3, turnOnLock: { true }, removePlaces: {}
+            )),
+            variants: [SnapshotVariant(.iPhone, .light, highContrast: true), SnapshotVariant(.iPhone, .dark, highContrast: true)]
+        )
     }
 }

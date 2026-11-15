@@ -42,15 +42,18 @@ public struct SnapshotVariant: Sendable {
     public var contentSize: UIContentSizeCategory
     /// Right-to-left layout (Arabic, Hebrew) with the English strings.
     public var isRightToLeft: Bool
+    /// iOS's Increase Contrast, or S04's Higher contrast.
+    public var isHighContrast: Bool
 
     public init(
         _ device: SnapshotDevice, _ style: UIUserInterfaceStyle, _ contentSize: UIContentSizeCategory = .large,
-        rightToLeft: Bool = false
+        rightToLeft: Bool = false, highContrast: Bool = false
     ) {
         self.device = device
         self.style = style
         self.contentSize = contentSize
         isRightToLeft = rightToLeft
+        isHighContrast = highContrast
     }
 
     /// Every device in light and dark, iPhone at a large accessibility text size, and iPhone right-to-left.
@@ -62,7 +65,7 @@ public struct SnapshotVariant: Sendable {
     var name: String {
         let styleName = style == .dark ? "dark" : "light"
         let sizeName = contentSize == .large ? "default" : "AX3"
-        return "\(device.rawValue)-\(styleName)-\(sizeName)" + (isRightToLeft ? "-rtl" : "")
+        return "\(device.rawValue)-\(styleName)-\(sizeName)" + (isRightToLeft ? "-rtl" : "") + (isHighContrast ? "-hc" : "")
     }
 
     @MainActor var config: ViewImageConfig {
@@ -73,6 +76,7 @@ public struct SnapshotVariant: Sendable {
             traits.horizontalSizeClass = device.isPad ? .regular : .compact
             traits.verticalSizeClass = .regular
             traits.layoutDirection = isRightToLeft ? .rightToLeft : .leftToRight
+            traits.accessibilityContrast = isHighContrast ? .high : .normal
         }
         return ViewImageConfig(safeArea: device.safeArea, size: device.size, traits: traits)
     }

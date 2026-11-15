@@ -62,7 +62,8 @@ public struct RootView: View {
         CaptureTime.followsDeviceTimeZone = memoriesPreferences.value.days == .thisIPhone
         _memories = State(initialValue: memories)
         _mosaic = State(initialValue: MemoriesModel(
-            context: dependencies.modelContainer.mainContext, store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
+            context: dependencies.modelContainer.mainContext, store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails,
+            separatesWindow: true
         ))
         _home = State(initialValue: Home(preferences: dependencies.homePreferences))
         let flow = Self.onboardingFlow(context: dependencies.modelContainer.mainContext, permissions: dependencies.permissions, surprises: surprises)

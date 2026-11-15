@@ -67,6 +67,10 @@ final class MemoriesModel {
     private(set) var isLoaded = false
     private(set) var details: [UUID: TileDetail] = [:]
     private(set) var images: [UUID: UIImage] = [:]
+    /// U13: a Mosaic piece shows the main picture with the selfie in its own small window, so `images` holds the
+    /// main picture and this the selfie (only where the moment shows a window).
+    let separatesWindow: Bool
+    private(set) var selfies: [UUID: UIImage] = [:]
     /// The day row at the top. Kept while the app runs, so leaving and coming back finds the same place.
     var scrolledRow: Int?
     /// Moments by local day (yyyymmdd), newest first, for the calendar.
@@ -82,6 +86,7 @@ final class MemoriesModel {
     var selectedDay: Int?
 
     static let tilePixels = 360
+    static let selfiePixels = 160
     /// Decoded tiles kept at once; the oldest go first.
     static let imageLimit = 400
 
@@ -96,8 +101,9 @@ final class MemoriesModel {
 
     init(
         context: ModelContext, store: MediaStore, thumbnails: ThumbnailPipeline, clock: any DateProvider = SystemDateProvider(),
-        calendar: @escaping () -> Calendar = { .current }
+        calendar: @escaping () -> Calendar = { .current }, separatesWindow: Bool = false
     ) {
+        self.separatesWindow = separatesWindow
         self.context = context
         self.store = store
         self.thumbnails = thumbnails
@@ -267,11 +273,30 @@ final class MemoriesModel {
         let detail = details[id] ?? fetchDetail(id)
         guard let detail else { return }
         details[id] = detail
-        guard images[id] == nil, let path = detail.thumbnailPath, let url = try? store.url(for: path),
+        guard images[id] == nil else { return }
+        let pictures = separatesWindow ? sources(id) : nil
+        guard let path = pictures?.main ?? detail.thumbnailPath, let url = try? store.url(for: path),
               let image = try? await thumbnails.thumbnail(for: url, maxPixelSize: Self.tilePixels) else { return }
+        if let selfie = pictures?.selfie, let url = try? store.url(for: selfie),
+           let window = try? await thumbnails.thumbnail(for: url, maxPixelSize: Self.selfiePixels) {
+            selfies[id] = UIImage(cgImage: window)
+        }
         images[id] = UIImage(cgImage: image)
         imageOrder.append(id)
-        if imageOrder.count > Self.imageLimit { images[imageOrder.removeFirst()] = nil }
+        if imageOrder.count > Self.imageLimit {
+            let oldest = imageOrder.removeFirst()
+            images[oldest] = nil
+            selfies[oldest] = nil
+        }
+    }
+
+    /// The main picture and, where the moment shows its window, the selfie: as Today's hero picks them.
+    private func sources(_ id: UUID) -> (main: String?, selfie: String?)? {
+        var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        guard let moment = try? context.fetch(descriptor).first else { return nil }
+        let summary = MomentSummary(moment)
+        return (summary.mainPath, summary.selfiePath)
     }
 
     private func fetchDetail(_ id: UUID) -> TileDetail? {
@@ -287,14 +312,14 @@ final class MemoriesModel {
     }
 
     /// U16: a video's two streams for a Mosaic piece's loop, pictures only, so it leaves other apps' sound alone.
-    func loopItems(_ video: ViewerMoment.VideoSource) async -> (main: AVPlayerItem, selfie: AVPlayerItem?)? {
+    func loopItems(_ video: ViewerMoment.VideoSource, withSelfie: Bool = true) async -> (main: AVPlayerItem, selfie: AVPlayerItem?)? {
         guard let mainURL = try? store.url(for: video.mainPath) else { return nil }
         do {
             let duration = try await AVURLAsset(url: mainURL).load(.duration)
             // The main stream's picture alone is the same as a selfie stream with no offset.
             let main = try await VideoComposer.selfieStream(mainURL, offset: 0, mainDuration: duration)
             var selfie: AVPlayerItem?
-            if video.layout != nil, let path = video.selfiePath, let selfieURL = try? store.url(for: path) {
+            if withSelfie, video.layout != nil, let path = video.selfiePath, let selfieURL = try? store.url(for: path) {
                 selfie = AVPlayerItem(asset: try await VideoComposer.selfieStream(selfieURL, offset: video.timing.selfieOffset, mainDuration: duration))
             }
             return (AVPlayerItem(asset: main), selfie)

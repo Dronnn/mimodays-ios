@@ -35,6 +35,8 @@ public enum ColorToken: String, CaseIterable, Sendable {
     case indicatorInactive
     /// PiP / selfie frame; stays light in dark mode.
     case mediaFrame
+    /// U13/U15: a Mosaic piece's frame; cream, dark plum in dark mode.
+    case mosaicFrame
     /// 45 % scrim behind text on photos.
     case mediaScrim
 

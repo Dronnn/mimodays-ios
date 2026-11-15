@@ -38,8 +38,8 @@ struct MosaicView: View {
                 title
                     .padding(.top, 13)
                     .padding(.horizontal, 24)
-                ForEach(months) { month in
-                    chapter(month)
+                ForEach(Array(months.enumerated()), id: \.element.id) { index, month in
+                    chapter(month, doodle: Self.doodles[index % Self.doodles.count])
                         .padding(.top, 19)
                 }
                 if model.isLoaded, model.allIDs.count < Self.growingUntil {
@@ -112,7 +112,21 @@ struct MosaicView: View {
         return date.formatted(thisYear ? .dateTime.month(.wide) : .dateTime.month(.wide).year())
     }
 
-    private func chapter(_ month: Month) -> some View {
+    /// U13: a hand-drawn mark by each month, in turn: the apricot star near the trailing edge, then the ticks just
+    /// after the name.
+    private static let doodles: [Doodle] = [
+        Doodle(icon: .markStarSolo, size: CGSize(width: 39.2, height: 40.4), alignment: .topTrailing, offset: CGSize(width: -19, height: -12)),
+        Doodle(icon: .markTicksA, size: CGSize(width: 26.7, height: 22.5), alignment: .topLeading, offset: CGSize(width: 220, height: -10)),
+    ]
+
+    struct Doodle {
+        let icon: Icon
+        let size: CGSize
+        let alignment: Alignment
+        let offset: CGSize
+    }
+
+    private func chapter(_ month: Month, doodle: Doodle) -> some View {
         let layout = MosaicLayout.chapter(
             month.items.map { MosaicLayout.Moment(id: $0.id, prefersLarge: $0.isFavorite || $0.mediaType == .video) },
             width: width
@@ -132,6 +146,15 @@ struct MosaicView: View {
                     .accessibilityHidden(true)
             }
             .padding(.horizontal, 26)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: doodle.alignment) {
+                doodle.icon.image
+                    .resizable()
+                    .frame(width: doodle.size.width, height: doodle.size.height)
+                    .foregroundStyle(ColorToken.accentApricot.color)
+                    .offset(doodle.offset)
+                    .accessibilityHidden(true)
+            }
             ZStack(alignment: .topLeading) {
                 ForEach(layout.tiles, id: \.id) { tile in
                     if let item = items[tile.id] {
@@ -149,8 +172,8 @@ struct MosaicView: View {
     private func piece(_ item: MemoryItem, _ tile: MosaicLayout.Tile) -> some View {
         NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id, origin: .mosaic))) {
             MosaicPiece(
-                item: item, detail: model.details[item.id], image: model.images[item.id], isLive: isLive, loops: loops,
-                loopItems: { [model] in await model.loopItems($0) }
+                item: item, detail: model.details[item.id], image: model.images[item.id], selfie: model.selfies[item.id],
+                isLive: isLive, loops: loops, loopItems: { [model] in await model.loopItems($0, withSelfie: !model.separatesWindow) }
             )
                 .frame(width: tile.frame.width, height: tile.frame.height)
                 .modifier(ZoomSource(id: item.id, namespace: zoom))
@@ -181,12 +204,14 @@ struct MosaicView: View {
     }
 }
 
-/// `Mosaic / Photo`, `Mosaic / Video`: the composed thumbnail in a hand-cut cream frame with a soft shadow; a video's
-/// length on a loop chip, a heart for a favorite.
+/// `Mosaic / Photo`, `Mosaic / Video`: the main picture in a hand-cut frame (cream; plum in dark, U15) with a soft shadow, and the selfie in
+/// a small tilted window inset from the top corner where the moment has one; a video's length on a loop chip, a heart
+/// for a favorite.
 struct MosaicPiece: View {
     let item: MemoryItem
     let detail: TileDetail?
     let image: UIImage?
+    var selfie: UIImage?
     /// U16: photos drift (Ken Burns, 12 s), pictures move against the scroll, videos loop while on screen.
     var isLive = false
     var loops: MosaicLoops?
@@ -200,11 +225,25 @@ struct MosaicPiece: View {
         Color(hex: 0xC9B8AA)
             .overlay { picture }
             .clipShape(MemoryCardOutline())
-            .overlay { MemoryCardOutline().strokeBorder(ColorToken.mediaFrame.color, lineWidth: 4) }
+            .overlay { MemoryCardOutline().strokeBorder(ColorToken.mosaicFrame.color, lineWidth: 4) }
             .background {
                 MemoryCardOutline()
-                    .fill(ColorToken.mediaFrame.color)
+                    .fill(ColorToken.mosaicFrame.color)
                     .shadow(color: ColorToken.textPrimary.color.opacity(0.14), radius: 4, y: 3)
+            }
+            .overlay(alignment: .topTrailing) {
+                if let selfie {
+                    GeometryReader { proxy in
+                        // U13: about 50 pt across on every piece, a little smaller on the narrowest.
+                        let width = min(50, proxy.size.width * 0.36)
+                        SelfieFrame { Image(uiImage: selfie).filling() }
+                            .frame(width: width)
+                            .padding(.top, 9)
+                            .padding(.trailing, 11)
+                            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topTrailing)
+                    }
+                    .allowsHitTesting(false)
+                }
             }
             .overlay(alignment: .bottomLeading) {
                 if let duration = detail?.duration {

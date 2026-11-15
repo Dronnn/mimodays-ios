@@ -58,7 +58,7 @@ struct HomeSnapshotTests {
     }
 
     private func makeMosaic() async -> MemoriesModel {
-        let model = MemoriesModel(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline(), clock: clock, calendar: { Self.calendar })
+        let model = MemoriesModel(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline(), clock: clock, calendar: { Self.calendar }, separatesWindow: true)
         model.refresh()
         for id in model.allIDs { await model.load(id) }
         return model

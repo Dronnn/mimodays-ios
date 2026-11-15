@@ -86,9 +86,30 @@ struct ViewerSnapshotTests {
         assertScreenSnapshots(of: try await viewer(video: true, format: .landscape), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPad, .light)])
     }
 
+    /// The test matrix's other cells: a square video and a wide photo.
+    @Test func squareVideo() async throws {
+        assertScreenSnapshots(of: try await viewer(video: true, format: .square), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func widePhoto() async throws {
+        assertScreenSnapshots(of: try await viewer(video: false, format: .landscape), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// The back of a square and of a wide card.
+    @Test func backSquareAndWide() async throws {
+        assertScreenSnapshots(of: try await page(video: true, format: .square, angle: 180), variants: [SnapshotVariant(.iPhone, .light)], testName: "backSquare")
+        assertScreenSnapshots(of: try await page(video: false, format: .landscape, angle: 180), variants: [SnapshotVariant(.iPhone, .light)], testName: "backWide")
+    }
+
+    /// Swapped on a square video and a wide one: the main stream in the window, on its side on the wide card.
+    @Test func swappedSquareAndWide() async throws {
+        assertScreenSnapshots(of: try await front(video: true, format: .square, swapped: true), variants: [SnapshotVariant(.iPhone, .light)], testName: "swappedSquare")
+        assertScreenSnapshots(of: try await front(video: true, format: .landscape, swapped: true), variants: [SnapshotVariant(.iPhone, .light)], testName: "swappedWide")
+    }
+
     /// A card on its own page, turned to `angle`.
-    private func page(video: Bool, angle: Double, bare: Bool = false) async throws -> some View {
-        let id = bare ? try await saveBare() : try await save(video: video)
+    private func page(video: Bool, format: CaptureFormat = .portrait, angle: Double, bare: Bool = false) async throws -> some View {
+        let id = bare ? try await saveBare() : try await save(video: video, format: format)
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)
         let moment = try #require(model.moments[id])
@@ -130,17 +151,19 @@ struct ViewerSnapshotTests {
         assertScreenSnapshots(of: try await page(video: false, angle: 180, bare: true), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
-    /// A photo's card front on its own: `swapped`, part way through a swap, or with the window held `dragged`.
-    private func front(swapped: Bool = false, swapProgress: Double? = nil, dragged: CGSize? = nil) async throws -> some View {
-        let id = try await save(video: false)
+    /// A card front on its own: `swapped`, part way through a swap, or with the window held `dragged`.
+    private func front(
+        video: Bool = false, format: CaptureFormat = .portrait, swapped: Bool = false, swapProgress: Double? = nil, dragged: CGSize? = nil
+    ) async throws -> some View {
+        let id = try await save(video: video, format: format)
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)
         let moment = try #require(model.moments[id])
         let card = MemoryCardGeometry.card(aspectRatio: moment.format.aspectRatio, in: CGSize(width: 359, height: 562))
-        let layout = MemoryCardGeometry.windowLayout(format: .portrait, screenWidth: 402)
-        let saved = try #require(moment.photo?.layout)
+        let layout = MemoryCardGeometry.windowLayout(format: format, screenWidth: 402)
+        let saved = try #require(moment.video?.layout ?? moment.photo?.layout)
         return MemoryCardFront(
-            pictures: MemoryCardFront.Pictures(main: model.image(moment.mainPath), selfie: model.image(moment.selfiePath), isVideo: false),
+            pictures: MemoryCardFront.Pictures(main: model.image(moment.mainPath), selfie: model.image(moment.selfiePath), isVideo: video),
             playback: nil, size: card,
             window: MemoryCardFront.Window(
                 layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow",

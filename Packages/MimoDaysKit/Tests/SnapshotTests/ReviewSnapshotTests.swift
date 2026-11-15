@@ -50,6 +50,19 @@ struct ReviewSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
+    /// The test matrix's other cells: a 16:9 video taken sideways and a 1:1 photo.
+    @Test func wideVideo() async throws {
+        let model = try await review(video: true, format: .landscape)
+        defer { model.discard() }
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func squarePhoto() async throws {
+        let model = try await review(format: .square)
+        defer { model.discard() }
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
     private func screen(_ model: ReviewModel) -> some View {
         ReviewView(model: model, onRetake: {}, onSave: {})
     }

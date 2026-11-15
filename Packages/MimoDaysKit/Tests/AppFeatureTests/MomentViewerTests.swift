@@ -138,6 +138,43 @@ struct MomentViewerTests {
         player.stop()
     }
 
+    /// U35: the video loops for as long as the card is on screen, both streams from the start together, and turning
+    /// the card over only silences it: it neither pauses nor starts again.
+    @Test func theVideoLoopsAndPlaysOnSilentlyOnTheBack() async throws {
+        let id = try await save(video: true, length: .seconds(1))
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        let items = try #require(await viewer.playerItems(id))
+        let player = ViewerVideoPlayer(duration: 1)
+        await player.load(main: items.main, selfie: items.selfie)
+        #expect(player.isReady && player.hasSelfie)
+        defer { player.stop() }
+
+        player.play()
+        try await Task.sleep(for: .milliseconds(300))
+        player.isOnBack = true
+        #expect(player.isPlaying && player.main.rate == 1, "the flip paused it")
+        #expect(player.main.isMuted)
+        let onBack = player.main.currentTime().seconds
+        try await Task.sleep(for: .milliseconds(150))
+        #expect(player.main.currentTime().seconds > onBack, "the flip stopped or restarted it")
+
+        // Past the end: round again, both streams.
+        var looped = false
+        for _ in 0..<60 where !looped {
+            try await Task.sleep(for: .milliseconds(50))
+            looped = player.main.currentTime().seconds < onBack
+        }
+        #expect(looped, "no loop: \(player.main.currentTime().seconds) s")
+        try await Task.sleep(for: .milliseconds(150))
+        #expect(player.isPlaying && player.main.rate == 1 && player.selfie.rate == 1)
+        let drift = abs(player.main.currentTime().seconds - player.selfie.currentTime().seconds)
+        #expect(drift < 0.05, "drift after the loop \(drift)")
+
+        player.isOnBack = false
+        #expect(!player.main.isMuted && player.isPlaying)
+    }
+
     /// 9.25: where the player puts the window is kept on the moment and is what the shared file shows - the
     /// selfie inside the window, the cream border around it, at the new corner and size.
     @Test func theSharedVideoHasTheWindowWhereThePlayerPutIt() async throws {

@@ -86,6 +86,8 @@ struct SettingsModelTests {
         #expect(model.notifications == .denied)
         await model.setSurprises(false)
         await model.setSurprises(true)
+        // Turning it off replans in the background; the store must outlive it.
+        await model.replanning?.value
         #expect(await permissions.requested == [.notifications])
     }
 

@@ -21,27 +21,53 @@ struct CameraView: View {
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(model: CameraModel, adjustsSelfie: Bool = false, onClose: @escaping () -> Void) {
+    /// How the window is turned: upright while the capture flow keeps it so (iPhone); on iPad it turns with the device.
+    @State private var windowHold: DeviceHold
+    /// Snapshots set the window's turn; the app reads it from the scene.
+    private let fixedWindowHold: DeviceHold?
+
+    init(model: CameraModel, adjustsSelfie: Bool = false, windowHold: DeviceHold? = nil, onClose: @escaping () -> Void) {
         _model = State(initialValue: model)
         _adjustsSelfie = State(initialValue: adjustsSelfie)
+        _windowHold = State(initialValue: windowHold ?? .upright)
+        fixedWindowHold = windowHold
         self.onClose = onClose
     }
 
+    /// The window has turned with the device (iPad): the camera draws its sideways layout as it is (Andrew, 2026-11-15).
+    private var followsWindow: Bool { windowHold.isLandscape }
+
+    /// The turn for an area of the camera: the camera's own with the window upright, none when the window has turned.
+    private func turn(_ screen: CGSize) -> CameraTurn {
+        followsWindow
+            ? CameraTurn(hold: .landscapeLeft, screen: screen, turnsItself: false)
+            : CameraTurn(hold: model.layoutHold, screen: screen)
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
+        let layout = followsWindow ? AnyLayout(HStackLayout(spacing: 0)) : AnyLayout(VStackLayout(spacing: 0))
+        layout {
             preview
-                .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 28, bottomTrailingRadius: 28, style: .continuous))
-                .ignoresSafeArea(edges: .top)
+                .clipShape(UnevenRoundedRectangle(
+                    bottomLeadingRadius: followsWindow ? 0 : 28, bottomTrailingRadius: 28,
+                    topTrailingRadius: followsWindow ? 28 : 0, style: .continuous
+                ))
+                .ignoresSafeArea(edges: followsWindow ? [.top, .bottom, .leading] : .top)
             bottomBar
-                .frame(height: CameraChrome.Bar.height)
+                .frame(width: followsWindow ? CameraChrome.Bar.height : nil, height: followsWindow ? nil : CameraChrome.Bar.height)
         }
         .background(CameraPalette.background.ignoresSafeArea())
         .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = $0 }
+        // The window's turn changes its size.
+        .onGeometryChange(for: CGSize.self, of: { $0.size }) { _ in
+            windowHold = fixedWindowHold ?? OrientationLock.windowHold
+        }
+        .onChange(of: windowHold, initial: true) { _, hold in model.engine.setPreviewHold(hold) }
         .environment(\.colorScheme, .dark)
         // U07: one spring as the phone turns; Reduce Motion cross-fades instead.
         .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.35), value: model.layoutHold)
         // Sideways the status bar would run down the buttons' column; the Camera app hides it too.
-        .statusBarHidden(model.layoutHold.isLandscape)
+        .statusBarHidden(model.layoutHold.isLandscape || followsWindow)
         .task { await model.start() }
         .onDisappear { Task { await model.stop() } }
         .sheet(isPresented: $showsSettings) {
@@ -79,19 +105,21 @@ struct CameraView: View {
 
     /// Mid-recording the layout keeps the recording's hold; only the chips turn to stay readable (U07).
     private func spin(_ turn: CameraTurn) -> Angle {
-        CameraTurn(hold: model.hold, screen: turn.screen).angle - turn.angle
+        turn.turnsItself ? CameraTurn(hold: model.hold, screen: turn.screen).angle - turn.angle : .zero
     }
 
     // MARK: Preview
 
     private var preview: some View {
         GeometryReader { proxy in
-            let turn = CameraTurn(hold: model.layoutHold, screen: proxy.size)
+            let turn = turn(proxy.size)
             let chrome = CameraChrome(turn: turn, topInset: topInset, isRightToLeft: layoutDirection == .rightToLeft)
             let whole = CGRect(origin: .zero, size: turn.size)
-            // The format's own way up fills the preview (9:16 upright, as before formats; 16:9 sideways);
-            // otherwise its shape is a frame inside it (U02, U03, U06).
-            let fills = model.format == (turn.hold.isLandscape ? .landscape : .portrait)
+            // The format's own way up fills the preview where the preview has about its shape (the iPhone: 9:16
+            // upright, as before formats; 16:9 sideways); otherwise its shape is a frame inside it (U02, U03, U06),
+            // as on the iPad's squarer screen.
+            let ownWay = model.format == (turn.hold.isLandscape ? .landscape : .portrait)
+            let fills = ownWay && abs(turn.size.width / max(turn.size.height, 1) / model.format.aspectRatio - 1) < 0.05
             let shape = fills ? whole : FormatMask.frame(model.format, in: turn.size)
             // While the phone is held the wrong way the window stays where the hold's own format has it (U03).
             let windowArea = fills || model.needsRotation ? whole : shape
@@ -208,7 +236,7 @@ struct CameraView: View {
 
     private var bottomBar: some View {
         GeometryReader { proxy in
-            let turn = CameraTurn(hold: model.layoutHold, screen: proxy.size)
+            let turn = turn(proxy.size)
             let bar = CameraChrome.Bar(turn: turn, isRightToLeft: layoutDirection == .rightToLeft)
             let sideways = turn.hold.isLandscape
             let direction = layoutDirection

@@ -173,6 +173,8 @@ public protocol CaptureEngine: AnyObject, Sendable {
     func setCaptureHold(_ hold: DeviceHold) async
     /// Live preview of one camera for the UI to host; nil when that camera isn't in the setup.
     @MainActor func previewLayer(for position: CameraPosition) -> CALayer?
+    /// Turns the previews with the window. Upright, except on iPad, whose window turns with the device.
+    @MainActor func setPreviewHold(_ hold: DeviceHold)
     /// Changes the camera screen should show. One listener.
     var events: AsyncStream<CaptureEvent> { get }
 }

@@ -31,8 +31,8 @@ struct CameraSnapshotTests {
     }
 
     /// The camera with every permission granted, so nothing asks the system.
-    private func screen(_ model: CameraModel, adjustsSelfie: Bool = false) -> some View {
-        CameraView(model: model, adjustsSelfie: adjustsSelfie, onClose: {})
+    private func screen(_ model: CameraModel, adjustsSelfie: Bool = false, windowHold: DeviceHold? = nil) -> some View {
+        CameraView(model: model, adjustsSelfie: adjustsSelfie, windowHold: windowHold, onClose: {})
             .environment(\.permissions, PresetPermissionService(status: .granted))
     }
 
@@ -85,6 +85,14 @@ struct CameraSnapshotTests {
     /// U06: 9:16 picked with the phone sideways: the 9:16 shape, the hint and the reason in the column.
     @Test func portraitPickedSideways() async {
         assertScreenSnapshots(of: screen(await camera(mode: .video, hold: .landscapeLeft)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// iPad: the window turns with the device, so the camera lays its sideways design out as it is (Andrew, 2026-11-15).
+    @Test func iPadWindowTurned() async {
+        let model = await camera(mode: .video, format: .landscape, hold: .landscapeLeft)
+        assertScreenSnapshots(of: screen(model, windowHold: .landscapeLeft), variants: [SnapshotVariant(.iPadLandscape, .dark)])
+        let upright = await camera(mode: .video, hold: .landscapeRight)
+        assertScreenSnapshots(of: screen(upright, windowHold: .landscapeRight), variants: [SnapshotVariant(.iPadLandscape, .light)], testName: "iPadWindowTurnedWithTheWrongFormat")
     }
 
     @Test func singleCamera() async {

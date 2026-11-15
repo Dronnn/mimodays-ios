@@ -170,13 +170,27 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
     }
 
-    public func setCaptureHold(_ hold: DeviceHold) async {
-        // 90 is portrait; 0 has the top of the phone to the left, 180 to the right. Device check: C.7.
-        let angle: CGFloat = switch hold {
+    /// 90 is portrait; 0 has the top of the phone to the left, 180 to the right. Device check: C.7.
+    private static func rotationAngle(_ hold: DeviceHold) -> CGFloat {
+        switch hold {
         case .upright: 90
         case .landscapeLeft: 0
         case .landscapeRight: 180
         }
+    }
+
+    @MainActor
+    public func setPreviewHold(_ hold: DeviceHold) {
+        let angle = Self.rotationAngle(hold)
+        for preview in previews.values {
+            if let connection = preview.connection, connection.isVideoRotationAngleSupported(angle) {
+                connection.videoRotationAngle = angle
+            }
+        }
+    }
+
+    public func setCaptureHold(_ hold: DeviceHold) async {
+        let angle = Self.rotationAngle(hold)
         try? await onQueue {
             for camera in self.cameras.values {
                 for connection in [camera.photo.connection(with: .video), camera.movie.connection(with: .video)].compactMap(\.self)

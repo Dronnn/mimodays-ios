@@ -147,6 +147,10 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         stopSignal = nil
     }
 
+    /// The simulated previews are still pictures that fill their view whichever way it is turned.
+    @MainActor
+    public func setPreviewHold(_: DeviceHold) {}
+
     @MainActor
     public func previewLayer(for position: CameraPosition) -> CALayer? {
         let layer = CALayer()

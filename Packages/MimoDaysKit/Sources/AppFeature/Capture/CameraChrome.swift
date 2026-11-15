@@ -8,12 +8,16 @@ struct CameraTurn {
     let hold: DeviceHold
     /// The area on the upright screen.
     let screen: CGSize
+    /// False when the window has turned with the device itself (iPad, Andrew 2026-11-15): the layout for `hold`
+    /// is drawn as it is.
+    var turnsItself = true
 
     /// The area as the person sees it.
-    var size: CGSize { hold.isLandscape ? CGSize(width: screen.height, height: screen.width) : screen }
+    var size: CGSize { hold.isLandscape && turnsItself ? CGSize(width: screen.height, height: screen.width) : screen }
 
     var angle: Angle {
-        switch hold {
+        guard turnsItself else { return .zero }
+        return switch hold {
         case .upright: .zero
         case .landscapeLeft: .degrees(90)
         case .landscapeRight: .degrees(-90)
@@ -23,7 +27,8 @@ struct CameraTurn {
     /// A point the person sees, on the screen. The top of the phone to the left turns the person's right
     /// into the screen's bottom; to the right, into the screen's top.
     func point(_ point: CGPoint) -> CGPoint {
-        switch hold {
+        guard turnsItself else { return point }
+        return switch hold {
         case .upright: point
         case .landscapeLeft: CGPoint(x: screen.width - point.y, y: point.x)
         case .landscapeRight: CGPoint(x: point.y, y: screen.height - point.x)
@@ -33,7 +38,7 @@ struct CameraTurn {
     /// A rectangle the person sees, on the screen.
     func rect(_ rect: CGRect) -> CGRect {
         let center = point(CGPoint(x: rect.midX, y: rect.midY))
-        let size = hold.isLandscape ? CGSize(width: rect.height, height: rect.width) : rect.size
+        let size = hold.isLandscape && turnsItself ? CGSize(width: rect.height, height: rect.width) : rect.size
         return CGRect(x: center.x - size.width / 2, y: center.y - size.height / 2, width: size.width, height: size.height)
     }
 }
@@ -145,7 +150,14 @@ struct CameraChrome {
     func selfieWindow(in area: CGRect, insideShape: Bool, chipBottom: CGFloat?) -> SelfieWindowLayout {
         let chip = chipBottom.map { (corner: surpriseCorner, bottom: $0) }
         if sideways { return .sideways(preview: area.size, columnOnRight: columnOnRight, chip: chip) }
-        return insideShape ? .insideFrame(area.size) : SelfieWindowLayout(preview: area.size, topInset: topInset, chip: chip)
+        guard insideShape else { return SelfieWindowLayout(preview: area.size, topInset: topInset, chip: chip) }
+        // 17 pt inside the frame (U02), and clear of the buttons and the pickers where the frame reaches them
+        // (a 9:16 frame on the iPad's squarer screen): where the window starts and stops on the whole preview.
+        let full = SelfieWindowLayout(preview: size, topInset: topInset)
+        return SelfieWindowLayout(
+            preview: area.size, topInset: max(0, topInset + full.topMargin - 17 - area.minY),
+            bottomMargin: max(17, full.bottomMargin - (size.height - area.maxY)), topMargin: 17
+        )
     }
 
     // MARK: The bar under the preview

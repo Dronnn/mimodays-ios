@@ -12,6 +12,18 @@ public enum OrientationLock {
         locked ?? (UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown)
     }
 
+    /// How the window is turned, as a hold: upright on iPhone while locked; on iPad it turns with the device.
+    public static var windowHold: DeviceHold {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        // An interface turned left has the home side on the left: the top of the device to the right.
+        return switch scene?.effectiveGeometry.interfaceOrientation {
+        case .landscapeLeft: .landscapeRight
+        case .landscapeRight: .landscapeLeft
+        default: .upright
+        }
+    }
+
     /// Locks to `mask`, or unlocks with nil, and turns the screen if it has to.
     public static func set(_ mask: UIInterfaceOrientationMask?) {
         locked = mask

@@ -57,8 +57,11 @@ struct DataIconRow: View {
     var value: Text?
     var opens = true
     var iconInk = ColorToken.textPrimary
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
+        // At accessibility sizes the value goes under the title, so neither breaks mid-word.
+        let stacksValue = typeSize.isAccessibilitySize
         HStack(spacing: 0) {
             icon.image
                 .resizable()
@@ -68,10 +71,13 @@ struct DataIconRow: View {
                 .background(Circle().fill(ColorToken.accentPeach.color))
                 .accessibilityHidden(true)
                 .padding(.trailing, 14)
-            DataRowLabel(title: title, detail: detail)
+            VStack(alignment: .leading, spacing: 3) {
+                DataRowLabel(title: title, detail: detail)
+                if stacksValue, let value { value.textStyle(.rowValue).foregroundStyle(ColorToken.textTertiary.color) }
+            }
             Spacer(minLength: 8)
             HStack(spacing: 6) {
-                if let value { value.textStyle(.rowValue).foregroundStyle(ColorToken.textTertiary.color) }
+                if !stacksValue, let value { value.textStyle(.rowValue).foregroundStyle(ColorToken.textTertiary.color) }
                 if opens { DataChevron() }
             }
         }

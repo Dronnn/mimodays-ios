@@ -4,9 +4,9 @@ import Persistence
 import SwiftUI
 
 /// U30-U34: the Memory Card's back, the same size as its front. The day (Fraunces) over a brush stroke, the time
-/// and the place, the caption and note in the hand-written face, the voice note, the collections, and a small live
-/// window of the front, still playing (muted) on a video. Missing parts are "+" links to Edit moment. It scrolls
-/// when it holds more than a short card shows.
+/// and the place, the note (or the caption when there is no note) in the hand-written face, the voice note, the collections, and a small live
+/// window of the front, still playing (muted) on a video, kept at the card's bottom. Missing parts are "+" links to
+/// Edit moment. It scrolls when it holds more than a short card shows.
 struct MemoryCardBack: View {
     let model: MomentViewerModel
     let moment: ViewerMoment
@@ -37,19 +37,20 @@ struct MemoryCardBack: View {
                     .padding(.top, 10)
                 words
                     .padding(.top, 26)
+                // U31: "+ Record a voice note" right under "+ Write a note".
                 voice
-                    .padding(.top, 20)
+                    .padding(.top, moment.voice == nil && !hasWords ? 0 : 20)
                 if !moment.collections.isEmpty {
                     collections
                         .padding(.top, 18)
                 }
+                Spacer(minLength: 20)
                 livePreview
-                    .padding(.top, 20)
             }
             .padding(.horizontal, 26)
             .padding(.top, 30)
-            .padding(.bottom, 56)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 40)
+            .frame(maxWidth: .infinity, minHeight: size.height, alignment: .topLeading)
         }
         .scrollIndicators(.hidden)
         .scrollBounceBehavior(.basedOnSize)
@@ -89,10 +90,19 @@ struct MemoryCardBack: View {
         .foregroundStyle(ColorToken.textPrimary.color)
     }
 
+    /// The note; the caption only when there is no note (Andrew, 2026-11-16: U30 has one text, and a caption alone
+    /// is never lost).
+    private var noteText: String? { moment.note ?? moment.title }
+
+    private var hasWords: Bool { noteText != nil }
+
     @ViewBuilder
     private var words: some View {
-        if moment.title != nil || moment.note != nil {
-            MomentWords(moment: moment, onPhoto: false)
+        if let noteText {
+            Text(noteText)
+                .textStyle(.dayCaption)
+                .foregroundStyle(ColorToken.textPrimary.color)
+                .fixedSize(horizontal: false, vertical: true)
         } else {
             VStack(alignment: .leading, spacing: 10) {
                 Text("No note yet.", bundle: .module)
@@ -128,7 +138,7 @@ struct MemoryCardBack: View {
         }
     }
 
-    /// The front, small and tilted, still playing on a video (U30).
+    /// The front, small, tilted and hand-cut, still playing on a video (U30).
     private var livePreview: some View {
         HStack(spacing: 14) {
             ZStack {
@@ -139,13 +149,13 @@ struct MemoryCardBack: View {
                     PlayerLayerView(player: playback.main)
                 }
             }
-            .frame(width: 72, height: 96)
-            .clipShape(MemoryCardOutline())
-            .overlay { MemoryCardOutline().strokeBorder(ColorToken.mediaFrame.color, lineWidth: 3) }
+            .frame(width: 80, height: 104)
+            .clipShape(CardSelfieBlob())
+            .overlay { CardSelfieBlob().stroke(ColorToken.mediaFrame.color, lineWidth: 6).clipShape(CardSelfieBlob()) }
             .background {
-                MemoryCardOutline()
+                CardSelfieBlob()
                     .fill(ColorToken.mediaFrame.color)
-                    .shadow(color: ColorToken.textPrimary.color.opacity(0.16), radius: 9, y: 6)
+                    .shadow(color: Color(hex: 0x2A1B21).opacity(0.16), radius: 9, y: 6)
             }
             .rotationEffect(.degrees(-5.4))
             .environment(\.layoutDirection, .leftToRight)
@@ -192,10 +202,15 @@ struct CardVoiceNote: View {
         let progress = isPlaying && voice.duration > 0 ? min(model.voiceTime / voice.duration, 1) : 0
         let length = Text(Duration.seconds(voice.duration.rounded()), format: .time(pattern: .minuteSecond))
         Button { model.toggleVoice(id) } label: {
-            // A card narrower than the design's 359 pt leaves the waveform out rather than squeeze the label.
+            // The 9:16 back is narrower than the design's 359 pt card: fewer bars, then the length alone beside the
+            // whole waveform (VoiceOver still hears "Voice note"); the label alone at the largest text sizes.
+            let label = Text("Voice note · \(length)", bundle: .module)
+            let filled = { (bars: Int) in Int((progress * Double(bars)).rounded()) }
             ViewThatFits(in: .horizontal) {
-                row(isPlaying: isPlaying, length: length, waveform: Int((progress * 12).rounded()))
-                row(isPlaying: isPlaying, length: length, waveform: nil)
+                row(isPlaying: isPlaying, label: label, bars: 12, filled: filled(12))
+                row(isPlaying: isPlaying, label: label, bars: 8, filled: filled(8))
+                row(isPlaying: isPlaying, label: length, bars: 12, filled: filled(12))
+                row(isPlaying: isPlaying, label: label, bars: 0, filled: 0)
             }
             .padding(.leading, 10)
             .padding(.trailing, 16)
@@ -210,8 +225,8 @@ struct CardVoiceNote: View {
         .accessibilityIdentifier("viewer.voice")
     }
 
-    /// Play or stop and the length, with the waveform `filled` that far when it is shown.
-    private func row(isPlaying: Bool, length: Text, waveform filled: Int?) -> some View {
+    /// Play or stop and `label`, with a waveform of `bars` (none for 0), `filled` that far.
+    private func row(isPlaying: Bool, label: Text, bars: Int, filled: Int) -> some View {
         HStack(spacing: 10) {
             (isPlaying ? Icon.glyphPause : .glyphPlay).image
                 .resizable()
@@ -220,20 +235,29 @@ struct CardVoiceNote: View {
                 .foregroundStyle(ColorToken.textOnCoral.color)
                 .frame(width: 36, height: 36)
                 .background(Circle().fill(ColorToken.actionCoral.color))
-            Text("Voice note · \(length)", bundle: .module)
+            label
                 .textStyle(.viewerPlace)
                 .foregroundStyle(ColorToken.textPrimary.color)
-            if let filled {
+            if bars > 0 {
                 Spacer(minLength: 8)
+                // 3 pt bars 8 pt apart, as in the design.
                 WaveformBars(
-                    levels: model.voiceLevels[id] ?? [], count: 12, filled: filled,
+                    levels: Self.levels(model.voiceLevels[id] ?? [], bars), count: bars, filled: filled,
                     minHeight: 6, maxHeight: 16, rest: ColorToken.textSecondary.color
                 )
-                .frame(width: 92, height: 18)
+                .frame(width: CGFloat(bars * 8), height: 18)
                 .environment(\.layoutDirection, .leftToRight)
                 .accessibilityHidden(true)
             }
         }
+    }
+
+    /// The waveform's levels taken down to `count` bars, each the loudest of its share (never empty: there are more
+    /// levels than bars).
+    static func levels(_ levels: [Float], _ count: Int) -> [Float] {
+        guard count > 0, levels.count > count else { return levels }
+        let total = levels.count
+        return (0 ..< count).map { levels[$0 * total / count ..< ($0 + 1) * total / count].max() ?? 0 }
     }
 
     /// The capsule: the canvas's cream on the card's paper, a soft plum in the dark (U30, U34).

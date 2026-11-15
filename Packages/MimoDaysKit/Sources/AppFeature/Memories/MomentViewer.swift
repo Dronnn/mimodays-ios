@@ -315,30 +315,6 @@ struct MomentViewer: View {
     }
 }
 
-/// A moment's caption, then its longer note, both handwritten (M05 Patrick Hand 20); cream on a video.
-struct MomentWords: View {
-    let moment: ViewerMoment
-    let onPhoto: Bool
-
-    var body: some View {
-        let color = (onPhoto ? ColorToken.mediaFrame : .textPrimary).color
-        VStack(alignment: .leading, spacing: 6) {
-            if let title = moment.title {
-                Text(title)
-                    .textStyle(.dayCaption)
-                    .foregroundStyle(color)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            if let note = moment.note {
-                Text(note)
-                    .textStyle(.dayCaption)
-                    .foregroundStyle(color)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
-}
-
 /// `Viewer / Voice pill`: play or stop, its length and its waveform, filling coral as it plays.
 /// On the canvas a cream hand-cut card; on a video a translucent cream capsule without the waveform.
 struct VoicePill: View {

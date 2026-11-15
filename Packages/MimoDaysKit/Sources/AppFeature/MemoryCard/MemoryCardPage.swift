@@ -127,10 +127,12 @@ struct MemoryCardPage: View {
                 // Drawn turned half round, so the turned card shows it the right way.
                 .rotation3DEffect(reduceMotion ? .zero : .degrees(180), axis: (x: 0, y: 1, z: 0))
         }
+        // Under the side showing, its own colour: no cream rim round the back in the dark (U34). The shadow is
+        // the dark plum in both appearances, not a light glow.
         .background {
             MemoryCardOutline()
-                .fill(ColorToken.mediaFrame.color)
-                .shadow(color: ColorToken.textPrimary.color.opacity(0.16), radius: 9, y: 6)
+                .fill((showsBack ? ColorToken.surfaceCard : .mediaFrame).color)
+                .shadow(color: Color(hex: 0x2A1B21).opacity(0.16), radius: 9, y: 6)
         }
         .modifier(CardTurn(angle: reduceMotion ? 0 : flip.angle, cornerOnRight: cornerOnRight))
         .overlay(alignment: .bottomTrailing) {

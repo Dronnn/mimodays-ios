@@ -94,8 +94,9 @@ public struct MemoryCardFlipCorner: View {
 
     public var body: some View {
         ZStack {
+            // Light peach in the dark too (U34).
             FlipCornerFold()
-                .fill(ColorToken.accentPeach.color)
+                .fill(Color(hex: 0xF8D7C3))
             FlipCornerCrease()
                 .stroke(ColorToken.textPrimary.color.opacity(0.25), lineWidth: 1.5)
             FlipCornerArrow()

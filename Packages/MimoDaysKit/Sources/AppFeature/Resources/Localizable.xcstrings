@@ -1471,6 +1471,18 @@
         }
       }
     },
+    "At a random time, MimoDays invites you to capture what is happening. The exact time is always a surprise." : {
+      "comment" : "Surprise settings (S02): note under the Surprise me switch",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At a random time, MimoDays invites you to capture what is happening. The exact time is always a surprise."
+          }
+        }
+      }
+    },
     "Audio" : {
       "comment" : "Movie editor: tool bar tab for sound levels and music (F09)",
       "extractionState" : "manual",
@@ -3043,6 +3055,30 @@
         }
       }
     },
+    "For a week" : {
+      "comment" : "Surprise settings (S02): pause choice, for seven days",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For a week"
+          }
+        }
+      }
+    },
+    "For today" : {
+      "comment" : "Surprise settings (S02): pause choice, until midnight tonight",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For today"
+          }
+        }
+      }
+    },
     "Free up space" : {
       "comment" : "Export failed (F14): button that opens Settings to make room",
       "extractionState" : "manual",
@@ -4195,6 +4231,18 @@
         }
       }
     },
+    "No surprises come while paused, and none are sent later for the time missed." : {
+      "comment" : "Surprise settings (S02): message of the pause choices",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No surprises come while paused, and none are sent later for the time missed."
+          }
+        }
+      }
+    },
     "None" : {
       "comment" : "Review (C07): accessibility value of the Place chip when the moment has no place",
       "extractionState" : "manual",
@@ -4203,6 +4251,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "None"
+          }
+        }
+      }
+    },
+    "Not after" : {
+      "comment" : "Surprise settings (S02): the latest time a surprise may come",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not after"
+          }
+        }
+      }
+    },
+    "Not before" : {
+      "comment" : "Surprise settings (S02): the earliest time a surprise may come",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not before"
           }
         }
       }
@@ -4407,6 +4479,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nothing was restored. This iPhone needs about %@ more free space."
+          }
+        }
+      }
+    },
+    "Notifications for MimoDays are off in iOS Settings, so surprises can't reach you." : {
+      "comment" : "Surprise settings (S02): note when notifications are turned off; a link to iOS Settings follows",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications for MimoDays are off in iOS Settings, so surprises can't reach you."
           }
         }
       }
@@ -4675,6 +4759,18 @@
         }
       }
     },
+    "Pause surprises" : {
+      "comment" : "Surprise settings (S02): row that opens the pause choices, and the title of those choices",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause surprises"
+          }
+        }
+      }
+    },
     "Pause voice note" : {
       "comment" : "Voice note card (C10): accessibility label of the play button while the voice note plays",
       "extractionState" : "manual",
@@ -4683,6 +4779,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pause voice note"
+          }
+        }
+      }
+    },
+    "Paused" : {
+      "comment" : "Settings (S01): the Surprises row's value while surprises are paused",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
           }
         }
       }
@@ -5439,6 +5547,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Resume"
+          }
+        }
+      }
+    },
+    "Resume now" : {
+      "comment" : "Surprise settings (S02): ends the pause",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume now"
           }
         }
       }
@@ -6295,6 +6415,18 @@
         }
       }
     },
+    "Surprise me" : {
+      "comment" : "Surprise settings (S02): the switch that turns surprises on or off",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surprise me"
+          }
+        }
+      }
+    },
     "Surprise moment, %@" : {
       "comment" : "VoiceOver: a moment that answered a surprise notification, then its time",
       "extractionState" : "manual",
@@ -6315,6 +6447,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Surprise · %@"
+          }
+        }
+      }
+    },
+    "Surprises" : {
+      "comment" : "Settings (S01) row and the title of its screen (S02): when and how often MimoDays surprises you",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surprises"
           }
         }
       }
@@ -7003,6 +7147,18 @@
         }
       }
     },
+    "Time to catch it" : {
+      "comment" : "Surprise settings (S02): how long a surprise stays open once it arrives; the value is a duration like 15 min",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time to catch it"
+          }
+        }
+      }
+    },
     "Timeline" : {
       "comment" : "Memories switch: every moment as a list by day.",
       "extractionState" : "manual",
@@ -7299,6 +7455,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unnamed place"
+          }
+        }
+      }
+    },
+    "Until %@" : {
+      "comment" : "Surprise settings (S02): Pause surprises value; the argument is a weekday (Friday) or a short date (Nov 22)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Until %@"
+          }
+        }
+      }
+    },
+    "Until I resume them" : {
+      "comment" : "Surprise settings (S02): pause choice with no end",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Until I resume them"
+          }
+        }
+      }
+    },
+    "Until tomorrow" : {
+      "comment" : "Surprise settings (S02): Pause surprises value when the pause ends tonight",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Until tomorrow"
+          }
+        }
+      }
+    },
+    "Until you resume" : {
+      "comment" : "Surprise settings (S02): Pause surprises value when paused with no end",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Until you resume"
           }
         }
       }

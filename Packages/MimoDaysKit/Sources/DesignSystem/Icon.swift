@@ -68,6 +68,11 @@ public enum Icon: String, CaseIterable, Sendable {
     /// Backup, export and storage (E01-E09), drawn on a 20×20 canvas.
     case glyphArchive
     case glyphBell
+    /// S01: Privacy & App Lock, Appearance, Import from Photos, Help & about.
+    case glyphLock
+    case glyphMoon
+    case glyphPhotos
+    case glyphHelp
     /// `Brand / Wordmark` on Today: the letters and the star, two layers on one 103.7×33 canvas.
     case brandWordmark
     case brandWordmarkStar

@@ -119,6 +119,8 @@ struct LocalizationTests {
         "Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos.",
         "Keep the place from Photos", "city level", "Already in MimoDays", "%lld skipped", "Some files couldn't be imported",
         "The others are in Memories. Try the rest again from Photos.",
+        // Settings (Phase 13); the plain Text keys are found by the source scan.
+        "Not before", "Not after", "Until %@",
     ]
 
     private static var resourceKeys: [String] {

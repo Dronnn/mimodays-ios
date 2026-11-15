@@ -46,6 +46,9 @@ final class BackupUITests: XCTestCase {
         XCTAssertTrue(move.waitForExistence(timeout: 60))
         attachScreenshot("E04p picker")
         move.tap()
+        // A backup from an earlier run on the same day has the same name.
+        let replaceExisting = app.buttons["Replace"]
+        if replaceExisting.waitForExistence(timeout: 3) { replaceExisting.tap() }
         // On CI each query can take half a minute while Files' picker goes away.
         let done = app.buttons["backup.done"]
         XCTAssertTrue(done.waitForExistence(timeout: 90))

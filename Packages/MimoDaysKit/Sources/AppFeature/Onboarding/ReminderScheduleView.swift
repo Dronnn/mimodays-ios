@@ -136,6 +136,8 @@ struct TimeWindowCard: View {
     enum Bound { case earliest, latest }
 
     @Binding var schedule: ReminderSchedule
+    /// S02 says "Not before" / "Not after" and puts the rows in a card of its own.
+    var inSettings = false
     @State private var open: Bound?
     @Environment(\.calendar) private var calendar
     @Environment(\.locale) private var locale
@@ -148,7 +150,7 @@ struct TimeWindowCard: View {
                 .padding(.leading, 16)
             row(.latest)
         }
-        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: Radius.card))
+        .background(inSettings ? .clear : ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: Radius.card))
     }
 
     @ViewBuilder
@@ -191,9 +193,11 @@ struct TimeWindowCard: View {
     }
 
     private func title(_ bound: Bound) -> LocalizedStringResource {
-        switch bound {
-        case .earliest: LocalizedStringResource("Earliest", bundle: .atURL(Bundle.module.bundleURL))
-        case .latest: LocalizedStringResource("Latest", bundle: .atURL(Bundle.module.bundleURL))
+        switch (bound, inSettings) {
+        case (.earliest, false): LocalizedStringResource("Earliest", bundle: .atURL(Bundle.module.bundleURL))
+        case (.latest, false): LocalizedStringResource("Latest", bundle: .atURL(Bundle.module.bundleURL))
+        case (.earliest, true): LocalizedStringResource("Not before", bundle: .atURL(Bundle.module.bundleURL))
+        case (.latest, true): LocalizedStringResource("Not after", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 

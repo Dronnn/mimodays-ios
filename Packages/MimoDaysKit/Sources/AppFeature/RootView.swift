@@ -125,7 +125,7 @@ public struct RootView: View {
         .tabViewStyle(.sidebarAdaptable)
         .tint(ColorToken.textLink.color)
         .sheet(isPresented: $router.isSettingsPresented) {
-            SettingsPlaceholderView()
+            SettingsScreen(surprises: surprises)
         }
         .fullScreenCover(item: $router.capture) { request in
             CaptureFlowView(request: request) { saved in
@@ -146,54 +146,6 @@ public struct RootView: View {
             }
         }
         .animation(.snappy, value: showsSavedToast)
-    }
-}
-
-/// Settings until Phase 13 builds it: Backup, Storage and Import from Photos.
-struct SettingsPlaceholderView: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var importsPhotos = false
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                DataCard {
-                    NavigationLink(value: DataRoute.backup) {
-                        DataIconRow(icon: .glyphArchive, title: Text("Backup", bundle: .module))
-                    }
-                    .accessibilityIdentifier("settings.backup")
-                    DataSeparator(leading: 64)
-                    NavigationLink(value: DataRoute.storage) {
-                        DataIconRow(icon: .glyphFolder, title: Text("Storage", bundle: .module))
-                    }
-                    .accessibilityIdentifier("settings.storage")
-                    DataSeparator(leading: 64)
-                    Button { importsPhotos = true } label: {
-                        DataIconRow(icon: .glyphDownload, title: Text("Import from Photos", bundle: .module))
-                    }
-                    .accessibilityIdentifier("settings.import")
-                }
-                .buttonStyle(.plain)
-                .padding(16)
-            }
-            .background(ColorToken.surfaceSheet.color.ignoresSafeArea())
-            .navigationTitle(Text("Settings", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: { Text("Done", bundle: .module) }
-                        .accessibilityIdentifier("settings.done")
-                }
-            }
-            .photoImport(isPresented: $importsPhotos)
-            .navigationDestination(for: DataRoute.self) { route in
-                switch route {
-                case .storage: StorageScreen()
-                case .backup: BackupScreen()
-                case .recentlyDeleted: RecentlyDeletedScreen()
-                }
-            }
-        }
     }
 }
 

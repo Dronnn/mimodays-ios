@@ -38,6 +38,8 @@ final class MoviesModel {
     private let clock: any DateProvider
     private let calendar: () -> Calendar
     private let defaults: UserDefaults
+    /// S06: what the suggested movie starts with.
+    private let movieDefaults: MovieDefaults
     private let logger = Logger(subsystem: "MimoDays", category: "Movies")
     /// The month whose suggestion was put away with Not now.
     static let dismissedKey = "movies.dismissedSuggestion"
@@ -46,9 +48,10 @@ final class MoviesModel {
 
     init(
         library: MediaLibrary, clock: any DateProvider = SystemDateProvider(), calendar: @escaping () -> Calendar = { .current },
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard, movieDefaults: MovieDefaults = MovieDefaults()
     ) {
         self.library = library
+        self.movieDefaults = movieDefaults
         self.clock = clock
         self.calendar = calendar
         self.defaults = defaults
@@ -89,7 +92,7 @@ final class MoviesModel {
             let picked = MovieSelection.pick(suggestion.candidates, target: Self.quickSeconds, seed: seed)
             let project = try store.create(
                 title: Self.monthTitle(suggestion.month), source: Self.monthRule(suggestion.month), length: .quick,
-                aspectRatio: .portrait9x16, fit: .fill, momentIDs: picked, seed: Int(seed)
+                aspectRatio: .portrait9x16, fit: .fill, momentIDs: picked, seed: Int(seed), defaults: movieDefaults
             )
             refresh()
             return project.id

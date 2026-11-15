@@ -6,9 +6,10 @@ import SwiftUI
 
 struct MoviesScreen: View {
     @Environment(\.mediaLibrary) private var library
+    @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
 
     var body: some View {
-        if let library { MoviesHost(model: MoviesModel(library: library)) }
+        if let library { MoviesHost(model: MoviesModel(library: library, movieDefaults: moviePreferences?.value ?? MovieDefaults())) }
     }
 }
 

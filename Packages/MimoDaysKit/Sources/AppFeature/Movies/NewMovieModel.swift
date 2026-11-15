@@ -47,6 +47,7 @@ final class NewMovieModel {
     private(set) var collections: [Choice] = []
     private(set) var places: [MapPlace] = []
     let tiles: MemoriesModel
+    private let defaults: MovieDefaults
     private let library: MediaLibrary
     private let clock: any DateProvider
     private let calendar: () -> Calendar
@@ -54,9 +55,13 @@ final class NewMovieModel {
 
     init(
         library: MediaLibrary, source rule: MovieSourceRule? = nil, clock: any DateProvider = SystemDateProvider(),
-        calendar: @escaping () -> Calendar = { .current }, seed: UInt64 = .random(in: 0...UInt64(Int.max))
+        calendar: @escaping () -> Calendar = { .current }, seed: UInt64 = .random(in: 0...UInt64(Int.max)),
+        defaults: MovieDefaults = MovieDefaults()
     ) {
         self.library = library
+        self.defaults = defaults
+        length = defaults.length
+        aspectRatio = defaults.aspectRatio
         self.clock = clock
         self.calendar = calendar
         self.seed = seed
@@ -216,7 +221,7 @@ final class NewMovieModel {
         do {
             let project = try MovieStore(context: library.context, store: library.store, now: { [clock] in clock.now() }).create(
                 title: title, source: rule, length: length, aspectRatio: aspectRatio, fit: fit, momentIDs: ordered,
-                seed: Int(truncatingIfNeeded: seed)
+                seed: Int(truncatingIfNeeded: seed), defaults: defaults
             )
             if length == .custom { project.customLength = Double(customMinutes) * 60 }
             try library.context.save()

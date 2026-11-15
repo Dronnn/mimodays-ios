@@ -89,7 +89,7 @@ struct TodayView: View {
     }
 
     /// S09 "On this day on Today".
-    private var showsOnThisDay: Bool { memoriesPreferences?.settings.onThisDayOnToday ?? true }
+    private var showsOnThisDay: Bool { memoriesPreferences?.value.onThisDayOnToday ?? true }
 
     /// iPad landscape (X01): the hero on the left; the ribbon, On this day, this month and the movie on the right.
     private var wide: some View {

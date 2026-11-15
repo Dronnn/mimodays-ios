@@ -27,16 +27,21 @@ struct MovieStore {
     @discardableResult
     func create(
         title: String, source: MovieSourceRule, length: MovieLength, aspectRatio: MovieAspectRatio, fit: MovieFit,
-        momentIDs: [UUID], seed: Int = 0
+        momentIDs: [UUID], seed: Int = 0, defaults: MovieDefaults = MovieDefaults()
     ) throws -> MovieProject {
         let project = MovieProject(title: title, sourceRule: source, aspectRatio: aspectRatio, length: length, createdAt: now())
         project.fit = fit
         project.selectionSeed = seed
+        // S06: dates, places and transitions start as set in Settings.
+        project.showsDates = defaults.showsDates
+        project.showsPlaces = defaults.showsPlaces
         context.insert(project)
         let moments = try self.moments(momentIDs)
         for (position, id) in momentIDs.enumerated() {
             guard let moment = moments[id] else { continue }
-            context.insert(MovieClip(project: project, moment: moment, position: position))
+            let clip = MovieClip(project: project, moment: moment, position: position)
+            clip.transition = defaults.transition
+            context.insert(clip)
         }
         try save()
         return project

@@ -17,9 +17,12 @@ struct NewMovieScreen: View {
     let source: MovieSourceRule?
     let built: (UUID) -> Void
     @Environment(\.mediaLibrary) private var library
+    @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
 
     var body: some View {
-        if let library { NewMovieFlow(model: NewMovieModel(library: library, source: source), built: built) }
+        if let library {
+            NewMovieFlow(model: NewMovieModel(library: library, source: source, defaults: moviePreferences?.value ?? MovieDefaults()), built: built)
+        }
     }
 }
 

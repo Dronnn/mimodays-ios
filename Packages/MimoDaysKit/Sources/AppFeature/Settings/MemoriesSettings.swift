@@ -1,7 +1,5 @@
 import Core
 import Foundation
-import Observation
-import os
 import Persistence
 import SwiftData
 
@@ -39,40 +37,12 @@ struct MemoriesSettings: Codable, Equatable, Sendable {
     }
 }
 
-/// The S09 settings for the whole app. Device preferences, not part of the archive: kept in UserDefaults
-/// (in memory for UI tests).
-@MainActor
-@Observable
-final class MemoriesPreferences {
-    var settings: MemoriesSettings {
-        didSet { if settings != oldValue { save() } }
-    }
+/// The S09 settings for the whole app.
+typealias MemoriesPreferences = DevicePreference<MemoriesSettings>
 
-    private static let key = "memoriesSettings"
-    @ObservationIgnored private let defaults: UserDefaults?
-    private static let logger = Logger(subsystem: "MimoDays", category: "Settings")
-
-    init(defaults: UserDefaults?) {
-        self.defaults = defaults
-        guard let data = defaults?.data(forKey: Self.key) else {
-            settings = MemoriesSettings()
-            return
-        }
-        do {
-            settings = try JSONDecoder().decode(MemoriesSettings.self, from: data)
-        } catch {
-            Self.logger.error("Reading Memories settings failed: \(error.localizedDescription, privacy: .public)")
-            settings = MemoriesSettings()
-        }
-    }
-
-    private func save() {
-        guard let defaults else { return }
-        do {
-            defaults.set(try JSONEncoder().encode(settings), forKey: Self.key)
-        } catch {
-            Self.logger.error("Saving Memories settings failed: \(error.localizedDescription, privacy: .public)")
-        }
+extension DevicePreference<MemoriesSettings> {
+    static func memories(_ defaults: UserDefaults?) -> MemoriesPreferences {
+        MemoriesPreferences(key: "memoriesSettings", defaults: defaults, initial: MemoriesSettings())
     }
 }
 

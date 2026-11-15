@@ -16,6 +16,7 @@ public struct RootView: View {
     private let camera: CameraServices
     private let momentSaver: MomentSaver
     private let memoriesPreferences: MemoriesPreferences
+    private let moviePreferences: MoviePreferences
     @State private var today: TodayModel
     @State private var memories: MemoriesModel
     /// C12 toast after a save.
@@ -38,9 +39,10 @@ public struct RootView: View {
             context: dependencies.modelContainer.mainContext, store: dependencies.momentSaver.store, thumbnails: dependencies.thumbnails
         )
         memoriesPreferences = dependencies.memoriesPreferences
-        memories.mode = memoriesPreferences.settings.opensIn.memoriesMode
-        memories.newestFirst = memoriesPreferences.settings.newestFirst
-        CaptureTime.followsDeviceTimeZone = memoriesPreferences.settings.days == .thisIPhone
+        moviePreferences = dependencies.moviePreferences
+        memories.mode = memoriesPreferences.value.opensIn.memoriesMode
+        memories.newestFirst = memoriesPreferences.value.newestFirst
+        CaptureTime.followsDeviceTimeZone = memoriesPreferences.value.days == .thisIPhone
         _memories = State(initialValue: memories)
         let store = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
         let flow = OnboardingFlow(permissions: dependencies.permissions, store: store) { await surprises.settingsChanged() }
@@ -63,6 +65,7 @@ public struct RootView: View {
         .environment(\.camera, camera)
         .environment(\.momentSaver, momentSaver)
         .environment(memoriesPreferences)
+        .environment(moviePreferences)
         .environment(\.mediaLibrary, memories.library)
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
@@ -73,13 +76,13 @@ public struct RootView: View {
             }
         }
         // S09: Memories follows a change at once.
-        .onChange(of: memoriesPreferences.settings.opensIn) { _, mode in memories.mode = mode.memoriesMode }
-        .onChange(of: memoriesPreferences.settings.newestFirst) { _, newestFirst in
+        .onChange(of: memoriesPreferences.value.opensIn) { _, mode in memories.mode = mode.memoriesMode }
+        .onChange(of: memoriesPreferences.value.newestFirst) { _, newestFirst in
             memories.newestFirst = newestFirst
             memories.scrolledRow = nil
             memories.refresh()
         }
-        .onChange(of: memoriesPreferences.settings.days) { _, days in
+        .onChange(of: memoriesPreferences.value.days) { _, days in
             CaptureTime.followsDeviceTimeZone = days == .thisIPhone
             relabelDays(days)
         }
@@ -88,7 +91,7 @@ public struct RootView: View {
             refreshSurprises()
             purgeRecentlyDeleted()
             // The iPhone may be in another zone now.
-            if memoriesPreferences.settings.days == .thisIPhone { relabelDays(.thisIPhone) }
+            if memoriesPreferences.value.days == .thisIPhone { relabelDays(.thisIPhone) }
         }
         // Midnight, a clock change or a new time zone: hours follow the device.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
@@ -97,7 +100,7 @@ public struct RootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
             NSTimeZone.resetSystemTimeZone()
             refreshSurprises()
-            if memoriesPreferences.settings.days == .thisIPhone { relabelDays(.thisIPhone) }
+            if memoriesPreferences.value.days == .thisIPhone { relabelDays(.thisIPhone) }
         }
     }
 

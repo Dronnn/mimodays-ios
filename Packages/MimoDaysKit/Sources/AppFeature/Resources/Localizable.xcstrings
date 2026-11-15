@@ -2264,7 +2264,7 @@
       }
     },
     "Cut" : {
-      "comment" : "Movie editor (F06): transition option, straight to the next clip",
+      "comment" : "Movie editor (F06): transition option, straight to the next clip; also the Movies & export settings (S06) Transitions value",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2283,6 +2283,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date in the file"
+          }
+        }
+      }
+    },
+    "Date on clips" : {
+      "comment" : "Movies & export settings (S06): switch, new movies show each clip's date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date on clips"
           }
         }
       }
@@ -2911,6 +2923,18 @@
         }
       }
     },
+    "Exact place in exported files" : {
+      "comment" : "Movies & export settings (S06): switch, exported movies and moments carry the exact place in their details",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exact place in exported files"
+          }
+        }
+      }
+    },
     "Exact place in the file" : {
       "comment" : "Export (F11): toggle that writes the place into the movie file",
       "extractionState" : "manual",
@@ -2936,7 +2960,7 @@
       }
     },
     "Export" : {
-      "comment" : "Movie editor: top bar button that opens Export movie (F11); also on the preview (F10)",
+      "comment" : "Movie editor: top bar button that opens Export movie (F11); also on the preview (F10); also the Movies & export settings (S06) section title (shown in capitals)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3008,7 +3032,7 @@
       }
     },
     "Fade" : {
-      "comment" : "Movie editor (F06): transition option, a cross-fade into the next clip",
+      "comment" : "Movie editor (F06): transition option, a cross-fade into the next clip; also the Movies & export settings (S06) Transitions value",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3188,7 +3212,7 @@
       }
     },
     "Full" : {
-      "comment" : "New movie (F04): length option",
+      "comment" : "New movie (F04): length option; also the Movies & export settings (S06) Length value",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3524,7 +3548,7 @@
       }
     },
     "Length" : {
-      "comment" : "New movie (F04): section title (shown in capitals); back button to step 2",
+      "comment" : "New movie (F04): section title (shown in capitals); back button to step 2; also the Movies & export settings (S06) row for a new movie's length",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -4003,6 +4027,18 @@
         }
       }
     },
+    "Movie quality" : {
+      "comment" : "Movies & export settings (S06): row, the resolution an export starts with",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movie quality"
+          }
+        }
+      }
+    },
     "Movie title" : {
       "comment" : "Title sheet: placeholder of the title field",
       "extractionState" : "manual",
@@ -4035,6 +4071,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Movies"
+          }
+        }
+      }
+    },
+    "Movies & export" : {
+      "comment" : "Settings (S01) row and the title of its screen (S06): defaults for new movies and exports",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movies & export"
           }
         }
       }
@@ -4107,6 +4155,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New movie"
+          }
+        }
+      }
+    },
+    "New movies start as" : {
+      "comment" : "Movies & export settings (S06): section title (shown in capitals) above the movie shape choice 9:16, 16:9, 1:1",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New movies start as"
           }
         }
       }
@@ -5107,6 +5167,18 @@
         }
       }
     },
+    "Place on clips" : {
+      "comment" : "Movies & export settings (S06): switch, new movies show each clip's place",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place on clips"
+          }
+        }
+      }
+    },
     "Place on each clip" : {
       "comment" : "Movie editor (F08): toggle for the place caption on every clip",
       "extractionState" : "manual",
@@ -5300,7 +5372,7 @@
       }
     },
     "Quick" : {
-      "comment" : "New movie (F04): length option",
+      "comment" : "New movie (F04): length option; also the Movies & export settings (S06) Length value",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -6188,7 +6260,7 @@
       }
     },
     "Short" : {
-      "comment" : "New movie (F04): length option",
+      "comment" : "New movie (F04): length option; also the Movies & export settings (S06) Length value",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -7543,6 +7615,18 @@
         }
       }
     },
+    "Transitions" : {
+      "comment" : "Movies & export settings (S06): row, how a new movie goes from one clip to the next (Cut or Fade)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transitions"
+          }
+        }
+      }
+    },
     "Trim" : {
       "comment" : "Movie editor (F06): button that opens Trim for the chosen clip; also the Trim sheet's title",
       "extractionState" : "manual",
@@ -8175,6 +8259,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings."
+          }
+        }
+      }
+    },
+    "You can still change any of these for a single movie or export." : {
+      "comment" : "Movies & export settings (S06): note under the export card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can still change any of these for a single movie or export."
           }
         }
       }

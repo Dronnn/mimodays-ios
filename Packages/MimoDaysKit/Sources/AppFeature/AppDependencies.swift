@@ -16,6 +16,7 @@ public final class AppDependencies {
     let momentSaver: MomentSaver
     let thumbnails = ThumbnailPipeline()
     let memoriesPreferences: MemoriesPreferences
+    let moviePreferences: MoviePreferences
 
     /// The simulator has no microphone worth testing with, and UI tests need a fixed transcript.
     private static func voice(simulated: Bool) -> VoiceServices {
@@ -36,7 +37,8 @@ public final class AppDependencies {
             permissions = SystemPermissionService()
         }
         skipsOnboarding = configuration.skipsOnboarding
-        memoriesPreferences = MemoriesPreferences(defaults: configuration.isUITesting ? nil : .standard)
+        memoriesPreferences = .memories(configuration.isUITesting ? nil : .standard)
+        moviePreferences = .movies(configuration.isUITesting ? nil : .standard)
         // UI tests keep notification requests in memory so nothing is left on the simulator.
         let notifications: any NotificationScheduler = configuration.isUITesting
             ? InMemoryNotificationScheduler() : SystemNotificationScheduler()

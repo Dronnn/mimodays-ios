@@ -8,7 +8,7 @@ struct MemoriesSettingsScreen: View {
     var body: some View {
         if let preferences {
             @Bindable var preferences = preferences
-            MemoriesSettingsView(settings: $preferences.settings)
+            MemoriesSettingsView(settings: $preferences.value)
         }
     }
 }

@@ -9,13 +9,23 @@ import SwiftUI
 struct MovieExportScreen: View {
     let projectID: UUID
     @Environment(\.mediaLibrary) private var library
+    @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
 
     var body: some View {
         if let library, let project = MovieStore.project(projectID, in: library.context) {
-            MovieExportHost(model: MovieExportModel(project: project, library: library), tiles: MemoriesModel(
+            MovieExportHost(model: model(project, library), tiles: MemoriesModel(
                 context: library.context, store: library.store, thumbnails: library.thumbnails
             ))
         }
+    }
+
+    /// F11 starts with the quality and place set in Settings (S06).
+    private func model(_ project: MovieProject, _ library: MediaLibrary) -> MovieExportModel {
+        let model = MovieExportModel(project: project, library: library)
+        let defaults = moviePreferences?.value ?? MovieDefaults()
+        model.resolution = defaults.resolution
+        model.placeInFile = defaults.exactPlaceInFiles
+        return model
     }
 }
 

@@ -8,6 +8,7 @@ enum SettingsRoute: Hashable {
     case surprises
     case camera
     case memories
+    case movies
 }
 
 /// The Settings sheet: S01 and everything under it.
@@ -38,6 +39,7 @@ private struct SettingsHost: View {
                     case .surprises: SurpriseSettingsView(model: model).toolbar(.hidden, for: .navigationBar)
                     case .camera: CameraSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     case .memories: MemoriesSettingsScreen().toolbar(.hidden, for: .navigationBar)
+                    case .movies: MovieSettingsScreen().toolbar(.hidden, for: .navigationBar)
                     }
                 }
                 .navigationDestination(for: DataRoute.self) { route in
@@ -89,6 +91,8 @@ struct SettingsView: View {
                         link(SettingsRoute.camera, .glyphCamera, Text("Camera", bundle: .module), id: "settings.camera")
                         DataSeparator(leading: 64)
                         link(SettingsRoute.memories, .glyphCollection, Text("Memories", bundle: .module), id: "settings.memories")
+                        DataSeparator(leading: 64)
+                        link(SettingsRoute.movies, .glyphFilm, Text("Movies & export", bundle: .module), id: "settings.movies")
                     }
                     DataCard {
                         link(DataRoute.storage, .glyphFolder, Text("Storage", bundle: .module), value: model.storageBytes.map { Text(StorageView.bytes($0)) }, id: "settings.storage")

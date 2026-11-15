@@ -27,11 +27,13 @@ final class MomentExportModel: Identifiable {
     private let exporter: MomentExporter
     private var folder: URL?
 
-    init(ids: [UUID], library: MediaLibrary, freeSpace: () -> Int64? = BackupModel.deviceFreeSpace) {
+    /// `exactPlace`: S06's "Exact place in exported files".
+    init(ids: [UUID], library: MediaLibrary, exactPlace: Bool = false, freeSpace: () -> Int64? = BackupModel.deviceFreeSpace) {
         self.ids = ids
         exporter = MomentExporter(library: library)
         contents = exporter.contents(ids)
         available = freeSpace()
+        options.exactPlace = exactPlace
     }
 
     /// E01's choice: the picture as seen, or the camera's own files.

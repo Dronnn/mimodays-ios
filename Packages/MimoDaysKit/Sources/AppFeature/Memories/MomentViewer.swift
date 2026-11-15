@@ -29,6 +29,7 @@ private struct MomentViewerHost: View {
 struct MomentViewer: View {
     @Bindable var model: MomentViewerModel
     @Environment(\.camera) private var camera
+    @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
     /// M07 while it is open.
     @State private var editing: EditMomentModel?
     /// M15 while it is open, for this moment.
@@ -261,7 +262,7 @@ struct MomentViewer: View {
         let tint = (isVideo ? ColorToken.mediaFrame : .textPrimary).color
         return HStack {
             // E01: as seen or as the camera's files, with what the moment has.
-            Button { exporting = MomentExportModel(ids: [moment.id], library: model.library) } label: {
+            Button { exporting = MomentExportModel(ids: [moment.id], library: model.library, exactPlace: moviePreferences?.value.exactPlaceInFiles ?? false) } label: {
                 Icon.glyphShare.image.resizable().frame(width: 24, height: 24).foregroundStyle(tint)
                     .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
                     .contentShape(Rectangle())

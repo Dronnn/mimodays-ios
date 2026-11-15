@@ -29,13 +29,13 @@ struct MemoriesSettingsTests {
     @Test func settingsAreKeptAcrossLaunches() throws {
         let defaults = try #require(UserDefaults(suiteName: "MemoriesSettingsTests"))
         defaults.removePersistentDomain(forName: "MemoriesSettingsTests")
-        let preferences = MemoriesPreferences(defaults: defaults)
-        #expect(preferences.settings == MemoriesSettings())
-        preferences.settings.opensIn = .calendar
-        preferences.settings.newestFirst = false
-        preferences.settings.onThisDayOnToday = false
-        preferences.settings.days = .thisIPhone
-        let relaunched = MemoriesPreferences(defaults: defaults).settings
+        let preferences = MemoriesPreferences.memories(defaults)
+        #expect(preferences.value == MemoriesSettings())
+        preferences.value.opensIn = .calendar
+        preferences.value.newestFirst = false
+        preferences.value.onThisDayOnToday = false
+        preferences.value.days = .thisIPhone
+        let relaunched = MemoriesPreferences.memories(defaults).value
         #expect(relaunched.opensIn == .calendar && !relaunched.newestFirst && !relaunched.onThisDayOnToday && relaunched.days == .thisIPhone)
     }
 
@@ -43,7 +43,7 @@ struct MemoriesSettingsTests {
         let defaults = try #require(UserDefaults(suiteName: "MemoriesSettingsUpgradeTests"))
         defaults.removePersistentDomain(forName: "MemoriesSettingsUpgradeTests")
         defaults.set(Data(#"{"newestFirst":false}"#.utf8), forKey: "memoriesSettings")
-        let settings = MemoriesPreferences(defaults: defaults).settings
+        let settings = MemoriesPreferences.memories(defaults).value
         #expect(!settings.newestFirst)
         #expect(settings.opensIn == .timeline && settings.onThisDayOnToday && settings.days == .whereTaken)
     }

@@ -115,11 +115,17 @@ private struct MemoriesSelectActions: ViewModifier {
     let model: MemoriesModel
     @Binding var selection: Set<UUID>?
     @Environment(AppRouter.self) private var router
+    @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
     @State private var confirmsDelete = false
     @State private var collects = false
     @State private var collections: Set<UUID> = []
     /// E02.
     @State private var exporting: MomentExportModel?
+
+    /// E02 with S06's "Exact place in exported files".
+    private func exportModel(_ ids: [UUID]) -> MomentExportModel {
+        MomentExportModel(ids: ids, library: model.library, exactPlace: moviePreferences?.value.exactPlaceInFiles ?? false)
+    }
 
     func body(content: Content) -> some View {
         content
@@ -136,7 +142,7 @@ private struct MemoriesSelectActions: ViewModifier {
                         } label: { action(.glyphFilm, Text("Movie", bundle: .module)) }
                             .accessibilityIdentifier("select.movie")
                         Spacer()
-                        Button { exporting = MomentExportModel(ids: Array(chosen), library: model.library) } label: {
+                        Button { exporting = exportModel(Array(chosen)) } label: {
                             action(.glyphShare, Text("Export", bundle: .module))
                         }
                         .accessibilityIdentifier("select.export")

@@ -128,9 +128,12 @@ struct MemoryCardPage: View {
                 .rotation3DEffect(reduceMotion ? .zero : .degrees(180), axis: (x: 0, y: 1, z: 0))
         }
         // Under the side showing, its own colour: no cream rim round the back in the dark (U34). The shadow is
-        // the dark plum in both appearances, not a light glow.
+        // the dark plum in both appearances, not a light glow. Turned over, the card shows the back's outline the
+        // right way round while this one turns with the card: mirrored ahead, it lies exactly under the back, and
+        // nothing of it shows past the back's border.
         .background {
             MemoryCardOutline()
+                .scale(x: showsBack && !reduceMotion ? -1 : 1)
                 .fill((showsBack ? ColorToken.surfaceCard : .mediaFrame).color)
                 .shadow(color: Color(hex: 0x2A1B21).opacity(0.16), radius: 9, y: 6)
         }

@@ -128,6 +128,23 @@ struct CameraModelInterruptionTests {
         }
     }
 
+    /// The ••• sheet's rear lens reaches the camera when it opens and when it changes (Andrew, 2026-11-16).
+    @Test func theChosenBackLensFilms() async throws {
+        let engine = SimulatedCaptureEngine(lenses: [.ultraWide, .wide, .telephoto])
+        var settings = CameraSettings()
+        settings.backLens = .ultraWide
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { $0.discardFiles() }
+        )
+        await model.start()
+        #expect(model.lenses == [.ultraWide, .wide, .telephoto])
+        #expect(await engine.backLens == .ultraWide)
+        model.settings.backLens = .telephoto
+        for _ in 0..<50 where await engine.backLens != .telephoto { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(await engine.backLens == .telephoto)
+    }
+
     /// The flash button goes off, auto, on and round again, and the camera remembers it (Andrew, 2026-11-16).
     @Test func flashButtonGoesRoundItsThreeModes() {
         let store = InMemoryCameraSettingsStore()

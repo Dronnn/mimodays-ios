@@ -83,6 +83,8 @@ final class CameraModel {
     private var torch: Task<Void, Never>?
     /// The selfie window is shown and captured (dual setups only).
     private(set) var showsSelfie = true
+    /// The rear lenses the ••• sheet offers; one means no choice.
+    private(set) var lenses: [BackLens] = []
     /// Dual setups: the front camera is the big one (↻).
     private(set) var isSwapped = false
     /// A call, the background or heat has the camera; nothing can be captured until it's back.
@@ -98,6 +100,9 @@ final class CameraModel {
             store.save(settings)
             if settings.recordsSound != oldValue.recordsSound { Task { await refreshMicrophone() } }
             if isRecording, settings.flash != oldValue.flash { setTorch(settings.flash) }
+            if settings.backLens != oldValue.backLens, phase != .starting {
+                Task { [engine, lens = settings.backLens] in try? await engine.setBackLens(lens) }
+            }
         }
     }
 
@@ -188,7 +193,9 @@ final class CameraModel {
 
     func start() async {
         do {
+            try? await engine.setBackLens(settings.backLens)
             setup = try await engine.start()
+            lenses = await engine.backLenses()
             showsSingleCameraNote = setup != .dual
             phase = .ready
             await refreshMicrophone()

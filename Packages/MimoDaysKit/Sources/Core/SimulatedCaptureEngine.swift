@@ -14,6 +14,8 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     /// Why the current recording is being stopped, when it isn't the person or the limit.
     private var stopReason: CaptureInterruption?
     public private(set) var hasMicrophone = false
+    nonisolated let lenses: [BackLens]
+    public private(set) var backLens = BackLens.wide
     /// Every `setCaptureHold`, in order.
     public private(set) var captureHolds: [DeviceHold] = []
     private(set) var isRecording = false
@@ -23,9 +25,10 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     public nonisolated let events: AsyncStream<CaptureEvent>
     private let eventSink: AsyncStream<CaptureEvent>.Continuation
 
-    public init(multiCam: Bool = true, freeBytes: Int64? = nil) {
+    public init(multiCam: Bool = true, freeBytes: Int64? = nil, lenses: [BackLens] = [.ultraWide, .wide]) {
         self.multiCam = multiCam
         self.freeBytes = freeBytes
+        self.lenses = lenses
         (events, eventSink) = AsyncStream.makeStream()
     }
 
@@ -70,6 +73,12 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         guard case let .single(position) = setup, !isRecording else { return setup }
         self.setup = .single(position.other)
         return .single(position.other)
+    }
+
+    public func backLenses() -> [BackLens] { lenses }
+
+    public func setBackLens(_ lens: BackLens) {
+        backLens = lenses.contains(lens) ? lens : .wide
     }
 
     public func setMicrophone(_ enabled: Bool) {

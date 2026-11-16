@@ -74,6 +74,8 @@ struct CameraSettings: Codable, Equatable, Sendable {
     var format = CaptureFormat.portrait
     /// Photos: the flash. Videos: the rear light while recording, also changed mid-recording.
     var flash = FlashMode.off
+    /// The rear lens; one the phone can't use is the wide one.
+    var backLens = BackLens.wide
 
     init() {}
 
@@ -88,6 +90,7 @@ struct CameraSettings: Codable, Equatable, Sendable {
         selfieWindow = try container.decodeIfPresent(SelfieWindow.self, forKey: .selfieWindow) ?? selfieWindow
         format = try container.decodeIfPresent(CaptureFormat.self, forKey: .format) ?? format
         flash = try container.decodeIfPresent(FlashMode.self, forKey: .flash) ?? flash
+        backLens = try container.decodeIfPresent(BackLens.self, forKey: .backLens) ?? backLens
     }
 }
 
@@ -190,6 +193,16 @@ extension FlashMode {
         case .off: Text("Off", bundle: .module)
         case .auto: Text("Auto", bundle: .module, comment: "Camera: the flash fires only when it's dark (button value, ••• sheet choice)")
         case .on: Text("On", bundle: .module)
+        }
+    }
+}
+
+extension BackLens {
+    var label: Text {
+        switch self {
+        case .ultraWide: Text("Ultra wide", bundle: .module, comment: "Camera ••• sheet: the rear camera choice, the 0.5× lens")
+        case .wide: Text("Wide", bundle: .module, comment: "Camera ••• sheet: the rear camera choice, the main 1× lens")
+        case .telephoto: Text("Telephoto", bundle: .module, comment: "Camera ••• sheet: the rear camera choice, the zoom lens")
         }
     }
 }

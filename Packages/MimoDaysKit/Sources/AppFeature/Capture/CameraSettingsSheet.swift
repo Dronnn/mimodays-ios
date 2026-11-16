@@ -1,15 +1,41 @@
+import Core
 import DesignSystem
+import Persistence
 import SwiftUI
 
 /// The camera's ••• sheet: the S03 camera settings without leaving the camera (Andrew, 2026-11-13).
 struct CameraSettingsSheet: View {
     @Binding var settings: CameraSettings
+    /// The rear lenses this phone can use; the choice shows with more than one.
+    var lenses: [BackLens] = []
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
+                    section(Text("Format", bundle: .module, comment: "Camera ••• sheet: section title over the 9:16 / 16:9 / 1:1 choice")) {
+                        SegmentedControl(selection: $settings.format, options: CaptureFormat.allCases) { Text(verbatim: $0.label) }
+                            .accessibilityIdentifier("cameraSettings.format")
+                    }
+                    section(Text("Flash", bundle: .module)) {
+                        SegmentedControl(selection: $settings.flash, options: FlashMode.allCases) { $0.label }
+                            .accessibilityIdentifier("cameraSettings.flash")
+                    }
+                    if lenses.count > 1 {
+                        section(Text("Back camera", bundle: .module, comment: "Camera ••• sheet: section title over the rear lens choice")) {
+                            SegmentedControl(selection: $settings.backLens, options: lenses, fitsLabels: true) { $0.label }
+                                .accessibilityIdentifier("cameraSettings.lens")
+                        }
+                    }
+                    section(Text("Selfie window", bundle: .module)) {
+                        SegmentedControl(selection: $settings.selfieWindow.corner, options: CameraSettings.SelfieWindow.Corner.allCases, fitsLabels: true) {
+                            Text($0.title)
+                        }
+                        .accessibilityIdentifier("cameraSettings.corner")
+                        SegmentedControl(selection: $settings.selfieWindow.scale, options: CameraSettings.SelfieWindow.Scale.allCases) { Text($0.title) }
+                            .accessibilityIdentifier("cameraSettings.size")
+                    }
                     section(Text("Opens in", bundle: .module)) {
                         SegmentedControl(selection: $settings.opensIn, options: CameraSettings.Mode.allCases) { $0.label }
                     }

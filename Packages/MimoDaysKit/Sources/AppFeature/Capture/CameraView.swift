@@ -74,7 +74,7 @@ struct CameraView: View {
         .task { await model.start() }
         .onDisappear { Task { await model.stop() } }
         .sheet(isPresented: $showsSettings) {
-            CameraSettingsSheet(settings: $model.settings)
+            CameraSettingsSheet(settings: $model.settings, lenses: model.lenses)
         }
         .sheet(isPresented: $adjustsSelfie) {
             SelfieWindowSheet(placement: $model.settings.selfieWindow)

@@ -159,12 +159,23 @@ public enum FlashMode: String, Codable, CaseIterable, Sendable {
     case on
 }
 
+/// Which rear camera films: the phone's ultra wide, wide or telephoto lens (Andrew, 2026-11-16).
+public enum BackLens: String, Codable, CaseIterable, Sendable {
+    case ultraWide
+    case wide
+    case telephoto
+}
+
 /// The camera, behind a protocol so the UI can run on a simulated engine (simulator, UI tests).
 public protocol CaptureEngine: AnyObject, Sendable {
     /// Configures and starts the session: dual when the device supports it, otherwise the rear camera.
     /// Calling it again restarts a stopped session with the same setup.
     func start() async throws -> CameraSetup
     func stop() async
+    /// The rear lenses this phone has; with two cameras at once, only those that pair with the front one.
+    func backLenses() async -> [BackLens]
+    /// The rear lens from now on; before `start()`, the one it starts with. A lens the phone can't use is the wide one.
+    func setBackLens(_ lens: BackLens) async throws
     /// Switches to the other camera. Single-camera setups only; a dual setup is returned unchanged.
     func flip() async throws -> CameraSetup
     /// Adds or removes the microphone. Only with permission, and only for video.

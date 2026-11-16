@@ -196,7 +196,7 @@ struct CameraSnapshotTests {
 /// The sheet's content on its own (a presented sheet doesn't render in snapshots).
 private struct CameraSettingsSheetPreview: View {
     @State private var settings = CameraSettings()
-    var body: some View { CameraSettingsSheet(settings: $settings) }
+    var body: some View { CameraSettingsSheet(settings: $settings, lenses: [.ultraWide, .wide, .telephoto]) }
 }
 
 private struct SelfieWindowSheetPreview: View {

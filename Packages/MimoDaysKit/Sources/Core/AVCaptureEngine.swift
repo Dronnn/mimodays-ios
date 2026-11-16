@@ -20,6 +20,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private var setup: CameraSetup?
     private var cameras: [CameraPosition: Camera] = [:]
     private var microphone: AVCaptureDeviceInput?
+    private var backLens = BackLens.wide
     private var recording: RecordingDelegate?
     private var pressure: [CameraPosition: CapturePressurePolicy.Level] = [:]
     private var pressureObservations: [CameraPosition: NSKeyValueObservation] = [:]
@@ -119,6 +120,44 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             self.isActive = false
             if self.session.isRunning { self.session.stopRunning() }
         }
+    }
+
+    public func backLenses() async -> [BackLens] {
+        (try? await onQueue { BackLens.allCases.filter { self.backDevice($0) != nil } }) ?? [.wide]
+    }
+
+    public func setBackLens(_ lens: BackLens) async throws {
+        try await onQueue {
+            guard lens != self.backLens else { return }
+            self.backLens = lens
+            guard let setup = self.setup, self.recording == nil, setup.positions.contains(.back) else { return }
+            // Another lens costs the hardware differently: the setup is worked out again.
+            self.removeAllCameras()
+            let changed: CameraSetup
+            do {
+                changed = try self.configureWithinBudget()
+            } catch {
+                self.backLens = .wide
+                changed = try self.configureWithinBudget()
+            }
+            self.setup = changed
+            self.applyPressure()
+            if changed != setup { self.eventSink.yield(.setupChanged(changed)) }
+        }
+    }
+
+    /// The rear lens's device, if the phone has it and, with two cameras, it pairs with the front one.
+    private func backDevice(_ lens: BackLens) -> AVCaptureDevice? {
+        let type: AVCaptureDevice.DeviceType = switch lens {
+        case .ultraWide: .builtInUltraWideCamera
+        case .wide: .builtInWideAngleCamera
+        case .telephoto: .builtInTelephotoCamera
+        }
+        guard let device = AVCaptureDevice.default(type, for: .video, position: .back) else { return nil }
+        guard isMultiCam, let front = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else { return device }
+        let discovery = AVCaptureDevice.DiscoverySession(deviceTypes: [type, .builtInWideAngleCamera], mediaType: .video, position: .unspecified)
+        let pairs = discovery.supportedMultiCamDeviceSets.contains { $0.contains(device) && $0.contains(front) }
+        return pairs ? device : nil
     }
 
     public func flip() async throws -> CameraSetup {
@@ -403,7 +442,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     private func addCamera(_ position: CameraPosition, formatWidth: Int32?) throws {
         let avPosition: AVCaptureDevice.Position = position == .back ? .back : .front
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: avPosition) else {
+        let chosen = position == .back ? backDevice(backLens) : nil
+        guard let device = chosen ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: avPosition) else {
             throw CaptureError.cameraUnavailable
         }
         if isMultiCam, let formatWidth { try selectMultiCamFormat(device, maxWidth: formatWidth) }

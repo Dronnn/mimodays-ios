@@ -1855,6 +1855,18 @@
         }
       }
     },
+    "Back camera" : {
+      "comment" : "Camera ••• sheet: section title over the rear lens choice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back camera"
+          }
+        }
+      }
+    },
     "Back to the editor" : {
       "comment" : "Export failed (F14): button that goes back to the movie editor",
       "extractionState" : "manual",
@@ -2371,6 +2383,18 @@
         }
       }
     },
+    "Format" : {
+      "comment" : "Camera ••• sheet: section title over the 9:16 / 16:9 / 1:1 choice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      }
+    },
     "In silent mode, photos never make a sound." : {
       "comment" : "Camera settings (S03, ••• sheet): note under the Shutter sound toggle",
       "extractionState" : "manual",
@@ -2403,6 +2427,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shutter sound"
+          }
+        }
+      }
+    },
+    "Telephoto" : {
+      "comment" : "Camera ••• sheet: the rear camera choice, the zoom lens",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telephoto"
           }
         }
       }
@@ -3788,7 +3824,7 @@
       }
     },
     "Flash" : {
-      "comment" : "Camera (C01): accessibility label of the flash button",
+      "comment" : "Camera (C01): accessibility label of the flash button; the ••• sheet's section title over Off / Auto / On",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -5007,6 +5043,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Music"
+          }
+        }
+      }
+    },
+    "Ultra wide" : {
+      "comment" : "Camera ••• sheet: the rear camera choice, the 0.5× lens",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultra wide"
+          }
+        }
+      }
+    },
+    "Wide" : {
+      "comment" : "Camera ••• sheet: the rear camera choice, the main 1× lens",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wide"
           }
         }
       }

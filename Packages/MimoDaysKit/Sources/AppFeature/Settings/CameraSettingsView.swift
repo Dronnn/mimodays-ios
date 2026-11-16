@@ -16,6 +16,9 @@ struct CameraSettingsScreen: View {
                     settings: Binding { settings } set: { self.settings = $0; services.settings.save($0) },
                     access: access
                 )
+            } else {
+                // An empty group never appears, so its task would never load the settings.
+                ColorToken.canvas.color.ignoresSafeArea()
             }
         }
         .task {

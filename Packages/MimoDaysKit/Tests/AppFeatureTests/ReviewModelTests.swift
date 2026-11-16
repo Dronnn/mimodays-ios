@@ -9,7 +9,7 @@ struct ReviewModelTests {
     private let time = CaptureTime(instant: Date(timeIntervalSince1970: 1_000), timeZone: .gmt)
 
     private func photo(selfie: Bool = true, window: CameraSettings.SelfieWindow? = .init(corner: .bottomLeft)) async throws -> ReviewModel {
-        var photo = try await started(multiCam: selfie).capturePhoto(flash: false, silent: true)
+        var photo = try await started(multiCam: selfie).capturePhoto(flash: .off, silent: true)
         if !selfie { photo.selfieURL = nil }
         return ReviewModel(capture: CaptureResult(media: .photo(photo), window: selfie ? window : nil, capturedAt: time))
     }
@@ -65,13 +65,13 @@ struct ReviewModelTests {
     @Test func reviewShowsTheRecordedShape() async throws {
         let engine = await started()
         await engine.setCaptureHold(.landscapeLeft)
-        let wide = try await engine.capturePhoto(flash: false, silent: true)
+        let wide = try await engine.capturePhoto(flash: .off, silent: true)
         let review = ReviewModel(capture: CaptureResult(media: .photo(wide), window: .init(), capturedAt: time, format: .landscape))
         defer { review.discard() }
         await review.load()
         #expect(review.main?.size == CGSize(width: 1200, height: 900))
         #expect(abs(review.aspectRatio - 16.0 / 9) < 0.001)
-        let square = ReviewModel(capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: nil, capturedAt: time, format: .square))
+        let square = ReviewModel(capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: nil, capturedAt: time, format: .square))
         defer { square.discard() }
         #expect(square.aspectRatio == 1)
     }

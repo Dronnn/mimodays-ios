@@ -31,7 +31,7 @@ struct MomentViewerTests {
         _ = await engine.start()
         let media: CaptureResult.Media = video
             ? .video(try await engine.record(limit: length))
-            : .photo(try await engine.capturePhoto(flash: false, silent: true))
+            : .photo(try await engine.capturePhoto(flash: .off, silent: true))
         let capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_794_400_000), timeZone: .gmt))
         var draft = MomentDraft(
             capture: capture, caption: caption, window: window, promptID: nil,

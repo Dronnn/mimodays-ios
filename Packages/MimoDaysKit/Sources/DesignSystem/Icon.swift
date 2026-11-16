@@ -15,6 +15,9 @@ public enum Icon: String, CaseIterable, Sendable {
     /// 24 pt camera controls (C01-C05, C13b).
     case glyphClose
     case glyphFlash
+    /// The flash button's other states (Andrew, 2026-11-16).
+    case glyphFlashAuto
+    case glyphFlashOff
     case glyphPiP
     case glyphMore
     case glyphFlip

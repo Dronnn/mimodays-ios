@@ -39,7 +39,7 @@ struct MemoriesSnapshotTests {
     private func save(at date: Date, place: String? = nil, caption: String = "", voice: Bool = false) async throws -> UUID {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
-        let photo = try await engine.capturePhoto(flash: false, silent: true)
+        let photo = try await engine.capturePhoto(flash: .off, silent: true)
         let capture = CaptureResult(media: .photo(photo), window: .init(), capturedAt: CaptureTime(instant: date, timeZone: .gmt))
         let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
         let saver = MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil })

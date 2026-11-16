@@ -95,15 +95,32 @@ struct CameraModelInterruptionTests {
             microphoneStatus: { .denied }, onCapture: { $0.discardFiles() }
         )
         await model.start()
-        model.isFlashOn = true
+        model.settings.flash = .on
         async let recording: Void = model.shutter()
         while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
-        model.isFlashOn = false
-        model.isFlashOn = true
+        model.settings.flash = .off
+        model.nextFlash()
         try await Task.sleep(for: .milliseconds(100))
         await engine.stopRecording()
         await recording
-        #expect(await engine.torchChanges == [true, false, true, false])
+        #expect(await engine.torchChanges == [.on, .off, .auto, .off])
+    }
+
+    /// The flash button goes off, auto, on and round again, and the camera remembers it (Andrew, 2026-11-16).
+    @Test func flashButtonGoesRoundItsThreeModes() {
+        let store = InMemoryCameraSettingsStore()
+        let model = CameraModel(
+            engine: SimulatedCaptureEngine(), store: store, isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { $0.discardFiles() }
+        )
+        var seen = [model.settings.flash]
+        for _ in 0..<3 {
+            model.nextFlash()
+            seen.append(model.settings.flash)
+        }
+        #expect(seen == [.off, .auto, .on, .off])
+        model.nextFlash()
+        #expect(store.load().flash == .auto)
     }
 }
 
@@ -164,7 +181,7 @@ struct MediaCheckTests {
     private func goodPhoto() async throws -> CapturedPhoto {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
-        return try await engine.capturePhoto(flash: false, silent: true)
+        return try await engine.capturePhoto(flash: .off, silent: true)
     }
 
     @Test func anUnreadableMainPhotoIsRejectedAndDeleted() async throws {

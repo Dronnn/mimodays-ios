@@ -152,6 +152,13 @@ public enum CapturePressurePolicy {
     public static let dualFormatWidths: [Int32] = [1920, 1280, 640]
 }
 
+/// The rear camera's flash for a photo, its light while a video records (Andrew, 2026-11-16).
+public enum FlashMode: String, Codable, CaseIterable, Sendable {
+    case off
+    case auto
+    case on
+}
+
 /// The camera, behind a protocol so the UI can run on a simulated engine (simulator, UI tests).
 public protocol CaptureEngine: AnyObject, Sendable {
     /// Configures and starts the session: dual when the device supports it, otherwise the rear camera.
@@ -162,13 +169,14 @@ public protocol CaptureEngine: AnyObject, Sendable {
     func flip() async throws -> CameraSetup
     /// Adds or removes the microphone. Only with permission, and only for video.
     func setMicrophone(_ enabled: Bool) async throws
-    /// Flash applies to the rear camera only. `silent` suppresses the shutter sound where iOS allows it.
-    func capturePhoto(flash: Bool, silent: Bool) async throws -> CapturedPhoto
+    /// Flash applies to the rear camera only; where its photo flash isn't offered (two cameras at once), its light
+    /// stands in. `silent` suppresses the shutter sound where iOS allows it.
+    func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto
     /// Records until `stopRecording()` is called or `limit` is reached, then returns the clip.
     func record(limit: Duration?) async throws -> CapturedVideo
     func stopRecording() async
     /// The rear camera's light, for the flash button in video mode. Does nothing where there is none.
-    func setTorch(_ on: Bool) async
+    func setTorch(_ mode: FlashMode) async
     /// How the next photo or recording is turned: upright, or landscape the way the phone is held. Previews stay upright.
     func setCaptureHold(_ hold: DeviceHold) async
     /// Live preview of one camera for the UI to host; nil when that camera isn't in the setup.

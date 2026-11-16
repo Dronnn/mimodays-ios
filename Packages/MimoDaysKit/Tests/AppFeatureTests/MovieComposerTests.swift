@@ -34,7 +34,7 @@ struct MovieComposerTests {
         for index in 0..<count {
             let media: CaptureResult.Media = videos.contains(index)
                 ? .video(try await engine.record(limit: .seconds(1)))
-                : .photo(try await engine.capturePhoto(flash: false, silent: true))
+                : .photo(try await engine.capturePhoto(flash: .off, silent: true))
             var capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: now, timeZone: .gmt))
             capture.format = format
             let draft = MomentDraft(

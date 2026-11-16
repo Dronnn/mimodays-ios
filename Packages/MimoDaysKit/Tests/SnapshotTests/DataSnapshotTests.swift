@@ -29,7 +29,7 @@ struct DataSnapshotTests {
         let saver = MomentSaver(context: container.mainContext, store: store, clock: TestDateProvider(), freeBytes: { nil })
         for index in 0..<count {
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_791_374_400 + Double(index) * 86_400), timeZone: .gmt)
             )
             _ = try await saver.save(MomentDraft(capture: capture, caption: "", window: nil, promptID: nil))
@@ -122,7 +122,7 @@ struct DataSnapshotTests {
         _ = await engine.start()
         let saver = MomentSaver(context: container.mainContext, store: store, clock: TestDateProvider(), freeBytes: { nil })
         let capture = CaptureResult(
-            media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+            media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
             capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_791_374_400), timeZone: .gmt)
         )
         var draft = MomentDraft(

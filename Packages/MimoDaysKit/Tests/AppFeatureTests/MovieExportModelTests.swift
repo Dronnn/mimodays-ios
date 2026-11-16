@@ -31,7 +31,7 @@ struct MovieExportModelTests {
         var ids: [UUID] = []
         for _ in 0..<count {
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: clock.now(), timeZone: .gmt)
             )
             let draft = MomentDraft(

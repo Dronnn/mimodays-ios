@@ -14,7 +14,7 @@ struct SimulatedCaptureEngineTests {
     @Test func dualSetupCapturesBothCameras() async throws {
         let engine = SimulatedCaptureEngine()
         #expect(await engine.start() == .dual)
-        let photo = try await engine.capturePhoto(flash: false, silent: false)
+        let photo = try await engine.capturePhoto(flash: .off, silent: false)
         #expect(photo.mainPosition == .back)
         #expect(try pixelSize(photo.mainURL) == CGSize(width: 900, height: 1200))
         #expect(try pixelSize(try #require(photo.selfieURL)) == CGSize(width: 360, height: 480))
@@ -24,7 +24,7 @@ struct SimulatedCaptureEngineTests {
         let engine = SimulatedCaptureEngine(multiCam: false)
         #expect(await engine.start() == .single(.back))
         #expect(try await engine.flip() == .single(.front))
-        let photo = try await engine.capturePhoto(flash: true, silent: true)
+        let photo = try await engine.capturePhoto(flash: .on, silent: true)
         #expect(photo.mainPosition == .front)
         #expect(photo.selfieURL == nil)
         #expect(try await engine.flip() == .single(.back))
@@ -38,7 +38,7 @@ struct SimulatedCaptureEngineTests {
 
     @Test func nothingIsCapturedBeforeStartOrAfterStop() async {
         let engine = SimulatedCaptureEngine()
-        await #expect(throws: CaptureError.notRunning) { try await engine.capturePhoto(flash: false, silent: false) }
+        await #expect(throws: CaptureError.notRunning) { try await engine.capturePhoto(flash: .off, silent: false) }
         _ = await engine.start()
         await engine.stop()
         await #expect(throws: CaptureError.notRunning) { try await engine.record(limit: .seconds(1)) }
@@ -83,7 +83,7 @@ struct AVCaptureEngineTests {
     @Test @MainActor func startWithoutCamerasFails() async {
         let engine = AVCaptureEngine()
         await #expect(throws: CaptureError.cameraUnavailable) { try await engine.start() }
-        await #expect(throws: CaptureError.notRunning) { try await engine.capturePhoto(flash: false, silent: false) }
+        await #expect(throws: CaptureError.notRunning) { try await engine.capturePhoto(flash: .off, silent: false) }
         #expect(engine.previewLayer(for: .back) != nil)
     }
 }
@@ -118,7 +118,7 @@ struct CapturePressurePolicyTests {
         await engine.simulatePressure(.serious)
         await engine.simulatePressure(.critical)
         #expect(await events.next() == .setupChanged(.single(.back)))
-        #expect(try await engine.capturePhoto(flash: false, silent: false).selfieURL == nil)
+        #expect(try await engine.capturePhoto(flash: .off, silent: false).selfieURL == nil)
     }
 }
 
@@ -161,9 +161,9 @@ struct CaptureInterruptionTests {
         #expect(clip.duration < 10)
         #expect(clip.selfieURL != nil)
         // Nothing is captured until the camera is back.
-        await #expect(throws: CaptureError.notRunning) { try await engine.capturePhoto(flash: false, silent: false) }
+        await #expect(throws: CaptureError.notRunning) { try await engine.capturePhoto(flash: .off, silent: false) }
         await engine.simulateInterruptionEnded()
-        let photo = try await engine.capturePhoto(flash: false, silent: false)
+        let photo = try await engine.capturePhoto(flash: .off, silent: false)
         [photo.mainURL, photo.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
     }
 

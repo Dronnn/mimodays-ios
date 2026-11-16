@@ -25,7 +25,7 @@ struct VoiceNoteTests {
     private func review(drafts: ReviewDraftStore? = nil) async throws -> ReviewModel {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
-        let capture = CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(), capturedAt: time)
+        let capture = CaptureResult(media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(), capturedAt: time)
         return ReviewModel(capture: try drafts?.adopt(capture) ?? capture, drafts: drafts, voice: services)
     }
 
@@ -122,7 +122,7 @@ struct VoiceNoteTests {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
         let review = ReviewModel(
-            capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(), capturedAt: time),
+            capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(), capturedAt: time),
             voice: quiet
         )
         defer { review.discard() }

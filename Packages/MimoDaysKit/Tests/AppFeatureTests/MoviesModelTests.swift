@@ -43,7 +43,7 @@ struct MoviesModelTests {
         for day in days {
             let date = gmt.date(from: DateComponents(year: day / 10_000, month: day / 100 % 100, day: day % 100, hour: 12))!
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: date, timeZone: .gmt)
             )
             let draft = MomentDraft(

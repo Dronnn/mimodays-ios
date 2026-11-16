@@ -33,7 +33,7 @@ struct MomentExporterTests {
         let saver = MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil })
         let zone = TimeZone(identifier: "Asia/Yerevan")!
         let photo = CaptureResult(
-            media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+            media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
             capturedAt: CaptureTime(instant: clock.now(), timeZone: zone)
         )
         var draft = MomentDraft(

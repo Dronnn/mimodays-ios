@@ -43,7 +43,7 @@ struct SearchSnapshotTests {
         ]
         for (date, caption, note, place, transcript) in moments {
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: date, timeZone: .gmt)
             )
             var draft = MomentDraft(

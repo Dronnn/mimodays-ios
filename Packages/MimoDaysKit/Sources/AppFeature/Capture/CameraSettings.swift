@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Persistence
 import SwiftUI
@@ -71,6 +72,8 @@ struct CameraSettings: Codable, Equatable, Sendable {
     var selfieWindow = SelfieWindow()
     /// U01: the recording format; remembered on this device.
     var format = CaptureFormat.portrait
+    /// Photos: the flash. Videos: the rear light while recording, also changed mid-recording.
+    var flash = FlashMode.off
 
     init() {}
 
@@ -84,6 +87,7 @@ struct CameraSettings: Codable, Equatable, Sendable {
         cameraSounds = try container.decodeIfPresent(Bool.self, forKey: .cameraSounds) ?? cameraSounds
         selfieWindow = try container.decodeIfPresent(SelfieWindow.self, forKey: .selfieWindow) ?? selfieWindow
         format = try container.decodeIfPresent(CaptureFormat.self, forKey: .format) ?? format
+        flash = try container.decodeIfPresent(FlashMode.self, forKey: .flash) ?? flash
     }
 }
 
@@ -169,4 +173,23 @@ struct VoiceServices {
 
 extension EnvironmentValues {
     @Entry var camera: CameraServices?
+}
+
+extension FlashMode {
+    /// The flash button's glyph and the ••• sheet's choice.
+    var icon: Icon {
+        switch self {
+        case .off: .glyphFlashOff
+        case .auto: .glyphFlashAuto
+        case .on: .glyphFlash
+        }
+    }
+
+    var label: Text {
+        switch self {
+        case .off: Text("Off", bundle: .module)
+        case .auto: Text("Auto", bundle: .module, comment: "Camera: the flash fires only when it's dark (button value, ••• sheet choice)")
+        case .on: Text("On", bundle: .module)
+        }
+    }
 }

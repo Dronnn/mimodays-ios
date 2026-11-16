@@ -18,7 +18,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     public private(set) var captureHolds: [DeviceHold] = []
     private(set) var isRecording = false
     /// Every change of the rear light, in order (tests).
-    public private(set) var torchChanges: [Bool] = []
+    public private(set) var torchChanges: [FlashMode] = []
     private var stopSignal: CheckedContinuation<Void, Never>?
     public nonisolated let events: AsyncStream<CaptureEvent>
     private let eventSink: AsyncStream<CaptureEvent>.Continuation
@@ -76,7 +76,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         hasMicrophone = enabled
     }
 
-    public func capturePhoto(flash _: Bool, silent _: Bool) throws -> CapturedPhoto {
+    public func capturePhoto(flash _: FlashMode, silent _: Bool) throws -> CapturedPhoto {
         guard isRunning, interruption == nil, let setup else { throw CaptureError.notRunning }
         let urls = try setup.positions.map { position in
             let url = try CaptureFiles.temporaryURL("jpg")
@@ -131,8 +131,8 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         signalStop()
     }
 
-    public func setTorch(_ on: Bool) {
-        torchChanges.append(on)
+    public func setTorch(_ mode: FlashMode) {
+        torchChanges.append(mode)
     }
 
     public func setCaptureHold(_ hold: DeviceHold) {

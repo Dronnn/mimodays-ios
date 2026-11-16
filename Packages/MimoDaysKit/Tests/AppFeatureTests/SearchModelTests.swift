@@ -93,7 +93,7 @@ struct SearchModelTests {
         let saver = MomentSaver(context: container.mainContext, store: store, clock: TestDateProvider(), freeBytes: { nil })
         for (caption, place, transcript) in [("Ducks", "Lake Merritt", nil), ("", nil, "we walked around the lake twice"), ("Gone", "Lake Tahoe", nil)] {
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: .now, timeZone: .gmt)
             )
             var draft = MomentDraft(

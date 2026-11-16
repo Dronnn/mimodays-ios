@@ -187,9 +187,9 @@ struct CameraView: View {
         RoundButton(icon: .glyphClose, label: Text("Close", bundle: .module), id: "capture.close", action: onClose)
             .turned(chrome.button(.close), turn, direction: direction)
         RoundButton(
-            icon: .glyphFlash, label: Text("Flash", bundle: .module), id: "camera.flash",
-            isOn: model.isFlashOn
-        ) { model.isFlashOn.toggle() }
+            icon: model.settings.flash.icon, label: Text("Flash", bundle: .module), id: "camera.flash",
+            value: model.settings.flash.label
+        ) { model.nextFlash() }
             .turned(chrome.button(.flash), turn, direction: direction)
         Group {
             if model.mode == .video {
@@ -297,6 +297,8 @@ private struct RoundButton: View {
     let label: Text
     let id: String
     var isOn: Bool?
+    /// Says more than on or off (the flash's Auto).
+    var value: Text?
     let action: () -> Void
 
     var body: some View {
@@ -312,7 +314,7 @@ private struct RoundButton: View {
         .buttonStyle(.plain)
         .padding(-2)
         .accessibilityLabel(label)
-        .accessibilityValue(isOn.map { $0 ? Text("On", bundle: .module) : Text("Off", bundle: .module) } ?? Text(verbatim: ""))
+        .accessibilityValue(value ?? isOn.map { $0 ? Text("On", bundle: .module) : Text("Off", bundle: .module) } ?? Text(verbatim: ""))
         .accessibilityIdentifier(id)
     }
 }

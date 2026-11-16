@@ -28,7 +28,7 @@ struct MomentSaverTests {
     private func photo(swapped: Bool = false) async throws -> CaptureResult {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
-        var photo = try await engine.capturePhoto(flash: false, silent: true)
+        var photo = try await engine.capturePhoto(flash: .off, silent: true)
         if swapped, let selfie = photo.selfieURL {
             photo = CapturedPhoto(mainURL: selfie, mainPosition: .front, selfieURL: photo.mainURL)
         }
@@ -150,7 +150,7 @@ struct MomentSaverTests {
     @Test func aMomentWithoutASelfieHasNoWindow() async throws {
         let engine = SimulatedCaptureEngine(multiCam: false)
         _ = await engine.start()
-        let photo = try await engine.capturePhoto(flash: false, silent: true)
+        let photo = try await engine.capturePhoto(flash: .off, silent: true)
         let capture = CaptureResult(media: .photo(photo), window: nil, capturedAt: time)
         let moment = try await saver().save(MomentDraft(capture: capture, caption: "", window: nil, promptID: nil))
         #expect(moment.pipLayout == nil)

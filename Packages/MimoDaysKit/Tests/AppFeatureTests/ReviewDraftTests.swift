@@ -14,7 +14,7 @@ struct ReviewDraftTests {
         _ = await engine.start()
         let media: CaptureResult.Media = video
             ? .video(try await engine.record(limit: .seconds(1)))
-            : .photo(try await engine.capturePhoto(flash: false, silent: true))
+            : .photo(try await engine.capturePhoto(flash: .off, silent: true))
         return CaptureResult(media: media, window: .init(corner: .bottomLeft), capturedAt: time)
     }
 

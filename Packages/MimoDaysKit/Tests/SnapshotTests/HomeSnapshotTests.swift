@@ -45,7 +45,7 @@ struct HomeSnapshotTests {
         for index in 0..<count {
             let media: CaptureResult.Media = video && index == 0
                 ? .video(try await engine.record(limit: .seconds(1)))
-                : .photo(try await engine.capturePhoto(flash: false, silent: true))
+                : .photo(try await engine.capturePhoto(flash: .off, silent: true))
             let at = Self.date(2026, 11, 11, 14).addingTimeInterval(-Double(index) * 86_400 * 2.5)
             let capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: at, timeZone: .gmt))
             let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))

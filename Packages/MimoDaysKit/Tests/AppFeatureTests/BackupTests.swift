@@ -35,7 +35,7 @@ struct BackupTests {
         var moments: [Moment] = []
         for index in 0..<4 {
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: clock.now().addingTimeInterval(Double(index) * 86_400), timeZone: TimeZone(identifier: "Asia/Yerevan")!)
             )
             var draft = MomentDraft(

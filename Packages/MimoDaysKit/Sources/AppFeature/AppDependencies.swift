@@ -142,7 +142,7 @@ public final class AppDependencies {
             let engine = SimulatedCaptureEngine()
             _ = await engine.start()
             for (index, date) in dates.enumerated() {
-                guard let photo = try? await engine.capturePhoto(flash: false, silent: true) else { continue }
+                guard let photo = try? await engine.capturePhoto(flash: .off, silent: true) else { continue }
                 let capture = CaptureResult(media: .photo(photo), window: .init(), capturedAt: CaptureTime(instant: date, timeZone: .current))
                 let place = index == dates.count - 1
                     ? ReviewPlace.current(city: "Yerevan", at: GeoPoint(latitude: 40.18111, longitude: 44.51361, horizontalAccuracy: 30)) : nil
@@ -159,7 +159,7 @@ public final class AppDependencies {
             let engine = SimulatedCaptureEngine()
             _ = await engine.start()
             for index in 0..<8 {
-                guard let photo = try? await engine.capturePhoto(flash: false, silent: true) else { continue }
+                guard let photo = try? await engine.capturePhoto(flash: .off, silent: true) else { continue }
                 let instant = now.addingTimeInterval(Double(index - 7) * 3600)
                 let capture = CaptureResult(media: .photo(photo), window: .init(), capturedAt: CaptureTime(instant: instant, timeZone: .current))
                 _ = try? await momentSaver.save(MomentDraft(capture: capture, caption: "", window: window, promptID: nil))

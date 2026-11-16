@@ -38,7 +38,7 @@ struct MapSnapshotTests {
             let date = calendar.date(from: DateComponents(year: 2026, month: 8 + index % 4, day: 1 + index, hour: 12))!
             let media: CaptureResult.Media = index == video
                 ? .video(try await engine.record(limit: .seconds(1)))
-                : .photo(try await engine.capturePhoto(flash: false, silent: true))
+                : .photo(try await engine.capturePhoto(flash: .off, silent: true))
             let capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: date, timeZone: .gmt))
             let draft = MomentDraft(
                 capture: capture, caption: "",

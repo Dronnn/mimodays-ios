@@ -30,7 +30,7 @@ struct EditMomentTests {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
         let capture = CaptureResult(
-            media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+            media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
             capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_794_400_000), timeZone: .gmt)
         )
         var draft = MomentDraft(

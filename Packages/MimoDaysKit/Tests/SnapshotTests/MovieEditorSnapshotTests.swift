@@ -33,7 +33,7 @@ struct MovieEditorSnapshotTests {
         for index in 0..<count {
             let instant = Date(timeIntervalSince1970: 1_791_374_400 + Double(index - 2) * 86_400) // Oct 7, 2026 noon UTC at index 2
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: instant, timeZone: .gmt)
             )
             let draft = MomentDraft(

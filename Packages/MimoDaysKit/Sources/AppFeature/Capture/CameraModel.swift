@@ -79,10 +79,6 @@ final class CameraModel {
     var mode: CameraSettings.Mode {
         didSet { if mode != oldValue { Task { await refreshMicrophone() } } }
     }
-    /// Photos: the flash. Videos: the rear light while recording, also turned on or off mid-recording.
-    var isFlashOn = false {
-        didSet { if isRecording, isFlashOn != oldValue { setTorch(isFlashOn) } }
-    }
     /// The last torch change asked for; each waits for the one before, so they reach the camera in order.
     private var torch: Task<Void, Never>?
     /// The selfie window is shown and captured (dual setups only).
@@ -101,6 +97,7 @@ final class CameraModel {
         didSet {
             store.save(settings)
             if settings.recordsSound != oldValue.recordsSound { Task { await refreshMicrophone() } }
+            if isRecording, settings.flash != oldValue.flash { setTorch(settings.flash) }
         }
     }
 
@@ -250,7 +247,7 @@ final class CameraModel {
         do {
             let capturedAt = now
             await engine.setCaptureHold(hold)
-            let captured = arranged(try await engine.capturePhoto(flash: isFlashOn, silent: !settings.cameraSounds))
+            let captured = arranged(try await engine.capturePhoto(flash: settings.flash, silent: !settings.cameraSounds))
             guard let photo = MediaCheck.checked(captured) else { throw CaptureError.photoFailed }
             phase = .ready
             onCapture(result(.photo(photo), selfie: photo.selfieURL, at: capturedAt))
@@ -268,27 +265,33 @@ final class CameraModel {
         await engine.setCaptureHold(hold)
         showsSingleCameraNote = false
         failure = nil
-        if isFlashOn { await setTorch(true).value }
+        if settings.flash != .off { await setTorch(settings.flash).value }
         do {
             let recorded = arranged(try await engine.record(limit: settings.videoLength.duration))
-            await setTorch(false).value
+            await setTorch(.off).value
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready
             onCapture(result(.video(video), selfie: video.selfieURL, at: capturedAt))
         } catch {
-            await setTorch(false).value
+            await setTorch(.off).value
             phase = .ready
             failure = CaptureFailure(error)
         }
     }
 
+    /// The flash button: off, auto, on, round again.
+    func nextFlash() {
+        let all = FlashMode.allCases
+        settings.flash = all[(all.firstIndex(of: settings.flash)! + 1) % all.count]
+    }
+
     @discardableResult
-    private func setTorch(_ on: Bool) -> Task<Void, Never> {
+    private func setTorch(_ mode: FlashMode) -> Task<Void, Never> {
         let previous = torch
         let engine = engine
         let task = Task {
             await previous?.value
-            await engine.setTorch(on)
+            await engine.setTorch(mode)
         }
         torch = task
         return task

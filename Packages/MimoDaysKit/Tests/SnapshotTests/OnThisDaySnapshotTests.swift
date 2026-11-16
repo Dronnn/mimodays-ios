@@ -38,7 +38,7 @@ struct OnThisDaySnapshotTests {
         for moment in moments {
             let date = Self.utc.date(from: DateComponents(year: moment.year, month: 11, day: 11, hour: 12))!
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: date, timeZone: .gmt)
             )
             let draft = MomentDraft(

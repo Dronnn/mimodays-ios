@@ -29,7 +29,7 @@ struct ReviewSnapshotTests {
             clip.duration = 6.2
             media = .video(clip)
         } else {
-            media = .photo(try await engine.capturePhoto(flash: false, silent: true))
+            media = .photo(try await engine.capturePhoto(flash: .off, silent: true))
         }
         let model = ReviewModel(capture: CaptureResult(media: media, window: window, capturedAt: time, format: format))
         await model.load()
@@ -122,7 +122,7 @@ struct ReviewSnapshotTests {
     @Test func photoFromASurprise() async throws {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
-        let capture = CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(), capturedAt: time)
+        let capture = CaptureResult(media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(), capturedAt: time)
         let model = ReviewModel(capture: capture, promptID: UUID())
         defer { model.discard() }
         await model.load()
@@ -152,7 +152,7 @@ struct ReviewSnapshotTests {
         let places = PlaceServices(location: SimulatedLocationProvider(), lookup: SimulatedPlaceLookup(), recents: { [recent] })
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
-        let model = ReviewModel(capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(), capturedAt: time), places: places)
+        let model = ReviewModel(capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(), capturedAt: time), places: places)
         defer { model.discard() }
         await model.locate()
         await model.loadNearby()

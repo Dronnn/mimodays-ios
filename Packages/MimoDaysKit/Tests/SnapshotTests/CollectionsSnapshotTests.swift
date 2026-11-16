@@ -35,7 +35,7 @@ struct CollectionsSnapshotTests {
         for index in 0..<count {
             let date = calendar.date(from: DateComponents(year: 2026, month: 3 + index % 9, day: 1 + index, hour: 12))!
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: date, timeZone: .gmt)
             )
             let draft = MomentDraft(

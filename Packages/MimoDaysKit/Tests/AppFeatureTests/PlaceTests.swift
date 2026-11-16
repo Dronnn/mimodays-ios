@@ -22,7 +22,7 @@ struct PlaceTests {
     private func capture() async throws -> CaptureResult {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
-        return CaptureResult(media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(), capturedAt: time)
+        return CaptureResult(media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(), capturedAt: time)
     }
 
     private func places(location: GeoPoint? = nil, lookup: any PlaceLookup = SimulatedPlaceLookup(), recents: [RecentPlace] = []) -> PlaceServices {

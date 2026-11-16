@@ -31,7 +31,7 @@ struct MemoriesModelTests {
         _ = await engine.start()
         let media: CaptureResult.Media = video
             ? .video(try await engine.record(limit: .seconds(1)))
-            : .photo(try await engine.capturePhoto(flash: false, silent: true))
+            : .photo(try await engine.capturePhoto(flash: .off, silent: true))
         let capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: date, timeZone: TimeZone(identifier: zone)!))
         let saver = MomentSaver(context: context, store: store, clock: clock, freeBytes: { nil })
         return try await saver.save(MomentDraft(capture: capture, caption: "", window: SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536)), promptID: nil, place: nil)).id

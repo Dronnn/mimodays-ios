@@ -45,7 +45,7 @@ struct MoviesSnapshotTests {
         for (index, day) in days.enumerated() {
             let media: CaptureResult.Media = videos.contains(index)
                 ? .video(try await engine.record(limit: .seconds(1)))
-                : .photo(try await engine.capturePhoto(flash: false, silent: true))
+                : .photo(try await engine.capturePhoto(flash: .off, silent: true))
             let capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: date(day), timeZone: .gmt))
             let draft = MomentDraft(
                 capture: capture, caption: "",

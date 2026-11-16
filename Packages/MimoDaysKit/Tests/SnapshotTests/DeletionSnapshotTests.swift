@@ -33,7 +33,7 @@ struct DeletionSnapshotTests {
         let saver = MomentSaver(context: container.mainContext, store: store, clock: TestDateProvider(), freeBytes: { nil })
         for index in 0..<count {
             let capture = CaptureResult(
-                media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+                media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
                 capturedAt: CaptureTime(instant: Self.now.addingTimeInterval(-Double(index + 20) * 86_400), timeZone: .gmt)
             )
             let draft = MomentDraft(

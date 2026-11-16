@@ -37,7 +37,7 @@ struct ViewerSnapshotTests {
         if format == .landscape { await engine.setCaptureHold(.landscapeLeft) }
         let media: CaptureResult.Media = video
             ? .video(try await engine.record(limit: .seconds(1)))
-            : .photo(try await engine.capturePhoto(flash: false, silent: true))
+            : .photo(try await engine.capturePhoto(flash: .off, silent: true))
         // Wed, Nov 11, 2026, 6:42 PM in Yerevan.
         var capture = CaptureResult(
             media: media, window: .init(),
@@ -129,7 +129,7 @@ struct ViewerSnapshotTests {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
         let capture = CaptureResult(
-            media: .photo(try await engine.capturePhoto(flash: false, silent: true)), window: .init(),
+            media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(),
             capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_794_422_520), timeZone: TimeZone(identifier: "Asia/Yerevan")!)
         )
         let draft = MomentDraft(

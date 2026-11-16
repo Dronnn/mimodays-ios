@@ -1,6 +1,7 @@
 import AVFoundation
 import QuartzCore
 import Synchronization
+import os
 
 /// The device cameras. `AVCaptureMultiCamSession` with rear + front when supported, otherwise one
 /// `AVCaptureSession` camera at a time. Each camera has its own photo and movie output (separate streams).
@@ -8,6 +9,7 @@ import Synchronization
 /// what it has; a media services reset restarts the session.
 public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private let queue = DispatchQueue(label: "MimoDays.capture")
+    private static let logger = Logger(subsystem: "MimoDays", category: "Camera")
     private let session: AVCaptureSession
     private let isMultiCam: Bool
     /// The video quality setting: no camera format wider than this.
@@ -158,8 +160,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     }
 
     /// Rare lock failures leave the light as it was; the recording itself is unaffected.
-    public func setTorch(_ on: Bool) async {
-        let mode: AVCaptureDevice.TorchMode = on ? .on : .off
+    public func setTorch(_ flash: FlashMode) async {
+        let mode = AVCaptureDevice.TorchMode(flash)
         try? await onQueue {
             guard let device = self.cameras[.back]?.input.device, device.hasTorch, device.isTorchModeSupported(mode) else { return }
             try device.lockForConfiguration()
@@ -206,7 +208,26 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     // MARK: Photo
 
-    public func capturePhoto(flash: Bool, silent: Bool) async throws -> CapturedPhoto {
+    public func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto {
+        // Two cameras at once offer no photo flash: the rear light stands in, lit a moment before the shot.
+        let offered = (try? await onQueue { self.cameras[.back]?.photo.supportedFlashModes }) ?? nil
+        let lights = flash != .off && offered.map { !$0.contains(AVCaptureDevice.FlashMode(flash)) } == true
+        Self.logger.info("Photo flash \(flash.rawValue, privacy: .public), offered \(offered?.map(\.rawValue) ?? [], privacy: .public), light \(lights)")
+        if lights {
+            await setTorch(flash)
+            try? await Task.sleep(for: .milliseconds(300))
+        }
+        do {
+            let photo = try await shoot(flash: lights ? .off : flash, silent: silent)
+            if lights { await setTorch(.off) }
+            return photo
+        } catch {
+            if lights { await setTorch(.off) }
+            throw error
+        }
+    }
+
+    private func shoot(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto {
         try await withCheckedThrowingContinuation { continuation in
             queue.async {
                 guard let setup = self.setup, self.session.isRunning else {
@@ -219,7 +240,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     let hevc = output.availablePhotoCodecTypes.contains(.hevc)
                     let settings = hevc ? AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc]) : AVCapturePhotoSettings()
                     settings.maxPhotoDimensions = output.maxPhotoDimensions
-                    if flash, position == .back, output.supportedFlashModes.contains(.on) { settings.flashMode = .on }
+                    let mode = AVCaptureDevice.FlashMode(flash)
+                    if position == .back, output.supportedFlashModes.contains(mode) { settings.flashMode = mode }
                     if silent, output.isShutterSoundSuppressionSupported { settings.isShutterSoundSuppressionEnabled = true }
                     output.capturePhoto(with: settings, delegate: batch.delegate(for: position, fileExtension: hevc ? "heic" : "jpg"))
                 }
@@ -644,6 +666,26 @@ extension CaptureInterruption {
         case .maximumDurationReached?: return nil
         case .diskFull?, .maximumFileSizeReached?: self = .lowStorage
         default: self = .other
+        }
+    }
+}
+
+private extension AVCaptureDevice.FlashMode {
+    init(_ mode: FlashMode) {
+        switch mode {
+        case .off: self = .off
+        case .auto: self = .auto
+        case .on: self = .on
+        }
+    }
+}
+
+private extension AVCaptureDevice.TorchMode {
+    init(_ mode: FlashMode) {
+        switch mode {
+        case .off: self = .off
+        case .auto: self = .auto
+        case .on: self = .on
         }
     }
 }

@@ -1819,6 +1819,18 @@
         }
       }
     },
+    "Auto" : {
+      "comment" : "Camera: the flash fires only when it's dark (button value, ••• sheet choice)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto"
+          }
+        }
+      }
+    },
     "Autumn" : {
       "comment" : "Season label under a sample movie clip",
       "extractionState" : "manual",
@@ -5648,7 +5660,7 @@
       }
     },
     "Off" : {
-      "comment" : "Camera: accessibility value of a switched-off control (flash, sound, selfie window); also the editor's Music row (F09) when there's no music",
+      "comment" : "Camera: accessibility value of a switched-off control (sound, selfie window); the flash's Off; also the editor's Music row (F09) when there's no music",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -5660,7 +5672,7 @@
       }
     },
     "On" : {
-      "comment" : "Camera: accessibility value of a switched-on control (flash, sound, selfie window)",
+      "comment" : "Camera: accessibility value of a switched-on control (sound, selfie window); the flash's On",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

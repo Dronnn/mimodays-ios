@@ -42,27 +42,27 @@ private struct SettingsHost: View {
     var body: some View {
         NavigationStack(path: $path) {
             SettingsView(model: model, importPhotos: { importsPhotos = true }, done: { dismiss() })
-                .toolbar(.hidden, for: .navigationBar)
+                .settingsPage()
                 .navigationDestination(for: SettingsRoute.self) { route in
                     switch route {
-                    case .surprises: SurpriseSettingsView(model: model).toolbar(.hidden, for: .navigationBar)
-                    case .camera: CameraSettingsScreen().toolbar(.hidden, for: .navigationBar)
-                    case .memories: MemoriesSettingsScreen().toolbar(.hidden, for: .navigationBar)
-                    case .movies: MovieSettingsScreen().toolbar(.hidden, for: .navigationBar)
-                    case .privacy: PrivacySettingsScreen().toolbar(.hidden, for: .navigationBar)
-                    case .appearance: AppearanceSettingsScreen().toolbar(.hidden, for: .navigationBar)
-                    case .donations: DonationsScreen().toolbar(.hidden, for: .navigationBar)
-                    case .help: HelpView().toolbar(.hidden, for: .navigationBar)
-                    case let .helpArticle(article): HelpArticleView(article: article).toolbar(.hidden, for: .navigationBar)
-                    case .dataUse: DataUseView().toolbar(.hidden, for: .navigationBar)
-                    case .deleteAll: DeleteAllScreen().toolbar(.hidden, for: .navigationBar)
+                    case .surprises: SurpriseSettingsView(model: model).settingsPage()
+                    case .camera: CameraSettingsScreen().settingsPage()
+                    case .memories: MemoriesSettingsScreen().settingsPage()
+                    case .movies: MovieSettingsScreen().settingsPage()
+                    case .privacy: PrivacySettingsScreen().settingsPage()
+                    case .appearance: AppearanceSettingsScreen().settingsPage()
+                    case .donations: DonationsScreen().settingsPage()
+                    case .help: HelpView().settingsPage()
+                    case let .helpArticle(article): HelpArticleView(article: article).settingsPage()
+                    case .dataUse: DataUseView().settingsPage()
+                    case .deleteAll: DeleteAllScreen().settingsPage()
                     }
                 }
                 .navigationDestination(for: DataRoute.self) { route in
                     switch route {
-                    case .storage: StorageScreen()
-                    case .backup: BackupScreen()
-                    case .recentlyDeleted: RecentlyDeletedScreen()
+                    case .storage: StorageScreen().settingsPage()
+                    case .backup: BackupScreen().settingsPage()
+                    case .recentlyDeleted: RecentlyDeletedScreen().settingsPage()
                     }
                 }
         }
@@ -72,6 +72,14 @@ private struct SettingsHost: View {
             // Back on S01: Storage, Backup or Surprises may have changed what it says.
             if count == 0 { Task { await model.load() } }
         }
+    }
+}
+
+private extension View {
+    /// A Settings page draws its own bar; a sheet has no top inset, so the bar keeps this room from the sheet's
+    /// rounded top edge (Andrew, 2026-11-16).
+    func settingsPage() -> some View {
+        toolbar(.hidden, for: .navigationBar).safeAreaPadding(.top, 16)
     }
 }
 

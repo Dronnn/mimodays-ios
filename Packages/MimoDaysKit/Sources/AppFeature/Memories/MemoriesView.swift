@@ -80,12 +80,15 @@ struct MemoriesView: View {
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(selection == nil ? .automatic : .hidden, for: .tabBar)
         .safeAreaInset(edge: .top, spacing: 0) {
-            if selection != nil {
-                SelectBar(selection: $selection, all: model.allIDs)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            } else if isSearching {
-                searchBar
+            Group {
+                if selection != nil {
+                    SelectBar(selection: $selection, all: model.allIDs)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                } else if isSearching {
+                    searchBar
+                }
             }
+            .clearOfBareTopEdge()
         }
         .sheet(isPresented: $showsFilters) { SearchFiltersSheet(model: search) }
         // Into and out of selecting, however it's left (Cancel, a delete, the mode switch).

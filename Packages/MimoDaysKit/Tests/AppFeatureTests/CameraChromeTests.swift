@@ -81,4 +81,14 @@ struct CameraChromeTests {
             }
         }
     }
+
+    /// iPhone Duo's outer display has no status bar above the screen: the controls still keep clear of the edge.
+    @Test func withoutATopInsetTheControlsKeepClearOfTheEdge() {
+        #expect(CameraChrome.topInset(0) == CameraChrome.bareTopInset)
+        #expect(CameraChrome.topInset(62) == 62)
+        let chrome = CameraChrome(turn: CameraTurn(hold: .upright, screen: CGSize(width: 382, height: 678)), topInset: CameraChrome.topInset(0), isRightToLeft: false)
+        for button in CameraChrome.Button.allCases {
+            #expect(chrome.button(button).minY >= 8, "\(button)")
+        }
+    }
 }

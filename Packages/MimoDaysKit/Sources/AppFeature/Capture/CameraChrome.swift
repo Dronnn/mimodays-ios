@@ -53,6 +53,13 @@ struct CameraChrome {
 
     enum Button: CaseIterable { case close, flash, middle, more }
 
+    /// The top inset the controls are placed under when nothing is above the screen (iPhone Duo's outer display
+    /// keeps the status bar on the side): the buttons keep clear of the edge.
+    static let bareTopInset: CGFloat = 20
+
+    /// The screen's top inset, or `bareTopInset` where it has none.
+    static func topInset(_ safeArea: CGFloat) -> CGFloat { max(safeArea, bareTopInset) }
+
     private var size: CGSize { turn.size }
     private var sideways: Bool { turn.hold.isLandscape }
     /// The buttons' column is on the person's right (the top of the phone to the right).

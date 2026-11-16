@@ -86,7 +86,7 @@ struct MomentViewer: View {
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
         .background(SwipeBackEnabler())
-        .safeAreaInset(edge: .top, spacing: 0) { topBar }
+        .safeAreaInset(edge: .top, spacing: 0) { topBar.clearOfBareTopEdge() }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let moment = model.currentMoment {
                 VStack(spacing: 0) {

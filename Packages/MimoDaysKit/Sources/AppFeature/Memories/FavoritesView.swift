@@ -72,7 +72,7 @@ struct FavoritesView: View {
             }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
-            if selection != nil { SelectBar(selection: $selection, all: favorites.map(\.id)) }
+            if selection != nil { SelectBar(selection: $selection, all: favorites.map(\.id)).clearOfBareTopEdge() }
         }
         .memoriesSelectActions(model: model, selection: $selection)
     }

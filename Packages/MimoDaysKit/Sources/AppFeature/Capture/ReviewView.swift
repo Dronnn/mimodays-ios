@@ -43,7 +43,7 @@ struct ReviewView: View {
         }
         .ignoresSafeArea(.container, edges: .top)
         .background(ColorToken.canvas.color.ignoresSafeArea())
-        .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = $0 }
+        .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = CameraChrome.topInset($0) }
         .task {
             await model.load()
             await model.startPlayback()

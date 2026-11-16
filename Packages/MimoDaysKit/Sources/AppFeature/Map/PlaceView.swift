@@ -84,7 +84,7 @@ private struct PlaceContent: View {
             if selection == nil { movieButton }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
-            if selection != nil { SelectBar(selection: $selection, all: place.moments.map(\.id)) }
+            if selection != nil { SelectBar(selection: $selection, all: place.moments.map(\.id)).clearOfBareTopEdge() }
         }
         .memoriesSelectActions(model: tiles, selection: $selection)
         .navigationTitle(PlaceName.text(place))

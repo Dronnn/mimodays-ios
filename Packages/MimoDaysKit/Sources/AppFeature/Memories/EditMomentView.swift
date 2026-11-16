@@ -48,7 +48,7 @@ struct EditMomentView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollDismissesKeyboard(.interactively)
-        .safeAreaInset(edge: .top, spacing: 0) { bar }
+        .safeAreaInset(edge: .top, spacing: 0) { bar.clearOfBareTopEdge() }
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .interactiveDismissDisabled(model.hasChanges)
         .task { await model.loadThumbnail() }

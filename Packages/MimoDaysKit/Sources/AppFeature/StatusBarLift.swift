@@ -35,3 +35,19 @@ struct StatusBarLift: ViewModifier {
         return statusBarOnTop ? -amount : edgeMargin
     }
 }
+
+extension View {
+    /// A screen's own top bar, kept `StatusBarLift.edgeMargin` from the display's edge when no status bar is above it
+    /// (iPhone Duo's outer display); under a status bar it stays where it is.
+    func clearOfBareTopEdge() -> some View {
+        modifier(BareTopEdge())
+    }
+}
+
+private struct BareTopEdge: ViewModifier {
+    @Environment(\.statusBarOnTop) private var statusBarOnTop
+
+    func body(content: Content) -> some View {
+        content.padding(.top, statusBarOnTop ? 0 : StatusBarLift.edgeMargin)
+    }
+}

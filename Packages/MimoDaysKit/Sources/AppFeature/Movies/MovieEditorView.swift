@@ -56,6 +56,7 @@ struct MovieEditorView: View {
     var body: some View {
         VStack(spacing: 0) {
             topBar
+                .clearOfBareTopEdge()
             stage
                 .padding(.top, 8)
             transport
@@ -69,7 +70,10 @@ struct MovieEditorView: View {
                 panel.frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollBounceBehavior(.basedOnSize)
-            .frame(height: panelHeight)
+            // As tall as drawn where the screen has room (the stage gives way first); a short screen (iPhone Duo's
+            // outer display) shortens it, and it scrolls.
+            .frame(minHeight: 96, idealHeight: panelHeight, maxHeight: panelHeight)
+            .layoutPriority(1)
             .padding(.top, 8)
             toolBar
         }

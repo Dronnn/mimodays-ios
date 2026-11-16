@@ -60,7 +60,7 @@ struct CameraView: View {
                 .frame(width: followsWindow ? CameraChrome.Bar.height : nil, height: followsWindow ? nil : CameraChrome.Bar.height)
         }
         .background(CameraPalette.background.ignoresSafeArea())
-        .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = $0 }
+        .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = CameraChrome.topInset($0) }
         // The window's turn changes its size.
         .onGeometryChange(for: CGSize.self, of: { $0.size }) { _ in
             windowHold = fixedWindowHold ?? OrientationLock.windowHold

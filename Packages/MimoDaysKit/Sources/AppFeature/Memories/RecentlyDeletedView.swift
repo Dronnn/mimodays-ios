@@ -221,7 +221,7 @@ struct RecentlyDeletedView: View {
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .safeAreaInset(edge: .top, spacing: 0) {
-            if selection != nil { SelectBar(selection: $selection, all: model.items.map(\.id)) }
+            if selection != nil { SelectBar(selection: $selection, all: model.items.map(\.id)).clearOfBareTopEdge() }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if !model.items.isEmpty { actions }

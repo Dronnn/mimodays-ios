@@ -126,6 +126,7 @@ struct SearchResults: View {
                 .padding(.top, 56)
         } else if model.isSearching {
             results(model.hits, places: model.places)
+                .tileMotionScreen(.search)
         }
     }
 
@@ -149,7 +150,7 @@ struct SearchResults: View {
         sectionTitle(Text("Moments · \(hits.count)", bundle: .module))
             .padding(.top, places.isEmpty ? 14 : 24)
         ForEach(hits) { hit in
-            NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: ids, start: hit.id, origin: .search))) {
+            MomentTileLink(MemoriesRoute.moment(MomentPager(ids: ids, start: hit.id, origin: .search))) {
                 resultRow(hit)
             }
             .buttonStyle(.plain)
@@ -215,6 +216,7 @@ struct SearchResults: View {
                     if let image = model.images[hit.id] { Image(uiImage: image).filling() }
                 }
                 .frame(width: 76, height: 72)
+                .tileMotion(hit.id, isVideo: hit.entry.item.mediaType == .video, still: model.images[hit.id])
                 .clipShape(NoteThumbnailBlob())
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {

@@ -418,4 +418,48 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
         XCTAssertEqual(selfieWindow.value as? String, "Bottom left, Medium")
     }
+
+    /// H.8/H.9 (Andrew, 2026-11-16): Halves from the ••• sheet films both cameras in halves, kept on the card with
+    /// its switch; holding the video lifts it playing, with motion on (the default) as with it off, and Open opens it.
+    @MainActor
+    func testHalvesFilmAndATileHeldStillOpens() {
+        openCamera()
+        app.buttons["camera.more"].tap()
+        let halves = app.descendants(matching: .any)["cameraSettings.arrangement"].buttons["Halves"]
+        XCTAssertTrue(halves.waitForExistence(timeout: 5))
+        halves.tap()
+        XCTAssertFalse(app.descendants(matching: .any)["cameraSettings.corner"].exists, "halves have no window corner")
+        app.buttons["cameraSettings.done"].tap()
+        XCTAssertFalse(selfieWindow.waitForExistence(timeout: 2), "no window over the halves")
+        attachScreenshot("camera-halves")
+
+        app.buttons["camera.mode.video"].tap()
+        app.buttons["camera.shutter"].tap()
+        let stop = app.buttons["camera.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        sleep(2)
+        stop.tap()
+        let half = app.descendants(matching: .any)["review.selfieWindow"]
+        XCTAssertTrue(half.waitForExistence(timeout: 10))
+        XCTAssertEqual(half.label, "Selfie half")
+        attachScreenshot("review-halves")
+        app.buttons["review.save"].tap()
+
+        let hero = app.descendants(matching: .any)["today.hero"]
+        XCTAssertTrue(hero.waitForExistence(timeout: 10))
+        sleep(3)
+        attachScreenshot("hero-playing")
+        hero.press(forDuration: 1.5)
+        XCTAssertTrue(app.descendants(matching: .any)["tile.preview"].waitForExistence(timeout: 5), "held, it plays lifted")
+        sleep(1)
+        attachScreenshot("held")
+        XCTAssertFalse(app.buttons["viewer.favorite"].exists, "letting go after a hold doesn't open it")
+        XCTAssertTrue(app.buttons["Share"].exists && app.buttons["Favorite"].exists)
+        app.buttons["Open"].tap()
+        XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.descendants(matching: .any)["viewer.selfieWindow"].label, "Selfie half")
+        app.buttons["viewer.more"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["viewer.arrangement"].waitForExistence(timeout: 5))
+        attachScreenshot("viewer-menu")
+    }
 }

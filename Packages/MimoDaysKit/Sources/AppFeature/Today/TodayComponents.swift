@@ -102,8 +102,27 @@ struct StripTile: View {
         Style(shape: AnyShape(StripBlobD()), size: CGSize(width: 86, height: 84.5), lift: 2),
     ]
 
+    /// One of the four hand-cut shapes, picked from `seed` so a tile keeps its shape (Andrew, 2026-11-16: Memories and
+    /// the iPad's month grid are cut like the strip, never plain rounded squares).
+    static func shape(_ seed: Int) -> AnyShape {
+        styles[(seed & Int.max) % styles.count].shape
+    }
+
+    /// By the moment's capture time, mixed so neighbours differ: the same on every launch and in every test.
+    static func shape(_ captured: Date) -> AnyShape {
+        shape(Int(captured.timeIntervalSince1970) &* 2_654_435_761 >> 16)
+    }
+
+    /// The strip's soft shadow under a hand-cut tile.
+    static func shadow(_ shape: AnyShape) -> some View {
+        shape.fill(Color(hex: 0xC9B8AA)).shadow(color: Color(hex: 0x4B2938).opacity(0.1), radius: 3, y: 2)
+    }
+
     let image: UIImage?
     let style: Style
+    /// H.9: a video tile plays.
+    var id: UUID?
+    var isVideo = false
 
     var body: some View {
         Color(hex: 0xC9B8AA)
@@ -111,8 +130,9 @@ struct StripTile: View {
                 if let image { Image(uiImage: image).filling() }
             }
             .frame(width: style.size.width, height: style.size.height)
+            .tileMotion(id ?? UUID(), isVideo: isVideo && id != nil, still: image)
             .clipShape(style.shape)
-            .background(style.shape.fill(Color(hex: 0xC9B8AA)).shadow(color: Color(hex: 0x4B2938).opacity(0.1), radius: 3, y: 2))
+            .background(Self.shadow(style.shape))
             .offset(y: -style.lift)
             .accessibilityElement()
             .accessibilityAddTraits(.isImage)

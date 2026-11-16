@@ -97,11 +97,12 @@ struct MosaicLayoutTests {
     }
 }
 
-/// U16: at most four videos loop at once, the first on screen; a fifth takes over when one leaves.
+/// U16/H.9: at most four videos loop at once, the first on screen; a fifth takes over when one leaves.
 @MainActor
-struct MosaicLoopsTests {
+struct TileMotionTests {
     @Test func theFirstFourVideosOnScreenLoop() {
-        let loops = MosaicLoops()
+        let loops = TileMotion()
+        loops.isOn = true
         let ids = (0..<5).map { _ in UUID() }
         for id in ids { loops.setOnScreen(id, true) }
         #expect(ids.map(loops.plays) == [true, true, true, true, false])
@@ -109,5 +110,17 @@ struct MosaicLoopsTests {
         #expect(ids.map(loops.plays) == [true, false, true, true, true])
         loops.setOnScreen(ids[1], true)
         #expect(!loops.plays(ids[1]))
+        // The screen's Motion off (or Reduce Motion, Low Power): none plays on its own.
+        loops.isOn = false
+        #expect(!ids.contains(where: loops.plays))
+    }
+
+    @Test func motionSettingsStartOnAndReadOlderSettings() throws {
+        #expect(MotionScreen.allCases.allSatisfy { MotionSettings()[$0] })
+        let old = try JSONDecoder().decode(AppearanceSettings.self, from: Data(#"{"appearance":"dark","higherContrast":false}"#.utf8))
+        #expect(old.motion == MotionSettings())
+        var settings = MotionSettings()
+        settings[.map] = false
+        #expect(!settings.map && settings.search)
     }
 }

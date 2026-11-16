@@ -27,8 +27,6 @@ struct TileDetail: Equatable {
     /// Videos: the clip's length.
     var duration: Double?
     var hasVoiceNote: Bool
-    /// Videos: the streams and window a Mosaic piece loops (U16).
-    var video: ViewerMoment.VideoSource?
 }
 
 /// The timeline as rows: a month's title, then its days, newest first. Flat, so the list stays lazy
@@ -306,26 +304,7 @@ final class MemoriesModel {
         return TileDetail(
             thumbnailPath: moment.media.first { $0.role == .thumbnail }?.relativePath,
             duration: moment.mediaType == .video ? moment.media.compactMap(\.duration).max() : nil,
-            hasVoiceNote: !moment.voiceNotes.isEmpty,
-            video: moment.mediaType == .video ? ViewerMoment(moment).video : nil
+            hasVoiceNote: !moment.voiceNotes.isEmpty
         )
-    }
-
-    /// U16: a video's two streams for a Mosaic piece's loop, pictures only, so it leaves other apps' sound alone.
-    func loopItems(_ video: ViewerMoment.VideoSource, withSelfie: Bool = true) async -> (main: AVPlayerItem, selfie: AVPlayerItem?)? {
-        guard let mainURL = try? store.url(for: video.mainPath) else { return nil }
-        do {
-            let duration = try await AVURLAsset(url: mainURL).load(.duration)
-            // The main stream's picture alone is the same as a selfie stream with no offset.
-            let main = try await VideoComposer.selfieStream(mainURL, offset: 0, mainDuration: duration)
-            var selfie: AVPlayerItem?
-            if withSelfie, video.layout != nil, let path = video.selfiePath, let selfieURL = try? store.url(for: path) {
-                selfie = AVPlayerItem(asset: try await VideoComposer.selfieStream(selfieURL, offset: video.timing.selfieOffset, mainDuration: duration))
-            }
-            return (AVPlayerItem(asset: main), selfie)
-        } catch {
-            logger.error("Reading a Mosaic loop failed: \(error.localizedDescription, privacy: .public)")
-            return nil
-        }
     }
 }

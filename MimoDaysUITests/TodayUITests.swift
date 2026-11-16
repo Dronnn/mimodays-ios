@@ -46,6 +46,18 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(app.buttons["today.onThisDay"].exists)
     }
 
+    /// A tile of this month opens its card: the strip on iPhone, the grid on iPad (Andrew, 2026-11-16: the iPad's
+    /// tiles opened nothing).
+    @MainActor
+    func testAMonthTileOpensItsCard() {
+        launch(.populated)
+        let grid = app.buttons["today.monthTile"].firstMatch
+        let strip = app.descendants(matching: .any)["today.strip"].buttons.firstMatch
+        XCTAssertTrue(grid.waitForExistence(timeout: 10) || strip.waitForExistence(timeout: 5))
+        (grid.exists ? grid : strip).tap()
+        XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
+    }
+
     @MainActor
     func testThisMonthOpensMemories() {
         launch(.populated)

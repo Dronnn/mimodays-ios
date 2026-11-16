@@ -8,6 +8,8 @@ struct AppearanceSettings: Codable, Equatable, Sendable {
     var appearance = AppearancePreference.system
     /// The colours' high-contrast variants even when iOS's Increase Contrast is off.
     var higherContrast = false
+    /// H.9: which screens' video tiles play on their own.
+    var motion = MotionSettings()
 
     init() {}
 
@@ -16,6 +18,7 @@ struct AppearanceSettings: Codable, Equatable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         appearance = try container.decodeIfPresent(AppearancePreference.self, forKey: .appearance) ?? appearance
         higherContrast = try container.decodeIfPresent(Bool.self, forKey: .higherContrast) ?? higherContrast
+        motion = try container.decodeIfPresent(MotionSettings.self, forKey: .motion) ?? motion
     }
 
     var interfaceStyle: UIUserInterfaceStyle {

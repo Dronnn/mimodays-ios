@@ -218,6 +218,8 @@ public struct RootView: View {
                             }
                         }
                         .environment(\.mosaicZoom, nil)
+                        // H.9: the pages pushed on the tab move as it does.
+                        .tileMotionScreen(tab == .map ? .map : .memories)
                     }
                 } label: {
                     Label { Text(tab.title) } icon: { tab.icon.image }

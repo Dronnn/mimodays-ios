@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Persistence
 import SwiftData
 import SwiftUI
 import UIKit
@@ -17,6 +18,11 @@ struct TodayView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @Environment(MemoriesPreferences.self) private var memoriesPreferences: MemoriesPreferences?
+    @Environment(\.tileMotion) private var motion
+    @Environment(\.mediaLibrary) private var library
+    /// The hero's latest video, both streams, while Today's motion plays it.
+    @State private var heroPlayer: ViewerVideoPlayer?
+    @State private var heroHalves: CaptureFormat?
 
     var body: some View {
         ScrollView {
@@ -214,15 +220,22 @@ struct TodayView: View {
     @ViewBuilder
     private var hero: some View {
         if let latest = model.latest {
-            NavigationLink(value: MemoriesRoute.moment(pager(from: latest.id))) {
+            MomentTileLink(MemoriesRoute.moment(pager(from: latest.id))) {
                 MomentHero(
-                    photo: media(latest.picturePath, TodayModel.heroPixels),
-                    selfie: latest.windowPath.map { media($0, TodayModel.selfiePixels) },
+                    photo: heroPicture(latest),
+                    selfie: latest.windowPath.map { heroSelfie($0) },
                     caption: model.timeText(latest.captured),
                     place: latest.place.map { Text($0) },
                     tag: latest.origin == .randomPrompt ? Text("surprise", bundle: .module) : nil
                 )
+                // H.9: held, the whole hero lifts; its video plays inside it, under the frame and caption.
+                .tileMotion(
+                    latest.id, isVideo: latest.mediaType == .video,
+                    still: model.image(latest.thumbnailPath, TodayModel.tilePixels), plays: false
+                )
             }
+            .task(id: heroPlaying) { await playHero() }
+            .onDisappear { stopHero() }
             .buttonStyle(.plain)
             .accessibilityLabel(describe(latest, withSelfie: latest.selfiePath != nil))
             .accessibilityIdentifier("today.hero")
@@ -320,8 +333,11 @@ struct TodayView: View {
             HStack(spacing: 2) {
                 ForEach(Array(model.month.enumerated()), id: \.element.id) { index, moment in
                     let style = StripTile.styles[index % StripTile.styles.count]
-                    NavigationLink(value: MemoriesRoute.moment(pager(from: moment.id))) {
-                        StripTile(image: model.image(moment.thumbnailPath, TodayModel.tilePixels), style: style)
+                    MomentTileLink(MemoriesRoute.moment(pager(from: moment.id))) {
+                        StripTile(
+                            image: model.image(moment.thumbnailPath, TodayModel.tilePixels), style: style,
+                            id: moment.id, isVideo: moment.mediaType == .video
+                        )
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(describe(moment, withSelfie: false))
@@ -335,20 +351,23 @@ struct TodayView: View {
         .accessibilityIdentifier("today.strip")
     }
 
-    /// X01: up to eight rounded tiles, four across.
+    /// X01: up to eight hand-cut tiles, four across.
     private var monthGrid: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 4), spacing: 4) {
             ForEach(model.month.prefix(8)) { moment in
-                Color(hex: 0xC9B8AA)
-                    .aspectRatio(1, contentMode: .fit)
-                    .overlay {
-                        if let image = model.image(moment.thumbnailPath, TodayModel.tilePixels) {
-                            Image(uiImage: image).filling()
-                        }
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .accessibilityElement()
-                    .accessibilityLabel(describe(moment, withSelfie: false))
+                // Each opens its card, as the iPhone's strip does (Andrew, 2026-11-16).
+                MomentTileLink(MemoriesRoute.moment(pager(from: moment.id))) {
+                    let image = model.image(moment.thumbnailPath, TodayModel.tilePixels)
+                    Color(hex: 0xC9B8AA)
+                        .aspectRatio(1, contentMode: .fit)
+                        .overlay { if let image { Image(uiImage: image).filling() } }
+                        .tileMotion(moment.id, isVideo: moment.mediaType == .video, still: image)
+                        .clipShape(StripTile.shape(moment.captured.instant))
+                        .background(StripTile.shadow(StripTile.shape(moment.captured.instant)))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(describe(moment, withSelfie: false))
+                .accessibilityIdentifier("today.monthTile")
             }
         }
     }
@@ -431,6 +450,48 @@ struct TodayView: View {
     // MARK: Helpers
 
     private func pager(from id: UUID) -> MomentPager { model.pager(from: id) }
+
+    /// H.9: a video's main stream plays in the hero; its selfie window stays a still.
+    private func heroPicture(_ latest: MomentSummary) -> HeroMedia {
+        guard latest.mediaType == .video, let image = model.image(latest.picturePath, TodayModel.heroPixels) else {
+            return media(latest.picturePath, TodayModel.heroPixels)
+        }
+        return .view(AnyView(
+            Image(uiImage: image).filling()
+                .overlay { if let heroPlayer, heroPlayer.isReady { HeroVideo(player: heroPlayer, halves: heroHalves) } }
+        ))
+    }
+
+    /// The hero's selfie window: its still, with the selfie stream playing over it while the hero plays.
+    private func heroSelfie(_ path: String) -> HeroMedia {
+        guard let heroPlayer, heroPlayer.isReady, heroPlayer.hasSelfie, let image = model.image(path, TodayModel.selfiePixels) else {
+            return media(path, TodayModel.selfiePixels)
+        }
+        return .view(AnyView(Image(uiImage: image).filling().overlay { PlayerLayerView(player: heroPlayer.selfie).allowsHitTesting(false) }))
+    }
+
+    /// H.9: the latest moment's video while Today's motion plays it (on screen, among the four, motion on).
+    private var heroPlaying: UUID? {
+        guard let latest = model.latest, latest.mediaType == .video, motion?.plays(latest.id) == true else { return nil }
+        return latest.id
+    }
+
+    /// Both streams, silent, round and round (Andrew, 2026-11-16: the hero is the one tile whose selfie plays).
+    private func playHero() async {
+        stopHero()
+        guard let id = heroPlaying, let library, let loaded = await library.loop(id, withSelfie: true), !Task.isCancelled else { return }
+        let player = ViewerVideoPlayer(duration: loaded.video.timing.duration, silent: true)
+        await player.load(main: loaded.main, selfie: loaded.selfie)
+        guard !Task.isCancelled else { return player.stop() }
+        heroHalves = loaded.video.timing.halves
+        heroPlayer = player
+        player.play()
+    }
+
+    private func stopHero() {
+        heroPlayer?.stop()
+        heroPlayer = nil
+    }
 
     private func media(_ path: String?, _ size: Int) -> HeroMedia {
         model.image(path, size).map { .image(Image(uiImage: $0)) } ?? .placeholder

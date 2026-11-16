@@ -101,7 +101,8 @@ struct MemoriesCalendarView: View {
                             LinearGradient(colors: [.clear, ColorToken.mediaScrim.color], startPoint: .top, endPoint: .bottom)
                                 .frame(height: 26)
                         }
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .clipShape(StripTile.shape(key))
+                        .background(StripTile.shadow(StripTile.shape(key)))
                         .task { await model.load(cover.id) }
                     Text(key % 100, format: .number)
                         .textStyle(.calendarDayOnPhoto)
@@ -120,7 +121,8 @@ struct MemoriesCalendarView: View {
             .padding(4)
             .overlay {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: 15, style: .continuous).strokeBorder(ColorToken.actionCoral.color, lineWidth: 2.5)
+                    // The day's own hand-cut shape, around it.
+                    StripTile.shape(key).stroke(ColorToken.actionCoral.color, lineWidth: 2.5).padding(1.25)
                 }
             }
             .padding(-4)

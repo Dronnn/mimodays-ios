@@ -103,7 +103,7 @@ struct DayView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 10)
                 ForEach(model.moments) { moment in
-                    NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.moments.map(\.id), start: moment.id))) {
+                    MomentTileLink(MemoriesRoute.moment(MomentPager(ids: model.moments.map(\.id), start: moment.id))) {
                         card(moment)
                     }
                     .buttonStyle(.plain)

@@ -2467,6 +2467,18 @@
         }
       }
     },
+    "Motion" : {
+      "comment" : "Settings › Appearance (H.9): section title over the switches for videos playing in tiles",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motion"
+          }
+        }
+      }
+    },
     "Recent places panel" : {
       "comment" : "Map (P01): VoiceOver label of the panel's grabber",
       "extractionState" : "manual",
@@ -5127,6 +5139,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ultra wide"
+          }
+        }
+      }
+    },
+    "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger." : {
+      "comment" : "Settings › Appearance (H.9): the note under the Motion switches",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger."
           }
         }
       }

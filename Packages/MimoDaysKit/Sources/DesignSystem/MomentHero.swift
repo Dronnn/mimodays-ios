@@ -4,6 +4,8 @@ import SwiftUI
 public enum HeroMedia {
     case placeholder
     case image(Image)
+    /// The picture with something over it, e.g. a video playing (H.9).
+    case view(AnyView)
 }
 
 /// `Hero / Latest moment`: the photo in a hand-cut cream frame, a soft scrim and a handwritten caption,
@@ -114,6 +116,7 @@ public struct MomentHero: View {
         switch media {
         case .placeholder: Color(hex: placeholder)
         case let .image(image): image.filling()
+        case let .view(view): view
         }
     }
 }
@@ -279,8 +282,10 @@ public struct SelfieWindow: View {
 
     public var body: some View {
         SelfieFrame {
-            if case let .image(image) = media {
-                image.filling()
+            switch media {
+            case let .image(image): image.filling()
+            case let .view(view): view
+            case .placeholder: EmptyView()
             }
         }
     }

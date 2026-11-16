@@ -12,10 +12,12 @@ struct HomeView: View {
         let side = home.side
         ZStack {
             TodayView(model: today)
+                .tileMotionScreen(.today, isActive: side == .today)
                 .opacity(side == .today ? 1 : 0)
                 .allowsHitTesting(side == .today)
                 .accessibilityHidden(side != .today)
             MosaicView(model: mosaic, isFacing: side == .mosaic)
+                .tileMotionScreen(.mosaic, isActive: side == .mosaic)
                 .opacity(side == .mosaic ? 1 : 0)
                 .allowsHitTesting(side == .mosaic)
                 .accessibilityHidden(side != .mosaic)

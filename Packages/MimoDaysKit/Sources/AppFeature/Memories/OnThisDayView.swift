@@ -122,7 +122,7 @@ struct OnThisDayView: View {
                         .padding(.horizontal, 20)
                         .padding(.top, year == model.years.first ? 18 : 30)
                     ForEach(year.moments) { moment in
-                        NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.ids, start: moment.id, origin: .onThisDay))) {
+                        MomentTileLink(MemoriesRoute.moment(MomentPager(ids: model.ids, start: moment.id, origin: .onThisDay))) {
                             card(moment)
                         }
                         .buttonStyle(.plain)

@@ -51,6 +51,8 @@ struct AppearanceSettingsView: View {
                     DataNote(text: Text("Text size follows iOS Settings › Display & Brightness.", bundle: .module))
                         .padding(.horizontal, 22)
                         .padding(.top, 12)
+                    motion
+                        .padding(.top, 26)
                     DataCard {
                         Button {
                             if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
@@ -71,6 +73,34 @@ struct AppearanceSettingsView: View {
             }
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+    }
+}
+
+extension AppearanceSettingsView {
+    /// H.9: a switch per screen for the videos that play in its tiles.
+    var motion: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Motion", bundle: .module, comment: "Settings › Appearance (H.9): section title over the switches for videos playing in tiles")
+                .textStyle(.labelCaps)
+                .foregroundStyle(ColorToken.textSecondary.color)
+                .accessibilityAddTraits(.isHeader)
+                .padding(.horizontal, 22)
+                .padding(.bottom, 8)
+            DataCard {
+                ForEach(Array(MotionScreen.allCases.enumerated()), id: \.offset) { index, screen in
+                    if index > 0 { DataSeparator() }
+                    DataToggleRow(title: screen.title, isOn: $settings.motion[screen])
+                        .accessibilityIdentifier("appearanceSettings.motion.\(index)")
+                }
+            }
+            .padding(.horizontal, 16)
+            DataNote(text: Text(
+                "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger.",
+                bundle: .module, comment: "Settings › Appearance (H.9): the note under the Motion switches"
+            ))
+            .padding(.horizontal, 22)
+            .padding(.top, 12)
+        }
     }
 }
 

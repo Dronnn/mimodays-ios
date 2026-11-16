@@ -322,7 +322,7 @@ struct MemoriesView: View {
                                 MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id], leavesRoomForMark: true)
                             }
                         } else {
-                            NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id))) {
+                            MomentTileLink(MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id))) {
                                 MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
                             }
                         }
@@ -459,7 +459,7 @@ struct VideoBadge: View {
     }
 }
 
-/// `Moment / Tile`: the composed thumbnail, its selfie window included, with a heart for a favourite,
+/// `Moment / Tile`: the composed thumbnail in one of the strip's hand-cut shapes, its selfie window included, with a heart for a favourite,
 /// a mic for a voice note and the length of a video.
 struct MemoryTile: View {
     let item: MemoryItem
@@ -479,7 +479,9 @@ struct MemoryTile: View {
             .overlay {
                 if let image { Image(uiImage: image).filling() }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .tileMotion(item.id, isVideo: item.mediaType == .video, still: image)
+            .clipShape(StripTile.shape(item.capturedAt))
+            .background(StripTile.shadow(StripTile.shape(item.capturedAt)))
             .overlay(alignment: .topLeading) {
                 if item.isFavorite, !videoBadgeAtTop {
                     // `Badge / Favorite`: the heart sits 5 pt right of and below the disc's centre, past its

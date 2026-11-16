@@ -121,8 +121,10 @@ private struct PlaceContent: View {
                     MemoryTile(item: moment.item, detail: tiles.details[moment.id], image: tiles.images[moment.id], leavesRoomForMark: true)
                 }
             } else {
-                Button { openMoment = MomentPager(ids: ids, start: moment.id, origin: .place(place.label)) } label: {
+                let open: @MainActor () -> Void = { openMoment = MomentPager(ids: ids, start: moment.id, origin: .place(place.label)) }
+                Button(action: open) {
                     MemoryTile(item: moment.item, detail: tiles.details[moment.id], image: tiles.images[moment.id])
+                        .environment(\.tileOpen, .action(open))
                 }
                 .buttonStyle(.plain)
             }

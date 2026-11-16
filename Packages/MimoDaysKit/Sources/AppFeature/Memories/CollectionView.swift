@@ -58,7 +58,7 @@ struct CollectionView: View {
                 .padding(.top, 16)
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                     ForEach(model.items) { item in
-                        NavigationLink(value: MemoriesRoute.moment(MomentPager(ids: model.items.map(\.id), start: item.id, origin: .collection(model.title)))) {
+                        MomentTileLink(MemoriesRoute.moment(MomentPager(ids: model.items.map(\.id), start: item.id, origin: .collection(model.title)))) {
                             MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
                         }
                         .buttonStyle(.plain)

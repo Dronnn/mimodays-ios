@@ -53,11 +53,18 @@ struct OnboardingIntroView: View {
 struct OnboardingPageView: View {
     let page: OnboardingPage
     let action: () -> Void
+    /// What the page shows above the button.
+    @State private var visibleHeight: CGFloat = 0
+
+    /// Room the headline and body take under the art at the default text size.
+    private static let textRoom: CGFloat = 216
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 ArtCanvas(layers: page.artLayers)
+                    // A short screen (iPhone Duo's outer display) draws the art smaller, so the words fit under it.
+                    .frame(maxHeight: visibleHeight > 0 ? max(200, visibleHeight - Self.textRoom) : nil)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, Spacing.screenMargin)
                     .padding(.top, 16)
@@ -77,6 +84,7 @@ struct OnboardingPageView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollBounceBehavior(.basedOnSize)
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.height - $0.safeAreaInsets.bottom }) { visibleHeight = $0 }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Button(action: action) { Text(page.primaryAction) }
                 .buttonStyle(.primary)

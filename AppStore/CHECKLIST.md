@@ -21,3 +21,8 @@ App: MimoDays (`com.mrmaier.MimoDays`, App Store Connect app ID 6835025354).
 - [x] State: READY_TO_SUBMIT (re-read after every write)
 - [ ] Submitted with the first app version (16.5) - only with Andrew's go-ahead
 - Promotional images (`IAP/Tip-*.png`, 1024 px) not uploaded: only needed to promote the tips on the App Store
+
+## App Privacy (questionnaire is manual in App Store Connect)
+
+- Answer: **Data Not Collected**. Moments, places, voice notes and settings stay on the device; backups are files the person exports; tips go through Apple; no analytics, no tracking, no third-party SDKs.
+- Matches `MimoDays/PrivacyInfo.xcprivacy` (no tracking, no collected data; required-reason APIs: UserDefaults CA92.1, disk space E174.1, file timestamp C617.1).

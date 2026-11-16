@@ -63,7 +63,8 @@ struct SimulatedCaptureEngineTests {
         while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
         await engine.stopRecording()
         let clip = try await video
-        #expect(clip.duration < 10)
+        // Before its limit, however slow the runner (one stalled 22 s between start and stop).
+        #expect(clip.duration < 60)
         #expect(clip.selfieURL == nil)
     }
 
@@ -158,7 +159,7 @@ struct CaptureInterruptionTests {
         let clip = try await video
         defer { [clip.mainURL, clip.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) } }
         #expect(clip.interruption == .anotherApp)
-        #expect(clip.duration < 10)
+        #expect(clip.duration < 30, "ended by the interruption, not its limit")
         #expect(clip.selfieURL != nil)
         // Nothing is captured until the camera is back.
         await #expect(throws: CaptureError.notRunning) { try await engine.capturePhoto(flash: .off, silent: false) }

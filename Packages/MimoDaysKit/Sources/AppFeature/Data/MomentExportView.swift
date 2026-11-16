@@ -234,24 +234,19 @@ struct MomentsExportView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
+            TitleBar {
+                Button(action: close) {
+                    Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("export.cancel")
+            } title: {
                 Text("Export \(model.ids.count) moments", bundle: .module)
                     .textStyle(.editorTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
-                    .multilineTextAlignment(.center)
                     .accessibilityAddTraits(.isHeader)
-                    // Clear of Cancel at large sizes.
-                    .padding(.horizontal, 84)
-                HStack {
-                    Button(action: close) {
-                        Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("export.cancel")
-                    Spacer()
-                }
-                .frame(minHeight: Size.minimumTapTarget)
             }
+            .frame(minHeight: Size.minimumTapTarget)
             .padding(.horizontal, 16)
             .padding(.vertical, 4)
             ScrollView {

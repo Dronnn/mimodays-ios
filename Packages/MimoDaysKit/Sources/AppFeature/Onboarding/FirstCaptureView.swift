@@ -59,7 +59,7 @@ struct FirstCaptureView: View {
     /// The OB-03 dual-camera art with its own caption (`Onboarding / Art / Dual camera` in O09).
     nonisolated static var artLayers: [ArtLayer] {
         OnboardingPage.dualCamera.artLayers.map { layer in
-            guard case let .text(.localized(resource), style, color, _, rotation) = layer, resource.key == "the world around you" else {
+            guard case let .text(.localized(resource), style, color, _, rotation, _) = layer, resource.key == "the world around you" else {
                 return layer
             }
             return .text(

@@ -31,8 +31,8 @@ extension OnboardingPage {
                 .shape("onboardingSurprise06", .token(.textOnCoral), shadow: nil),
                 .text(.verbatim("MIMODAYS"), TextStyle(.inter, size: 12, weight: 600, tracking: 0.4, isUppercase: false, relativeTo: .body), .textSecondary, center: CGPoint(x: 97.5, y: 107.5), rotation: 0),
                 .text(.localized(LocalizedStringResource("now", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.inter, size: 13, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textSecondary, center: CGPoint(x: 325, y: 107), rotation: 0),
-                .text(.localized(LocalizedStringResource("A little moment is happening.", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.inter, size: 15, weight: 700, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 169, y: 129), rotation: 0),
-                .text(.localized(LocalizedStringResource("Look around. This could be a memory.", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.inter, size: 15, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 198, y: 149), rotation: 0),
+                .text(.localized(LocalizedStringResource("A little moment is happening.", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.inter, size: 15, weight: 700, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 169, y: 129), rotation: 0, width: 220),
+                .text(.localized(LocalizedStringResource("Look around. This could be a memory.", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.inter, size: 15, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 198, y: 149), rotation: 0, width: 276),
                 .shape("onboardingSurprise07", .token(.accentApricot), shadow: nil),
                 .shape("onboardingSurprise08", .token(.actionCoral), shadow: nil),
             ]
@@ -44,7 +44,7 @@ extension OnboardingPage {
                 .text(.localized(LocalizedStringResource("the world around you", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 91, y: 300.5), rotation: 0),
                 .shape("onboardingDualCamera04", .token(.mediaFrame), shadow: ArtShadow(color: 0x4B2938, opacity: 0.2, radius: 6, y: 4)),
                 .shape("onboardingDualCamera05", .placeholder(0xB9A89A), shadow: nil),
-                .text(.localized(LocalizedStringResource("you", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 269.2, y: 122.2), rotation: -5.4),
+                .text(.localized(LocalizedStringResource("you", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 269.2, y: 122.2), rotation: -5.4, width: 60),
                 .shape("onboardingDualCamera06", .token(.accentApricot), shadow: nil),
             ]
         case .voice:
@@ -59,7 +59,7 @@ extension OnboardingPage {
                 .text(.localized(LocalizedStringResource("Coffee, rain, and one stubborn bug.", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 19, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 156.5, y: 295.8), rotation: -2),
                 .shape("onboardingVoice08", .token(.surfaceChip), shadow: nil),
                 .shape("onboardingVoice09", .token(.textPrimary), shadow: nil),
-                .text(.localized(LocalizedStringResource("Tbilisi · optional", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 14, weight: 600, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 121, y: 343), rotation: 0),
+                .text(.localized(LocalizedStringResource("Tbilisi · optional", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 14, weight: 600, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 121, y: 343), rotation: 0, width: 106),
                 .shape("onboardingVoice10", .token(.actionCoral), shadow: nil),
             ]
         case .movie:
@@ -71,16 +71,16 @@ extension OnboardingPage {
                 .shape("onboardingMovie05", .token(.textPrimary), shadow: nil),
                 .shape("onboardingMovie06", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
                 .shape("onboardingMovie07", .placeholder(0xDCDDD3), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
-                .text(.localized(LocalizedStringResource("Winter", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 42, y: 321.5), rotation: 0),
+                .text(.localized(LocalizedStringResource("Winter", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 42, y: 321.5), rotation: 0, width: 88),
                 .shape("onboardingMovie08", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
                 .shape("onboardingMovie09", .placeholder(0xD8DBC1), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
-                .text(.localized(LocalizedStringResource("Spring", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 135, y: 321.5), rotation: 0),
+                .text(.localized(LocalizedStringResource("Spring", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 135, y: 321.5), rotation: 0, width: 88),
                 .shape("onboardingMovie10", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
                 .shape("onboardingMovie11", .placeholder(0xF6D7A6), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
-                .text(.localized(LocalizedStringResource("Summer", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 227, y: 321.5), rotation: 0),
+                .text(.localized(LocalizedStringResource("Summer", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 227, y: 321.5), rotation: 0, width: 88),
                 .shape("onboardingMovie12", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
                 .shape("onboardingMovie13", .placeholder(0xEFC2A8), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
-                .text(.localized(LocalizedStringResource("Autumn", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 320, y: 321.5), rotation: 0),
+                .text(.localized(LocalizedStringResource("Autumn", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 320, y: 321.5), rotation: 0, width: 88),
                 .shape("onboardingMovie14", .token(.actionCoral), shadow: nil),
             ]
         case .privacy:

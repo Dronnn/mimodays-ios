@@ -165,67 +165,66 @@ struct MomentViewer: View {
     /// `Navigation / Back bar`: ‹ and where it was opened from ("Nov 11", "Map"), its time, the ••• menu.
     private var topBar: some View {
         let ink = ColorToken.textPrimary.color
-        return ZStack {
+        return TitleBar {
+            Button { dismiss() } label: {
+                HStack(spacing: 0) {
+                    Icon.glyphBack.image
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundStyle(ink)
+                        .flipsForRightToLeftLayoutDirection(true)
+                    if let moment = model.currentMoment {
+                        backLabel(moment)
+                            .textStyle(.editorCancel)
+                            .foregroundStyle(ColorToken.textLink.color)
+                            .lineLimit(1)
+                    }
+                }
+                .frame(minHeight: Size.minimumTapTarget)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Back", bundle: .module))
+            .accessibilityIdentifier("viewer.back")
+        } title: {
             if let moment = model.currentMoment {
                 Self.time(moment.captured, date: false)
                     .textStyle(.editorTitle)
                     .foregroundStyle(ink)
                     .accessibilityAddTraits(.isHeader)
             }
-            HStack(spacing: 0) {
-                Button { dismiss() } label: {
-                    HStack(spacing: 0) {
-                        Icon.glyphBack.image
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundStyle(ink)
-                            .flipsForRightToLeftLayoutDirection(true)
-                        if let moment = model.currentMoment {
-                            backLabel(moment)
-                                .textStyle(.editorCancel)
-                                .foregroundStyle(ColorToken.textLink.color)
-                                .lineLimit(1)
-                        }
+        } trailing: {
+            if let moment = model.currentMoment {
+                Menu {
+                    Button { collecting = CollectingMoment(id: moment.id, selection: Set(moment.collections.map(\.id))) } label: {
+                        Label { Text("Add to collection", bundle: .module) } icon: { Icon.glyphCollection.image }
                     }
-                    .frame(minHeight: Size.minimumTapTarget)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Back", bundle: .module))
-                .accessibilityIdentifier("viewer.back")
-                Spacer(minLength: 8)
-                if let moment = model.currentMoment {
-                    Menu {
-                        Button { collecting = CollectingMoment(id: moment.id, selection: Set(moment.collections.map(\.id))) } label: {
-                            Label { Text("Add to collection", bundle: .module) } icon: { Icon.glyphCollection.image }
-                        }
-                        NavigationLink(value: MemoriesRoute.day(LocalDay(moment.captured.instant, in: moment.captured.timeZone).key)) {
-                            Label { Text("Show the whole day", bundle: .module) } icon: { Icon.glyphClock.image }
-                        }
-                        if moment.selfiePath != nil, moment.format != .square,
-                           let layout = moment.video?.layout ?? moment.photo?.layout {
-                            Picker(selection: Binding(
-                                get: { layout.isHalves ? PiPLayout.Arrangement.halves : .window },
-                                set: { model.setArrangement($0, for: moment.id) }
-                            )) {
-                                ForEach(PiPLayout.Arrangement.allCases, id: \.self) { $0.label }
-                            } label: {
-                                Text("Layout", bundle: .module, comment: "Camera and viewer ••• menus (H.8): the selfie in its window, or both cameras in halves")
-                            }
-                            .pickerStyle(.menu)
-                            .accessibilityIdentifier("viewer.arrangement")
-                        }
-                    } label: {
-                        Icon.glyphMore.image
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundStyle(ink)
-                            .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
-                            .contentShape(Rectangle())
+                    NavigationLink(value: MemoriesRoute.day(LocalDay(moment.captured.instant, in: moment.captured.timeZone).key)) {
+                        Label { Text("Show the whole day", bundle: .module) } icon: { Icon.glyphClock.image }
                     }
-                    .accessibilityLabel(Text("More", bundle: .module))
-                    .accessibilityIdentifier("viewer.more")
+                    if moment.selfiePath != nil, moment.format != .square,
+                       let layout = moment.video?.layout ?? moment.photo?.layout {
+                        Picker(selection: Binding(
+                            get: { layout.isHalves ? PiPLayout.Arrangement.halves : .window },
+                            set: { model.setArrangement($0, for: moment.id) }
+                        )) {
+                            ForEach(PiPLayout.Arrangement.allCases, id: \.self) { $0.label }
+                        } label: {
+                            Text("Layout", bundle: .module, comment: "Camera and viewer ••• menus (H.8): the selfie in its window, or both cameras in halves")
+                        }
+                        .pickerStyle(.menu)
+                        .accessibilityIdentifier("viewer.arrangement")
+                    }
+                } label: {
+                    Icon.glyphMore.image
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundStyle(ink)
+                        .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
+                        .contentShape(Rectangle())
                 }
+                .accessibilityLabel(Text("More", bundle: .module))
+                .accessibilityIdentifier("viewer.more")
             }
         }
         .padding(.leading, 8)

@@ -56,31 +56,30 @@ struct NoteEditorView: View {
 
     /// `Navigation / Editor bar`: Cancel, Note, Done.
     private var bar: some View {
-        ZStack {
+        TitleBar {
+            Button { dismiss() } label: {
+                Text("Cancel", bundle: .module)
+                    .textStyle(.editorCancel)
+                    .foregroundStyle(ColorToken.textBody.color)
+                    .frame(minHeight: Size.minimumTapTarget)
+            }
+            .accessibilityIdentifier("note.cancel")
+        } title: {
             Text("Note", bundle: .module)
                 .textStyle(.editorTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)
-            HStack {
-                Button { dismiss() } label: {
-                    Text("Cancel", bundle: .module)
-                        .textStyle(.editorCancel)
-                        .foregroundStyle(ColorToken.textBody.color)
-                        .frame(minHeight: Size.minimumTapTarget)
-                }
-                .accessibilityIdentifier("note.cancel")
-                Spacer()
-                Button {
-                    model.note = text
-                    dismiss()
-                } label: {
-                    Text("Done", bundle: .module)
-                        .textStyle(.editorDone)
-                        .foregroundStyle(ColorToken.textLink.color)
-                        .frame(minHeight: Size.minimumTapTarget)
-                }
-                .accessibilityIdentifier("note.done")
+        } trailing: {
+            Button {
+                model.note = text
+                dismiss()
+            } label: {
+                Text("Done", bundle: .module)
+                    .textStyle(.editorDone)
+                    .foregroundStyle(ColorToken.textLink.color)
+                    .frame(minHeight: Size.minimumTapTarget)
             }
+            .accessibilityIdentifier("note.done")
         }
         .buttonStyle(.plain)
         .padding(.horizontal, 16)

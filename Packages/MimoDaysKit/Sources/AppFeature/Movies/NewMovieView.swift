@@ -61,40 +61,38 @@ struct WizardBar: View {
     let action: () -> Void
 
     var body: some View {
-        ZStack {
+        TitleBar {
+            Button(action: action) {
+                HStack(spacing: 0) {
+                    if let back {
+                        Icon.glyphBack.image
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(ColorToken.textPrimary.color)
+                            .flipsForRightToLeftLayoutDirection(true)
+                        back
+                            .textStyle(.editorCancel)
+                            .foregroundStyle(ColorToken.textLink.color)
+                    } else {
+                        Icon.glyphClose.image
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(ColorToken.textPrimary.color)
+                            .padding(.leading, 6)
+                    }
+                }
+                .frame(minWidth: Size.minimumTapTarget, minHeight: Size.minimumTapTarget, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(back == nil ? Text("Close", bundle: .module) : Text("Back", bundle: .module))
+            .accessibilityIdentifier(back == nil ? "newMovie.close" : "newMovie.back")
+            .padding(.leading, 10)
+        } title: {
             Text("New movie", bundle: .module)
                 .textStyle(.editorTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)
-            HStack(spacing: 0) {
-                Button(action: action) {
-                    HStack(spacing: 0) {
-                        if let back {
-                            Icon.glyphBack.image
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                                .foregroundStyle(ColorToken.textPrimary.color)
-                                .flipsForRightToLeftLayoutDirection(true)
-                            back
-                                .textStyle(.editorCancel)
-                                .foregroundStyle(ColorToken.textLink.color)
-                        } else {
-                            Icon.glyphClose.image
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                                .foregroundStyle(ColorToken.textPrimary.color)
-                                .padding(.leading, 6)
-                        }
-                    }
-                    .frame(minWidth: Size.minimumTapTarget, minHeight: Size.minimumTapTarget, alignment: .leading)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(back == nil ? Text("Close", bundle: .module) : Text("Back", bundle: .module))
-                .accessibilityIdentifier(back == nil ? "newMovie.close" : "newMovie.back")
-                Spacer()
-            }
-            .padding(.leading, 10)
         }
         .frame(height: 44)
     }

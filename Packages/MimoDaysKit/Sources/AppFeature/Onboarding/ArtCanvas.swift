@@ -5,8 +5,9 @@ import SwiftUI
 enum ArtLayer {
     /// A vector template image covering the whole canvas.
     case shape(_ asset: String, _ fill: ArtFill, shadow: ArtShadow?)
-    /// Live text, so it can be translated; placed by its centre, like in the design.
-    case text(_ content: ArtText, _ style: TextStyle, _ color: ColorToken, center: CGPoint, rotation: Double)
+    /// Live text, so it can be translated; placed by its centre, like in the design. A longer translation shrinks
+    /// on its line to `width`: by default as wide as the picture allows around the centre.
+    case text(_ content: ArtText, _ style: TextStyle, _ color: ColorToken, center: CGPoint, rotation: Double, width: CGFloat? = nil)
 }
 
 enum ArtFill {
@@ -73,11 +74,13 @@ struct ArtCanvas: View {
                     color: Color(hex: shadow?.color ?? 0).opacity(shadow?.opacity ?? 0),
                     radius: shadow?.radius ?? 0, y: shadow?.y ?? 0
                 )
-        case let .text(content, style, color, center, rotation):
+        case let .text(content, style, color, center, rotation, width):
             content.text
                 .textStyle(style)
                 .foregroundStyle(color.color)
-                .fixedSize()
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .frame(maxWidth: width ?? 2 * min(center.x, size.width - center.x) - 8)
                 .rotationEffect(.degrees(rotation))
                 .position(center)
         }

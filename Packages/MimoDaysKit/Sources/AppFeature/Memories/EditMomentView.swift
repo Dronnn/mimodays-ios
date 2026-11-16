@@ -102,29 +102,28 @@ struct EditMomentView: View {
 
     /// `Navigation / Editor bar`: Cancel, Edit moment, Save.
     private var bar: some View {
-        ZStack {
+        TitleBar {
+            Button(action: cancel) {
+                Text("Cancel", bundle: .module)
+                    .textStyle(.editorCancel)
+                    .foregroundStyle(ColorToken.textBody.color)
+                    .frame(minHeight: Size.minimumTapTarget)
+            }
+            .accessibilityIdentifier("edit.cancel")
+        } title: {
             Text("Edit moment", bundle: .module)
                 .textStyle(.editorTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)
-            HStack {
-                Button(action: cancel) {
-                    Text("Cancel", bundle: .module)
-                        .textStyle(.editorCancel)
-                        .foregroundStyle(ColorToken.textBody.color)
-                        .frame(minHeight: Size.minimumTapTarget)
-                }
-                .accessibilityIdentifier("edit.cancel")
-                Spacer()
-                Button(action: save) {
-                    Text("Save", bundle: .module)
-                        .textStyle(.editorDone)
-                        .foregroundStyle(ColorToken.textLink.color)
-                        .frame(minHeight: Size.minimumTapTarget)
-                }
-                .disabled(model.isSaving)
-                .accessibilityIdentifier("edit.save")
+        } trailing: {
+            Button(action: save) {
+                Text("Save", bundle: .module)
+                    .textStyle(.editorDone)
+                    .foregroundStyle(ColorToken.textLink.color)
+                    .frame(minHeight: Size.minimumTapTarget)
             }
+            .disabled(model.isSaving)
+            .accessibilityIdentifier("edit.save")
         }
         .buttonStyle(.plain)
         .padding(.horizontal, 16)

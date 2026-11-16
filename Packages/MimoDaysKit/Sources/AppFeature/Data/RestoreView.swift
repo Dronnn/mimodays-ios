@@ -50,33 +50,32 @@ struct RestoreView: View {
 
     /// `Navigation / Editor bar`: Cancel until it's done, then Done.
     private var bar: some View {
-        ZStack {
+        TitleBar {
+            if !isFinished {
+                Button {
+                    model.cancel()
+                    close()
+                } label: {
+                    Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textBody.color)
+                        .padding(.horizontal, 16).frame(minHeight: Size.minimumTapTarget).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isRestoring)
+                .accessibilityIdentifier("restore.cancel")
+            }
+        } title: {
             Text("Restore", bundle: .module)
                 .textStyle(.editorTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)
-            HStack {
-                if !isFinished {
-                    Button {
-                        model.cancel()
-                        close()
-                    } label: {
-                        Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textBody.color)
-                            .padding(.horizontal, 16).frame(minHeight: Size.minimumTapTarget).contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(isRestoring)
-                    .accessibilityIdentifier("restore.cancel")
+        } trailing: {
+            if isFinished {
+                Button(action: close) {
+                    Text("Done", bundle: .module).textStyle(.editorDone).foregroundStyle(ColorToken.textLink.color)
+                        .padding(.horizontal, 16).frame(minHeight: Size.minimumTapTarget).contentShape(Rectangle())
                 }
-                Spacer()
-                if isFinished {
-                    Button(action: close) {
-                        Text("Done", bundle: .module).textStyle(.editorDone).foregroundStyle(ColorToken.textLink.color)
-                            .padding(.horizontal, 16).frame(minHeight: Size.minimumTapTarget).contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("restore.done")
-                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("restore.done")
             }
         }
         .frame(height: 44)

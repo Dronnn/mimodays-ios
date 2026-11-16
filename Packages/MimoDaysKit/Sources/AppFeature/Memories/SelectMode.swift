@@ -12,7 +12,12 @@ struct SelectBar: View {
     var body: some View {
         let chosen = selection ?? []
         let isAll = !all.isEmpty && chosen.count == all.count
-        ZStack {
+        TitleBar {
+            Button { withAnimation(.snappy) { selection = nil } } label: {
+                Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
+            }
+            .accessibilityIdentifier("select.cancel")
+        } title: {
             Group {
                 if chosen.isEmpty {
                     Text("Select moments", bundle: .module)
@@ -24,21 +29,15 @@ struct SelectBar: View {
             .foregroundStyle(ColorToken.textPrimary.color)
             .accessibilityAddTraits(.isHeader)
             .accessibilityIdentifier("select.count")
-            HStack {
-                Button { withAnimation(.snappy) { selection = nil } } label: {
-                    Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
-                }
-                .accessibilityIdentifier("select.cancel")
-                Spacer()
-                Button { selection = isAll ? [] : Set(all) } label: {
-                    (isAll ? Text("Deselect all", bundle: .module) : Text("Select all", bundle: .module))
-                        .textStyle(.editorDone).foregroundStyle(ColorToken.textLink.color)
-                }
-                .accessibilityIdentifier("select.all")
+        } trailing: {
+            Button { selection = isAll ? [] : Set(all) } label: {
+                (isAll ? Text("Deselect all", bundle: .module) : Text("Select all", bundle: .module))
+                    .textStyle(.editorDone).foregroundStyle(ColorToken.textLink.color)
             }
-            .buttonStyle(.plain)
-            .frame(minHeight: Size.minimumTapTarget)
+            .accessibilityIdentifier("select.all")
         }
+        .buttonStyle(.plain)
+        .frame(minHeight: Size.minimumTapTarget)
         .padding(.horizontal, 20)
         .padding(.vertical, 4)
         .background(ColorToken.canvas.color.ignoresSafeArea())

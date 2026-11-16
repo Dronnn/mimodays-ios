@@ -11,38 +11,37 @@ struct SheetBar: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ZStack {
+        TitleBar {
+            Button { dismiss() } label: {
+                Text("Cancel", bundle: .module)
+                    .textStyle(.editorCancel)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: Size.minimumTapTarget)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("sheet.cancel")
+        } title: {
             title
                 .textStyle(.editorTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)
-            HStack {
-                Button { dismiss() } label: {
-                    Text("Cancel", bundle: .module)
-                        .textStyle(.editorCancel)
-                        .foregroundStyle(ColorToken.textPrimary.color)
+        } trailing: {
+            if let done {
+                Button {
+                    done()
+                    dismiss()
+                } label: {
+                    Text("Done", bundle: .module)
+                        .textStyle(.editorDone)
+                        .foregroundStyle(ColorToken.textLink.color)
                         .padding(.horizontal, 16)
                         .frame(minHeight: Size.minimumTapTarget)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityIdentifier("sheet.cancel")
-                Spacer()
-                if let done {
-                    Button {
-                        done()
-                        dismiss()
-                    } label: {
-                        Text("Done", bundle: .module)
-                            .textStyle(.editorDone)
-                            .foregroundStyle(ColorToken.textLink.color)
-                            .padding(.horizontal, 16)
-                            .frame(minHeight: Size.minimumTapTarget)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("sheet.done")
-                }
+                .accessibilityIdentifier("sheet.done")
             }
         }
         .padding(.top, 8)

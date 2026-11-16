@@ -130,7 +130,8 @@ struct MovieEditorSnapshotTests {
     /// F11.
     @Test func exportOptions() async throws {
         let model = MovieExportModel(project: try await project(), library: library, freeSpace: { 12_000_000_000 })
-        assertScreenSnapshots(of: page(MovieExportOptions(model: model, cover: nil)), variants: variants)
+        // On the canvas, as MovieExportView puts it.
+        assertScreenSnapshots(of: page(MovieExportOptions(model: model, cover: nil).background(ColorToken.canvas.color.ignoresSafeArea())), variants: variants)
     }
 
     /// F12.

@@ -177,33 +177,29 @@ struct BackTitleBar: View {
     let action: () -> Void
 
     var body: some View {
-        ZStack {
+        TitleBar {
+            Button(action: action) {
+                HStack(spacing: 0) {
+                    Icon.glyphBack.image
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundStyle(ColorToken.textPrimary.color)
+                        .flipsForRightToLeftLayoutDirection(true)
+                    back.textStyle(.editorCancel).foregroundStyle(ColorToken.textLink.color)
+                }
+                .padding(.leading, 8)
+                .padding(.trailing, 12)
+                .frame(minHeight: Size.minimumTapTarget)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("back")
+        } title: {
             if let title {
                 title
                     .textStyle(.editorTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
-                    .lineLimit(1)
-                    .padding(.horizontal, 96)
                     .accessibilityAddTraits(.isHeader)
-            }
-            HStack(spacing: 0) {
-                Button(action: action) {
-                    HStack(spacing: 0) {
-                        Icon.glyphBack.image
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundStyle(ColorToken.textPrimary.color)
-                            .flipsForRightToLeftLayoutDirection(true)
-                        back.textStyle(.editorCancel).foregroundStyle(ColorToken.textLink.color)
-                    }
-                    .padding(.leading, 8)
-                    .padding(.trailing, 12)
-                    .frame(minHeight: Size.minimumTapTarget)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("back")
-                Spacer()
             }
         }
         .frame(height: 44)
@@ -355,7 +351,7 @@ struct MovieReady: View {
         .background(alignment: .top) {
             // `Hero / Bg`: the sage card runs off the top of the screen, 460×580 from 60 pt above it.
             DayCardBlob()
-                .fill(Color(hex: 0xD8DBC1))
+                .fill(ColorToken.accentMint.color)
                 .frame(width: 460, height: 580)
                 .offset(y: -60)
                 .ignoresSafeArea()

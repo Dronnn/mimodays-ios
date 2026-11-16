@@ -105,50 +105,47 @@ struct MovieEditorView: View {
 
     /// `Navigation / Back bar`: ‹ Movies, the movie's name, Export.
     private var topBar: some View {
-        ZStack {
-            Text(model.project.title)
-                .textStyle(.editorTitle)
-                .foregroundStyle(ColorToken.textPrimary.color)
-                .lineLimit(1)
-                .padding(.horizontal, 96)
-                .accessibilityAddTraits(.isHeader)
-            HStack(spacing: 0) {
-                Button { dismiss() } label: {
-                    HStack(spacing: 0) {
-                        Icon.glyphBack.image
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundStyle(ColorToken.textPrimary.color)
-                            .flipsForRightToLeftLayoutDirection(true)
-                        Text("Movies", bundle: .module)
-                            .textStyle(.editorCancel)
-                            .foregroundStyle(ColorToken.textLink.color)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
-                    }
-                    .padding(.leading, 8)
-                    .padding(.trailing, 12)
-                    // Inside the 96 pt the title leaves, however long the translation.
-                    .frame(maxWidth: 96, minHeight: Size.minimumTapTarget, alignment: .leading)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("editor.back")
-                Spacer()
-                Button(action: export) {
-                    Text("Export", bundle: .module)
-                        .textStyle(TextStyle(.nunito, size: 17, weight: 700, relativeTo: .body, maximumScale: 1.35))
+        TitleBar {
+            Button { dismiss() } label: {
+                HStack(spacing: 0) {
+                    Icon.glyphBack.image
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundStyle(ColorToken.textPrimary.color)
+                        .flipsForRightToLeftLayoutDirection(true)
+                    Text("Movies", bundle: .module)
+                        .textStyle(.editorCancel)
                         .foregroundStyle(ColorToken.textLink.color)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: 96, minHeight: Size.minimumTapTarget, alignment: .trailing)
-                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                .disabled(model.items.isEmpty)
-                .accessibilityIdentifier("editor.export")
+                .padding(.leading, 8)
+                .padding(.trailing, 12)
+                // At most 96 pt, so the movie's name keeps the room, however long the translation.
+                .frame(maxWidth: 96, minHeight: Size.minimumTapTarget, alignment: .leading)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("editor.back")
+        } title: {
+            Text(model.project.title)
+                .textStyle(.editorTitle)
+                .foregroundStyle(ColorToken.textPrimary.color)
+                .accessibilityAddTraits(.isHeader)
+        } trailing: {
+            Button(action: export) {
+                Text("Export", bundle: .module)
+                    .textStyle(TextStyle(.nunito, size: 17, weight: 700, relativeTo: .body, maximumScale: 1.35))
+                    .foregroundStyle(ColorToken.textLink.color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .padding(.horizontal, 20)
+                    .frame(maxWidth: 96, minHeight: Size.minimumTapTarget, alignment: .trailing)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(model.items.isEmpty)
+            .accessibilityIdentifier("editor.export")
         }
         .frame(height: 44)
     }

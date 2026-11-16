@@ -13,22 +13,20 @@ struct PhotoImportView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
+            TitleBar {
+                Button(action: close) {
+                    Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
+                }
+                .buttonStyle(.plain)
+                .disabled(isImporting)
+                .accessibilityIdentifier("import.cancel")
+            } title: {
                 Text("Import", bundle: .module)
                     .textStyle(.editorTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .accessibilityAddTraits(.isHeader)
-                HStack {
-                    Button(action: close) {
-                        Text("Cancel", bundle: .module).textStyle(.editorCancel).foregroundStyle(ColorToken.textPrimary.color)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(isImporting)
-                    .accessibilityIdentifier("import.cancel")
-                    Spacer()
-                }
-                .frame(minHeight: Size.minimumTapTarget)
             }
+            .frame(minHeight: Size.minimumTapTarget)
             .padding(.horizontal, 16)
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {

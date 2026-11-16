@@ -13,7 +13,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     private var interruption: CaptureInterruption?
     /// Why the current recording is being stopped, when it isn't the person or the limit.
     private var stopReason: CaptureInterruption?
-    private(set) var hasMicrophone = false
+    public private(set) var hasMicrophone = false
     /// Every `setCaptureHold`, in order.
     public private(set) var captureHolds: [DeviceHold] = []
     private(set) var isRecording = false

@@ -266,6 +266,8 @@ final class CameraModel {
         showsSingleCameraNote = false
         failure = nil
         if settings.flash != .off { await setTorch(settings.flash).value }
+        // The sound setting as it is at the shutter, whatever an earlier change left behind.
+        try? await engine.setMicrophone(microphoneOn)
         do {
             let recorded = arranged(try await engine.record(limit: settings.videoLength.duration))
             await setTorch(.off).value

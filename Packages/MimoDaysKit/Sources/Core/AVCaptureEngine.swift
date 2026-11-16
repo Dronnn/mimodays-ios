@@ -143,7 +143,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     public func setMicrophone(_ enabled: Bool) async throws {
         try await onQueue {
             if !enabled {
-                if let microphone = self.microphone { self.session.removeInput(microphone) }
+                guard let microphone = self.microphone else { return }
+                self.session.beginConfiguration()
+                defer { self.session.commitConfiguration() }
+                // Connections made by hand go by hand, before the input that feeds them.
+                for connection in self.session.connections where connection.inputPorts.contains(where: { $0.input === microphone }) {
+                    self.session.removeConnection(connection)
+                }
+                self.session.removeInput(microphone)
                 self.microphone = nil
                 return
             }
@@ -270,8 +277,16 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     return
                 }
                 self.lastInterruption = nil
+                // Sound off records none: any sound connection left on an output is switched off for this recording.
+                let hasAudio = self.microphone != nil
+                for (_, movie) in outputs {
+                    for connection in movie.connections where connection.inputPorts.contains(where: { $0.mediaType == .audio }) {
+                        connection.isEnabled = hasAudio
+                    }
+                }
+                Self.logger.info("Recording, sound \(hasAudio), sound connections \(outputs.map { $0.1.connections.filter { $0.isEnabled && $0.inputPorts.contains { $0.mediaType == .audio } }.count }, privacy: .public)")
                 let delegate = RecordingDelegate(
-                    outputs: outputs.map { ($0.0, ObjectIdentifier($0.1)) }, hasAudio: self.microphone != nil,
+                    outputs: outputs.map { ($0.0, ObjectIdentifier($0.1)) }, hasAudio: hasAudio,
                     // One stream failing ends the others too.
                     streamFailed: { Task { await self.stopRecording() } }
                 ) { result in

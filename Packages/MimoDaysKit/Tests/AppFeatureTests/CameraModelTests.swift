@@ -106,6 +106,28 @@ struct CameraModelInterruptionTests {
         #expect(await engine.torchChanges == [.on, .off, .auto, .off])
     }
 
+    /// Sound off records no sound, also right after it was on (Andrew, 2026-11-16); sound on records it.
+    @Test func eachRecordingTakesTheSoundSettingAtTheShutter() async throws {
+        let engine = SimulatedCaptureEngine()
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.videoLength = .long
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .granted }, onCapture: { $0.discardFiles() }
+        )
+        await model.start()
+        for sound in [false, true, false] {
+            model.toggleSound()
+            #expect(model.microphoneOn == sound)
+            async let recording: Void = model.shutter()
+            while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+            #expect(await engine.hasMicrophone == sound)
+            await engine.stopRecording()
+            await recording
+        }
+    }
+
     /// The flash button goes off, auto, on and round again, and the camera remembers it (Andrew, 2026-11-16).
     @Test func flashButtonGoesRoundItsThreeModes() {
         let store = InMemoryCameraSettingsStore()

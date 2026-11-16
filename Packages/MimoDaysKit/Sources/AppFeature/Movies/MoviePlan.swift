@@ -1,3 +1,4 @@
+@preconcurrency import AVFoundation
 import Core
 import CoreGraphics
 import Foundation
@@ -179,6 +180,30 @@ extension MovieAspectRatio {
         case .portrait9x16: CGSize(width: short, height: short * 16 / 9)
         case .landscape16x9: CGSize(width: short * 16 / 9, height: short)
         case .square1x1: CGSize(width: short, height: short)
+        }
+    }
+}
+
+extension MoviePlan {
+    /// Doc 01 §16: a moment whose picture can't be read any more (a damaged file) is left out of the export, as a
+    /// deleted one is, rather than stopping it or showing an empty frame (Andrew, 2026-11-16).
+    func leavingOutUnreadable() async -> MoviePlan {
+        var plan = self
+        plan.clips = []
+        for clip in clips where await clip.isReadable { plan.clips.append(clip) }
+        return plan
+    }
+}
+
+private extension MoviePlan.Clip {
+    var isReadable: Bool {
+        get async {
+            guard let mainURL else { return isCard }
+            switch media {
+            case .card: return true
+            case .photo: return ImageDecoding.thumbnailNow(mainURL, maxPixelSize: 64) != nil
+            case .video: return (try? await AVURLAsset(url: mainURL).loadTracks(withMediaType: .video).first) != nil
+            }
         }
     }
 }

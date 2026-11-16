@@ -112,6 +112,15 @@ struct MemoriesSnapshotTests {
         ])
     }
 
+    /// Doc 01 §16 "empty month": August has no moments, so its days are plain and nothing opens.
+    @Test func calendarEmptyMonth() async throws {
+        try await populate()
+        let model = await memories()
+        model.mode = .calendar
+        model.show(month: 202608)
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
     /// M03: 2026 in dots.
     @Test func calendarYear() async throws {
         try await populate()

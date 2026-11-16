@@ -119,6 +119,37 @@ struct MovieExportModelTests {
         #expect(project.render == nil)
     }
 
+    /// Doc 01 §16: a moment whose picture is damaged is left out of the movie, as a deleted one is.
+    @Test func aDamagedPictureIsLeftOut() async throws {
+        let project = try await project(photos: 2)
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>()).first)
+        let main = try #require(MomentSummary(moment).mainPath)
+        try Data("not a picture".utf8).write(to: try store.url(for: main))
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil })
+        model.resolution = .p720
+        model.start()
+        await model.waitForRender()
+        guard case let .ready(render) = model.phase else {
+            Issue.record("Expected ready, got \(model.phase)")
+            return
+        }
+        #expect(abs(render.duration - MovieSelection.photoSeconds) < 0.1)
+    }
+
+    /// Doc 01 §16 "rendering failure": nothing left to show stops on F14, and the draft stays a draft.
+    @Test func nothingReadableFailsAndKeepsTheDraft() async throws {
+        let project = try await project(photos: 2)
+        for media in try context.fetch(FetchDescriptor<MomentMedia>()) {
+            try Data("not a picture".utf8).write(to: try store.url(for: media.relativePath))
+        }
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil })
+        model.resolution = .p720
+        model.start()
+        await model.waitForRender()
+        #expect(model.phase == .failed(.other))
+        #expect(project.render == nil)
+    }
+
     @Test func placeIsWrittenOnlyWhenAskedFor() {
         #expect(MovieExportModel.iso6709(latitude: 37.8044, longitude: -122.2712) == "+37.8044-122.2712/")
         #expect(MovieExportModel.iso6709(latitude: -3.5, longitude: 7.25) == "-03.5000+007.2500/")

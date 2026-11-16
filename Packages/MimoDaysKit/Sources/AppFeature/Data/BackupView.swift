@@ -154,6 +154,8 @@ struct BackupFlowView: View {
     let model: BackupModel
     let close: () -> Void
     @State private var choosing = false
+    /// The chosen place couldn't take the file (offline drive, no room there): the backup stays packed to choose again.
+    @State private var notSaved = false
 
     var body: some View {
         Group {
@@ -176,7 +178,16 @@ struct BackupFlowView: View {
             if case .working(.choosing, _) = phase { choosing = true }
         }
         .fileMover(isPresented: $choosing, file: model.packed) { result in
-            if case let .success(url) = result { model.saved(to: url) }
+            switch result {
+            case let .success(url): model.saved(to: url)
+            case let .failure(error): notSaved = (error as? CocoaError)?.code != .userCancelled
+            }
+        }
+        .alert(Text("The backup wasn't saved", bundle: .module), isPresented: $notSaved) {
+            Button { choosing = true } label: { Text("Choose another place", bundle: .module) }
+            Button(role: .cancel) {} label: { Text("Not now", bundle: .module) }
+        } message: {
+            Text("That place couldn't take the file. Nothing was changed.", bundle: .module)
         }
         .onDisappear { if case .working = model.phase { model.cancel() } }
     }

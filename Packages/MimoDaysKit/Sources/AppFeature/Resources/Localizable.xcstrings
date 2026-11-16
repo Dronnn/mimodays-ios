@@ -2287,6 +2287,18 @@
         }
       }
     },
+    "Choose another place" : {
+      "comment" : "Backup (15.1): alert button that opens the Files picker again for the same backup",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose another place"
+          }
+        }
+      }
+    },
     "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for a day, a week or until you resume them." : {
       "comment" : "Help & about (S07): Surprises help",
       "extractionState" : "manual",
@@ -2523,6 +2535,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Telephoto"
+          }
+        }
+      }
+    },
+    "That place couldn't take the file. Nothing was changed." : {
+      "comment" : "Backup (15.1): alert message when saving the backup to the chosen place failed (offline drive, no room there)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That place couldn't take the file. Nothing was changed."
+          }
+        }
+      }
+    },
+    "The backup wasn't saved" : {
+      "comment" : "Backup (15.1): alert title when the place chosen in Files couldn't take the backup file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup wasn't saved"
           }
         }
       }

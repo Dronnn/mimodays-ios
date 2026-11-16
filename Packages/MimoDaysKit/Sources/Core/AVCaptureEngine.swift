@@ -374,7 +374,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             return .single(.back)
         }
         for width in CapturePressurePolicy.dualFormatWidths where width <= maxFormatWidth {
-            try configure(.dual, formatWidth: width)
+            // A selfie camera that can't be added (busy, broken) leaves the rear camera alone, not no camera.
+            guard (try? configure(.dual, formatWidth: width)) != nil else { break }
             if multiCam.hardwareCost <= 1 {
                 for frameRate in [30, 24, 15] where multiCam.systemPressureCost > 1 {
                     setFrameRate(frameRate)

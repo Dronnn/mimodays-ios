@@ -37,6 +37,7 @@ final class MovieExportModel {
     private let clock: any DateProvider
     private let freeSpace: () -> Int64?
     private var task: Task<Void, Never>?
+    private var background = UIBackgroundTaskIdentifier.invalid
     private let logger = Logger(subsystem: "MimoDays", category: "Movies")
 
     init(
@@ -87,18 +88,22 @@ final class MovieExportModel {
         let started = clock.now()
         task = Task { [weak self] in
             guard let self else { return }
-            let background = UIApplication.shared.beginBackgroundTask(withName: "Movie export")
-            defer { UIApplication.shared.endBackgroundTask(background) }
+            let id = UIApplication.shared.beginBackgroundTask(withName: "Movie export") { [weak self] in
+                MainActor.assumeIsolated { self?.backgroundTimeRanOut() }
+            }
+            background = id
+            // Only its own: after a cancel and a new start, `background` is the new export's.
+            defer { if background == id { endBackgroundTask() } }
             do {
                 let render = try await render(started: started)
                 try store.attach(render, to: project)
                 phase = .ready(render)
                 notifyIfAway()
-            } catch is CancellationError {
-                phase = .options
             } catch {
+                // A cancel has already said where to go: back to the options, or F14 when time ran out.
+                guard !Task.isCancelled, !(error is CancellationError) else { return }
                 logger.error("Exporting the movie failed: \(error.localizedDescription, privacy: .public)")
-                phase = Task.isCancelled ? .options : .failed(.other)
+                phase = .failed(.other)
             }
         }
     }
@@ -107,6 +112,22 @@ final class MovieExportModel {
         task?.cancel()
         task = nil
         phase = .options
+        endBackgroundTask()
+    }
+
+    /// iOS gives an app in the background a few minutes. When they run out, the render stops, the draft stays as it
+    /// was and F14 offers to try again; left running, iOS would end the app.
+    private func backgroundTimeRanOut() {
+        task?.cancel()
+        task = nil
+        phase = .failed(.other)
+        endBackgroundTask()
+    }
+
+    private func endBackgroundTask() {
+        guard background != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(background)
+        background = .invalid
     }
 
     /// F14's smaller option: the same movie at 720p.
@@ -118,7 +139,7 @@ final class MovieExportModel {
     func waitForRender() async { await task?.value }
 
     private func render(started: Date) async throws -> MovieRender {
-        let plan = MoviePlan(project, store: library.store)
+        let plan = await MoviePlan(project, store: library.store).leavingOutUnreadable()
         self.plan = plan
         let composed = try await MovieComposer.compose(plan, renderSize: plan.aspectRatio.renderSize(resolution))
         guard let session = AVAssetExportSession(asset: composed.asset, presetName: Self.preset(resolution)) else {

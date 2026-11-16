@@ -153,6 +153,16 @@ struct TodayModelTests {
         #expect(today.month.allSatisfy { today.image($0.thumbnailPath, TodayModel.tilePixels) != nil })
     }
 
+    /// Doc 01 §16 "empty month": nothing yet this month leaves the strip out, while the latest moment still leads.
+    @Test func anEmptyMonthHasNoStrip() async throws {
+        let october = try await save(at: Self.date(2026, 10, 31, 23))
+        let today = model()
+        await today.refresh()
+        #expect(today.month.isEmpty)
+        #expect(today.latest?.id == october)
+        #expect(!today.isEmpty)
+    }
+
     @Test func thisMonthStopsAtTwelve() async throws {
         for day in 1...11 {
             try await save(at: Self.date(2026, 11, day, 9))

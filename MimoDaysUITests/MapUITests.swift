@@ -43,6 +43,27 @@ final class MapUITests: XCTestCase {
         XCTAssertTrue(app.buttons["place.seeAll"].waitForExistence(timeout: 5))
     }
 
+    /// H.10: the places panel's grabber drags it down to its title and up to half the screen (Andrew, 2026-11-16).
+    @MainActor
+    func testThePlacesPanelDragsBetweenItsHeights() {
+        launchOnMap()
+        let grabber = app.descendants(matching: .any)["map.panelGrabber"]
+        XCTAssertTrue(grabber.waitForExistence(timeout: 20))
+        XCTAssertEqual(grabber.value as? String, "Recent places")
+        let window = app.windows.firstMatch
+        func drag(to y: CGFloat) {
+            grabber.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(
+                forDuration: 0.2, thenDragTo: window.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: y)),
+                withVelocity: .slow, thenHoldForDuration: 0.2
+            )
+        }
+        drag(to: 0.97)
+        XCTAssertEqual(grabber.value as? String, "Collapsed")
+        drag(to: 0.3)
+        XCTAssertEqual(grabber.value as? String, "Half screen")
+        XCTAssertTrue(app.buttons["map.recentPlace"].firstMatch.isHittable)
+    }
+
     /// Flow 04 (doc 02): the map, a place (P02), its moments (P03), one of them in the viewer.
     @MainActor
     func testAPlaceOpensItsMomentsAndTheViewer() {

@@ -291,18 +291,79 @@ struct MapView: View {
     }
 }
 
-/// P01's sheet: recent places, newest visit first; All places lists every one.
+/// P01's sheet: recent places, newest visit first; All places lists every one. It rises from the screen's bottom edge,
+/// under the tab bar, and its grabber drags it between three heights: just the title, the photo strip, and half the
+/// screen with every recent place (Andrew, 2026-11-16).
 struct RecentPlacesPanel: View {
+    enum Detent: Int, CaseIterable {
+        case collapsed
+        case strip
+        case half
+    }
+
     let model: MapModel
     let select: (String) -> Void
+    @State private var detent = Detent.strip
+    @State private var dragOffset: CGFloat = 0
+    @State private var headerHeight: CGFloat = 60
+    @State private var stripHeight: CGFloat = 120
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// A place's column, 108 pt as drawn; it widens with larger text so names keep whole words.
     @ScaledMetric(relativeTo: .footnote) private var width: CGFloat = 108
     /// P01 draws each photo with its own uneven outline; places cycle through them.
     private static let photoShapes = [AnyShape(PlacePhotoBlobA()), AnyShape(PlacePhotoBlobB()), AnyShape(PlacePhotoBlobC())]
 
     var body: some View {
+        GeometryReader { proxy in
+            let bottom = proxy.safeAreaInsets.bottom
+            let heights = heights(screen: proxy.size.height + proxy.safeAreaInsets.top + bottom)
+            let resting = heights[detent.rawValue]
+            let shown = min(max(resting - dragOffset, heights[0]), heights[2])
+            VStack(alignment: .leading, spacing: 0) {
+                header(heights: heights)
+                    .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { headerHeight = $0 }
+                if detent == .half {
+                    grid
+                } else {
+                    strip
+                        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { stripHeight = $0 }
+                        .opacity(detent == .collapsed && dragOffset >= 0 ? 0 : 1)
+                }
+                Spacer(minLength: 0)
+            }
+            .frame(width: proxy.size.width, height: shown + bottom, alignment: .top)
+            .background {
+                UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous)
+                    .fill(ColorToken.surfaceSheet.color)
+                    .shadow(color: Color(hex: 0x4B2938).opacity(0.12), radius: 10, y: -2)
+            }
+            .clipped()
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            .offset(y: bottom)
+        }
+    }
+
+    /// Title only, the strip, half the screen: visible heights above the screen's bottom safe area.
+    private func heights(screen: CGFloat) -> [CGFloat] {
+        let collapsed = headerHeight + 10
+        let strip = headerHeight + stripHeight
+        return [collapsed, strip, max(strip, screen / 2)]
+    }
+
+    private func header(heights: [CGFloat]) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Capsule().fill(Color(hex: 0xCDBFB4)).frame(width: 36, height: 5).frame(maxWidth: .infinity).padding(.top, 8)
+            Capsule().fill(Color(hex: 0xCDBFB4)).frame(width: 36, height: 5)
+                .frame(maxWidth: .infinity, minHeight: 21)
+                .contentShape(Rectangle())
+                .onTapGesture { settle(detent == .half ? .collapsed : Detent(rawValue: detent.rawValue + 1) ?? .half) }
+                .accessibilityElement()
+                .accessibilityLabel(Text("Recent places panel", bundle: .module, comment: "Map (P01): VoiceOver label of the panel's grabber"))
+                .accessibilityValue(detentName)
+                .accessibilityAdjustableAction { direction in
+                    let step = direction == .increment ? 1 : -1
+                    settle(Detent(rawValue: detent.rawValue + step) ?? detent)
+                }
+                .accessibilityIdentifier("map.panelGrabber")
             // Side by side as drawn; stacked when larger text doesn't leave room for both.
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .firstTextBaseline) {
@@ -316,26 +377,70 @@ struct RecentPlacesPanel: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 2)
-            ScrollView(.horizontal) {
-                HStack(alignment: .top, spacing: 19) {
-                    ForEach(Array(model.recentPlaces.prefix(10).enumerated()), id: \.element.id) { index, place in
-                        Button { select(place.id) } label: { recentPlace(place, index: index) }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("map.recentPlace")
-                    }
-                }
-                .padding(.horizontal, 20)
+        }
+        .contentShape(Rectangle())
+        .highPriorityGesture(drag(heights: heights))
+    }
+
+    private var detentName: Text {
+        switch detent {
+        case .collapsed: Text("Collapsed", bundle: .module, comment: "Map (P01): the places panel shows only its title")
+        case .strip: Text("Recent places", bundle: .module)
+        case .half: Text("Half screen", bundle: .module, comment: "Map (P01): the places panel fills half the screen")
+        }
+    }
+
+    private func drag(heights: [CGFloat]) -> some Gesture {
+        // Measured on the screen: the header moves with the finger, so its own space would see almost no movement.
+        DragGesture(minimumDistance: 4, coordinateSpace: .global)
+            .onChanged { dragOffset = $0.translation.height }
+            .onEnded { value in
+                let resting = heights[detent.rawValue]
+                let target = resting - value.predictedEndTranslation.height
+                let nearest = Detent.allCases.min { abs(heights[$0.rawValue] - target) < abs(heights[$1.rawValue] - target) } ?? detent
+                settle(nearest)
             }
-            .scrollIndicators(.hidden)
+    }
+
+    private func settle(_ target: Detent) {
+        withAnimation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.35)) {
+            detent = target
+            dragOffset = 0
+        }
+    }
+
+    private var places: [(offset: Int, element: MapPlace)] {
+        Array(model.recentPlaces.prefix(detent == .half ? 30 : 10).enumerated())
+    }
+
+    private var strip: some View {
+        ScrollView(.horizontal) {
+            HStack(alignment: .top, spacing: 19) {
+                ForEach(places, id: \.element.id) { index, place in placeButton(place, index: index) }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 2)
+        }
+        .scrollIndicators(.hidden)
+        .padding(.bottom, 14)
+    }
+
+    private var grid: some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: width), spacing: 19, alignment: .top)], alignment: .leading, spacing: 16) {
+                ForEach(places, id: \.element.id) { index, place in placeButton(place, index: index) }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 2)
             .padding(.bottom, 14)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous)
-                .fill(ColorToken.surfaceSheet.color)
-                .shadow(color: Color(hex: 0x4B2938).opacity(0.12), radius: 10, y: -2)
-        }
+        .scrollIndicators(.hidden)
+    }
+
+    private func placeButton(_ place: MapPlace, index: Int) -> some View {
+        Button { select(place.id) } label: { recentPlace(place, index: index) }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("map.recentPlace")
     }
 
     private func recentPlace(_ place: MapPlace, index: Int) -> some View {

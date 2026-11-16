@@ -2419,6 +2419,18 @@
         }
       }
     },
+    "Halves" : {
+      "comment" : "H.8: both cameras, each filling half the frame, split across its long side",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halves"
+          }
+        }
+      }
+    },
     "In silent mode, photos never make a sound." : {
       "comment" : "Camera settings (S03, ••• sheet): note under the Shutter sound toggle",
       "extractionState" : "manual",
@@ -2443,6 +2455,18 @@
         }
       }
     },
+    "Layout" : {
+      "comment" : "Camera and viewer ••• menus (H.8): the selfie in its window, or both cameras in halves",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
     "Recent places panel" : {
       "comment" : "Map (P01): VoiceOver label of the panel's grabber",
       "extractionState" : "manual",
@@ -2451,6 +2475,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recent places panel"
+          }
+        }
+      }
+    },
+    "Selfie half" : {
+      "comment" : "Memory Card (H.8): VoiceOver label of the selfie camera's half of the card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selfie half"
           }
         }
       }

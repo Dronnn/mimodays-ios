@@ -73,6 +73,27 @@ struct MomentSaverTests {
         #expect(!FileManager.default.fileExists(atPath: capture.mainURL.path))
     }
 
+    /// H.8: halves keep the composed halves as the picture tiles show, and a window for the card's switch.
+    @Test func aHalvesPhotoKeepsHalvesAndTilesShowItsComposite() async throws {
+        var capture = try await photo()
+        capture.arrangement = .halves
+        let moment = try await saver().save(MomentDraft(capture: capture, caption: "", window: window, promptID: nil))
+        let layout = try #require(moment.pipLayout)
+        #expect(layout.isHalves && layout.source == .frontSource)
+        let composed = try #require(moment.media.first { $0.role == .composedPreview })
+        #expect(composed.pixelWidth == 674 && composed.pixelHeight == 1200)
+        let summary = MomentSummary(moment)
+        #expect(summary.isHalves && summary.windowPath == nil && summary.picturePath == composed.relativePath)
+        #expect(summary.selfiePath != nil)
+    }
+
+    @Test func oldLayoutsWithoutAnArrangementAreTheWindow() throws {
+        let json = #"{"centerX":0.5,"centerY":0.2,"scale":0.3,"shape":"roundedRectangle","rotation":-5.4,"source":"frontSource"}"#
+        let layout = try JSONDecoder().decode(PiPLayout.self, from: Data(json.utf8))
+        #expect(layout.arrangement == nil && !layout.isHalves)
+        #expect(try JSONDecoder().decode(CameraSettings.self, from: JSONEncoder().encode(CameraSettings())).arrangement == .window)
+    }
+
     @Test func theRecordingFormatIsKeptOnTheMoment() async throws {
         #expect(try await saver().save(MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)).captureFormat == .portrait)
         var capture = try await video()

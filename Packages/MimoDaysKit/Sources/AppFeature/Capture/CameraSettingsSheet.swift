@@ -28,6 +28,14 @@ struct CameraSettingsSheet: View {
                                 .accessibilityIdentifier("cameraSettings.lens")
                         }
                     }
+                    // H.8: halves split the frame across its long side; 1:1 has the window only.
+                    if settings.format != .square {
+                        section(Text("Layout", bundle: .module, comment: "Camera and viewer ••• menus (H.8): the selfie in its window, or both cameras in halves")) {
+                            SegmentedControl(selection: $settings.arrangement, options: PiPLayout.Arrangement.allCases) { $0.label }
+                                .accessibilityIdentifier("cameraSettings.arrangement")
+                        }
+                    }
+                    if settings.arrangement == .window || settings.format == .square {
                     section(Text("Selfie window", bundle: .module)) {
                         SegmentedControl(selection: $settings.selfieWindow.corner, options: CameraSettings.SelfieWindow.Corner.allCases, fitsLabels: true) {
                             Text($0.title)
@@ -35,6 +43,7 @@ struct CameraSettingsSheet: View {
                         .accessibilityIdentifier("cameraSettings.corner")
                         SegmentedControl(selection: $settings.selfieWindow.scale, options: CameraSettings.SelfieWindow.Scale.allCases) { Text($0.title) }
                             .accessibilityIdentifier("cameraSettings.size")
+                    }
                     }
                     section(Text("Opens in", bundle: .module)) {
                         SegmentedControl(selection: $settings.opensIn, options: CameraSettings.Mode.allCases) { $0.label }

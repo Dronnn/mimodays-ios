@@ -76,6 +76,8 @@ struct CameraSettings: Codable, Equatable, Sendable {
     var flash = FlashMode.off
     /// The rear lens; one the phone can't use is the wide one.
     var backLens = BackLens.wide
+    /// H.8: the selfie in its window, or both cameras in halves (9:16 and 16:9; 1:1 keeps the window).
+    var arrangement = PiPLayout.Arrangement.window
 
     init() {}
 
@@ -91,6 +93,7 @@ struct CameraSettings: Codable, Equatable, Sendable {
         format = try container.decodeIfPresent(CaptureFormat.self, forKey: .format) ?? format
         flash = try container.decodeIfPresent(FlashMode.self, forKey: .flash) ?? flash
         backLens = try container.decodeIfPresent(BackLens.self, forKey: .backLens) ?? backLens
+        arrangement = try container.decodeIfPresent(PiPLayout.Arrangement.self, forKey: .arrangement) ?? arrangement
     }
 }
 
@@ -203,6 +206,15 @@ extension BackLens {
         case .ultraWide: Text("Ultra wide", bundle: .module, comment: "Camera ••• sheet: the rear camera choice, the 0.5× lens")
         case .wide: Text("Wide", bundle: .module, comment: "Camera ••• sheet: the rear camera choice, the main 1× lens")
         case .telephoto: Text("Telephoto", bundle: .module, comment: "Camera ••• sheet: the rear camera choice, the zoom lens")
+        }
+    }
+}
+
+extension PiPLayout.Arrangement {
+    var label: Text {
+        switch self {
+        case .window: Text("Window", bundle: .module, comment: "U52: the selfie in its window over the main camera")
+        case .halves: Text("Halves", bundle: .module, comment: "H.8: both cameras, each filling half the frame, split across its long side")
         }
     }
 }

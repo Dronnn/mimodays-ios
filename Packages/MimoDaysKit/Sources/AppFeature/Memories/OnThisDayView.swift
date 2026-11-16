@@ -55,8 +55,8 @@ final class OnThisDayModel {
         }
         isLoaded = true
         for moment in years.flatMap(\.moments) {
-            await load(moment.mainPath, DayModel.photoPixels)
-            await load(moment.selfiePath, DayModel.selfiePixels)
+            await load(moment.picturePath, DayModel.photoPixels)
+            await load(moment.windowPath, DayModel.selfiePixels)
         }
     }
 
@@ -161,12 +161,12 @@ struct OnThisDayView: View {
         VStack(alignment: .leading, spacing: 6) {
             Color(hex: 0x9C8573)
                 .overlay {
-                    if let image = model.image(moment.mainPath) { Image(uiImage: image).filling() }
+                    if let image = model.image(moment.picturePath) { Image(uiImage: image).filling() }
                 }
                 .aspectRatio(370 / 210, contentMode: .fit)
                 .clipShape(DayCardBlob())
                 .overlay(alignment: .topTrailing) {
-                    if let selfie = moment.selfiePath {
+                    if let selfie = moment.windowPath {
                         SelfieWindow(media: model.image(selfie).map { .image(Image(uiImage: $0)) } ?? .placeholder)
                             .frame(width: 48, height: SelfieWindowStyle.height(forWidth: 48))
                             .padding(.top, 10)

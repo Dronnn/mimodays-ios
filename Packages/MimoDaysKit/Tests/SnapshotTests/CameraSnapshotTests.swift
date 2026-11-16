@@ -15,9 +15,10 @@ struct CameraSnapshotTests {
     private func camera(
         multiCam: Bool = true, surprise: Bool = false, mode: CameraSettings.Mode = .photo,
         selfieWindow: CameraSettings.SelfieWindow = .init(), microphone: PermissionStatus = .granted,
-        format: CaptureFormat = .portrait, hold: DeviceHold = .upright
+        format: CaptureFormat = .portrait, hold: DeviceHold = .upright, halves: Bool = false
     ) async -> CameraModel {
         var settings = CameraSettings()
+        if halves { settings.arrangement = .halves }
         settings.opensIn = mode
         settings.selfieWindow = selfieWindow
         settings.format = format
@@ -186,6 +187,22 @@ struct CameraSnapshotTests {
         let selfie = try #require(SimulatedMedia.image(.front).cgImage)
         let composed = PhotoComposer.compose(main: main, selfie: selfie, window: window)
         assertSnapshot(of: UIImage(cgImage: composed), as: .image(precision: 0.99))
+    }
+
+    /// H.8: halves, each camera filling half of 9:16 (top and bottom) and of 16:9 held sideways (left and right).
+    @Test func halves() async {
+        assertScreenSnapshots(of: screen(await camera(halves: true)), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func halvesSideways() async {
+        assertScreenSnapshots(of: screen(await camera(format: .landscape, hold: .landscapeLeft, halves: true)), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// H.8: the composed halves, simulated 900 × 1200 sources kept as 9:16.
+    @Test func composedHalves() throws {
+        let main = try #require(SimulatedMedia.image(.back).cgImage)
+        let selfie = try #require(SimulatedMedia.image(.front).cgImage)
+        assertSnapshot(of: UIImage(cgImage: PhotoComposer.compose(main: main, selfie: selfie, halves: .portrait)), as: .image(precision: 0.99))
     }
 
     @Test func settingsSheet() {

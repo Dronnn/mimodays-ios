@@ -139,7 +139,8 @@ struct MoviePlan: Sendable, Equatable {
         return Clip(
             momentID: moment.id, media: media, mainURL: mainURL, selfieURL: selfieURL,
             window: selfieURL == nil ? nil : clip.pipFrame ?? moment.pipLayout, placement: clip.selfiePlacement,
-            layout: selfieURL == nil ? nil : clip.cameraLayout, duration: duration, transition: clip.transition,
+            // H.8: a moment kept in halves stays in halves until the clip picks otherwise.
+            layout: selfieURL == nil ? nil : clip.cameraLayout ?? (summary.isHalves ? .sideBySide : nil), duration: duration, transition: clip.transition,
             atmosphere: clip.atmosphere, caption: parts.isEmpty ? nil : parts.joined(separator: " · "),
             voiceURL: voice, soundOn: clip.clipAudio != .muted, volume: clip.clipVolume,
             pictureSize: moment.media.first { $0.relativePath == mainPath }.map { media in

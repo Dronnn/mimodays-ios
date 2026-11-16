@@ -216,8 +216,8 @@ struct TodayView: View {
         if let latest = model.latest {
             NavigationLink(value: MemoriesRoute.moment(pager(from: latest.id))) {
                 MomentHero(
-                    photo: media(latest.mainPath, TodayModel.heroPixels),
-                    selfie: latest.selfiePath.map { media($0, TodayModel.selfiePixels) },
+                    photo: media(latest.picturePath, TodayModel.heroPixels),
+                    selfie: latest.windowPath.map { media($0, TodayModel.selfiePixels) },
                     caption: model.timeText(latest.captured),
                     place: latest.place.map { Text($0) },
                     tag: latest.origin == .randomPrompt ? Text("surprise", bundle: .module) : nil
@@ -364,7 +364,7 @@ struct TodayView: View {
                 .padding(.leading, isWide ? 0 : 6)
             NavigationLink(value: MemoriesRoute.onThisDay) {
                 OnThisDayCard(
-                    image: model.image(day.cover.mainPath, TodayModel.heroPixels),
+                    image: model.image(day.cover.picturePath, TodayModel.heroPixels),
                     caption: Text("Years ago and count: \(Text(yearsAgo(day.yearsAgo))) · \(Text("\(day.count) moments", bundle: .module))", bundle: .module)
                 )
             }

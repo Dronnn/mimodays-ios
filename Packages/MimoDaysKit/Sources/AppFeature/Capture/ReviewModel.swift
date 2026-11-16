@@ -316,7 +316,8 @@ final class ReviewModel {
     func timing(_ video: CapturedVideo) -> VideoTiming {
         VideoTiming(
             duration: video.duration, selfieOffset: video.selfieOffset, hasAudio: video.hasAudio,
-            mainPosition: video.mainPosition, window: video.selfieURL == nil ? nil : windowFrame
+            mainPosition: video.mainPosition, window: video.selfieURL == nil ? nil : windowFrame,
+            halves: capture.isHalves ? capture.format : nil
         )
     }
 

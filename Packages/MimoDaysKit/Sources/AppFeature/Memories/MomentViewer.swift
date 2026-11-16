@@ -1,6 +1,7 @@
 @preconcurrency import AVFoundation
 import Core
 import DesignSystem
+import Persistence
 import SwiftData
 import SwiftUI
 
@@ -200,6 +201,19 @@ struct MomentViewer: View {
                         }
                         NavigationLink(value: MemoriesRoute.day(LocalDay(moment.captured.instant, in: moment.captured.timeZone).key)) {
                             Label { Text("Show the whole day", bundle: .module) } icon: { Icon.glyphClock.image }
+                        }
+                        if moment.selfiePath != nil, moment.format != .square,
+                           let layout = moment.video?.layout ?? moment.photo?.layout {
+                            Picker(selection: Binding(
+                                get: { layout.isHalves ? PiPLayout.Arrangement.halves : .window },
+                                set: { model.setArrangement($0, for: moment.id) }
+                            )) {
+                                ForEach(PiPLayout.Arrangement.allCases, id: \.self) { $0.label }
+                            } label: {
+                                Text("Layout", bundle: .module, comment: "Camera and viewer ••• menus (H.8): the selfie in its window, or both cameras in halves")
+                            }
+                            .pickerStyle(.menu)
+                            .accessibilityIdentifier("viewer.arrangement")
                         }
                     } label: {
                         Icon.glyphMore.image

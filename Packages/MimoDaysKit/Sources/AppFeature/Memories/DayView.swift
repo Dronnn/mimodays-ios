@@ -52,8 +52,8 @@ final class DayModel {
             logger.error("Reading the day failed: \(error.localizedDescription, privacy: .public)")
         }
         for moment in moments {
-            await load(moment.mainPath, Self.photoPixels)
-            await load(moment.selfiePath, Self.selfiePixels)
+            await load(moment.picturePath, Self.photoPixels)
+            await load(moment.windowPath, Self.selfiePixels)
         }
     }
 
@@ -179,12 +179,12 @@ struct DayView: View {
     private func picture(_ moment: MomentSummary) -> some View {
         Color(hex: 0x9C8573)
             .overlay {
-                if let image = model.image(moment.mainPath) { Image(uiImage: image).filling() }
+                if let image = model.image(moment.picturePath) { Image(uiImage: image).filling() }
             }
             .aspectRatio(370 / 250, contentMode: .fit)
             .clipShape(DayCardBlob())
             .overlay(alignment: .topTrailing) {
-                if let selfie = moment.selfiePath {
+                if let selfie = moment.windowPath {
                     SelfieWindow(media: model.image(selfie).map { .image(Image(uiImage: $0)) } ?? .placeholder)
                         .frame(width: 48, height: SelfieWindowStyle.height(forWidth: 48))
                         .padding(.top, 10)

@@ -57,8 +57,13 @@ struct MomentSaver {
         do {
             let isPhoto = if case .photo = capture.media { true } else { false }
             let window = capture.selfieURL == nil ? nil : draft.window
-            if isPhoto, let selfieURL = capture.selfieURL, let window {
-                composedPhoto = try? await PhotoComposer.compose(mainURL: capture.mainURL, selfieURL: selfieURL, window: window)
+            let halves = capture.isHalves ? capture.format : nil
+            if isPhoto, let selfieURL = capture.selfieURL {
+                if let halves {
+                    composedPhoto = try? await PhotoComposer.compose(mainURL: capture.mainURL, selfieURL: selfieURL, halves: halves)
+                } else if let window {
+                    composedPhoto = try? await PhotoComposer.compose(mainURL: capture.mainURL, selfieURL: selfieURL, window: window)
+                }
             }
             let mainRole = role(capture.mainPosition)
             var media = [try await stored(capture.mainURL, role: mainRole, isVideo: !isPhoto, written: &written)]
@@ -70,7 +75,7 @@ struct MomentSaver {
             if let composedPhoto {
                 media.append(try await stored(composedPhoto, role: .composedPreview, isVideo: false, area: .derived, written: &written))
             }
-            if let thumbnail = try? await thumbnail(capture, composedPhoto: composedPhoto, window: window) {
+            if let thumbnail = try? await thumbnail(capture, composedPhoto: composedPhoto, window: window, halves: halves) {
                 media.append(try await stored(thumbnail, role: .thumbnail, isVideo: false, area: .derived, written: &written))
                 try? FileManager.default.removeItem(at: thumbnail)
             }
@@ -83,7 +88,15 @@ struct MomentSaver {
             moment.title = caption.isEmpty ? nil : caption
             let note = draft.note.trimmingCharacters(in: .whitespacesAndNewlines)
             moment.note = note.isEmpty ? nil : note
-            moment.pipLayout = window.map { PiPLayout($0, source: role(capture.mainPosition.other)) }
+            var layout = window.map { PiPLayout($0, source: role(capture.mainPosition.other)) }
+            if halves != nil {
+                // Halves still keeps a window, where the card's switch puts it back.
+                layout = layout ?? PiPLayout(
+                    centerX: 0.7, centerY: 0.2, scale: MomentComposition.defaultWindowScale, source: role(capture.mainPosition.other)
+                )
+                layout?.arrangement = .halves
+            }
+            moment.pipLayout = layout
             moment.captureFormat = capture.format
             let voiceNote = try draft.voice.map { voice in
                 let file = try store.store(copyOf: voice.url, in: .originals)
@@ -149,11 +162,15 @@ struct MomentSaver {
     }
 
     /// The thumbnail grids and strips show: the composed photo, or the first frames composed like playback.
-    private func thumbnail(_ capture: CaptureResult, composedPhoto: URL?, window: SelfieWindowFrame?) async throws -> URL {
+    private func thumbnail(
+        _ capture: CaptureResult, composedPhoto: URL?, window: SelfieWindowFrame?, halves: CaptureFormat?
+    ) async throws -> URL {
         let size = Self.thumbnailSize
         var image: CGImage?
         if case let .video(video) = capture.media {
-            image = await Self.videoThumbnail(mainURL: video.mainURL, selfieURL: video.selfieURL, selfieOffset: video.selfieOffset, window: window)
+            image = await Self.videoThumbnail(
+                mainURL: video.mainURL, selfieURL: video.selfieURL, selfieOffset: video.selfieOffset, window: window, halves: halves
+            )
         } else {
             image = await ReviewModel.still(composedPhoto ?? capture.mainURL, maxPixelSize: size, at: 0)?.cgImage
         }
@@ -165,12 +182,15 @@ struct MomentSaver {
 
     /// A video's first frames composed with its selfie window, as grids show it; also when the player moves
     /// the window.
-    static func videoThumbnail(mainURL: URL, selfieURL: URL?, selfieOffset: TimeInterval, window: SelfieWindowFrame?) async -> CGImage? {
+    static func videoThumbnail(
+        mainURL: URL, selfieURL: URL?, selfieOffset: TimeInterval, window: SelfieWindowFrame?, halves: CaptureFormat? = nil
+    ) async -> CGImage? {
         let size = thumbnailSize
         guard let main = await ReviewModel.still(mainURL, maxPixelSize: size, at: 0)?.cgImage else { return nil }
-        guard let selfieURL, let window,
+        guard let selfieURL, window != nil || halves != nil,
               let selfie = await ReviewModel.still(selfieURL, maxPixelSize: size, at: max(0, -selfieOffset))?.cgImage else { return main }
-        return PhotoComposer.compose(main: main, selfie: selfie, window: window)
+        if let halves { return PhotoComposer.compose(main: main, selfie: selfie, halves: halves) }
+        return window.map { PhotoComposer.compose(main: main, selfie: selfie, window: $0) } ?? main
     }
 
     private struct Info {

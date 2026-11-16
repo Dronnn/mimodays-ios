@@ -52,9 +52,12 @@ struct MemoryCardPage: View {
         return MemoryCardFront.Window(
             layout: layout, placement: layout.placement(nearest: saved), rotation: saved.rotation, id: "viewer.selfieWindow",
             move: { [model, id = moment.id] placement in
-                model.setWindow(PiPLayout(layout.windowFrame(placement), source: saved.source), for: id)
+                var moved = PiPLayout(layout.windowFrame(placement), source: saved.source)
+                moved.arrangement = saved.arrangement
+                model.setWindow(moved, for: id)
             },
-            swap: { swap() }
+            swap: { swap() },
+            halves: saved.isHalves && moment.format != .square
         )
     }
 

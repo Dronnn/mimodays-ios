@@ -31,6 +31,8 @@ struct MemoryCardFront: View {
         let id: String
         let move: (CameraSettings.SelfieWindow) -> Void
         let swap: () -> Void
+        /// H.8: the two streams each fill half the card instead, split across its long side; a tap swaps them.
+        var halves = false
     }
 
     let pictures: Pictures
@@ -78,12 +80,17 @@ struct MemoryCardFront: View {
         ZStack(alignment: .topLeading) {
             Self.face
             ZStack(alignment: .topLeading) {
+                if let window, window.halves {
+                    half(.main, bounds: bounds)
+                    half(.selfie, bounds: bounds)
+                } else {
                 picture(.main, bounds: bounds, window: frame)
                 if let frame {
                     if let window, adjustsWindow || drag != nil {
                         targets(window.layout, window.placement)
                     }
                     picture(.selfie, bounds: bounds, window: frame)
+                }
                 }
             }
             .frame(width: size.width, height: size.height, alignment: .topLeading)
@@ -166,6 +173,25 @@ struct MemoryCardFront: View {
                 id: pictures.id, actions: actions
             ))
             .gesture(windowGesture, isEnabled: inWindow)
+    }
+
+    /// H.8: a stream in its half of the card, main first (top, or left on a wide card); swapping slides them past
+    /// each other. No window edge or tilt: the card's own outline frames both, as they're shared.
+    private func half(_ stream: Stream, bounds: CGRect) -> some View {
+        let (first, second) = HalvesArt.halves(bounds.size)
+        let progress = swapProgress ?? (swapped ? 1 : 0)
+        let rect = stream == .main ? Self.between(first, second, progress) : Self.between(second, first, progress)
+        return content(stream)
+            .frame(width: rect.width, height: rect.height)
+            .clipped()
+            .position(x: rect.midX, y: rect.midY)
+            .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: Self.growDuration), value: swapped)
+            .modifier(PictureAccess(
+                isWindow: stream == .selfie, placement: nil, windowID: window?.id ?? "", adjust: nil,
+                swap: { window?.swap() }, isSwapped: swapped,
+                label: Text(isVideo ? "Video" : "Photo with selfie", bundle: .module), id: pictures.id, actions: actions
+            ))
+            .onTapGesture { window?.swap() }
     }
 
     /// `from` moved `share` of the way to `to`.
@@ -257,7 +283,8 @@ private struct PictureAccess: ViewModifier {
     let isWindow: Bool
     let placement: CameraSettings.SelfieWindow?
     let windowID: String
-    let adjust: () -> Void
+    /// Nil for a half (H.8), which has no size or corner to change.
+    let adjust: (() -> Void)?
     let swap: () -> Void
     /// The window shows the main stream: VoiceOver hears it as selected, as the Swap cameras button was.
     let isSwapped: Bool
@@ -266,16 +293,12 @@ private struct PictureAccess: ViewModifier {
     let actions: MemoryCardActions?
 
     func body(content: Content) -> some View {
-        if isWindow {
-            content
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text("Selfie window", bundle: .module))
+        if isWindow, let adjust {
+            selfie(content, label: Text("Selfie window", bundle: .module))
                 .accessibilityValue(Text(placement?.accessibilityValue ?? ""))
-                .accessibilityAddTraits(isSwapped ? [.isButton, .isSelected] : .isButton)
-                .accessibilityAction { swap() }
-                .accessibilityAction(named: Text("Swap cameras", bundle: .module), swap)
                 .accessibilityAction(named: Text("Adjust selfie window", bundle: .module), adjust)
-                .accessibilityIdentifier(windowID)
+        } else if isWindow {
+            selfie(content, label: Text("Selfie half", bundle: .module, comment: "Memory Card (H.8): VoiceOver label of the selfie camera's half of the card"))
         } else {
             content
                 .accessibilityElement(children: .ignore)
@@ -284,6 +307,19 @@ private struct PictureAccess: ViewModifier {
                 .accessibilityIdentifier(id)
                 .modifier(CardActions(actions: actions))
         }
+    }
+}
+
+extension PictureAccess {
+    /// The selfie's element, in its window or its half: a tap or VoiceOver's activate swaps the cameras.
+    func selfie(_ content: Content, label: Text) -> some View {
+        content
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(label)
+            .accessibilityAddTraits(isSwapped ? [.isButton, .isSelected] : .isButton)
+            .accessibilityAction { swap() }
+            .accessibilityAction(named: Text("Swap cameras", bundle: .module), swap)
+            .accessibilityIdentifier(windowID)
     }
 }
 

@@ -18,6 +18,12 @@ struct MomentSummary: Equatable, Identifiable {
     var selfiePath: String?
     /// The composed thumbnail grids and strips show.
     var thumbnailPath: String?
+    /// H.8: the two cameras share the frame in halves, so tiles show the composed picture with no window.
+    var isHalves = false
+    /// What a tile shows full size: the main stream, or for halves the composed picture.
+    var picturePath: String?
+    /// What a tile shows in its selfie window; nil for halves.
+    var windowPath: String?
     /// The one-line caption, if any.
     var title: String?
     /// Videos: the clip's length.
@@ -35,6 +41,13 @@ struct MomentSummary: Equatable, Identifiable {
         selfiePath = windowRole.flatMap { role in sources.first { $0.role == role } }?.relativePath
         mainPath = sources.first { $0.role != windowRole }?.relativePath
         thumbnailPath = moment.media.first { $0.role == .thumbnail }?.relativePath
+        isHalves = selfiePath != nil && moment.pipLayout?.isHalves == true && moment.captureFormat != .square
+        if isHalves {
+            picturePath = moment.media.first { $0.role == .composedPreview }?.relativePath ?? thumbnailPath ?? mainPath
+        } else {
+            picturePath = mainPath
+            windowPath = selfiePath
+        }
         title = moment.title
         duration = moment.mediaType == .video ? moment.media.compactMap(\.duration).max() : nil
         hasVoiceNote = !moment.voiceNotes.isEmpty
@@ -209,10 +222,10 @@ final class TodayModel {
     private func loadImages() async {
         var wanted: [ImageKey] = []
         if let latest {
-            wanted += [latest.mainPath.map { ImageKey(path: $0, maxPixelSize: Self.heroPixels) }, latest.selfiePath.map { ImageKey(path: $0, maxPixelSize: Self.selfiePixels) }].compactMap(\.self)
+            wanted += [latest.picturePath.map { ImageKey(path: $0, maxPixelSize: Self.heroPixels) }, latest.windowPath.map { ImageKey(path: $0, maxPixelSize: Self.selfiePixels) }].compactMap(\.self)
         }
         wanted += month.compactMap { $0.thumbnailPath.map { ImageKey(path: $0, maxPixelSize: Self.tilePixels) } }
-        if let cover = onThisDay?.cover.mainPath { wanted.append(ImageKey(path: cover, maxPixelSize: Self.heroPixels)) }
+        if let cover = onThisDay?.cover.picturePath { wanted.append(ImageKey(path: cover, maxPixelSize: Self.heroPixels)) }
 
         var loaded: [ImageKey: UIImage] = [:]
         for key in wanted {

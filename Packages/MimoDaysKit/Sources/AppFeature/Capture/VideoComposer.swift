@@ -1,5 +1,6 @@
 @preconcurrency import AVFoundation
 import Core
+import Persistence
 import CoreImage
 
 /// What a saved video needs besides its files to be played back composed, also after a relaunch.
@@ -11,6 +12,8 @@ struct VideoTiming: Codable, Equatable, Sendable {
     var mainPosition: CameraPosition
     /// Where the selfie window was when recording started; nil without a selfie stream.
     var window: SelfieWindowFrame?
+    /// H.8: the two streams share the format's frame in halves instead (the window is ignored).
+    var halves: CaptureFormat?
 }
 
 /// Plays (and later exports) the two streams as one: the main video with the selfie video in the signature
@@ -49,7 +52,7 @@ enum VideoComposer {
             try audioTrack.insertTimeRange(range, of: audio, at: .zero)
         }
 
-        guard let selfieURL, let window = timing.window else {
+        guard let selfieURL, timing.window != nil || timing.halves != nil else {
             return Composed(asset: composition, videoComposition: nil)
         }
         let selfie = AVURLAsset(url: selfieURL)
@@ -64,15 +67,20 @@ enum VideoComposer {
 
         let naturalSize = try await mainVideo.load(.naturalSize)
         let upright = naturalSize.applying(mainTransform)
-        let renderSize = CGSize(width: abs(upright.width), height: abs(upright.height))
+        let mainSize = CGSize(width: abs(upright.width), height: abs(upright.height))
+        let art: any FrameArt = if let format = timing.halves {
+            HalvesArt(format: format, main: mainSize)
+        } else {
+            SelfieWindowArt(window: timing.window ?? SelfieWindowFrame(frame: .zero, preview: mainSize), canvas: mainSize)
+        }
         let instruction = SelfieWindowInstruction(
             timeRange: range, mainTrackID: mainTrack.trackID, selfieTrackID: selfieTrack.trackID,
             mainOrientation: .init(mainTransform), selfieOrientation: .init(try await selfieVideo.load(.preferredTransform)),
-            art: SelfieWindowArt(window: window, canvas: renderSize)
+            art: art
         )
         let videoComposition = AVMutableVideoComposition()
         videoComposition.customVideoCompositorClass = SelfieWindowCompositor.self
-        videoComposition.renderSize = renderSize
+        videoComposition.renderSize = art.canvas
         videoComposition.frameDuration = CMTime(value: 1, timescale: 30)
         videoComposition.instructions = [instruction]
         return Composed(asset: composition, videoComposition: videoComposition)
@@ -132,11 +140,11 @@ final class SelfieWindowInstruction: NSObject, AVVideoCompositionInstructionProt
     let selfieTrackID: CMPersistentTrackID
     let mainOrientation: CGImagePropertyOrientation
     let selfieOrientation: CGImagePropertyOrientation
-    let art: SelfieWindowArt
+    let art: any FrameArt
 
     init(
         timeRange: CMTimeRange, mainTrackID: CMPersistentTrackID, selfieTrackID: CMPersistentTrackID,
-        mainOrientation: CGImagePropertyOrientation, selfieOrientation: CGImagePropertyOrientation, art: SelfieWindowArt
+        mainOrientation: CGImagePropertyOrientation, selfieOrientation: CGImagePropertyOrientation, art: any FrameArt
     ) {
         self.timeRange = timeRange
         self.mainTrackID = mainTrackID

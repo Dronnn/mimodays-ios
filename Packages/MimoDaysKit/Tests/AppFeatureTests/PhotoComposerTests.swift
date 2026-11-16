@@ -3,6 +3,7 @@ import Core
 import CoreGraphics
 import Foundation
 import ImageIO
+import Persistence
 import Testing
 import TestSupport
 
@@ -53,6 +54,56 @@ struct PhotoComposerTests {
         #expect(result.capturedAt == CaptureTime(instant: Date(timeIntervalSince1970: 1_000), timeZone: .current))
         result.discardFiles()
         #expect(!FileManager.default.fileExists(atPath: photo.mainURL.path))
+    }
+
+    /// H.8: halves split the format's frame across its long side, the main camera first.
+    @Test func halvesSplitTheFormatsFrameAcrossItsLongSide() {
+        let tall = HalvesArt.halves(CGSize(width: 900, height: 1600))
+        #expect(tall.first == CGRect(x: 0, y: 0, width: 900, height: 800))
+        #expect(tall.second == CGRect(x: 0, y: 800, width: 900, height: 800))
+        let wide = HalvesArt.halves(CGSize(width: 1600, height: 900))
+        #expect(wide.first == CGRect(x: 0, y: 0, width: 800, height: 900))
+        #expect(wide.second == CGRect(x: 800, y: 0, width: 800, height: 900))
+        // A 3:4 photo kept as 9:16 is its middle 9:16, in even pixels.
+        #expect(HalvesArt.canvas(format: .portrait, main: CGSize(width: 900, height: 1200)) == CGSize(width: 674, height: 1200))
+    }
+
+    @Test func composesHalvesWithTheMainCameraOnTopAndNoWindow() throws {
+        let main = solid(width: 900, height: 1200, rgb: (200, 40, 40))
+        let selfie = solid(width: 360, height: 480, rgb: (40, 40, 200))
+        let composed = PhotoComposer.compose(main: main, selfie: selfie, halves: .portrait)
+        #expect(composed.width == 674 && composed.height == 1200)
+        let pixels = try rgba(composed)
+        #expect(pixels(337, 300).isClose(to: (200, 40, 40)))
+        #expect(pixels(337, 900).isClose(to: (40, 40, 200)))
+        #expect(pixels(5, 5).isClose(to: (200, 40, 40)))
+        #expect(pixels(668, 1195).isClose(to: (40, 40, 200)))
+        let sideways = PhotoComposer.compose(main: solid(width: 1200, height: 900, rgb: (200, 40, 40)), selfie: selfie, halves: .landscape)
+        let wide = try rgba(sideways)
+        #expect(sideways.width == 1200 && sideways.height == 674)
+        #expect(wide(300, 337).isClose(to: (200, 40, 40)) && wide(900, 337).isClose(to: (40, 40, 200)))
+    }
+
+    /// H.8: halves picked in the ••• sheet go with the capture; 1:1 has the window only.
+    @MainActor
+    @Test func theShutterKeepsHalvesExceptOnSquare() async throws {
+        for (format, expected) in [(CaptureFormat.portrait, PiPLayout.Arrangement.halves), (.square, nil)] {
+            var results: [CaptureResult] = []
+            var settings = CameraSettings()
+            settings.arrangement = .halves
+            settings.format = format
+            let model = CameraModel(
+                engine: SimulatedCaptureEngine(), store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+                clock: TestDateProvider(Date(timeIntervalSince1970: 1_000)),
+                microphoneStatus: { .granted }, onCapture: { results.append($0) }
+            )
+            await model.start()
+            #expect(model.showsHalves == (expected != nil))
+            await model.shutter()
+            let result = try #require(results.first)
+            #expect(result.arrangement == expected, "\(format)")
+            result.discardFiles()
+        }
     }
 
     // MARK: Helpers

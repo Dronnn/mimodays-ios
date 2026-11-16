@@ -17,6 +17,11 @@ struct CaptureResult: Codable, Equatable, Sendable {
     var capturedAt: CaptureTime
     /// U01: the format it was recorded in.
     var format = CaptureFormat.portrait
+    /// H.8: halves when the two cameras shared the frame; nil is the window.
+    var arrangement: PiPLayout.Arrangement?
+
+    /// Both cameras in halves: only with a selfie, and never on 1:1.
+    var isHalves: Bool { arrangement == .halves && selfieURL != nil && format != .square }
 
     var mainURL: URL {
         switch media {
@@ -156,6 +161,9 @@ final class CameraModel {
     var canCapture: Bool { phase == .ready && interruption == nil && formatFitsHold }
 
     var format: CaptureFormat { settings.format }
+
+    /// H.8: the two cameras each fill half the frame: picked in the ••• sheet, with both cameras, not on 1:1.
+    var showsHalves: Bool { settings.arrangement == .halves && selfiePosition != nil && format != .square }
 
     /// 16:9 needs the phone on its side; 9:16 and 1:1 need it upright (U03, U06).
     var formatFitsHold: Bool { format == .landscape ? hold.isLandscape : !hold.isLandscape }
@@ -323,7 +331,10 @@ final class CameraModel {
 
     /// The window can't move while capturing, so the current placement is where it was.
     private func result(_ media: CaptureResult.Media, selfie: URL?, at time: CaptureTime) -> CaptureResult {
-        CaptureResult(media: media, window: selfie == nil ? nil : settings.selfieWindow, capturedAt: time, format: format)
+        CaptureResult(
+            media: media, window: selfie == nil ? nil : settings.selfieWindow, capturedAt: time, format: format,
+            arrangement: selfie != nil && showsHalves ? .halves : nil
+        )
     }
 
     private func arranged(_ video: CapturedVideo) -> CapturedVideo {

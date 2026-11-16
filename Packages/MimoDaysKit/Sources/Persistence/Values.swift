@@ -57,11 +57,21 @@ public struct PiPLayout: Codable, Equatable, Hashable, Sendable {
     /// Degrees; the design tilts the window -5.4.
     public var rotation: Double
     /// The stream in the window: the front camera, or the rear one after ↻ made the front camera the big one.
+    /// In halves, the stream in the second half (bottom on 9:16, right on 16:9).
     public var source: MediaRole
+    /// How the two cameras share the frame; nil is the window (every moment from before halves existed).
+    public var arrangement: Arrangement?
+
+    /// H.8 (Andrew, 2026-11-16): the selfie in its window, or both cameras each filling half the frame, split
+    /// across its long side. 1:1 has the window only.
+    public enum Arrangement: String, Codable, CaseIterable, Sendable {
+        case window
+        case halves
+    }
 
     public init(
         centerX: Double, centerY: Double, scale: Double, shape: Shape = .roundedRectangle, rotation: Double = -5.4,
-        source: MediaRole = .frontSource
+        source: MediaRole = .frontSource, arrangement: Arrangement? = nil
     ) {
         self.centerX = centerX
         self.centerY = centerY
@@ -69,7 +79,11 @@ public struct PiPLayout: Codable, Equatable, Hashable, Sendable {
         self.shape = shape
         self.rotation = rotation
         self.source = source
+        self.arrangement = arrangement
     }
+
+    /// Both cameras each fill half the frame.
+    public var isHalves: Bool { arrangement == .halves }
 }
 
 /// The shape a moment was recorded in (U01-U07). The full sensor frame is kept; the format crops it on screen and in exports.

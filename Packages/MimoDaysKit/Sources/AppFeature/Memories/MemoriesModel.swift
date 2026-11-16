@@ -296,7 +296,7 @@ final class MemoriesModel {
         descriptor.fetchLimit = 1
         guard let moment = try? context.fetch(descriptor).first else { return nil }
         let summary = MomentSummary(moment)
-        return (summary.mainPath, summary.selfiePath)
+        return (summary.picturePath, summary.windowPath)
     }
 
     private func fetchDetail(_ id: UUID) -> TileDetail? {

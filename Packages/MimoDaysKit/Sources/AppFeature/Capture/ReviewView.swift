@@ -122,7 +122,7 @@ struct ReviewView: View {
                     window: model.hasSelfie && proxy.size.width > 0
                         ? MemoryCardFront.Window(
                             layout: layout, placement: model.window, rotation: Size.selfieWindowTilt.degrees, id: "review.selfieWindow",
-                            move: { model.window = $0 }, swap: { swap() }
+                            move: { model.window = $0 }, swap: { swap() }, halves: model.capture.isHalves
                         )
                         : nil,
                     swapped: swapped, cornerOnRight: nil, controlsShown: $controlsShown, actions: nil

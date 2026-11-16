@@ -17,7 +17,7 @@ struct ReviewSnapshotTests {
 
     private func review(
         video: Bool = false, interruption: CaptureInterruption? = nil, window: CameraSettings.SelfieWindow = .init(),
-        format: CaptureFormat = .portrait
+        format: CaptureFormat = .portrait, halves: Bool = false
     ) async throws -> ReviewModel {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()
@@ -31,7 +31,9 @@ struct ReviewSnapshotTests {
         } else {
             media = .photo(try await engine.capturePhoto(flash: .off, silent: true))
         }
-        let model = ReviewModel(capture: CaptureResult(media: media, window: window, capturedAt: time, format: format))
+        let model = ReviewModel(capture: CaptureResult(
+            media: media, window: window, capturedAt: time, format: format, arrangement: halves ? .halves : nil
+        ))
         await model.load()
         return model
     }
@@ -53,6 +55,19 @@ struct ReviewSnapshotTests {
     /// The test matrix's other cells: a 16:9 video taken sideways and a 1:1 photo.
     @Test func wideVideo() async throws {
         let model = try await review(video: true, format: .landscape)
+        defer { model.discard() }
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// H.8: a photo in halves on the card, 9:16 top and bottom, 16:9 side by side.
+    @Test func halvesPhoto() async throws {
+        let model = try await review(halves: true)
+        defer { model.discard() }
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    @Test func wideHalvesVideo() async throws {
+        let model = try await review(video: true, format: .landscape, halves: true)
         defer { model.discard() }
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }

@@ -129,7 +129,8 @@ struct ViewerMoment: Equatable, Identifiable {
                 timing: VideoTiming(
                     duration: main.duration ?? 0, selfieOffset: selfie?.startOffset ?? 0, hasAudio: main.hasAudio,
                     mainPosition: main.role == .frontSource ? .front : .back,
-                    window: layout?.windowFrame(in: pixelSize)
+                    window: layout?.windowFrame(in: pixelSize),
+                    halves: layout?.isHalves == true ? moment.captureFormat : nil
                 ),
                 pixelSize: pixelSize, layout: layout
             )
@@ -345,6 +346,7 @@ final class MomentViewerModel {
         if var video = viewed.video {
             video.layout = saved
             video.timing.window = saved.windowFrame(in: video.pixelSize)
+            video.timing.halves = saved.isHalves ? viewed.format : nil
             moments[id]?.video = video
         } else {
             moments[id]?.photo?.layout = saved
@@ -355,6 +357,13 @@ final class MomentViewerModel {
             await previous?.value
             await recompose(changed)
         }
+    }
+
+    /// H.8: the card's switch between the window and halves; kept on the moment like a moved window.
+    func setArrangement(_ arrangement: PiPLayout.Arrangement, for id: UUID) {
+        guard var layout = moments[id]?.video?.layout ?? moments[id]?.photo?.layout else { return }
+        layout.arrangement = arrangement == .halves ? .halves : nil
+        setWindow(layout, for: id)
     }
 
     /// The last rebuild of what grids and sharing show; each waits for the one before, so files are replaced
@@ -368,12 +377,15 @@ final class MomentViewerModel {
             if let video = viewed.video {
                 guard let main = url(video.mainPath),
                       let image = await MomentSaver.videoThumbnail(
-                          mainURL: main, selfieURL: url(video.selfiePath), selfieOffset: video.timing.selfieOffset, window: video.timing.window
+                          mainURL: main, selfieURL: url(video.selfiePath), selfieOffset: video.timing.selfieOffset,
+                          window: video.timing.window, halves: video.timing.halves
                       ) else { return }
                 try replace(.thumbnail, of: viewed.id, with: image)
             } else if let photo = viewed.photo, let layout = photo.layout,
                       let main = url(viewed.mainPath), let selfie = url(viewed.selfiePath) {
-                let composed = try await PhotoComposer.compose(mainURL: main, selfieURL: selfie, window: layout.windowFrame(in: photo.pixelSize))
+                let composed = layout.isHalves
+                    ? try await PhotoComposer.compose(mainURL: main, selfieURL: selfie, halves: viewed.format)
+                    : try await PhotoComposer.compose(mainURL: main, selfieURL: selfie, window: layout.windowFrame(in: photo.pixelSize))
                 defer { try? FileManager.default.removeItem(at: composed) }
                 moments[viewed.id]?.composedPath = try replace(.composedPreview, of: viewed.id, with: composed)
                 guard let image = await ReviewModel.still(composed, maxPixelSize: MomentSaver.thumbnailSize, at: 0)?.cgImage else { return }

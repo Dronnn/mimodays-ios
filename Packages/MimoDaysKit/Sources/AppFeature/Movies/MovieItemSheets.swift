@@ -95,7 +95,7 @@ struct ClipSheet: View {
     }
 
     private func layoutRow(fills: Bool) -> some View {
-        let current = model.selectedClip?.cameraLayout ?? .window
+        let current = model.selectedPlan?.layout ?? .window
         return HStack(spacing: 6) {
             ForEach(ClipCameraLayout.allCases, id: \.self) { layout in
                 let isOn = layout == current

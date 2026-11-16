@@ -128,8 +128,12 @@ struct CameraView: View {
             let windowArea = fills || model.needsRotation ? whole : shape
             ZStack {
                 CameraPalette.previewPlaceholder
-                CameraPreview(engine: model.engine, position: model.mainPosition)
-                    .accessibilityHidden(true)
+                if let selfie = model.selfiePosition, model.showsHalves, !model.needsRotation {
+                    halves(turn, shape: shape, selfie: selfie)
+                } else {
+                    CameraPreview(engine: model.engine, position: model.mainPosition)
+                        .accessibilityHidden(true)
+                }
                 if !fills {
                     FormatMask(frame: turn.rect(shape))
                 }
@@ -142,11 +146,27 @@ struct CameraView: View {
         }
     }
 
+    /// H.8: each camera fills its half of the format's frame, the big one first (top, or left held sideways);
+    /// ↻ swaps them. The previews stay upright as the camera sees them, like the full one.
+    private func halves(_ turn: CameraTurn, shape: CGRect, selfie: CameraPosition) -> some View {
+        let (first, second) = HalvesArt.halves(shape.size)
+        return ZStack(alignment: .topLeading) {
+            ForEach([(model.mainPosition, first), (selfie, second)], id: \.0) { position, half in
+                let rect = turn.rect(half.offsetBy(dx: shape.minX, dy: shape.minY))
+                CameraPreview(engine: model.engine, position: position)
+                    .frame(width: rect.width, height: rect.height)
+                    .clipped()
+                    .position(x: rect.midX, y: rect.midY)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
     private func overPreview(_ turn: CameraTurn, _ chrome: CameraChrome, shape: CGRect, windowArea: CGRect, insideShape: Bool) -> some View {
         let direction = layoutDirection
         return ZStack {
             // U03/U06: while the phone is held the wrong way the hint has the preview to itself.
-            if let selfie = model.selfiePosition, !model.needsRotation {
+            if let selfie = model.selfiePosition, !model.needsRotation, !model.showsHalves {
                 let chipBottom = model.isSurprise ? chipHeight.map { chrome.surpriseChip.minY + $0 } : nil
                 AdjustableSelfieWindow(
                     placement: $model.settings.selfieWindow, showsSheet: $adjustsSelfie,

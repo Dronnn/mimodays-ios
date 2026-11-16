@@ -110,7 +110,8 @@ struct MomentExporter {
                 let timing = VideoTiming(
                     duration: media.duration ?? 0, selfieOffset: selfie?.startOffset ?? 0, hasAudio: media.hasAudio,
                     mainPosition: media.role == .frontSource ? .front : .back,
-                    window: selfie == nil ? nil : moment.pipLayout?.windowFrame(in: pixelSize)
+                    window: selfie == nil ? nil : moment.pipLayout?.windowFrame(in: pixelSize),
+                    halves: selfie != nil && moment.pipLayout?.isHalves == true ? moment.captureFormat : nil
                 )
                 pictures.append((.composedVideo(main: main, selfie: url(summary.selfiePath), timing: timing), "", "mp4"))
             } else if !isVideo {

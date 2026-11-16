@@ -1,4 +1,5 @@
 import Core
+import Persistence
 import CoreImage
 import Foundation
 import ImageIO
@@ -23,10 +24,21 @@ enum PhotoComposer {
     /// Reads both files upright (orientation and mirroring applied), composes, writes HEIC (JPEG where HEIC
     /// encoding isn't available). Runs off the main actor.
     static func compose(mainURL: URL, selfieURL: URL, window: SelfieWindowFrame) async throws -> URL {
+        try await compose(mainURL: mainURL, selfieURL: selfieURL) { compose(main: $0, selfie: $1, window: window) }
+    }
+
+    /// H.8: the two photos in halves of the format's frame.
+    static func compose(mainURL: URL, selfieURL: URL, halves format: CaptureFormat) async throws -> URL {
+        try await compose(mainURL: mainURL, selfieURL: selfieURL) { compose(main: $0, selfie: $1, halves: format) }
+    }
+
+    private static func compose(
+        mainURL: URL, selfieURL: URL, _ draw: @Sendable (CGImage, CGImage) -> CGImage
+    ) async throws -> URL {
         // Full size, EXIF orientation applied.
         guard let main = await ImageDecoding.thumbnail(mainURL, maxPixelSize: nil),
               let selfie = await ImageDecoding.thumbnail(selfieURL, maxPixelSize: nil) else { throw Failure.unreadable }
-        let composed = compose(main: main, selfie: selfie, window: window)
+        let composed = draw(main, selfie)
         return try await withCheckedThrowingContinuation { continuation in
             encoding.async { continuation.resume(with: Result { try write(composed) }) }
         }
@@ -49,10 +61,16 @@ enum PhotoComposer {
     }
 
     static func compose(main: CGImage, selfie: CGImage, window: SelfieWindowFrame) -> CGImage {
-        let canvas = CGSize(width: main.width, height: main.height)
-        let art = SelfieWindowArt(window: window, canvas: canvas)
+        draw(SelfieWindowArt(window: window, canvas: CGSize(width: main.width, height: main.height)), main: main, selfie: selfie)
+    }
+
+    static func compose(main: CGImage, selfie: CGImage, halves format: CaptureFormat) -> CGImage {
+        draw(HalvesArt(format: format, main: CGSize(width: main.width, height: main.height)), main: main, selfie: selfie)
+    }
+
+    private static func draw(_ art: some FrameArt, main: CGImage, selfie: CGImage) -> CGImage {
         let image = art.compose(main: CIImage(cgImage: main), selfie: CIImage(cgImage: selfie))
-        return context.createCGImage(image, from: CGRect(origin: .zero, size: canvas), format: .RGBA8, colorSpace: CGColorSpace(name: CGColorSpace.sRGB)) ?? main
+        return context.createCGImage(image, from: CGRect(origin: .zero, size: art.canvas), format: .RGBA8, colorSpace: CGColorSpace(name: CGColorSpace.sRGB)) ?? main
     }
 
     private static let context = CIContext(options: [.cacheIntermediates: false])

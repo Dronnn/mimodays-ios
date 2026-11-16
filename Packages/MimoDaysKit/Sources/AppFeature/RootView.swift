@@ -187,7 +187,7 @@ public struct RootView: View {
     /// DG.1: the latest moment for the camera's thumbnail; a tap closes the camera and opens it on Today.
     private var lastCapture: LastCapture? {
         guard let latest = today.latest else { return nil }
-        let image = today.image(latest.thumbnailPath, TodayModel.tilePixels) ?? today.image(latest.mainPath, TodayModel.heroPixels)
+        let image = today.image(latest.thumbnailPath, TodayModel.tilePixels) ?? today.image(latest.picturePath, TodayModel.heroPixels)
         return LastCapture(image: image) { [router, today] in
             router.capture = nil
             router.selectedTab = .today

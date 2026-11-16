@@ -126,7 +126,8 @@ public final class AppDependencies {
     }
 
     /// `-seed populated`: a few moments from the simulated camera, saved the normal way. The newest is from
-    /// two hours ago in Yerevan; one is from a year ago today, for On this day.
+    /// two hours ago in Yerevan, or midnight if that was yesterday: it is always today's; one is from a year ago
+    /// today, for On this day.
     private func seedMoments() {
         let calendar = Calendar.current
         let now = Date()
@@ -134,7 +135,7 @@ public final class AppDependencies {
             calendar.date(byAdding: .year, value: -1, to: now),
             calendar.date(byAdding: .day, value: -3, to: now),
             calendar.date(byAdding: .day, value: -1, to: now),
-            now.addingTimeInterval(-2 * 3600),
+            max(now.addingTimeInterval(-2 * 3600), calendar.startOfDay(for: now)),
         ].compactMap(\.self)
         let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
         Task {

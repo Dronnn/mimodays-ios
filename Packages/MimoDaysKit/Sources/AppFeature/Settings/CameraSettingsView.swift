@@ -97,7 +97,7 @@ struct CameraSettingsView: View {
                         DataToggleRow(title: Text("Record sound", bundle: .module), isOn: $settings.recordsSound)
                             .accessibilityIdentifier("cameraSettings.sound")
                         DataSeparator()
-                        DataToggleRow(title: Text("Camera sounds", bundle: .module), isOn: $settings.cameraSounds)
+                        DataToggleRow(title: Text("Shutter sound", bundle: .module), detail: Text("In silent mode, photos never make a sound.", bundle: .module), isOn: $settings.cameraSounds)
                             .accessibilityIdentifier("cameraSettings.shutter")
                     }
                     .padding(.horizontal, 16)

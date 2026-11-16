@@ -2107,18 +2107,6 @@
         }
       }
     },
-    "Camera sounds" : {
-      "comment" : "Camera settings: toggle, play the shutter sound where iOS allows turning it off",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Camera sounds"
-          }
-        }
-      }
-    },
     "Cameras" : {
       "comment" : "U50: button that opens the clip's cameras and sound sheet (U52)",
       "extractionState" : "manual",
@@ -2383,6 +2371,18 @@
         }
       }
     },
+    "In silent mode, photos never make a sound." : {
+      "comment" : "Camera settings (S03, ••• sheet): note under the Shutter sound toggle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In silent mode, photos never make a sound."
+          }
+        }
+      }
+    },
     "Last moment" : {
       "comment" : "Camera (U01): VoiceOver label of the last capture's thumbnail, which opens it",
       "extractionState" : "manual",
@@ -2391,6 +2391,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last moment"
+          }
+        }
+      }
+    },
+    "Shutter sound" : {
+      "comment" : "Camera settings (S03, ••• sheet): toggle, the sound a photo makes where iOS allows turning it off",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shutter sound"
           }
         }
       }

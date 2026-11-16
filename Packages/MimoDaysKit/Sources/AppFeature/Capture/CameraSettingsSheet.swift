@@ -21,7 +21,7 @@ struct CameraSettingsSheet: View {
                     VStack(spacing: 0) {
                         toggle(Text("Record sound", bundle: .module), isOn: $settings.recordsSound, id: "cameraSettings.sound")
                         Rectangle().fill(ColorToken.separator.color).frame(height: 1).padding(.leading, 16)
-                        toggle(Text("Camera sounds", bundle: .module), isOn: $settings.cameraSounds, id: "cameraSettings.shutter")
+                        toggle(Text("Shutter sound", bundle: .module), detail: Text("In silent mode, photos never make a sound.", bundle: .module), isOn: $settings.cameraSounds, id: "cameraSettings.shutter")
                     }
                     .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
                     .padding(.top, 12)
@@ -53,14 +53,23 @@ struct CameraSettingsSheet: View {
         .padding(.top, 8)
     }
 
-    private func toggle(_ title: Text, isOn: Binding<Bool>, id: String) -> some View {
+    private func toggle(_ title: Text, detail: Text? = nil, isOn: Binding<Bool>, id: String) -> some View {
         Toggle(isOn: isOn) {
-            title
-                .textStyle(.rowTitle)
-                .foregroundStyle(ColorToken.textPrimary.color)
+            VStack(alignment: .leading, spacing: 2) {
+                title
+                    .textStyle(.rowTitle)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                if let detail {
+                    detail
+                        .textStyle(.meta)
+                        .foregroundStyle(ColorToken.textSecondary.color)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
         }
         .tint(ColorToken.actionCoral.color)
         .padding(.horizontal, 16)
+        .padding(.vertical, detail == nil ? 0 : 10)
         .frame(minHeight: 52)
         .accessibilityIdentifier(id)
     }

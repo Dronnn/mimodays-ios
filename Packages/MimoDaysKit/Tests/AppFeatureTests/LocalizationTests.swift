@@ -36,7 +36,7 @@ struct LocalizationTests {
         "Camera settings", "Flash", "Sound", "Selfie window", "On", "Off", "Switch camera", "Take photo", "Record video",
         "Stop recording", "Recording", "Tap to stop",
         "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.",
-        "Opens in", "Video length", "Record sound", "Camera sounds", "Camera", "Photo", "Video",
+        "Opens in", "Video length", "Record sound", "Shutter sound", "In silent mode, photos never make a sound.", "Camera", "Photo", "Video",
         "Top left", "Top right", "Bottom left", "Bottom right", "Small", "Medium", "Large", "Reset to default",
         "Adjust selfie window",
         "Videos will be silent. Turn on the microphone in Settings to add sound.",

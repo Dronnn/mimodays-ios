@@ -18,7 +18,7 @@
       "internalID": "6700000000",
       "localizations": [
         {
-          "description": "A tip that keeps MimoDays independent. It unlocks nothing.",
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
           "displayName": "Small tip",
           "locale": "en_US"
         }
@@ -33,7 +33,7 @@
       "internalID": "6700000001",
       "localizations": [
         {
-          "description": "A tip that keeps MimoDays independent. It unlocks nothing.",
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
           "displayName": "Medium tip",
           "locale": "en_US"
         }
@@ -48,7 +48,7 @@
       "internalID": "6700000002",
       "localizations": [
         {
-          "description": "A tip that keeps MimoDays independent. It unlocks nothing.",
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
           "displayName": "Large tip",
           "locale": "en_US"
         }
@@ -63,7 +63,7 @@
       "internalID": "6700000003",
       "localizations": [
         {
-          "description": "A tip that keeps MimoDays independent. It unlocks nothing.",
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
           "displayName": "Generous tip",
           "locale": "en_US"
         }
@@ -78,7 +78,7 @@
       "internalID": "6700000004",
       "localizations": [
         {
-          "description": "A tip that keeps MimoDays independent. It unlocks nothing.",
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
           "displayName": "Patron tip",
           "locale": "en_US"
         }
@@ -93,7 +93,7 @@
       "internalID": "6700000005",
       "localizations": [
         {
-          "description": "A tip that keeps MimoDays independent. It unlocks nothing.",
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
           "displayName": "Extraordinary tip",
           "locale": "en_US"
         }

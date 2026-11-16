@@ -60,7 +60,8 @@ jobs:
         run: |
           mkdir -p results/samples
           xcodebuild test -scheme MimoDaysKit-Package \
-            -destination "$DESTINATION" -resultBundlePath results/Package.xcresult &
+            -destination "$DESTINATION" -resultBundlePath results/Package.xcresult \
+            -skip-testing:AppFeatureTests/ArchivePerformanceTests &
           tests=$!
           (
             sleep 1800
@@ -72,6 +73,12 @@ jobs:
             kill "$tests"
           ) &
           wait "$tests"
+      # Timed on their own: run beside the movie exports, they time the runner's load, not the code.
+      - name: Performance tests
+        run: |
+          xcodebuild test -scheme MimoDaysKit-Package \
+            -destination "$DESTINATION" -resultBundlePath results/Performance.xcresult \
+            -only-testing:AppFeatureTests/ArchivePerformanceTests
       - name: Upload results and snapshot diffs
         if: failure()
         uses: actions/upload-artifact@v4

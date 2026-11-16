@@ -9,7 +9,7 @@ import TestSupport
 /// 9.12: Memories, search and On this day stay quick on a 10,000-moment archive (about 27 years of a moment a day).
 /// Budgets are generous so a slow CI machine passes; a regression to per-moment faulting blows far past them.
 @MainActor
-@Suite(.timeLimit(.minutes(2)))
+@Suite(.serialized, .timeLimit(.minutes(2)))
 struct ArchivePerformanceTests {
     private let container = try! TestStore.container()
     private let store: MediaStore

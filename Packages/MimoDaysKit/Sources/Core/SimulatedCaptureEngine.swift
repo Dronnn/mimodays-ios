@@ -25,10 +25,14 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     public nonisolated let events: AsyncStream<CaptureEvent>
     private let eventSink: AsyncStream<CaptureEvent>.Continuation
 
-    public init(multiCam: Bool = true, freeBytes: Int64? = nil, lenses: [BackLens] = [.ultraWide, .wide]) {
+    /// Real clips instead of drawn frames (website recordings).
+    nonisolated let footage: DemoFootage?
+
+    public init(multiCam: Bool = true, freeBytes: Int64? = nil, lenses: [BackLens] = [.ultraWide, .wide], footage: DemoFootage? = nil) {
         self.multiCam = multiCam
         self.freeBytes = freeBytes
         self.lenses = lenses
+        self.footage = footage
         (events, eventSink) = AsyncStream.makeStream()
     }
 
@@ -85,8 +89,13 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         hasMicrophone = enabled
     }
 
-    public func capturePhoto(flash _: FlashMode, silent _: Bool) throws -> CapturedPhoto {
+    public func capturePhoto(flash _: FlashMode, silent _: Bool) async throws -> CapturedPhoto {
         guard isRunning, interruption == nil, let setup else { throw CaptureError.notRunning }
+        if let footage {
+            var urls: [URL] = []
+            for position in setup.positions { urls.append(try await footage.photo(position)) }
+            return CapturedPhoto(mainURL: urls[0], mainPosition: setup.positions[0], selfieURL: urls.dropFirst().first)
+        }
         let urls = try setup.positions.map { position in
             let url = try CaptureFiles.temporaryURL("jpg")
             guard let data = SimulatedMedia.image(position, sideways: isSideways).jpegData(compressionQuality: 0.8) else { throw CaptureError.photoFailed }
@@ -108,6 +117,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
         let clock = ContinuousClock()
         let started = clock.now
+        let startedAt = Date.now
         await withCheckedContinuation { continuation in
             stopSignal = continuation
             if let limit {
@@ -124,7 +134,11 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         var urls: [URL] = []
         do {
             for position in setup.positions {
-                urls.append(try await SimulatedMedia.writeClip(position, seconds: seconds, sideways: isSideways))
+                if let footage {
+                    urls.append(try await footage.clip(position, from: startedAt, seconds: seconds))
+                } else {
+                    urls.append(try await SimulatedMedia.writeClip(position, seconds: seconds, sideways: isSideways))
+                }
             }
         } catch {
             urls.forEach { try? FileManager.default.removeItem(at: $0) }
@@ -162,6 +176,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
     @MainActor
     public func previewLayer(for position: CameraPosition) -> CALayer? {
+        if let footage { return footage.previewLayer(position) }
         let layer = CALayer()
         layer.contents = SimulatedMedia.image(position).cgImage
         layer.contentsGravity = .resizeAspectFill

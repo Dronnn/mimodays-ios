@@ -74,10 +74,17 @@ public final class AppDependencies {
         #else
         let simulatedCamera = configuration.usesFakeCamera
         #endif
+        #if DEBUG
+        let footage = configuration.demoFootage.flatMap { DemoFootage(folder: $0) }
+        #else
+        let footage: DemoFootage? = nil
+        #endif
         let cameraSettings: any CameraSettingsStore = configuration.isUITesting ? InMemoryCameraSettingsStore() : UserDefaultsCameraSettingsStore()
         camera = CameraServices(
             makeEngine: { @MainActor () -> any CaptureEngine in
-                simulatedCamera ? SimulatedCaptureEngine() : AVCaptureEngine(maxFormatWidth: cameraSettings.load().videoQuality.maxFormatWidth)
+                simulatedCamera
+                    ? SimulatedCaptureEngine(footage: footage)
+                    : AVCaptureEngine(maxFormatWidth: cameraSettings.load().videoQuality.maxFormatWidth)
             },
             // The simulator has no motion data; there the sensor follows the device orientation, which UI tests can set.
             makeOrientation: { MotionOrientationSensor() },
@@ -123,6 +130,11 @@ public final class AppDependencies {
         if configuration.isUITesting, configuration.seed == .movie {
             seedMovieMoments()
         }
+        #if DEBUG
+        if configuration.isUITesting, let folder = footage?.folder {
+            seedDemoMoments(from: folder)
+        }
+        #endif
     }
 
     /// `-seed populated`: a few moments from the simulated camera, saved the normal way. The newest is from

@@ -24,6 +24,7 @@ public struct LaunchConfiguration: Equatable, Sendable {
     public static let seedArgument = "-seed"
     public static let permissionsArgument = "-permissions"
     public static let surpriseTapArgument = "-surprise-tap"
+    public static let demoFootageArgument = "-demo-footage"
 
     public var isUITesting: Bool
     public var skipsOnboarding: Bool
@@ -32,10 +33,12 @@ public struct LaunchConfiguration: Equatable, Sendable {
     /// Every permission starts in this state instead of asking the system (UI tests only).
     public var permissions: PermissionStatus?
     public var surpriseTap: SurpriseTap?
+    /// A folder of real clips for the simulated camera and a year of moments (debug builds, website recordings).
+    public var demoFootage: URL?
 
     public init(
         isUITesting: Bool, skipsOnboarding: Bool = false, usesFakeCamera: Bool = false,
-        seed: Seed? = nil, permissions: PermissionStatus? = nil, surpriseTap: SurpriseTap? = nil
+        seed: Seed? = nil, permissions: PermissionStatus? = nil, surpriseTap: SurpriseTap? = nil, demoFootage: URL? = nil
     ) {
         self.isUITesting = isUITesting
         self.skipsOnboarding = skipsOnboarding
@@ -43,6 +46,7 @@ public struct LaunchConfiguration: Equatable, Sendable {
         self.seed = seed
         self.permissions = permissions
         self.surpriseTap = surpriseTap
+        self.demoFootage = demoFootage
     }
 
     public init(arguments: [String] = ProcessInfo.processInfo.arguments) {
@@ -52,6 +56,7 @@ public struct LaunchConfiguration: Equatable, Sendable {
         seed = Self.value(after: Self.seedArgument, in: arguments).flatMap(Seed.init(rawValue:))
         permissions = Self.value(after: Self.permissionsArgument, in: arguments).flatMap(PermissionStatus.init(rawValue:))
         surpriseTap = Self.value(after: Self.surpriseTapArgument, in: arguments).flatMap(SurpriseTap.init(rawValue:))
+        demoFootage = Self.value(after: Self.demoFootageArgument, in: arguments).map { URL(filePath: $0, directoryHint: .isDirectory) }
     }
 
     /// Launch arguments that reproduce this configuration, for `XCUIApplication.launchArguments`.
@@ -63,6 +68,7 @@ public struct LaunchConfiguration: Equatable, Sendable {
         if let seed { result += [Self.seedArgument, seed.rawValue] }
         if let permissions { result += [Self.permissionsArgument, permissions.rawValue] }
         if let surpriseTap { result += [Self.surpriseTapArgument, surpriseTap.rawValue] }
+        if let demoFootage { result += [Self.demoFootageArgument, demoFootage.path(percentEncoded: false)] }
         return result
     }
 

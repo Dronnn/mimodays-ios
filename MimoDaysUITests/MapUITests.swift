@@ -27,6 +27,22 @@ final class MapUITests: XCTestCase {
         add(attachment)
     }
 
+    /// H.2: on iPhone the interface stays upright when the phone turns; the map and its places stay usable.
+    @MainActor
+    func testTheMapStaysUprightWhenThePhoneTurns() {
+        launchOnMap()
+        defer { XCUIDevice.shared.orientation = .portrait }
+        let recent = app.buttons["map.recentPlace"]
+        XCTAssertTrue(recent.waitForExistence(timeout: 20))
+        XCUIDevice.shared.orientation = .landscapeLeft
+        sleep(1)
+        let window = app.windows.firstMatch.frame
+        XCTAssertGreaterThan(window.height, window.width, "the screen stays upright: \(window)")
+        XCTAssertTrue(recent.isHittable)
+        recent.tap()
+        XCTAssertTrue(app.buttons["place.seeAll"].waitForExistence(timeout: 5))
+    }
+
     /// Flow 04 (doc 02): the map, a place (P02), its moments (P03), one of them in the viewer.
     @MainActor
     func testAPlaceOpensItsMomentsAndTheViewer() {

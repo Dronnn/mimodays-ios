@@ -1,15 +1,15 @@
 import UIKit
 
-/// The interface orientations the app allows right now. The capture flow keeps the screen upright and the camera
-/// turns its own controls with the phone (C.3), like the Camera app; everywhere else the app rotates as before.
-/// The app delegate reports `mask` to iOS.
+/// The interface orientations the app allows right now. On iPhone the interface is always upright (Andrew,
+/// 2026-11-16); the camera turns its own controls with the phone (C.3), like the Camera app. iPad turns with the
+/// device, the capture flow upright. The app delegate reports `mask` to iOS.
 @MainActor
 public enum OrientationLock {
     /// Nil: what Info.plist allows.
     private static var locked: UIInterfaceOrientationMask?
 
     public static var mask: UIInterfaceOrientationMask {
-        locked ?? (UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown)
+        locked ?? (UIDevice.current.userInterfaceIdiom == .pad ? .all : .portrait)
     }
 
     /// How the window is turned, as a hold: upright on iPhone while locked; on iPad it turns with the device.

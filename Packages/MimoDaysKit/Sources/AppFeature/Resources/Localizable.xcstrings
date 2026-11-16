@@ -448,22 +448,52 @@
       }
     },
     "%lld moments are only on this iPhone." : {
-      "comment" : "Backup (E06): status card line before the first backup",
+      "comment" : "Backup (E06): status card line before the first backup. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld moment is only on this iPhone."
+            "device" : {
+              "ipad" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "%lld moment is only on this iPad."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "%lld moments are only on this iPad."
+                      }
+                    }
+                  }
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld moments are only on this iPhone."
+                }
+              },
+              "iphone" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "%lld moment is only on this iPhone."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "%lld moments are only on this iPhone."
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -696,22 +726,52 @@
       }
     },
     "%lld new moments since then are only on this iPhone." : {
-      "comment" : "Backup (E06): status card warning",
+      "comment" : "Backup (E06): status card warning. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld new moment since then is only on this iPhone."
+            "device" : {
+              "ipad" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "%lld new moment since then is only on this iPad."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "%lld new moments since then are only on this iPad."
+                      }
+                    }
+                  }
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld new moments since then are only on this iPhone."
+                }
+              },
+              "iphone" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "%lld new moment since then is only on this iPhone."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "%lld new moments since then are only on this iPhone."
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1952,13 +2012,25 @@
       }
     },
     "Backups are files you keep. MimoDays never uploads them anywhere. If this iPhone is lost, a backup is the only way to get your moments back." : {
-      "comment" : "Backup (E06): note under the rows",
+      "comment" : "Backup (E06): note under the rows. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Backups are files you keep. MimoDays never uploads them anywhere. If this iPhone is lost, a backup is the only way to get your moments back."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Backups are files you keep. MimoDays never uploads them anywhere. If this iPad is lost, a backup is the only way to get your moments back."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Backups are files you keep. MimoDays never uploads them anywhere. If this iPhone is lost, a backup is the only way to get your moments back."
+                }
+              }
+            }
           }
         }
       }
@@ -2996,25 +3068,49 @@
       }
     },
     "Days and times follow wherever this iPhone is now, so a photo taken late in the evening can move to the next day." : {
-      "comment" : "Memories settings (S09): note explaining Days follow this iPhone's time zone",
+      "comment" : "Memories settings (S09): note explaining Days follow this iPhone's time zone. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Days and times follow wherever this iPhone is now, so a photo taken late in the evening can move to the next day."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Days and times follow wherever this iPad is now, so a photo taken late in the evening can move to the next day."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Days and times follow wherever this iPhone is now, so a photo taken late in the evening can move to the next day."
+                }
+              }
+            }
           }
         }
       }
     },
     "Days follow this iPhone's time zone" : {
-      "comment" : "Memories settings (S09): choice, a moment's day and time follow the iPhone's current time zone",
+      "comment" : "Memories settings (S09): choice, a moment's day and time follow the iPhone's current time zone. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Days follow this iPhone's time zone"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Days follow this iPad's time zone"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Days follow this iPhone's time zone"
+                }
+              }
+            }
           }
         }
       }
@@ -3644,13 +3740,25 @@
       }
     },
     "Everything stays on this iPhone. No account, no ads, no tracking, no analytics." : {
-      "comment" : "Privacy settings (S05): note at the bottom",
+      "comment" : "Privacy settings (S05): note at the bottom. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Everything stays on this iPhone. No account, no ads, no tracking, no analytics."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Everything stays on this iPad. No account, no ads, no tracking, no analytics."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Everything stays on this iPhone. No account, no ads, no tracking, no analytics."
+                }
+              }
+            }
           }
         }
       }
@@ -4292,13 +4400,25 @@
       }
     },
     "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives." : {
-      "comment" : "First moment saved (onboarding O10): body",
+      "comment" : "First moment saved (onboarding O10): body. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It lives on this iPad. Come back tomorrow, or whenever a surprise arrives."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives."
+                }
+              }
+            }
           }
         }
       }
@@ -4820,13 +4940,25 @@
       }
     },
     "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all." : {
-      "comment" : "Privacy statement (S05): location use",
+      "comment" : "Privacy statement (S05): location use. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "MimoDays asks where this iPad is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
+                }
+              }
+            }
           }
         }
       }
@@ -5144,13 +5276,25 @@
       }
     },
     "Moving to a new iPhone" : {
-      "comment" : "Help & about (S07): help page title",
+      "comment" : "Help & about (S07): help page title. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moving to a new iPhone"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Moving to a new iPad"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Moving to a new iPhone"
+                }
+              }
+            }
           }
         }
       }
@@ -5624,13 +5768,25 @@
       }
     },
     "Not enough space to record. Free up some space on this iPhone and try again." : {
-      "comment" : "Camera note: too little free storage to start a video.",
+      "comment" : "Camera note: too little free storage to start a video. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Not enough space to record. Free up some space on this iPhone and try again."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Not enough space to record. Free up some space on this iPad and try again."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Not enough space to record. Free up some space on this iPhone and try again."
+                }
+              }
+            }
           }
         }
       }
@@ -5780,13 +5936,25 @@
       }
     },
     "Nothing on this iPhone was changed. Try again." : {
-      "comment" : "Restore: any other failure, message",
+      "comment" : "Restore: any other failure, message. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing on this iPhone was changed. Try again."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing on this iPad was changed. Try again."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing on this iPhone was changed. Try again."
+                }
+              }
+            }
           }
         }
       }
@@ -5816,13 +5984,25 @@
       }
     },
     "Nothing was restored. This iPhone needs about %@ more free space." : {
-      "comment" : "Restore: not enough room. %@: how much more space is needed",
+      "comment" : "Restore: not enough room. %@: how much more space is needed. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing was restored. This iPhone needs about %@ more free space."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing was restored. This iPad needs about %@ more free space."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing was restored. This iPhone needs about %@ more free space."
+                }
+              }
+            }
           }
         }
       }
@@ -5924,13 +6104,25 @@
       }
     },
     "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file." : {
-      "comment" : "Help & about (S07): Moving to a new iPhone help",
+      "comment" : "Help & about (S07): Moving to a new iPhone help. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On the new iPad, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file."
+                }
+              }
+            }
           }
         }
       }
@@ -5984,25 +6176,49 @@
       }
     },
     "On this iPhone" : {
-      "comment" : "Privacy statement (S05): section title",
+      "comment" : "Privacy statement (S05): section title. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "On this iPhone"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On this iPad"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On this iPhone"
+                }
+              }
+            }
           }
         }
       }
     },
     "On this iPhone, open Settings › Backup and make a backup. Save it to iCloud Drive, another place in Files, or a computer." : {
-      "comment" : "Help & about (S07): Moving to a new iPhone help",
+      "comment" : "Help & about (S07): Moving to a new iPhone help. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "On this iPhone, open Settings › Backup and make a backup. Save it to iCloud Drive, another place in Files, or a computer."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On this iPad, open Settings › Backup and make a backup. Save it to iCloud Drive, another place in Files, or a computer."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On this iPhone, open Settings › Backup and make a backup. Save it to iCloud Drive, another place in Files, or a computer."
+                }
+              }
+            }
           }
         }
       }
@@ -6056,13 +6272,25 @@
       }
     },
     "One file with every moment, note, voice note, collection and movie project. Keep it in Files, on a Mac or on a drive. It can be restored on any iPhone with MimoDays." : {
-      "comment" : "Backup options (E03): what a backup is",
+      "comment" : "Backup options (E03): what a backup is. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "One file with every moment, note, voice note, collection and movie project. Keep it in Files, on a Mac or on a drive. It can be restored on any iPhone with MimoDays."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "One file with every moment, note, voice note, collection and movie project. Keep it in Files, on a Mac or on a drive. It can be restored on any iPad or iPad with MimoDays."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "One file with every moment, note, voice note, collection and movie project. Keep it in Files, on a Mac or on a drive. It can be restored on any iPhone with MimoDays."
+                }
+              }
+            }
           }
         }
       }
@@ -6536,13 +6764,25 @@
       }
     },
     "Places are stored on this iPhone only. You can choose how precise they are in Settings." : {
-      "comment" : "Place sheet (C11): note under the list",
+      "comment" : "Place sheet (C11): note under the list. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Places are stored on this iPhone only. You can choose how precise they are in Settings."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Places are stored on this iPad only. You can choose how precise they are in Settings."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Places are stored on this iPhone only. You can choose how precise they are in Settings."
+                }
+              }
+            }
           }
         }
       }
@@ -6932,25 +7172,49 @@
       }
     },
     "Recording starts working once the phone is sideways" : {
-      "comment" : "Camera (U03): under the dimmed record button",
+      "comment" : "Camera (U03): under the dimmed record button. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recording starts working once the phone is sideways"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Recording starts working once the iPad is sideways"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Recording starts working once the phone is sideways"
+                }
+              }
+            }
           }
         }
       }
     },
     "Recording starts working once the phone is upright" : {
-      "comment" : "Camera (U06): under the dimmed record button",
+      "comment" : "Camera (U06): under the dimmed record button. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recording starts working once the phone is upright"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Recording starts working once the iPad is upright"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Recording starts working once the phone is upright"
+                }
+              }
+            }
           }
         }
       }
@@ -8936,25 +9200,49 @@
       }
     },
     "The shutter works once the phone is sideways" : {
-      "comment" : "Camera: under the dimmed photo shutter when 16:9 is picked",
+      "comment" : "Camera: under the dimmed photo shutter when 16:9 is picked. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The shutter works once the phone is sideways"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The shutter works once the iPad is sideways"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The shutter works once the phone is sideways"
+                }
+              }
+            }
           }
         }
       }
     },
     "The shutter works once the phone is upright" : {
-      "comment" : "Camera: under the dimmed photo shutter when 9:16 or 1:1 is picked",
+      "comment" : "Camera: under the dimmed photo shutter when 9:16 or 1:1 is picked. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The shutter works once the phone is upright"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The shutter works once the iPad is upright"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The shutter works once the phone is upright"
+                }
+              }
+            }
           }
         }
       }
@@ -9020,37 +9308,73 @@
       }
     },
     "There isn't enough free space on this iPhone to make it. It needs about %@ more." : {
-      "comment" : "Backup failed: no room. %@: how much more space is needed",
+      "comment" : "Backup failed: no room. %@: how much more space is needed. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "There isn't enough free space on this iPhone to make it. It needs about %@ more."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There isn't enough free space on this iPad to make it. It needs about %@ more."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There isn't enough free space on this iPhone to make it. It needs about %@ more."
+                }
+              }
+            }
           }
         }
       }
     },
     "There isn't enough free space on this iPhone.\nIt needs about %@ more.\nYour draft is safe." : {
-      "comment" : "Export failed (F14): no room. %@: how much more space is needed",
+      "comment" : "Export failed (F14): no room. %@: how much more space is needed. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "There isn't enough free space on this iPhone.\nIt needs about %@ more.\nYour draft is safe."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There isn't enough free space on this iPad.\nIt needs about %@ more.\nYour draft is safe."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There isn't enough free space on this iPhone.\nIt needs about %@ more.\nYour draft is safe."
+                }
+              }
+            }
           }
         }
       }
     },
     "There isn't enough free space on this iPhone. It needs about %@ more." : {
-      "comment" : "Alert when exporting moments needs more space; %@ is a size, e.g. 1.2 GB",
+      "comment" : "Alert when exporting moments needs more space; %@ is a size, e.g. 1.2 GB. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "There isn't enough free space on this iPhone. It needs about %@ more."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There isn't enough free space on this iPad. It needs about %@ more."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There isn't enough free space on this iPhone. It needs about %@ more."
+                }
+              }
+            }
           }
         }
       }
@@ -9140,61 +9464,121 @@
       }
     },
     "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world." : {
-      "comment" : "Camera (C05): note on iPhones that can't use both cameras at once; ↻ is the switch-camera button",
+      "comment" : "Camera (C05): note on iPhones that can't use both cameras at once; ↻ is the switch-camera button. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPad can use one camera at a time. Tap ↻ to switch between you and the world."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world."
+                }
+              }
+            }
           }
         }
       }
     },
     "This iPhone got too warm, so the recording stopped at %@. The part before is kept." : {
-      "comment" : "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the iPhone overheated",
+      "comment" : "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the iPhone overheated. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This iPhone got too warm, so the recording stopped at %@. The part before is kept."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPad got too warm, so the recording stopped at %@. The part before is kept."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPhone got too warm, so the recording stopped at %@. The part before is kept."
+                }
+              }
+            }
           }
         }
       }
     },
     "This iPhone is too warm for the camera right now. It comes back once it cools down." : {
-      "comment" : "Camera note: iOS paused the camera because the iPhone is too warm.",
+      "comment" : "Camera note: iOS paused the camera because the iPhone is too warm. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This iPhone is too warm for the camera right now. It comes back once it cools down."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPad is too warm for the camera right now. It comes back once it cools down."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPhone is too warm for the camera right now. It comes back once it cools down."
+                }
+              }
+            }
           }
         }
       }
     },
     "This iPhone ran out of space, so the recording stopped at %@. The part before is kept." : {
-      "comment" : "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the disk filled up",
+      "comment" : "Review after a recording stopped early (C13d). %@ = where it stopped, e.g. 0:06; the disk filled up. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This iPhone ran out of space, so the recording stopped at %@. The part before is kept."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPad ran out of space, so the recording stopped at %@. The part before is kept."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPhone ran out of space, so the recording stopped at %@. The part before is kept."
+                }
+              }
+            }
           }
         }
       }
     },
     "This iPhone will match the backup exactly" : {
-      "comment" : "Restore (E07): detail of Replace everything",
+      "comment" : "Restore (E07): detail of Replace everything. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This iPhone will match the backup exactly"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPad will match the backup exactly"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This iPhone will match the backup exactly"
+                }
+              }
+            }
           }
         }
       }
@@ -9260,13 +9644,31 @@
       }
     },
     "This removes %lld moments, %lld collections, %lld movie projects and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched." : {
-      "comment" : "Delete all data (S08): what goes; the number of moments, collections and movie projects",
+      "comment" : "Delete all data (S08): what goes; the number of moments, collections and movie projects. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This removes %1$#@moments@, %2$#@collections@, %3$#@projects@ and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This removes %1$#@moments@, %2$#@collections@, %3$#@projects@ and all settings from this iPad. It can't be undone. Backups saved in Files are not touched."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This removes %lld moments, %lld collections, %lld movie projects and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched."
+                }
+              },
+              "iphone" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This removes %1$#@moments@, %2$#@collections@, %3$#@projects@ and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched."
+                }
+              }
+            }
           },
           "substitutions" : {
             "moments" : {
@@ -9610,13 +10012,25 @@
       }
     },
     "Transcribed on this iPhone" : {
-      "comment" : "Voice note card (C10): small line under the transcript; the words were worked out on the device, nothing was sent anywhere",
+      "comment" : "Voice note card (C10): small line under the transcript; the words were worked out on the device, nothing was sent anywhere. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transcribed on this iPhone"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Transcribed on this iPad"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Transcribed on this iPhone"
+                }
+              }
+            }
           }
         }
       }
@@ -9758,9 +10172,21 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Turn your phone sideways"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turn your iPad sideways"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turn your phone sideways"
+                }
+              }
+            }
           }
         }
       }
@@ -9770,9 +10196,21 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Turn your phone sideways to record 16:9."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turn your iPad sideways to record 16:9."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turn your phone sideways to record 16:9."
+                }
+              }
+            }
           }
         }
       }
@@ -9782,9 +10220,21 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Turn your phone upright"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turn your iPad upright"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turn your phone upright"
+                }
+              }
+            }
           }
         }
       }
@@ -9794,9 +10244,21 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Turn your phone upright to record %@."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turn your iPad upright to record %@."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turn your phone upright to record %@."
+                }
+              }
+            }
           }
         }
       }
@@ -10522,13 +10984,25 @@
       }
     },
     "You can leave this screen or lock the phone. We'll let you know when it's ready." : {
-      "comment" : "Export (F12): note while the movie renders",
+      "comment" : "Export (F12): note while the movie renders. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can leave this screen or lock the phone. We'll let you know when it's ready."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You can leave this screen or lock the iPad. We'll let you know when it's ready."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You can leave this screen or lock the phone. We'll let you know when it's ready."
+                }
+              }
+            }
           }
         }
       }
@@ -10690,13 +11164,25 @@
       }
     },
     "Your newest moments are only on this iPhone. A backup keeps them safe." : {
-      "comment" : "Backup reminder notification text",
+      "comment" : "Backup reminder notification text. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your newest moments are only on this iPhone. A backup keeps them safe."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your newest moments are only on this iPad. A backup keeps them safe."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your newest moments are only on this iPhone. A backup keeps them safe."
+                }
+              }
+            }
           }
         }
       }
@@ -10726,13 +11212,25 @@
       }
     },
     "Your photos, videos, voice notes, notes, places, collections and movies are kept in MimoDays on this iPhone. There is no account and no MimoDays server." : {
-      "comment" : "Privacy statement (S05): what is kept where",
+      "comment" : "Privacy statement (S05): what is kept where. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your photos, videos, voice notes, notes, places, collections and movies are kept in MimoDays on this iPhone. There is no account and no MimoDays server."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your photos, videos, voice notes, notes, places, collections and movies are kept in MimoDays on this iPad. There is no account and no MimoDays server."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your photos, videos, voice notes, notes, places, collections and movies are kept in MimoDays on this iPhone. There is no account and no MimoDays server."
+                }
+              }
+            }
           }
         }
       }

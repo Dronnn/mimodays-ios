@@ -11,7 +11,6 @@ import UIKit
 struct TodayView: View {
     let model: TodayModel
     @Environment(AppRouter.self) private var router
-    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var width: CGFloat = 0
     @State private var height: CGFloat = 0
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -88,7 +87,7 @@ struct TodayView: View {
             }
         }
         // On iPhone the wordmark sits up level with the status bar's bottom, as drawn.
-        .padding(.top, sizeClass == .compact ? -13 : 0)
+        .statusBarLift(13)
         .padding(.bottom, 12)
         .frame(maxWidth: 520)
         .frame(maxWidth: .infinity, minHeight: height, alignment: .top)

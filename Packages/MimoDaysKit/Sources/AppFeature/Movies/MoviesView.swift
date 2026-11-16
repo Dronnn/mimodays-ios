@@ -22,7 +22,6 @@ private struct MoviesHost: View {
 struct MoviesView: View {
     let model: MoviesModel
     @Environment(AppRouter.self) private var router
-    @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -42,7 +41,7 @@ struct MoviesView: View {
                 }
             }
             // On iPhone the buttons sit level with the status bar's bottom, as drawn (as Memories).
-            .padding(.top, sizeClass == .compact ? -9 : 0)
+            .statusBarLift(9)
             .padding(.bottom, 24)
             .frame(maxWidth: 1180)
             .frame(maxWidth: .infinity)

@@ -126,7 +126,7 @@ struct MapView: View {
                 .padding(.top, 16)
                 .accessibilityIdentifier("map.period")
         }
-        .padding(.top, -9)
+        .statusBarLift(9, compactOnly: false)
         .padding(.bottom, 12)
     }
 

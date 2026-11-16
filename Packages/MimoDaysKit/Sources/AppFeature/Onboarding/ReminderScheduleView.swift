@@ -13,7 +13,7 @@ struct ReminderScheduleView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 BackButton(action: back)
-                    .padding(.top, -8)
+                    .statusBarLift(8, compactOnly: false)
                 Text(LocalizedStringResource("When should MimoDays surprise you?", bundle: .atURL(Bundle.module.bundleURL)))
                     .textStyle(.displaySheet)
                     .foregroundStyle(ColorToken.textPrimary.color)

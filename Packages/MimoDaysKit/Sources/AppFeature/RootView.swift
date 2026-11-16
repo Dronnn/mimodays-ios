@@ -33,6 +33,8 @@ public struct RootView: View {
     @Namespace private var mosaicZoom
     /// C12 toast after a save.
     @State private var showsSavedToast = false
+    /// Off on iPhone Duo's outer display, where the status bar sits on the side.
+    @State private var statusBarOnTop = true
     @Environment(\.scenePhase) private var scenePhase
 
     public init(router: AppRouter = AppRouter(), dependencies: AppDependencies) {
@@ -81,6 +83,8 @@ public struct RootView: View {
                 tabs
             }
         }
+        .onGeometryChange(for: Bool.self, of: { $0.safeAreaInsets.top > 0 }) { statusBarOnTop = $0 }
+        .environment(\.statusBarOnTop, statusBarOnTop)
         .environment(router)
         .environment(\.permissions, permissions)
         .environment(\.camera, camera)

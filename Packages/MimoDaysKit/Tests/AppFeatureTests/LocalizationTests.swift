@@ -181,19 +181,29 @@ struct LocalizationTests {
         for (key, entry) in catalog.strings {
             #expect(entry.comment?.isEmpty == false, "no comment: \(key)")
             let english = entry.localizations?["en"]
-            let units = english?.stringUnit.map { [$0] } ?? english?.variations?.plural?.values.map(\.stringUnit) ?? []
+            let units = english?.units ?? []
             #expect(!units.isEmpty && units.allSatisfy { $0.state == "translated" }, "no English: \(key)")
         }
     }
 
     private struct Catalog: Decodable {
         struct Entry: Decodable {
-            struct Localization: Decodable {
+            /// A string, or its plural or device (iPad) variants, which can nest.
+            final class Localization: Decodable {
                 struct Unit: Decodable { var state: String }
-                struct Variant: Decodable { var stringUnit: Unit }
-                struct Variations: Decodable { var plural: [String: Variant]? }
+                struct Variations: Decodable {
+                    var plural: [String: Localization]?
+                    var device: [String: Localization]?
+                }
                 var stringUnit: Unit?
                 var variations: Variations?
+
+                var units: [Unit] {
+                    if let stringUnit { return [stringUnit] }
+                    let variants = Array((variations?.plural ?? [:]).values) + Array((variations?.device ?? [:]).values)
+                    let units = variants.map(\.units)
+                    return units.contains(where: \.isEmpty) ? [] : units.flatMap { $0 }
+                }
             }
 
             var comment: String?

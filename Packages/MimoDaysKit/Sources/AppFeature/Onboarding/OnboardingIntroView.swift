@@ -37,7 +37,7 @@ struct OnboardingIntroView: View {
         .frame(minHeight: Size.minimumTapTarget)
         .padding(.leading, 24)
         .padding(.trailing, Spacing.screenMargin)
-        .padding(.top, -10)
+        .statusBarLift(10, compactOnly: false)
     }
 
     private func advance(from current: OnboardingPage) {

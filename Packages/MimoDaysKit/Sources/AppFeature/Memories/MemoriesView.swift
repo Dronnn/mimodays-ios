@@ -7,8 +7,8 @@ import SwiftUI
 /// was where it was taken (§H20), so a trip abroad keeps its own dates.
 struct MemoriesView: View {
     @Bindable var model: MemoriesModel
-    @Environment(AppRouter.self) private var router
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(AppRouter.self) private var router
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.calendar) private var calendar
     /// M13: the moments ticked while selecting; nil when not selecting.
@@ -67,7 +67,7 @@ struct MemoriesView: View {
             }
             .scrollTargetLayout()
             // On iPhone the buttons sit level with the status bar's bottom, as drawn.
-            .padding(.top, sizeClass == .compact && !isSearching ? -9 : 0)
+            .statusBarLift(isSearching ? 0 : 9)
             .padding(.bottom, 24)
             .frame(maxWidth: 1180)
             .frame(maxWidth: .infinity)
@@ -314,7 +314,8 @@ struct MemoriesView: View {
                 .foregroundStyle(ColorToken.textSecondary.color)
                 .padding(.leading, 22)
                 .accessibilityAddTraits(.isHeader)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
+            // X02: iPad's tiles are about 136 pt, six to a row; iPhone fits three to a row.
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: sizeClass == .regular ? 132 : 100), spacing: 4)], spacing: 4) {
                 ForEach(items) { item in
                     Group {
                         if selection != nil {

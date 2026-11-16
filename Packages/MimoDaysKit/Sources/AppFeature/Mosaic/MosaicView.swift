@@ -13,7 +13,6 @@ struct MosaicView: View {
     var isFacing = true
     @State private var width: CGFloat = 0
     @State private var isShown = false
-    @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.mosaicZoom) private var zoom
     @Environment(\.tileMotion) private var motion
 
@@ -49,7 +48,7 @@ struct MosaicView: View {
                 }
             }
             // On iPhone the wordmark sits up level with the status bar's bottom, as on Today.
-            .padding(.top, sizeClass == .compact ? -13 : 0)
+            .statusBarLift(13)
             .padding(.bottom, 72)
             .frame(maxWidth: .infinity, alignment: .leading)
         }

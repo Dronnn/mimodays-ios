@@ -58,20 +58,28 @@ struct MomentViewer: View {
     var body: some View {
         GeometryReader { proxy in
             let slot = MemoryCardGeometry.slotWidth(screen: proxy.size.width)
-            ScrollView(.horizontal) {
-                LazyHStack(spacing: MemoryCardGeometry.pageGap) {
-                    ForEach(model.ids, id: \.self) { id in
-                        page(id)
-                            .frame(width: slot, height: proxy.size.height)
-                            .task { await model.load(id) }
+            ScrollViewReader { reader in
+                ScrollView(.horizontal) {
+                    LazyHStack(spacing: MemoryCardGeometry.pageGap) {
+                        ForEach(model.ids, id: \.self) { id in
+                            page(id)
+                                .frame(width: slot, height: proxy.size.height)
+                                .task { await model.load(id) }
+                        }
                     }
+                    .scrollTargetLayout()
                 }
-                .scrollTargetLayout()
+                .contentMargins(.horizontal, (proxy.size.width - slot) / 2, for: .scrollContent)
+                .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne))
+                .scrollPosition(id: $model.current)
+                .scrollIndicators(.hidden)
+                // The opening page is set before the pages are laid out, and the pager stays on the first one while
+                // the bar already shows the opened day: once they are laid out (the next turn), go to it.
+                .task(id: slot) {
+                    await Task.yield()
+                    if let id = model.current { reader.scrollTo(id) }
+                }
             }
-            .contentMargins(.horizontal, (proxy.size.width - slot) / 2, for: .scrollContent)
-            .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne))
-            .scrollPosition(id: $model.current)
-            .scrollIndicators(.hidden)
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
         // M05/M06 draw their own bar: back with the day, the time, •••. Swiping back still works.

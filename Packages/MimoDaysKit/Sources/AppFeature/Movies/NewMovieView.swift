@@ -141,7 +141,6 @@ private struct WizardPage<Bottom: View>: ViewModifier {
     let back: Text?
     let action: () -> Void
     let bottom: Bottom
-    @Environment(\.horizontalSizeClass) private var sizeClass
 
     func body(content: Content) -> some View {
         content
@@ -149,11 +148,14 @@ private struct WizardPage<Bottom: View>: ViewModifier {
                 WizardBar(back: back, action: action)
                     .background(ColorToken.canvas.color)
                     // On iPhone the bar starts where the status bar ends, as drawn (as Memories' header).
-                    .padding(.top, sizeClass == .compact ? -8 : 0)
+                    .statusBarLift(8)
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 bottom
                     .padding(.horizontal, 20)
+                    // As wide as the page above it, on iPad too.
+                    .frame(maxWidth: 640)
+                    .frame(maxWidth: .infinity)
                     .padding(.top, 8)
                     .padding(.bottom, 8)
                     .background(ColorToken.canvas.color.ignoresSafeArea())

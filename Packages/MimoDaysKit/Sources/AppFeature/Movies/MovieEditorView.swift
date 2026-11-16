@@ -30,6 +30,7 @@ struct MovieEditorView: View {
     let model: MovieEditorModel
     let export: () -> Void
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var sheet: Sheet?
     @State private var choosingMusic = false
     @State private var musicOptions = false
@@ -72,6 +73,8 @@ struct MovieEditorView: View {
             .padding(.top, 8)
             toolBar
         }
+        // The whole screen, so the canvas reaches every edge whatever the content's height.
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
@@ -175,7 +178,8 @@ struct MovieEditorView: View {
             .contentShape(Rectangle())
             .onTapGesture { previewing = true }
         }
-        .frame(minHeight: 140, maxHeight: 330)
+        // iPad's taller screen goes to the stage; on iPhone it is as tall as drawn at most.
+        .frame(minHeight: 140, maxHeight: sizeClass == .regular ? .infinity : 330)
         .background(Color(hex: 0x2A1B21))
         .accessibilityElement()
         .accessibilityLabel(Text("Movie preview", bundle: .module))

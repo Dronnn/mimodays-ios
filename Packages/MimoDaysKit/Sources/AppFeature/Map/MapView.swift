@@ -31,6 +31,7 @@ struct MapView: View {
     let model: MapModel
     @Environment(AppRouter.self) private var router
     @Environment(\.permissions) private var permissions
+    @Environment(PrivacyPreferences.self) private var privacy: PrivacyPreferences?
     @State private var asker = PermissionAsker()
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -371,7 +372,7 @@ struct MapView: View {
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
             ScrollView {
-                NoPlacesCard(locationIsUsable: location.isUsable, unlocatedCount: model.unlocatedCount) {
+                NoPlacesCard(location: location, savesPlaces: privacy?.value.savesPlace ?? true, unlocatedCount: model.unlocatedCount) {
                     Task { await turnOnLocation() }
                 }
                     .frame(maxWidth: 420)
@@ -667,7 +668,9 @@ private struct MapUnavailableGrid: View {
 
 /// P05's `Card`: the location art, the title, why, Turn on location while it's off, and the way to add places.
 struct NoPlacesCard: View {
-    let locationIsUsable: Bool
+    let location: PermissionStatus
+    /// S05's Save a place with moments.
+    let savesPlaces: Bool
     let unlocatedCount: Int
     let turnOnLocation: () -> Void
 
@@ -681,8 +684,12 @@ struct NoPlacesCard: View {
                 .padding(.top, 10)
                 .accessibilityAddTraits(.isHeader)
             Group {
-                if locationIsUsable {
+                if !savesPlaces {
+                    Text("Moments show up here when they have a place. Saving places is off; turn it on in Settings › Privacy.", bundle: .module)
+                } else if location.isUsable {
                     Text("Moments show up here when they have a place. New moments get one when you save them.", bundle: .module)
+                } else if location == .notDetermined {
+                    Text("Moments show up here when they have a place. Turn on location so new moments get one.", bundle: .module)
                 } else {
                     Text("Moments show up here when they have a place. Location is off, so new moments are saved without one.", bundle: .module)
                 }
@@ -693,7 +700,7 @@ struct NoPlacesCard: View {
             .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 18)
             .padding(.top, 7)
-            if !locationIsUsable {
+            if savesPlaces, !location.isUsable {
                 Button(action: turnOnLocation) { Text("Turn on location", bundle: .module) }
                     .buttonStyle(.primary)
                     .padding(.top, 16)

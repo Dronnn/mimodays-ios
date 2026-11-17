@@ -2611,6 +2611,30 @@
         }
       }
     },
+    "Moments show up here when they have a place. Saving places is off; turn it on in Settings › Privacy." : {
+      "comment" : "Map with no places yet (P05): card text when Settings › Privacy › Save a place with moments is off. Settings › Privacy is MimoDays' own Settings page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments show up here when they have a place. Saving places is off; turn it on in Settings › Privacy."
+          }
+        }
+      }
+    },
+    "Moments show up here when they have a place. Turn on location so new moments get one." : {
+      "comment" : "Map with no places yet (P05): card text when location hasn't been asked for yet, above Turn on location",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments show up here when they have a place. Turn on location so new moments get one."
+          }
+        }
+      }
+    },
     "Motion" : {
       "comment" : "Settings › Appearance (H.9): section title over the switches for videos playing in tiles",
       "extractionState" : "manual",

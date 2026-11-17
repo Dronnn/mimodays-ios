@@ -131,7 +131,7 @@ struct LocalizationTests {
 
     private static var resourceKeys: [String] {
         let resources = MainTab.allCases.map(\.title)
-            + PermissionScreen.allCases.flatMap { [$0.title, $0.message, $0.primaryAction, $0.secondaryAction] }
+            + PermissionScreen.allCases.flatMap { [$0.title, $0.message, $0.primaryAction] + [$0.secondaryAction].compactMap { $0 } }
             + OnboardingPage.allCases.flatMap { [$0.title, $0.message, $0.primaryAction] }
             + SurpriseFrequency.allCases.map(\.label)
             + CameraSettings.VideoLength.allCases.map(\.settingsLabel)

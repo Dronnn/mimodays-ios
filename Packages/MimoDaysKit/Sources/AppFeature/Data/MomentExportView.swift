@@ -214,7 +214,7 @@ struct MomentExportSheet: View {
     }
 
     private func saveToPhotos() async {
-        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
+        _ = await asker.request(.photoLibrary, using: permissions)
         guard let files = await model.files() else { return }
         defer { model.removeFiles() }
         do {

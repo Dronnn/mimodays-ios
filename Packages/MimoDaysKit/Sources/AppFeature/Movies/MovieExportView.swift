@@ -433,7 +433,7 @@ struct MovieFileButtons: View {
 
     private func saveToPhotos() async {
         guard let url else { return }
-        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
+        _ = await asker.request(.photoLibrary, using: permissions)
         do {
             try await MovieFiles.saveToPhotos(url)
             saved = true

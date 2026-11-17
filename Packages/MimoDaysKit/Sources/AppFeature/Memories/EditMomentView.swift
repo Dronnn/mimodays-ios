@@ -335,7 +335,6 @@ struct EditMomentView: View {
         model.stopVoice()
         Task {
             let status = await asker.request(.microphone, using: permissions)
-            guard status != .notDetermined else { return }
             guard status.isUsable else {
                 microphoneOff = true
                 return

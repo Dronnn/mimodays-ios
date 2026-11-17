@@ -5924,7 +5924,7 @@
       }
     },
     "Not now" : {
-      "comment" : "Closes a permission screen without asking; generic save failure alert: button that closes the alert and stays on review; microphone off screen: secondary button",
+      "comment" : "Camera or microphone off screen: secondary button that closes it; save failure alert: button that closes the alert and stays on review; the movie suggestion and backup reminder: puts them away",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -7239,18 +7239,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Record video"
-          }
-        }
-      }
-    },
-    "Record without sound" : {
-      "comment" : "C06c: skip the microphone and record silent videos",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Record without sound"
           }
         }
       }

@@ -5071,7 +5071,7 @@
         }
       }
     },
-    "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all." : {
+    "MimoDays checks where this iPhone is only while you're reviewing a capture or using the map, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all." : {
       "comment" : "Privacy statement (S05): location use. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
@@ -5081,13 +5081,13 @@
               "ipad" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "MimoDays asks where this iPad is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
+                  "value" : "MimoDays checks where this iPad is only while you're reviewing a capture or using the map, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
+                  "value" : "MimoDays checks where this iPhone is only while you're reviewing a capture or using the map, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
                 }
               }
             }

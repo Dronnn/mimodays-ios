@@ -51,7 +51,10 @@ private struct TitleBarLayout: Layout {
     /// Leading, title and trailing: x and width along the bar, and each part's height.
     private func frames(width: CGFloat, subviews: Subviews) -> [CGRect] {
         guard subviews.count == 3 else { return subviews.map { _ in .zero } }
-        let side = ProposedViewSize(width: width / 3, height: nil)
+        // Each side may use what a centred title leaves it, and at least a third of the bar: a long back word
+        // ("Appearance", or a longer translation) beside a short title isn't cut.
+        let natural = subviews[1].sizeThatFits(.unspecified).width
+        let side = ProposedViewSize(width: max(width / 3, (width - natural) / 2 - spacing), height: nil)
         let leading = subviews[0].sizeThatFits(side)
         let trailing = subviews[2].sizeThatFits(side)
         let room = max(0, width - leading.width - trailing.width - 2 * spacing)

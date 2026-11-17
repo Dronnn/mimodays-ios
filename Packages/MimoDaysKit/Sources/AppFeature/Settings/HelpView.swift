@@ -27,26 +27,27 @@ enum HelpArticle: String, CaseIterable, Hashable {
     var paragraphs: [Text] {
         switch self {
         case .surprises: [
-            Text("At a random time within your hours, MimoDays sends one notification: a little moment is happening. Open it while it's fresh and capture whatever is around you.", bundle: .module),
-            Text("Missed one? Nothing happens. There are no streaks, scores or reminders about it.", bundle: .module),
-            Text("Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for a day, a week or until you resume them.", bundle: .module),
+            Text("At a random time within your hours, MimoDays sends a notification: a little moment is happening. Open it while it's fresh and capture whatever is around you.", bundle: .module),
+            Text("Missed one? Nothing happens. There are no streaks or scores.", bundle: .module),
+            Text("Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for the rest of today, for a week or until you resume them.", bundle: .module),
         ]
         case .selfieWindow: [
             Text("On iPhones that can use both cameras at once, MimoDays captures what's in front of you and your face in a small window, in the same photo or video.", bundle: .module),
-            Text("Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts.", bundle: .module),
+            Text("Drag the window to any corner. Touch and hold it to change its corner and size. MimoDays remembers where you leave it; Settings › Camera sets it too.", bundle: .module),
             Text("On other iPhones, MimoDays uses one camera.", bundle: .module),
         ]
         case .permissions: [
             Text("Camera and microphone: for photos, videos and voice notes.", bundle: .module),
-            Text("Location, if you allow it: to save where a moment happened.", bundle: .module),
-            Text("Notifications, if you allow them: for surprises.", bundle: .module),
-            Text("Photos: to save what you export, and to import only the photos you pick.", bundle: .module),
+            Text("Location, if you allow it: to save where a moment happened and to show where you are on the map.", bundle: .module),
+            Text("Notifications, if you allow them: for surprises, and to tell you when a movie is ready or a backup is due.", bundle: .module),
+            Text("Photos: only to save what you export. Importing uses the system picker and needs no access.", bundle: .module),
+            Text("Face ID, if you turn on App Lock.", bundle: .module),
             Text("You can change any of them in iOS Settings.", bundle: .module),
         ]
         case .newIPhone: [
             Text("On this iPhone, open Settings › Backup and make a backup. Save it to iCloud Drive, another place in Files, or a computer.", bundle: .module),
-            Text("On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file.", bundle: .module),
-            Text("Your moments come back with their notes, voice notes, places, collections and movie drafts.", bundle: .module),
+            Text("On the new iPhone, install MimoDays and, after the introduction, open Settings › Backup, tap Restore from a backup and choose that file.", bundle: .module),
+            Text("Your moments come back with their notes, voice notes, places, collections and movie projects. Settings aren't included; set them again.", bundle: .module),
         ]
         }
     }

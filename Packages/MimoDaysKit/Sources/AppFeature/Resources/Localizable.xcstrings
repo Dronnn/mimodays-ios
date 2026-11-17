@@ -1831,14 +1831,14 @@
         }
       }
     },
-    "At a random time within your hours, MimoDays sends one notification: a little moment is happening. Open it while it's fresh and capture whatever is around you." : {
+    "At a random time within your hours, MimoDays sends a notification: a little moment is happening. Open it while it's fresh and capture whatever is around you." : {
       "comment" : "Help & about (S07): Surprises help",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "At a random time within your hours, MimoDays sends one notification: a little moment is happening. Open it while it's fresh and capture whatever is around you."
+            "value" : "At a random time within your hours, MimoDays sends a notification: a little moment is happening. Open it while it's fresh and capture whatever is around you."
           }
         }
       }
@@ -2395,14 +2395,14 @@
         }
       }
     },
-    "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for a day, a week or until you resume them." : {
+    "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for the rest of today, for a week or until you resume them." : {
       "comment" : "Help & about (S07): Surprises help",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for a day, a week or until you resume them."
+            "value" : "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for the rest of today, for a week or until you resume them."
           }
         }
       }
@@ -2559,6 +2559,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "voice note"
+          }
+        }
+      }
+    },
+    "Face ID, if you turn on App Lock." : {
+      "comment" : "Help › Permissions: the Face ID line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID, if you turn on App Lock."
           }
         }
       }
@@ -3811,14 +3823,14 @@
         }
       }
     },
-    "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts." : {
+    "Drag the window to any corner. Touch and hold it to change its corner and size. MimoDays remembers where you leave it; Settings › Camera sets it too." : {
       "comment" : "Help & about (S07): Selfie window help",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts."
+            "value" : "Drag the window to any corner. Touch and hold it to change its corner and size. MimoDays remembers where you leave it; Settings › Camera sets it too."
           }
         }
       }
@@ -4879,14 +4891,14 @@
         }
       }
     },
-    "Location, if you allow it: to save where a moment happened." : {
+    "Location, if you allow it: to save where a moment happened and to show where you are on the map." : {
       "comment" : "Help & about (S07): Permissions help",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Location, if you allow it: to save where a moment happened."
+            "value" : "Location, if you allow it: to save where a moment happened and to show where you are on the map."
           }
         }
       }
@@ -5227,14 +5239,14 @@
         }
       }
     },
-    "Missed one? Nothing happens. There are no streaks, scores or reminders about it." : {
+    "Missed one? Nothing happens. There are no streaks or scores." : {
       "comment" : "Help & about (S07): Surprises help",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Missed one? Nothing happens. There are no streaks, scores or reminders about it."
+            "value" : "Missed one? Nothing happens. There are no streaks or scores."
           }
         }
       }
@@ -6271,14 +6283,14 @@
         }
       }
     },
-    "Notifications, if you allow them: for surprises." : {
+    "Notifications, if you allow them: for surprises, and to tell you when a movie is ready or a backup is due." : {
       "comment" : "Help & about (S07): Permissions help",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Notifications, if you allow them: for surprises."
+            "value" : "Notifications, if you allow them: for surprises, and to tell you when a movie is ready or a backup is due."
           }
         }
       }
@@ -6355,7 +6367,7 @@
         }
       }
     },
-    "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file." : {
+    "On the new iPhone, install MimoDays and, after the introduction, open Settings › Backup, tap Restore from a backup and choose that file." : {
       "comment" : "Help & about (S07): Moving to a new iPhone help. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
@@ -6365,13 +6377,13 @@
               "ipad" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "On the new iPad, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file."
+                  "value" : "On the new iPad, install MimoDays and, after the introduction, open Settings › Backup, tap Restore from a backup and choose that file."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file."
+                  "value" : "On the new iPhone, install MimoDays and, after the introduction, open Settings › Backup, tap Restore from a backup and choose that file."
                 }
               }
             }
@@ -6859,14 +6871,14 @@
         }
       }
     },
-    "Photos: to save what you export, and to import only the photos you pick." : {
+    "Photos: only to save what you export. Importing uses the system picker and needs no access." : {
       "comment" : "Help & about (S07): Permissions help",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Photos: to save what you export, and to import only the photos you pick."
+            "value" : "Photos: only to save what you export. Importing uses the system picker and needs no access."
           }
         }
       }
@@ -11331,14 +11343,14 @@
         }
       }
     },
-    "Your moments come back with their notes, voice notes, places, collections and movie drafts." : {
+    "Your moments come back with their notes, voice notes, places, collections and movie projects. Settings aren't included; set them again." : {
       "comment" : "Help & about (S07): Moving to a new iPhone help",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your moments come back with their notes, voice notes, places, collections and movie drafts."
+            "value" : "Your moments come back with their notes, voice notes, places, collections and movie projects. Settings aren't included; set them again."
           }
         }
       }

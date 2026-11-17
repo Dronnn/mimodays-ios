@@ -37,6 +37,7 @@ struct MovieEditorView: View {
     @State private var previewing = false
     /// U52: the window while a finger moves it on the stage, in movie pixels.
     @State private var movingWindow: CGRect?
+    @State private var isLandscape = false
 
     enum Sheet: Identifiable, Hashable {
         case trim
@@ -54,29 +55,11 @@ struct MovieEditorView: View {
     @ScaledMetric(relativeTo: .body) private var panelHeight: CGFloat = 182
 
     var body: some View {
-        VStack(spacing: 0) {
-            topBar
-                .clearOfBareTopEdge()
-            stage
-                .padding(.top, 8)
-            transport
-                .padding(.top, 8)
-            MovieTimeline(model: model, transition: { index in
-                model.select(index)
-                sheet = .transition(index)
-            })
-            .padding(.top, 8)
-            ScrollView {
-                panel.frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .scrollBounceBehavior(.basedOnSize)
-            // As tall as drawn where the screen has room (the stage gives way first); a short screen (iPhone Duo's
-            // outer display) shortens it, and it scrolls.
-            .frame(minHeight: 96, idealHeight: panelHeight, maxHeight: panelHeight)
-            .layoutPriority(1)
-            .padding(.top, 8)
-            toolBar
+        Group {
+            // X04 is drawn landscape; an upright iPad keeps the stacked layout, the stage taking the extra height.
+            if sizeClass == .regular, isLandscape { wideLayout } else { narrowLayout }
         }
+        .onGeometryChange(for: Bool.self, of: { $0.size.width > $0.size.height }) { isLandscape = $0 }
         // The whole screen, so the canvas reaches every edge whatever the content's height.
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorToken.canvas.color.ignoresSafeArea())
@@ -106,6 +89,73 @@ struct MovieEditorView: View {
             })
         }
         .onDisappear { if !previewing { model.close() } }
+    }
+
+    // MARK: Layouts
+
+    private var narrowLayout: some View {
+        VStack(spacing: 0) {
+            topBar
+                .clearOfBareTopEdge()
+            stage
+                .padding(.top, 8)
+            transport
+                .padding(.top, 8)
+            timeline
+                .padding(.top, 8)
+            ScrollView {
+                panel.frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            // As tall as drawn where the screen has room (the stage gives way first); a short screen (iPhone Duo's
+            // outer display) shortens it, and it scrolls.
+            .frame(minHeight: 96, idealHeight: panelHeight, maxHeight: panelHeight)
+            .layoutPriority(1)
+            .padding(.top, 8)
+            toolBar
+                .overlay(alignment: .top) { Color(hex: 0x4B2938).opacity(0.14).frame(height: 1) }
+                .background(ColorToken.canvas.color.ignoresSafeArea(edges: .bottom))
+        }
+    }
+
+    /// X04: the stage and transport with the tools beside them, the tool's panel under the tools; the timeline runs
+    /// the full width below.
+    private var wideLayout: some View {
+        VStack(spacing: 0) {
+            topBar
+                .clearOfBareTopEdge()
+            HStack(alignment: .top, spacing: 0) {
+                VStack(spacing: 0) {
+                    stage
+                        .padding(.top, 8)
+                    transport
+                        .padding(.top, 8)
+                }
+                VStack(spacing: 0) {
+                    toolBar
+                        .padding(.horizontal, 8)
+                    ScrollView {
+                        panel.frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 12)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .frame(maxHeight: .infinity)
+                    .background(ColorToken.canvasSidebar.color)
+                }
+                .frame(width: 400)
+                .padding(.top, 8)
+            }
+            timeline
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+        }
+    }
+
+    private var timeline: some View {
+        MovieTimeline(model: model, transition: { index in
+            model.select(index)
+            sheet = .transition(index)
+        })
     }
 
     // MARK: Top
@@ -362,8 +412,6 @@ struct MovieEditorView: View {
         }
         .padding(.top, 8)
         .padding(.bottom, 6)
-        .overlay(alignment: .top) { Color(hex: 0x4B2938).opacity(0.14).frame(height: 1) }
-        .background(ColorToken.canvas.color.ignoresSafeArea(edges: .bottom))
     }
 }
 

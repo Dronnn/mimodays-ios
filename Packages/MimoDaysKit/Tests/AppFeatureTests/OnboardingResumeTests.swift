@@ -95,4 +95,18 @@ struct OnboardingResumeTests {
         #expect(stored.latestMinute == 20 * 60)
         #expect(stored.isEnabled)
     }
+
+    @Test func replayStartsOnTheFirstPageAndStaysFinished() {
+        let store = InMemoryOnboardingStore()
+        let first = flow(store)
+        first.page = .movie
+        first.finishIntro()
+        first.finish()
+        let replay = flow(store)
+        replay.restart()
+        #expect(replay.step == .intro)
+        #expect(replay.page == .welcome)
+        #expect(store.record.isCompleted)
+        #expect(flow(store).isCompleted)
+    }
 }

@@ -99,6 +99,7 @@ public struct RootView: View {
         .environment(\.appEraser, eraser)
         .environment(\.tipStore, tipStore)
         .environment(\.didEraseEverything, startOver)
+        .environment(\.replayOnboarding, replayOnboarding)
         .environment(\.mediaLibrary, memories.library)
         // S05: the lock screen sits in its own window, over sheets too.
         .background(AppLockWindow(lock: appLock, isLocked: appLock.isLocked))
@@ -167,6 +168,14 @@ public struct RootView: View {
         mosaic.refresh()
         Task { await today.refresh() }
         onboarding = Self.onboardingFlow(context: memories.library.context, permissions: permissions, surprises: surprises)
+    }
+
+    /// Help › "Show the introduction again".
+    private func replayOnboarding() {
+        router.isSettingsPresented = false
+        let flow = Self.onboardingFlow(context: memories.library.context, permissions: permissions, surprises: surprises)
+        flow.restart()
+        onboarding = flow
     }
 
     /// S09: every moment's day for the chosen time zone; Memories reads them again when any moved.

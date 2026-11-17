@@ -2587,6 +2587,18 @@
         }
       }
     },
+    "Show the introduction again" : {
+      "comment" : "Help & about (S07): opens onboarding again from its first page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the introduction again"
+          }
+        }
+      }
+    },
     "Shutter sound" : {
       "comment" : "Camera settings (S03, ••• sheet): toggle, the sound a photo makes where iOS allows turning it off",
       "extractionState" : "manual",

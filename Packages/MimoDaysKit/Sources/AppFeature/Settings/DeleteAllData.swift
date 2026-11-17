@@ -71,6 +71,8 @@ extension EnvironmentValues {
     @Entry var appEraser: AppEraser?
     /// What RootView does once everything is gone.
     @Entry var didEraseEverything: @MainActor () -> Void = {}
+    /// Help › "Show the introduction again": closes Settings and opens onboarding from its first page.
+    @Entry var replayOnboarding: @MainActor () -> Void = {}
 }
 
 /// S08 with the app's eraser and App Lock.

@@ -58,6 +58,7 @@ struct HelpView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.requestReview) private var requestReview
     @Environment(\.openURL) private var openURL
+    @Environment(\.replayOnboarding) private var replayOnboarding
 
     /// "1.0 (12)".
     static var appVersion: String {
@@ -97,6 +98,14 @@ struct HelpView: View {
                             }
                             .accessibilityIdentifier("help.\(article.rawValue)")
                         }
+                        DataSeparator()
+                        Button(action: replayOnboarding) {
+                            SettingsValueRow(
+                                title: Text("Show the introduction again", bundle: .module, comment: "Help & about (S07): opens onboarding again from its first page"),
+                                value: Text(verbatim: "")
+                            )
+                        }
+                        .accessibilityIdentifier("help.introduction")
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 6)

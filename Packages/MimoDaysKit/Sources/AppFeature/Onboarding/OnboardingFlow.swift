@@ -102,6 +102,15 @@ final class OnboardingFlow {
         step = .firstMomentSaved
     }
 
+    /// Help › "Show the introduction again": from the first page. A finished onboarding stays finished, so closing
+    /// the app on the way doesn't bring it back on the next launch.
+    func restart() {
+        firstMoment = nil
+        isCapturing = false
+        page = .welcome
+        step = .intro
+    }
+
     func finish() {
         isCompleted = true
         save()

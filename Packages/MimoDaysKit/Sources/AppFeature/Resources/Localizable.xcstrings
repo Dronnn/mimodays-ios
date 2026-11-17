@@ -1675,14 +1675,14 @@
         }
       }
     },
-    "Allow MimoDays to add to your photos in Settings." : {
+    "Allow MimoDays to add to your photos in iOS Settings." : {
       "comment" : "Alert message when Photos access is off",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow MimoDays to add to your photos in Settings."
+            "value" : "Allow MimoDays to add to your photos in iOS Settings."
           }
         }
       }

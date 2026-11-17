@@ -102,7 +102,7 @@ struct MomentExportSheet: View {
     @State var model: MomentExportModel
     @State private var sharing: [URL]?
     @State private var saved = false
-    @State private var photosProblem: Text?
+    @State private var photosProblem: PhotosSaveProblem?
     @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
     @State private var height: CGFloat = 520
@@ -172,11 +172,7 @@ struct MomentExportSheet: View {
         }
         .exportFailureAlert(model)
         .permissionExplainers(asker)
-        .alert(Text("Couldn't save to Photos", bundle: .module), isPresented: Binding(get: { photosProblem != nil }, set: { if !$0 { photosProblem = nil } })) {
-            Button { photosProblem = nil } label: { Text("OK", bundle: .module) }
-        } message: {
-            photosProblem
-        }
+        .photosSaveAlert($photosProblem)
     }
 
     private var kindNote: Text {
@@ -221,9 +217,9 @@ struct MomentExportSheet: View {
             try await MovieFiles.saveToPhotos(MomentExportModel.pictures(files))
             saved = true
         } catch MovieFiles.Failure.notAllowed {
-            photosProblem = Text("Allow MimoDays to add to your photos in Settings.", bundle: .module)
+            photosProblem = .notAllowed
         } catch {
-            photosProblem = Text("Something went wrong. Try again.", bundle: .module)
+            photosProblem = .other
         }
     }
 }

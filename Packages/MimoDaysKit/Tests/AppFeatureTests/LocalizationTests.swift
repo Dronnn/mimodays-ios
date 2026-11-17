@@ -75,7 +75,7 @@ struct LocalizationTests {
         "Privacy", "Date in the file", "Exact place in the file",
         "Captions you added are part of the picture. File details are hidden unless you turn them on.", "4K", "Making your movie", "Progress",
         "You can leave this screen or lock the phone. We'll let you know when it's ready.", "Play the movie", "Your movie is ready",
-        "Saved to Photos", "Save to Photos", "Save to Files", "Couldn't save to Photos", "OK", "Allow MimoDays to add to your photos in Settings.",
+        "Saved to Photos", "Save to Photos", "Save to Files", "Couldn't save to Photos", "OK", "Allow MimoDays to add to your photos in iOS Settings.",
         "Something went wrong. Try again.", "The movie couldn't be finished", "Free up space", "Back to the editor",
         "Something went wrong while making it.\nYour draft is safe.", "Saved", "Project", "Delete movie and project",
         "Copies saved to Photos or Files stay there.", "Rename movie", "Delete this movie and its project?", "Duplicate", "Changes make a new version",

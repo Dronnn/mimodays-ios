@@ -12,9 +12,13 @@ struct StatusBarLiftTests {
         #expect(StatusBarLift.edgeMargin > 0)
     }
 
+    /// iPhone Duo's inner display is regular width with the status bar on the side: no lift there, but the margin.
+    @Test func withoutAStatusBarAboveEvenUnliftedRowsKeepTheMargin() {
+        #expect(StatusBarLift.topPadding(amount: 13, lifts: false, statusBarOnTop: false) == StatusBarLift.edgeMargin)
+    }
+
     @Test func whereTheLiftIsNotDrawnNothingMoves() {
         #expect(StatusBarLift.topPadding(amount: 13, lifts: false, statusBarOnTop: true) == 0)
-        #expect(StatusBarLift.topPadding(amount: 13, lifts: false, statusBarOnTop: false) == 0)
         #expect(StatusBarLift.topPadding(amount: 0, lifts: true, statusBarOnTop: false) == 0)
     }
 }

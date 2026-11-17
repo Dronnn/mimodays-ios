@@ -14,6 +14,10 @@ public enum SnapshotDevice: String, CaseIterable, Sendable {
     case iPad
     /// X01 and the other two-column iPad boards are drawn landscape.
     case iPadLandscape
+    /// iPhone Duo's outer display: the status bar and tab bar on a strip at the trailing edge, no top inset.
+    case duoOuter
+    /// iPhone Duo open, landscape: regular width, the same trailing strip.
+    case duoInner
 
     var size: CGSize {
         switch self {
@@ -21,6 +25,8 @@ public enum SnapshotDevice: String, CaseIterable, Sendable {
         case .iPhoneCompact: CGSize(width: 375, height: 812)
         case .iPad: CGSize(width: 820, height: 1180)
         case .iPadLandscape: CGSize(width: 1180, height: 820)
+        case .duoOuter: CGSize(width: 466, height: 678)
+        case .duoInner: CGSize(width: 951, height: 669)
         }
     }
 
@@ -29,10 +35,12 @@ public enum SnapshotDevice: String, CaseIterable, Sendable {
         case .iPhone: UIEdgeInsets(top: 62, left: 0, bottom: 34, right: 0)
         case .iPhoneCompact: UIEdgeInsets(top: 50, left: 0, bottom: 34, right: 0)
         case .iPad, .iPadLandscape: UIEdgeInsets(top: 24, left: 0, bottom: 20, right: 0)
+        case .duoOuter, .duoInner: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 84)
         }
     }
 
     var isPad: Bool { self == .iPad || self == .iPadLandscape }
+    var isRegular: Bool { isPad || self == .duoInner }
 }
 
 /// One rendering environment for a snapshot.
@@ -73,7 +81,7 @@ public struct SnapshotVariant: Sendable {
             traits.userInterfaceStyle = style
             traits.preferredContentSizeCategory = contentSize
             traits.userInterfaceIdiom = device.isPad ? .pad : .phone
-            traits.horizontalSizeClass = device.isPad ? .regular : .compact
+            traits.horizontalSizeClass = device.isRegular ? .regular : .compact
             traits.verticalSizeClass = .regular
             traits.layoutDirection = isRightToLeft ? .rightToLeft : .leftToRight
             traits.accessibilityContrast = isHighContrast ? .high : .normal

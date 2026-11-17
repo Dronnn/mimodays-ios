@@ -31,8 +31,10 @@ struct StatusBarLift: ViewModifier {
     /// The row's top padding: up by `amount` under a status bar, a margin from the bare edge, nothing where the
     /// lift isn't drawn or there is nothing to lift.
     static func topPadding(amount: CGFloat, lifts: Bool, statusBarOnTop: Bool) -> CGFloat {
-        guard lifts, amount > 0 else { return 0 }
-        return statusBarOnTop ? -amount : edgeMargin
+        guard amount > 0 else { return 0 }
+        // Without a status bar above (iPhone Duo's displays, either size class) the row still keeps off the edge.
+        guard statusBarOnTop else { return edgeMargin }
+        return lifts ? -amount : 0
     }
 }
 

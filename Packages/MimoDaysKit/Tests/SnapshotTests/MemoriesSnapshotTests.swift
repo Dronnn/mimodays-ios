@@ -90,6 +90,11 @@ struct MemoriesSnapshotTests {
         assertScreenSnapshots(of: screen(await memories()))
     }
 
+    @Test func timelineOnDuo() async throws {
+        try await populate()
+        assertScreenSnapshots(of: screen(await memories()).onDuo(), variants: SnapshotVariant.duo)
+    }
+
     /// M13: two moments ticked.
     @Test func select() async throws {
         try await populate()

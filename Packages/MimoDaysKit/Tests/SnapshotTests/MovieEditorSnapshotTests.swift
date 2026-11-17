@@ -70,6 +70,11 @@ struct MovieEditorSnapshotTests {
         assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: variants)
     }
 
+    @Test func clipsOnDuo() async throws {
+        let model = try await editor(.clips)
+        assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})).onDuo(), variants: SnapshotVariant.duo)
+    }
+
     /// X04: on iPad the tools and their panel are on the right of the stage and timeline.
     @Test func clipsOnIPad() async throws {
         let model = try await editor(.clips)

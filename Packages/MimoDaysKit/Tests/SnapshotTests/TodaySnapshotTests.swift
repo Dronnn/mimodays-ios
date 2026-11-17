@@ -89,6 +89,11 @@ struct TodaySnapshotTests {
         assertScreenSnapshots(of: screen(await today()), variants: Self.variants)
     }
 
+    @Test func populatedOnDuo() async throws {
+        try await populate()
+        assertScreenSnapshots(of: screen(await today()).onDuo(), variants: SnapshotVariant.duo)
+    }
+
     /// The standard set plus X01, iPad landscape in two columns.
     private static let variants = SnapshotVariant.standard + [SnapshotVariant(.iPadLandscape, .light), SnapshotVariant(.iPadLandscape, .dark)]
 

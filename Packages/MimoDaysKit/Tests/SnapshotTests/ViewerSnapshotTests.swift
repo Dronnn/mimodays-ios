@@ -73,6 +73,10 @@ struct ViewerSnapshotTests {
         ])
     }
 
+    @Test func photoOnDuo() async throws {
+        assertScreenSnapshots(of: try await viewer(video: false).onDuo(), variants: SnapshotVariant.duo)
+    }
+
     /// U20, before it starts playing.
     @Test func video() async throws {
         assertScreenSnapshots(of: try await viewer(video: true), variants: [

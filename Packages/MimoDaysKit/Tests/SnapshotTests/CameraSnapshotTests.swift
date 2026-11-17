@@ -50,6 +50,10 @@ struct CameraSnapshotTests {
         assertScreenSnapshots(of: screen(await camera()))
     }
 
+    @Test func photoOnDuo() async {
+        assertScreenSnapshots(of: screen(await camera()).onDuo(), variants: SnapshotVariant.duo)
+    }
+
     @Test func surprise() async {
         assertScreenSnapshots(of: screen(await camera(surprise: true)), variants: [SnapshotVariant(.iPhone, .light)])
     }

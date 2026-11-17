@@ -166,7 +166,7 @@ struct VoiceNoteCard: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.trailing, -10)
-                .accessibilityLabel(Text("Remove voice note", bundle: .module))
+                .accessibilityLabel(Text("Delete voice note", bundle: .module))
                 .accessibilityIdentifier("review.voice.remove")
             }
             .padding(.top, 14)

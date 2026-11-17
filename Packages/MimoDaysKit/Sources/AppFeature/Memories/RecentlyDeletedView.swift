@@ -46,7 +46,7 @@ extension MomentParts {
     }
 }
 
-/// M15: what deleting does, a note when a movie draft uses them, Delete, Cancel.
+/// M15: what deleting does, a note when a movie project uses them, Delete, Cancel.
 struct DeleteConfirmationSheet: View {
     let count: Int
     /// Only for one moment: its words name what goes.
@@ -83,9 +83,9 @@ struct DeleteConfirmationSheet: View {
                     Icon.glyphFilm.image.resizable().scaledToFit().frame(width: 18, height: 16).accessibilityHidden(true)
                     Group {
                         if count == 1 {
-                            Text("Used in \(movieDrafts) movie drafts. It will be skipped there.", bundle: .module)
+                            Text("Used in \(movieDrafts) movie projects. It will be skipped there.", bundle: .module)
                         } else {
-                            Text("Used in \(movieDrafts) movie drafts. They will be skipped there.", bundle: .module)
+                            Text("Used in \(movieDrafts) movie projects. They will be skipped there.", bundle: .module)
                         }
                     }
                     .textStyle(.rowCaption)

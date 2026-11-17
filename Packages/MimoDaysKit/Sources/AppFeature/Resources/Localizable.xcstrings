@@ -3620,7 +3620,7 @@
       }
     },
     "Delete voice note" : {
-      "comment" : "Edit moment: destructive action that removes the moment's voice note when saved.",
+      "comment" : "Edit moment: destructive action that removes the moment's voice note when saved; review's voice note card (C10): accessibility label of the trash button",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -7567,18 +7567,6 @@
         }
       }
     },
-    "Remove voice note" : {
-      "comment" : "Voice note card (C10): accessibility label of the trash button",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove voice note"
-          }
-        }
-      }
-    },
     "Removed in %lld days" : {
       "comment" : "Recently deleted badge, for VoiceOver.",
       "extractionState" : "manual",
@@ -10683,8 +10671,8 @@
         }
       }
     },
-    "Used in %lld movie drafts. It will be skipped there." : {
-      "comment" : "Delete sheet (M15): the moment is in movie drafts.",
+    "Used in %lld movie projects. It will be skipped there." : {
+      "comment" : "Delete sheet (M15): the moment is in movie projects.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -10693,13 +10681,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Used in a movie draft. It will be skipped there."
+                  "value" : "Used in a movie project. It will be skipped there."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Used in %lld movie drafts. It will be skipped there."
+                  "value" : "Used in %lld movie projects. It will be skipped there."
                 }
               }
             }
@@ -10707,8 +10695,8 @@
         }
       }
     },
-    "Used in %lld movie drafts. They will be skipped there." : {
-      "comment" : "Delete sheet (M15): some of the selected moments are in movie drafts.",
+    "Used in %lld movie projects. They will be skipped there." : {
+      "comment" : "Delete sheet (M15): some of the selected moments are in movie projects.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -10717,13 +10705,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Used in a movie draft. They will be skipped there."
+                  "value" : "Used in a movie project. They will be skipped there."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Used in %lld movie drafts. They will be skipped there."
+                  "value" : "Used in %lld movie projects. They will be skipped there."
                 }
               }
             }

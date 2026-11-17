@@ -109,6 +109,21 @@ struct MovieExportModelTests {
         #expect(store.fileExists(second.relativePath))
     }
 
+    /// Settings' quality is only where the movie starts; one made before keeps the quality it was made in.
+    @Test func anEarlierRenderKeepsItsQuality() async throws {
+        let project = try await project(photos: 2)
+        var defaults = MovieDefaults()
+        defaults.resolution = .p2160
+        defaults.exactPlaceInFiles = true
+        let first = MovieExportModel(project: project, library: library, defaults: defaults, clock: clock, freeSpace: { nil })
+        #expect(first.resolution == .p2160 && first.placeInFile)
+        first.resolution = .p720
+        first.start()
+        await first.waitForRender()
+        let again = MovieExportModel(project: project, library: library, defaults: defaults, clock: clock, freeSpace: { nil })
+        #expect(again.resolution == .p720 && again.placeInFile)
+    }
+
     @Test func cancellingLeavesTheProjectAsItWas() async throws {
         let project = try await project(photos: 3)
         let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil })

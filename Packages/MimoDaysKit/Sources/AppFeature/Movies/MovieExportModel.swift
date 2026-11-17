@@ -40,16 +40,18 @@ final class MovieExportModel {
     private var background = UIBackgroundTaskIdentifier.invalid
     private let logger = Logger(subsystem: "MimoDays", category: "Movies")
 
+    /// Starts with the quality and place set in Settings (S06); a movie made before keeps its own quality.
     init(
-        project: MovieProject, library: MediaLibrary, clock: any DateProvider = SystemDateProvider(),
-        freeSpace: @escaping () -> Int64? = MovieExportModel.deviceFreeSpace
+        project: MovieProject, library: MediaLibrary, defaults: MovieDefaults = MovieDefaults(),
+        clock: any DateProvider = SystemDateProvider(), freeSpace: @escaping () -> Int64? = MovieExportModel.deviceFreeSpace
     ) {
         self.project = project
         self.library = library
         self.clock = clock
         self.freeSpace = freeSpace
         plan = MoviePlan(project, store: library.store)
-        if let last = project.render?.resolution { resolution = last }
+        resolution = project.render?.resolution ?? defaults.resolution
+        placeInFile = defaults.exactPlaceInFiles
     }
 
     private var store: MovieStore { MovieStore(context: library.context, store: library.store, now: { [clock] in clock.now() }) }

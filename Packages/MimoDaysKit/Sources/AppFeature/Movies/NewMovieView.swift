@@ -141,9 +141,11 @@ private struct WizardPage<Bottom: View>: ViewModifier {
     let back: Text?
     let action: () -> Void
     let bottom: Bottom
+    @State private var width: CGFloat = 0
 
     func body(content: Content) -> some View {
         content
+            .onGeometryChange(for: CGFloat.self, of: \.size.width) { width = $0 }
             .safeAreaInset(edge: .top, spacing: 0) {
                 WizardBar(back: back, action: action)
                     .background(ColorToken.canvas.color)
@@ -152,10 +154,9 @@ private struct WizardPage<Bottom: View>: ViewModifier {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 bottom
-                    .padding(.horizontal, 20)
-                    // As wide as the page above it, on iPad too.
-                    .frame(maxWidth: 640)
-                    .frame(maxWidth: .infinity)
+                    // As wide as the page above it (640 with its margins), on iPad too. Padding, not a frame: a page
+                    // without a button (too few moments) must not get an empty band over its content.
+                    .padding(.horizontal, max(20, (width - 600) / 2))
                     .padding(.top, 8)
                     .padding(.bottom, 8)
                     .background(ColorToken.canvas.color.ignoresSafeArea())

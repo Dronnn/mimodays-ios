@@ -10,6 +10,8 @@ public final class AppDependencies {
     let modelContainer: ModelContainer
     let permissions: any PermissionService
     let skipsOnboarding: Bool
+    /// UI tests: where `-open-url` sends the app at launch.
+    let launchRoute: Route?
     let surprises: SurpriseCoordinator
     let notificationTaps = SurpriseNotificationHandler()
     let camera: CameraServices
@@ -57,6 +59,7 @@ public final class AppDependencies {
             permissions = SystemPermissionService()
         }
         skipsOnboarding = configuration.skipsOnboarding
+        launchRoute = configuration.isUITesting ? configuration.openURL.flatMap(AppRouter.route(from:)) : nil
         memoriesPreferences = .memories(configuration.isUITesting ? nil : .standard)
         moviePreferences = .movies(configuration.isUITesting ? nil : .standard)
         let privacyPreferences = PrivacyPreferences.privacy(configuration.isUITesting ? nil : .standard)

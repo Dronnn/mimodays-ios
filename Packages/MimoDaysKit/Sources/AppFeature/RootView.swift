@@ -35,11 +35,13 @@ public struct RootView: View {
     @State private var showsSavedToast = false
     /// Off on iPhone Duo's outer display, where the status bar sits on the side.
     @State private var statusBarOnTop = true
+    private let launchRoute: Route?
     @Environment(\.scenePhase) private var scenePhase
 
     public init(router: AppRouter = AppRouter(), dependencies: AppDependencies) {
         _router = State(initialValue: router)
         permissions = dependencies.permissions
+        launchRoute = dependencies.launchRoute
         let surprises = dependencies.surprises
         self.surprises = surprises
         notificationTaps = dependencies.notificationTaps
@@ -105,10 +107,17 @@ public struct RootView: View {
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)
+            if let launchRoute { router.open(launchRoute) }
             // iOS closed the app mid-review: back to it, as it was.
             if onboarding == nil, let draft = camera.drafts.load() {
                 router.open(.capture(promptID: draft.promptID))
             }
+        }
+        // mimodays://today (and the other tabs), …/settings, …/capture?prompt=<uuid>; a prompt is checked as a
+        // notification's is. Not during onboarding.
+        .onOpenURL { url in
+            guard onboarding == nil, let route = AppRouter.route(from: url) else { return }
+            if case let .capture(promptID?) = route { openSurprise(promptID) } else { router.open(route) }
         }
         // S09: Memories follows a change at once.
         .onChange(of: memoriesPreferences.value.opensIn) { _, mode in memories.mode = mode.memoriesMode }

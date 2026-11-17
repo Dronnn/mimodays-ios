@@ -476,6 +476,7 @@
 				DEVELOPMENT_TEAM = FP287HDXWV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/MimoDays-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MimoDays;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "MimoDays uses the camera to capture your moments.";
@@ -516,6 +517,7 @@
 				DEVELOPMENT_TEAM = FP287HDXWV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/MimoDays-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MimoDays;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "MimoDays uses the camera to capture your moments.";

@@ -13,11 +13,17 @@ struct FirstCaptureSnapshotTests {
     /// 2026-11-13 16:12 UTC: "Today, 4:12 PM" in the pinned snapshot locale.
     @Test func firstMoment() {
         let moment = SavedMoment(photo: .placeholder, selfie: .placeholder, capturedAt: Date(timeIntervalSince1970: 1_794_586_320))
-        assertScreenSnapshots(of: FirstMomentView(moment: moment, viewMoments: {}, done: {}))
+        assertScreenSnapshots(of: FirstMomentView(moment: moment, surprisesOn: true, viewMoments: {}, done: {}))
     }
 
     @Test func firstMomentWithoutSelfie() {
         let moment = SavedMoment(photo: .placeholder, selfie: nil, capturedAt: Date(timeIntervalSince1970: 1_794_586_320))
-        assertScreenSnapshots(of: FirstMomentView(moment: moment, viewMoments: {}, done: {}), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: FirstMomentView(moment: moment, surprisesOn: true, viewMoments: {}, done: {}), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// No surprise will come, so it doesn't promise one.
+    @Test func firstMomentWithSurprisesOff() {
+        let moment = SavedMoment(photo: .placeholder, selfie: .placeholder, capturedAt: Date(timeIntervalSince1970: 1_794_586_320))
+        assertScreenSnapshots(of: FirstMomentView(moment: moment, surprisesOn: false, viewMoments: {}, done: {}), variants: [SnapshotVariant(.iPhone, .light)])
     }
 }

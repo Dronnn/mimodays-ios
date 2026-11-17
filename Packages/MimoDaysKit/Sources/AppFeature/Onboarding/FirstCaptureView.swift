@@ -73,6 +73,8 @@ struct FirstCaptureView: View {
 /// O10: the first saved moment, then on to the app.
 struct FirstMomentView: View {
     let moment: SavedMoment
+    /// Surprises are on, so one may bring the person back.
+    let surprisesOn: Bool
     let viewMoments: () -> Void
     let done: () -> Void
     @Environment(\.calendar) private var calendar
@@ -97,7 +99,7 @@ struct FirstMomentView: View {
                     .accessibilityAddTraits(.isHeader)
                     .padding(.top, 36)
                     .padding(.horizontal, 18)
-                Text(LocalizedStringResource("It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.", bundle: .atURL(Bundle.module.bundleURL)))
+                Text(comeBack)
                     .textStyle(.body)
                     .foregroundStyle(ColorToken.textSecondary.color)
                     .padding(.top, 12)
@@ -126,6 +128,12 @@ struct FirstMomentView: View {
             .background(ColorToken.canvas.color.ignoresSafeArea(edges: .bottom))
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+    }
+
+    private var comeBack: LocalizedStringResource {
+        surprisesOn
+            ? LocalizedStringResource("It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.", bundle: .atURL(Bundle.module.bundleURL))
+            : LocalizedStringResource("It lives on this iPhone. Come back tomorrow, or whenever something feels worth keeping.", bundle: .atURL(Bundle.module.bundleURL))
     }
 
     /// "Today, 4:12 PM": the moment was saved a moment ago.

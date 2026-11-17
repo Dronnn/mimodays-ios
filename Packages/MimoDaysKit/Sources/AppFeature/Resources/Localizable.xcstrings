@@ -2539,6 +2539,30 @@
         }
       }
     },
+    "It lives on this iPhone. Come back tomorrow, or whenever something feels worth keeping." : {
+      "comment" : "First moment saved (onboarding O10): body when surprises are off. On iPad it says iPad.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It lives on this iPad. Come back tomorrow, or whenever something feels worth keeping."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It lives on this iPhone. Come back tomorrow, or whenever something feels worth keeping."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Last moment" : {
       "comment" : "Camera (U01): VoiceOver label of the last capture's thumbnail, which opens it",
       "extractionState" : "manual",
@@ -4508,7 +4532,7 @@
       }
     },
     "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives." : {
-      "comment" : "First moment saved (onboarding O10): body. On iPad it says iPad.",
+      "comment" : "First moment saved (onboarding O10): body when surprises are on. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

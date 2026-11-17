@@ -113,4 +113,30 @@ final class MoviesUITests: XCTestCase {
         XCTAssertTrue(app.buttons["movie.play"].waitForExistence(timeout: 5))
         attachScreenshot("F15")
     }
+
+    /// F16 → Catch a moment now: the camera opens over the wizard, which is still there when it closes.
+    @MainActor
+    func testCatchingAMomentKeepsTheNewMovie() {
+        app = XCUIApplication()
+        app.launchArguments = LaunchConfiguration(
+            isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: .granted
+        ).arguments
+        app.launch()
+        app.tabBars.firstMatch.buttons.element(boundBy: 3).tap()
+        let new = app.buttons["movies.new"]
+        XCTAssertTrue(new.waitForExistence(timeout: 10))
+        new.tap()
+        let thisYear = app.buttons["newMovie.source.thisYear"]
+        XCTAssertTrue(thisYear.waitForExistence(timeout: 5))
+        thisYear.tap()
+        app.buttons["newMovie.next"].firstMatch.tap()
+        let capture = app.buttons["newMovie.capture"]
+        XCTAssertTrue(capture.waitForExistence(timeout: 5))
+        capture.tap()
+        let close = app.buttons["capture.close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        close.tap()
+        XCTAssertTrue(capture.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["newMovie.moreDates"].exists)
+    }
 }

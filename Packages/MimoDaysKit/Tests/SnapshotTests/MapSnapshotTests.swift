@@ -103,7 +103,7 @@ struct MapSnapshotTests {
     @Test func noPlaces() {
         assertScreenSnapshots(
             of: NavigationStack {
-                NoPlacesCard(locationIsUsable: false, unlocatedCount: 40) {}
+                NoPlacesCard(location: .denied, savesPlaces: true, unlocatedCount: 40) {}
                     .padding(.horizontal, 24)
                     .frame(maxHeight: .infinity, alignment: .top)
                     .padding(.top, 44)
@@ -116,7 +116,31 @@ struct MapSnapshotTests {
     /// P05, location on: no button, the other words.
     @Test func noPlacesWithLocation() {
         assertScreenSnapshots(
-            of: NoPlacesCard(locationIsUsable: true, unlocatedCount: 0) {}
+            of: NoPlacesCard(location: .granted, savesPlaces: true, unlocatedCount: 0) {}
+                .padding(.horizontal, 24)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding(.top, 44)
+                .background(ColorToken.canvas.color.ignoresSafeArea()),
+            variants: [SnapshotVariant(.iPhone, .light)]
+        )
+    }
+
+    /// P05, location never asked: the button turns it on, nothing says it's off.
+    @Test func noPlacesLocationNotAsked() {
+        assertScreenSnapshots(
+            of: NoPlacesCard(location: .notDetermined, savesPlaces: true, unlocatedCount: 0) {}
+                .padding(.horizontal, 24)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding(.top, 44)
+                .background(ColorToken.canvas.color.ignoresSafeArea()),
+            variants: [SnapshotVariant(.iPhone, .light)]
+        )
+    }
+
+    /// P05 with Privacy's Save a place off: location can't help, so no button.
+    @Test func noPlacesSavingOff() {
+        assertScreenSnapshots(
+            of: NoPlacesCard(location: .granted, savesPlaces: false, unlocatedCount: 0) {}
                 .padding(.horizontal, 24)
                 .frame(maxHeight: .infinity, alignment: .top)
                 .padding(.top, 44)

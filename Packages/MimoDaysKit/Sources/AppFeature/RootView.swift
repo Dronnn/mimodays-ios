@@ -304,8 +304,6 @@ struct CaptureFlowView: View {
             case .explain:
                 PermissionExplainerView(screen: .camera) {
                     Task { show(CameraAccessStep(await permissions.request(.camera))) }
-                } secondary: {
-                    dismiss()
                 }
             case .openSettings:
                 PermissionExplainerView(screen: .cameraOff) {

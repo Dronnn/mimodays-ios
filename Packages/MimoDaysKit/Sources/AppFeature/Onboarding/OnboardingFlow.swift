@@ -40,7 +40,8 @@ final class OnboardingFlow {
     /// The camera is open for the first capture.
     var isCapturing = false
     private(set) var firstMoment: SavedMoment?
-    private var remindersEnabled = false
+    /// Surprises are on: the reminders choice, or on a replay the person's existing setting.
+    private(set) var remindersEnabled = false
     private(set) var isCompleted = false
 
     private let permissions: any PermissionService
@@ -80,8 +81,10 @@ final class OnboardingFlow {
         await remindersChanged()
     }
 
+    /// "Maybe later". On a replay (Help › "Show the introduction again") the person's existing reminders setting
+    /// stays as it is.
     func remindLater() {
-        remindersEnabled = false
+        if !isCompleted { remindersEnabled = false }
         step = .reminders(.later)
     }
 

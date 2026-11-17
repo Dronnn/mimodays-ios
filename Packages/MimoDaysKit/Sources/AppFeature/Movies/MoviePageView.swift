@@ -40,7 +40,7 @@ struct MoviePageView: View {
     @State private var name = ""
     @State private var deleting = false
     @State private var saved = false
-    @State private var problem: Text?
+    @State private var problem: PhotosSaveProblem?
     @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
 
@@ -141,11 +141,7 @@ struct MoviePageView: View {
             Text("Copies saved to Photos or Files stay there.", bundle: .module)
         }
         .permissionExplainers(asker)
-        .alert(Text("Couldn't save to Photos", bundle: .module), isPresented: Binding(get: { problem != nil }, set: { if !$0 { problem = nil } })) {
-            Button { problem = nil } label: { Text("OK", bundle: .module) }
-        } message: {
-            problem
-        }
+        .photosSaveAlert($problem)
     }
 
     /// `Movie / Cover`: the first picture in its hand-cut 370×230 frame, Play over it.
@@ -248,14 +244,14 @@ struct MoviePageView: View {
 
     private func save() async {
         guard let url else { return }
-        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
+        _ = await asker.request(.photoLibrary, using: permissions)
         do {
             try await MovieFiles.saveToPhotos(url)
             saved = true
         } catch MovieFiles.Failure.notAllowed {
-            problem = Text("Allow MimoDays to add to your photos in Settings.", bundle: .module)
+            problem = .notAllowed
         } catch {
-            problem = Text("Something went wrong. Try again.", bundle: .module)
+            problem = .other
         }
     }
 

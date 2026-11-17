@@ -38,7 +38,7 @@ struct CameraModelMicrophoneTests {
         #expect(!(await engine.hasMicrophone))
     }
 
-    /// "Record sound" off in the ••• sheet (or "Record without sound" in C06c) turns the microphone off.
+    /// "Record sound" off in the ••• sheet turns the microphone off.
     @Test func turningSoundOffInSettingsStopsTheMicrophone() async {
         let engine = SimulatedCaptureEngine()
         let model = await videoCamera(engine: engine, allowed: true)

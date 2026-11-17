@@ -4,11 +4,53 @@ import Persistence
 import SwiftData
 import SwiftUI
 
-/// M15: what deleting does, a note when a movie draft uses them, Delete, Cancel.
+/// What one moment is made of, so deleting it names only what it has (M15).
+struct MomentParts: Equatable {
+    var mediaType: MediaType
+    var hasSelfie = false
+    var hasNote = false
+    var hasVoiceNote = false
+}
+
+extension MomentParts {
+    init(_ moment: Moment) {
+        mediaType = moment.mediaType
+        hasSelfie = MomentSummary(moment).selfiePath != nil
+        hasNote = moment.note?.isEmpty == false
+        hasVoiceNote = !moment.voiceNotes.isEmpty
+    }
+
+    /// "The photo moves…", or "The video, selfie window and note move…": each part a localized noun, joined by
+    /// the locale's own list format.
+    var deletionMessage: Text {
+        var extras: [String] = []
+        if hasSelfie {
+            extras.append(String(appLocalized: "Deleted part: selfie window", defaultValue: "selfie window", bundle: .module, comment: "M15: one part of a deleted moment, in a list after The photo or The video"))
+        }
+        if hasNote {
+            extras.append(String(appLocalized: "Deleted part: note", defaultValue: "note", bundle: .module, comment: "M15: one part of a deleted moment, in a list after The photo or The video"))
+        }
+        if hasVoiceNote {
+            extras.append(String(appLocalized: "Deleted part: voice note", defaultValue: "voice note", bundle: .module, comment: "M15: one part of a deleted moment, in a list after The photo or The video"))
+        }
+        guard !extras.isEmpty else {
+            return mediaType == .video
+                ? Text("The video moves to Recently deleted. You can bring it back within 30 days.", bundle: .module)
+                : Text("The photo moves to Recently deleted. You can bring it back within 30 days.", bundle: .module)
+        }
+        let main = mediaType == .video
+            ? String(appLocalized: "Deleted part: the video", defaultValue: "The video", bundle: .module, comment: "M15: first part of a deleted moment, starting a list such as \"The video, selfie window and note\"")
+            : String(appLocalized: "Deleted part: the photo", defaultValue: "The photo", bundle: .module, comment: "M15: first part of a deleted moment, starting a list such as \"The photo, selfie window and note\"")
+        let parts = ([main] + extras).formatted(.list(type: .and).locale(AppLanguage.shared.locale))
+        return Text("\(parts) move to Recently deleted. You can bring them back within 30 days.", bundle: .module, comment: "M15: %@ is the moment's parts as a list, e.g. \"The photo, selfie window and voice note\"")
+    }
+}
+
+/// M15: what deleting does, a note when a movie project uses them, Delete, Cancel.
 struct DeleteConfirmationSheet: View {
     let count: Int
     /// Only for one moment: its words name what goes.
-    let mediaType: MediaType?
+    let parts: MomentParts?
     let movieDrafts: Int
     let onDelete: () -> Void
     @Environment(\.dismiss) private var dismiss
@@ -26,12 +68,9 @@ struct DeleteConfirmationSheet: View {
             .foregroundStyle(ColorToken.textPrimary.color)
             .accessibilityAddTraits(.isHeader)
             Group {
-                switch (count, mediaType) {
-                case (1, .video?):
-                    Text("The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days.", bundle: .module)
-                case (1, _):
-                    Text("The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days.", bundle: .module)
-                default:
+                if count == 1, let parts {
+                    parts.deletionMessage
+                } else {
                     Text("They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days.", bundle: .module)
                 }
             }
@@ -44,9 +83,9 @@ struct DeleteConfirmationSheet: View {
                     Icon.glyphFilm.image.resizable().scaledToFit().frame(width: 18, height: 16).accessibilityHidden(true)
                     Group {
                         if count == 1 {
-                            Text("Used in \(movieDrafts) movie drafts. It will be skipped there.", bundle: .module)
+                            Text("Used in \(movieDrafts) movie projects. It will be skipped there.", bundle: .module)
                         } else {
-                            Text("Used in \(movieDrafts) movie drafts. They will be skipped there.", bundle: .module)
+                            Text("Used in \(movieDrafts) movie projects. They will be skipped there.", bundle: .module)
                         }
                     }
                     .textStyle(.rowCaption)

@@ -90,6 +90,11 @@ struct ViewerMoment: Equatable, Identifiable {
     /// The collections it's in, by name (M05 chips).
     var collections: [CollectionLink]
 
+    /// What deleting it names (M15).
+    var parts: MomentParts {
+        MomentParts(mediaType: mediaType, hasSelfie: selfiePath != nil, hasNote: note != nil, hasVoiceNote: voice != nil)
+    }
+
     struct CollectionLink: Equatable, Identifiable {
         var id: UUID
         var title: String

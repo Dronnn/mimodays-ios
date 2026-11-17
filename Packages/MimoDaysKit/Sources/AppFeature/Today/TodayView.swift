@@ -401,7 +401,7 @@ struct TodayView: View {
     // MARK: Movie
 
     private var movieCard: some View {
-        Button { router.open(.tab(.movies)) } label: {
+        Button { router.open(.newMovie(nil)) } label: {
             HStack(spacing: 0) {
                 Icon.glyphFilm.image
                     .resizable()

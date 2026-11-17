@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ move to Recently deleted. You can bring them back within 30 days." : {
+      "comment" : "Delete sheet (M15) body for one moment with more than its photo or video. %@ is its parts as a list, e.g. \"The photo, selfie window and voice note\"",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ move to Recently deleted. You can bring them back within 30 days."
+          }
+        }
+      }
+    },
     "%@ – %@ · %@ s" : {
       "comment" : "Trim sheet: a video's chosen start and end and their length, as 0:02 – 0:05 · 3.0 s",
       "extractionState" : "manual",
@@ -1435,6 +1447,438 @@
         }
       }
     },
+    "Allow MimoDays to add to your photos in iOS Settings." : {
+      "comment" : "Alert message when Photos access is off",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow MimoDays to add to your photos in iOS Settings."
+          }
+        }
+      }
+    },
+    "Allow location in iOS Settings to see where you are." : {
+      "comment" : "Map: alert message when Show where I am is tapped with location turned off in iOS Settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow location in iOS Settings to see where you are."
+          }
+        }
+      }
+    },
+    "At a random time within your hours, MimoDays sends a notification: a little moment is happening. Open it while it's fresh and capture whatever is around you." : {
+      "comment" : "Help & about (S07): Surprises help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At a random time within your hours, MimoDays sends a notification: a little moment is happening. Open it while it's fresh and capture whatever is around you."
+          }
+        }
+      }
+    },
+    "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for the rest of today, for a week or until you resume them." : {
+      "comment" : "Help & about (S07): Surprises help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for the rest of today, for a week or until you resume them."
+          }
+        }
+      }
+    },
+    "Deleted part: note" : {
+      "comment" : "M15: one part of a deleted moment, in a list after The photo or The video",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "note"
+          }
+        }
+      }
+    },
+    "Deleted part: selfie window" : {
+      "comment" : "M15: one part of a deleted moment, in a list after The photo or The video",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "selfie window"
+          }
+        }
+      }
+    },
+    "Deleted part: the photo" : {
+      "comment" : "M15: first part of a deleted moment, starting a list such as \"The photo, selfie window and note\"",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The photo"
+          }
+        }
+      }
+    },
+    "Deleted part: the video" : {
+      "comment" : "M15: first part of a deleted moment, starting a list such as \"The video, selfie window and note\"",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The video"
+          }
+        }
+      }
+    },
+    "Deleted part: voice note" : {
+      "comment" : "M15: one part of a deleted moment, in a list after The photo or The video",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "voice note"
+          }
+        }
+      }
+    },
+    "Drag the window to any corner. Touch and hold it to change its corner and size. MimoDays remembers where you leave it; Settings › Camera sets it too." : {
+      "comment" : "Help & about (S07): Selfie window help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag the window to any corner. Touch and hold it to change its corner and size. MimoDays remembers where you leave it; Settings › Camera sets it too."
+          }
+        }
+      }
+    },
+    "Face ID, if you turn on App Lock." : {
+      "comment" : "Help › Permissions: the Face ID line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID, if you turn on App Lock."
+          }
+        }
+      }
+    },
+    "It lives on this iPhone. Come back tomorrow, or whenever something feels worth keeping." : {
+      "comment" : "First moment saved (onboarding O10): body when surprises are off. On iPad it says iPad.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It lives on this iPad. Come back tomorrow, or whenever something feels worth keeping."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It lives on this iPhone. Come back tomorrow, or whenever something feels worth keeping."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Location is off for MimoDays" : {
+      "comment" : "Map: alert title when Show where I am is tapped with location turned off in iOS Settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location is off for MimoDays"
+          }
+        }
+      }
+    },
+    "Location, if you allow it: to save where a moment happened and to show where you are on the map." : {
+      "comment" : "Help & about (S07): Permissions help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location, if you allow it: to save where a moment happened and to show where you are on the map."
+          }
+        }
+      }
+    },
+    "MimoDays checks where this iPhone is only while you're reviewing a capture or using the map, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all." : {
+      "comment" : "Privacy statement (S05): location use. On iPad it says iPad.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "MimoDays checks where this iPad is only while you're reviewing a capture or using the map, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "MimoDays checks where this iPhone is only while you're reviewing a capture or using the map, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Missed one? Nothing happens. There are no streaks or scores." : {
+      "comment" : "Help & about (S07): Surprises help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Missed one? Nothing happens. There are no streaks or scores."
+          }
+        }
+      }
+    },
+    "Moments show up here when they have a place. Saving places is off; turn it on in Settings › Privacy." : {
+      "comment" : "Map with no places yet (P05): card text when Settings › Privacy › Save a place with moments is off. Settings › Privacy is MimoDays' own Settings page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments show up here when they have a place. Saving places is off; turn it on in Settings › Privacy."
+          }
+        }
+      }
+    },
+    "Moments show up here when they have a place. Turn on location so new moments get one." : {
+      "comment" : "Map with no places yet (P05): card text when location hasn't been asked for yet, above Turn on location",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments show up here when they have a place. Turn on location so new moments get one."
+          }
+        }
+      }
+    },
+    "Notifications, if you allow them: for surprises, and to tell you when a movie is ready or a backup is due." : {
+      "comment" : "Help & about (S07): Permissions help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications, if you allow them: for surprises, and to tell you when a movie is ready or a backup is due."
+          }
+        }
+      }
+    },
+    "On the new iPhone, install MimoDays and, after the introduction, open Settings › Backup, tap Restore from a backup and choose that file." : {
+      "comment" : "Help & about (S07): Moving to a new iPhone help. On iPad it says iPad.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On the new iPad, install MimoDays and, after the introduction, open Settings › Backup, tap Restore from a backup and choose that file."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On the new iPhone, install MimoDays and, after the introduction, open Settings › Backup, tap Restore from a backup and choose that file."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Photos: only to save what you export. Importing uses the system picker and needs no access." : {
+      "comment" : "Help & about (S07): Permissions help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos: only to save what you export. Importing uses the system picker and needs no access."
+          }
+        }
+      }
+    },
+    "The photo moves to Recently deleted. You can bring it back within 30 days." : {
+      "comment" : "Delete sheet (M15) body for a photo with no selfie window, note or voice note.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The photo moves to Recently deleted. You can bring it back within 30 days."
+          }
+        }
+      }
+    },
+    "The video moves to Recently deleted. You can bring it back within 30 days." : {
+      "comment" : "Delete sheet (M15) body for a video with no selfie window, note or voice note.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The video moves to Recently deleted. You can bring it back within 30 days."
+          }
+        }
+      }
+    },
+    "To capture moments, allow camera access in iOS Settings." : {
+      "comment" : "C13a body: camera access off",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To capture moments, allow camera access in iOS Settings."
+          }
+        }
+      }
+    },
+    "To record voice notes, allow microphone access in iOS Settings. You can still write a note." : {
+      "comment" : "Microphone off screen: message under the title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To record voice notes, allow microphone access in iOS Settings. You can still write a note."
+          }
+        }
+      }
+    },
+    "Used in %lld movie projects. It will be skipped there." : {
+      "comment" : "Delete sheet (M15): the moment is in movie projects.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Used in a movie project. It will be skipped there."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Used in %lld movie projects. It will be skipped there."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Used in %lld movie projects. They will be skipped there." : {
+      "comment" : "Delete sheet (M15): some of the selected moments are in movie projects.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Used in a movie project. They will be skipped there."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Used in %lld movie projects. They will be skipped there."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Videos will be silent. Turn on the microphone in iOS Settings to add sound." : {
+      "comment" : "Camera note (C13b): video mode with sound on while the microphone is turned off in Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos will be silent. Turn on the microphone in iOS Settings to add sound."
+          }
+        }
+      }
+    },
+    "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in iOS Settings." : {
+      "comment" : "Onboarding O08c, reminders off after Don't Allow: body",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in iOS Settings."
+          }
+        }
+      }
+    },
+    "You can still capture moments whenever you like. Turn on surprises any time in Settings › Surprises." : {
+      "comment" : "Onboarding O08c, reminders off after Maybe later: body. Settings › Surprises is MimoDays' own Settings page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can still capture moments whenever you like. Turn on surprises any time in Settings › Surprises."
+          }
+        }
+      }
+    },
+    "Your moments come back with their notes, voice notes, places, collections and movie projects. Settings aren't included; set them again." : {
+      "comment" : "Help & about (S07): Moving to a new iPhone help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your moments come back with their notes, voice notes, places, collections and movie projects. Settings aren't included; set them again."
+          }
+        }
+      }
+    },
     "about 1 min" : {
       "comment" : "New movie (F04): Quick's length",
       "extractionState" : "manual",
@@ -1687,18 +2131,6 @@
         }
       }
     },
-    "Allow MimoDays to add to your photos in Settings." : {
-      "comment" : "Alert message when Photos access is off",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allow MimoDays to add to your photos in Settings."
-          }
-        }
-      }
-    },
     "Allowed" : {
       "comment" : "Camera settings (S03): Permissions value, camera and microphone are allowed",
       "extractionState" : "manual",
@@ -1851,18 +2283,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties."
-          }
-        }
-      }
-    },
-    "At a random time within your hours, MimoDays sends one notification: a little moment is happening. Open it while it's fresh and capture whatever is around you." : {
-      "comment" : "Help & about (S07): Surprises help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "At a random time within your hours, MimoDays sends one notification: a little moment is happening. Open it while it's fresh and capture whatever is around you."
           }
         }
       }
@@ -2276,7 +2696,7 @@
       }
     },
     "Cancel" : {
-      "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12); also backup and restore",
+      "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12); also backup and restore; the map's location-off alert",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2451,18 +2871,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose another place"
-          }
-        }
-      }
-    },
-    "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for a day, a week or until you resume them." : {
-      "comment" : "Help & about (S07): Surprises help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for a day, a week or until you resume them."
           }
         }
       }
@@ -3308,7 +3716,7 @@
       }
     },
     "Delete voice note" : {
-      "comment" : "Edit moment: destructive action that removes the moment's voice note when saved.",
+      "comment" : "Edit moment: destructive action that removes the moment's voice note when saved; review's voice note card (C10): accessibility label of the trash button",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3483,18 +3891,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Drag the window in the preview to place it; pinch to resize. The movie uses exactly this."
-          }
-        }
-      }
-    },
-    "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts." : {
-      "comment" : "Help & about (S07): Selfie window help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drag the window to any corner. Touch and hold it to change its corner and size. Settings › Camera sets where it starts."
           }
         }
       }
@@ -4448,7 +4844,7 @@
       }
     },
     "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives." : {
-      "comment" : "First moment saved (onboarding O10): body. On iPad it says iPad.",
+      "comment" : "First moment saved (onboarding O10): body when surprises are on. On iPad it says iPad.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -4707,18 +5103,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Light"
-          }
-        }
-      }
-    },
-    "Location, if you allow it: to save where a moment happened." : {
-      "comment" : "Help & about (S07): Permissions help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Location, if you allow it: to save where a moment happened."
           }
         }
       }
@@ -5071,30 +5455,6 @@
         }
       }
     },
-    "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all." : {
-      "comment" : "Privacy statement (S05): location use. On iPad it says iPad.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "device" : {
-              "ipad" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "MimoDays asks where this iPad is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "MimoDays only adds what you save. It can't see the rest of your library." : {
       "comment" : "Explainer message before the system Photos (add only) prompt",
       "extractionState" : "manual",
@@ -5127,18 +5487,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device."
-          }
-        }
-      }
-    },
-    "Missed one? Nothing happens. There are no streaks, scores or reminders about it." : {
-      "comment" : "Help & about (S07): Surprises help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Missed one? Nothing happens. There are no streaks, scores or reminders about it."
           }
         }
       }
@@ -5948,7 +6296,7 @@
       }
     },
     "Not now" : {
-      "comment" : "Closes a permission screen without asking; generic save failure alert: button that closes the alert and stays on review; microphone off screen: secondary button",
+      "comment" : "Camera or microphone off screen: secondary button that closes it; save failure alert: button that closes the alert and stays on review; the movie suggestion and backup reminder: puts them away",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -6151,18 +6499,6 @@
         }
       }
     },
-    "Notifications, if you allow them: for surprises." : {
-      "comment" : "Help & about (S07): Permissions help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Notifications, if you allow them: for surprises."
-          }
-        }
-      }
-    },
     "now" : {
       "comment" : "Time on the sample notification in onboarding art",
       "extractionState" : "manual",
@@ -6255,30 +6591,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "On screen"
-          }
-        }
-      }
-    },
-    "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file." : {
-      "comment" : "Help & about (S07): Moving to a new iPhone help. On iPad it says iPad.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "device" : {
-              "ipad" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "On the new iPad, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "On the new iPhone, install MimoDays, open Settings › Backup, tap Restore from a backup and choose that file."
-                }
-              }
-            }
           }
         }
       }
@@ -6488,7 +6800,7 @@
       }
     },
     "Open iOS Settings" : {
-      "comment" : "Onboarding O08c button, opens the app's notification settings in iOS Settings",
+      "comment" : "Button that opens MimoDays' page in iOS Settings: onboarding O08c, the camera or microphone off screens, Help, Surprises and the alerts when access is off",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -6507,18 +6819,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Recently deleted"
-          }
-        }
-      }
-    },
-    "Open Settings" : {
-      "comment" : "Opens the app's page in iOS Settings; microphone off screen: primary button",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Settings"
           }
         }
       }
@@ -6771,18 +7071,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "photos, videos, selfie windows"
-          }
-        }
-      }
-    },
-    "Photos: to save what you export, and to import only the photos you pick." : {
-      "comment" : "Help & about (S07): Permissions help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Photos: to save what you export, and to import only the photos you pick."
           }
         }
       }
@@ -7327,18 +7615,6 @@
         }
       }
     },
-    "Record without sound" : {
-      "comment" : "C06c: skip the microphone and record silent videos",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Record without sound"
-          }
-        }
-      }
-    },
     "Recording" : {
       "comment" : "Camera (C03): accessibility label of the timer pill; its value is elapsed / limit",
       "extractionState" : "manual",
@@ -7527,18 +7803,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "Remove voice note" : {
-      "comment" : "Voice note card (C10): accessibility label of the trash button",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove voice note"
           }
         }
       }
@@ -9475,18 +9739,6 @@
         }
       }
     },
-    "The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days." : {
-      "comment" : "Delete sheet (M15) body for a photo.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days."
-          }
-        }
-      }
-    },
     "The picture dips through black." : {
       "comment" : "U53: what the Fade transition does",
       "extractionState" : "manual",
@@ -9627,18 +9879,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The video and its time can't be changed."
-          }
-        }
-      }
-    },
-    "The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days." : {
-      "comment" : "Delete sheet (M15) body for a video.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days."
           }
         }
       }
@@ -10275,30 +10515,6 @@
         }
       }
     },
-    "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today." : {
-      "comment" : "C13a body: camera access off",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today."
-          }
-        }
-      }
-    },
-    "To record voice notes, allow microphone access in Settings. You can still write a note." : {
-      "comment" : "Microphone off screen: message under the title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To record voice notes, allow microphone access in Settings. You can still write a note."
-          }
-        }
-      }
-    },
     "Today" : {
       "comment" : "Tab: today's capture screen Also the Memory Card's back label when opened from there (U42).",
       "extractionState" : "manual",
@@ -10839,54 +11055,6 @@
         }
       }
     },
-    "Used in %lld movie drafts. It will be skipped there." : {
-      "comment" : "Delete sheet (M15): the moment is in movie drafts.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Used in a movie draft. It will be skipped there."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Used in %lld movie drafts. It will be skipped there."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "Used in %lld movie drafts. They will be skipped there." : {
-      "comment" : "Delete sheet (M15): some of the selected moments are in movie drafts.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Used in a movie draft. They will be skipped there."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Used in %lld movie drafts. They will be skipped there."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "Version %@" : {
       "comment" : "Help & about (S07): the app's version and build, e.g. 'Version 1.0 (12)'",
       "extractionState" : "manual",
@@ -10967,18 +11135,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger."
-          }
-        }
-      }
-    },
-    "Videos will be silent. Turn on the microphone in Settings to add sound." : {
-      "comment" : "Camera note (C13b): video mode with sound on while the microphone is turned off in Settings.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Videos will be silent. Turn on the microphone in Settings to add sound."
           }
         }
       }
@@ -11463,18 +11619,6 @@
         }
       }
     },
-    "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings." : {
-      "comment" : "Onboarding O08c, reminders off: body",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings."
-          }
-        }
-      }
-    },
     "You can still change any of these for a single movie or export." : {
       "comment" : "Movies & export settings (S06): note under the export card",
       "extractionState" : "manual",
@@ -11567,18 +11711,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your life, in little pieces."
-          }
-        }
-      }
-    },
-    "Your moments come back with their notes, voice notes, places, collections and movie drafts." : {
-      "comment" : "Help & about (S07): Moving to a new iPhone help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your moments come back with their notes, voice notes, places, collections and movie drafts."
           }
         }
       }

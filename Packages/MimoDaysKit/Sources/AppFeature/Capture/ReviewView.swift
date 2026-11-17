@@ -167,7 +167,6 @@ struct ReviewView: View {
     private func choosePlace() {
         guard !isSaving else { return }
         Task {
-            // "Not now" still opens the place sheet, without the current city, like a denial.
             let status = await asker.request(.location, using: permissions)
             locationAllowed = status.isUsable
             choosesPlace = true
@@ -180,7 +179,6 @@ struct ReviewView: View {
         guard !isSaving else { return }
         Task {
             let status = await asker.request(.microphone, using: permissions)
-            guard status != .notDetermined else { return }
             guard status.isUsable else {
                 microphoneOff = true
                 return

@@ -11,7 +11,8 @@ struct LocalizationTests {
         "No favorites yet", "Tap the heart on any moment to keep it here.", "Search moments", "Clear", "Removes this place", "Photos", "Videos", "Voice", "Filters", "Filters · %lld", "Places", "Moments · %lld", "Place detail: %@ · %@", "matched in caption", "matched in note", "matched in voice note", "matched in place", "No matches", "No moments match these filters.", "Nothing matches “%@” in photos.", "Nothing matches “%@” in videos.", "Nothing matches “%@”.", "Nothing matches “%@” with these filters.", "No matches message: %@ %@", "Search looks at notes, voice-note words and places.", "Search all moments", "Search", "All", "From", "To", "Any time", "Up to today", "Has a voice note", "Has a written note", "Favorites only", "Reset", "Show %lld moments",
         "%lld years back", "Years ago and year: %@ · %@", "On this day subtitle: %@", "Nothing on this day yet", "Moments from today will be here next year.",
         "Select", "Select moments", "%lld selected", "Select all", "Deselect all", "Collect",
-        "Delete this moment?", "Delete these %lld moments?", "The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days.", "The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days.", "They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days.", "Used in %lld movie drafts. It will be skipped there.", "Used in %lld movie drafts. They will be skipped there.", "Delete moment", "Delete %lld moments", "Delete", "Recently deleted", "Moments are deleted for good after 30 days. They are not shown anywhere else in the app.", "Delete all", "Recover all", "Delete %lld moments for good?", "This can't be undone.", "%lld days", "Removed in %lld days", "Deleted today.", "Deleted %lld days ago.", "Will be removed in %lld days.", "Recover", "Delete now", "Delete this moment for good?",
+        "Moments show up here when they have a place. Saving places is off; turn it on in Settings › Privacy.", "Moments show up here when they have a place. Turn on location so new moments get one.", "Location is off for MimoDays", "Allow location in iOS Settings to see where you are.",
+        "Delete this moment?", "Delete these %lld moments?", "The photo moves to Recently deleted. You can bring it back within 30 days.", "The video moves to Recently deleted. You can bring it back within 30 days.", "%@ move to Recently deleted. You can bring them back within 30 days.", "Deleted part: the photo", "Deleted part: the video", "Deleted part: selfie window", "Deleted part: note", "Deleted part: voice note", "They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days.", "Used in %lld movie projects. It will be skipped there.", "Used in %lld movie projects. They will be skipped there.", "Delete moment", "Delete %lld moments", "Delete", "Recently deleted", "Moments are deleted for good after 30 days. They are not shown anywhere else in the app.", "Delete all", "Recover all", "Delete %lld moments for good?", "This can't be undone.", "%lld days", "Removed in %lld days", "Deleted today.", "Deleted %lld days ago.", "Will be removed in %lld days.", "Recover", "Delete now", "Delete this moment for good?",
         "Edit", "Edit moment", "Discard your changes?", "Discard changes", "Delete voice note",
         "Couldn't save the changes", "Nothing was changed. Try again in a moment.", "The photo and its time can't be changed.",
         "The video and its time can't be changed.", "Add a note", "Add", "Photo with selfie", "Share", "Favorite", "Voice note · %@", "Stops it", "Plays it", "Pause", "Play", "Sound off", "Sound on", "Playback position",
@@ -29,17 +30,19 @@ struct LocalizationTests {
         "Back", "When should MimoDays surprise you?", "Pick how often and when. The exact time is always a surprise.",
         "How often", "On these days", "Earliest", "Latest", "Surprises only arrive between these times. Focus modes still apply.",
         "Enable reminders", "Maybe later", "Your first surprise is on its way.", "No reminders for now. That's okay.",
-        "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings.",
+        "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in iOS Settings.",
+        "You can still capture moments whenever you like. Turn on surprises any time in Settings › Surprises.",
         "Open iOS Settings", "Ready for your first little moment?", "Try the camera. Save the photo or video only if you like it.",
         "Capture my first moment", "I'll do it later", "Your first moment is here.",
-        "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.", "View my moments", "Today, %@",
+        "It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.",
+        "It lives on this iPhone. Come back tomorrow, or whenever something feels worth keeping.", "View my moments", "Today, %@",
         "Camera settings", "Flash", "Sound", "Selfie window", "On", "Off", "Switch camera", "Take photo", "Record video",
         "Stop recording", "Recording", "Tap to stop",
         "This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.",
         "Opens in", "Video length", "Record sound", "Shutter sound", "In silent mode, photos never make a sound.", "Camera", "Photo", "Video",
         "Top left", "Top right", "Bottom left", "Bottom right", "Small", "Medium", "Large", "Reset to default",
         "Adjust selfie window",
-        "Videos will be silent. Turn on the microphone in Settings to add sound.",
+        "Videos will be silent. Turn on the microphone in iOS Settings to add sound.",
         "Not enough space to record. Free up some space on this iPhone and try again.",
         "The camera is busy with a call or another app. It comes back on its own.",
         "This iPhone is too warm for the camera right now. It comes back once it cools down.",
@@ -51,7 +54,7 @@ struct LocalizationTests {
         "Not enough space to save", "This moment is kept until you free up about %@. Nothing is lost.",
         "This moment didn't save", "Nothing is lost. Try again in a moment.",
         "Note", "Cancel", "Retake and drop the note?", "Keep editing", "%lld of %lld characters",
-        "Voice note", "%@ of %@", "%@ copy", "Remove voice note", "Pause voice note", "Play voice note", "Transcript in quotes: %@",
+        "Voice note", "%@ of %@", "%@ copy", "Pause voice note", "Play voice note", "Transcript in quotes: %@",
         // Movies (Phase 11).
         "New movie", "Movie", "Make a movie of these", "Drafts", "No movies yet", "Turn a month, a trip or a whole year of moments into a short film.", "Make a movie", "%@ is ready", "%lld moments from %lld days.", "About %lld minutes.", "Make it", "Not now", "Draft", "Edited %@", "%@ · %@ · %@", "%@, the whole year", "Last month", "This year", "Last year", "These dates", "This collection", "This place", "This choice", "Movie period: this collection", "Movie period: this place", "Movie period: these dates", "Step %lld of 3", "What's it about?", "%@ · %@", "Dates", "Pick a start and an end", "A collection", "A place", "Choose moments", "Not enough yet", "%@ has %lld moments. A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips.", "Choose more dates", "Catch a moment now", "Source", "Which dates?", "Pick a day", "The end is before the start. Pick a later end date.", "Previous month", "Next month", "Which collection?", "How long, what shape?", "No collections yet. Make one in Memories.", "Which place?", "No moments have a place yet.", "Length", "Shape", "%lld minutes", "Quick", "Short", "Full", "Custom", "about 1 min", "3 to 5 min", "every moment · %@", "you choose", "Photos and videos that don't match the shape", "Fill the frame", "Show all of it", "9:16 · Phone", "16:9 · TV", "1:1 · Square", "Which moments?", "All · %lld", "Picked · %lld", "Build the movie", "Tap the moments you want in the movie. It needs at least 5.", "We picked %lld of %lld, spread evenly across %@. Tap to add or remove.", "Next", "Unnamed place", "Back",
         "Transcribed on this iPhone", "Retake and drop the voice note?", "Retake and drop the notes?",
@@ -73,7 +76,7 @@ struct LocalizationTests {
         "Privacy", "Date in the file", "Exact place in the file",
         "Captions you added are part of the picture. File details are hidden unless you turn them on.", "4K", "Making your movie", "Progress",
         "You can leave this screen or lock the phone. We'll let you know when it's ready.", "Play the movie", "Your movie is ready",
-        "Saved to Photos", "Save to Photos", "Save to Files", "Couldn't save to Photos", "OK", "Allow MimoDays to add to your photos in Settings.",
+        "Saved to Photos", "Save to Photos", "Save to Files", "Couldn't save to Photos", "OK", "Allow MimoDays to add to your photos in iOS Settings.",
         "Something went wrong. Try again.", "The movie couldn't be finished", "Free up space", "Back to the editor",
         "Something went wrong while making it.\nYour draft is safe.", "Saved", "Project", "Delete movie and project",
         "Copies saved to Photos or Files stay there.", "Rename movie", "Delete this movie and its project?", "Duplicate", "Changes make a new version",
@@ -130,7 +133,7 @@ struct LocalizationTests {
 
     private static var resourceKeys: [String] {
         let resources = MainTab.allCases.map(\.title)
-            + PermissionScreen.allCases.flatMap { [$0.title, $0.message, $0.primaryAction, $0.secondaryAction] }
+            + PermissionScreen.allCases.flatMap { [$0.title, $0.message, $0.primaryAction] + [$0.secondaryAction].compactMap { $0 } }
             + OnboardingPage.allCases.flatMap { [$0.title, $0.message, $0.primaryAction] }
             + SurpriseFrequency.allCases.map(\.label)
             + CameraSettings.VideoLength.allCases.map(\.settingsLabel)

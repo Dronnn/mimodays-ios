@@ -14,12 +14,32 @@ enum SettingsRoute: Hashable {
     case donations
     case help
     case helpArticle(HelpArticle)
-    /// S05 "How MimoDays uses your data".
-    case dataUse
+    /// S05 "How MimoDays uses your data", from Privacy or Help.
+    case dataUse(back: SettingsBack)
     /// S08.
     case deleteAll
     /// Appearance › Language.
     case language
+}
+
+/// What the back button says on a page opened from more than one place: the page it goes back to.
+enum SettingsBack: Hashable {
+    case settings
+    case privacy
+    case help
+    case storage
+    /// S08, whose title is a question: a plain "Back".
+    case deleteAll
+
+    var label: Text {
+        switch self {
+        case .settings: Text("Settings", bundle: .module)
+        case .privacy: Text("Privacy", bundle: .module)
+        case .help: Text("Help & about", bundle: .module)
+        case .storage: Text("Storage", bundle: .module)
+        case .deleteAll: Text("Back", bundle: .module)
+        }
+    }
 }
 
 /// The Settings sheet: S01 and everything under it.
@@ -56,7 +76,7 @@ private struct SettingsHost: View {
                     case .donations: DonationsScreen().settingsPage()
                     case .help: HelpView().settingsPage()
                     case let .helpArticle(article): HelpArticleView(article: article).settingsPage()
-                    case .dataUse: DataUseView().settingsPage()
+                    case let .dataUse(back): DataUseView(back: back.label).settingsPage()
                     case .deleteAll: DeleteAllScreen().settingsPage()
                     case .language: LanguageSettingsView().settingsPage()
                     }
@@ -64,10 +84,13 @@ private struct SettingsHost: View {
                 .navigationDestination(for: DataRoute.self) { route in
                     switch route {
                     case .storage: StorageScreen().settingsPage()
-                    case .backup: BackupScreen().settingsPage()
-                    case .recentlyDeleted: RecentlyDeletedScreen().settingsPage()
+                    case let .backup(back): BackupScreen(back: back.label).settingsPage()
+                    // Its own bar, as in Memories: the system back button and Select.
+                    case .recentlyDeleted: RecentlyDeletedScreen()
                     }
                 }
+                // Recently deleted opens its moments.
+                .memoriesDestinations(thisYear: Calendar.current.component(.year, from: .now))
         }
         .photoImport(isPresented: $importsPhotos)
         .task { await model.load() }
@@ -130,7 +153,7 @@ struct SettingsView: View {
                     DataCard {
                         link(DataRoute.storage, .glyphFolder, Text("Storage", bundle: .module), value: model.storageBytes.map { Text(StorageView.bytes($0)) }, id: "settings.storage")
                         DataSeparator(leading: 64)
-                        link(DataRoute.backup, .glyphArchive, Text("Backup", bundle: .module), value: backupValue, id: "settings.backup")
+                        link(DataRoute.backup(back: .settings), .glyphArchive, Text("Backup", bundle: .module), value: backupValue, id: "settings.backup")
                         DataSeparator(leading: 64)
                         Button(action: importPhotos) {
                             DataIconRow(icon: .glyphPhotos, title: Text("Import from Photos", bundle: .module))

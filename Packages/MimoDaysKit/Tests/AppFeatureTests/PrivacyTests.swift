@@ -220,6 +220,22 @@ struct DeleteAllTests {
         #expect(privacy.value == PrivacySettings() && memories.value == MemoriesSettings())
         #expect(defaults.data(forKey: "privacySettings") == nil && defaults.data(forKey: "memoriesSettings") == nil)
     }
+
+    /// The backup reminder isn't a surprise, so `pending()` doesn't list it; it goes all the same.
+    @Test func theBackupReminderGoesToo() async throws {
+        let notifications = CancelRecorder()
+        let eraser = AppEraser(context: context, store: store, notifications: notifications, drafts: drafts) {}
+        try await eraser.eraseEverything()
+        #expect(await notifications.cancelled == [BackupReminder.notificationID])
+    }
+
+    /// Lists no requests, like the system scheduler for a time-interval one, and keeps what is cancelled.
+    private actor CancelRecorder: NotificationScheduler {
+        private(set) var cancelled: [String] = []
+        func pending() -> [SurpriseNotification] { [] }
+        func schedule(_: SurpriseNotification) {}
+        func cancel(ids: [String]) { cancelled += ids }
+    }
 }
 
 /// 13.7 (S04): the appearance is kept and becomes the windows' style.

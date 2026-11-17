@@ -99,7 +99,7 @@ struct MomentViewer: View {
             EditMomentView(model: edit) { model.removeFromPager(edit.id) }
         }
         .sheet(item: $deleting) { moment in
-            DeleteConfirmationSheet(count: 1, mediaType: moment.mediaType, movieDrafts: model.movieDrafts(moment.id)) {
+            DeleteConfirmationSheet(count: 1, parts: moment.parts, movieDrafts: model.movieDrafts(moment.id)) {
                 model.delete(moment.id)
             }
         }

@@ -139,9 +139,12 @@ final class MemoriesModel {
     // MARK: Select (M13)
 
     /// The moment's kind when only one is chosen, for M15's words.
-    func mediaType(of ids: Set<UUID>) -> MediaType? {
+    /// What a single chosen moment has, for the delete sheet (M15); nil for several.
+    func parts(of ids: Set<UUID>) -> MomentParts? {
         guard ids.count == 1, let id = ids.first else { return nil }
-        return days.values.lazy.flatMap(\.self).first { $0.id == id }?.mediaType
+        var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return (try? context.fetch(descriptor).first).map(MomentParts.init)
     }
 
     func movieDrafts(using ids: Set<UUID>) -> Int {

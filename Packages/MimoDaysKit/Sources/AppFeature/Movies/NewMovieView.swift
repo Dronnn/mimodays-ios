@@ -255,9 +255,10 @@ struct SourceStep: View {
     let model: NewMovieModel
     @Binding var path: [NewMovieStep]
     let close: () -> Void
-    @Environment(AppRouter.self) private var router
     /// F16: the source has too few moments.
     @State private var tooFew: Bool
+    /// F16's Catch a moment now: the camera over the wizard, which waits underneath as it was.
+    @State private var capturing: CaptureRequest?
 
     init(model: NewMovieModel, path: Binding<[NewMovieStep]>, close: @escaping () -> Void, tooFew: Bool = false) {
         self.model = model
@@ -289,6 +290,15 @@ struct SourceStep: View {
             }
         }
         .task { model.loadChoices() }
+        .fullScreenCover(item: $capturing, onDismiss: recount) { CaptureFlowView(request: $0) }
+    }
+
+    /// Back from the camera: the counts include a new moment, and F16 goes once the source has enough.
+    private func recount() {
+        model.loadChoices()
+        if tooFew, model.loadCandidates() {
+            withAnimation(.snappy) { tooFew = false }
+        }
     }
 
     private var sources: some View {
@@ -382,7 +392,7 @@ struct SourceStep: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 24)
                 .accessibilityIdentifier("newMovie.moreDates")
-            Button { router.open(.capture(promptID: nil)) } label: { Text("Catch a moment now", bundle: .module) }
+            Button { capturing = CaptureRequest() } label: { Text("Catch a moment now", bundle: .module) }
                 .buttonStyle(.text)
                 .padding(.horizontal, 20)
                 .padding(.top, 8)

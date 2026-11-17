@@ -101,17 +101,6 @@ final class MimoDaysUITests: XCTestCase {
     }
 
     @MainActor
-    func testCameraExplainerNotNowCloses() {
-        launch(permissions: .notDetermined)
-        app.buttons["capture"].tap()
-        let notNow = app.buttons["permission.secondary"]
-        XCTAssertTrue(notNow.waitForExistence(timeout: 5))
-        notNow.tap()
-        XCTAssertTrue(notNow.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["capture"].exists)
-    }
-
-    @MainActor
     func testCameraOffOffersSettings() {
         launch(permissions: .denied)
         app.buttons["capture"].tap()

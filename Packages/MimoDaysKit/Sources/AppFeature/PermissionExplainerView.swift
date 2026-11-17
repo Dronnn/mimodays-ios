@@ -8,7 +8,7 @@ enum PermissionScreen: CaseIterable {
     case camera
     /// C06c: before the microphone prompt, on the first video.
     case microphone
-    /// C13a: camera access is off; only Settings can turn it back on.
+    /// C13a: camera access is off; only iOS Settings can turn it back on.
     case cameraOff
     /// Like C13a, when Voice note is tapped with the microphone off.
     case microphoneOff
@@ -71,12 +71,12 @@ enum PermissionScreen: CaseIterable {
             )
         case .cameraOff:
             LocalizedStringResource(
-                "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today.",
+                "To capture moments, allow camera access in iOS Settings.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
         case .microphoneOff:
             LocalizedStringResource(
-                "To record voice notes, allow microphone access in Settings. You can still write a note.",
+                "To record voice notes, allow microphone access in iOS Settings. You can still write a note.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
         case .voiceNote:
@@ -105,18 +105,20 @@ enum PermissionScreen: CaseIterable {
     var primaryAction: LocalizedStringResource {
         switch self {
         case .camera, .microphone, .voiceNote, .location, .notifications, .photos: LocalizedStringResource("Continue", bundle: .atURL(Bundle.module.bundleURL))
-        case .cameraOff, .microphoneOff: LocalizedStringResource("Open Settings", bundle: .atURL(Bundle.module.bundleURL))
+        case .cameraOff, .microphoneOff: LocalizedStringResource("Open iOS Settings", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
-    var secondaryAction: LocalizedStringResource {
+    /// Only the "turned off" screens have a way out: an explainer must always lead to the system prompt
+    /// (App Review Guideline 5.1.1).
+    var secondaryAction: LocalizedStringResource? {
         switch self {
-        case .camera, .cameraOff, .microphoneOff, .voiceNote, .location, .notifications, .photos: LocalizedStringResource("Not now", bundle: .atURL(Bundle.module.bundleURL))
-        case .microphone: LocalizedStringResource("Record without sound", bundle: .atURL(Bundle.module.bundleURL))
+        case .camera, .microphone, .voiceNote, .location, .notifications, .photos: nil
+        case .cameraOff, .microphoneOff: LocalizedStringResource("Not now", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
-    /// Explainers keep their buttons at the bottom; the "turned off" screen keeps them under the text.
+    /// Explainers keep their button at the bottom; the "turned off" screen keeps them under the text.
     var pinsActions: Bool { self != .cameraOff && self != .microphoneOff }
 }
 
@@ -124,7 +126,8 @@ enum PermissionScreen: CaseIterable {
 struct PermissionExplainerView: View {
     let screen: PermissionScreen
     let primary: () -> Void
-    let secondary: () -> Void
+    /// Not now on the "turned off" screens; explainers have no secondary action.
+    var secondary: () -> Void = {}
 
     var body: some View {
         ScrollView {
@@ -167,9 +170,11 @@ struct PermissionExplainerView: View {
             Button(action: primary) { Text(screen.primaryAction) }
                 .buttonStyle(.primary)
                 .accessibilityIdentifier("permission.primary")
-            Button(action: secondary) { Text(screen.secondaryAction) }
-                .buttonStyle(.text)
-                .accessibilityIdentifier("permission.secondary")
+            if let secondaryAction = screen.secondaryAction {
+                Button(action: secondary) { Text(secondaryAction) }
+                    .buttonStyle(.text)
+                    .accessibilityIdentifier("permission.secondary")
+            }
         }
         .padding(.horizontal, Spacing.screenMargin)
         .frame(maxWidth: Self.columnWidth)
@@ -201,25 +206,25 @@ extension EnvironmentValues {
 }
 
 /// Our explainer before a system prompt, for screens that ask on a tap. Shown only while iOS hasn't asked yet;
-/// "Not now" leaves the permission undecided, so the next tap explains again.
+/// its Continue always leads to the system prompt.
 @MainActor @Observable
 final class PermissionAsker {
     private(set) var screen: PermissionScreen?
-    @ObservationIgnored private var answer: CheckedContinuation<Bool, Never>?
+    @ObservationIgnored private var answer: CheckedContinuation<Void, Never>?
 
-    /// The status after the explainer and the system prompt; `.notDetermined` after "Not now".
+    /// The status after the explainer and the system prompt.
     func request(_ permission: Permission, using service: any PermissionService) async -> PermissionStatus {
         let status = await service.status(of: permission)
         guard status == .notDetermined, answer == nil else { return status }
         screen = PermissionScreen(explaining: permission)
-        let goesOn = await withCheckedContinuation { answer = $0 }
-        return goesOn ? await service.request(permission) : .notDetermined
+        await withCheckedContinuation { answer = $0 }
+        return await service.request(permission)
     }
 
-    /// Continue (true) or Not now (false) on the explainer.
-    func respond(_ goesOn: Bool) {
+    /// Continue on the explainer.
+    func proceed() {
         screen = nil
-        answer?.resume(returning: goesOn)
+        answer?.resume()
         answer = nil
     }
 }
@@ -231,8 +236,8 @@ extension PermissionScreen: Identifiable {
 extension View {
     /// Presents `asker`'s explainers over this view.
     func permissionExplainers(_ asker: PermissionAsker) -> some View {
-        fullScreenCover(item: Binding { asker.screen } set: { if $0 == nil { asker.respond(false) } }) { screen in
-            PermissionExplainerView(screen: screen) { asker.respond(true) } secondary: { asker.respond(false) }
+        fullScreenCover(item: Binding { asker.screen } set: { if $0 == nil { asker.proceed() } }) { screen in
+            PermissionExplainerView(screen: screen) { asker.proceed() }
         }
     }
 }

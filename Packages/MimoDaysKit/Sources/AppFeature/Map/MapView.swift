@@ -31,6 +31,7 @@ struct MapView: View {
     let model: MapModel
     @Environment(AppRouter.self) private var router
     @Environment(\.permissions) private var permissions
+    @Environment(PrivacyPreferences.self) private var privacy: PrivacyPreferences?
     @State private var asker = PermissionAsker()
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -43,6 +44,8 @@ struct MapView: View {
     @State private var retry = 0
     @State private var location = PermissionStatus.notDetermined
     @State private var showsUser = false
+    /// Show where I am was tapped with location turned off in iOS Settings.
+    @State private var locationOff = false
     /// How much of the map the places panel covers at its strip height, from the map's bottom edge (iPhone).
     @State private var panelCover: CGFloat = 0
     @State private var openMoment: MomentPager?
@@ -92,6 +95,14 @@ struct MapView: View {
             }
         }
         .sheet(isPresented: $filtering) { MapFiltersSheet(model: model, thisYear: thisYear) }
+        .alert(Text("Location is off for MimoDays", bundle: .module), isPresented: $locationOff) {
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            } label: { Text("Open iOS Settings", bundle: .module) }
+            Button(role: .cancel) {} label: { Text("Cancel", bundle: .module) }
+        } message: {
+            Text("Allow location in iOS Settings to see where you are.", bundle: .module)
+        }
         .task {
             model.refresh()
             fitToken += 1
@@ -330,11 +341,16 @@ struct MapView: View {
         .accessibilityIdentifier("map.locate")
     }
 
-    /// Where I am when location is allowed (asking first if it never was); otherwise, or a second tap, all places.
+    /// Where I am when location is allowed (asking first if it never was); once it's off, the way to iOS Settings.
+    /// A second tap, or a no given just now, shows all places.
     private func locate() async {
         if showsUser {
             showsUser = false
             fitToken += 1
+            return
+        }
+        if location.needsSettings {
+            locationOff = true
             return
         }
         if location == .notDetermined { location = await asker.request(.location, using: permissions) }
@@ -371,7 +387,7 @@ struct MapView: View {
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
             ScrollView {
-                NoPlacesCard(locationIsUsable: location.isUsable, unlocatedCount: model.unlocatedCount) {
+                NoPlacesCard(location: location, savesPlaces: privacy?.value.savesPlace ?? true, unlocatedCount: model.unlocatedCount) {
                     Task { await turnOnLocation() }
                 }
                     .frame(maxWidth: 420)
@@ -667,7 +683,9 @@ private struct MapUnavailableGrid: View {
 
 /// P05's `Card`: the location art, the title, why, Turn on location while it's off, and the way to add places.
 struct NoPlacesCard: View {
-    let locationIsUsable: Bool
+    let location: PermissionStatus
+    /// S05's Save a place with moments.
+    let savesPlaces: Bool
     let unlocatedCount: Int
     let turnOnLocation: () -> Void
 
@@ -681,8 +699,12 @@ struct NoPlacesCard: View {
                 .padding(.top, 10)
                 .accessibilityAddTraits(.isHeader)
             Group {
-                if locationIsUsable {
+                if !savesPlaces {
+                    Text("Moments show up here when they have a place. Saving places is off; turn it on in Settings › Privacy.", bundle: .module)
+                } else if location.isUsable {
                     Text("Moments show up here when they have a place. New moments get one when you save them.", bundle: .module)
+                } else if location == .notDetermined {
+                    Text("Moments show up here when they have a place. Turn on location so new moments get one.", bundle: .module)
                 } else {
                     Text("Moments show up here when they have a place. Location is off, so new moments are saved without one.", bundle: .module)
                 }
@@ -693,7 +715,7 @@ struct NoPlacesCard: View {
             .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 18)
             .padding(.top, 7)
-            if !locationIsUsable {
+            if savesPlaces, !location.isUsable {
                 Button(action: turnOnLocation) { Text("Turn on location", bundle: .module) }
                     .buttonStyle(.primary)
                     .padding(.top, 16)

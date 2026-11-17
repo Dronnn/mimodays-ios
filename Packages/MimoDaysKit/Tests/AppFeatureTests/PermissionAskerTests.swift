@@ -12,19 +12,9 @@ struct PermissionAskerTests {
         let request = Task { await asker.request(permission, using: service) }
         while asker.screen == nil { await Task.yield() }
         #expect(asker.screen == PermissionScreen(explaining: permission))
-        asker.respond(true)
+        asker.proceed()
         #expect(await request.value == .granted)
         #expect(asker.screen == nil)
-    }
-
-    @Test func notNowLeavesItUndecided() async {
-        let service = PresetPermissionService(status: .notDetermined)
-        let asker = PermissionAsker()
-        let request = Task { await asker.request(.location, using: service) }
-        while asker.screen == nil { await Task.yield() }
-        asker.respond(false)
-        #expect(await request.value == .notDetermined)
-        #expect(await service.status(of: .location) == .notDetermined)
     }
 
     @Test(arguments: [PermissionStatus.granted, .denied, .limited, .restricted])

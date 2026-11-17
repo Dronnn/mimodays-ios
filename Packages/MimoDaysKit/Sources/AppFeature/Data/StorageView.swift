@@ -5,7 +5,8 @@ import SwiftUI
 /// The places Settings opens for the archive's data (E06, E09 and what they lead to).
 enum DataRoute: Hashable {
     case storage
-    case backup
+    /// E06, from Settings, Storage or Delete all data's Back up first.
+    case backup(back: SettingsBack)
     case recentlyDeleted
 }
 
@@ -85,7 +86,7 @@ struct StorageView: View {
                         }
                         .accessibilityIdentifier("storage.recentlyDeleted")
                         DataSeparator(leading: 64)
-                        NavigationLink(value: DataRoute.backup) {
+                        NavigationLink(value: DataRoute.backup(back: .storage)) {
                             DataIconRow(icon: .glyphArchive, title: Text("Backup", bundle: .module), value: lastBackup)
                         }
                         .accessibilityIdentifier("storage.backup")

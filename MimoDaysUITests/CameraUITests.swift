@@ -379,20 +379,6 @@ final class CameraUITests: XCTestCase {
     }
 
     @MainActor
-    func testRecordWithoutSoundKeepsVideosSilentAndDoesNotAskAgain() {
-        openCamera(permissions: .notDetermined)
-        app.buttons["camera.mode.video"].tap()
-        let withoutSound = app.buttons["permission.secondary"]
-        XCTAssertTrue(withoutSound.waitForExistence(timeout: 5))
-        withoutSound.tap()
-        XCTAssertTrue(withoutSound.waitForNonExistence(timeout: 5))
-        XCTAssertEqual(app.buttons["camera.sound"].value as? String, "Off")
-        app.buttons["camera.mode.photo"].tap()
-        app.buttons["camera.mode.video"].tap()
-        XCTAssertFalse(app.buttons["permission.primary"].waitForExistence(timeout: 2))
-    }
-
-    @MainActor
     func testTouchAndHoldOpensTheSheetAndResetRestoresTheDefault() {
         openCamera()
         XCTAssertEqual(selfieWindow.value as? String, "Top right, Medium")

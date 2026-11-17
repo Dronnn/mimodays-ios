@@ -103,7 +103,7 @@ struct PrivacySettingsView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
                     DataCard {
-                        NavigationLink(value: SettingsRoute.dataUse) {
+                        NavigationLink(value: SettingsRoute.dataUse(back: .privacy)) {
                             DataIconRow(icon: .glyphInfo, title: Text("How MimoDays uses your data", bundle: .module))
                         }
                         .accessibilityIdentifier("privacySettings.dataUse")
@@ -182,11 +182,13 @@ extension PrivacySettings.PlacePrecision {
 
 /// S05 "How MimoDays uses your data": the privacy statement, in plain words.
 struct DataUseView: View {
+    /// The page it was opened from: Privacy, or Help's Privacy statement.
+    var back = Text("Privacy", bundle: .module)
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
-            BackTitleBar(back: Text("Privacy", bundle: .module)) { dismiss() }
+            BackTitleBar(back: back) { dismiss() }
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("How MimoDays uses your data", bundle: .module)
@@ -204,7 +206,7 @@ struct DataUseView: View {
                     )
                     section(
                         Text("Places", bundle: .module),
-                        Text("MimoDays asks where this iPhone is only when you save a moment, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all.", bundle: .module)
+                        Text("MimoDays checks where this iPhone is only while you're reviewing a capture or using the map, never in the background. To name the city, it asks Apple's map service. You can turn places off or remove them all.", bundle: .module)
                     )
                     section(
                         Text("Exports and backups", bundle: .module),

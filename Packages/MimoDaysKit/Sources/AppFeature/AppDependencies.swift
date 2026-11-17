@@ -121,6 +121,8 @@ public final class AppDependencies {
                 appearancePreferences.reset()
                 homePreferences.reset()
                 cameraSettings.save(CameraSettings())
+                UserDefaults.standard.removeObject(forKey: BackupReminder.key)
+                UserDefaults.standard.removeObject(forKey: MoviesModel.dismissedKey)
             }
         )
         UNUserNotificationCenter.current().delegate = notificationTaps

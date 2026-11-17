@@ -13,19 +13,11 @@ struct MovieExportScreen: View {
 
     var body: some View {
         if let library, let project = MovieStore.project(projectID, in: library.context) {
-            MovieExportHost(model: model(project, library), tiles: MemoriesModel(
-                context: library.context, store: library.store, thumbnails: library.thumbnails
-            ))
+            MovieExportHost(
+                model: MovieExportModel(project: project, library: library, defaults: moviePreferences?.value ?? MovieDefaults()),
+                tiles: MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails)
+            )
         }
-    }
-
-    /// F11 starts with the quality and place set in Settings (S06).
-    private func model(_ project: MovieProject, _ library: MediaLibrary) -> MovieExportModel {
-        let model = MovieExportModel(project: project, library: library)
-        let defaults = moviePreferences?.value ?? MovieDefaults()
-        model.resolution = defaults.resolution
-        model.placeInFile = defaults.exactPlaceInFiles
-        return model
     }
 }
 
@@ -390,7 +382,7 @@ struct MovieFileButtons: View {
     let url: URL?
     let primary: Primary
     @State private var saved = false
-    @State private var problem: Text?
+    @State private var problem: PhotosSaveProblem?
     @State private var exporting = false
     @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
@@ -424,23 +416,53 @@ struct MovieFileButtons: View {
             if let url { FileExportSheet(url: url).ignoresSafeArea() }
         }
         .permissionExplainers(asker)
-        .alert(Text("Couldn't save to Photos", bundle: .module), isPresented: Binding(get: { problem != nil }, set: { if !$0 { problem = nil } })) {
-            Button { problem = nil } label: { Text("OK", bundle: .module) }
-        } message: {
-            problem
-        }
+        .photosSaveAlert($problem)
     }
 
     private func saveToPhotos() async {
         guard let url else { return }
-        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
+        _ = await asker.request(.photoLibrary, using: permissions)
         do {
             try await MovieFiles.saveToPhotos(url)
             saved = true
         } catch MovieFiles.Failure.notAllowed {
-            problem = Text("Allow MimoDays to add to your photos in Settings.", bundle: .module)
+            problem = .notAllowed
         } catch {
-            problem = Text("Something went wrong. Try again.", bundle: .module)
+            problem = .other
+        }
+    }
+}
+
+/// Why Save to Photos failed: only a refusal can be undone, in iOS Settings.
+enum PhotosSaveProblem {
+    case notAllowed
+    case other
+}
+
+extension View {
+    /// "Couldn't save to Photos", with a way to iOS Settings when adding to Photos isn't allowed.
+    func photosSaveAlert(_ problem: Binding<PhotosSaveProblem?>) -> some View {
+        modifier(PhotosSaveAlert(problem: problem))
+    }
+}
+
+private struct PhotosSaveAlert: ViewModifier {
+    @Binding var problem: PhotosSaveProblem?
+    @Environment(\.openURL) private var openURL
+
+    func body(content: Content) -> some View {
+        content.alert(Text("Couldn't save to Photos", bundle: .module), isPresented: Binding(get: { problem != nil }, set: { if !$0 { problem = nil } }), presenting: problem) { problem in
+            if problem == .notAllowed {
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                } label: { Text("Open iOS Settings", bundle: .module) }
+            }
+            Button(role: .cancel) {} label: { Text("OK", bundle: .module) }
+        } message: { problem in
+            switch problem {
+            case .notAllowed: Text("Allow MimoDays to add to your photos in iOS Settings.", bundle: .module)
+            case .other: Text("Something went wrong. Try again.", bundle: .module)
+            }
         }
     }
 }

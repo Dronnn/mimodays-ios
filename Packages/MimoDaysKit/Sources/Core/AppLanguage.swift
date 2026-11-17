@@ -18,16 +18,28 @@ public final class AppLanguage: @unchecked Sendable {
     ]
 
     static let key = "AppleLanguages"
+    /// The iPhone's own languages, remembered while MimoDays follows them.
+    static let deviceKey = "deviceLanguages"
 
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let state: OSAllocatedUnfairLock<String?>
+    @ObservationIgnored private let device: [String]
 
     /// `domain` is where `defaults` keeps the app's own values (the bundle identifier for `.standard`), read
-    /// directly so the device-wide language list doesn't count as a choice.
-    public init(defaults: UserDefaults, domain: String? = Bundle.main.bundleIdentifier) {
+    /// directly so the device-wide language list doesn't count as a choice. `preferred` is what iOS gives this
+    /// process: the iPhone's languages, or the app's own choice first once there is one, kept until the next launch.
+    public init(
+        defaults: UserDefaults, domain: String? = Bundle.main.bundleIdentifier, preferred: [String] = Locale.preferredLanguages
+    ) {
         self.defaults = defaults
-        let saved = domain.flatMap { defaults.persistentDomain(forName: $0)?[Self.key] as? [String] }?.first
-        state = OSAllocatedUnfairLock(initialState: saved.flatMap(Self.match))
+        let saved = domain.flatMap { defaults.persistentDomain(forName: $0)?[Self.key] as? [String] }
+        if saved == nil {
+            defaults.set(preferred, forKey: Self.deviceKey)
+            device = preferred
+        } else {
+            device = defaults.stringArray(forKey: Self.deviceKey) ?? preferred
+        }
+        state = OSAllocatedUnfairLock(initialState: saved?.first.flatMap(Self.match))
     }
 
     /// "pt-BR", "zh-Hans", "de" from what iOS stores ("pt-BR", "zh-Hans-CN", "de-DE").
@@ -56,7 +68,7 @@ public final class AppLanguage: @unchecked Sendable {
 
     /// The chosen language, or the best match for the device's languages.
     public var locale: Locale {
-        Locale(identifier: code ?? Self.systemCode)
+        Locale(identifier: code ?? systemCode)
     }
 
     /// Right-to-left scripts (Hebrew, Arabic) flip the layout.
@@ -64,9 +76,11 @@ public final class AppLanguage: @unchecked Sendable {
         locale.language.characterDirection == .rightToLeft
     }
 
-    /// The supported language iOS would pick for this device.
-    public static var systemCode: String {
-        Bundle.preferredLocalizations(from: supported, forPreferences: Locale.preferredLanguages).first ?? "en"
+    /// The supported language iOS would pick for the iPhone's languages. With a choice made, iOS reports that choice
+    /// as the iPhone's too, so the list remembered while following them is used (Same as iPhone stayed Hebrew
+    /// after a switch back, 2026-11-17).
+    public var systemCode: String {
+        Bundle.preferredLocalizations(from: Self.supported, forPreferences: device).first ?? "en"
     }
 
     /// A language's own name, e.g. "Deutsch", "日本語".

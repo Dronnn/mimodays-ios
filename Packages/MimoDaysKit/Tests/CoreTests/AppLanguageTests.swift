@@ -12,7 +12,7 @@ struct AppLanguageTests {
         let (defaults, suite) = defaults()
         let language = AppLanguage(defaults: defaults, domain: suite)
         #expect(language.code == nil)
-        #expect(language.locale.identifier == AppLanguage.systemCode)
+        #expect(language.locale.identifier == language.systemCode)
     }
 
     @Test func aChoiceIsKeptWhereIOSKeepsTheAppLanguage() {
@@ -29,6 +29,19 @@ struct AppLanguageTests {
         language.code = nil
         #expect(defaults.persistentDomain(forName: suite)?["AppleLanguages"] == nil)
         #expect(AppLanguage(defaults: defaults, domain: suite).code == nil)
+    }
+
+    /// iOS reports the app's choice as the iPhone's language until the next launch, so the iPhone's own is
+    /// remembered while it is followed.
+    @Test func theIPhonesLanguageIsRememberedWhileAnotherIsChosen() {
+        let (defaults, suite) = defaults()
+        let following = AppLanguage(defaults: defaults, domain: suite, preferred: ["de-DE"])
+        #expect(following.systemCode == "de")
+        following.code = "he"
+        let relaunched = AppLanguage(defaults: defaults, domain: suite, preferred: ["he", "de-DE"])
+        #expect(relaunched.systemCode == "de")
+        relaunched.code = nil
+        #expect(relaunched.locale.identifier == "de")
     }
 
     @Test(arguments: [("de-DE", "de"), ("zh-Hant-TW", "zh-Hant"), ("zh-Hans-CN", "zh-Hans"), ("pt-BR", "pt-BR"), ("he", "he"), ("fi", nil)])

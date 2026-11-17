@@ -16,7 +16,7 @@ struct LanguageSettingsView: View {
                     DataCard {
                         choice(
                             Text("Same as iPhone", bundle: .module, comment: "Language settings: follow the iPhone's language"),
-                            detail: Text(verbatim: AppLanguage.nativeName(AppLanguage.systemCode)),
+                            detail: Text(verbatim: AppLanguage.nativeName(language.systemCode)),
                             code: nil
                         )
                     }

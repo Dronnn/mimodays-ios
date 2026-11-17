@@ -44,6 +44,8 @@ struct MapView: View {
     @State private var retry = 0
     @State private var location = PermissionStatus.notDetermined
     @State private var showsUser = false
+    /// Show where I am was tapped with location turned off in iOS Settings.
+    @State private var locationOff = false
     /// How much of the map the places panel covers at its strip height, from the map's bottom edge (iPhone).
     @State private var panelCover: CGFloat = 0
     @State private var openMoment: MomentPager?
@@ -93,6 +95,14 @@ struct MapView: View {
             }
         }
         .sheet(isPresented: $filtering) { MapFiltersSheet(model: model, thisYear: thisYear) }
+        .alert(Text("Location is off for MimoDays", bundle: .module), isPresented: $locationOff) {
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            } label: { Text("Open iOS Settings", bundle: .module) }
+            Button(role: .cancel) {} label: { Text("Cancel", bundle: .module) }
+        } message: {
+            Text("Allow location in iOS Settings to see where you are.", bundle: .module)
+        }
         .task {
             model.refresh()
             fitToken += 1
@@ -331,11 +341,16 @@ struct MapView: View {
         .accessibilityIdentifier("map.locate")
     }
 
-    /// Where I am when location is allowed (asking first if it never was); otherwise, or a second tap, all places.
+    /// Where I am when location is allowed (asking first if it never was); once it's off, the way to iOS Settings.
+    /// A second tap, or a no given just now, shows all places.
     private func locate() async {
         if showsUser {
             showsUser = false
             fitToken += 1
+            return
+        }
+        if location.needsSettings {
+            locationOff = true
             return
         }
         if location == .notDetermined { location = await asker.request(.location, using: permissions) }

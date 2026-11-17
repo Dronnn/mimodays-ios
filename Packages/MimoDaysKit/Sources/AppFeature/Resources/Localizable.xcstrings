@@ -1675,6 +1675,18 @@
         }
       }
     },
+    "Allow location in iOS Settings to see where you are." : {
+      "comment" : "Map: alert message when Show where I am is tapped with location turned off in iOS Settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow location in iOS Settings to see where you are."
+          }
+        }
+      }
+    },
     "Allow MimoDays to add to your photos in iOS Settings." : {
       "comment" : "Alert message when Photos access is off",
       "extractionState" : "manual",
@@ -2204,7 +2216,7 @@
       }
     },
     "Cancel" : {
-      "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12); also backup and restore",
+      "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12); also backup and restore; the map's location-off alert",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2583,6 +2595,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Layout"
+          }
+        }
+      }
+    },
+    "Location is off for MimoDays" : {
+      "comment" : "Map: alert title when Show where I am is tapped with location turned off in iOS Settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location is off for MimoDays"
           }
         }
       }

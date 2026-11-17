@@ -75,7 +75,7 @@ struct MapSnapshotTests {
         for place in model.recentPlaces { if let id = place.moments.first?.id { await model.load(id) } }
         assertScreenSnapshots(
             of: NavigationStack {
-                RecentPlacesPanel(model: model) { _ in }
+                RecentPlacesPanel(model: model, cover: .constant(0)) { _ in }
                     .frame(maxHeight: .infinity, alignment: .bottom)
                     .background(ColorToken.canvas.color.ignoresSafeArea())
             },

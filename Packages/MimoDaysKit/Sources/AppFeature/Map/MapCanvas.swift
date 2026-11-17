@@ -91,6 +91,18 @@ final class MarkerView: MKAnnotationView {
 
 /// P01's map: muted Apple map, places as photo markers, clusters while zoomed out. Choosing a place or a cluster
 /// is reported; a cluster also zooms in on its places.
+/// Holds a fit asked for before the first layout and runs it once the map has a size.
+final class FittingMapView: MKMapView {
+    var pendingFit: ((MKMapView) -> Void)?
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard !bounds.isEmpty, let fit = pendingFit else { return }
+        pendingFit = nil
+        fit(self)
+    }
+}
+
 struct MapCanvas: UIViewRepresentable {
     let places: [MapPlace]
     let images: [UUID: UIImage]
@@ -98,13 +110,16 @@ struct MapCanvas: UIViewRepresentable {
     /// Bumped to fit every place again (filters changed, Locate without location).
     let fitToken: Int
     let showsUser: Bool
+    /// What the places panel covers: the bottom on iPhone (P01's strip), the leading edge on iPad (X03). Fitting keeps
+    /// every place clear of it.
+    var cover = EdgeInsets()
     let onLoad: (UUID) -> Void
     let onFailure: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
     func makeUIView(context: Context) -> MKMapView {
-        let map = MKMapView()
+        let map = FittingMapView()
         let configuration = MKStandardMapConfiguration(elevationStyle: .flat, emphasisStyle: .muted)
         configuration.pointOfInterestFilter = .excludingAll
         map.preferredConfiguration = configuration
@@ -131,7 +146,7 @@ struct MapCanvas: UIViewRepresentable {
         map.addAnnotations(places.filter { !kept.contains($0.id) }.map(PlaceAnnotation.init))
         if coordinator.fitToken != fitToken {
             coordinator.fitToken = fitToken
-            fit(map)
+            fit(map, coordinator: coordinator, leftToRight: context.environment.layoutDirection == .leftToRight)
         }
         map.showsUserLocation = showsUser
         if showsUser, coordinator.followsUser == false {
@@ -150,13 +165,32 @@ struct MapCanvas: UIViewRepresentable {
         }
     }
 
-    private func fit(_ map: MKMapView) {
+    private func fit(_ map: MKMapView, coordinator: Coordinator, leftToRight: Bool) {
+        // The first fit comes before the map has a size; fitting a 0×0 view shows the wrong region. It runs at the
+        // first layout instead, with the cover known by then.
+        if map.bounds.isEmpty, let map = map as? FittingMapView {
+            map.pendingFit = { coordinator.parent.fit($0, coordinator: coordinator, leftToRight: leftToRight) }
+            return
+        }
         let annotations = map.annotations.compactMap { $0 as? PlaceAnnotation }
         guard !annotations.isEmpty else { return }
-        map.showAnnotations(annotations, animated: false)
-        if annotations.count == 1 {
-            map.setRegion(MKCoordinateRegion(center: annotations[0].coordinate, latitudinalMeters: 4_000, longitudinalMeters: 4_000), animated: false)
-        }
+        // One place: 4 km around it.
+        let side = annotations.count == 1 ? MKMapPointsPerMeterAtLatitude(annotations[0].coordinate.latitude) * 4_000 : 0
+        let rect = annotations.map { MKMapRect(origin: MKMapPoint($0.coordinate), size: MKMapSize(width: 0, height: 0)) }
+            .reduce(MKMapRect.null) { $0.union($1) }
+            .insetBy(dx: -side / 2, dy: -side / 2)
+        map.setVisibleMapRect(rect, edgePadding: Self.padding(cover, leftToRight), animated: false)
+    }
+
+    /// Room for a marker (about 60 pt) on every side, plus what the panel covers.
+    static func padding(_ cover: EdgeInsets, _ leftToRight: Bool) -> UIEdgeInsets {
+        let marker: CGFloat = 60
+        return UIEdgeInsets(
+            top: marker + cover.top,
+            left: marker + (leftToRight ? cover.leading : cover.trailing),
+            bottom: marker + cover.bottom,
+            right: marker + (leftToRight ? cover.trailing : cover.leading)
+        )
     }
 
     @MainActor

@@ -34,6 +34,7 @@ struct MapView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.calendar) private var calendar
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var selection: String?
     @State private var filtering = false
     @State private var fitToken = 0
@@ -41,16 +42,30 @@ struct MapView: View {
     @State private var retry = 0
     @State private var location = PermissionStatus.notDetermined
     @State private var showsUser = false
+    /// How much of the map the places panel covers at its strip height, from the map's bottom edge (iPhone).
+    @State private var panelCover: CGFloat = 0
     @State private var openMoment: MomentPager?
     /// P03, from P02's See all: the sheet isn't part of this stack, so the map pushes it.
     @State private var shownPlace: String?
 
     private var thisYear: Int { LocalDay(.now, in: calendar.timeZone).key / 10_000 }
 
+    private static let panelWidth: CGFloat = 360
+
+    /// X03: on iPad the map fills the screen and the places float over it in a panel on the left.
+    private var isWide: Bool { sizeClass == .regular }
+    private var showsMap: Bool { model.isLoaded && model.hasLocatedMoments && !failed }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header
-            content
+        Group {
+            if isWide, showsMap {
+                widePage
+            } else {
+                VStack(alignment: .leading, spacing: 0) {
+                    header
+                    content
+                }
+            }
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .navigationTitle(Text("Map", bundle: .module))
@@ -65,7 +80,7 @@ struct MapView: View {
         .navigationDestination(item: $openMoment) { MomentViewerScreen(pager: $0) }
         .navigationDestination(item: $shownPlace) { PlaceView(model: model, id: $0) }
         .memoriesDestinations(thisYear: thisYear)
-        .sheet(item: Binding(get: { selection.flatMap(model.place) }, set: { selection = $0?.id })) { place in
+        .sheet(item: Binding(get: { isWide ? nil : selection.flatMap(model.place) }, set: { selection = $0?.id })) { place in
             PlacePreviewSheet(model: model, place: place) { pager in
                 selection = nil
                 openMoment = pager
@@ -82,6 +97,7 @@ struct MapView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
         .onChange(of: model.filters) { fitToken += 1 }
+        .onChange(of: panelCover) { fitToken += 1 }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
             Task { location = await permissions.status(of: .location) }
@@ -98,7 +114,22 @@ struct MapView: View {
                 circleButton(.glyphGear, Text("Settings", bundle: .module), id: "settings") { router.open(.settings) }
             }
             .padding(.trailing, 19)
-            Text("Map", bundle: .module)
+            title
+                .padding(.leading, 23)
+            // P05 keeps the chip too: the map's period is there before any place is.
+            Button { filtering = true } label: { dateChip }
+                .buttonStyle(.plain)
+                .padding(.leading, 20)
+                .padding(.top, 16)
+                .accessibilityIdentifier("map.period")
+        }
+        .statusBarLift(9, compactOnly: false)
+        .padding(.bottom, 12)
+    }
+
+    /// "Map" with its brush underline and star.
+    private var title: some View {
+        Text("Map", bundle: .module)
                 .textStyle(.screenTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .overlay(alignment: .bottomLeading) {
@@ -118,16 +149,6 @@ struct MapView: View {
                         .accessibilityHidden(true)
                 }
                 .accessibilityAddTraits(.isHeader)
-                .padding(.leading, 23)
-            // P05 keeps the chip too: the map's period is there before any place is.
-            Button { filtering = true } label: { dateChip }
-                .buttonStyle(.plain)
-                .padding(.leading, 20)
-                .padding(.top, 16)
-                .accessibilityIdentifier("map.period")
-        }
-        .statusBarLift(9, compactOnly: false)
-        .padding(.bottom, 12)
     }
 
     private func circleButton(_ icon: Icon, _ label: Text, id: String, action: @escaping () -> Void) -> some View {
@@ -177,6 +198,100 @@ struct MapView: View {
         }
     }
 
+    // MARK: X03
+
+    private var widePage: some View {
+        mapCanvas
+            .ignoresSafeArea(edges: [.bottom, .trailing])
+            .overlay(alignment: .topTrailing) {
+                VStack(alignment: .trailing, spacing: 12) {
+                    circleButton(.glyphGear, Text("Settings", bundle: .module), id: "settings") { router.open(.settings) }
+                        .background(Circle().fill(ColorToken.mediaFrame.color).padding(2))
+                    locateButton
+                }
+                .padding(.top, 12)
+                .padding(.trailing, 16)
+            }
+            .overlay {
+                if model.places.isEmpty { nothingMatches }
+            }
+            .overlay(alignment: .topLeading) { placesPanel }
+    }
+
+    /// The panel: the title, the period and filters, the chosen place, every place.
+    private var placesPanel: some View {
+        // As tall as its content; a scroll view only once that is taller than the screen.
+        ViewThatFits(in: .vertical) {
+            panelContent
+            ScrollView { panelContent }.scrollBounceBehavior(.basedOnSize)
+        }
+        .frame(width: Self.panelWidth)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(ColorToken.surfaceSheet.color)
+                .shadow(color: Color(hex: 0x4B2938).opacity(0.14), radius: 14, y: 4)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .padding(16)
+        .padding(.bottom, 8)
+    }
+
+    private var panelContent: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            title
+                .padding(.leading, 4)
+            HStack(spacing: 8) {
+                Button { filtering = true } label: { dateChip }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("map.period")
+                Button { filtering = true } label: { filtersChip }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("map.filters")
+            }
+            .padding(.top, 14)
+            if let place = selection.flatMap(model.place) {
+                PlacePreview(model: model, place: place) { pager in
+                    openMoment = pager
+                } seeAll: {
+                    shownPlace = place.id
+                } close: {
+                    selection = nil
+                }
+                .padding(.top, 22)
+                .id(place.id)
+            }
+            PlacesList(model: model)
+                .padding(.horizontal, -16)
+                .padding(.top, 24)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 22)
+        .padding(.bottom, 20)
+    }
+
+    private var filtersChip: some View {
+        HStack(spacing: 6) {
+            Icon.glyphFilter.image.resizable().frame(width: 16, height: 16).accessibilityHidden(true)
+            Text("Filters", bundle: .module).textStyle(.reviewChip)
+        }
+        .foregroundStyle(ColorToken.textPrimary.color)
+        .padding(.horizontal, 12)
+        .frame(minHeight: 34)
+        .background(ReviewChipBlob().fill(ColorToken.surfaceChip.color))
+        .frame(minHeight: Size.minimumTapTarget)
+        .contentShape(Rectangle())
+    }
+
+    private var mapCanvas: some View {
+        MapCanvas(
+            places: model.places, images: model.images, selection: $selection, fitToken: fitToken, showsUser: showsUser,
+            cover: isWide ? EdgeInsets(top: 0, leading: Self.panelWidth + 16, bottom: 0, trailing: 0)
+                : EdgeInsets(top: 0, leading: 0, bottom: panelCover, trailing: 0),
+            onLoad: { id in Task { await model.load(id) } }, onFailure: { failed = true }
+        )
+        .id(retry)
+    }
+
     // MARK: Map
 
     @ViewBuilder
@@ -188,14 +303,10 @@ struct MapView: View {
         } else if failed {
             cannotLoad
         } else {
-            MapCanvas(
-                places: model.places, images: model.images, selection: $selection, fitToken: fitToken, showsUser: showsUser,
-                onLoad: { id in Task { await model.load(id) } }, onFailure: { failed = true }
-            )
-            .id(retry)
+            mapCanvas
             .ignoresSafeArea(edges: .bottom)
             .overlay(alignment: .topTrailing) { locateButton.padding(.top, 12).padding(.trailing, 16) }
-            .overlay(alignment: .bottom) { RecentPlacesPanel(model: model) { selection = $0 } }
+            .overlay(alignment: .bottom) { RecentPlacesPanel(model: model, cover: $panelCover) { selection = $0 } }
             .overlay {
                 if model.places.isEmpty { nothingMatches }
             }
@@ -302,6 +413,8 @@ struct RecentPlacesPanel: View {
     }
 
     let model: MapModel
+    /// The strip's height plus the tab bar under it: what the map keeps its places clear of.
+    @Binding var cover: CGFloat
     let select: (String) -> Void
     @State private var detent = Detent.strip
     @State private var dragOffset: CGFloat = 0
@@ -340,6 +453,7 @@ struct RecentPlacesPanel: View {
             .clipped()
             .frame(maxHeight: .infinity, alignment: .bottom)
             .offset(y: bottom)
+            .onChange(of: heights[1] + bottom, initial: true) { cover = heights[1] + bottom }
         }
     }
 
@@ -700,7 +814,7 @@ struct PlacesListView: View {
     }
 }
 
-/// P02: the place's name, its count and months, four of its moments and See all.
+/// P02 on iPhone: the place's preview in a sheet as tall as it is.
 struct PlacePreviewSheet: View {
     let model: MapModel
     let place: MapPlace
@@ -708,14 +822,13 @@ struct PlacePreviewSheet: View {
     let seeAll: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var height: CGFloat = 380
-    /// P02's four previews, each its own uneven outline.
-    private static let previewShapes = [
-        AnyShape(PlacePreviewBlobA()), AnyShape(PlacePreviewBlobB()), AnyShape(PlacePreviewBlobC()), AnyShape(PlacePreviewBlobD()),
-    ]
 
     var body: some View {
         ScrollView {
-            content
+            PlacePreview(model: model, place: place, open: open, seeAll: seeAll, close: { dismiss() })
+                .padding(.horizontal, 20)
+                .padding(.top, 26)
+                .padding(.bottom, 12)
                 .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height = $0 }
         }
         // The detent is the content's height; a scroll view lets larger text go past it rather than be cut.
@@ -726,8 +839,22 @@ struct PlacePreviewSheet: View {
         .presentationBackground(ColorToken.surfaceSheet.color)
         .presentationBackgroundInteraction(.enabled(upThrough: .height(height)))
     }
+}
 
-    private var content: some View {
+/// P02: the place's name, its count and months, four of its moments and See all; in a sheet on iPhone, in the places
+/// panel on iPad (X03).
+struct PlacePreview: View {
+    let model: MapModel
+    let place: MapPlace
+    let open: (MomentPager) -> Void
+    let seeAll: () -> Void
+    let close: () -> Void
+    /// P02's four previews, each its own uneven outline.
+    private static let previewShapes = [
+        AnyShape(PlacePreviewBlobA()), AnyShape(PlacePreviewBlobB()), AnyShape(PlacePreviewBlobC()), AnyShape(PlacePreviewBlobD()),
+    ]
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
                 PlaceName(place: place)
@@ -735,7 +862,7 @@ struct PlacePreviewSheet: View {
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 12)
-                Button { dismiss() } label: {
+                Button(action: close) {
                     Icon.glyphClose.image
                         .resizable()
                         .frame(width: 20, height: 20)
@@ -772,9 +899,6 @@ struct PlacePreviewSheet: View {
             .padding(.top, 20)
             .accessibilityIdentifier("place.seeAll")
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 26)
-        .padding(.bottom, 12)
     }
 
     private func preview(_ moment: MapMoment, index: Int) -> some View {

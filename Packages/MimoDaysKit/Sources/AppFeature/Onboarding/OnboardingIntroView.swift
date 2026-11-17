@@ -11,7 +11,7 @@ struct OnboardingIntroView: View {
             header
             TabView(selection: $page) {
                 ForEach(OnboardingPage.allCases) { page in
-                    OnboardingPageView(page: page) { advance(from: page) }
+                    OnboardingPageView(page: page, isCurrent: page == self.page) { advance(from: page) }
                         .tag(page)
                 }
             }
@@ -52,6 +52,8 @@ struct OnboardingIntroView: View {
 /// One page: art, headline, body; the button stays at the bottom.
 struct OnboardingPageView: View {
     let page: OnboardingPage
+    /// The page in view plays its clips; the pages beside it keep their stills.
+    var isCurrent = true
     let action: () -> Void
     /// What the page shows above the button.
     @State private var visibleHeight: CGFloat = 0
@@ -62,7 +64,7 @@ struct OnboardingPageView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                ArtCanvas(layers: page.artLayers)
+                ArtCanvas(layers: page.artLayers, playsLoops: isCurrent)
                     // A short screen (iPhone Duo's outer display) draws the art smaller, so the words fit under it.
                     .frame(maxHeight: visibleHeight > 0 ? max(200, visibleHeight - Self.textRoom) : nil)
                     .frame(maxWidth: .infinity)

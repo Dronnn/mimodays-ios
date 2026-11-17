@@ -9,7 +9,7 @@ struct FirstCaptureView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                ArtCanvas(layers: Self.artLayers)
+                ArtCanvas(layers: Self.artLayers, playsLoops: true)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, Spacing.screenMargin)
                     .padding(.top, 50)

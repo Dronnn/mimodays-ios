@@ -1,3 +1,4 @@
+import AVFoundation
 import DesignSystem
 import SwiftUI
 
@@ -15,7 +16,8 @@ enum ArtFill {
     /// Flat tone standing in for a photo until real images are added.
     case placeholder(UInt32)
     /// A photo filling the shape: drawn over `frame` (the shape's bounds, before `rotation` about its centre) and
-    /// cut to the shape.
+    /// cut to the shape. Where `Resources/OnboardingLoops` has a clip of the same name ("onboardingPhotoX" plays
+    /// "onboardingLoopX.mp4"), it loops over the photo while the canvas plays loops.
     case photo(String, frame: CGRect, rotation: Double = 0)
     /// The app icon's coral gradient.
     case brandGradient
@@ -46,6 +48,10 @@ struct ArtShadow {
 struct ArtCanvas: View {
     let layers: [ArtLayer]
     var size = CGSize(width: 362, height: 360)
+    /// Photo frames play their clips: on the page in view, not with Reduce Motion or in Low Power Mode.
+    var playsLoops = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
 
     var body: some View {
         GeometryReader { proxy in
@@ -62,6 +68,9 @@ struct ArtCanvas: View {
         .environment(\.layoutDirection, .leftToRight)
         .environment(\.dynamicTypeSize, .large)
         .accessibilityHidden(true)
+        .onReceive(NotificationCenter.default.publisher(for: .NSProcessInfoPowerStateDidChange).receive(on: RunLoop.main)) { _ in
+            lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+        }
     }
 
     @ViewBuilder
@@ -71,6 +80,11 @@ struct ArtCanvas: View {
             Image(photo, bundle: .module)
                 .resizable()
                 .scaledToFill()
+                .overlay {
+                    if playsLoops, !reduceMotion, !lowPower, let clip = ArtLoop.clip(for: photo) {
+                        ArtLoop(url: clip)
+                    }
+                }
                 .frame(width: frame.width, height: frame.height)
                 .clipped()
                 .rotationEffect(.degrees(rotation))
@@ -113,6 +127,43 @@ struct ArtCanvas: View {
         case let .placeholder(hex): AnyShapeStyle(Color(hex: hex))
         case .photo: AnyShapeStyle(Color.clear)
         case .brandGradient: AnyShapeStyle(LinearGradient(colors: [Color(hex: 0xF27650), Color(hex: 0xE2582F)], startPoint: .top, endPoint: .bottom))
+        }
+    }
+}
+
+/// A muted clip looping over a photo frame's still, which shows until the first frame is ready. The clips have no
+/// sound track, so playing them leaves other apps' audio alone.
+private struct ArtLoop: View {
+    let url: URL
+    @State private var loop: Loop?
+
+    static func clip(for photo: String) -> URL? {
+        Bundle.module.url(forResource: photo.replacingOccurrences(of: "onboardingPhoto", with: "onboardingLoop"), withExtension: "mp4")
+    }
+
+    var body: some View {
+        // A clear base, so the view appears (and starts its clip) before there is a player to show.
+        ZStack {
+            Color.clear
+            if let loop { PlayerLayerView(player: loop.player) }
+        }
+        .onAppear { loop = Loop(url: url) }
+        .onDisappear {
+            loop?.player.pause()
+            loop = nil
+        }
+    }
+
+    @MainActor
+    final class Loop {
+        let player = AVQueuePlayer()
+        private let looper: AVPlayerLooper
+
+        init(url: URL) {
+            player.isMuted = true
+            player.preventsDisplaySleepDuringVideoPlayback = false
+            looper = AVPlayerLooper(player: player, templateItem: AVPlayerItem(url: url))
+            player.play()
         }
     }
 }

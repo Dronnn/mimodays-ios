@@ -21,11 +21,24 @@ final class SurpriseNotificationHandler: NSObject, UNUserNotificationCenterDeleg
         if let onOpen { onOpen(promptID) } else { waiting = promptID }
     }
 
-    nonisolated func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        guard response.actionIdentifier == UNNotificationDefaultActionIdentifier,
-              case let .capture(promptID?) = AppRouter.route(fromNotification: response.notification.request.content.userInfo)
-        else { return }
-        await deliver(promptID)
+    /// The completion-handler form, called back on the main thread: with the async form, Swift calls the system's
+    /// handler from a background thread and UIKit stops the app (tapping a surprise crashed it on an iPhone 16 Pro,
+    /// 2026-11-17).
+    nonisolated func userNotificationCenter(
+        _: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping @Sendable () -> Void
+    ) {
+        let promptID: UUID? = if response.actionIdentifier == UNNotificationDefaultActionIdentifier,
+                                 case let .capture(id?) = AppRouter.route(fromNotification: response.notification.request.content.userInfo) {
+            id
+        } else {
+            nil
+        }
+        Task { @MainActor in
+            if let promptID { deliver(promptID) }
+            completionHandler()
+        }
     }
 
     /// A surprise that arrives while the app is open still shows, so it can be tapped.

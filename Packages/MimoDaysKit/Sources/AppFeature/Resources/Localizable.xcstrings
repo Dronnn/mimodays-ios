@@ -83,6 +83,18 @@
         }
       }
     },
+    "%@ move to Recently deleted. You can bring them back within 30 days." : {
+      "comment" : "Delete sheet (M15) body for one moment with more than its photo or video. %@ is its parts as a list, e.g. \"The photo, selfie window and voice note\"",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ move to Recently deleted. You can bring them back within 30 days."
+          }
+        }
+      }
+    },
     "%@ of %@" : {
       "comment" : "Voice note sheet (C09): accessibility value of the stop button, e.g. \"12 seconds of 1 minute\". First: time recorded, second: the limit",
       "extractionState" : "manual",
@@ -2487,6 +2499,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Collapsed"
+          }
+        }
+      }
+    },
+    "Deleted part: note" : {
+      "comment" : "M15: one part of a deleted moment, in a list after The photo or The video",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "note"
+          }
+        }
+      }
+    },
+    "Deleted part: selfie window" : {
+      "comment" : "M15: one part of a deleted moment, in a list after The photo or The video",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "selfie window"
+          }
+        }
+      }
+    },
+    "Deleted part: the photo" : {
+      "comment" : "M15: first part of a deleted moment, starting a list such as \"The photo, selfie window and note\"",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The photo"
+          }
+        }
+      }
+    },
+    "Deleted part: the video" : {
+      "comment" : "M15: first part of a deleted moment, starting a list such as \"The video, selfie window and note\"",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The video"
+          }
+        }
+      }
+    },
+    "Deleted part: voice note" : {
+      "comment" : "M15: one part of a deleted moment, in a list after The photo or The video",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "voice note"
           }
         }
       }
@@ -9295,14 +9367,14 @@
         }
       }
     },
-    "The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days." : {
-      "comment" : "Delete sheet (M15) body for a photo.",
+    "The photo moves to Recently deleted. You can bring it back within 30 days." : {
+      "comment" : "Delete sheet (M15) body for a photo with no selfie window, note or voice note.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The photo, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days."
+            "value" : "The photo moves to Recently deleted. You can bring it back within 30 days."
           }
         }
       }
@@ -9451,14 +9523,14 @@
         }
       }
     },
-    "The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days." : {
-      "comment" : "Delete sheet (M15) body for a video.",
+    "The video moves to Recently deleted. You can bring it back within 30 days." : {
+      "comment" : "Delete sheet (M15) body for a video with no selfie window, note or voice note.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days."
+            "value" : "The video moves to Recently deleted. You can bring it back within 30 days."
           }
         }
       }

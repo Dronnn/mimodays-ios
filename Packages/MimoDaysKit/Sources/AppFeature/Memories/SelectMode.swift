@@ -154,7 +154,7 @@ private struct MemoriesSelectActions: ViewModifier {
             .sheet(isPresented: $confirmsDelete) {
                 let chosen = selection ?? []
                 DeleteConfirmationSheet(
-                    count: chosen.count, mediaType: model.mediaType(of: chosen), movieDrafts: model.movieDrafts(using: chosen)
+                    count: chosen.count, parts: model.parts(of: chosen), movieDrafts: model.movieDrafts(using: chosen)
                 ) {
                     if model.delete(chosen) { selection = nil }
                 }

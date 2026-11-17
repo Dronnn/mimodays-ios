@@ -143,7 +143,7 @@ struct MemoriesModelTests {
         let b = try await save(at: Self.date(2026, 11, 1), video: true)
         let c = try await save(at: Self.date(2026, 11, 9))
         let model = model()
-        #expect(model.mediaType(of: [b]) == .video && model.mediaType(of: [a]) == .photo && model.mediaType(of: [a, b]) == nil)
+        #expect(model.parts(of: [b])?.mediaType == .video && model.parts(of: [a])?.mediaType == .photo && model.parts(of: [a, b]) == nil)
         #expect(model.movieDrafts(using: [a, b]) == 0)
         #expect(model.delete([a, b]))
         model.refresh()

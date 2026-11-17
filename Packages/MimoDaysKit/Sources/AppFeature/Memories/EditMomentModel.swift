@@ -29,6 +29,8 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     let library: MediaLibrary
     let captured: CaptureTime
     let mediaType: MediaType
+    /// What it has as saved, for the delete sheet (M15).
+    let parts: MomentParts
     private(set) var thumbnail: UIImage?
     var caption: String
     var note: String
@@ -70,6 +72,7 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
         self.places = places
         captured = MomentSummary(moment).captured
         mediaType = moment.mediaType
+        parts = MomentParts(moment)
         thumbnailPath = moment.media.first { $0.role == .thumbnail }?.relativePath
         let place = moment.location.map {
             ReviewPlace(label: $0.placeLabel, latitude: $0.latitude, longitude: $0.longitude, precision: $0.precision, source: $0.source)

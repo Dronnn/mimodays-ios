@@ -77,7 +77,7 @@ struct EditMomentView: View {
             dismiss()
             onDelete()
         }) {
-            DeleteConfirmationSheet(count: 1, mediaType: model.mediaType, movieDrafts: model.movieDrafts) {
+            DeleteConfirmationSheet(count: 1, parts: model.parts, movieDrafts: model.movieDrafts) {
                 deleted = model.delete()
             }
         }

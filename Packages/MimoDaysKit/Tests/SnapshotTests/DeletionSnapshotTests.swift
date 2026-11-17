@@ -51,17 +51,26 @@ struct DeletionSnapshotTests {
         return model
     }
 
-    /// M15, for a photo used in two movie drafts.
+    /// M15, for a photo with every part, used in two movie projects.
     @Test func sheet() {
         assertScreenSnapshots(
-            of: DeleteConfirmationSheet(count: 1, mediaType: .photo, movieDrafts: 2) {}.background(ColorToken.surfaceSheet.color.ignoresSafeArea()),
+            of: DeleteConfirmationSheet(count: 1, parts: MomentParts(mediaType: .photo, hasSelfie: true, hasNote: true, hasVoiceNote: true), movieDrafts: 2) {}.background(ColorToken.surfaceSheet.color.ignoresSafeArea()),
             variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
         )
     }
 
     @Test func sheetForSeveral() {
         assertScreenSnapshots(
-            of: DeleteConfirmationSheet(count: 4, mediaType: nil, movieDrafts: 0) {}.background(ColorToken.surfaceSheet.color.ignoresSafeArea()),
+            of: DeleteConfirmationSheet(count: 4, parts: nil, movieDrafts: 0) {}.background(ColorToken.surfaceSheet.color.ignoresSafeArea()),
+            variants: [SnapshotVariant(.iPhone, .light)]
+        )
+    }
+
+    /// M15 for a video with only a note: the other parts aren't named.
+    @Test func sheetForAVideoWithANote() {
+        assertScreenSnapshots(
+            of: DeleteConfirmationSheet(count: 1, parts: MomentParts(mediaType: .video, hasNote: true), movieDrafts: 0) {}
+                .background(ColorToken.surfaceSheet.color.ignoresSafeArea()),
             variants: [SnapshotVariant(.iPhone, .light)]
         )
     }

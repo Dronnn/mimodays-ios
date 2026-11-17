@@ -238,8 +238,8 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
     }
 
-    /// C09/C10: the first Voice note goes straight to the system prompt (no explainer), records until Stop, then
-    /// shows as a card with its words that plays; Retake asks before dropping it, and Save keeps it.
+    /// C09/C10: the first Voice note shows our explainer, whose Continue leads to the system prompt; it records until
+    /// Stop, then shows as a card with its words that plays; Retake asks before dropping it, and Save keeps it.
     @MainActor
     func testAVoiceNoteIsRecordedPlayedAndKept() {
         openCamera(permissions: .notDetermined)
@@ -247,9 +247,12 @@ final class CameraUITests: XCTestCase {
         let chip = app.buttons["review.voiceNote"]
         XCTAssertTrue(chip.waitForExistence(timeout: 5))
         chip.tap()
+        let explainerContinue = app.buttons["permission.primary"]
+        XCTAssertTrue(explainerContinue.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["permission.secondary"].exists)
+        explainerContinue.tap()
         let stop = app.buttons["voice.stop"]
         XCTAssertTrue(stop.waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["permission.primary"].exists)
         // Let it record a little over a second.
         XCTAssertFalse(app.staticTexts["review.voice.transcript"].waitForExistence(timeout: 1.5))
         stop.tap()
@@ -292,7 +295,7 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(app.buttons["camera.shutter"].waitForExistence(timeout: 5))
     }
 
-    /// C11: location is asked for only at the first tap on Place, then the city fills in; a place nearby, a search
+    /// C11: location is asked for only at the first tap on Place, after our explainer, then the city fills in; a place nearby, a search
     /// result or No place can replace it.
     @MainActor
     func testTheFirstPlaceTapAsksThenTheCityCanBeChanged() {
@@ -303,6 +306,9 @@ final class CameraUITests: XCTestCase {
         XCTAssertEqual(place.value as? String, "None")
 
         place.tap()
+        let explainerContinue = app.buttons["permission.primary"]
+        XCTAssertTrue(explainerContinue.waitForExistence(timeout: 5))
+        explainerContinue.tap()
         let current = app.buttons["place.current"]
         XCTAssertTrue(current.waitForExistence(timeout: 5))
         // The city fills in by itself and is the chosen row.

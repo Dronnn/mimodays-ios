@@ -13,8 +13,10 @@ struct PermissionAskerTests {
         while asker.screen == nil { await Task.yield() }
         #expect(asker.screen == PermissionScreen(explaining: permission))
         asker.proceed()
-        #expect(await request.value == .granted)
         #expect(asker.screen == nil)
+        // The request goes on only once the explainer has finished closing.
+        asker.dismissed()
+        #expect(await request.value == .granted)
     }
 
     @Test(arguments: [PermissionStatus.granted, .denied, .limited, .restricted])

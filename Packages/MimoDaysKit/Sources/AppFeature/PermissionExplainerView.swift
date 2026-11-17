@@ -221,8 +221,15 @@ final class PermissionAsker {
         return await service.request(permission)
     }
 
-    /// Continue on the explainer.
+    /// Continue on the explainer: it starts to close.
     func proceed() {
+        screen = nil
+    }
+
+    /// The explainer has finished closing. Only now does the request go on, so what it leads to (the system prompt,
+    /// the voice note's recording sheet) isn't presented while the explainer is still on its way out: the recording
+    /// sheet was dropped at once and the recording stopped after a second (UI test, 2026-11-17).
+    func dismissed() {
         screen = nil
         answer?.resume()
         answer = nil
@@ -236,7 +243,7 @@ extension PermissionScreen: Identifiable {
 extension View {
     /// Presents `asker`'s explainers over this view.
     func permissionExplainers(_ asker: PermissionAsker) -> some View {
-        fullScreenCover(item: Binding { asker.screen } set: { if $0 == nil { asker.proceed() } }) { screen in
+        fullScreenCover(item: Binding { asker.screen } set: { if $0 == nil { asker.proceed() } }, onDismiss: asker.dismissed) { screen in
             PermissionExplainerView(screen: screen) { asker.proceed() }
         }
     }

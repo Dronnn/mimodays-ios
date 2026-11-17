@@ -8,7 +8,7 @@ enum PermissionScreen: CaseIterable {
     case camera
     /// C06c: before the microphone prompt, on the first video.
     case microphone
-    /// C13a: camera access is off; only Settings can turn it back on.
+    /// C13a: camera access is off; only iOS Settings can turn it back on.
     case cameraOff
     /// Like C13a, when Voice note is tapped with the microphone off.
     case microphoneOff
@@ -71,12 +71,12 @@ enum PermissionScreen: CaseIterable {
             )
         case .cameraOff:
             LocalizedStringResource(
-                "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today.",
+                "To capture moments, allow camera access in iOS Settings.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
         case .microphoneOff:
             LocalizedStringResource(
-                "To record voice notes, allow microphone access in Settings. You can still write a note.",
+                "To record voice notes, allow microphone access in iOS Settings. You can still write a note.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
         case .voiceNote:
@@ -105,7 +105,7 @@ enum PermissionScreen: CaseIterable {
     var primaryAction: LocalizedStringResource {
         switch self {
         case .camera, .microphone, .voiceNote, .location, .notifications, .photos: LocalizedStringResource("Continue", bundle: .atURL(Bundle.module.bundleURL))
-        case .cameraOff, .microphoneOff: LocalizedStringResource("Open Settings", bundle: .atURL(Bundle.module.bundleURL))
+        case .cameraOff, .microphoneOff: LocalizedStringResource("Open iOS Settings", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 

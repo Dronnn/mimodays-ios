@@ -6451,20 +6451,8 @@
         }
       }
     },
-    "Open Settings" : {
-      "comment" : "Opens the app's page in iOS Settings; microphone off screen: primary button",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Settings"
-          }
-        }
-      }
-    },
     "Open iOS Settings" : {
-      "comment" : "Onboarding O08c button, opens the app's notification settings in iOS Settings",
+      "comment" : "Button that opens MimoDays' page in iOS Settings: onboarding O08c, the camera or microphone off screens, Help, Surprises and the alerts when access is off",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -10035,26 +10023,26 @@
         }
       }
     },
-    "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today." : {
+    "To capture moments, allow camera access in iOS Settings." : {
       "comment" : "C13a body: camera access off",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To capture moments, allow camera access in Settings. You can still write notes and record voice notes from Today."
+            "value" : "To capture moments, allow camera access in iOS Settings."
           }
         }
       }
     },
-    "To record voice notes, allow microphone access in Settings. You can still write a note." : {
+    "To record voice notes, allow microphone access in iOS Settings. You can still write a note." : {
       "comment" : "Microphone off screen: message under the title",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To record voice notes, allow microphone access in Settings. You can still write a note."
+            "value" : "To record voice notes, allow microphone access in iOS Settings. You can still write a note."
           }
         }
       }
@@ -10683,14 +10671,14 @@
         }
       }
     },
-    "Videos will be silent. Turn on the microphone in Settings to add sound." : {
+    "Videos will be silent. Turn on the microphone in iOS Settings to add sound." : {
       "comment" : "Camera note (C13b): video mode with sound on while the microphone is turned off in Settings.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Videos will be silent. Turn on the microphone in Settings to add sound."
+            "value" : "Videos will be silent. Turn on the microphone in iOS Settings to add sound."
           }
         }
       }

@@ -577,7 +577,7 @@ private struct CameraNote: View {
     init(_ notice: CameraNotice) {
         switch notice {
         case .microphoneOff:
-            self.init(icon: .glyphMute, text: Text("Videos will be silent. Turn on the microphone in Settings to add sound.", bundle: .module), id: "camera.notice")
+            self.init(icon: .glyphMute, text: Text("Videos will be silent. Turn on the microphone in iOS Settings to add sound.", bundle: .module), id: "camera.notice")
         case .lowStorage:
             self.init(icon: .glyphInfo, text: Text("Not enough space to record. Free up some space on this iPhone and try again.", bundle: .module), id: "camera.notice")
         case .interrupted(.anotherApp):

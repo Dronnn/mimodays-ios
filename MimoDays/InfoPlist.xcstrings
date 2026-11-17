@@ -4,6 +4,7 @@
     "CFBundleDisplayName" : {
       "comment" : "App name under the icon on the Home Screen",
       "extractionState" : "manual",
+      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -16,6 +17,7 @@
     "CFBundleName" : {
       "comment" : "Bundle name",
       "extractionState" : "extracted_with_value",
+      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {

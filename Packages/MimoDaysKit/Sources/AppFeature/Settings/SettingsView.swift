@@ -82,9 +82,12 @@ private struct SettingsHost: View {
                     switch route {
                     case .storage: StorageScreen().settingsPage()
                     case let .backup(back): BackupScreen(back: back.label).settingsPage()
-                    case .recentlyDeleted: RecentlyDeletedScreen().settingsPage()
+                    // Its own bar, as in Memories: the system back button and Select.
+                    case .recentlyDeleted: RecentlyDeletedScreen()
                     }
                 }
+                // Recently deleted opens its moments.
+                .memoriesDestinations(thisYear: Calendar.current.component(.year, from: .now))
         }
         .photoImport(isPresented: $importsPhotos)
         .task { await model.load() }

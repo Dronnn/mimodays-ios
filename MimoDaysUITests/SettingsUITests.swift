@@ -52,4 +52,40 @@ final class SettingsUITests: XCTestCase {
         XCTAssertFalse(done.waitForExistence(timeout: 2))
         XCTAssertTrue(small.isHittable, "back on the tips, nothing else asked")
     }
+
+    /// Storage › Recently deleted opens a deleted moment and goes back to Storage.
+    @MainActor
+    func testRecentlyDeletedFromStorageOpensAMoment() {
+        let app = XCUIApplication()
+        app.launchArguments = LaunchConfiguration(isUITesting: true, skipsOnboarding: true, seed: .populated, permissions: .granted).arguments
+        app.launch()
+        app.tabBars.firstMatch.buttons.element(boundBy: 1).tap()
+        let tile = app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch
+        XCTAssertTrue(tile.waitForExistence(timeout: 20))
+        tile.tap()
+        let delete = app.buttons["viewer.delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 10))
+        delete.tap()
+        let confirm = app.buttons["delete.confirm"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        confirm.tap()
+        XCTAssertTrue(delete.waitForExistence(timeout: 5))
+        app.buttons["viewer.back"].tap()
+        let settings = app.buttons["settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 10))
+        settings.tap()
+        app.buttons["settings.storage"].firstMatch.tap()
+        let recentlyDeleted = app.buttons["storage.recentlyDeleted"]
+        XCTAssertTrue(recentlyDeleted.waitForExistence(timeout: 5))
+        recentlyDeleted.tap()
+        let deleted = app.buttons["deleted.tile"].firstMatch
+        XCTAssertTrue(deleted.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["deleted.select"].exists)
+        deleted.tap()
+        XCTAssertTrue(app.buttons["deleted.recover"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(deleted.waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(recentlyDeleted.waitForExistence(timeout: 5))
+    }
 }

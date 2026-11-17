@@ -29,10 +29,11 @@ struct AppEraser {
         )
     }
 
-    /// Surprise notifications, every record, every file, the capture in review and the settings.
+    /// Surprise notifications and the backup reminder, every record, every file, the capture in review and the settings.
     func eraseEverything() async throws {
+        // `pending()` lists only surprises; the backup reminder is cancelled by its own id.
         let pending = await notifications.pending()
-        if !pending.isEmpty { await notifications.cancel(ids: pending.map(\.id)) }
+        await notifications.cancel(ids: pending.map(\.id) + [BackupReminder.notificationID])
         do {
             // Children before their parents, so no rule is left pointing at a deleted row.
             try deleteAll(MovieAudioTrack.self)

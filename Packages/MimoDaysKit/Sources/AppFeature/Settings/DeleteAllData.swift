@@ -145,7 +145,7 @@ struct DeleteAllView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 30)
                     .padding(.top, 10)
-                    NavigationLink(value: DataRoute.backup) {
+                    NavigationLink(value: DataRoute.backup(back: .deleteAll)) {
                         HStack(spacing: 8) {
                             Icon.glyphArchive.image
                                 .resizable()

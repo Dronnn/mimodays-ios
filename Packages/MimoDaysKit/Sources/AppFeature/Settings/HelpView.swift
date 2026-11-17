@@ -122,7 +122,7 @@ struct HelpView: View {
                         }
                         .accessibilityIdentifier("help.rate")
                         DataSeparator(leading: 64)
-                        NavigationLink(value: SettingsRoute.dataUse) {
+                        NavigationLink(value: SettingsRoute.dataUse(back: .help)) {
                             DataIconRow(icon: .glyphLock, title: Text("Privacy statement", bundle: .module))
                         }
                         .accessibilityIdentifier("help.privacy")

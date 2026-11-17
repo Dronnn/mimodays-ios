@@ -103,7 +103,7 @@ struct PrivacySettingsView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
                     DataCard {
-                        NavigationLink(value: SettingsRoute.dataUse) {
+                        NavigationLink(value: SettingsRoute.dataUse(back: .privacy)) {
                             DataIconRow(icon: .glyphInfo, title: Text("How MimoDays uses your data", bundle: .module))
                         }
                         .accessibilityIdentifier("privacySettings.dataUse")
@@ -182,11 +182,13 @@ extension PrivacySettings.PlacePrecision {
 
 /// S05 "How MimoDays uses your data": the privacy statement, in plain words.
 struct DataUseView: View {
+    /// The page it was opened from: Privacy, or Help's Privacy statement.
+    var back = Text("Privacy", bundle: .module)
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
-            BackTitleBar(back: Text("Privacy", bundle: .module)) { dismiss() }
+            BackTitleBar(back: back) { dismiss() }
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("How MimoDays uses your data", bundle: .module)

@@ -3,22 +3,25 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct BackupScreen: View {
+    /// The page it was opened from.
+    var back = Text("Settings", bundle: .module)
     @Environment(\.mediaLibrary) private var library
 
     var body: some View {
-        if let library { BackupHost(model: BackupModel(library: library), library: library) }
+        if let library { BackupHost(model: BackupModel(library: library), library: library, back: back) }
     }
 }
 
 private struct BackupHost: View {
     @State var model: BackupModel
     let library: MediaLibrary
+    let back: Text
     @State private var backingUp = false
     @State private var choosingBackup = false
     @State private var restoring: URL?
 
     var body: some View {
-        BackupView(model: model, backUp: {
+        BackupView(model: model, back: back, backUp: {
             model.reset()
             backingUp = true
         }, restore: { choosingBackup = true })
@@ -38,13 +41,15 @@ private struct BackupHost: View {
 /// E06: when the last backup was made and what isn't in one yet; back up now, restore, and the reminder.
 struct BackupView: View {
     @Bindable var model: BackupModel
+    /// The page it was opened from.
+    var back = Text("Settings", bundle: .module)
     let backUp: () -> Void
     let restore: () -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
-            BackTitleBar(back: Text("Settings", bundle: .module)) { dismiss() }
+            BackTitleBar(back: back) { dismiss() }
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Backup", bundle: .module)

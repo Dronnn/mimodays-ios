@@ -30,6 +30,14 @@ struct SettingsModelTests {
         try container.mainContext.fetch(FetchDescriptor<SurpriseSchedule>()).first
     }
 
+    @Test func notNowOnTheExplainerLeavesSurprisesOff() async throws {
+        let model = model(PresetPermissionService(status: .notDetermined))
+        await model.load()
+        await model.setSurprises(true) { _ in .notDetermined }
+        #expect(!model.surprisesOn)
+        #expect(model.notifications == .notDetermined)
+    }
+
     @Test func changesAreSavedAndComeBackAfterARelaunch() async throws {
         let model = model()
         await model.load()

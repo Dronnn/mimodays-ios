@@ -8,6 +8,8 @@ import SwiftUI
 struct SurpriseSettingsView: View {
     @Bindable var model: SettingsModel
     @State private var pausing = false
+    @State private var asker = PermissionAsker()
+    @Environment(\.permissions) private var permissions
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.calendar) private var calendar
@@ -63,6 +65,7 @@ struct SurpriseSettingsView: View {
             }
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .permissionExplainers(asker)
         .confirmationDialog(Text("Pause surprises", bundle: .module), isPresented: $pausing, titleVisibility: .visible) {
             Button { Task { await model.pause(.today) } } label: { Text("For today", bundle: .module) }
             Button { Task { await model.pause(.week) } } label: { Text("For a week", bundle: .module) }
@@ -76,7 +79,7 @@ struct SurpriseSettingsView: View {
     }
 
     private var surprisesOn: Binding<Bool> {
-        Binding { model.surprisesOn } set: { isOn in Task { await model.setSurprises(isOn) } }
+        Binding { model.surprisesOn } set: { isOn in Task { await model.setSurprises(isOn) { await asker.request($0, using: permissions) } } }
     }
 
     /// "Time to catch it": how long a surprise stays open.

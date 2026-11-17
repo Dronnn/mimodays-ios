@@ -12,6 +12,7 @@ struct EditMomentView: View {
     var onDelete: () -> Void = {}
     @Environment(\.dismiss) private var dismiss
     @Environment(\.permissions) private var permissions
+    @State private var asker = PermissionAsker()
     @Environment(\.openURL) private var openURL
     @State private var confirmsDiscard = false
     @State private var choosesVoice = false
@@ -86,6 +87,7 @@ struct EditMomentView: View {
         .sheet(isPresented: $choosesCollections) {
             CollectionPickerSheet(library: model.library, selection: $model.collectionIDs)
         }
+        .permissionExplainers(asker)
         .sheet(isPresented: $microphoneOff) {
             PermissionExplainerView(screen: .microphoneOff) {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
@@ -328,12 +330,12 @@ struct EditMomentView: View {
         }
     }
 
-    /// The system prompt the first time; once it is off, the way to Settings.
+    /// Our explainer and the system prompt the first time; once it is off, the way to Settings.
     private func recordVoice() {
         model.stopVoice()
         Task {
-            var status = await permissions.status(of: .microphone)
-            if status == .notDetermined { status = await permissions.request(.microphone) }
+            let status = await asker.request(.microphone, using: permissions)
+            guard status != .notDetermined else { return }
             guard status.isUsable else {
                 microphoneOff = true
                 return

@@ -21,6 +21,8 @@ struct TodayView: View {
     @Environment(\.mediaLibrary) private var library
     /// The hero's latest video, both streams, while Today's motion plays it.
     @State private var heroPlayer: ViewerVideoPlayer?
+    @State private var asker = PermissionAsker()
+    @Environment(\.permissions) private var permissions
     @State private var heroHalves: CaptureFormat?
 
     var body: some View {
@@ -33,6 +35,7 @@ struct TodayView: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .permissionExplainers(asker)
         .toolbar(.hidden, for: .navigationBar)
         .navigationTitle(Text("Today", bundle: .module))
         .memoriesDestinations(thisYear: Calendar.current.component(.year, from: model.now))
@@ -293,7 +296,7 @@ struct TodayView: View {
             case .paused: Task { await model.resume() }
             case .off:
                 Task {
-                    if await !model.turnOn(), let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                    if await !model.turnOn(request: { await asker.request($0, using: permissions) }), let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                 }
             case .onItsWay, .passed: break
             }

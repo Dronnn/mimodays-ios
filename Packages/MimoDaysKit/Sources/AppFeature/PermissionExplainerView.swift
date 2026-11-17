@@ -12,13 +12,35 @@ enum PermissionScreen: CaseIterable {
     case cameraOff
     /// Like C13a, when Voice note is tapped with the microphone off.
     case microphoneOff
+    /// Before the microphone prompt from Voice note.
+    case voiceNote
+    /// Before the location prompt: a moment's place, or where I am on the map.
+    case location
+    /// Before the notifications prompt when surprises are turned on outside onboarding.
+    case notifications
+    /// Before the add-only Photos prompt on the first save to Photos.
+    case photos
+
+    /// Our explainer for a system prompt (Andrew, 2026-11-17: every prompt gets one).
+    init(explaining permission: Permission) {
+        switch permission {
+        case .camera: self = .camera
+        case .microphone: self = .voiceNote
+        case .location: self = .location
+        case .notifications: self = .notifications
+        case .photoLibrary: self = .photos
+        }
+    }
 
     var glyph: Icon {
         switch self {
         case .camera: .explainerCamera
         case .microphone: .explainerMicrophone
         case .cameraOff: .explainerCameraOff
-        case .microphoneOff: .explainerMicrophone
+        case .microphoneOff, .voiceNote: .explainerMicrophone
+        case .location: .explainerPin
+        case .notifications: .explainerBell
+        case .photos: .explainerPhotos
         }
     }
 
@@ -28,6 +50,10 @@ enum PermissionScreen: CaseIterable {
         case .microphone: LocalizedStringResource("Add sound to your videos?", bundle: .atURL(Bundle.module.bundleURL))
         case .cameraOff: LocalizedStringResource("The camera is turned off for MimoDays", bundle: .atURL(Bundle.module.bundleURL))
         case .microphoneOff: LocalizedStringResource("The microphone is turned off for MimoDays", bundle: .atURL(Bundle.module.bundleURL))
+        case .voiceNote: LocalizedStringResource("Say a few words?", bundle: .atURL(Bundle.module.bundleURL))
+        case .location: LocalizedStringResource("Remember where it happened?", bundle: .atURL(Bundle.module.bundleURL))
+        case .notifications: LocalizedStringResource("Get a little surprise?", bundle: .atURL(Bundle.module.bundleURL))
+        case .photos: LocalizedStringResource("Save to your photos?", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
@@ -53,19 +79,39 @@ enum PermissionScreen: CaseIterable {
                 "To record voice notes, allow microphone access in Settings. You can still write a note.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
+        case .voiceNote:
+            LocalizedStringResource(
+                "The microphone records only while you are recording a voice note. Voice notes stay on your device.",
+                bundle: .atURL(Bundle.module.bundleURL)
+            )
+        case .location:
+            LocalizedStringResource(
+                "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device.",
+                bundle: .atURL(Bundle.module.bundleURL)
+            )
+        case .notifications:
+            LocalizedStringResource(
+                "Now and then, at a random time within your hours, MimoDays sends one notification to catch the moment. No streaks, no nagging. Pause or turn it off any time.",
+                bundle: .atURL(Bundle.module.bundleURL)
+            )
+        case .photos:
+            LocalizedStringResource(
+                "MimoDays only adds what you save. It can't see the rest of your library.",
+                bundle: .atURL(Bundle.module.bundleURL)
+            )
         }
     }
 
     var primaryAction: LocalizedStringResource {
         switch self {
-        case .camera, .microphone: LocalizedStringResource("Continue", bundle: .atURL(Bundle.module.bundleURL))
+        case .camera, .microphone, .voiceNote, .location, .notifications, .photos: LocalizedStringResource("Continue", bundle: .atURL(Bundle.module.bundleURL))
         case .cameraOff, .microphoneOff: LocalizedStringResource("Open Settings", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
     var secondaryAction: LocalizedStringResource {
         switch self {
-        case .camera, .cameraOff, .microphoneOff: LocalizedStringResource("Not now", bundle: .atURL(Bundle.module.bundleURL))
+        case .camera, .cameraOff, .microphoneOff, .voiceNote, .location, .notifications, .photos: LocalizedStringResource("Not now", bundle: .atURL(Bundle.module.bundleURL))
         case .microphone: LocalizedStringResource("Record without sound", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
@@ -152,4 +198,41 @@ enum CameraAccessStep: Equatable {
 
 extension EnvironmentValues {
     @Entry var permissions: any PermissionService = SystemPermissionService()
+}
+
+/// Our explainer before a system prompt, for screens that ask on a tap. Shown only while iOS hasn't asked yet;
+/// "Not now" leaves the permission undecided, so the next tap explains again.
+@MainActor @Observable
+final class PermissionAsker {
+    private(set) var screen: PermissionScreen?
+    @ObservationIgnored private var answer: CheckedContinuation<Bool, Never>?
+
+    /// The status after the explainer and the system prompt; `.notDetermined` after "Not now".
+    func request(_ permission: Permission, using service: any PermissionService) async -> PermissionStatus {
+        let status = await service.status(of: permission)
+        guard status == .notDetermined, answer == nil else { return status }
+        screen = PermissionScreen(explaining: permission)
+        let goesOn = await withCheckedContinuation { answer = $0 }
+        return goesOn ? await service.request(permission) : .notDetermined
+    }
+
+    /// Continue (true) or Not now (false) on the explainer.
+    func respond(_ goesOn: Bool) {
+        screen = nil
+        answer?.resume(returning: goesOn)
+        answer = nil
+    }
+}
+
+extension PermissionScreen: Identifiable {
+    var id: Self { self }
+}
+
+extension View {
+    /// Presents `asker`'s explainers over this view.
+    func permissionExplainers(_ asker: PermissionAsker) -> some View {
+        fullScreenCover(item: Binding { asker.screen } set: { if $0 == nil { asker.respond(false) } }) { screen in
+            PermissionExplainerView(screen: screen) { asker.respond(true) } secondary: { asker.respond(false) }
+        }
+    }
 }

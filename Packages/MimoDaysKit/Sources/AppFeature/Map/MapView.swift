@@ -31,6 +31,7 @@ struct MapView: View {
     let model: MapModel
     @Environment(AppRouter.self) private var router
     @Environment(\.permissions) private var permissions
+    @State private var asker = PermissionAsker()
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.calendar) private var calendar
@@ -68,6 +69,7 @@ struct MapView: View {
             }
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .permissionExplainers(asker)
         .navigationTitle(Text("Map", bundle: .module))
         .toolbar(.hidden, for: .navigationBar)
         .navigationDestination(for: MapRoute.self) { route in
@@ -335,7 +337,7 @@ struct MapView: View {
             fitToken += 1
             return
         }
-        if location == .notDetermined { location = await permissions.request(.location) }
+        if location == .notDetermined { location = await asker.request(.location, using: permissions) }
         if location.isUsable {
             showsUser = true
         } else {
@@ -384,7 +386,7 @@ struct MapView: View {
 
     private func turnOnLocation() async {
         if location == .notDetermined {
-            location = await permissions.request(.location)
+            location = await asker.request(.location, using: permissions)
         } else if let url = URL(string: UIApplication.openSettingsURLString) {
             openURL(url)
         }

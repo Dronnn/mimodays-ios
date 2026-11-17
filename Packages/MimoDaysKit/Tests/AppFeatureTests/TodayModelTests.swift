@@ -230,6 +230,14 @@ struct TodayModelTests {
         #expect(today.surprise == .onItsWay)
     }
 
+    @Test func notNowOnTheExplainerTurnsNothingOnAndOpensNoSettings() async throws {
+        let today = model(.notDetermined)
+        await today.refresh()
+        #expect(await today.turnOn { _ in .notDetermined })
+        #expect(try schedule()?.isEnabled != true)
+        #expect(today.surprise == .off)
+    }
+
     @Test func turnOnEnablesAndUnpausesASchedule() async throws {
         let existing = SurpriseSchedule()
         existing.isEnabled = false

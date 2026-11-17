@@ -2491,6 +2491,18 @@
         }
       }
     },
+    "Get a little surprise?" : {
+      "comment" : "Explainer title before the system notifications prompt, when surprises are turned on",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get a little surprise?"
+          }
+        }
+      }
+    },
     "Half screen" : {
       "comment" : "Map (P01): the places panel fills half the screen",
       "extractionState" : "manual",
@@ -2551,6 +2563,30 @@
         }
       }
     },
+    "MimoDays only adds what you save. It can't see the rest of your library." : {
+      "comment" : "Explainer message before the system Photos (add only) prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays only adds what you save. It can't see the rest of your library."
+          }
+        }
+      }
+    },
+    "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device." : {
+      "comment" : "Explainer message before the system location prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device."
+          }
+        }
+      }
+    },
     "Motion" : {
       "comment" : "Settings › Appearance (H.9): section title over the switches for videos playing in tiles",
       "extractionState" : "manual",
@@ -2563,6 +2599,18 @@
         }
       }
     },
+    "Now and then, at a random time within your hours, MimoDays sends one notification to catch the moment. No streaks, no nagging. Pause or turn it off any time." : {
+      "comment" : "Explainer message before the system notifications prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now and then, at a random time within your hours, MimoDays sends one notification to catch the moment. No streaks, no nagging. Pause or turn it off any time."
+          }
+        }
+      }
+    },
     "Recent places panel" : {
       "comment" : "Map (P01): VoiceOver label of the panel's grabber",
       "extractionState" : "manual",
@@ -2571,6 +2619,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recent places panel"
+          }
+        }
+      }
+    },
+    "Remember where it happened?" : {
+      "comment" : "Explainer title before the system location prompt (a moment's place, or where I am on the map)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remember where it happened?"
+          }
+        }
+      }
+    },
+    "Save to your photos?" : {
+      "comment" : "Explainer title before the system Photos (add only) prompt, on the first save to Photos",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to your photos?"
+          }
+        }
+      }
+    },
+    "Say a few words?" : {
+      "comment" : "Explainer title before the system microphone prompt, from Voice note",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say a few words?"
           }
         }
       }
@@ -2643,6 +2727,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The backup wasn't saved"
+          }
+        }
+      }
+    },
+    "The microphone records only while you are recording a voice note. Voice notes stay on your device." : {
+      "comment" : "Explainer message before the system microphone prompt, from Voice note",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The microphone records only while you are recording a voice note. Voice notes stay on your device."
           }
         }
       }

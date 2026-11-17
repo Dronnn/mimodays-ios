@@ -392,6 +392,8 @@ struct MovieFileButtons: View {
     @State private var saved = false
     @State private var problem: Text?
     @State private var exporting = false
+    @State private var asker = PermissionAsker()
+    @Environment(\.permissions) private var permissions
 
     var body: some View {
         VStack(spacing: 12) {
@@ -421,6 +423,7 @@ struct MovieFileButtons: View {
         .sheet(isPresented: $exporting) {
             if let url { FileExportSheet(url: url).ignoresSafeArea() }
         }
+        .permissionExplainers(asker)
         .alert(Text("Couldn't save to Photos", bundle: .module), isPresented: Binding(get: { problem != nil }, set: { if !$0 { problem = nil } })) {
             Button { problem = nil } label: { Text("OK", bundle: .module) }
         } message: {
@@ -430,6 +433,7 @@ struct MovieFileButtons: View {
 
     private func saveToPhotos() async {
         guard let url else { return }
+        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
         do {
             try await MovieFiles.saveToPhotos(url)
             saved = true

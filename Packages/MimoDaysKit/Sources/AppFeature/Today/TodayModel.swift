@@ -175,11 +175,12 @@ final class TodayModel {
     }
 
     /// T07 "Turn on". False when only Settings can allow notifications again. A "Don't Allow" given just now
-    /// to the system prompt stands: no jump to Settings.
-    func turnOn() async -> Bool {
+    /// to the system prompt, or "Not now" on the explainer `request` shows, stands: no jump to Settings.
+    func turnOn(request: ((Permission) async -> PermissionStatus)? = nil) async -> Bool {
         let status = await permissions.status(of: .notifications)
         if status == .notDetermined {
-            guard await permissions.request(.notifications).isUsable else { return true }
+            let answer = if let request { await request(.notifications) } else { await permissions.request(.notifications) }
+            guard answer.isUsable else { return true }
         } else if !status.isUsable {
             return !status.needsSettings
         }

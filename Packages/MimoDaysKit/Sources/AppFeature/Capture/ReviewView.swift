@@ -22,6 +22,7 @@ struct ReviewView: View {
     @State private var choosesPlace = false
     @State private var locationAllowed = false
     @Environment(\.permissions) private var permissions
+    @State private var asker = PermissionAsker()
     /// C13c, or the generic save failure.
     @State private var saveError: SaveError?
     @Environment(\.openURL) private var openURL
@@ -64,6 +65,7 @@ struct ReviewView: View {
         .sheet(isPresented: $choosesPlace) {
             PlaceSheet(model: model, showsCurrent: locationAllowed)
         }
+        .permissionExplainers(asker)
         .sheet(isPresented: $microphoneOff) {
             PermissionExplainerView(screen: .microphoneOff) {
                 openSettings()
@@ -161,24 +163,24 @@ struct ReviewView: View {
         }
     }
 
-    /// The system prompt the first time (the tap says why), then one fix for the city (Andrew, 2026-11-13).
+    /// Our explainer and the system prompt the first time, then one fix for the city (Andrew, 2026-11-13).
     private func choosePlace() {
         guard !isSaving else { return }
         Task {
-            var status = await permissions.status(of: .location)
-            if status == .notDetermined { status = await permissions.request(.location) }
+            // "Not now" still opens the place sheet, without the current city, like a denial.
+            let status = await asker.request(.location, using: permissions)
             locationAllowed = status.isUsable
             choosesPlace = true
             if status.isUsable { await model.locate() }
         }
     }
 
-    /// The system prompt the first time (the tap says why); once it is off, the way to Settings.
+    /// Our explainer and the system prompt the first time; once it is off, the way to Settings.
     private func recordVoice() {
         guard !isSaving else { return }
         Task {
-            var status = await permissions.status(of: .microphone)
-            if status == .notDetermined { status = await permissions.request(.microphone) }
+            let status = await asker.request(.microphone, using: permissions)
+            guard status != .notDetermined else { return }
             guard status.isUsable else {
                 microphoneOff = true
                 return

@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import Foundation
 import Observation
@@ -102,6 +103,8 @@ struct MomentExportSheet: View {
     @State private var sharing: [URL]?
     @State private var saved = false
     @State private var photosProblem: Text?
+    @State private var asker = PermissionAsker()
+    @Environment(\.permissions) private var permissions
     @State private var height: CGFloat = 520
 
     var body: some View {
@@ -168,6 +171,7 @@ struct MomentExportSheet: View {
             ShareSheet(items: sharing ?? [])
         }
         .exportFailureAlert(model)
+        .permissionExplainers(asker)
         .alert(Text("Couldn't save to Photos", bundle: .module), isPresented: Binding(get: { photosProblem != nil }, set: { if !$0 { photosProblem = nil } })) {
             Button { photosProblem = nil } label: { Text("OK", bundle: .module) }
         } message: {
@@ -210,6 +214,7 @@ struct MomentExportSheet: View {
     }
 
     private func saveToPhotos() async {
+        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
         guard let files = await model.files() else { return }
         defer { model.removeFiles() }
         do {

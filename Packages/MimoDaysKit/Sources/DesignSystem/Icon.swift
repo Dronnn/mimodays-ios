@@ -101,6 +101,7 @@ public enum Icon: String, CaseIterable, Sendable {
     case explainerBell
     case explainerSearch
     case explainerPin
+    case explainerPhotos
     case explainerHeart
     case explainerClock
     case explainerCollection

@@ -41,6 +41,8 @@ struct MoviePageView: View {
     @State private var deleting = false
     @State private var saved = false
     @State private var problem: Text?
+    @State private var asker = PermissionAsker()
+    @Environment(\.permissions) private var permissions
 
     private var store: MovieStore { MovieStore(context: library.context, store: library.store) }
     private var coverID: UUID? { MovieStore.liveClips(of: project).first?.moment?.id }
@@ -138,6 +140,7 @@ struct MoviePageView: View {
         } message: {
             Text("Copies saved to Photos or Files stay there.", bundle: .module)
         }
+        .permissionExplainers(asker)
         .alert(Text("Couldn't save to Photos", bundle: .module), isPresented: Binding(get: { problem != nil }, set: { if !$0 { problem = nil } })) {
             Button { problem = nil } label: { Text("OK", bundle: .module) }
         } message: {
@@ -245,6 +248,7 @@ struct MoviePageView: View {
 
     private func save() async {
         guard let url else { return }
+        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
         do {
             try await MovieFiles.saveToPhotos(url)
             saved = true

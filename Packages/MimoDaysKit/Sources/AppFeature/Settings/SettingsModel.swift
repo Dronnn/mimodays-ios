@@ -70,10 +70,17 @@ final class SettingsModel {
         notifications = await permissions.status(of: .notifications)
     }
 
-    /// "Surprise me": turning it on asks for notifications the first time.
-    func setSurprises(_ isOn: Bool) async {
+    /// "Surprise me": turning it on asks for notifications the first time, through `request` (the view's explainer);
+    /// "Not now" there leaves surprises off.
+    func setSurprises(_ isOn: Bool, request: ((Permission) async -> PermissionStatus)? = nil) async {
         surprisesOn = isOn
-        if isOn, notifications == .notDetermined { notifications = await permissions.request(.notifications) }
+        if isOn, notifications == .notDetermined {
+            notifications = if let request { await request(.notifications) } else { await permissions.request(.notifications) }
+            guard notifications != .notDetermined else {
+                surprisesOn = false
+                return
+            }
+        }
         if isOn {
             pause = .off
             if let surprises { await surprises.turnOn() } else { saveSchedule() }

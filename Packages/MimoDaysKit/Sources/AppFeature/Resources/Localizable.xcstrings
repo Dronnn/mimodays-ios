@@ -11103,14 +11103,26 @@
         }
       }
     },
-    "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings." : {
-      "comment" : "Onboarding O08c, reminders off: body",
+    "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in iOS Settings." : {
+      "comment" : "Onboarding O08c, reminders off after Don't Allow: body",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings."
+            "value" : "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in iOS Settings."
+          }
+        }
+      }
+    },
+    "You can still capture moments whenever you like. Turn on surprises any time in Settings › Surprises." : {
+      "comment" : "Onboarding O08c, reminders off after Maybe later: body. Settings › Surprises is MimoDays' own Settings page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can still capture moments whenever you like. Turn on surprises any time in Settings › Surprises."
           }
         }
       }

@@ -139,7 +139,7 @@ struct TodayView: View {
 
     /// "WED, NOV 11" and "Your life, in little pieces." with its brush underline and apricot star.
     private func greeting(oneLine: Bool) -> some View {
-        let headline = String(localized: "Today headline", bundle: .module)
+        let headline = String(appLocalized: "Today headline", bundle: .module)
         let marks = !typeSize.isAccessibilitySize
         // T02's 0.98 line height is tighter than Fraunces' own, which one text never draws: each line is its own
         // text, stacked that close. At accessibility sizes lines wrap inside each text, so they keep the font's own.
@@ -309,7 +309,7 @@ struct TodayView: View {
     private var monthHeader: some View {
         Button { router.open(.tab(.memories)) } label: {
             HStack {
-                Text("Your \(model.now.formatted(.dateTime.month(.wide)))", bundle: .module)
+                Text("Your \(model.now.formatted(.dateTime.month(.wide).locale(AppLanguage.shared.locale)))", bundle: .module)
                     .textStyle(.displaySection)
                     .foregroundStyle(ColorToken.textPrimary.color)
                 Spacer(minLength: 8)

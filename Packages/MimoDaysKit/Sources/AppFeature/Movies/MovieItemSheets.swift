@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import Persistence
 import SwiftUI
@@ -312,7 +313,7 @@ struct CardSheet: View {
             if let note = model.selectedCardVoice {
                 HStack(spacing: 8) {
                     Icon.glyphMic.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
-                    Text("Voice comment from \(note.recordedAt.formatted(.dateTime.month(.abbreviated).day())) · \(MovieEditorView.clock(note.duration))", bundle: .module)
+                    Text("Voice comment from \(note.recordedAt.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))) · \(MovieEditorView.clock(note.duration))", bundle: .module)
                         .textStyle(TextStyle(.nunito, size: 14, weight: 700, relativeTo: .subheadline))
                         .lineLimit(1)
                     Spacer(minLength: 8)
@@ -321,7 +322,7 @@ struct CardSheet: View {
                             Button {
                                 model.setCardVoice(other)
                             } label: {
-                                Text(verbatim: "\(other.recordedAt.formatted(.dateTime.month(.abbreviated).day())) · \(MovieEditorView.clock(other.duration))")
+                                Text(verbatim: "\(other.recordedAt.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))) · \(MovieEditorView.clock(other.duration))")
                             }
                         }
                     } label: {
@@ -434,7 +435,7 @@ struct TransitionSheet: View {
     }
 
     static func seconds(_ value: Double) -> String {
-        String(localized: "\(value.formatted(.number.precision(.fractionLength(1)))) s", bundle: .module, comment: "U53: seconds, e.g. 2.0 s")
+        String(appLocalized: "\(value.formatted(.number.precision(.fractionLength(1)).locale(AppLanguage.shared.locale))) s", bundle: .module, comment: "U53: seconds, e.g. 2.0 s")
     }
 }
 

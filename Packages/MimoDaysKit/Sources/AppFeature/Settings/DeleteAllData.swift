@@ -85,7 +85,7 @@ struct DeleteAllScreen: View {
         if let eraser {
             DeleteAllView(counts: eraser.counts()) {
                 if let lock, lock.isEnabled {
-                    let reason = String(localized: "Face ID reason: delete all data", defaultValue: "Delete all data", bundle: .module, comment: "Why Face ID is asked for: to delete everything in MimoDays")
+                    let reason = String(appLocalized: "Face ID reason: delete all data", defaultValue: "Delete all data", bundle: .module, comment: "Why Face ID is asked for: to delete everything in MimoDays")
                     guard await lock.confirm(reason) else { return false }
                 }
                 do {
@@ -113,7 +113,7 @@ struct DeleteAllView: View {
 
     /// The word to type, in the person's language.
     static var word: String {
-        String(localized: "Delete all data: the word to type", defaultValue: "DELETE", bundle: .module, comment: "S08: the word typed to confirm deleting everything. Translate it; keep it one short, uppercase word.")
+        String(appLocalized: "Delete all data: the word to type", defaultValue: "DELETE", bundle: .module, comment: "S08: the word typed to confirm deleting everything. Translate it; keep it one short, uppercase word.")
     }
 
     private var confirmed: Bool {

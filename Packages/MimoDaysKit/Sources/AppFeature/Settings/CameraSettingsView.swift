@@ -136,8 +136,8 @@ struct CameraSettingsView: View {
 
     /// "Top right, medium", joined the way the locale lists things.
     private var selfieWindowValue: Text {
-        Text(verbatim: [String(localized: settings.selfieWindow.corner.title), String(localized: settings.selfieWindow.scale.inlineTitle)]
-            .formatted(.list(type: .and, width: .narrow)))
+        Text(verbatim: [String(appLocalized: settings.selfieWindow.corner.title), String(appLocalized: settings.selfieWindow.scale.inlineTitle)]
+            .formatted(.list(type: .and, width: .narrow).locale(AppLanguage.shared.locale)))
     }
 
     private var accessValue: Text {

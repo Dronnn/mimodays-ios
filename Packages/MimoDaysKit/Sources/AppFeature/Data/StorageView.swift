@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -153,7 +154,7 @@ struct StorageView: View {
         return Text(DataFormat.ago(date, now: .now))
     }
 
-    static func bytes(_ count: Int64) -> String { count.formatted(.byteCount(style: .file, spellsOutZero: false)) }
+    static func bytes(_ count: Int64) -> String { count.formatted(.byteCount(style: .file, spellsOutZero: false).locale(AppLanguage.shared.locale)) }
 }
 
 /// `Storage / Bar`: one 14 pt bar split by kind with 2 pt gaps; a kind too small to see still shows 6 pt.

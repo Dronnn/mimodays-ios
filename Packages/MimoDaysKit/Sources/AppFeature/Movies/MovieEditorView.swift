@@ -362,7 +362,7 @@ struct MovieEditorView: View {
 
     /// "0:12".
     static func clock(_ seconds: Double) -> String {
-        Duration.seconds(max(seconds, 0).rounded(.down)).formatted(.time(pattern: .minuteSecond))
+        Duration.seconds(max(seconds, 0).rounded(.down)).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
     }
 
     // MARK: Panels
@@ -562,7 +562,7 @@ extension MovieEditorModel {
             )
         }
         if let card = selectedCard {
-            return String(localized: "Text card · \(Int(card.duration)) s", bundle: .module, comment: "U50: a chosen text card and its seconds")
+            return String(appLocalized: "Text card · \(Int(card.duration)) s", bundle: .module, comment: "U50: a chosen text card and its seconds")
         }
         guard let clip = selectedClip, let plan = selectedPlan, let moment = clip.moment else { return nil }
         let zone = TimeZone(identifier: moment.timeZoneID) ?? .current
@@ -772,7 +772,7 @@ struct AudioPanel: View {
                     Spacer(minLength: 8)
                     Group {
                         if let track = model.music {
-                            Text(track.name ?? String(localized: "On", bundle: .module))
+                            Text(track.name ?? String(appLocalized: "On", bundle: .module))
                         } else {
                             Text("None", bundle: .module, comment: "F09: no music chosen")
                         }

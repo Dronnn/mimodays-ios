@@ -108,7 +108,7 @@ struct MosaicView: View {
         components.calendar = Calendar.current
         guard let date = components.date else { return "" }
         let thisYear = Calendar.current.component(.year, from: now) == year
-        return date.formatted(thisYear ? .dateTime.month(.wide) : .dateTime.month(.wide).year())
+        return date.formatted(thisYear ? .dateTime.month(.wide) : .dateTime.month(.wide).year().locale(AppLanguage.shared.locale))
     }
 
     /// U13: a hand-drawn mark by each month, in turn: the apricot star near the trailing edge, then the ticks just

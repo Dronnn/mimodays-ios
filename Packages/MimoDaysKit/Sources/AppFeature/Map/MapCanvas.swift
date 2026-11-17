@@ -233,10 +233,10 @@ struct MapCanvas: UIViewRepresentable {
             guard let cover = members.max(by: { $0.latest < $1.latest }) else { return }
             let count = members.reduce(0) { $0 + $1.count }
             if parent.images[cover.coverID] == nil { parent.onLoad(cover.coverID) }
-            let name = members.count == 1 ? (cover.title ?? String(localized: "Unnamed place", bundle: .module)) : String(localized: "\(members.count) places", bundle: .module)
+            let name = members.count == 1 ? (cover.title ?? String(appLocalized: "Unnamed place", bundle: .module)) : String(appLocalized: "\(members.count) places", bundle: .module)
             view.show(
                 image: parent.images[cover.coverID], count: count,
-                label: String(localized: "Map marker: \(name) · \(String(localized: "\(count) moments", bundle: .module))", bundle: .module),
+                label: String(appLocalized: "Map marker: \(name) · \(String(appLocalized: "\(count) moments", bundle: .module))", bundle: .module),
                 isSelected: members.count == 1 && parent.selection == cover.id
             )
         }

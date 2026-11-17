@@ -103,6 +103,8 @@ public struct RootView: View {
         .environment(\.mediaLibrary, memories.library)
         // S05: the lock screen sits in its own window, over sheets too.
         .background(AppLockWindow(lock: appLock, isLocked: appLock.isLocked))
+        // The language chosen in Settings › Appearance, at once, for every screen and sheet.
+        .appLanguage()
         // S04: light, dark and contrast for every window, sheets and the lock screen included.
         .background(WindowAppearance(settings: appearancePreferences.value))
         // Launch and every return to the app (notification permission may have changed in Settings).
@@ -120,6 +122,8 @@ public struct RootView: View {
             guard onboarding == nil, let route = AppRouter.route(from: url) else { return }
             if case let .capture(promptID?) = route { openSurprise(promptID) } else { router.open(route) }
         }
+        // Planned surprises carry their words: drawn again in the language just chosen.
+        .onChange(of: AppLanguage.shared.code) { Task { await surprises.settingsChanged() } }
         // S09: Memories follows a change at once.
         .onChange(of: memoriesPreferences.value.opensIn) { _, mode in memories.mode = mode.memoriesMode }
         .onChange(of: memoriesPreferences.value.newestFirst) { _, newestFirst in
@@ -266,7 +270,7 @@ public struct RootView: View {
                     .padding(.bottom, 100)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .task {
-                        AccessibilityNotification.Announcement(String(localized: "Saved to today", bundle: .module)).post()
+                        AccessibilityNotification.Announcement(String(appLocalized: "Saved to today", bundle: .module)).post()
                         try? await Task.sleep(for: .seconds(2.5))
                         withAnimation { showsSavedToast = false }
                     }

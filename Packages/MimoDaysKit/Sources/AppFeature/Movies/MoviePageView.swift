@@ -261,13 +261,13 @@ struct MoviePageView: View {
 
     /// "Movie · 1:02 · 9:16 · 1080p · made Oct 1".
     static func meta(_ render: MovieRender, _ shape: MovieAspectRatio) -> String {
-        let length = Duration.seconds(render.duration.rounded()).formatted(.time(pattern: .minuteSecond))
+        let length = Duration.seconds(render.duration.rounded()).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
         let quality = switch render.resolution {
         case .p720: "720p"
         case .p1080: "1080p"
-        case .p2160: String(localized: "4K", bundle: .module)
+        case .p2160: String(appLocalized: "4K", bundle: .module)
         }
-        let made = render.renderedAt.formatted(.dateTime.month(.abbreviated).day())
+        let made = render.renderedAt.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))
         return String(
             localized: "Movie · \(length) · \(shape.label) · \(quality) · made \(made)", bundle: .module,
             comment: "F15: a rendered movie's length, shape, quality and the day it was made"

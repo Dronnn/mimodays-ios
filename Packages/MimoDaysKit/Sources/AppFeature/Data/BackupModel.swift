@@ -214,8 +214,8 @@ enum BackupReminder: String, CaseIterable {
         guard let days else { return }
         let fire = max(date.addingTimeInterval(Double(days) * 86_400).timeIntervalSinceNow, 60)
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "Time for a backup", bundle: .module, comment: "Backup reminder notification title")
-        content.body = String(localized: "Your newest moments are only on this iPhone. A backup keeps them safe.", bundle: .module, comment: "Backup reminder notification text")
+        content.title = String(appLocalized: "Time for a backup", bundle: .module, comment: "Backup reminder notification title")
+        content.body = String(appLocalized: "Your newest moments are only on this iPhone. A backup keeps them safe.", bundle: .module, comment: "Backup reminder notification text")
         let request = UNNotificationRequest(identifier: Self.notificationID, content: content, trigger: UNTimeIntervalNotificationTrigger(timeInterval: fire, repeats: false))
         center.add(request)
     }

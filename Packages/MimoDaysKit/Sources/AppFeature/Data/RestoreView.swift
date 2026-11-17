@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -145,7 +146,7 @@ struct RestoreView: View {
                 .background(Circle().fill(ColorToken.accentPeach.color))
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 6) {
-                Text("Backup from \(summary.createdAt.formatted(date: .abbreviated, time: .omitted))", bundle: .module)
+                Text("Backup from \(summary.createdAt.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(AppLanguage.shared.locale)))", bundle: .module)
                     .textStyle(.rowTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
                 Text(Self.contents(summary))
@@ -165,8 +166,8 @@ struct RestoreView: View {
     /// "1,140 moments · 6 collections · 3 movie projects · checked, no problems".
     static func contents(_ summary: BackupService.Summary) -> String {
         let check = summary.isClean
-            ? String(localized: "checked, no problems", bundle: .module, comment: "Restore (E07): the backup was read and every file matched")
-            : String(localized: "some files are damaged", bundle: .module, comment: "Restore (E07): the backup was read and some files didn't match")
+            ? String(appLocalized: "checked, no problems", bundle: .module, comment: "Restore (E07): the backup was read and every file matched")
+            : String(appLocalized: "some files are damaged", bundle: .module, comment: "Restore (E07): the backup was read and some files didn't match")
         return String(
             localized: "\(summary.moments) moments · \(summary.collections) collections · \(summary.projects) movie projects · \(check)", bundle: .module,
             comment: "Restore (E07): what the backup holds, then how its check went"
@@ -256,7 +257,7 @@ struct RestoreView: View {
             List {
                 if case let .done(outcome) = model.phase {
                     ForEach(outcome.skipped, id: \.self) { date in
-                        Text(date.formatted(date: .complete, time: .shortened))
+                        Text(date.formatted(Date.FormatStyle(date: .complete, time: .shortened).locale(AppLanguage.shared.locale)))
                     }
                 }
             }

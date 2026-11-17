@@ -16,7 +16,7 @@ struct PrivacySettingsScreen: View {
                 biometry: lock.biometry,
                 placeCount: placeCount,
                 turnOnLock: {
-                    await lock.confirm(String(localized: "Turn on App Lock", bundle: .module, comment: "Why Face ID is asked for: to turn App Lock on"))
+                    await lock.confirm(String(appLocalized: "Turn on App Lock", bundle: .module, comment: "Why Face ID is asked for: to turn App Lock on"))
                 },
                 removePlaces: {
                     do {
@@ -111,7 +111,7 @@ struct PrivacySettingsView: View {
                         NavigationLink(value: SettingsRoute.deleteAll) {
                             DataIconRow(
                                 icon: .glyphTrash,
-                                title: Text(String(localized: "Privacy row: delete all data", defaultValue: "Delete all data…", bundle: .module, comment: "Privacy settings (S05): row that opens Delete all data")),
+                                title: Text(String(appLocalized: "Privacy row: delete all data", defaultValue: "Delete all data…", bundle: .module, comment: "Privacy settings (S05): row that opens Delete all data")),
                                 titleColor: .textLink
                             )
                         }

@@ -123,9 +123,9 @@ enum DataFormat {
     static func ago(_ date: Date, now: Date, calendar: Calendar = .current) -> String {
         let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: date), to: calendar.startOfDay(for: now)).day ?? 0
         switch days {
-        case ...0: return String(localized: "Days since the backup: today", defaultValue: "today", bundle: .module, comment: "When the last backup was made: today")
-        case 1: return String(localized: "Days since the backup: yesterday", defaultValue: "yesterday", bundle: .module, comment: "When the last backup was made: yesterday")
-        default: return String(localized: "\(days) days ago", bundle: .module, comment: "When the last backup was made, in days")
+        case ...0: return String(appLocalized: "Days since the backup: today", defaultValue: "today", bundle: .module, comment: "When the last backup was made: today")
+        case 1: return String(appLocalized: "Days since the backup: yesterday", defaultValue: "yesterday", bundle: .module, comment: "When the last backup was made: yesterday")
+        default: return String(appLocalized: "\(days) days ago", bundle: .module, comment: "When the last backup was made, in days")
         }
     }
 }

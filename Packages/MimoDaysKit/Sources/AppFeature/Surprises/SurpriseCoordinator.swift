@@ -205,7 +205,7 @@ final class SurpriseCoordinator {
         for prompt in wanted where fireDates[prompt.id] != prompt.fireDate {
             let notification = SurpriseNotification(
                 id: prompt.id, fireDate: prompt.fireDate,
-                title: String(localized: Self.title), body: String(localized: Self.bodies.randomElement(using: &generator)!)
+                title: String(appLocalized: Self.title), body: String(appLocalized: Self.bodies.randomElement(using: &generator)!)
             )
             do {
                 try await notifications.schedule(notification)

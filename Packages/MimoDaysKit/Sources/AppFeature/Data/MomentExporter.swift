@@ -133,7 +133,7 @@ struct MomentExporter {
             return (latitude, longitude)
         } : nil
         let zone = TimeZone(identifier: moment.timeZoneID) ?? .current
-        let date = moment.capturedAt.formatted(Date.FormatStyle(date: .complete, time: .shortened, timeZone: zone))
+        let date = moment.capturedAt.formatted(Date.FormatStyle(date: .complete, time: .shortened, timeZone: zone).locale(AppLanguage.shared.locale))
         let placeLine = options.exactPlace ? location?.placeLabel : nil
         var lines = [date]
         if let title = moment.title, !title.isEmpty { lines.append(title) }

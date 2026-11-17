@@ -257,7 +257,7 @@ struct MovieTimeline: View {
                     .fill(ColorToken.accentSage.color.opacity(0.55))
                     .overlay { MusicEnvelope().stroke(Color(hex: 0x4F6B4A), lineWidth: 1.5) }
                     .overlay(alignment: .leading) {
-                        Text(verbatim: "\(music.name ?? String(localized: "Music", bundle: .module)) · \(Int((music.gain * 100).rounded()))%")
+                        Text(verbatim: "\(music.name ?? String(appLocalized: "Music", bundle: .module)) · \(Int((music.gain * 100).rounded()))%")
                             .textStyle(TextStyle(.nunito, size: 11, weight: 700, relativeTo: .caption2, maximumScale: 1))
                             .foregroundStyle(Color(hex: 0x3B4E37))
                             .lineLimit(1)

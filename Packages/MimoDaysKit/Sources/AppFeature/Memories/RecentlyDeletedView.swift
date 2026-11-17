@@ -156,7 +156,7 @@ struct RecentlyDeletedScreen: View {
     }
 
     private func ask(_ lock: AppLock) async {
-        unlocked = await lock.confirm(String(localized: "Open Recently deleted", bundle: .module, comment: "Why Face ID is asked for: to open Recently deleted"))
+        unlocked = await lock.confirm(String(appLocalized: "Open Recently deleted", bundle: .module, comment: "Why Face ID is asked for: to open Recently deleted"))
     }
 }
 

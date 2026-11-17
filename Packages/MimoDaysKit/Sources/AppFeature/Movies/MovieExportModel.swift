@@ -214,7 +214,7 @@ final class MovieExportModel {
     private func notifyIfAway() {
         guard UIApplication.shared.applicationState != .active else { return }
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "Your movie is ready", bundle: .module)
+        content.title = String(appLocalized: "Your movie is ready", bundle: .module)
         content.body = project.title
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "movie-\(project.id)", content: content, trigger: nil))
     }

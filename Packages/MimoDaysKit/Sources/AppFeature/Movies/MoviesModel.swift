@@ -140,11 +140,11 @@ final class MoviesModel {
     }
 
     static func monthTitle(_ month: Int) -> String {
-        MemoriesView.monthDate(month).formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).year())
+        MemoriesView.monthDate(month).formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).year().locale(AppLanguage.shared.locale))
     }
 
     static func monthName(_ month: Int) -> String {
-        MemoriesView.monthDate(month).formatted(Date.FormatStyle(timeZone: .gmt).month(.wide))
+        MemoriesView.monthDate(month).formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).locale(AppLanguage.shared.locale))
     }
 
     private static func lastDay(of month: Int) -> Int {

@@ -60,7 +60,7 @@ final class MomentExportModel: Identifiable {
         removeFiles()
         let root = FileManager.default.temporaryDirectory.appending(path: "Export-\(UUID().uuidString)", directoryHint: .isDirectory)
         folder = root
-        let name = String(localized: "MimoDays \(ids.count) moments", bundle: .module, comment: "The exported archive's file name")
+        let name = String(appLocalized: "MimoDays \(ids.count) moments", bundle: .module, comment: "The exported archive's file name")
         let target = root.appending(path: name, directoryHint: .isDirectory)
         let items = exporter.items(ids, options: options)
         let archive = archive
@@ -293,7 +293,7 @@ struct MomentsExportView: View {
             }
             Button { Task { sharing = await model.files() } } label: {
                 if let progress = model.progress {
-                    Text("Exporting \(progress.formatted(.percent.precision(.fractionLength(0))))", bundle: .module)
+                    Text("Exporting \(progress.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.shared.locale)))", bundle: .module)
                 } else {
                     Text("Export", bundle: .module)
                 }

@@ -128,9 +128,9 @@ struct MovieExportOptions: View {
 
     /// "About 95 MB. You have 12 GB free."
     private var sizeNote: Text {
-        let size = model.estimatedBytes(model.resolution).formatted(.byteCount(style: .file))
+        let size = model.estimatedBytes(model.resolution).formatted(.byteCount(style: .file).locale(AppLanguage.shared.locale))
         if let free = model.available {
-            return Text("About \(size). You have \(free.formatted(.byteCount(style: .file))) free.", bundle: .module)
+            return Text("About \(size). You have \(free.formatted(.byteCount(style: .file).locale(AppLanguage.shared.locale))) free.", bundle: .module)
         }
         return Text("About \(size).", bundle: .module)
     }
@@ -165,8 +165,8 @@ extension MovieResolution {
 extension MovieCard {
     /// "1:04 · 9:16 · 24 clips".
     static func length(_ seconds: Double, _ shape: MovieAspectRatio, clips: Int) -> String {
-        let length = Duration.seconds(seconds.rounded()).formatted(.time(pattern: .minuteSecond))
-        return String(localized: "\(length) · \(shape.label) · \(clips) clips", bundle: .module, comment: "F11: the movie's length, shape and clip count")
+        let length = Duration.seconds(seconds.rounded()).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
+        return String(appLocalized: "\(length) · \(shape.label) · \(clips) clips", bundle: .module, comment: "F11: the movie's length, shape and clip count")
     }
 }
 
@@ -288,9 +288,9 @@ struct MovieRendering: View {
 
     /// "42% · about 20 seconds left".
     private var status: Text {
-        let percent = progress.formatted(.percent.precision(.fractionLength(0)))
+        let percent = progress.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.shared.locale))
         guard let remaining else { return Text(percent) }
-        let left = Duration.seconds(max(remaining.rounded(), 1)).formatted(.units(allowed: [.minutes, .seconds], width: .wide, maximumUnitCount: 1))
+        let left = Duration.seconds(max(remaining.rounded(), 1)).formatted(.units(allowed: [.minutes, .seconds], width: .wide, maximumUnitCount: 1).locale(AppLanguage.shared.locale))
         return Text("\(percent) · about \(left) left", bundle: .module, comment: "F12: progress and time left, as 42% · about 20 seconds left")
     }
 }
@@ -364,8 +364,8 @@ struct MovieReady: View {
 
     /// "October 2026 · 1:04 · 95 MB".
     private var meta: String {
-        let length = Duration.seconds(render.duration.rounded()).formatted(.time(pattern: .minuteSecond))
-        return "\(title) · \(length) · \(render.byteCount.formatted(.byteCount(style: .file)))"
+        let length = Duration.seconds(render.duration.rounded()).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
+        return "\(title) · \(length) · \(render.byteCount.formatted(.byteCount(style: .file).locale(AppLanguage.shared.locale)))"
     }
 }
 
@@ -560,7 +560,7 @@ struct MovieExportFailed: View {
                 case .space:
                     if model.resolution != .p720 {
                         Button(action: model.retryAt720) {
-                            Text("Make it in 720p (about \(model.estimatedBytes(.p720).formatted(.byteCount(style: .file))))", bundle: .module)
+                            Text("Make it in 720p (about \(model.estimatedBytes(.p720).formatted(.byteCount(style: .file).locale(AppLanguage.shared.locale))))", bundle: .module)
                         }
                         .buttonStyle(.primary)
                         .accessibilityIdentifier("failed.smaller")
@@ -588,7 +588,7 @@ struct MovieExportFailed: View {
     private func body(for failure: MovieExportModel.Failure) -> Text {
         switch failure {
         case let .space(needed):
-            Text("There isn't enough free space on this iPhone.\nIt needs about \(needed.formatted(.byteCount(style: .file))) more.\nYour draft is safe.", bundle: .module)
+            Text("There isn't enough free space on this iPhone.\nIt needs about \(needed.formatted(.byteCount(style: .file).locale(AppLanguage.shared.locale))) more.\nYour draft is safe.", bundle: .module)
         case .other:
             Text("Something went wrong while making it.\nYour draft is safe.", bundle: .module)
         }

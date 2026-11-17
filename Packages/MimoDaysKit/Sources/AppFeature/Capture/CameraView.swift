@@ -667,13 +667,13 @@ extension CameraModel {
     }
 
     private static func clock(_ seconds: Int) -> String {
-        Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond(padMinuteToLength: 2)))
+        Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond(padMinuteToLength: 2)).locale(AppLanguage.shared.locale))
     }
 }
 
 extension CameraSettings.VideoLength {
     /// "10s": the system's narrow unit style, localized by Foundation.
     var label: String {
-        duration.formatted(.units(allowed: [.seconds], width: .narrow))
+        duration.formatted(.units(allowed: [.seconds], width: .narrow).locale(AppLanguage.shared.locale))
     }
 }

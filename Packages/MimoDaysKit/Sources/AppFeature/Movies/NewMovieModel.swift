@@ -239,26 +239,26 @@ final class NewMovieModel {
         switch source {
         case .lastMonth: return MoviesModel.monthTitle(lastMonth)
         case .thisYear: return String(thisYear)
-        case .lastYear: return String(localized: "\(String(thisYear - 1)), the whole year", bundle: .module)
+        case .lastYear: return String(appLocalized: "\(String(thisYear - 1)), the whole year", bundle: .module)
         case .dates, .moments:
             let days = candidates.filter { picked.contains($0.id) }.map(\.day)
-            guard let first = days.min(), let last = days.max() else { return String(localized: "New movie", bundle: .module) }
+            guard let first = days.min(), let last = days.max() else { return String(appLocalized: "New movie", bundle: .module) }
             return Self.span(first, last)
-        case let .collection(id): return collections.first { $0.id == id }?.title ?? String(localized: "New movie", bundle: .module)
-        case .place: return placeName ?? String(localized: "Unnamed place", bundle: .module)
+        case let .collection(id): return collections.first { $0.id == id }?.title ?? String(appLocalized: "New movie", bundle: .module)
+        case .place: return placeName ?? String(appLocalized: "Unnamed place", bundle: .module)
         }
     }
 
     /// The source in F16's sentence: "Last month has 3 moments."
     var sourceName: String {
         switch source {
-        case .lastMonth: String(localized: "Last month", bundle: .module)
-        case .thisYear: String(localized: "This year", bundle: .module)
-        case .lastYear: String(localized: "Last year", bundle: .module)
-        case .dates: String(localized: "These dates", bundle: .module)
-        case .collection: String(localized: "This collection", bundle: .module)
-        case .place: String(localized: "This place", bundle: .module)
-        case .moments: String(localized: "This choice", bundle: .module)
+        case .lastMonth: String(appLocalized: "Last month", bundle: .module)
+        case .thisYear: String(appLocalized: "This year", bundle: .module)
+        case .lastYear: String(appLocalized: "Last year", bundle: .module)
+        case .dates: String(appLocalized: "These dates", bundle: .module)
+        case .collection: String(appLocalized: "This collection", bundle: .module)
+        case .place: String(appLocalized: "This place", bundle: .module)
+        case .moments: String(appLocalized: "This choice", bundle: .module)
         }
     }
 
@@ -268,17 +268,17 @@ final class NewMovieModel {
         case .lastMonth: MoviesModel.monthName(lastMonth)
         case .thisYear: String(thisYear)
         case .lastYear: String(thisYear - 1)
-        case let .collection(id): collections.first { $0.id == id }?.title ?? String(localized: "Movie period: this collection", bundle: .module)
-        case .place: placeName ?? String(localized: "Movie period: this place", bundle: .module)
-        case .dates, .moments: String(localized: "Movie period: these dates", bundle: .module)
+        case let .collection(id): collections.first { $0.id == id }?.title ?? String(appLocalized: "Movie period: this collection", bundle: .module)
+        case .place: placeName ?? String(appLocalized: "Movie period: this place", bundle: .module)
+        case .dates, .moments: String(appLocalized: "Movie period: these dates", bundle: .module)
         }
     }
 
     /// "Jun 1 – 30, 2026".
     static func span(_ first: Int, _ last: Int) -> String {
         let start = MemoriesView.dayDate(first)
-        guard first != last else { return start.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, timeZone: .gmt)) }
-        return (start..<MemoriesView.dayDate(last)).formatted(Date.IntervalFormatStyle(date: .abbreviated, time: .omitted, timeZone: .gmt))
+        guard first != last else { return start.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, timeZone: .gmt).locale(AppLanguage.shared.locale)) }
+        return (start..<MemoriesView.dayDate(last)).formatted(Date.IntervalFormatStyle(date: .abbreviated, time: .omitted, timeZone: .gmt).locale(AppLanguage.shared.locale))
     }
 
     /// What the project remembers it was made from.

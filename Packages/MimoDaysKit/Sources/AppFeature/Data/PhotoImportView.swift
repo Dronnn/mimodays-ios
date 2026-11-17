@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import PhotosUI
 import SwiftUI
@@ -48,7 +49,7 @@ struct PhotoImportView: View {
                 }
             } label: {
                 if case let .importing(progress) = model.phase {
-                    Text("Importing \(progress.formatted(.percent.precision(.fractionLength(0))))", bundle: .module)
+                    Text("Importing \(progress.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.shared.locale)))", bundle: .module)
                 } else {
                     Text("Import \(model.new.count)", bundle: .module)
                 }

@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -77,8 +78,8 @@ struct SurpriseRibbon: View {
         let days = calendar.dateComponents([.day], from: today, to: calendar.startOfDay(for: until)).day ?? 0
         if days <= 1 { return resource("Surprises are paused until tomorrow") }
         let day = days < 7
-            ? until.formatted(.dateTime.weekday(.wide))
-            : until.formatted(.dateTime.month(.abbreviated).day())
+            ? until.formatted(.dateTime.weekday(.wide).locale(AppLanguage.shared.locale))
+            : until.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))
         return LocalizedStringResource("Surprises are paused until \(day)", bundle: .atURL(Bundle.module.bundleURL))
     }
 

@@ -18,6 +18,8 @@ enum SettingsRoute: Hashable {
     case dataUse
     /// S08.
     case deleteAll
+    /// Appearance › Language.
+    case language
 }
 
 /// The Settings sheet: S01 and everything under it.
@@ -56,6 +58,7 @@ private struct SettingsHost: View {
                     case let .helpArticle(article): HelpArticleView(article: article).settingsPage()
                     case .dataUse: DataUseView().settingsPage()
                     case .deleteAll: DeleteAllScreen().settingsPage()
+                    case .language: LanguageSettingsView().settingsPage()
                     }
                 }
                 .navigationDestination(for: DataRoute.self) { route in

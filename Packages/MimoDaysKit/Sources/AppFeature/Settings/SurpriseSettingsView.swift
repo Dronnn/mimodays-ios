@@ -111,7 +111,7 @@ struct SurpriseSettingsView: View {
         case let .until(date):
             let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: .now), to: calendar.startOfDay(for: date)).day ?? 0
             if days <= 1 { return Text("Until tomorrow", bundle: .module) }
-            let day = days < 7 ? date.formatted(.dateTime.weekday(.wide)) : date.formatted(.dateTime.month(.abbreviated).day())
+            let day = days < 7 ? date.formatted(.dateTime.weekday(.wide).locale(AppLanguage.shared.locale)) : date.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))
             return Text("Until \(day)", bundle: .module)
         }
     }
@@ -132,6 +132,6 @@ struct SurpriseSettingsView: View {
 
     /// "15 min", "1 hr", in the person's language.
     static func minutes(_ minutes: Int) -> String {
-        Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
+        Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated).locale(AppLanguage.shared.locale))
     }
 }

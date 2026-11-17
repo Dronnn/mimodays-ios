@@ -51,7 +51,7 @@ struct MovieStore {
     @discardableResult
     func duplicate(_ project: MovieProject) throws -> MovieProject {
         let copy = MovieProject(
-            title: String(localized: "\(project.title) copy", bundle: .module, comment: "Title of a duplicated movie project"),
+            title: String(appLocalized: "\(project.title) copy", bundle: .module, comment: "Title of a duplicated movie project"),
             sourceRule: project.sourceRule, aspectRatio: project.aspectRatio, length: project.length, createdAt: now()
         )
         copy.style = project.style

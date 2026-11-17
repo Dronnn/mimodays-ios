@@ -71,7 +71,7 @@ struct AppLockWindow: UIViewRepresentable {
             let window = UIWindow(windowScene: scene)
             window.windowLevel = .alert + 1
             let lock = lock
-            let host = UIHostingController(rootView: AppLockView(biometry: lock.biometry) { Task { await lock.unlock() } })
+            let host = UIHostingController(rootView: AppLockView(biometry: lock.biometry) { Task { await lock.unlock() } }.appLanguage())
             host.view.backgroundColor = .clear
             window.rootViewController = host
             window_ = window

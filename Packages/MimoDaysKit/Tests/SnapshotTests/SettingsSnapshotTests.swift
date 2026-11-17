@@ -1,5 +1,6 @@
 @testable import AppFeature
 @testable import Core
+import Core
 import DesignSystem
 import Foundation
 import Persistence
@@ -117,6 +118,11 @@ struct SettingsSnapshotTests {
         assertScreenSnapshots(
             of: page(AppearanceSettingsView(settings: Binding { settings } set: { settings = $0 }, language: "English")), variants: variants
         )
+    }
+
+    /// Appearance › Language: the iPhone's language, then MimoDays' own, each named in its own words.
+    @Test func language() {
+        assertScreenSnapshots(of: page(LanguageSettingsView(language: AppLanguage(defaults: UserDefaults(suiteName: "language-snapshot")!, domain: nil))), variants: variants)
     }
 
     /// S05 with Higher contrast: links, secondary words and the coral button get their darker colours.

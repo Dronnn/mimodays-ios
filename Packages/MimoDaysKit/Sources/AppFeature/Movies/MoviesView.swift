@@ -262,8 +262,8 @@ struct SuggestionCard: View {
 
     private var summary: String {
         let minutes = max(1, Int((suggestion.seconds / 60).rounded()))
-        let moments = String(localized: "\(suggestion.candidates.count) moments from \(suggestion.days) days.", bundle: .module)
-        let length = String(localized: "About \(minutes) minutes.", bundle: .module)
+        let moments = String(appLocalized: "\(suggestion.candidates.count) moments from \(suggestion.days) days.", bundle: .module)
+        let length = String(appLocalized: "About \(minutes) minutes.", bundle: .module)
         return "\(moments) \(length)"
     }
 }
@@ -382,14 +382,14 @@ extension MovieCard {
         relative.dateTimeStyle = .named
         let when = now.timeIntervalSince(date) < 7 * 86_400
             ? relative.localizedString(for: date, relativeTo: now)
-            : date.formatted(.dateTime.month(.abbreviated).day())
+            : date.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))
         return Text("Edited \(when)", bundle: .module)
     }
 
     /// "1:02 · 9:16 · Oct 1".
     static func meta(_ render: MovieRender, _ shape: MovieAspectRatio) -> Text {
-        let length = Duration.seconds(render.duration.rounded()).formatted(.time(pattern: .minuteSecond))
-        let made = render.renderedAt.formatted(.dateTime.month(.abbreviated).day())
+        let length = Duration.seconds(render.duration.rounded()).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
+        let made = render.renderedAt.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))
         return Text("\(length) · \(shape.label) · \(made)", bundle: .module)
     }
 }

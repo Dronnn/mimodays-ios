@@ -133,7 +133,7 @@ struct MoviePlan: Sendable, Equatable {
         }
         var parts: [String] = []
         if showsDates, let zone = TimeZone(identifier: summary.captured.timeZoneID) {
-            parts.append(summary.captured.instant.formatted(Date.FormatStyle(timeZone: zone).weekday(.abbreviated).month(.abbreviated).day()))
+            parts.append(summary.captured.instant.formatted(Date.FormatStyle(timeZone: zone).weekday(.abbreviated).month(.abbreviated).day().locale(AppLanguage.shared.locale)))
         }
         if showsPlaces, let place = summary.place { parts.append(place) }
         let voice = clip.includesVoiceNote ? moment.voiceNotes.first.flatMap { try? store.url(for: $0.relativePath) } : nil

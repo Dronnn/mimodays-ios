@@ -1,6 +1,100 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ – %@ · %@ s" : {
+      "comment" : "Trim sheet: a video's chosen start and end and their length, as 0:02 – 0:05 · 3.0 s",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ – %2$@ · %3$@ s"
+          }
+        }
+      }
+    },
+    "%@ · %@" : {
+      "comment" : "New movie (F02): a period and how many moments it has, e.g. October 2026 · 38 moments",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ · %@ · %@" : {
+      "comment" : "Movies library (F01): a movie's length, shape and when it was made, e.g. 1:02 · 9:16 · Oct 1",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@ · %3$@"
+          }
+        }
+      }
+    },
+    "%@ · %@ · %lld clips" : {
+      "comment" : "F11: the movie's length, shape and clip count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@ · %3$#@clips@"
+          },
+          "substitutions" : {
+            "clips" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg clip"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg clips"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%@ · about %@ left" : {
+      "comment" : "F12: progress and time left, as 42% · about 20 seconds left",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · about %2$@ left"
+          }
+        }
+      }
+    },
+    "%@ · Surprise" : {
+      "comment" : "Origin of a moment, after its time in lists and review: \"8:05 AM · Surprise\". The moment answered a surprise notification",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · Surprise"
+          }
+        }
+      }
+    },
     "%@ copy" : {
       "comment" : "Title of a duplicated movie project (F15 Duplicate). %@: the original title",
       "extractionState" : "manual",
@@ -119,100 +213,6 @@
         }
       }
     },
-    "%@ · %@" : {
-      "comment" : "New movie (F02): a period and how many moments it has, e.g. October 2026 · 38 moments",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ · %2$@"
-          }
-        }
-      }
-    },
-    "%@ · %@ · %@" : {
-      "comment" : "Movies library (F01): a movie's length, shape and when it was made, e.g. 1:02 · 9:16 · Oct 1",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ · %2$@ · %3$@"
-          }
-        }
-      }
-    },
-    "%@ · %@ · %lld clips" : {
-      "comment" : "F11: the movie's length, shape and clip count",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ · %2$@ · %3$#@clips@"
-          },
-          "substitutions" : {
-            "clips" : {
-              "argNum" : 3,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg clip"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg clips"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "%@ · Surprise" : {
-      "comment" : "Origin of a moment, after its time in lists and review: \"8:05 AM · Surprise\". The moment answered a surprise notification",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ · Surprise"
-          }
-        }
-      }
-    },
-    "%@ · about %@ left" : {
-      "comment" : "F12: progress and time left, as 42% · about 20 seconds left",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ · about %2$@ left"
-          }
-        }
-      }
-    },
-    "%@ – %@ · %@ s" : {
-      "comment" : "Trim sheet: a video's chosen start and end and their length, as 0:02 – 0:05 · 3.0 s",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ – %2$@ · %3$@ s"
-          }
-        }
-      }
-    },
     "%@, the whole year" : {
       "comment" : "New movie: title of a movie of last year. %@: the year, e.g. 2025",
       "extractionState" : "manual",
@@ -221,6 +221,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@, the whole year"
+          }
+        }
+      }
+    },
+    "%lld · %@" : {
+      "comment" : "Storage (E09): Recently deleted count and size, as 7 · 120 MB",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld · %2$@"
           }
         }
       }
@@ -447,6 +459,80 @@
         }
       }
     },
+    "%lld moments · %lld collections · %lld movie projects · %@" : {
+      "comment" : "Restore (E07): what the backup holds, then how its check went",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$#@moments@ · %2$#@collections@ · %3$#@projects@ · %4$@"
+          },
+          "substitutions" : {
+            "collections" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg collection"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg collections"
+                    }
+                  }
+                }
+              }
+            },
+            "moments" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moment"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moments"
+                    }
+                  }
+                }
+              }
+            },
+            "projects" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg movie project"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg movie projects"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld moments are only on this iPhone." : {
       "comment" : "Backup (E06): status card line before the first backup. On iPad it says iPad.",
       "extractionState" : "manual",
@@ -472,12 +558,6 @@
                   }
                 }
               },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld moments are only on this iPhone."
-                }
-              },
               "iphone" : {
                 "variations" : {
                   "plural" : {
@@ -494,6 +574,12 @@
                       }
                     }
                   }
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld moments are only on this iPhone."
                 }
               }
             }
@@ -651,80 +737,6 @@
         }
       }
     },
-    "%lld moments · %lld collections · %lld movie projects · %@" : {
-      "comment" : "Restore (E07): what the backup holds, then how its check went",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$#@moments@ · %2$#@collections@ · %3$#@projects@ · %4$@"
-          },
-          "substitutions" : {
-            "collections" : {
-              "argNum" : 2,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg collection"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg collections"
-                    }
-                  }
-                }
-              }
-            },
-            "moments" : {
-              "argNum" : 1,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg moment"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg moments"
-                    }
-                  }
-                }
-              }
-            },
-            "projects" : {
-              "argNum" : 3,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg movie project"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg movie projects"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "%lld new moments since then are only on this iPhone." : {
       "comment" : "Backup (E06): status card warning. On iPad it says iPad.",
       "extractionState" : "manual",
@@ -750,12 +762,6 @@
                   }
                 }
               },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld new moments since then are only on this iPhone."
-                }
-              },
               "iphone" : {
                 "variations" : {
                   "plural" : {
@@ -772,6 +778,12 @@
                       }
                     }
                   }
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new moments since then are only on this iPhone."
                 }
               }
             }
@@ -1099,18 +1111,6 @@
         }
       }
     },
-    "%lld · %@" : {
-      "comment" : "Storage (E09): Recently deleted count and size, as 7 · 120 MB",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld · %2$@"
-          }
-        }
-      }
-    },
     "+ Add a place" : {
       "comment" : "Memory Card back (U31): link where the place would be, when the moment has none; opens Edit moment",
       "extractionState" : "manual",
@@ -1143,30 +1143,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "+ Write a note"
-          }
-        }
-      }
-    },
-    "16:9 records in landscape" : {
-      "comment" : "Camera (U03): under 'Turn your phone sideways'",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:9 records in landscape"
-          }
-        }
-      }
-    },
-    "16:9 · TV" : {
-      "comment" : "New movie (F04): wide shape option",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:9 · TV"
           }
         }
       }
@@ -1231,6 +1207,18 @@
         }
       }
     },
+    "9:16 · Phone" : {
+      "comment" : "New movie (F04): tall shape option",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9:16 · Phone"
+          }
+        }
+      }
+    },
     "9:16 and 1:1 record upright" : {
       "comment" : "Camera (U06): under 'Turn your phone upright'",
       "extractionState" : "manual",
@@ -1243,14 +1231,26 @@
         }
       }
     },
-    "9:16 · Phone" : {
-      "comment" : "New movie (F04): tall shape option",
+    "16:9 · TV" : {
+      "comment" : "New movie (F04): wide shape option",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "9:16 · Phone"
+            "value" : "16:9 · TV"
+          }
+        }
+      }
+    },
+    "16:9 records in landscape" : {
+      "comment" : "Camera (U03): under 'Turn your phone sideways'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:9 records in landscape"
           }
         }
       }
@@ -1431,6 +1431,18 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "about 1 min" : {
+      "comment" : "New movie (F04): Quick's length",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about 1 min"
           }
         }
       }
@@ -1639,6 +1651,18 @@
         }
       }
     },
+    "All · %lld" : {
+      "comment" : "New movie (F05): switch option showing every moment, with the count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All · %lld"
+          }
+        }
+      }
+    },
     "All places" : {
       "comment" : "Map (P01): opens every place as a list - the map's accessible alternative; also that list's title.",
       "extractionState" : "manual",
@@ -1659,18 +1683,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All time"
-          }
-        }
-      }
-    },
-    "All · %lld" : {
-      "comment" : "New movie (F05): switch option showing every moment, with the count",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All · %lld"
           }
         }
       }
@@ -1719,6 +1731,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "An archive keeps everything together with a list of dates, notes and places that any computer can read."
+          }
+        }
+      }
+    },
+    "an ordinary afternoon" : {
+      "comment" : "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "an ordinary afternoon"
           }
         }
       }
@@ -1779,6 +1803,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appearance"
+          }
+        }
+      }
+    },
+    "as a text file" : {
+      "comment" : "Export sheet (E01): under 'Note', how it's exported",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "as a text file"
+          }
+        }
+      }
+    },
+    "as an audio file" : {
+      "comment" : "Export sheet (E01): under 'Voice note', how it's exported",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "as an audio file"
           }
         }
       }
@@ -2203,6 +2251,30 @@
         }
       }
     },
+    "can be made again" : {
+      "comment" : "Storage (E09): detail of the Rendered movies row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "can be made again"
+          }
+        }
+      }
+    },
+    "can be made again from projects" : {
+      "comment" : "Backup options (E03): why rendered movies are optional",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "can be made again from projects"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Note editor (C08): drops the changes made since it opened; also closes the editor sheets and stops an export (F12); also backup and restore",
       "extractionState" : "manual",
@@ -2319,6 +2391,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Changes make a new version"
+          }
+        }
+      }
+    },
+    "checked, no problems" : {
+      "comment" : "Restore (E07): the backup was read and every file matched",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "checked, no problems"
           }
         }
       }
@@ -2443,6 +2527,18 @@
         }
       }
     },
+    "city level" : {
+      "comment" : "Import from Photos (E05): under 'Keep the place from Photos', only the city is kept",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "city level"
+          }
+        }
+      }
+    },
     "Clear" : {
       "comment" : "Search (M08): clears the search field.",
       "extractionState" : "manual",
@@ -2463,294 +2559,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clear temporary files"
-          }
-        }
-      }
-    },
-    "Collapsed" : {
-      "comment" : "Map (P01): the places panel shows only its title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collapsed"
-          }
-        }
-      }
-    },
-    "Format" : {
-      "comment" : "Camera ••• sheet: section title over the 9:16 / 16:9 / 1:1 choice",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Format"
-          }
-        }
-      }
-    },
-    "Get a little surprise?" : {
-      "comment" : "Explainer title before the system notifications prompt, when surprises are turned on",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Get a little surprise?"
-          }
-        }
-      }
-    },
-    "Half screen" : {
-      "comment" : "Map (P01): the places panel fills half the screen",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Half screen"
-          }
-        }
-      }
-    },
-    "Halves" : {
-      "comment" : "H.8: both cameras, each filling half the frame, split across its long side",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Halves"
-          }
-        }
-      }
-    },
-    "In silent mode, photos never make a sound." : {
-      "comment" : "Camera settings (S03, ••• sheet): note under the Shutter sound toggle",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In silent mode, photos never make a sound."
-          }
-        }
-      }
-    },
-    "Last moment" : {
-      "comment" : "Camera (U01): VoiceOver label of the last capture's thumbnail, which opens it",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last moment"
-          }
-        }
-      }
-    },
-    "Layout" : {
-      "comment" : "Camera and viewer ••• menus (H.8): the selfie in its window, or both cameras in halves",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Layout"
-          }
-        }
-      }
-    },
-    "MimoDays only adds what you save. It can't see the rest of your library." : {
-      "comment" : "Explainer message before the system Photos (add only) prompt",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MimoDays only adds what you save. It can't see the rest of your library."
-          }
-        }
-      }
-    },
-    "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device." : {
-      "comment" : "Explainer message before the system location prompt",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device."
-          }
-        }
-      }
-    },
-    "Motion" : {
-      "comment" : "Settings › Appearance (H.9): section title over the switches for videos playing in tiles",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Motion"
-          }
-        }
-      }
-    },
-    "Now and then, at a random time within your hours, MimoDays sends one notification to catch the moment. No streaks, no nagging. Pause or turn it off any time." : {
-      "comment" : "Explainer message before the system notifications prompt",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Now and then, at a random time within your hours, MimoDays sends one notification to catch the moment. No streaks, no nagging. Pause or turn it off any time."
-          }
-        }
-      }
-    },
-    "Recent places panel" : {
-      "comment" : "Map (P01): VoiceOver label of the panel's grabber",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recent places panel"
-          }
-        }
-      }
-    },
-    "Remember where it happened?" : {
-      "comment" : "Explainer title before the system location prompt (a moment's place, or where I am on the map)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remember where it happened?"
-          }
-        }
-      }
-    },
-    "Save to your photos?" : {
-      "comment" : "Explainer title before the system Photos (add only) prompt, on the first save to Photos",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save to your photos?"
-          }
-        }
-      }
-    },
-    "Say a few words?" : {
-      "comment" : "Explainer title before the system microphone prompt, from Voice note",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Say a few words?"
-          }
-        }
-      }
-    },
-    "Selfie half" : {
-      "comment" : "Memory Card (H.8): VoiceOver label of the selfie camera's half of the card",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selfie half"
-          }
-        }
-      }
-    },
-    "Show the introduction again" : {
-      "comment" : "Help & about (S07): opens onboarding again from its first page",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show the introduction again"
-          }
-        }
-      }
-    },
-    "Shutter sound" : {
-      "comment" : "Camera settings (S03, ••• sheet): toggle, the sound a photo makes where iOS allows turning it off",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shutter sound"
-          }
-        }
-      }
-    },
-    "Telephoto" : {
-      "comment" : "Camera ••• sheet: the rear camera choice, the zoom lens",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Telephoto"
-          }
-        }
-      }
-    },
-    "That place couldn't take the file. Nothing was changed." : {
-      "comment" : "Backup (15.1): alert message when saving the backup to the chosen place failed (offline drive, no room there)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "That place couldn't take the file. Nothing was changed."
-          }
-        }
-      }
-    },
-    "The backup wasn't saved" : {
-      "comment" : "Backup (15.1): alert title when the place chosen in Files couldn't take the backup file",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The backup wasn't saved"
-          }
-        }
-      }
-    },
-    "The microphone records only while you are recording a voice note. Voice notes stay on your device." : {
-      "comment" : "Explainer message before the system microphone prompt, from Voice note",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The microphone records only while you are recording a voice note. Voice notes stay on your device."
-          }
-        }
-      }
-    },
-    "Transition title: clip %lld" : {
-      "comment" : "U53: a clip in the transition sheet's title, e.g. clip 2",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "clip %lld"
           }
         }
       }
@@ -2835,6 +2643,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coffee, rain, and one stubborn bug."
+          }
+        }
+      }
+    },
+    "Collapsed" : {
+      "comment" : "Map (P01): the places panel shows only its title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapsed"
           }
         }
       }
@@ -3271,6 +3091,18 @@
         }
       }
     },
+    "Delete “%@”?" : {
+      "comment" : "Collection (M12): delete confirmation title with the collection's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete “%@”?"
+          }
+        }
+      }
+    },
     "Delete %lld moments" : {
       "comment" : "Delete sheet (M15) button for several moments.",
       "extractionState" : "manual",
@@ -3483,18 +3315,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete voice note"
-          }
-        }
-      }
-    },
-    "Delete “%@”?" : {
-      "comment" : "Collection (M12): delete confirmation title with the collection's name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete “%@”?"
           }
         }
       }
@@ -3819,6 +3639,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Every file checked and readable"
+          }
+        }
+      }
+    },
+    "every moment · %@" : {
+      "comment" : "New movie (F04): Full's length. %@: how long, e.g. 2:40",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "every moment · %@"
           }
         }
       }
@@ -4207,6 +4039,18 @@
         }
       }
     },
+    "Format" : {
+      "comment" : "Camera ••• sheet: section title over the 9:16 / 16:9 / 1:1 choice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      }
+    },
     "Format locked while recording: %@" : {
       "comment" : "Camera (U05): spoken for the lock chip while a video records, e.g. 'Format locked while recording: Horizontal, 16 by 9'",
       "extractionState" : "manual",
@@ -4243,6 +4087,18 @@
         }
       }
     },
+    "front and back separately" : {
+      "comment" : "Export (E02): under 'Original camera files'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "front and back separately"
+          }
+        }
+      }
+    },
     "Full" : {
       "comment" : "New movie (F04): length option; also the Movies & export settings (S06) Length value",
       "extractionState" : "manual",
@@ -4251,6 +4107,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Full"
+          }
+        }
+      }
+    },
+    "Get a little surprise?" : {
+      "comment" : "Explainer title before the system notifications prompt, when surprises are turned on",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get a little surprise?"
           }
         }
       }
@@ -4267,6 +4135,18 @@
         }
       }
     },
+    "good dog" : {
+      "comment" : "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "good dog"
+          }
+        }
+      }
+    },
     "Group moments that belong together, like a trip or someone's firsts." : {
       "comment" : "Collections: what collections are for, when there are none.",
       "extractionState" : "manual",
@@ -4275,6 +4155,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Group moments that belong together, like a trip or someone's firsts."
+          }
+        }
+      }
+    },
+    "Half screen" : {
+      "comment" : "Map (P01): the places panel fills half the screen",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Half screen"
+          }
+        }
+      }
+    },
+    "Halves" : {
+      "comment" : "H.8: both cameras, each filling half the frame, split across its long side",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halves"
           }
         }
       }
@@ -4327,6 +4231,18 @@
         }
       }
     },
+    "hidden unless you turn it on" : {
+      "comment" : "Export sheet (E01): under 'Exact place', it's off by default",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hidden unless you turn it on"
+          }
+        }
+      }
+    },
     "Higher contrast" : {
       "comment" : "Appearance settings (S04): switch for the high-contrast colours",
       "extractionState" : "manual",
@@ -4351,18 +4267,6 @@
         }
       }
     },
-    "How MimoDays uses your data" : {
-      "comment" : "Privacy settings (S05): row and title of the privacy statement",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "How MimoDays uses your data"
-          }
-        }
-      }
-    },
     "How it works" : {
       "comment" : "Help & about (S07): section title",
       "extractionState" : "manual",
@@ -4383,6 +4287,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "How long, what shape?"
+          }
+        }
+      }
+    },
+    "How MimoDays uses your data" : {
+      "comment" : "Privacy settings (S05): row and title of the privacy statement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How MimoDays uses your data"
           }
         }
       }
@@ -4447,18 +4363,6 @@
         }
       }
     },
-    "Imported from Photos, %@" : {
-      "comment" : "VoiceOver: a moment imported from Photos, then its date",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imported from Photos, %@"
-          }
-        }
-      }
-    },
     "Imported · %@" : {
       "comment" : "Origin of a moment imported from Photos, before its date: \"Imported · Jun 3, 2024 · 4:10 PM\"",
       "extractionState" : "manual",
@@ -4467,6 +4371,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imported · %@"
+          }
+        }
+      }
+    },
+    "Imported from Photos, %@" : {
+      "comment" : "VoiceOver: a moment imported from Photos, then its date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imported from Photos, %@"
           }
         }
       }
@@ -4495,6 +4411,18 @@
         }
       }
     },
+    "In silent mode, photos never make a sound." : {
+      "comment" : "Camera settings (S03, ••• sheet): note under the Shutter sound toggle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In silent mode, photos never make a sound."
+          }
+        }
+      }
+    },
     "Include" : {
       "comment" : "Export (E02) section header above what goes into the export (shown in capitals)",
       "extractionState" : "manual",
@@ -4503,6 +4431,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Include"
+          }
+        }
+      }
+    },
+    "iOS's own screens, like permission requests, switch the next time MimoDays opens." : {
+      "comment" : "Language settings: what follows a switch only after MimoDays opens again",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS's own screens, like permission requests, switch the next time MimoDays opens."
           }
         }
       }
@@ -4543,6 +4483,18 @@
         }
       }
     },
+    "Keep editing" : {
+      "comment" : "Review (C07): button in the Retake confirmation that stays on review",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep editing"
+          }
+        }
+      }
+    },
     "Keep MimoDays independent." : {
       "comment" : "Donations (D01-D04): headline",
       "extractionState" : "manual",
@@ -4567,18 +4519,6 @@
         }
       }
     },
-    "Keep editing" : {
-      "comment" : "Review (C07): button in the Retake confirmation that stays on review",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keep editing"
-          }
-        }
-      }
-    },
     "Keep the place from Photos" : {
       "comment" : "Import from Photos (E05) switch: keep where each photo was taken",
       "extractionState" : "manual",
@@ -4587,6 +4527,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keep the place from Photos"
+          }
+        }
+      }
+    },
+    "kitchen table" : {
+      "comment" : "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kitchen table"
           }
         }
       }
@@ -4627,6 +4579,18 @@
         }
       }
     },
+    "Last moment" : {
+      "comment" : "Camera (U01): VoiceOver label of the last capture's thumbnail, which opens it",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last moment"
+          }
+        }
+      }
+    },
     "Last month" : {
       "comment" : "New movie (F02): source row, and F16's sentence subject",
       "extractionState" : "manual",
@@ -4659,6 +4623,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Latest"
+          }
+        }
+      }
+    },
+    "Layout" : {
+      "comment" : "Camera and viewer ••• menus (H.8): the selfie in its window, or both cameras in halves",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
           }
         }
       }
@@ -4975,6 +4951,54 @@
         }
       }
     },
+    "matched in caption" : {
+      "comment" : "Search (M08): under a result, the words were found in its caption.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "matched in caption"
+          }
+        }
+      }
+    },
+    "matched in note" : {
+      "comment" : "Search (M08): under a result, the words were found in its written note.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "matched in note"
+          }
+        }
+      }
+    },
+    "matched in place" : {
+      "comment" : "Search (M08): under a result, the words were found in its place name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "matched in place"
+          }
+        }
+      }
+    },
+    "matched in voice note" : {
+      "comment" : "Search (M08): under a result, the words were found in what was said in its voice note.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "matched in voice note"
+          }
+        }
+      }
+    },
     "Maybe later" : {
       "comment" : "Surprise schedule (onboarding O07): secondary button, skips reminders for now",
       "extractionState" : "manual",
@@ -5071,6 +5095,18 @@
         }
       }
     },
+    "MimoDays only adds what you save. It can't see the rest of your library." : {
+      "comment" : "Explainer message before the system Photos (add only) prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays only adds what you save. It can't see the rest of your library."
+          }
+        }
+      }
+    },
     "MimoDays uses them only while the camera is open or you record a voice note. A surprise never opens the camera by itself." : {
       "comment" : "Privacy statement (S05): camera and microphone use",
       "extractionState" : "manual",
@@ -5079,6 +5115,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "MimoDays uses them only while the camera is open or you record a voice note. A surprise never opens the camera by itself."
+          }
+        }
+      }
+    },
+    "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device." : {
+      "comment" : "Explainer message before the system location prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device."
           }
         }
       }
@@ -5103,6 +5151,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moments"
+          }
+        }
+      }
+    },
+    "Moments · %lld" : {
+      "comment" : "Search (M08): section of matching moments with how many there are.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments · %lld"
           }
         }
       }
@@ -5167,18 +5227,6 @@
         }
       }
     },
-    "Moments · %lld" : {
-      "comment" : "Search (M08): section of matching moments with how many there are.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moments · %lld"
-          }
-        }
-      }
-    },
     "Moments, notes and voice" : {
       "comment" : "Backup options (E03): row with the size of the moments",
       "extractionState" : "manual",
@@ -5227,6 +5275,18 @@
         }
       }
     },
+    "Motion" : {
+      "comment" : "Settings › Appearance (H.9): section title over the switches for videos playing in tiles",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motion"
+          }
+        }
+      }
+    },
     "Move earlier" : {
       "comment" : "Movie editor timeline: VoiceOver action that moves a clip one place earlier",
       "extractionState" : "manual",
@@ -5259,6 +5319,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Movie"
+          }
+        }
+      }
+    },
+    "Movie · %@ · %@ · %@ · made %@" : {
+      "comment" : "F15: a rendered movie's length, shape, quality and the day it was made",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movie · %1$@ · %2$@ · %3$@ · made %4$@"
           }
         }
       }
@@ -5347,18 +5419,6 @@
         }
       }
     },
-    "Movie · %@ · %@ · %@ · made %@" : {
-      "comment" : "F15: a rendered movie's length, shape, quality and the day it was made",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Movie · %1$@ · %2$@ · %3$@ · made %4$@"
-          }
-        }
-      }
-    },
     "Movies" : {
       "comment" : "Tab: movies made from moments",
       "extractionState" : "manual",
@@ -5415,42 +5475,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Music"
-          }
-        }
-      }
-    },
-    "Ultra wide" : {
-      "comment" : "Camera ••• sheet: the rear camera choice, the 0.5× lens",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ultra wide"
-          }
-        }
-      }
-    },
-    "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger." : {
-      "comment" : "Settings › Appearance (H.9): the note under the Motion switches",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger."
-          }
-        }
-      }
-    },
-    "Wide" : {
-      "comment" : "Camera ••• sheet: the rear camera choice, the main 1× lens",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wide"
           }
         }
       }
@@ -6139,14 +6163,26 @@
         }
       }
     },
-    "OK" : {
-      "comment" : "Closes an alert",
+    "now" : {
+      "comment" : "Time on the sample notification in onboarding art",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OK"
+            "value" : "now"
+          }
+        }
+      }
+    },
+    "Now and then, at a random time within your hours, MimoDays sends one notification to catch the moment. No streaks, no nagging. Pause or turn it off any time." : {
+      "comment" : "Explainer message before the system notifications prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now and then, at a random time within your hours, MimoDays sends one notification to catch the moment. No streaks, no nagging. Pause or turn it off any time."
           }
         }
       }
@@ -6159,6 +6195,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Off"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "comment" : "Closes an alert",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
@@ -6439,6 +6487,18 @@
         }
       }
     },
+    "Open iOS Settings" : {
+      "comment" : "Onboarding O08c button, opens the app's notification settings in iOS Settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open iOS Settings"
+          }
+        }
+      }
+    },
     "Open Recently deleted" : {
       "comment" : "Why Face ID is asked for: to open Recently deleted",
       "extractionState" : "manual",
@@ -6463,14 +6523,14 @@
         }
       }
     },
-    "Open iOS Settings" : {
-      "comment" : "Onboarding O08c button, opens the app's notification settings in iOS Settings",
+    "Opens in" : {
+      "comment" : "Camera settings: section title, which mode the camera opens in (Photo/Video)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open iOS Settings"
+            "value" : "Opens in"
           }
         }
       }
@@ -6483,30 +6543,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opens iOS Settings for MimoDays."
-          }
-        }
-      }
-    },
-    "Opens iOS Settings, where each app can use its own language." : {
-      "comment" : "Appearance settings (S04): note under Language",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opens iOS Settings, where each app can use its own language."
-          }
-        }
-      }
-    },
-    "Opens in" : {
-      "comment" : "Camera settings: section title, which mode the camera opens in (Photo/Video)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opens in"
           }
         }
       }
@@ -6723,6 +6759,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Photos and videos that don't match the shape"
+          }
+        }
+      }
+    },
+    "photos, videos, selfie windows" : {
+      "comment" : "Storage (E09): detail of the Moments row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "photos, videos, selfie windows"
           }
         }
       }
@@ -7015,6 +7063,18 @@
         }
       }
     },
+    "previews and thumbnails" : {
+      "comment" : "Storage (E09): detail of the Temporary files row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "previews and thumbnails"
+          }
+        }
+      }
+    },
     "Previous moment" : {
       "comment" : "Memory Card (U25): VoiceOver action that moves to the previous moment in the list the card was opened from",
       "extractionState" : "manual",
@@ -7195,6 +7255,18 @@
         }
       }
     },
+    "Recent places panel" : {
+      "comment" : "Map (P01): VoiceOver label of the panel's grabber",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent places panel"
+          }
+        }
+      }
+    },
     "Recently deleted" : {
       "comment" : "Recently deleted (M16) title, and its row at the bottom of Collections (M11).; also Storage (E09)",
       "extractionState" : "manual",
@@ -7347,6 +7419,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recover all"
+          }
+        }
+      }
+    },
+    "Remember where it happened?" : {
+      "comment" : "Explainer title before the system location prompt (a moment's place, or where I am on the map)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remember where it happened?"
           }
         }
       }
@@ -7735,6 +7819,18 @@
         }
       }
     },
+    "Same as iPhone" : {
+      "comment" : "Language settings: follow the iPhone's language",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same as iPhone"
+          }
+        }
+      }
+    },
     "Save" : {
       "comment" : "Review (C07): primary button that keeps the moment; also the movie page (F15) button that adds the movie to Photos",
       "extractionState" : "manual",
@@ -7807,6 +7903,18 @@
         }
       }
     },
+    "Save to your photos?" : {
+      "comment" : "Explainer title before the system Photos (add only) prompt, on the first save to Photos",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to your photos?"
+          }
+        }
+      }
+    },
     "Saved" : {
       "comment" : "Movie page (F15): the Save button after the movie is saved",
       "extractionState" : "manual",
@@ -7863,6 +7971,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Say a few words, write a note, or save the moment without a caption. Time is recorded automatically. Location is optional."
+          }
+        }
+      }
+    },
+    "Say a few words?" : {
+      "comment" : "Explainer title before the system microphone prompt, from Voice note",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say a few words?"
           }
         }
       }
@@ -8019,6 +8139,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Selfie"
+          }
+        }
+      }
+    },
+    "Selfie half" : {
+      "comment" : "Memory Card (H.8): VoiceOver label of the selfie camera's half of the card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selfie half"
           }
         }
       }
@@ -8299,6 +8431,18 @@
         }
       }
     },
+    "Show the introduction again" : {
+      "comment" : "Help & about (S07): opens onboarding again from its first page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the introduction again"
+          }
+        }
+      }
+    },
     "Show the whole day" : {
       "comment" : "Viewer ••• menu item: open the day this moment belongs to.",
       "extractionState" : "manual",
@@ -8371,6 +8515,18 @@
         }
       }
     },
+    "Shutter sound" : {
+      "comment" : "Camera settings (S03, ••• sheet): toggle, the sound a photo makes where iOS allows turning it off",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shutter sound"
+          }
+        }
+      }
+    },
     "Side by side" : {
       "comment" : "U52: both cameras, each filling half",
       "extractionState" : "manual",
@@ -8439,6 +8595,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Small"
+          }
+        }
+      }
+    },
+    "some files are damaged" : {
+      "comment" : "Restore (E07): the backup was read and some files didn't match",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "some files are damaged"
           }
         }
       }
@@ -8707,6 +8875,30 @@
         }
       }
     },
+    "surprise" : {
+      "comment" : "Tag on a moment captured from a surprise notification (Today hero, T03), and in VoiceOver descriptions. Lowercase in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "surprise"
+          }
+        }
+      }
+    },
+    "Surprise · %@" : {
+      "comment" : "Origin of a moment, before its date and time in the viewer: \"Surprise · Wed, Nov 11 · 6:42 PM\"",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surprise · %@"
+          }
+        }
+      }
+    },
     "Surprise me" : {
       "comment" : "Surprise settings (S02): the switch that turns surprises on or off",
       "extractionState" : "manual",
@@ -8727,18 +8919,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Surprise moment, %@"
-          }
-        }
-      }
-    },
-    "Surprise · %@" : {
-      "comment" : "Origin of a moment, before its date and time in the viewer: \"Surprise · Wed, Nov 11 · 6:42 PM\"",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Surprise · %@"
           }
         }
       }
@@ -8911,6 +9091,18 @@
         }
       }
     },
+    "Telephoto" : {
+      "comment" : "Camera ••• sheet: the rear camera choice, the zoom lens",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telephoto"
+          }
+        }
+      }
+    },
     "Temporary files" : {
       "comment" : "Storage (E09): row for cache and temporary files",
       "extractionState" : "manual",
@@ -9007,6 +9199,18 @@
         }
       }
     },
+    "That place couldn't take the file. Nothing was changed." : {
+      "comment" : "Backup (15.1): alert message when saving the backup to the chosen place failed (offline drive, no room there)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That place couldn't take the file. Nothing was changed."
+          }
+        }
+      }
+    },
     "That surprise has passed. Catch a moment anyway?" : {
       "comment" : "Surprise ribbon on Today (T04): today's surprise expired without a moment. Gentle, no guilt.",
       "extractionState" : "manual",
@@ -9051,6 +9255,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The backup couldn't be restored"
+          }
+        }
+      }
+    },
+    "The backup wasn't saved" : {
+      "comment" : "Backup (15.1): alert title when the place chosen in Files couldn't take the backup file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup wasn't saved"
           }
         }
       }
@@ -9183,6 +9399,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The microphone records only while you are recording a video or a voice note. You can say no: videos are still saved, just silent."
+          }
+        }
+      }
+    },
+    "The microphone records only while you are recording a voice note. Voice notes stay on your device." : {
+      "comment" : "Explainer message before the system microphone prompt, from Voice note",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The microphone records only while you are recording a voice note. Voice notes stay on your device."
           }
         }
       }
@@ -9411,6 +9639,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The video, selfie window, note and voice note move to Recently deleted. You can bring them back within 30 days."
+          }
+        }
+      }
+    },
+    "the world around you" : {
+      "comment" : "Onboarding art caption on the back-camera sample (handwritten)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "the world around you"
           }
         }
       }
@@ -9756,49 +9996,7 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "variations" : {
-            "device" : {
-              "ipad" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "This removes %1$#@moments@, %2$#@collections@, %3$#@projects@ and all settings from this iPad. It can't be undone. Backups saved in Files are not touched."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "This removes %lld moments, %lld collections, %lld movie projects and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched."
-                }
-              },
-              "iphone" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "This removes %1$#@moments@, %2$#@collections@, %3$#@projects@ and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched."
-                }
-              }
-            }
-          },
           "substitutions" : {
-            "moments" : {
-              "argNum" : 1,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg moment"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg moments"
-                    }
-                  }
-                }
-              }
-            },
             "collections" : {
               "argNum" : 2,
               "formatSpecifier" : "lld",
@@ -9814,6 +10012,26 @@
                     "stringUnit" : {
                       "state" : "translated",
                       "value" : "%arg collections"
+                    }
+                  }
+                }
+              }
+            },
+            "moments" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moment"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg moments"
                     }
                   }
                 }
@@ -9836,6 +10054,28 @@
                       "value" : "%arg movie projects"
                     }
                   }
+                }
+              }
+            }
+          },
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This removes %1$#@moments@, %2$#@collections@, %3$#@projects@ and all settings from this iPad. It can't be undone. Backups saved in Files are not touched."
+                }
+              },
+              "iphone" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This removes %1$#@moments@, %2$#@collections@, %3$#@projects@ and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This removes %lld moments, %lld collections, %lld movie projects and all settings from this iPhone. It can't be undone. Backups saved in Files are not touched."
                 }
               }
             }
@@ -10119,6 +10359,18 @@
         }
       }
     },
+    "train window" : {
+      "comment" : "Onboarding art caption on a sample photo (handwritten)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "train window"
+          }
+        }
+      }
+    },
     "Transcribed on this iPhone" : {
       "comment" : "Voice note card (C10): small line under the transcript; the words were worked out on the device, nothing was sent anywhere. On iPad it says iPad.",
       "extractionState" : "manual",
@@ -10163,6 +10415,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Transition into item %lld"
+          }
+        }
+      }
+    },
+    "Transition title: clip %lld" : {
+      "comment" : "U53: a clip in the transition sheet's title, e.g. clip 2",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "clip %lld"
           }
         }
       }
@@ -10403,6 +10667,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type %@ to confirm"
+          }
+        }
+      }
+    },
+    "Ultra wide" : {
+      "comment" : "Camera ••• sheet: the rear camera choice, the 0.5× lens",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultra wide"
           }
         }
       }
@@ -10683,6 +10959,18 @@
         }
       }
     },
+    "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger." : {
+      "comment" : "Settings › Appearance (H.9): the note under the Motion switches",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger."
+          }
+        }
+      }
+    },
     "Videos will be silent. Turn on the microphone in Settings to add sound." : {
       "comment" : "Camera note (C13b): video mode with sound on while the microphone is turned off in Settings.",
       "extractionState" : "manual",
@@ -10887,6 +11175,18 @@
         }
       }
     },
+    "what you see" : {
+      "comment" : "Empty Today hero (T01): label under the placeholder for the back camera's picture. Lowercase, handwritten.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "what you see"
+          }
+        }
+      }
+    },
     "What's it about?" : {
       "comment" : "New movie (F02): step 1 question",
       "extractionState" : "manual",
@@ -10895,6 +11195,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "What's it about?"
+          }
+        }
+      }
+    },
+    "whatever is in front of you" : {
+      "comment" : "Onboarding art caption on the back-camera sample (handwritten)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "whatever is in front of you"
           }
         }
       }
@@ -10971,6 +11283,18 @@
         }
       }
     },
+    "Wide" : {
+      "comment" : "Camera ••• sheet: the rear camera choice, the main 1× lens",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wide"
+          }
+        }
+      }
+    },
     "Will be removed in %lld days." : {
       "comment" : "Deleted moment (M16b): how long until it goes for good.",
       "extractionState" : "manual",
@@ -11019,6 +11343,18 @@
         }
       }
     },
+    "with selfie" : {
+      "comment" : "VoiceOver: ends a moment's description when it has a selfie window, e.g. \"Photo, Today, 2:37 PM, with selfie\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "with selfie"
+          }
+        }
+      }
+    },
     "Without a place" : {
       "comment" : "Title of the screen listing moments that have no place (P05b).",
       "extractionState" : "manual",
@@ -11063,6 +11399,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yesterday, %@"
+          }
+        }
+      }
+    },
+    "you" : {
+      "comment" : "Onboarding art caption on the selfie sample (handwritten); also the label under the selfie placeholder on the empty Today hero (T01)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "you"
           }
         }
       }
@@ -11135,6 +11483,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can still change any of these for a single movie or export."
+          }
+        }
+      }
+    },
+    "you choose" : {
+      "comment" : "New movie (F04): Custom's length",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "you choose"
           }
         }
       }
@@ -11319,6 +11679,18 @@
         }
       }
     },
+    "your passcode" : {
+      "comment" : "What unlocks the app when the iPhone has no Face ID, as in 'Lock with your passcode'",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "your passcode"
+          }
+        }
+      }
+    },
     "Your photos, videos, voice notes, notes, places, collections and movies are kept in MimoDays on this iPhone. There is no account and no MimoDays server." : {
       "comment" : "Privacy statement (S05): what is kept where. On iPad it says iPad.",
       "extractionState" : "manual",
@@ -11363,366 +11735,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your support keeps the app going."
-          }
-        }
-      }
-    },
-    "about 1 min" : {
-      "comment" : "New movie (F04): Quick's length",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "about 1 min"
-          }
-        }
-      }
-    },
-    "an ordinary afternoon" : {
-      "comment" : "Onboarding art caption on a sample photo (handwritten)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "an ordinary afternoon"
-          }
-        }
-      }
-    },
-    "as a text file" : {
-      "comment" : "Export sheet (E01): under 'Note', how it's exported",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "as a text file"
-          }
-        }
-      }
-    },
-    "as an audio file" : {
-      "comment" : "Export sheet (E01): under 'Voice note', how it's exported",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "as an audio file"
-          }
-        }
-      }
-    },
-    "train window" : {
-      "comment" : "Onboarding art caption on a sample photo (handwritten)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "train window"
-          }
-        }
-      }
-    },
-    "can be made again" : {
-      "comment" : "Storage (E09): detail of the Rendered movies row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "can be made again"
-          }
-        }
-      }
-    },
-    "can be made again from projects" : {
-      "comment" : "Backup options (E03): why rendered movies are optional",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "can be made again from projects"
-          }
-        }
-      }
-    },
-    "checked, no problems" : {
-      "comment" : "Restore (E07): the backup was read and every file matched",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "checked, no problems"
-          }
-        }
-      }
-    },
-    "city level" : {
-      "comment" : "Import from Photos (E05): under 'Keep the place from Photos', only the city is kept",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "city level"
-          }
-        }
-      }
-    },
-    "good dog" : {
-      "comment" : "Onboarding art caption on a sample photo (handwritten)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "good dog"
-          }
-        }
-      }
-    },
-    "every moment · %@" : {
-      "comment" : "New movie (F04): Full's length. %@: how long, e.g. 2:40",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "every moment · %@"
-          }
-        }
-      }
-    },
-    "front and back separately" : {
-      "comment" : "Export (E02): under 'Original camera files'",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "front and back separately"
-          }
-        }
-      }
-    },
-    "hidden unless you turn it on" : {
-      "comment" : "Export sheet (E01): under 'Exact place', it's off by default",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "hidden unless you turn it on"
-          }
-        }
-      }
-    },
-    "kitchen table" : {
-      "comment" : "Onboarding art caption on a sample photo (handwritten)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kitchen table"
-          }
-        }
-      }
-    },
-    "matched in caption" : {
-      "comment" : "Search (M08): under a result, the words were found in its caption.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "matched in caption"
-          }
-        }
-      }
-    },
-    "matched in note" : {
-      "comment" : "Search (M08): under a result, the words were found in its written note.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "matched in note"
-          }
-        }
-      }
-    },
-    "matched in place" : {
-      "comment" : "Search (M08): under a result, the words were found in its place name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "matched in place"
-          }
-        }
-      }
-    },
-    "matched in voice note" : {
-      "comment" : "Search (M08): under a result, the words were found in what was said in its voice note.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "matched in voice note"
-          }
-        }
-      }
-    },
-    "now" : {
-      "comment" : "Time on the sample notification in onboarding art",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "now"
-          }
-        }
-      }
-    },
-    "photos, videos, selfie windows" : {
-      "comment" : "Storage (E09): detail of the Moments row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "photos, videos, selfie windows"
-          }
-        }
-      }
-    },
-    "previews and thumbnails" : {
-      "comment" : "Storage (E09): detail of the Temporary files row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "previews and thumbnails"
-          }
-        }
-      }
-    },
-    "some files are damaged" : {
-      "comment" : "Restore (E07): the backup was read and some files didn't match",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "some files are damaged"
-          }
-        }
-      }
-    },
-    "surprise" : {
-      "comment" : "Tag on a moment captured from a surprise notification (Today hero, T03), and in VoiceOver descriptions. Lowercase in English.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "surprise"
-          }
-        }
-      }
-    },
-    "the world around you" : {
-      "comment" : "Onboarding art caption on the back-camera sample (handwritten)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "the world around you"
-          }
-        }
-      }
-    },
-    "what you see" : {
-      "comment" : "Empty Today hero (T01): label under the placeholder for the back camera's picture. Lowercase, handwritten.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "what you see"
-          }
-        }
-      }
-    },
-    "whatever is in front of you" : {
-      "comment" : "Onboarding art caption on the back-camera sample (handwritten)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "whatever is in front of you"
-          }
-        }
-      }
-    },
-    "with selfie" : {
-      "comment" : "VoiceOver: ends a moment's description when it has a selfie window, e.g. \"Photo, Today, 2:37 PM, with selfie\".",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "with selfie"
-          }
-        }
-      }
-    },
-    "you" : {
-      "comment" : "Onboarding art caption on the selfie sample (handwritten); also the label under the selfie placeholder on the empty Today hero (T01)",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "you"
-          }
-        }
-      }
-    },
-    "you choose" : {
-      "comment" : "New movie (F04): Custom's length",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "you choose"
-          }
-        }
-      }
-    },
-    "your passcode" : {
-      "comment" : "What unlocks the app when the iPhone has no Face ID, as in 'Lock with your passcode'",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "your passcode"
           }
         }
       }

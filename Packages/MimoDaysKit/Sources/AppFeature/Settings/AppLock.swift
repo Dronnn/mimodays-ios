@@ -81,7 +81,7 @@ final class AppLock {
     /// The lock screen's button, and the first ask at launch.
     func unlock() async {
         guard isLocked, !isAuthenticating else { return }
-        if await confirm(String(localized: "Unlock MimoDays", bundle: .module, comment: "Why Face ID is asked for: to open the locked app")) {
+        if await confirm(String(appLocalized: "Unlock MimoDays", bundle: .module, comment: "Why Face ID is asked for: to open the locked app")) {
             isLocked = false
         }
     }
@@ -109,7 +109,7 @@ extension AppLock.Biometry {
         case .faceID: "Face ID"
         case .touchID: "Touch ID"
         case .opticID: "Optic ID"
-        case .passcode: String(localized: "your passcode", bundle: .module, comment: "What unlocks the app when the iPhone has no Face ID, as in 'Lock with your passcode'")
+        case .passcode: String(appLocalized: "your passcode", bundle: .module, comment: "What unlocks the app when the iPhone has no Face ID, as in 'Lock with your passcode'")
         }
     }
 }

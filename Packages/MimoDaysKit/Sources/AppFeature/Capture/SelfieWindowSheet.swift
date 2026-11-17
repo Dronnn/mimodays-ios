@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -72,6 +73,6 @@ extension CameraSettings.SelfieWindow.Scale {
 extension CameraSettings.SelfieWindow {
     /// VoiceOver value of the window, "Top right, Medium", joined the way the locale lists things.
     var accessibilityValue: String {
-        [String(localized: corner.title), String(localized: scale.title)].formatted(.list(type: .and, width: .narrow))
+        [String(appLocalized: corner.title), String(appLocalized: scale.title)].formatted(.list(type: .and, width: .narrow).locale(AppLanguage.shared.locale))
     }
 }

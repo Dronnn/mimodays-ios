@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import Persistence
 import SwiftUI
@@ -10,23 +11,16 @@ struct AppearanceSettingsScreen: View {
     var body: some View {
         if let preferences {
             @Bindable var preferences = preferences
-            AppearanceSettingsView(settings: $preferences.value, language: Self.language)
+            AppearanceSettingsView(settings: $preferences.value, language: AppLanguage.nativeName(AppLanguage.shared.locale.identifier))
         }
-    }
-
-    /// The language MimoDays shows itself in, in that language's own words for it ("English").
-    static var language: String {
-        let code = Bundle.main.preferredLocalizations.first ?? "en"
-        return Locale.current.localizedString(forIdentifier: code)?.capitalized(with: .current) ?? code
     }
 }
 
-/// S04: Light, Dark or System, higher contrast, and the language (set in iOS Settings).
+/// S04: Light, Dark or System, higher contrast, and the language.
 struct AppearanceSettingsView: View {
     @Binding var settings: AppearanceSettings
     let language: String
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(spacing: 0) {
@@ -54,18 +48,13 @@ struct AppearanceSettingsView: View {
                     motion
                         .padding(.top, 26)
                     DataCard {
-                        Button {
-                            if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
-                        } label: {
+                        NavigationLink(value: SettingsRoute.language) {
                             SettingsValueRow(title: Text("Language", bundle: .module), value: Text(verbatim: language))
                         }
                         .accessibilityIdentifier("appearanceSettings.language")
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 26)
-                    DataNote(text: Text("Opens iOS Settings, where each app can use its own language.", bundle: .module))
-                        .padding(.horizontal, 22)
-                        .padding(.top, 12)
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 8)

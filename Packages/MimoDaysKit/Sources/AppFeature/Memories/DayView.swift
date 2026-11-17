@@ -148,7 +148,7 @@ struct DayView: View {
             if places.isEmpty {
                 count
             } else {
-                Text("Day summary: \(count) · \(places.formatted(.list(type: .and)))", bundle: .module)
+                Text("Day summary: \(count) · \(places.formatted(.list(type: .and).locale(AppLanguage.shared.locale)))", bundle: .module)
             }
         }
         .textStyle(.noteMeta)

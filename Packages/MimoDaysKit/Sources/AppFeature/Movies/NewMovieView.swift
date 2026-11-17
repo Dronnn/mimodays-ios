@@ -823,7 +823,7 @@ struct LengthStep: View {
                 case .quick: Text("about 1 min", bundle: .module)
                 case .short: Text("3 to 5 min", bundle: .module)
                 case .full:
-                    let total = Duration.seconds(model.fullSeconds.rounded()).formatted(.time(pattern: .minuteSecond))
+                    let total = Duration.seconds(model.fullSeconds.rounded()).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
                     Text("every moment · \(total)", bundle: .module)
                 case .custom: Text("you choose", bundle: .module)
                 }

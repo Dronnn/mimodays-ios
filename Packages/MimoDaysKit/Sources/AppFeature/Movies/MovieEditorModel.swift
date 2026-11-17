@@ -385,10 +385,10 @@ final class MovieEditorModel {
 
     /// "clip 2", "the text card" (U53's title).
     func itemName(_ index: Int) -> String {
-        guard items.indices.contains(index) else { return String(localized: "the start", bundle: .module, comment: "U53: before the first item") }
-        if items[index].card != nil { return String(localized: "the text card", bundle: .module, comment: "U53: a text card in the title") }
+        guard items.indices.contains(index) else { return String(appLocalized: "the start", bundle: .module, comment: "U53: before the first item") }
+        if items[index].card != nil { return String(appLocalized: "the text card", bundle: .module, comment: "U53: a text card in the title") }
         let number = items.prefix(index + 1).count { $0.clip != nil }
-        let format = String(localized: "Transition title: clip %lld", defaultValue: "clip %lld", bundle: .module, comment: "U53: a clip in the transition sheet's title, e.g. clip 2")
+        let format = String(appLocalized: "Transition title: clip %lld", defaultValue: "clip %lld", bundle: .module, comment: "U53: a clip in the transition sheet's title, e.g. clip 2")
         return String(format: format, number)
     }
 
@@ -403,7 +403,7 @@ final class MovieEditorModel {
 
     /// A new card shows before the first clip; it can be dragged between clips afterwards.
     func addCard() {
-        let card = MovieTextCard(project: project, position: 0, text: String(localized: "A few words", bundle: .module, comment: "U51: a new text card's words, until they're changed"))
+        let card = MovieTextCard(project: project, position: 0, text: String(appLocalized: "A few words", bundle: .module, comment: "U51: a new text card's words, until they're changed"))
         edit {
             library.context.insert(card)
             renumber([.card(card)] + items)

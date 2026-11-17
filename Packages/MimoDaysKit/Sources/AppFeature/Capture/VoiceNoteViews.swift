@@ -123,12 +123,12 @@ struct VoiceRecordingSheet: View {
 
     /// "0:12".
     static func clock(_ seconds: TimeInterval) -> String {
-        Duration.seconds(Int(seconds.rounded(.down))).formatted(.time(pattern: .minuteSecond))
+        Duration.seconds(Int(seconds.rounded(.down))).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
     }
 
     /// "12 seconds", "1 minute".
     static func spoken(_ seconds: TimeInterval) -> String {
-        Duration.seconds(Int(seconds.rounded(.down))).formatted(.units(allowed: [.minutes, .seconds], width: .wide))
+        Duration.seconds(Int(seconds.rounded(.down))).formatted(.units(allowed: [.minutes, .seconds], width: .wide).locale(AppLanguage.shared.locale))
     }
 }
 

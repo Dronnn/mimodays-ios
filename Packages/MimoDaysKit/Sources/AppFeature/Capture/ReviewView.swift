@@ -249,7 +249,7 @@ struct ReviewView: View {
         if case let .lowStorage(shortfall) = saveError {
             // Rounded up to 10 MB: "about 40 MB".
             let rounded = (shortfall + 9_999_999) / 10_000_000 * 10_000_000
-            return Text("This moment is kept until you free up about \(rounded.formatted(.byteCount(style: .file))). Nothing is lost.", bundle: .module)
+            return Text("This moment is kept until you free up about \(rounded.formatted(.byteCount(style: .file).locale(AppLanguage.shared.locale))). Nothing is lost.", bundle: .module)
         }
         return Text("Nothing is lost. Try again in a moment.", bundle: .module)
     }
@@ -329,7 +329,7 @@ struct ReviewView: View {
 
     /// Copy approved by Andrew, 2026-11-13; the call version is the design's.
     private func interruptionText(_ interruption: CaptureInterruption) -> Text {
-        let at = Duration.seconds(model.keptSeconds).formatted(.time(pattern: .minuteSecond))
+        let at = Duration.seconds(model.keptSeconds).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
         return switch interruption {
         case .anotherApp: Text("A call stopped the recording at \(at). The part before the call is kept.", bundle: .module)
         case .background: Text("The recording stopped at \(at) when you left MimoDays. The part before is kept.", bundle: .module)

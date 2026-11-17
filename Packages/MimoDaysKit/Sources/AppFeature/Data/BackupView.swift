@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 import UniformTypeIdentifiers
@@ -318,7 +319,7 @@ struct BackupProgressView: View {
         case .collecting: Text("Collecting \(moments) moments", bundle: .module)
         case .packing:
             item == step
-                ? Text("Packing files · \(progress.formatted(.percent.precision(.fractionLength(0))))", bundle: .module)
+                ? Text("Packing files · \(progress.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.shared.locale)))", bundle: .module)
                 : Text("Packing files", bundle: .module)
         case .checking: Text("Checking the backup", bundle: .module)
         case .choosing: Text("Choosing where to save", bundle: .module)

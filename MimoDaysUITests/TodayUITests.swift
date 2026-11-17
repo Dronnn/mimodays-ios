@@ -67,8 +67,9 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(tab(1).isSelected)
     }
 
+    /// Make my movie starts a new movie (F02) on Movies, as Movies' own Make a movie does.
     @MainActor
-    func testTheMovieCardOpensMovies() {
+    func testTheMovieCardStartsANewMovie() {
         launch(.populated)
         let movie = app.buttons["today.movie"]
         // The seed saves its moments one by one; the card waits for the first.
@@ -78,6 +79,8 @@ final class TodayUITests: XCTestCase {
         if !movie.isHittable { app.swipeUp() }
         // On this day sits under the card; its cropped photo must not take the tap.
         movie.tap()
+        XCTAssertTrue(app.buttons["newMovie.source.thisYear"].waitForExistence(timeout: 5))
+        app.buttons["newMovie.close"].tap()
         XCTAssertTrue(tab(3).isSelected)
     }
 

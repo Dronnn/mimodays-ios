@@ -14,6 +14,9 @@ enum ArtFill {
     case token(ColorToken, opacity: Double = 1)
     /// Flat tone standing in for a photo until real images are added.
     case placeholder(UInt32)
+    /// A photo filling the shape: drawn over `frame` (the shape's bounds, before `rotation` about its centre) and
+    /// cut to the shape.
+    case photo(String, frame: CGRect, rotation: Double = 0)
     /// The app icon's coral gradient.
     case brandGradient
 }
@@ -64,6 +67,22 @@ struct ArtCanvas: View {
     @ViewBuilder
     private func layer(_ layer: ArtLayer) -> some View {
         switch layer {
+        case let .shape(asset, .photo(photo, frame, rotation), shadow):
+            Image(photo, bundle: .module)
+                .resizable()
+                .scaledToFill()
+                .frame(width: frame.width, height: frame.height)
+                .clipped()
+                .rotationEffect(.degrees(rotation))
+                .position(x: frame.midX, y: frame.midY)
+                .frame(width: size.width, height: size.height)
+                .mask {
+                    Image(asset, bundle: .module).resizable().frame(width: size.width, height: size.height)
+                }
+                .shadow(
+                    color: Color(hex: shadow?.color ?? 0).opacity(shadow?.opacity ?? 0),
+                    radius: shadow?.radius ?? 0, y: shadow?.y ?? 0
+                )
         case let .shape(asset, fill, shadow):
             Image(asset, bundle: .module)
                 .renderingMode(.template)
@@ -78,6 +97,8 @@ struct ArtCanvas: View {
             content.text
                 .textStyle(style)
                 .foregroundStyle(color.color)
+                // Light captions sit on photos; a soft shadow keeps them readable on bright ones.
+                .shadow(color: .black.opacity(color == .textOnCoral ? 0.45 : 0), radius: 2, y: 1)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .frame(maxWidth: width ?? 2 * min(center.x, size.width - center.x) - 8)
@@ -90,6 +111,7 @@ struct ArtCanvas: View {
         switch fill {
         case let .token(token, opacity): AnyShapeStyle(token.color.opacity(opacity))
         case let .placeholder(hex): AnyShapeStyle(Color(hex: hex))
+        case .photo: AnyShapeStyle(Color.clear)
         case .brandGradient: AnyShapeStyle(LinearGradient(colors: [Color(hex: 0xF27650), Color(hex: 0xE2582F)], startPoint: .top, endPoint: .bottom))
         }
     }

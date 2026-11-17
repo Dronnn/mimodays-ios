@@ -1,4 +1,5 @@
-// Generated from the Penpot onboarding art boards (O01-O06). Regenerate instead of editing by hand.
+// Generated from the Penpot onboarding art boards (O01-O06), then the photo frames filled with stills from the demo
+// footage and two captions changed to match them (2026-11-17).
 import DesignSystem
 import SwiftUI
 
@@ -8,14 +9,14 @@ extension OnboardingPage {
         case .welcome:
             [
                 .shape("onboardingWelcome01", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingWelcome02", .placeholder(0xB9A595), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .shape("onboardingWelcome02", .photo("onboardingPhotoWelcome02", frame: CGRect(x: 3.6, y: 44.8, width: 197.5, height: 166.4)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
                 .text(.localized(LocalizedStringResource("kitchen table", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 52, y: 71.9), rotation: -4),
                 .shape("onboardingWelcome03", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingWelcome04", .placeholder(0xC9B5A3), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
-                .text(.localized(LocalizedStringResource("bus window", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 211.7, y: 152.2), rotation: 5),
+                .shape("onboardingWelcome04", .photo("onboardingPhotoWelcome04", frame: CGRect(x: 169.7, y: 18.9, width: 187.5, height: 162.6)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .text(.localized(LocalizedStringResource("train window", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 211.7, y: 152.2), rotation: 5),
                 .shape("onboardingWelcome05", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingWelcome06", .placeholder(0xA48D7C), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
-                .text(.localized(LocalizedStringResource("dog asleep", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 146, y: 326.3), rotation: -2),
+                .shape("onboardingWelcome06", .photo("onboardingPhotoWelcome06", frame: CGRect(x: 102.0, y: 187.7, width: 188.3, height: 157.9)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .text(.localized(LocalizedStringResource("good dog", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 146, y: 326.3), rotation: -2),
                 .shape("onboardingWelcome07", .token(.accentApricot), shadow: nil),
                 .shape("onboardingWelcome08", .token(.accentCoralMark), shadow: nil),
                 .shape("onboardingWelcome09", .token(.accentSage), shadow: nil),
@@ -23,7 +24,7 @@ extension OnboardingPage {
         case .surprise:
             [
                 .shape("onboardingSurprise01", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingSurprise02", .placeholder(0xB49F8D), shadow: ArtShadow(color: 0x4B2938, opacity: 0.14, radius: 7, y: 4)),
+                .shape("onboardingSurprise02", .photo("onboardingPhotoSurprise02", frame: CGRect(x: 5, y: 35, width: 352, height: 290)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.14, radius: 7, y: 4)),
                 .shape("onboardingSurprise03", .token(.mediaFrame), shadow: nil),
                 .text(.localized(LocalizedStringResource("an ordinary afternoon", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 96, y: 290.5), rotation: 0),
                 .shape("onboardingSurprise04", .token(.surfaceCard, opacity: 0.94), shadow: ArtShadow(color: 0x4A2734, opacity: 0.16, radius: 12, y: 8)),
@@ -39,18 +40,18 @@ extension OnboardingPage {
         case .dualCamera:
             [
                 .shape("onboardingDualCamera01", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingDualCamera02", .placeholder(0xA08A79), shadow: ArtShadow(color: 0x4B2938, opacity: 0.14, radius: 7, y: 4)),
+                .shape("onboardingDualCamera02", .photo("onboardingPhotoDualCamera02", frame: CGRect(x: 5, y: 45, width: 352, height: 290)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.14, radius: 7, y: 4)),
                 .shape("onboardingDualCamera03", .token(.mediaFrame), shadow: nil),
                 .text(.localized(LocalizedStringResource("the world around you", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 91, y: 300.5), rotation: 0),
                 .shape("onboardingDualCamera04", .token(.mediaFrame), shadow: ArtShadow(color: 0x4B2938, opacity: 0.2, radius: 6, y: 4)),
-                .shape("onboardingDualCamera05", .placeholder(0xB9A89A), shadow: nil),
+                .shape("onboardingDualCamera05", .photo("onboardingPhotoDualCamera05", frame: CGRect(x: 243.2, y: 5.2, width: 105.3, height: 132.6), rotation: -5.4), shadow: nil),
                 .text(.localized(LocalizedStringResource("you", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.patrickHand, size: 17, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 269.2, y: 122.2), rotation: -5.4, width: 60),
                 .shape("onboardingDualCamera06", .token(.accentApricot), shadow: nil),
             ]
         case .voice:
             [
                 .shape("onboardingVoice01", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingVoice02", .placeholder(0xB7A190), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .shape("onboardingVoice02", .photo("onboardingPhotoVoice02", frame: CGRect(x: 7.5, y: 11.3, width: 227.6, height: 233.0)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
                 .shape("onboardingVoice03", .token(.surfaceCard), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
                 .shape("onboardingVoice04", .token(.actionCoral), shadow: nil),
                 .shape("onboardingVoice05", .token(.textOnCoral), shadow: nil),
@@ -65,28 +66,28 @@ extension OnboardingPage {
         case .movie:
             [
                 .shape("onboardingMovie01", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingMovie02", .placeholder(0x7E6A5E), shadow: ArtShadow(color: 0x4B2938, opacity: 0.14, radius: 7, y: 4)),
+                .shape("onboardingMovie02", .photo("onboardingPhotoMovie02", frame: CGRect(x: 5, y: 5, width: 352, height: 196)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.14, radius: 7, y: 4)),
                 .shape("onboardingMovie03", .token(.mediaFrame), shadow: nil),
                 .shape("onboardingMovie04", .token(.mediaFrame, opacity: 0.9), shadow: ArtShadow(color: 0x000000, opacity: 0.2, radius: 7, y: 4)),
                 .shape("onboardingMovie05", .token(.textPrimary), shadow: nil),
                 .shape("onboardingMovie06", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingMovie07", .placeholder(0xDCDDD3), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .shape("onboardingMovie07", .photo("onboardingPhotoMovie07", frame: CGRect(x: 4.8, y: 226.2, width: 74.1, height: 73.5)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
                 .text(.localized(LocalizedStringResource("Winter", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 42, y: 321.5), rotation: 0, width: 88),
                 .shape("onboardingMovie08", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingMovie09", .placeholder(0xD8DBC1), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .shape("onboardingMovie09", .photo("onboardingPhotoMovie09", frame: CGRect(x: 97.3, y: 227.4, width: 75.1, height: 72.2)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
                 .text(.localized(LocalizedStringResource("Spring", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 135, y: 321.5), rotation: 0, width: 88),
                 .shape("onboardingMovie10", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingMovie11", .placeholder(0xF6D7A6), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .shape("onboardingMovie11", .photo("onboardingPhotoMovie11", frame: CGRect(x: 190.6, y: 226.8, width: 73.5, height: 72.1)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
                 .text(.localized(LocalizedStringResource("Summer", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 227, y: 321.5), rotation: 0, width: 88),
                 .shape("onboardingMovie12", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingMovie13", .placeholder(0xEFC2A8), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .shape("onboardingMovie13", .photo("onboardingPhotoMovie13", frame: CGRect(x: 282.4, y: 227.1, width: 75.3, height: 72.2)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
                 .text(.localized(LocalizedStringResource("Autumn", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.nunito, size: 12, weight: 800, tracking: 1, isUppercase: true, relativeTo: .body), .textSecondary, center: CGPoint(x: 320, y: 321.5), rotation: 0, width: 88),
                 .shape("onboardingMovie14", .token(.actionCoral), shadow: nil),
             ]
         case .privacy:
             [
                 .shape("onboardingPrivacy01", .token(.surfaceCard), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
-                .shape("onboardingPrivacy02", .placeholder(0xB9A595), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .shape("onboardingPrivacy02", .photo("onboardingPhotoPrivacy02", frame: CGRect(x: 78.0, y: 49.8, width: 206.3, height: 164.4)), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
                 .shape("onboardingPrivacy03", .token(.accentPeach), shadow: nil),
                 .shape("onboardingPrivacy04", .token(.textPrimary), shadow: nil),
                 .shape("onboardingPrivacy05", .token(.accentApricot), shadow: nil),

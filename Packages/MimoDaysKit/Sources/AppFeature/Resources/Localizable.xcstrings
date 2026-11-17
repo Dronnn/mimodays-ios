@@ -11307,14 +11307,14 @@
         }
       }
     },
-    "bus window" : {
+    "train window" : {
       "comment" : "Onboarding art caption on a sample photo (handwritten)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bus window"
+            "value" : "train window"
           }
         }
       }
@@ -11367,14 +11367,14 @@
         }
       }
     },
-    "dog asleep" : {
+    "good dog" : {
       "comment" : "Onboarding art caption on a sample photo (handwritten)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "dog asleep"
+            "value" : "good dog"
           }
         }
       }

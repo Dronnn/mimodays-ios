@@ -11,6 +11,12 @@ enum ArtLayer {
     case text(_ content: ArtText, _ style: TextStyle, _ color: ColorToken, center: CGPoint, rotation: Double, width: CGFloat? = nil)
 }
 
+extension ArtLayer {
+    var isShape: Bool {
+        if case .shape = self { true } else { false }
+    }
+}
+
 enum ArtFill {
     case token(ColorToken, opacity: Double = 1)
     /// Flat tone standing in for a photo until real images are added.
@@ -44,7 +50,9 @@ struct ArtShadow {
 }
 
 /// Draws layers at the design size and scales the whole picture to the available width.
-/// Decorative: hidden from VoiceOver, never mirrored, and its text doesn't follow Dynamic Type.
+/// One image to VoiceOver, read by its captions (its shapes are hidden); never mirrored, and its text doesn't follow
+/// Dynamic Type. Captions stay readable to VoiceOver because they are visible words: hidden ones failed the
+/// accessibility audit once photos made them stand out (CI, 2026-11-17).
 struct ArtCanvas: View {
     let layers: [ArtLayer]
     var size = CGSize(width: 362, height: 360)
@@ -58,6 +66,7 @@ struct ArtCanvas: View {
             ZStack(alignment: .topLeading) {
                 ForEach(layers.indices, id: \.self) { index in
                     layer(layers[index])
+                        .accessibilityHidden(layers[index].isShape)
                 }
             }
             .frame(width: size.width, height: size.height)
@@ -67,7 +76,8 @@ struct ArtCanvas: View {
         .frame(maxWidth: size.width)
         .environment(\.layoutDirection, .leftToRight)
         .environment(\.dynamicTypeSize, .large)
-        .accessibilityHidden(true)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isImage)
         .onReceive(NotificationCenter.default.publisher(for: .NSProcessInfoPowerStateDidChange).receive(on: RunLoop.main)) { _ in
             lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
         }

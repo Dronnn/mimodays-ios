@@ -53,6 +53,16 @@ struct OnboardingResumeTests {
         #expect(flow(store).step == .firstCapture)
     }
 
+    @Test func maybeLaterOnAReplayKeepsSurprisesOn() {
+        let store = InMemoryOnboardingStore(OnboardingRecord(isCompleted: true, step: 7, remindersEnabled: true))
+        let replay = flow(store)
+        replay.restart()
+        replay.finishIntro()
+        replay.remindLater()
+        #expect(store.record.remindersEnabled)
+        #expect(replay.step == .reminders(.later))
+    }
+
     @Test func aSavedFirstMomentCompletesOnboarding() {
         let store = InMemoryOnboardingStore(OnboardingRecord(step: 7))
         let first = flow(store)

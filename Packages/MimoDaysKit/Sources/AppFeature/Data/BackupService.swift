@@ -157,6 +157,13 @@ struct BackupService {
             ? existingMomentIDs().intersection(document.moments.filter { $0.paths.contains(where: check.damaged.contains) }.map(\.id))
             : existingMomentIDs()
         let projectsHere = replacing ? [] : existingProjectIDs()
+        // A movie here whose soundtrack the backup can't bring: replacing would lose the only good copy.
+        if replacing {
+            let local = existingProjectIDs()
+            if document.movies.contains(where: { local.contains($0.id) && $0.audioTracks.contains { check.damaged.contains($0.path) } }) {
+                throw BackupArchive.Failure.unreadable
+            }
+        }
         var paths: [String: String] = [:]
         var stored: [String] = []
         // A file that can't come in (no space, unreadable): replacing then keeps what is here instead.
@@ -179,8 +186,13 @@ struct BackupService {
 
         // Files first: nothing in the library changes until every file that should come in is here, so a
         // replacement that can't bring one in leaves the library untouched (no records to roll back).
+        // A moment comes in whole or not at all: none of its files move unless all of them were unpacked.
         for record in document.moments where !here.contains(record.id) && !record.paths.contains(where: check.damaged.contains) {
-            for path in record.paths { _ = move(path) }
+            if record.paths.allSatisfy({ unpacked[$0] != nil }) {
+                for path in record.paths { _ = move(path) }
+            } else {
+                moveFailed = true
+            }
         }
         for record in document.movies where !projectsHere.contains(record.id) {
             if let render = record.render, !check.damaged.contains(render.relativePath) { _ = move(render.relativePath) }
@@ -208,7 +220,8 @@ struct BackupService {
             wanted += 1
             let damaged = record.paths.filter { check.damaged.contains($0) }
             damagedFiles += damaged.count
-            guard damaged.isEmpty, record.paths.allSatisfy(move) else {
+            // Its files came in above, all of them, or none did.
+            guard damaged.isEmpty, record.paths.allSatisfy({ paths[$0] != nil }) else {
                 skipped.append(record.capturedAt)
                 continue
             }

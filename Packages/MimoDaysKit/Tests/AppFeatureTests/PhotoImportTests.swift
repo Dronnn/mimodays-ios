@@ -62,14 +62,21 @@ struct PhotoImportTests {
 
     private func moments() throws -> [Moment] { try container.mainContext.fetch(FetchDescriptor<Moment>()) }
 
-    /// Copies the photo into `folder` like the picker, the slow one taking a while (or until cancelled).
+    /// Copies the photo into `folder` like the picker and notes in `log` that it was asked to. The slow one takes a
+    /// second; cancelled meanwhile, it either still hands over its copy or fails, as a picker may.
     private struct Item: PhotoPickerItemLoading {
         let folder: URL
+        let log: URL
+        let name: String
         var slow = false
+        var failsWhenCancelled = false
 
         func loadFile() async throws -> PickedFile? {
-            // Like the picker, the slow one finishes its copy even after the screen closed.
-            if slow { try? await Task.sleep(for: .seconds(1)) }
+            FileManager.default.createFile(atPath: log.appending(path: name).path, contents: nil)
+            if slow {
+                try? await Task.sleep(for: .seconds(1))
+                if failsWhenCancelled, Task.isCancelled { throw CancellationError() }
+            }
             let url = folder.appending(path: "\(UUID().uuidString).jpg")
             try PhotoImportTests.photo.write(to: url)
             return PickedFile(url: url, isVideo: false)
@@ -77,17 +84,28 @@ struct PhotoImportTests {
     }
 
     /// W2: closing the import while the picker still copies leaves no copy behind, and loads nothing more.
-    @Test func closingMidLoadLeavesNoCopies() async throws {
+    @Test(arguments: [false, true])
+    func closingMidLoadLeavesNoCopies(failsWhenCancelled: Bool) async throws {
         let folder = FileManager.default.temporaryDirectory.appending(path: "Picked-\(UUID().uuidString)", directoryHint: .isDirectory)
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let log = FileManager.default.temporaryDirectory.appending(path: "PickedLog-\(UUID().uuidString)", directoryHint: .isDirectory)
+        for url in [folder, log] { try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true) }
+        defer { for url in [folder, log] { try? FileManager.default.removeItem(at: url) } }
         let model = model()
-        model.start([Item(folder: folder), Item(folder: folder, slow: true), Item(folder: folder)])
-        try await Task.sleep(for: .milliseconds(300))
+        model.start([
+            Item(folder: folder, log: log, name: "first"),
+            Item(folder: folder, log: log, name: "slow", slow: true, failsWhenCancelled: failsWhenCancelled),
+            Item(folder: folder, log: log, name: "third"),
+        ])
+        let logged = { Set((try? FileManager.default.contentsOfDirectory(atPath: log.path)) ?? []) }
+        // Closed while the slow one copies.
+        for _ in 0..<100 where !logged().contains("slow") { try await Task.sleep(for: .milliseconds(50)) }
+        try #require(logged() == ["first", "slow"])
         #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).count == 1)
         model.discard()
-        // The slow copy lands after the close and goes too; the third is never loaded.
-        try await Task.sleep(for: .seconds(1.6))
+        // The slow copy lands (or fails) after the close; whatever came goes, and the third is never asked for.
+        try await Task.sleep(for: .seconds(1.5))
         #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).isEmpty)
+        #expect(logged() == ["first", "slow"])
         #expect(model.picked.isEmpty)
     }
 

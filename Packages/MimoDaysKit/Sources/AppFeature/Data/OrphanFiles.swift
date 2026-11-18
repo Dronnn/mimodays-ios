@@ -33,7 +33,9 @@ enum OrphanFiles {
         let scratch = ["Backup-", "Export-", "Movie-", "MimoDays-"]
         for item in (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? [] {
             let name = item.lastPathComponent
-            guard name == "Import" || scratch.contains(where: name.hasPrefix) else { continue }
+            // MovieFiller-1.mov is the kept filler clip; MovieFiller-<UUID>.mov is one being made.
+            let filler = name.hasPrefix("MovieFiller-") && name != "MovieFiller-1.mov"
+            guard name == "Import" || filler || scratch.contains(where: name.hasPrefix) else { continue }
             try? FileManager.default.removeItem(at: item)
         }
     }

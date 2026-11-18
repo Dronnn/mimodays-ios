@@ -60,6 +60,17 @@ struct BackupModelTests {
         #expect(try BackupArchive.check(destination).damaged.isEmpty)
     }
 
+    /// W2 review: a moment whose pictures are gone from this iPhone doesn't stop the others being backed up.
+    @Test func aMomentWithNoPictureLeftDoesntStopABackup() async throws {
+        let library = try await library(moments: 2)
+        let moment = try #require(try library.context.fetch(FetchDescriptor<Moment>()).first)
+        for media in moment.media where media.role == .rearSource || media.role == .frontSource { try library.store.remove(media.relativePath) }
+        let model = model(library)
+        model.start()
+        await model.waitForPacking()
+        #expect(model.phase == .working(.choosing, progress: 0))
+    }
+
     /// A real clock's time doesn't survive JSON's seconds-since-1970 to the last bit; the check must not care.
     @Test func aBackupMadeAtAnOddInstantStillChecksOut() async throws {
         let library = try await library(moments: 2)

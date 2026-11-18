@@ -64,6 +64,7 @@ struct BackupTests {
             title: "October", source: MovieSourceRule(kind: .selection, momentIDs: moments.map(\.id)), length: .full,
             aspectRatio: .portrait9x16, fit: .fill, momentIDs: moments.prefix(3).map(\.id)
         )
+        try #require(project.orderedClips.count == 3)
         project.orderedClips[1].transition = .fade
         moments[1].captureFormat = .square
         project.orderedClips[2].cameraLayout = .sideBySide
@@ -336,7 +337,7 @@ struct BackupTests {
     /// W2 review: a backup, export or import cut off when iOS ended the app goes at the next launch; captures stay.
     @Test func scratchLeftByAnEndedAppGoesAtLaunch() throws {
         let tmp = temporary("tmp")
-        let names = ["Backup-1", "Export-2", "Movie-3.mp4", "MimoDays-4.mp4", "Import", "Capture", "Review-5", "MovieFiller-1.mov"]
+        let names = ["Backup-1", "Export-2", "Movie-3.mp4", "MimoDays-4.mp4", "Import", "Capture", "Review-5", "MovieFiller-1.mov", "MovieFiller-6.mov"]
         for name in names { try FileManager.default.createDirectory(at: tmp.appending(path: name), withIntermediateDirectories: true) }
         OrphanFiles.removeScratch(in: tmp)
         #expect(Set(try FileManager.default.contentsOfDirectory(atPath: tmp.path)) == ["Capture", "Review-5", "MovieFiller-1.mov"])

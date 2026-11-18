@@ -302,3 +302,16 @@ struct AppearanceSettingsTests {
         #expect(window.overrideUserInterfaceStyle == .unspecified && !window.traitOverrides.contains(UITraitAccessibilityContrast.self))
     }
 }
+
+/// W8: the data-use page links to the full policy on the website, in the app's language.
+@MainActor
+struct PrivacyPolicyLinkTests {
+    @Test(arguments: [
+        ("en", "https://mimodays.mrmaier.com/privacy-policy/"), ("de", "https://mimodays.mrmaier.com/de/privacy-policy/"),
+        ("de_DE", "https://mimodays.mrmaier.com/de/privacy-policy/"), ("pt-BR", "https://mimodays.mrmaier.com/pt-br/privacy-policy/"),
+        ("zh-Hant", "https://mimodays.mrmaier.com/zh-hant/privacy-policy/"), ("fi", "https://mimodays.mrmaier.com/privacy-policy/"),
+    ])
+    func thePolicyOpensInTheAppsLanguage(_ identifier: String, _ expected: String) {
+        #expect(DataUseView.policyURL(Locale(identifier: identifier)).absoluteString == expected)
+    }
+}

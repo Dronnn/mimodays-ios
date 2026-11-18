@@ -115,6 +115,7 @@ struct MovieComposerTests {
     @Test func thePlanTimesPhotosAndVideosAndCaptionsThem() async throws {
         let ids = try await save(3, videos: [1])
         let project = try project(ids)
+        try #require(project.orderedClips.count == 3)
         project.showsPlaces = false
         project.orderedClips[2].clipAudio = .muted
         let plan = MoviePlan(project, store: store)
@@ -259,7 +260,9 @@ struct MovieComposerTests {
         let composed = try await MovieComposer.compose(plan, renderSize: portrait)
         let frame = 1.0 / 30
         // The sound as a clip carries it (AAC in a .mov runs a little short of the voice file's 2 s).
-        let soundTrack = try #require(try await AVURLAsset(url: try await clipWithSound()).loadTracks(withMediaType: .audio).first)
+        let probe = try await clipWithSound()
+        defer { try? FileManager.default.removeItem(at: probe) }
+        let soundTrack = try #require(try await AVURLAsset(url: probe).loadTracks(withMediaType: .audio).first)
         let soundLength = try await soundTrack.load(.timeRange).duration.seconds
         let main = try #require(composed.asset.tracks(withMediaType: .video).first)
         let sound = try #require(composed.asset.tracks(withMediaType: .audio).first)

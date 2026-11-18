@@ -239,13 +239,13 @@ struct MomentExportSheet: View {
     }
 
     private func saveToPhotos() async {
+        // Taken before the first wait, so no second Save or Share starts until Photos is done.
+        guard !savingToPhotos else { return }
+        savingToPhotos = true
+        defer { savingToPhotos = false }
         _ = await asker.request(.photoLibrary, using: permissions)
         guard let files = await model.files() else { return }
-        savingToPhotos = true
-        defer {
-            savingToPhotos = false
-            model.removeFiles()
-        }
+        defer { model.removeFiles() }
         do {
             try await MovieFiles.saveToPhotos(MomentExportModel.pictures(files))
             saved = true

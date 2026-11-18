@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -185,6 +186,17 @@ struct DataUseView: View {
     /// The page it was opened from: Privacy, or Help's Privacy statement.
     var back = Text("Privacy", bundle: .module)
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
+
+    /// The site's privacy policy in the app's language (English lives at the top level).
+    static func policyURL(_ locale: Locale) -> URL {
+        let id = locale.identifier.replacingOccurrences(of: "_", with: "-")
+        let code = AppLanguage.supported.first { $0.caseInsensitiveCompare(id) == .orderedSame }
+            ?? AppLanguage.supported.first { $0 == locale.language.languageCode?.identifier }
+            ?? "en"
+        let path = code == "en" ? "" : code.lowercased() + "/"
+        return URL(string: "https://mimodays.mrmaier.com/\(path)privacy-policy/")!
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -216,6 +228,18 @@ struct DataUseView: View {
                         Text("What MimoDays never does", bundle: .module),
                         Text("No ads, no tracking, no analytics, and nothing is sold or shared.", bundle: .module)
                     )
+                    // The full policy on the website, for what this summary leaves out.
+                    Link(destination: Self.policyURL(locale)) {
+                        HStack(spacing: 6) {
+                            Text("Privacy Policy", bundle: .module, comment: "How MimoDays uses your data (S05): link to the full privacy policy on the website")
+                            Image(systemName: "arrow.up.right").imageScale(.small).accessibilityHidden(true)
+                        }
+                        .textStyle(.body)
+                        .foregroundStyle(ColorToken.textLink.color)
+                        .frame(minHeight: 44)
+                    }
+                    .padding(.top, 22)
+                    .accessibilityIdentifier("dataUse.policy")
                 }
                 .padding(.horizontal, 22)
                 .padding(.top, 8)

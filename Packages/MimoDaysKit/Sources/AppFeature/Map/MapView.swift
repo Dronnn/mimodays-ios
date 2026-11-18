@@ -302,7 +302,7 @@ struct MapView: View {
             places: model.places, images: model.images, selection: $selection, fitToken: fitToken, showsUser: showsUser,
             cover: isWide ? EdgeInsets(top: 0, leading: Self.panelWidth + 16, bottom: 0, trailing: 0)
                 : EdgeInsets(top: 0, leading: 0, bottom: panelCover, trailing: 0),
-            onLoad: { id in Task { await model.load(id) } }, onFailure: failedToLoad
+            onLoad: { id in Task { await model.load(id) } }, onFailure: { [retry] in failedToLoad(map: retry) }
         )
         .id(retry)
     }
@@ -412,10 +412,12 @@ struct MapView: View {
 
     /// A first failure is often a passing hiccup as the map opens (seen on the simulator: Try again then loads it),
     /// so the map gets one quiet go before P06 says so.
-    private func failedToLoad() {
+    private func failedToLoad(map generation: Int) {
+        // A late report from a map already replaced says nothing about the one on screen.
+        guard generation == retry else { return }
         if let quietRetry {
-            // A second report from the map already being retried changes nothing; the new map failing does.
-            if retry > quietRetry { failed = true }
+            // A second report from the map waiting for its retry changes nothing; the new map failing does.
+            if generation > quietRetry { failed = true }
             return
         }
         quietRetry = retry

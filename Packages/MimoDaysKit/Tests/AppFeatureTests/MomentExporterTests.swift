@@ -62,10 +62,9 @@ struct MomentExporterTests {
         let items = exporter.items(ids, options: .init())
         let files = try await MomentExporter.write(items, into: folder(), list: false)
         // Nov 11, 2026 12:00 UTC is 16:00 in Yerevan.
-        #expect(names(files) == [
-            "2026-11-11 16.00.00.heic", "2026-11-11 16.00.00 voice.m4a", "2026-11-11 16.00.00 note.txt", "2026-11-11 17.00.00.mp4",
-        ])
-        let note = try String(contentsOf: files[2], encoding: .utf8)
+        // Voice notes, like exact places, only when turned on (doc 01 §17).
+        #expect(names(files) == ["2026-11-11 16.00.00.heic", "2026-11-11 16.00.00 note.txt", "2026-11-11 17.00.00.mp4"])
+        let note = try String(contentsOf: files[1], encoding: .utf8)
         #expect(note.contains("Lunch") && note.contains("the good one"))
         #expect(!note.contains("Kentron") && !note.contains("40.18"))
         #expect(gps(files[0]) == nil)
@@ -76,6 +75,7 @@ struct MomentExporterTests {
         let ids = try await moments()
         var options = MomentExporter.Options()
         options.exactPlace = true
+        options.voiceNotes = true
         let files = try await MomentExporter.write(MomentExporter(library: library).items(ids, options: options), into: folder(), list: true)
         let note = try String(contentsOf: files[2], encoding: .utf8)
         #expect(note.contains("Kentron") && note.contains("40.18110, 44.51360"))

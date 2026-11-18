@@ -16,7 +16,8 @@ struct MomentExporter {
         var asSeen = true
         /// The camera's front and back files, each on its own.
         var originals = false
-        var voiceNotes = true
+        // Doc 01 §13, §17: voice notes and exact places stay private unless the person adds them.
+        var voiceNotes = false
         var notes = true
         var exactPlace = false
     }

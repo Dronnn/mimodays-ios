@@ -30,8 +30,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     /// Set once in `init`.
     private var observers: [any NSObjectProtocol] = []
 
-    public let events: AsyncStream<CaptureEvent>
-    private let eventSink: AsyncStream<CaptureEvent>.Continuation
+    private let eventSink = CaptureEventRelay()
+    public var events: AsyncStream<CaptureEvent> { eventSink.stream() }
 
     private struct Camera {
         var input: AVCaptureDeviceInput
@@ -46,7 +46,6 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         self.isMultiCam = isMultiCam
         self.maxFormatWidth = maxFormatWidth
         self.session = session
-        (events, eventSink) = AsyncStream.makeStream()
         previews = Dictionary(uniqueKeysWithValues: CameraPosition.allCases.map { position in
             let layer = AVCaptureVideoPreviewLayer(sessionWithNoConnection: session)
             layer.videoGravity = .resizeAspectFill
@@ -570,11 +569,10 @@ private final class PhotoBatch: Sendable {
             guard state.results.count == positions.count else { return nil }
             state.delegates.removeAll()
             let urls = state.results.compactMapValues { $0 }
-            guard urls.count == positions.count, let main = positions.first, let mainURL = urls[main] else {
-                urls.values.forEach { try? FileManager.default.removeItem(at: $0) }
-                return .failure(CaptureError.photoFailed)
-            }
-            let selfie = positions.dropFirst().first.flatMap { urls[$0] }
+            // One camera failing doesn't lose the other's photo: it is kept as a one-camera moment.
+            let taken = positions.filter { urls[$0] != nil }
+            guard let main = taken.first, let mainURL = urls[main] else { return .failure(CaptureError.photoFailed) }
+            let selfie = taken.dropFirst().first.flatMap { urls[$0] }
             return .success(CapturedPhoto(mainURL: mainURL, mainPosition: main, selfieURL: selfie))
         }
         if let outcome { completion(outcome) }
@@ -672,12 +670,12 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
         if let outcome { completion(outcome) }
     }
 
-    /// Never hands back a clip with a missing or empty stream.
+    /// Never hands back a missing or empty stream; one camera failing keeps the other's clip as a one-camera moment.
     private func outcomeIfDone(_ streams: [ObjectIdentifier: Stream]) -> Result<CapturedVideo, any Error>? {
         guard streams.values.allSatisfy(\.finished) else { return nil }
-        let ordered = streams.values.sorted { $0.position == .back && $1.position == .front }
-        guard !ordered.contains(where: \.failed), let main = ordered.first, let mainResult = main.result else {
-            ordered.compactMap(\.result?.url).forEach { try? FileManager.default.removeItem(at: $0) }
+        let ordered = streams.values.filter { !$0.failed && $0.result != nil }.sorted { $0.position == .back && $1.position == .front }
+        guard let main = ordered.first, let mainResult = main.result else {
+            streams.values.compactMap(\.result?.url).forEach { try? FileManager.default.removeItem(at: $0) }
             return .failure(CaptureError.recordingFailed)
         }
         let selfie = ordered.count > 1 ? ordered[1] : nil

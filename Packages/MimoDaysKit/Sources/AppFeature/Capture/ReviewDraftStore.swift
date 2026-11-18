@@ -37,13 +37,21 @@ struct ReviewDraftStore: Sendable {
     }
 
     /// Moves the capture's files in (a rename on the same volume) and returns it pointing at them.
+    /// All or nothing: when one file can't move, those already moved go back, so the capture as it was still works.
     func adopt(_ capture: CaptureResult) throws -> CaptureResult {
         try prepare()
         var moved = capture
-        try moved.mapFiles { url in
-            let destination = root.appending(path: url.lastPathComponent)
-            try FileManager.default.moveItem(at: url, to: destination)
-            return destination
+        var done: [(from: URL, to: URL)] = []
+        do {
+            try moved.mapFiles { url in
+                let destination = root.appending(path: url.lastPathComponent)
+                try FileManager.default.moveItem(at: url, to: destination)
+                done.append((url, destination))
+                return destination
+            }
+        } catch {
+            for file in done { try? FileManager.default.moveItem(at: file.to, to: file.from) }
+            throw error
         }
         return moved
     }

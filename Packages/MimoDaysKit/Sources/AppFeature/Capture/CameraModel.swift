@@ -200,6 +200,9 @@ final class CameraModel {
     }
 
     func start() async {
+        // This start's events, from its first moment; what was interrupted before (a retake) is news no more.
+        let events = engine.events
+        interruption = nil
         do {
             try? await engine.setBackLens(settings.backLens)
             setup = try await engine.start()
@@ -207,7 +210,7 @@ final class CameraModel {
             showsSingleCameraNote = setup != .dual
             phase = .ready
             await refreshMicrophone()
-            listenForEvents()
+            listenForEvents(events)
             listenForHolds()
         } catch {
             phase = .failed(error as? CaptureError ?? .cameraUnavailable)
@@ -261,8 +264,9 @@ final class CameraModel {
         failure = nil
         do {
             let capturedAt = now
+            let swapped = isSwapped
             await engine.setCaptureHold(hold)
-            let captured = arranged(try await engine.capturePhoto(flash: settings.flash, silent: !settings.cameraSounds))
+            let captured = arranged(try await engine.capturePhoto(flash: settings.flash, silent: !settings.cameraSounds), swapped: swapped)
             guard let photo = MediaCheck.checked(captured) else { throw CaptureError.photoFailed }
             phase = .ready
             onCapture(result(.photo(photo), selfie: photo.selfieURL, at: capturedAt))
@@ -274,6 +278,8 @@ final class CameraModel {
 
     private func record() async {
         let capturedAt = now
+        // The big camera as it was at the shutter: heat dropping the front camera as the clip ends resets the swap.
+        let swapped = isSwapped
         phase = .recording(startedAt: capturedAt.instant)
         recordingHold = hold
         defer { recordingHold = nil }
@@ -284,7 +290,7 @@ final class CameraModel {
         // The sound setting as it is at the shutter, whatever an earlier change left behind.
         try? await engine.setMicrophone(microphoneOn)
         do {
-            let recorded = arranged(try await engine.record(limit: settings.videoLength.duration))
+            let recorded = arranged(try await engine.record(limit: settings.videoLength.duration), swapped: swapped)
             await setTorch(.off).value
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready
@@ -315,9 +321,9 @@ final class CameraModel {
     }
 
     /// Big camera first; a hidden selfie window is never kept.
-    private func arranged(_ photo: CapturedPhoto) -> CapturedPhoto {
+    private func arranged(_ photo: CapturedPhoto, swapped: Bool) -> CapturedPhoto {
         var photo = photo
-        if isSwapped, let selfie = photo.selfieURL {
+        if swapped, let selfie = photo.selfieURL {
             photo = CapturedPhoto(mainURL: selfie, mainPosition: photo.mainPosition.other, selfieURL: photo.mainURL)
         }
         if !showsSelfie, let selfie = photo.selfieURL {
@@ -337,9 +343,9 @@ final class CameraModel {
         )
     }
 
-    private func arranged(_ video: CapturedVideo) -> CapturedVideo {
+    private func arranged(_ video: CapturedVideo, swapped: Bool) -> CapturedVideo {
         var video = video
-        if isSwapped, let selfie = video.selfieURL {
+        if swapped, let selfie = video.selfieURL {
             video.selfieURL = video.mainURL
             video.mainURL = selfie
             video.mainPosition = video.mainPosition.other
@@ -373,8 +379,8 @@ final class CameraModel {
         }
     }
 
-    private func listenForEvents() {
-        let stream = engine.events
+    private func listenForEvents(_ stream: AsyncStream<CaptureEvent>) {
+        events?.cancel()
         events = Task { [weak self] in
             for await event in stream {
                 guard let self else { return }

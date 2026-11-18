@@ -1,3 +1,4 @@
+import os
 import Foundation
 import QuartzCore
 
@@ -195,6 +196,8 @@ public protocol CaptureEngine: AnyObject, Sendable {
     /// Turns the previews with the window. Upright, except on iPad, whose window turns with the device.
     @MainActor func setPreviewHold(_ hold: DeviceHold)
     /// Changes the camera screen should show. One listener.
+    /// A new stream for each camera start; the one before ends. A listener cancelled while Review shows (which ends
+    /// its stream) doesn't leave a retaken camera deaf to calls and heat.
     var events: AsyncStream<CaptureEvent> { get }
 }
 
@@ -205,5 +208,23 @@ public enum CaptureFiles {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Capture", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory.appendingPathComponent("\(UUID().uuidString).\(fileExtension)")
+    }
+}
+
+/// Where an engine's events go: the stream handed out last.
+final class CaptureEventRelay: Sendable {
+    private let sink = OSAllocatedUnfairLock<AsyncStream<CaptureEvent>.Continuation?>(initialState: nil)
+
+    func stream() -> AsyncStream<CaptureEvent> {
+        let (stream, continuation) = AsyncStream.makeStream(of: CaptureEvent.self)
+        sink.withLock { sink in
+            sink?.finish()
+            sink = continuation
+        }
+        return stream
+    }
+
+    func yield(_ event: CaptureEvent) {
+        sink.withLock { _ = $0?.yield(event) }
     }
 }

@@ -276,6 +276,17 @@ struct SurpriseCoordinatorTests {
         #expect(await notifications.pending().count == 14)
     }
 
+    @Test func aWeekChosenAfterAnIndefinitePauseEndsInAWeek() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        await coordinator.pause(.indefinitely)
+        await coordinator.pause(.week)
+        #expect(!schedule.isPausedIndefinitely)
+        #expect(schedule.pausedUntil == date("2026-11-18 00:00"))
+        await coordinator.pause(.indefinitely)
+        #expect(schedule.isPausedIndefinitely && schedule.pausedUntil == nil)
+    }
+
     @Test func resumingEarlyPlansTodayAgain() async throws {
         let coordinator = coordinator()
         await coordinator.refresh()

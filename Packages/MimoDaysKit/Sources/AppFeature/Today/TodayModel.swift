@@ -76,6 +76,8 @@ final class TodayModel {
     private(set) var surpriseChangesAt: Date?
     /// Decoded pictures by stored path and size.
     private(set) var images: [ImageKey: UIImage] = [:]
+    /// The newest image load: an older one finishing later doesn't put back what it saw.
+    private var imageLoad = 0
 
     struct ImageKey: Hashable {
         var path: String
@@ -221,6 +223,8 @@ final class TodayModel {
 
     /// Everything Today shows, decoded small; pictures no longer shown are dropped.
     private func loadImages() async {
+        imageLoad += 1
+        let load = imageLoad
         var wanted: [ImageKey] = []
         if let latest {
             wanted += [latest.picturePath.map { ImageKey(path: $0, maxPixelSize: Self.heroPixels) }, latest.windowPath.map { ImageKey(path: $0, maxPixelSize: Self.selfiePixels) }].compactMap(\.self)
@@ -238,6 +242,7 @@ final class TodayModel {
                   let image = try? await thumbnails.thumbnail(for: url, maxPixelSize: key.maxPixelSize) else { continue }
             loaded[key] = UIImage(cgImage: image)
         }
+        guard load == imageLoad else { return }
         images = loaded
     }
 }

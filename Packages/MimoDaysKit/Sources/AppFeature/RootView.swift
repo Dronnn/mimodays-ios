@@ -295,34 +295,20 @@ struct CaptureFlowView: View {
     @State private var step: CameraAccessStep?
     @State private var camera: CameraModel?
     @State private var review: ReviewModel?
+    @State private var restoredDraft = false
 
     var body: some View {
         Group {
-            switch step {
-            case nil:
-                CameraPalette.background.ignoresSafeArea()
-            case .explain:
-                PermissionExplainerView(screen: .camera) {
-                    Task { show(CameraAccessStep(await permissions.request(.camera))) }
+            // A capture waiting in Review is saved or dropped whatever camera access is now (taken away in Settings
+            // meanwhile, or after a relaunch).
+            if let review {
+                ReviewView(model: review) {
+                    self.review = nil
+                } onSave: {
+                    try await save(review)
                 }
-            case .openSettings:
-                PermissionExplainerView(screen: .cameraOff) {
-                    if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
-                } secondary: {
-                    dismiss()
-                }
-            case .camera:
-                if let review {
-                    ReviewView(model: review) {
-                        self.review = nil
-                    } onSave: {
-                        try await save(review)
-                    }
-                } else if let camera {
-                    CameraView(model: camera, lastCapture: lastCapture) { dismiss() }
-                } else {
-                    CameraPalette.background.ignoresSafeArea()
-                }
+            } else {
+                cameraStep
             }
         }
         .task { await refresh() }
@@ -332,6 +318,30 @@ struct CaptureFlowView: View {
         // Coming back from Settings with access turned on.
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await refresh() } }
+        }
+    }
+
+    @ViewBuilder
+    private var cameraStep: some View {
+        switch step {
+        case nil:
+            CameraPalette.background.ignoresSafeArea()
+        case .explain:
+            PermissionExplainerView(screen: .camera) {
+                Task { show(CameraAccessStep(await permissions.request(.camera))) }
+            }
+        case .openSettings:
+            PermissionExplainerView(screen: .cameraOff) {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            } secondary: {
+                dismiss()
+            }
+        case .camera:
+            if let camera {
+                CameraView(model: camera, lastCapture: lastCapture) { dismiss() }
+            } else {
+                CameraPalette.background.ignoresSafeArea()
+            }
         }
     }
 
@@ -352,12 +362,16 @@ struct CaptureFlowView: View {
 
     private func show(_ step: CameraAccessStep) {
         self.step = step
-        if step == .camera, camera == nil {
+        // A review iOS closed mid-way comes back first, with or without camera access.
+        if !restoredDraft {
+            restoredDraft = true
             let services = services ?? .simulated
-            // A review iOS closed mid-way comes back first.
             if let draft = services.drafts.load() {
                 review = ReviewModel(draft: draft, drafts: services.drafts, voice: services.voice, places: services.places)
             }
+        }
+        if step == .camera, camera == nil {
+            let services = services ?? .simulated
             let permissions = permissions
             camera = CameraModel(
                 engine: services.makeEngine(), store: services.settings, isSurprise: request.isSurprise,

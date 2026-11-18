@@ -22,8 +22,8 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     /// Every change of the rear light, in order (tests).
     public private(set) var torchChanges: [FlashMode] = []
     private var stopSignal: CheckedContinuation<Void, Never>?
-    public nonisolated let events: AsyncStream<CaptureEvent>
-    private let eventSink: AsyncStream<CaptureEvent>.Continuation
+    private let eventSink = CaptureEventRelay()
+    public nonisolated var events: AsyncStream<CaptureEvent> { eventSink.stream() }
 
     /// Real clips instead of drawn frames (website recordings).
     nonisolated let footage: DemoFootage?
@@ -33,7 +33,6 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         self.freeBytes = freeBytes
         self.lenses = lenses
         self.footage = footage
-        (events, eventSink) = AsyncStream.makeStream()
     }
 
     /// A call, the app going to the background, heat: a recording ends with what it has.

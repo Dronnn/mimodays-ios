@@ -202,6 +202,7 @@ struct ReviewView: View {
     private func save() {
         guard !isSaving else { return }
         isSaving = true
+        editsCaption = false
         Task {
             do {
                 try await onSave()
@@ -266,6 +267,8 @@ struct ReviewView: View {
     private var panel: some View {
         VStack(alignment: .leading, spacing: 0) {
             CaptionField(text: $model.caption, isFocused: $editsCaption)
+                // What is typed while the moment saves would be dropped with Review: nothing changes until it fails.
+                .disabled(isSaving)
                 .id(Self.captionID)
                 .padding(.top, 20)
             if let voice = model.voice {
@@ -277,6 +280,7 @@ struct ReviewView: View {
                 HStack(spacing: 8) { chips }
                 VStack(alignment: .leading, spacing: 0) { chips }
             }
+            .disabled(isSaving)
             .padding(.top, 14)
             OriginLabel(origin: model.promptID == nil ? .manual : .randomPrompt, time: CaptureTimeLabel.text(model.capture.capturedAt))
                 .textStyle(.reviewMeta)

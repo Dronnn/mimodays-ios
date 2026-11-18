@@ -64,11 +64,13 @@ final class SurpriseCoordinator {
             guard let schedule = self.fetchSchedule() else { return }
             let calendar = self.calendar(for: schedule)
             let today = calendar.startOfDay(for: self.clock.now())
+            // One pause at a time: a week chosen after "until I resume them" ends in a week.
             switch length {
             case .today: schedule.pausedUntil = calendar.date(byAdding: .day, value: 1, to: today)
             case .week: schedule.pausedUntil = calendar.date(byAdding: .day, value: 7, to: today)
-            case .indefinitely: schedule.isPausedIndefinitely = true
+            case .indefinitely: schedule.pausedUntil = nil
             }
+            schedule.isPausedIndefinitely = length == .indefinitely
             await self.performRefresh(replan: false)
         }
     }

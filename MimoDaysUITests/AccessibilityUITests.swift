@@ -33,11 +33,20 @@ final class AccessibilityUITests: XCTestCase {
         shot.name = screen
         shot.lifetime = .deleteOnSuccess
         add(shot)
-        try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast)) { issue in
-            if self.isKnownFalsePositive(issue) { return true }
-            let element = issue.element.map { "\($0.elementType) '\($0.identifier)' '\($0.label)' \($0.frame)" } ?? "-"
-            self.issues.append("\(screen): \(issue.compactDescription) - \(element)")
-            return true
+        // A busy CI machine can run out of the audit's own time (F3: "Audit failed to complete in time", with the
+        // keyboard up on a full library); that is the machine, not the screen, so it gets one more go.
+        for attempt in 1...2 {
+            do {
+                try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast)) { issue in
+                    if self.isKnownFalsePositive(issue) { return true }
+                    let element = issue.element.map { "\($0.elementType) '\($0.identifier)' '\($0.label)' \($0.frame)" } ?? "-"
+                    self.issues.append("\(screen): \(issue.compactDescription) - \(element)")
+                    return true
+                }
+                return
+            } catch where attempt == 1 && "\(error)".localizedCaseInsensitiveContains("in time") {
+                continue
+            }
         }
     }
 

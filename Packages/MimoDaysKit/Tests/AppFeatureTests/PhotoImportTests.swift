@@ -30,7 +30,7 @@ struct PhotoImportTests {
     }
 
     /// A small JPEG taken "2026:11:11 18:42:05" at +04:00, at the Cascade.
-    private static let photo: Data = {
+    nonisolated fileprivate static let photo: Data = {
         let context = CGContext(
             data: nil, width: 64, height: 48, bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
@@ -61,6 +61,36 @@ struct PhotoImportTests {
     }
 
     private func moments() throws -> [Moment] { try container.mainContext.fetch(FetchDescriptor<Moment>()) }
+
+    /// Copies the photo into `folder` like the picker, the slow one taking a while (or until cancelled).
+    private struct Item: PhotoPickerItemLoading {
+        let folder: URL
+        var slow = false
+
+        func loadFile() async throws -> PickedFile? {
+            if slow { try await Task.sleep(for: .seconds(5)) }
+            let url = folder.appending(path: "\(UUID().uuidString).jpg")
+            try PhotoImportTests.photo.write(to: url)
+            return PickedFile(url: url, isVideo: false)
+        }
+    }
+
+    /// W2: closing the import while the picker still copies leaves no copy behind, the ones done before included.
+    @Test func closingMidLoadLeavesNoCopies() async throws {
+        let folder = FileManager.default.temporaryDirectory.appending(path: "Picked-\(UUID().uuidString)", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let model = model()
+        model.start([Item(folder: folder), Item(folder: folder, slow: true), Item(folder: folder)])
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).count == 1)
+        model.discard()
+        for _ in 0..<40 where try !FileManager.default.contentsOfDirectory(atPath: folder.path).isEmpty {
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).isEmpty)
+        #expect(model.picked.isEmpty)
+    }
 
     @Test func aPhotoGoesToTheDayItWasTakenWithItsCity() async throws {
         let model = model()

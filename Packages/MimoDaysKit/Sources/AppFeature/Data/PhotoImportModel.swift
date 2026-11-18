@@ -69,7 +69,7 @@ final class PhotoImportModel: Identifiable {
         var seen = existing
         var picked: [Picked] = []
         var skipped: Set<Int> = []
-        received += files.map(\.url)
+        received += files.map(\.url).filter { !received.contains($0) }
         for (index, file) in files.enumerated() {
             guard !Task.isCancelled else { return }
             guard let item = await Task.detached(priority: .userInitiated, operation: { await Self.read(file.url, isVideo: file.isVideo, id: index) }).value else {
@@ -96,9 +96,11 @@ final class PhotoImportModel: Identifiable {
         var files: [(url: URL, isVideo: Bool)] = []
         for (index, item) in items.enumerated() {
             guard let file = try? await item.loadFile() else { continue }
+            received.append(file.url)
             guard !Task.isCancelled else {
-                // Copied after the screen closed.
-                try? FileManager.default.removeItem(at: file.url)
+                // The screen closed while this one was copied: it and any copied before it go.
+                received.forEach { try? FileManager.default.removeItem(at: $0) }
+                received = []
                 return
             }
             files.append((file.url, file.isVideo))

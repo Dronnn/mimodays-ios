@@ -280,4 +280,23 @@ struct BackupTests {
         #expect(service.status().last == clock.now())
         #expect(service.status().newSince == 0)
     }
+
+    /// V6: launch removes only files no record points to; a full library (Recently Deleted, voice note, music,
+    /// render, thumbnails, composed pictures) keeps every file.
+    @Test func launchRemovesOnlyFilesNoRecordKeeps() async throws {
+        let library = try library()
+        _ = try await fill(library)
+        let before = try library.store.orphans(referenced: [])
+        #expect(!before.isEmpty)
+        #expect(OrphanFiles.remove(context: library.context, store: library.store) == 0)
+        #expect(try library.store.orphans(referenced: []) == before)
+
+        // A save that iOS ended after the files were written, and a half-written copy.
+        let left = try library.store.store(Data(repeating: 1, count: 100), in: .originals, fileExtension: "heic")
+        let partial = try library.store.url(for: "derived").appending(path: ".x.partial")
+        try Data(repeating: 2, count: 10).write(to: partial)
+        #expect(OrphanFiles.remove(context: library.context, store: library.store) == 2)
+        #expect(!FileManager.default.fileExists(atPath: try library.store.url(for: left.relativePath).path))
+        #expect(try library.store.orphans(referenced: []) == before)
+    }
 }

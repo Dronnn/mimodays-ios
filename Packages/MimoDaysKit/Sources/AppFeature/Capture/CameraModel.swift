@@ -115,6 +115,8 @@ final class CameraModel {
     let engine: any CaptureEngine
     private let orientation: any OrientationSensor
     private var holds: Task<Void, Never>?
+    /// How many setup changes the engine has reported.
+    private var setupChanges = 0
 
     /// The event listener lives as long as the model; it ends with it.
     isolated deinit {
@@ -212,7 +214,10 @@ final class CameraModel {
         if events == nil { listenForEvents(engine.events) }
         do {
             try? await engine.setBackLens(settings.backLens)
-            setup = try await engine.start()
+            // A setup change reported while starting (heat dropped the selfie camera) is newer than what start saw.
+            let changes = setupChanges
+            let started = try await engine.start()
+            if setupChanges == changes { setup = started }
             lenses = await engine.backLenses()
             showsSingleCameraNote = setup != .dual
             phase = .ready
@@ -390,6 +395,7 @@ final class CameraModel {
                 switch event {
                 case let .setupChanged(setup):
                     self.setup = setup
+                    setupChanges += 1
                     if setup != .dual { isSwapped = false }
                 case let .interrupted(reason):
                     interruption = reason

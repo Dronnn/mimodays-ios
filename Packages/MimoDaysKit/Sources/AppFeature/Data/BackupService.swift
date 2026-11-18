@@ -168,7 +168,13 @@ struct BackupService {
             for path in stored { try? store.remove(path) }
             throw BackupArchive.Failure.unreadable
         }
-        let oldFiles = replacing ? try removeEverything() : []
+        let oldFiles: Set<String>
+        do {
+            oldFiles = replacing ? try removeEverything() : []
+        } catch {
+            for path in stored { try? store.remove(path) }
+            throw error
+        }
 
         var wanted = 0
         var restored = 0

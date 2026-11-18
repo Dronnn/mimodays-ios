@@ -38,6 +38,14 @@ public protocol NotificationScheduler: Sendable {
     func pending() async -> [SurpriseNotification]
     func schedule(_ notification: SurpriseNotification) async throws
     func cancel(ids: [String]) async
+    /// Every notification of the app, waiting or already shown (S08 Delete all data).
+    func removeAll() async
+}
+
+public extension NotificationScheduler {
+    func removeAll() async {
+        await cancel(ids: await pending().map(\.id))
+    }
 }
 
 // MARK: Location (7.4)

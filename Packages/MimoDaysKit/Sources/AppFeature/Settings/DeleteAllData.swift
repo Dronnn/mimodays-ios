@@ -20,6 +20,8 @@ struct AppEraser {
     let drafts: ReviewDraftStore?
     /// Puts every setting of this iPhone back to its first-launch value.
     let resetSettings: @MainActor () -> Void
+    /// The app's temporary folder, emptied too (exports, backups and picked photos waiting there); nil leaves it.
+    var temporaryDirectory: URL?
 
     func counts() -> Counts {
         Counts(
@@ -31,9 +33,10 @@ struct AppEraser {
 
     /// Surprise notifications and the backup reminder, every record, every file, the capture in review and the settings.
     func eraseEverything() async throws {
-        // `pending()` lists only surprises; the backup reminder is cancelled by its own id.
+        // Surprises, the backup reminder and "Your movie is ready", waiting or already shown.
         let pending = await notifications.pending()
         await notifications.cancel(ids: pending.map(\.id) + [BackupReminder.notificationID])
+        await notifications.removeAll()
         do {
             // Children before their parents, so no rule is left pointing at a deleted row.
             try deleteAll(MovieAudioTrack.self)
@@ -56,8 +59,19 @@ struct AppEraser {
             throw error
         }
         try store.removeAll()
+        if let temporaryDirectory { Self.removeTemporaryFiles(keeping: store.root, in: temporaryDirectory) }
         drafts?.clear()
         resetSettings()
+    }
+
+    /// The temporary folder's items, leaving out the media store when it lives there (UI tests).
+    static func removeTemporaryFiles(keeping root: URL, in folder: URL) {
+        let kept = root.standardizedFileURL.path
+        for item in (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? [] {
+            let path = item.standardizedFileURL.path
+            guard path != kept, !kept.hasPrefix(path + "/") else { continue }
+            try? FileManager.default.removeItem(at: item)
+        }
     }
 
     private func deleteAll<Model: PersistentModel>(_: Model.Type) throws {

@@ -112,7 +112,7 @@ public struct MediaStore: Sendable {
             .sorted()
     }
 
-    /// Every stored file goes; the empty areas stay (S08 Delete all data).
+    /// Every stored file goes, unpacked restores left by a stopped app too; the empty areas stay (S08 Delete all data).
     public func removeAll() throws {
         for area in Area.allCases {
             let folder = root.appendingPathComponent(area.rawValue, isDirectory: true)
@@ -120,7 +120,19 @@ public struct MediaStore: Sendable {
                 try FileManager.default.removeItem(at: item)
             }
         }
+        try removeStaging()
     }
+
+    /// Folders a restore unpacks into next to the areas (`.restore-…`); one left by an app that was stopped
+    /// mid-restore holds private media nothing points to.
+    public func removeStaging() throws {
+        let items = try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil, options: [])
+        for item in items where item.lastPathComponent.hasPrefix(Self.stagingPrefix) {
+            try FileManager.default.removeItem(at: item)
+        }
+    }
+
+    public static let stagingPrefix = ".restore-"
 
     public func clearCache() throws {
         let cache = root.appendingPathComponent(Area.cache.rawValue, isDirectory: true)

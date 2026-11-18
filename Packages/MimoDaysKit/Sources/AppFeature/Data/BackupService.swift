@@ -43,7 +43,7 @@ struct BackupService {
     /// The manifest's records and the files to pack (store path -> file). Recently deleted moments stay out.
     func plan(includesRenders: Bool) -> (document: BackupDocument, files: [(path: String, url: URL)]) {
         var document = BackupDocument(createdAt: now())
-        document.moments = liveMoments().map(BackupDocument.MomentRecord.init)
+        document.moments = liveMoments().map { BackupDocument.MomentRecord($0).leavingOut { !exists($0) } }
         document.collections = ((try? context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)]))) ?? [])
             .map(BackupDocument.CollectionRecord.init)
         document.movies = projects().map { BackupDocument.MovieRecord($0, includesRender: includesRenders) }
@@ -54,6 +54,11 @@ struct BackupService {
             return (path, url)
         }
         return (document, files)
+    }
+
+    private func exists(_ relativePath: String) -> Bool {
+        guard let url = try? store.url(for: relativePath) else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
     }
 
     /// Remembers a finished backup, for E06's "Last backup" and the moments made since.
@@ -68,10 +73,12 @@ struct BackupService {
     /// E06: when the last backup was made, and how many moments came after it.
     func status() -> (last: Date?, newSince: Int) {
         let backups = (try? context.fetch(FetchDescriptor<BackupManifest>(predicate: #Predicate { $0.restoredAt == nil }))) ?? []
-        let last = backups.map(\.createdAt).max()
         let moments = liveMoments()
-        guard let last else { return (nil, moments.count) }
-        return (last, moments.count { $0.createdAt > last })
+        guard let last = backups.max(by: { $0.createdAt < $1.createdAt }) else { return (nil, moments.count) }
+        // By what the last backup holds, not by date: a moment recovered from Recently deleted afterwards is older
+        // than the backup and still not in it.
+        let files = Set(last.checksums.keys)
+        return (last.createdAt, moments.count { moment in !moment.media.contains { files.contains($0.relativePath) } })
     }
 
     // MARK: Restoring
@@ -91,15 +98,27 @@ struct BackupService {
         var projects: Int
         var alreadyHere: Int
         var isClean: Bool
+        /// Movies, collections or collection places the backup has and this iPhone doesn't.
+        var addsMore = false
         var new: Int { moments - alreadyHere }
     }
 
     func summary(_ check: BackupArchive.Check) -> Summary {
         let here = existingMomentIDs()
         let document = check.document
+        let projectsHere = existingProjectIDs()
+        let collectionsHere = Dictionary(
+            ((try? context.fetch(FetchDescriptor<MomentCollection>())) ?? []).map { ($0.id, Set($0.memberships.compactMap { $0.moment?.id })) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let addsMore = document.movies.contains { !projectsHere.contains($0.id) } || document.collections.contains { record in
+            guard let members = collectionsHere[record.id] else { return true }
+            return record.members.contains { !members.contains($0.momentID) && here.contains($0.momentID) }
+        }
         return Summary(
             createdAt: document.createdAt, moments: document.moments.count, collections: document.collections.count,
-            projects: document.movies.count, alreadyHere: document.moments.count { here.contains($0.id) }, isClean: check.damaged.isEmpty
+            projects: document.movies.count, alreadyHere: document.moments.count { here.contains($0.id) }, isClean: check.damaged.isEmpty,
+            addsMore: addsMore
         )
     }
 
@@ -133,7 +152,10 @@ struct BackupService {
         // Replacing: what is here goes in the same save as the backup comes in, so a failed save keeps it all; its
         // files go only after that save. Until then the fetches below leave it out.
         let replacing = mode == .replaceEverything
-        let here = replacing ? [] : existingMomentIDs()
+        // Replacing still keeps the moments here whose copy in the backup is damaged: better this iPhone's than none.
+        let here = replacing
+            ? existingMomentIDs().intersection(document.moments.filter { $0.paths.contains(where: check.damaged.contains) }.map(\.id))
+            : existingMomentIDs()
         let projectsHere = replacing ? [] : existingProjectIDs()
         var paths: [String: String] = [:]
         var stored: [String] = []
@@ -168,9 +190,10 @@ struct BackupService {
             for path in stored { try? store.remove(path) }
             throw BackupArchive.Failure.unreadable
         }
-        let oldFiles: Set<String>
+        var oldFiles: Set<String> = []
+        var kept: [UUID: Moment] = [:]
         do {
-            oldFiles = replacing ? try removeEverything() : []
+            if replacing { (oldFiles, kept) = try removeEverything(keeping: here) }
         } catch {
             for path in stored { try? store.remove(path) }
             throw error
@@ -194,7 +217,7 @@ struct BackupService {
             moments[record.id] = moment
             restored += 1
         }
-        let present = replacing ? moments : try existingMoments(adding: moments)
+        let present = replacing ? moments.merging(kept) { new, _ in new } : try existingMoments(adding: moments)
 
         let collections = replacing ? [:] : Dictionary(((try? context.fetch(FetchDescriptor<MomentCollection>())) ?? []).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         for record in document.collections {
@@ -297,9 +320,11 @@ struct BackupService {
     /// Everything goes before a backup replaces it: moments (Recently deleted too), collections, movies, and
     /// their files.
     /// Marks every record for deletion, unsaved; their files, to remove once the restore has saved.
-    private func removeEverything() throws -> Set<String> {
+    private func removeEverything(keeping: Set<UUID>) throws -> (files: Set<String>, kept: [UUID: Moment]) {
         // All read before anything is marked: a failed read leaves the library as it is.
-        let moments = try context.fetch(FetchDescriptor<Moment>())
+        let all = try context.fetch(FetchDescriptor<Moment>())
+        let kept = Dictionary(all.filter { keeping.contains($0.id) }.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let moments = all.filter { !keeping.contains($0.id) }
         let projects = try context.fetch(FetchDescriptor<MovieProject>())
         let collections = try context.fetch(FetchDescriptor<MomentCollection>())
         let paths = moments.flatMap { $0.media.map(\.relativePath) + $0.voiceNotes.map(\.relativePath) }
@@ -307,7 +332,7 @@ struct BackupService {
         for project in projects { context.delete(project) }
         for collection in collections { context.delete(collection) }
         for moment in moments { context.delete(moment) }
-        return Set(paths)
+        return (Set(paths), kept)
     }
 
     private func liveMoments() -> [Moment] {

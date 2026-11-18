@@ -180,7 +180,7 @@ private struct PhotoImportFlow: ViewModifier {
                 let model = PhotoImportModel(library: library, saver: saver, lookup: lookup)
                 self.model = model
                 items = []
-                Task { await model.load(picked) }
+                model.start(picked)
             }
             .fullScreenCover(item: $model) { model in
                 PhotoImportView(model: model) {

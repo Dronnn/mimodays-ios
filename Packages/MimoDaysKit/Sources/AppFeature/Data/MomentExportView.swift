@@ -27,6 +27,7 @@ final class MomentExportModel: Identifiable {
 
     private let exporter: MomentExporter
     private var folder: URL?
+    private var work: Task<[URL], any Error>?
 
     /// `exactPlace`: S06's "Exact place in exported files".
     init(ids: [UUID], library: MediaLibrary, exactPlace: Bool = false, freeSpace: () -> Int64? = BackupModel.deviceFreeSpace) {
@@ -67,15 +68,37 @@ final class MomentExportModel: Identifiable {
         progress = 0
         defer { progress = nil }
         let report: @Sendable (Double) -> Void = { [weak self] value in Task { @MainActor in self?.report(value) } }
-        do {
-            return try await Task.detached(priority: .userInitiated) {
+        let work = Task {
+            try await detachedWork {
                 let files = try await MomentExporter.write(items, into: target, list: archive, progress: report)
                 return archive ? [try MomentExporter.zip(target, as: "\(name).zip")] : files
-            }.value
+            }
+        }
+        self.work = work
+        do {
+            let files = try await work.value
+            // Closed while writing: nobody will share these.
+            guard !work.isCancelled else {
+                discard(root)
+                return nil
+            }
+            return files
         } catch {
-            failure = .other
+            if work.isCancelled { discard(root) } else { failure = .other }
             return nil
         }
+    }
+
+    private func discard(_ root: URL) {
+        try? FileManager.default.removeItem(at: root)
+        if folder == root { folder = nil }
+    }
+
+    /// The screen closed: stop writing and throw away what was written.
+    func cancel() {
+        work?.cancel()
+        work = nil
+        removeFiles()
     }
 
     /// Only the pictures go to Photos.
@@ -167,6 +190,7 @@ struct MomentExportSheet: View {
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(28)
         .presentationBackground(ColorToken.canvas.color)
+        .onDisappear { model.cancel() }
         .sheet(isPresented: Binding(get: { sharing != nil }, set: { if !$0 { sharing = nil; model.removeFiles() } })) {
             ShareSheet(items: sharing ?? [])
         }
@@ -301,6 +325,7 @@ struct MomentsExportView: View {
             .padding(.bottom, 8)
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .onDisappear { model.cancel() }
         .sheet(isPresented: Binding(get: { sharing != nil }, set: { if !$0 { sharing = nil; model.removeFiles(); close() } })) {
             ShareSheet(items: sharing ?? [])
         }

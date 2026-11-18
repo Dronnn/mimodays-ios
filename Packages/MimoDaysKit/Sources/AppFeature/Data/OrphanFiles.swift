@@ -31,6 +31,8 @@ enum OrphanFiles {
     @MainActor
     @discardableResult
     static func remove(context: ModelContext, store: MediaStore) -> Int {
+        // No restore runs at launch: what one unpacked before the app was stopped goes too.
+        try? store.removeStaging()
         do {
             let orphans = try store.orphans(referenced: try referenced(in: context))
             for path in orphans { try store.remove(path) }

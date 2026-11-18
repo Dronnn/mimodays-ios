@@ -51,13 +51,19 @@ final class RestoreModel {
         return mode == .addMissing ? summary.new : summary.moments
     }
 
+    /// Whether E07's button has anything to do: moments, or (adding) only movies and collections.
+    var canRestore: Bool {
+        guard case let .ready(summary) = phase else { return false }
+        return adding > 0 || (mode == .addMissing && summary.addsMore)
+    }
+
     /// Reads the whole file once, hashing every entry.
     func start() {
         guard task == nil, case .checking = phase else { return }
         let url = url
         task = Task { [weak self] in
             let report: @Sendable (Double) -> Void = { progress in Task { @MainActor in self?.progress(checking: progress) } }
-            let result = await Task.detached(priority: .userInitiated) { () -> Result<BackupArchive.Check, BackupArchive.Failure> in
+            let result = await detachedWork { () -> Result<BackupArchive.Check, BackupArchive.Failure> in
                 let scoped = url.startAccessingSecurityScopedResource()
                 defer { if scoped { url.stopAccessingSecurityScopedResource() } }
                 do {
@@ -67,7 +73,7 @@ final class RestoreModel {
                 } catch {
                     return .failure(.unreadable)
                 }
-            }.value
+            }
             guard let self, !Task.isCancelled else { return }
             task = nil
             switch result {
@@ -93,13 +99,13 @@ final class RestoreModel {
             phase = .failed(.space(needed: needed - free))
             return
         }
-        let folder = library.store.root.appending(path: ".restore-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let folder = library.store.root.appending(path: MediaStore.stagingPrefix + UUID().uuidString, directoryHint: .isDirectory)
         let url = url
         let mode = mode
         phase = .restoring(0)
         task = Task { [weak self] in
             let report: @Sendable (Double) -> Void = { progress in Task { @MainActor in self?.progress(restoring: progress) } }
-            let unpacked = await Task.detached(priority: .userInitiated) { () -> [String: URL]? in
+            let unpacked = await detachedWork { () -> [String: URL]? in
                 let scoped = url.startAccessingSecurityScopedResource()
                 defer { if scoped { url.stopAccessingSecurityScopedResource() } }
                 var files: [String: URL] = [:]
@@ -112,7 +118,7 @@ final class RestoreModel {
                 } catch {
                     return nil
                 }
-            }.value
+            }
             defer { try? FileManager.default.removeItem(at: folder) }
             guard let self, !Task.isCancelled else { return }
             task = nil

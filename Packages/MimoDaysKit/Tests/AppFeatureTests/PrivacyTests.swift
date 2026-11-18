@@ -220,10 +220,16 @@ struct DeleteAllTests {
         let file = try store.store(Data("photo".utf8), in: .originals, fileExtension: "heic")
         _ = try drafts.newVoiceURL()
 
-        let eraser = AppEraser(context: context, store: store, notifications: notifications, drafts: drafts) {
+        let temporary = FileManager.default.temporaryDirectory.appending(path: "EraseTmp-\(UUID().uuidString)", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: temporary.appending(path: "Export-1"), withIntermediateDirectories: true)
+        let unpacked = store.root.appending(path: MediaStore.stagingPrefix + "1", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: unpacked, withIntermediateDirectories: true)
+        try Data("selfie".utf8).write(to: unpacked.appending(path: "a.heic"))
+        var eraser = AppEraser(context: context, store: store, notifications: notifications, drafts: drafts) {
             privacy.reset()
             memories.reset()
         }
+        eraser.temporaryDirectory = temporary
         #expect(eraser.counts() == AppEraser.Counts(moments: 1, collections: 1, movies: 1))
         try await eraser.eraseEverything()
 
@@ -233,6 +239,9 @@ struct DeleteAllTests {
         #expect(try store.usage().values.reduce(0, +) == 0)
         #expect(!FileManager.default.fileExists(atPath: drafts.root.path))
         #expect(await notifications.pending().isEmpty)
+        // What a restore stopped half-way unpacked, and exports waiting in the temporary folder.
+        #expect(!FileManager.default.fileExists(atPath: unpacked.path))
+        #expect(try FileManager.default.contentsOfDirectory(atPath: temporary.path).isEmpty)
         #expect(!onboarding.load().isCompleted)
         #expect(privacy.value == PrivacySettings() && memories.value == MemoriesSettings())
         #expect(defaults.data(forKey: "privacySettings") == nil && defaults.data(forKey: "memoriesSettings") == nil)
@@ -244,6 +253,7 @@ struct DeleteAllTests {
         let eraser = AppEraser(context: context, store: store, notifications: notifications, drafts: drafts) {}
         try await eraser.eraseEverything()
         #expect(await notifications.cancelled == [BackupReminder.notificationID])
+        #expect(await notifications.removedAll)
     }
 
     /// Lists no requests, like the system scheduler for a time-interval one, and keeps what is cancelled.
@@ -252,6 +262,8 @@ struct DeleteAllTests {
         func pending() -> [SurpriseNotification] { [] }
         func schedule(_: SurpriseNotification) {}
         func cancel(ids: [String]) { cancelled += ids }
+        private(set) var removedAll = false
+        func removeAll() { removedAll = true }
     }
 }
 

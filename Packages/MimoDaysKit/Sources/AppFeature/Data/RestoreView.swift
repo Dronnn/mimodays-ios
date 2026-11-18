@@ -129,7 +129,7 @@ struct RestoreView: View {
             }
             Button(action: model.restore) { restoreLabel(summary) }
                 .buttonStyle(.primary)
-                .disabled(model.adding == 0)
+                .disabled(!model.canRestore)
                 .accessibilityIdentifier("restore.start")
                 .padding(.horizontal, 20)
                 .padding(.bottom, 8)
@@ -183,7 +183,7 @@ struct RestoreView: View {
 
     private func restoreLabel(_ summary: BackupService.Summary) -> Text {
         model.mode == .addMissing
-            ? Text("Add \(model.adding) moments", bundle: .module)
+            ? (model.adding == 0 ? Text("Add what's missing", bundle: .module) : Text("Add \(model.adding) moments", bundle: .module))
             : Text("Replace with \(model.adding) moments", bundle: .module)
     }
 

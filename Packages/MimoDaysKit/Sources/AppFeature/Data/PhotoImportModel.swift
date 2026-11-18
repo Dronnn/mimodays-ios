@@ -43,6 +43,9 @@ final class PhotoImportModel: Identifiable {
     /// Picked files whose bytes are already in a moment (or picked twice).
     var skipped: Set<Int> = []
 
+    /// Every copy the picker handed over, read or not yet, so closing mid-load leaves none behind.
+    private var received: [URL] = []
+    private var loading: Task<Void, Never>?
     private let library: MediaLibrary
     private let saver: MomentSaver
     private let lookup: any PlaceLookup
@@ -66,7 +69,9 @@ final class PhotoImportModel: Identifiable {
         var seen = existing
         var picked: [Picked] = []
         var skipped: Set<Int> = []
+        received += files.map(\.url)
         for (index, file) in files.enumerated() {
+            guard !Task.isCancelled else { return }
             guard let item = await Task.detached(priority: .userInitiated, operation: { await Self.read(file.url, isVideo: file.isVideo, id: index) }).value else {
                 continue
             }
@@ -75,16 +80,28 @@ final class PhotoImportModel: Identifiable {
             phase = .loading(Double(index + 1) / Double(files.count))
             thumbnails[item.id] = await ReviewModel.still(item.url, maxPixelSize: 300, at: 0)
         }
+        guard !Task.isCancelled else { return }
         self.picked = picked
         self.skipped = skipped
         phase = picked.isEmpty ? .failed : .ready
+    }
+
+    /// The picker's choice, loaded and read until the screen closes.
+    func start(_ items: [some PhotoPickerItemLoading]) {
+        loading = Task { await load(items) }
     }
 
     /// Loads what the picker returned, then reads it.
     func load(_ items: [some PhotoPickerItemLoading]) async {
         var files: [(url: URL, isVideo: Bool)] = []
         for (index, item) in items.enumerated() {
-            if let file = try? await item.loadFile() { files.append((file.url, file.isVideo)) }
+            guard let file = try? await item.loadFile() else { continue }
+            guard !Task.isCancelled else {
+                // Copied after the screen closed.
+                try? FileManager.default.removeItem(at: file.url)
+                return
+            }
+            files.append((file.url, file.isVideo))
             phase = .loading(Double(index + 1) / Double(items.count) / 2)
         }
         await load(files)
@@ -125,9 +142,12 @@ final class PhotoImportModel: Identifiable {
         return failures == 0
     }
 
-    /// Removes the tmp copies nobody imported.
+    /// Stops loading and removes the tmp copies nobody imported.
     func discard() {
-        picked.forEach { try? FileManager.default.removeItem(at: $0.url) }
+        loading?.cancel()
+        loading = nil
+        (received + picked.map(\.url)).forEach { try? FileManager.default.removeItem(at: $0) }
+        received = []
     }
 
     private func existingChecksums() -> Set<String> {

@@ -125,7 +125,8 @@ public final class AppDependencies {
                 cameraSettings.save(CameraSettings())
                 UserDefaults.standard.removeObject(forKey: BackupReminder.key)
                 UserDefaults.standard.removeObject(forKey: MoviesModel.dismissedKey)
-            }
+            },
+            temporaryDirectory: FileManager.default.temporaryDirectory
         )
         UNUserNotificationCenter.current().delegate = notificationTaps
         if configuration.isUITesting, let tap = configuration.surpriseTap {

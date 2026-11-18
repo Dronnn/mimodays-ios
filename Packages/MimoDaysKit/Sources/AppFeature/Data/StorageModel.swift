@@ -16,8 +16,12 @@ final class StorageModel {
         var voiceNotes: Int64 = 0
         /// Files made on the way that nothing keeps: the store's cache and the app's temporary folder.
         var temporary: Int64 = 0
+        /// Moments in Recently deleted, still on this iPhone until they're gone for good.
+        var recentlyDeleted: Int64 = 0
+        /// Music picked for movies.
+        var soundtracks: Int64 = 0
 
-        var total: Int64 { moments + movies + voiceNotes + temporary }
+        var total: Int64 { moments + movies + voiceNotes + temporary + recentlyDeleted + soundtracks }
     }
 
     private(set) var usage = Usage()
@@ -50,8 +54,11 @@ final class StorageModel {
                 deletedBytes += media + voice
             }
         }
+        usage.recentlyDeleted = deletedBytes
         let projects = (try? library.context.fetch(FetchDescriptor<MovieProject>())) ?? []
         usage.movies = projects.reduce(Int64(0)) { sum, project in sum + (project.render.map { size(of: $0.relativePath) } ?? 0) }
+        // A track shared by two projects is one file.
+        usage.soundtracks = Set(projects.flatMap { $0.audioTracks.map(\.relativePath) }).reduce(Int64(0)) { $0 + size(of: $1) }
         usage.temporary = ((try? library.store.usage()[.cache]) ?? 0) + temporaryFiles().reduce(Int64(0)) { $0 + Self.allocated($1) }
         self.usage = usage
         self.deletedCount = deletedCount

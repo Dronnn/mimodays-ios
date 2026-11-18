@@ -54,6 +54,17 @@ struct BackupDocument: Codable, Equatable {
 
         /// Every file the moment needs.
         var paths: [String] { media.map(\.path) + voiceNotes.map(\.path) }
+
+        /// Without the files that are gone from this iPhone, so a restore brings back the rest of the moment
+        /// instead of skipping it. One whose camera files are all gone stays as it is: there is nothing to restore.
+        func leavingOut(_ isMissing: (String) -> Bool) -> Self {
+            let sources = media.filter { $0.role == MediaRole.rearSource.rawValue || $0.role == MediaRole.frontSource.rawValue }
+            guard sources.contains(where: { !isMissing($0.path) }) else { return self }
+            var record = self
+            record.media.removeAll { isMissing($0.path) }
+            record.voiceNotes.removeAll { isMissing($0.path) }
+            return record
+        }
     }
 
     struct MediaRecord: Codable, Equatable {

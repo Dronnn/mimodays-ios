@@ -94,10 +94,11 @@ struct BackupTests {
     }
 
     private func restore(
-        _ url: URL, into library: MediaLibrary, mode: BackupService.Mode = .addMissing, losing lost: Int = 0
+        _ url: URL, into library: MediaLibrary, mode: BackupService.Mode = .addMissing, losing lost: Int = 0, damaging: Set<String> = []
     ) throws -> BackupService.Outcome {
         let service = BackupService(library: library, now: { [clock] in clock.now() })
-        let check = try BackupArchive.check(url)
+        var check = try BackupArchive.check(url)
+        check.damaged.formUnion(damaging)
         let wanted = service.files(for: check, mode: mode)
         let folder = temporary("unpacked")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -296,6 +297,67 @@ struct BackupTests {
         service.record(document)
         #expect(service.status().last == clock.now())
         #expect(service.status().newSince == 0)
+    }
+
+    /// W2: replacing keeps a moment whose copy in the backup is damaged, in its collection again.
+    @Test func replacingKeepsAMomentTheBackupCantBringBack() async throws {
+        let phone = try library()
+        let ids = try await fill(phone)
+        let (url, document) = try backUp(phone)
+        let hurt = try #require(document.moments.first { $0.id == ids[1] })
+        let outcome = try restore(url, into: phone, mode: .replaceEverything, damaging: [hurt.paths[0]])
+        let moments = try phone.context.fetch(FetchDescriptor<Moment>())
+        #expect(Set(moments.map(\.id)) == Set(ids.prefix(3)))
+        let kept = try #require(moments.first { $0.id == ids[1] })
+        #expect(kept.media.allSatisfy { phone.store.fileExists($0.relativePath) })
+        let trip = try #require(try phone.context.fetch(FetchDescriptor<MomentCollection>()).first)
+        #expect(Set(trip.memberships.compactMap { $0.moment?.id }) == Set(ids.prefix(2)))
+        #expect(outcome.skipped.isEmpty)
+        // Nothing left behind: every file belongs to a record.
+        #expect(OrphanFiles.remove(context: phone.context, store: phone.store) == 0)
+    }
+
+    /// W2: a file already gone from the iPhone (a lost voice note) leaves the backup without it, and the moment
+    /// comes back with the rest.
+    @Test func aMissingFileDoesntCostTheMoment() async throws {
+        let phone = try library()
+        let ids = try await fill(phone)
+        let first = try #require(try phone.context.fetch(FetchDescriptor<Moment>()).first { $0.id == ids[0] })
+        try phone.store.remove(try #require(first.voiceNotes.first).relativePath)
+        let (url, document) = try backUp(phone)
+        #expect(try #require(document.moments.first { $0.id == ids[0] }).voiceNotes.isEmpty)
+        let newPhone = try library()
+        let outcome = try restore(url, into: newPhone)
+        #expect(outcome.restored == 3 && outcome.skipped.isEmpty)
+    }
+
+    /// W2: a moment recovered from Recently deleted after a backup isn't in it, though it's older.
+    @Test func aMomentRecoveredAfterTheBackupIsNotInIt() async throws {
+        let phone = try library()
+        let ids = try await fill(phone)
+        let service = BackupService(library: phone, now: { [clock] in clock.now() })
+        let (_, document) = try backUp(phone)
+        service.record(document)
+        #expect(service.status().newSince == 0)
+        let deleted = try #require(try phone.context.fetch(FetchDescriptor<Moment>()).first { $0.id == ids[3] })
+        deleted.deletedAt = nil
+        try phone.context.save()
+        #expect(service.status().newSince == 1)
+    }
+
+    /// W2: adding from a backup whose moments are all here still brings back a movie deleted since.
+    @Test func aDeletedMovieAloneCanBeAdded() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let (url, _) = try backUp(phone)
+        let service = BackupService(library: phone, now: { [clock] in clock.now() })
+        #expect(!service.summary(try BackupArchive.check(url)).addsMore)
+        for project in try phone.context.fetch(FetchDescriptor<MovieProject>()) { phone.context.delete(project) }
+        try phone.context.save()
+        let summary = service.summary(try BackupArchive.check(url))
+        #expect(summary.new == 0 && summary.addsMore)
+        _ = try restore(url, into: phone)
+        #expect(try phone.context.fetchCount(FetchDescriptor<MovieProject>()) == 1)
     }
 
     /// V6: launch removes only files no record points to; a full library (Recently Deleted, voice note, music,

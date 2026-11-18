@@ -99,19 +99,24 @@ final class BackupModel {
         }
         phase = .working(.collecting, progress: 0)
         let plan = service.plan(includesRenders: includesRenders)
-        let url = FileManager.default.temporaryDirectory.appending(path: Self.fileName(plan.document.createdAt))
+        // A folder of its own per attempt: a cancelled one still winding down never shares a file with the next.
+        let url = FileManager.default.temporaryDirectory.appending(path: "Backup-\(UUID().uuidString)", directoryHint: .isDirectory)
+            .appending(path: Self.fileName(plan.document.createdAt))
         task = Task { [weak self] in
             let update: @Sendable (Step, Double) -> Void = { step, progress in
                 Task { @MainActor in self?.advance(step, progress) }
             }
             do {
                 let written = try await Self.pack(plan.document, files: plan.files.map { Pair(path: $0.path, url: $0.url) }, to: url, update: update)
-                guard let self, !Task.isCancelled else { return }
+                guard let self, !Task.isCancelled else {
+                    Self.remove(url)
+                    return
+                }
                 document = written
                 packed = url
                 phase = .working(.choosing, progress: 0)
             } catch {
-                try? FileManager.default.removeItem(at: url)
+                Self.remove(url)
                 guard let self, !Task.isCancelled else { return }
                 Self.logger.error("Backup failed: \(String(describing: error), privacy: .public)")
                 phase = .failed(.other)
@@ -130,6 +135,8 @@ final class BackupModel {
     func saved(to destination: URL) {
         guard let document else { return }
         service.record(document)
+        // The file has moved out; its empty folder goes.
+        if let packed { Self.remove(packed) }
         packed = nil
         scheduleReminder(reminder, document.createdAt)
         phase = .saved(Saved(url: destination, bytes: document.files.values.reduce(Int64(0)) { $0 + $1.bytes }, moments: document.moments.count))
@@ -140,7 +147,7 @@ final class BackupModel {
     func cancel() {
         task?.cancel()
         task = nil
-        if let packed { try? FileManager.default.removeItem(at: packed) }
+        if let packed { Self.remove(packed) }
         packed = nil
         document = nil
         if case .working = phase { phase = .options }
@@ -155,7 +162,8 @@ final class BackupModel {
     nonisolated private static func pack(
         _ document: BackupDocument, files: [Pair], to url: URL, update: @escaping @Sendable (Step, Double) -> Void
     ) async throws -> BackupDocument {
-        try await Task.detached(priority: .userInitiated) {
+        try await detachedWork {
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             update(.packing, 0)
             let written = try BackupArchive.write(
                 document, files: files.map { ($0.path, $0.url) }, to: url, progress: { update(.packing, $0) }, isCancelled: { Task.isCancelled }
@@ -166,7 +174,12 @@ final class BackupModel {
             // don't survive JSON's seconds-since-1970 to the last bit.)
             guard check.damaged.isEmpty, check.document.files == written.files else { throw BackupArchive.Failure.unreadable }
             return written
-        }.value
+        }
+    }
+
+    /// A packed backup and the folder it was made in.
+    nonisolated private static func remove(_ url: URL) {
+        try? FileManager.default.removeItem(at: url.deletingLastPathComponent())
     }
 
     private struct Pair: Sendable {

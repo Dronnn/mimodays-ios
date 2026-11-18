@@ -235,12 +235,20 @@ private struct TileMotionTile: ViewModifier {
                     if plays, isOnScreen, motion.plays(id) { TileLoop(id: id, still: still, library: library) }
                 }
                 .onScrollVisibilityChange(threshold: 0.3) { visible in
+                    // Counted per tile: each tile adds itself once.
+                    guard visible != isOnScreen else { return }
                     isOnScreen = visible
                     motion.setOnScreen(id, visible)
                 }
                 .onDisappear {
                     if isOnScreen { motion.setOnScreen(id, false) }
                     isOnScreen = false
+                }
+                // The same tile showing another moment (Today's hero after a new one): the slot moves with it.
+                .onChange(of: id) { old, new in
+                    guard isOnScreen else { return }
+                    motion.setOnScreen(old, false)
+                    motion.setOnScreen(new, true)
                 }
             if !holds || open == nil {
                 tile

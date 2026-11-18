@@ -91,8 +91,9 @@ actor LoopPreviews {
     }
 
     private func finished(_ path: String, job: UUID, _ outcome: Outcome, store: MediaStore) {
-        // A job that was left and replaced by a newer one changes nothing of the newer one's.
-        if making[path]?.id == job { making[path] = nil }
+        // A job that was left (and maybe replaced by a newer one) changes nothing of the newer one's.
+        let current = making[path]?.id == job
+        if current { making[path] = nil }
         waiting[job] = nil
         switch outcome {
         case .made:
@@ -101,9 +102,9 @@ actor LoopPreviews {
         case .cancelled:
             break
         case .failed:
-            failed[path] = Date()
+            if current { failed[path] = Date() }
         case .tooBig:
-            failed[path] = .distantFuture
+            if current { failed[path] = .distantFuture }
         }
     }
 

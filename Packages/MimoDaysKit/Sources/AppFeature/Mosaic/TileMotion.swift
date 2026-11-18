@@ -225,8 +225,18 @@ private struct TileMotionTile: ViewModifier {
     @Environment(\.mediaLibrary) private var library
     @Environment(\.tileOpen) private var open
     @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
-    @State private var isOnScreen = false
+    /// The moment this tile counts as on screen for, nil while off screen: each tile counts once, for one moment.
+    @State private var registered: UUID?
     @State private var exporting: MomentExportModel?
+
+    private var isOnScreen: Bool { registered != nil }
+
+    private func register(_ new: UUID?, _ motion: TileMotion) {
+        guard registered != new else { return }
+        if let registered { motion.setOnScreen(registered, false) }
+        if let new { motion.setOnScreen(new, true) }
+        registered = new
+    }
 
     func body(content: Content) -> some View {
         if let motion, isVideo, let library {
@@ -235,20 +245,12 @@ private struct TileMotionTile: ViewModifier {
                     if plays, isOnScreen, motion.plays(id) { TileLoop(id: id, still: still, library: library) }
                 }
                 .onScrollVisibilityChange(threshold: 0.3) { visible in
-                    // Counted per tile: each tile adds itself once.
-                    guard visible != isOnScreen else { return }
-                    isOnScreen = visible
-                    motion.setOnScreen(id, visible)
+                    register(visible ? id : nil, motion)
                 }
-                .onDisappear {
-                    if isOnScreen { motion.setOnScreen(id, false) }
-                    isOnScreen = false
-                }
+                .onDisappear { register(nil, motion) }
                 // The same tile showing another moment (Today's hero after a new one): the slot moves with it.
-                .onChange(of: id) { old, new in
-                    guard isOnScreen else { return }
-                    motion.setOnScreen(old, false)
-                    motion.setOnScreen(new, true)
+                .onChange(of: id) { _, new in
+                    if registered != nil { register(new, motion) }
                 }
             if !holds || open == nil {
                 tile

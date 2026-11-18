@@ -35,6 +35,17 @@ struct CameraModelMicrophoneTests {
         #expect(await eventually { await MainActor.run { model.interruption == nil } })
     }
 
+    @Test func aCallEndingWhileReviewShowsFreesTheShutter() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: true)
+        await engine.simulateInterruption(.anotherApp)
+        #expect(await eventually { await MainActor.run { model.interruption == .anotherApp } })
+        await model.stop() // Review opens
+        await engine.simulateInterruptionEnded()
+        await model.start() // Retake
+        #expect(await eventually { await MainActor.run { model.interruption == nil } })
+    }
+
     @Test func videoWithPermissionAndSoundUsesTheMicrophone() async {
         let engine = SimulatedCaptureEngine()
         let model = await videoCamera(engine: engine, allowed: true)

@@ -115,6 +115,12 @@ final class CameraModel {
     let engine: any CaptureEngine
     private let orientation: any OrientationSensor
     private var holds: Task<Void, Never>?
+
+    /// The event listener lives as long as the model; it ends with it.
+    isolated deinit {
+        events?.cancel()
+        holds?.cancel()
+    }
     private let store: any CameraSettingsStore
     private let clock: any DateProvider
     private let microphoneStatus: @MainActor () async -> PermissionStatus
@@ -200,9 +206,9 @@ final class CameraModel {
     }
 
     func start() async {
-        // This start's events, from its first moment; what was interrupted before (a retake) is news no more.
-        let events = engine.events
-        interruption = nil
+        // One listener for the model's life, from its first start: a call ending while Review shows still arrives,
+        // and a second start (Retake, the screen appearing again) doesn't drop what came before.
+        let events = self.events == nil ? engine.events : nil
         do {
             try? await engine.setBackLens(settings.backLens)
             setup = try await engine.start()
@@ -210,7 +216,7 @@ final class CameraModel {
             showsSingleCameraNote = setup != .dual
             phase = .ready
             await refreshMicrophone()
-            listenForEvents(events)
+            if let events { listenForEvents(events) }
             listenForHolds()
         } catch {
             phase = .failed(error as? CaptureError ?? .cameraUnavailable)
@@ -218,8 +224,6 @@ final class CameraModel {
     }
 
     func stop() async {
-        events?.cancel()
-        events = nil
         holds?.cancel()
         holds = nil
         if isRecording { await engine.stopRecording() }
@@ -380,7 +384,6 @@ final class CameraModel {
     }
 
     private func listenForEvents(_ stream: AsyncStream<CaptureEvent>) {
-        events?.cancel()
         events = Task { [weak self] in
             for await event in stream {
                 guard let self else { return }

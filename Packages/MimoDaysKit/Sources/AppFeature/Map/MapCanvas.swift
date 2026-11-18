@@ -134,6 +134,11 @@ struct MapCanvas: UIViewRepresentable {
         return map
     }
 
+    /// A map taken off screen (a retry, or the layout changing between compact and wide) reports nothing more.
+    static func dismantleUIView(_ map: MKMapView, coordinator: Coordinator) {
+        map.delegate = nil
+    }
+
     func updateUIView(_ map: MKMapView, context: Context) {
         let coordinator = context.coordinator
         coordinator.parent = self

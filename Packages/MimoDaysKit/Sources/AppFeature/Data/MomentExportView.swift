@@ -170,7 +170,7 @@ struct MomentExportSheet: View {
                 .buttonStyle(SecondaryButtonStyle())
                 .disabled(saved || savingToPhotos || model.progress != nil)
                 .accessibilityIdentifier("exportMoment.photos")
-                Button { Task { sharing = await model.files() } } label: {
+                Button { Task { if !savingToPhotos { sharing = await model.files() } } } label: {
                     HStack(spacing: 8) {
                         if model.progress != nil {
                             ProgressView().tint(ColorToken.textOnCoral.color)

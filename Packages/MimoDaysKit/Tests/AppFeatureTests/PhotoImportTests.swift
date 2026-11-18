@@ -62,8 +62,8 @@ struct PhotoImportTests {
 
     private func moments() throws -> [Moment] { try container.mainContext.fetch(FetchDescriptor<Moment>()) }
 
-    /// Copies the photo into `folder` like the picker and notes in `log` that it was asked to. The slow one takes a
-    /// second; cancelled meanwhile, it either still hands over its copy or fails, as a picker may.
+    /// Copies the photo into `folder` like the picker and notes in `log` that it was asked to. The slow one waits
+    /// until cancelled; then it either still hands over its copy or fails, as a picker may.
     private struct Item: PhotoPickerItemLoading {
         let folder: URL
         let log: URL
@@ -74,7 +74,8 @@ struct PhotoImportTests {
         func loadFile() async throws -> PickedFile? {
             FileManager.default.createFile(atPath: log.appending(path: name).path, contents: nil)
             if slow {
-                try? await Task.sleep(for: .seconds(1))
+                // Long enough that only the close ends it, however slow the machine.
+                try? await Task.sleep(for: .seconds(30))
                 if failsWhenCancelled, Task.isCancelled { throw CancellationError() }
             }
             let url = folder.appending(path: "\(UUID().uuidString).jpg")

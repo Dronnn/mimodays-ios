@@ -133,19 +133,42 @@ struct BackupService {
         // Replacing: what is here goes in the same save as the backup comes in, so a failed save keeps it all; its
         // files go only after that save. Until then the fetches below leave it out.
         let replacing = mode == .replaceEverything
-        let oldFiles = replacing ? removeEverything() : []
         let here = replacing ? [] : existingMomentIDs()
+        let projectsHere = replacing ? [] : existingProjectIDs()
         var paths: [String: String] = [:]
         var stored: [String] = []
+        // A file that can't come in (no space, unreadable): replacing then keeps what is here instead.
+        var moveFailed = false
         func move(_ path: String) -> Bool {
             if paths[path] != nil { return true }
-            guard let file = unpacked[path] else { return false }
+            guard let file = unpacked[path] else {
+                moveFailed = true
+                return false
+            }
             let area: MediaStore.Area = path.hasPrefix(MediaStore.Area.derived.rawValue + "/") ? .derived : .originals
-            guard let new = try? store.store(moving: file, in: area) else { return false }
+            guard let new = try? store.store(moving: file, in: area) else {
+                moveFailed = true
+                return false
+            }
             paths[path] = new.relativePath
             stored.append(new.relativePath)
             return true
         }
+
+        // Files first: nothing in the library changes until every file that should come in is here, so a
+        // replacement that can't bring one in leaves the library untouched (no records to roll back).
+        for record in document.moments where !here.contains(record.id) && !record.paths.contains(where: check.damaged.contains) {
+            for path in record.paths { _ = move(path) }
+        }
+        for record in document.movies where !projectsHere.contains(record.id) {
+            if let render = record.render, !check.damaged.contains(render.relativePath) { _ = move(render.relativePath) }
+            for track in record.audioTracks where !check.damaged.contains(track.path) { _ = move(track.path) }
+        }
+        if replacing, moveFailed {
+            for path in stored { try? store.remove(path) }
+            throw BackupArchive.Failure.unreadable
+        }
+        let oldFiles = replacing ? try removeEverything() : []
 
         var wanted = 0
         var restored = 0
@@ -182,7 +205,6 @@ struct BackupService {
             }
         }
 
-        let projectsHere = replacing ? [] : existingProjectIDs()
         for record in document.movies where !projectsHere.contains(record.id) {
             let project = MovieProject(
                 id: record.id, title: record.title, sourceRule: record.sourceRule,
@@ -269,13 +291,15 @@ struct BackupService {
     /// Everything goes before a backup replaces it: moments (Recently deleted too), collections, movies, and
     /// their files.
     /// Marks every record for deletion, unsaved; their files, to remove once the restore has saved.
-    private func removeEverything() -> Set<String> {
-        let moments = (try? context.fetch(FetchDescriptor<Moment>())) ?? []
-        let projects = (try? context.fetch(FetchDescriptor<MovieProject>())) ?? []
+    private func removeEverything() throws -> Set<String> {
+        // All read before anything is marked: a failed read leaves the library as it is.
+        let moments = try context.fetch(FetchDescriptor<Moment>())
+        let projects = try context.fetch(FetchDescriptor<MovieProject>())
+        let collections = try context.fetch(FetchDescriptor<MomentCollection>())
         let paths = moments.flatMap { $0.media.map(\.relativePath) + $0.voiceNotes.map(\.relativePath) }
             + projects.flatMap { $0.audioTracks.map(\.relativePath) + ($0.render.map { [$0.relativePath] } ?? []) }
         for project in projects { context.delete(project) }
-        for collection in (try? context.fetch(FetchDescriptor<MomentCollection>())) ?? [] { context.delete(collection) }
+        for collection in collections { context.delete(collection) }
         for moment in moments { context.delete(moment) }
         return Set(paths)
     }

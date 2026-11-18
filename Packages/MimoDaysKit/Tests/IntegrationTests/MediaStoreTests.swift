@@ -60,7 +60,15 @@ struct MediaStoreTests {
         let folder = store.root.appendingPathComponent("originals/ab", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         try Data([0]).write(to: folder.appendingPathComponent(".interrupted.partial"))
-        #expect(try store.orphans(referenced: ["originals/ab/.interrupted.partial"]) == ["originals/ab/.interrupted.partial"])
+        #expect(try store.orphans(referenced: []) == ["originals/ab/.interrupted.partial"])
+    }
+
+    /// A file a record points to stays, whatever its name says (a restored file can keep a `.partial` extension).
+    @Test func aReferencedFileIsNeverAnOrphan() throws {
+        let folder = store.root.appendingPathComponent("originals/ab", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try Data([0]).write(to: folder.appendingPathComponent("restored.partial"))
+        #expect(try store.orphans(referenced: ["originals/ab/restored.partial"]).isEmpty)
     }
 
     @Test func pathsCannotEscapeTheStore() {

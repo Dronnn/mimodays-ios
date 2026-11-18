@@ -302,6 +302,8 @@ final class MemoriesModel {
            let picture = try? await thumbnails.thumbnail(for: url, maxPixelSize: Self.selfiePixels) {
             window = UIImage(cgImage: picture)
         }
+        // Replaced while it was read (the viewer saved a new layout meanwhile): the new one instead.
+        guard self.pictures(id)?.all == pictures.all else { return await loadImage(id) }
         selfies[id] = window
         if images.updateValue(UIImage(cgImage: image), forKey: id) == nil { imageOrder.append(id) }
         imagePaths[id] = pictures.all

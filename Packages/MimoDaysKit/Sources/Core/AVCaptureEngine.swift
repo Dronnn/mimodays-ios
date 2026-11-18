@@ -104,7 +104,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         try await onQueue {
             self.isActive = true
             if let setup = self.setup {
-                if !self.session.isRunning { self.session.startRunning() }
+                if !self.session.isRunning {
+                    self.session.startRunning()
+                    // Running again after an error that said "interrupted": the shutter may work again.
+                    if self.session.isRunning, !self.session.isInterrupted, self.lastInterruption != nil {
+                        self.lastInterruption = nil
+                        self.eventSink.yield(.resumed)
+                    }
+                }
                 return setup
             }
             let setup = try self.configureWithinBudget()

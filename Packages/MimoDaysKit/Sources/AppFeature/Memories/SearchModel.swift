@@ -185,6 +185,8 @@ final class SearchModel {
               let path = moment.media.first(where: { $0.role == .thumbnail })?.relativePath,
               let url = try? library.store.url(for: path),
               let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: MemoriesModel.tilePixels) else { return }
+        // Replaced while it was read: the new one instead.
+        guard library.context.thumbnailPaths(of: [id])[id] == path else { return await load(id, again: true) }
         if images.updateValue(UIImage(cgImage: image), forKey: id) == nil { imageOrder.append(id) }
         imagePaths[id] = path
         if imageOrder.count > MemoriesModel.imageLimit {

@@ -208,7 +208,8 @@ final class CameraModel {
     func start() async {
         // One listener for the model's life, from its first start: a call ending while Review shows still arrives,
         // and a second start (Retake, the screen appearing again) doesn't drop what came before.
-        let events = self.events == nil ? engine.events : nil
+        // Set up before the first wait, so two starts overlapping can't both subscribe.
+        if events == nil { listenForEvents(engine.events) }
         do {
             try? await engine.setBackLens(settings.backLens)
             setup = try await engine.start()
@@ -216,7 +217,6 @@ final class CameraModel {
             showsSingleCameraNote = setup != .dual
             phase = .ready
             await refreshMicrophone()
-            if let events { listenForEvents(events) }
             listenForHolds()
         } catch {
             phase = .failed(error as? CaptureError ?? .cameraUnavailable)

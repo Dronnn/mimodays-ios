@@ -104,11 +104,11 @@ public struct MediaStore: Sendable {
         try FileManager.default.removeItem(at: url)
     }
 
-    /// Files in originals and derived that no record points to, e.g. after an interrupted save.
-    /// Leftover staging files are always orphans.
+    /// Files in originals and derived that no record points to, e.g. after an interrupted save (leftover staging
+    /// files among them). A file a record points to is never one, whatever its name.
     public func orphans(referenced: Set<String>) throws -> [String] {
         try [Area.originals, .derived].flatMap { try relativePaths(in: $0) }
-            .filter { !referenced.contains($0) || ($0 as NSString).lastPathComponent.hasSuffix(".partial") }
+            .filter { !referenced.contains($0) }
             .sorted()
     }
 

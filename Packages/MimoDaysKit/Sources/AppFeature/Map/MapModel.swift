@@ -148,6 +148,8 @@ final class MapModel {
         guard let path = moment.media.first(where: { $0.role == .thumbnail })?.relativePath,
               let url = try? library.store.url(for: path),
               let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: MemoriesModel.tilePixels) else { return }
+        // Replaced while it was read: the new one instead.
+        guard library.context.thumbnailPaths(of: [id])[id] == path else { return await load(id, again: true) }
         images[id] = UIImage(cgImage: image)
         imagePaths[id] = path
     }

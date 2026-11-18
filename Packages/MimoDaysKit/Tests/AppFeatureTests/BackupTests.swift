@@ -93,7 +93,9 @@ struct BackupTests {
         return (url, document)
     }
 
-    private func restore(_ url: URL, into library: MediaLibrary, mode: BackupService.Mode = .addMissing) throws -> BackupService.Outcome {
+    private func restore(
+        _ url: URL, into library: MediaLibrary, mode: BackupService.Mode = .addMissing, losing lost: Int = 0
+    ) throws -> BackupService.Outcome {
         let service = BackupService(library: library, now: { [clock] in clock.now() })
         let check = try BackupArchive.check(url)
         let wanted = service.files(for: check, mode: mode)
@@ -101,7 +103,22 @@ struct BackupTests {
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         var unpacked: [String: URL] = [:]
         try BackupArchive.extract(url, paths: wanted, into: folder) { path, file in unpacked[path] = file }
+        // Files that couldn't be unpacked (no space).
+        for path in unpacked.keys.sorted().prefix(lost) { unpacked[path] = nil }
         return try service.restore(check, mode: mode, unpacked: unpacked)
+    }
+
+    /// V7: replacing with a backup one of whose files can't come in keeps the library as it is.
+    @Test func aReplacementMissingAFileKeepsTheLibrary() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let (url, _) = try backUp(phone)
+        let other = try library()
+        let own = Set(try await fill(other))
+        let files = try other.store.orphans(referenced: [])
+        #expect(throws: (any Error).self) { try restore(url, into: other, mode: .replaceEverything, losing: 1) }
+        #expect(Set(try other.context.fetch(FetchDescriptor<Moment>()).map(\.id)) == own)
+        #expect(try other.store.orphans(referenced: []) == files)
     }
 
     /// The records as a backup would write them, with the store's file names left out.

@@ -56,7 +56,7 @@ struct MomentExporterTests {
 
     private func names(_ urls: [URL]) -> [String] { urls.map(\.lastPathComponent) }
 
-    @Test func byDefaultThePictureVoiceAndNoteLeaveWithoutThePlace() async throws {
+    @Test func byDefaultThePictureAndNoteLeaveWithoutThePlaceOrVoice() async throws {
         let ids = try await moments()
         let exporter = MomentExporter(library: library)
         let items = exporter.items(ids, options: .init())
@@ -68,7 +68,7 @@ struct MomentExporterTests {
         #expect(note.contains("Lunch") && note.contains("the good one"))
         #expect(!note.contains("Kentron") && !note.contains("40.18"))
         #expect(gps(files[0]) == nil)
-        #expect(try await location(files[3]) == nil)
+        #expect(try await location(files[2]) == nil)
     }
 
     @Test func exactPlaceIsWrittenWhenTurnedOn() async throws {

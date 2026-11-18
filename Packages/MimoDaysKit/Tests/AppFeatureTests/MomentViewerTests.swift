@@ -331,7 +331,8 @@ struct MomentViewerTests {
         await player.load(main: items.main, selfie: items.selfie)
         #expect(player.isReady && !player.hasSelfie)
         player.play()
-        try await Task.sleep(for: .milliseconds(300))
+        // A busy CI machine can take more than a fixed moment to start: waits up to 5 s for the picture to move.
+        for _ in 0..<100 where player.main.currentTime().seconds <= 0.1 { try await Task.sleep(for: .milliseconds(50)) }
         #expect(player.isPlaying && player.main.currentTime().seconds > 0.1)
         player.stop()
         let url = try #require(await viewer.exportVideo(id))

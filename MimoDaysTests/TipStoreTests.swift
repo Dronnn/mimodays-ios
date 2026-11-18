@@ -8,8 +8,13 @@ import Testing
 /// 14.9: the real StoreKit store against the local configuration.
 /// With dialogs off, the test session answers the purchase sheet itself: bought, failed, Ask to Buy. The thanks and
 /// the screen's states are covered by `DonationsModelTests` with a fake store.
+/// Run locally: on the hosted CI runners (unsigned app) a test-session purchase never finishes. The tips on a real
+/// device are on the device check. The time limit turns any other hang into a failure.
 @MainActor
-@Suite(.serialized)
+@Suite(
+    .serialized, .timeLimit(.minutes(1)),
+    .disabled(if: ProcessInfo.processInfo.environment["MIMODAYS_CI"] != nil, "StoreKit test purchases hang on hosted runners")
+)
 struct StoreKitTipStoreTests {
     private func session() throws -> SKTestSession {
         // The same file the MimoDays scheme runs with.

@@ -108,6 +108,7 @@ struct BackButton: View {
 struct WeekdayPicker: View {
     @Binding var schedule: ReminderSchedule
     @Environment(\.calendar) private var calendar
+    @Environment(\.locale) private var locale
 
     var body: some View {
         HStack(spacing: 8) {
@@ -116,14 +117,14 @@ struct WeekdayPicker: View {
                 Button {
                     schedule.toggle(day)
                 } label: {
-                    Text(verbatim: calendar.veryShortStandaloneWeekdaySymbols[day - 1])
+                    Text(verbatim: calendar.speaking(locale).veryShortStandaloneWeekdaySymbols[day - 1])
                         .textStyle(TextStyle(.nunito, size: 16, weight: isOn ? 800 : 700, relativeTo: .body, maximumScale: 1.35))
                         .foregroundStyle((isOn ? ColorToken.textOnCoral : .textSecondary).color)
                         .frame(width: 44, height: 44)
                         .background(Circle().fill((isOn ? ColorToken.actionCoral : .surfaceChip).color))
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(Text(verbatim: calendar.standaloneWeekdaySymbols[day - 1]))
+                .accessibilityLabel(Text(verbatim: calendar.speaking(locale).standaloneWeekdaySymbols[day - 1]))
                 .accessibilityAddTraits(isOn ? .isSelected : [])
             }
         }

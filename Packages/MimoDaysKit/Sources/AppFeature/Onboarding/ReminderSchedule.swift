@@ -109,6 +109,16 @@ extension SurpriseFrequency {
 }
 
 extension Calendar {
+    /// This calendar with its day and month names in `locale`, the language chosen in MimoDays. The environment's
+    /// calendar is the iPhone's, so its names follow the iPhone's language; its week and time zone stay as they are.
+    func speaking(_ locale: Locale) -> Calendar {
+        var calendar = self
+        let firstWeekday = calendar.firstWeekday
+        calendar.locale = locale
+        calendar.firstWeekday = firstWeekday
+        return calendar
+    }
+
     /// Weekdays (1 = Sunday) starting on this calendar's first day of the week.
     var orderedWeekdays: [Int] {
         (0..<7).map { (firstWeekday - 1 + $0) % 7 + 1 }

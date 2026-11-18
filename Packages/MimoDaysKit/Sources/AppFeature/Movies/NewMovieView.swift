@@ -553,6 +553,7 @@ struct MonthDays: View {
     let choose: (Int) -> Void
     let move: (Int) -> Void
     @Environment(\.calendar) private var calendar
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -622,7 +623,7 @@ struct MonthDays: View {
 
     /// The locale's week, first day first: "M T W T F S S".
     private var weekdays: [String] {
-        let symbols = calendar.veryShortStandaloneWeekdaySymbols
+        let symbols = calendar.speaking(locale).veryShortStandaloneWeekdaySymbols
         let first = calendar.firstWeekday - 1
         return Array(symbols[first...] + symbols[..<first])
     }

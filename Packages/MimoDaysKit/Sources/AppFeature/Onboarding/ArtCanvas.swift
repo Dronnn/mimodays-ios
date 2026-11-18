@@ -118,16 +118,23 @@ struct ArtCanvas: View {
                     radius: shadow?.radius ?? 0, y: shadow?.y ?? 0
                 )
         case let .text(content, style, color, center, rotation, width):
-            content.text
+            let label = content.text
                 .textStyle(style)
                 .foregroundStyle(color.color)
                 // Light captions sit on photos; a soft shadow keeps them readable on bright ones.
                 .shadow(color: .black.opacity(color == .textOnCoral ? 0.45 : 0), radius: 2, y: 1)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
-                .frame(maxWidth: width ?? 2 * min(center.x, size.width - center.x) - 8)
-                .rotationEffect(.degrees(rotation))
-                .position(center)
+            if let width {
+                label
+                    .frame(maxWidth: width)
+                    .rotationEffect(.degrees(rotation))
+                    .position(center)
+            } else {
+                // A longer translation slides inward instead of running off the photo it is written on.
+                InsideArt(center: center) { label.rotationEffect(.degrees(rotation)) }
+                    .frame(width: size.width, height: size.height)
+            }
         }
     }
 
@@ -175,5 +182,27 @@ private struct ArtLoop: View {
             looper = AVPlayerLooper(player: player, templateItem: AVPlayerItem(url: url))
             player.play()
         }
+    }
+}
+
+/// Centres a caption on its point, moved just enough to stay 20 pt inside the art; only a caption wider than the
+/// art itself shrinks.
+private struct InsideArt: Layout {
+    let center: CGPoint
+    let inset: CGFloat = 20
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache _: inout ()) -> CGSize {
+        proposal.replacingUnspecifiedDimensions()
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
+        guard let label = subviews.first else { return }
+        let size = label.sizeThatFits(ProposedViewSize(width: bounds.width - 2 * inset, height: nil))
+        let half = size.width / 2
+        let x = min(max(center.x, inset + half), bounds.width - inset - half)
+        label.place(
+            at: CGPoint(x: bounds.minX + x, y: bounds.minY + center.y), anchor: .center,
+            proposal: ProposedViewSize(size)
+        )
     }
 }

@@ -49,13 +49,13 @@ struct SettingsSnapshotTests {
         container.mainContext.insert(BackupManifest(formatVersion: 1, createdAt: Date.now.addingTimeInterval(-18 * 86_400)))
         let model = await model()
         model.storageBytes = 6_000_000_000
-        assertScreenSnapshots(of: page(SettingsView(model: model, importPhotos: {}, done: {})), variants: variants)
+        assertScreenSnapshots(of: page(SettingsView(model: model, importPhotos: {}, done: {})), variants: variants + SnapshotVariant.languages)
     }
 
     /// S02.
     @Test func surprises() async {
         let model = await model()
-        assertScreenSnapshots(of: page(SurpriseSettingsView(model: model)), variants: variants)
+        assertScreenSnapshots(of: page(SurpriseSettingsView(model: model)), variants: variants + SnapshotVariant.languages)
     }
 
     /// S02 when notifications are off in iOS Settings.
@@ -145,7 +145,7 @@ struct SettingsSnapshotTests {
     /// S07's help pages.
     @Test func helpArticles() {
         for article in HelpArticle.allCases {
-            assertScreenSnapshots(of: page(HelpArticleView(article: article)), variants: [SnapshotVariant(.iPhone, .light)], testName: "helpArticle-\(article.rawValue)")
+            assertScreenSnapshots(of: page(HelpArticleView(article: article)), variants: [SnapshotVariant(.iPhone, .light)] + SnapshotVariant.languages, testName: "helpArticle-\(article.rawValue)")
         }
     }
 

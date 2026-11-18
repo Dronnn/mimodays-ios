@@ -7,6 +7,7 @@ import SwiftUI
 struct MemoriesCalendarView: View {
     @Bindable var model: MemoriesModel
     @Environment(\.calendar) private var calendar
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(spacing: 0) {
@@ -71,7 +72,7 @@ struct MemoriesCalendarView: View {
     }
 
     private var weekdays: some View {
-        let symbols = calendar.veryShortStandaloneWeekdaySymbols
+        let symbols = calendar.speaking(locale).veryShortStandaloneWeekdaySymbols
         let first = calendar.firstWeekday - 1
         return HStack(spacing: 6) {
             ForEach(0..<7, id: \.self) { index in

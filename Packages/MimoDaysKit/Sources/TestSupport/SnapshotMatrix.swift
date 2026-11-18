@@ -52,17 +52,23 @@ public struct SnapshotVariant: Sendable {
     public var isRightToLeft: Bool
     /// iOS's Increase Contrast, or S04's Higher contrast.
     public var isHighContrast: Bool
+    /// The app's language, e.g. "de"; nil is US English. Arabic and Hebrew also lay out right to left.
+    public var language: String?
 
     public init(
         _ device: SnapshotDevice, _ style: UIUserInterfaceStyle, _ contentSize: UIContentSizeCategory = .large,
-        rightToLeft: Bool = false, highContrast: Bool = false
+        rightToLeft: Bool = false, highContrast: Bool = false, language: String? = nil
     ) {
         self.device = device
         self.style = style
         self.contentSize = contentSize
-        isRightToLeft = rightToLeft
+        isRightToLeft = rightToLeft || language.map { Locale.Language(identifier: $0).characterDirection == .rightToLeft } == true
         isHighContrast = highContrast
+        self.language = language
     }
+
+    /// The longest words (German), right to left (Arabic) and CJK line breaking (Japanese), on iPhone.
+    public static let languages: [SnapshotVariant] = ["de", "ar", "ja"].map { SnapshotVariant(.iPhone, .light, language: $0) }
 
     /// Every device in light and dark, iPhone at a large accessibility text size, and iPhone right-to-left.
     public static let standard: [SnapshotVariant] =
@@ -73,6 +79,7 @@ public struct SnapshotVariant: Sendable {
     var name: String {
         let styleName = style == .dark ? "dark" : "light"
         let sizeName = contentSize == .large ? "default" : "AX3"
+        if let language { return "\(device.rawValue)-\(styleName)-\(sizeName)-\(language)" }
         return "\(device.rawValue)-\(styleName)-\(sizeName)" + (isRightToLeft ? "-rtl" : "") + (isHighContrast ? "-hc" : "")
     }
 
@@ -106,7 +113,7 @@ public func assertScreenSnapshots(
         let controller = UIHostingController(
             rootView: view
                 .environment(\.layoutDirection, variant.isRightToLeft ? .rightToLeft : .leftToRight)
-                .environment(\.locale, snapshotLocale)
+                .environment(\.locale, variant.language.map(Locale.init(identifier:)) ?? snapshotLocale)
                 .environment(\.calendar, snapshotCalendar)
                 .environment(\.timeZone, snapshotCalendar.timeZone)
         )

@@ -132,6 +132,12 @@ final class MovieEditorModel {
         plan = MoviePlan(clips: [], aspectRatio: project.aspectRatio, fit: project.fit)
         musicFiles = Set(project.audioTracks.map(\.relativePath))
         reload()
+        observeTime()
+    }
+
+    /// The playhead follows playback; again after Export was pushed over the editor and popped (which closed it).
+    func observeTime() {
+        guard timeObserver == nil else { return }
         timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 30), queue: .main) { [weak self] time in
             MainActor.assumeIsolated { self?.tick(time.seconds) }
         }
@@ -416,9 +422,9 @@ final class MovieEditorModel {
     static let cardLimit = 60
     static let cardDurations: [Double] = [2, 3, 5]
 
-    func setCardText(_ text: String) {
+    func setCardText(_ text: String, of card: MovieTextCard) {
         let text = String(text.prefix(Self.cardLimit))
-        guard let card = selectedCard, card.text != text, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard !card.isDeleted, card.text != text, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         edit { card.text = text }
     }
 

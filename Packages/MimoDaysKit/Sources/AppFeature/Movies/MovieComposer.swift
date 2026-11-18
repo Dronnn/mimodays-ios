@@ -496,8 +496,10 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
             frame = Self.sideBySide(picture, selfie, canvas: canvas).composited(over: frame)
         } else if let picture {
             let rect = MovieComposer.pictureRect(source: picture.extent.size, canvas: canvas, fit: instruction.fit)
-            // Photos drift in a little over their seconds, so a still doesn't sit dead (doc 01).
-            let zoom = instruction.video == nil ? 1 + 0.04 * seconds / max(instruction.timeRange.duration.seconds, 0.1) : 1
+            // Photos drift in a little over their seconds, so a still doesn't sit dead (doc 01). Not with Show all,
+            // which promises the whole picture.
+            let drifts = instruction.video == nil && instruction.fit == .fill
+            let zoom = drifts ? 1 + 0.04 * seconds / max(instruction.timeRange.duration.seconds, 0.1) : 1
             let placed = picture
                 .transformed(by: CGAffineTransform(scaleX: rect.width / picture.extent.width * zoom, y: rect.height / picture.extent.height * zoom))
             let x = rect.midX - placed.extent.width / 2

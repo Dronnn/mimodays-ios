@@ -123,7 +123,7 @@ struct MovieEditorSnapshotTests {
     @Test func cardSheet() async throws {
         let model = try await editor(.text)
         model.addCard()
-        model.setCardText("The long way home")
+        model.setCardText("The long way home", of: try #require(model.selectedCard))
         assertScreenSnapshots(of: sheet(CardSheet(model: model)), variants: variants)
     }
 

@@ -81,6 +81,13 @@ final class OnboardingFlow {
         await remindersChanged()
     }
 
+    /// Back from iOS Settings on "Notifications are off": allowed there, the outcome says they are on.
+    func recheckReminders() async {
+        guard step == .reminders(.denied), await permissions.status(of: .notifications).isUsable else { return }
+        step = .reminders(.on)
+        await remindersChanged()
+    }
+
     /// "Maybe later". On a replay (Help › "Show the introduction again") the person's existing reminders setting
     /// stays as it is.
     func remindLater() {

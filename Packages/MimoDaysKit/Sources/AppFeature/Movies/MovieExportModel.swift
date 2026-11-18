@@ -187,7 +187,9 @@ final class MovieExportModel {
     /// Only what F11 allows: the day the first clip was taken, the place of the first clip that has one.
     private func metadata(_ plan: MoviePlan) -> [AVMetadataItem] {
         var items: [AVMetadataItem] = []
-        let moments = MovieStore.liveClips(of: project).compactMap(\.moment)
+        // The clips the movie really shows: one that couldn't be read is left out of its place and day too.
+        let shown = Set(plan.clips.map(\.momentID))
+        let moments = MovieStore.liveClips(of: project).compactMap(\.moment).filter { shown.contains($0.id) }
         if dateInFile, let first = moments.first {
             let item = AVMutableMetadataItem()
             item.identifier = .commonIdentifierCreationDate

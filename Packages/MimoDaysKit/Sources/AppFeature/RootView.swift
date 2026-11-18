@@ -102,7 +102,7 @@ public struct RootView: View {
         .environment(\.replayOnboarding, replayOnboarding)
         .environment(\.mediaLibrary, memories.library)
         // S05: the lock screen sits in its own window, over sheets too.
-        .background(AppLockWindow(lock: appLock, isLocked: appLock.isLocked, fonts: appearancePreferences.value.fonts))
+        .background(AppLockWindow(lock: appLock, isLocked: appLock.isLocked || appLock.isCovered, fonts: appearancePreferences.value.fonts))
         // The language chosen in Settings › Appearance, at once, for every screen and sheet.
         .appLanguage(fonts: appearancePreferences.value.fonts)
         // S04: light, dark and contrast for every window, sheets and the lock screen included.

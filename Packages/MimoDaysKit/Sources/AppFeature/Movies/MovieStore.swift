@@ -130,7 +130,14 @@ struct MovieStore {
         let old = project.render?.relativePath
         project.render = render
         project.status = .rendered
-        try save()
+        do {
+            try save()
+        } catch {
+            // Not kept: the new file goes, the project keeps the render it had.
+            context.rollback()
+            if render.relativePath != old { removeFile(render.relativePath) }
+            throw error
+        }
         if let old, old != render.relativePath { removeFile(old) }
     }
 

@@ -59,6 +59,7 @@ struct SettingsScreen: View {
 
 private struct SettingsHost: View {
     @State var model: SettingsModel
+    @Environment(\.scenePhase) private var scenePhase
     @State private var path = NavigationPath()
     @State private var importsPhotos = false
     @Environment(\.dismiss) private var dismiss
@@ -100,6 +101,10 @@ private struct SettingsHost: View {
         .onChange(of: path.count) { _, count in
             // Back on S01: Storage, Backup or Surprises may have changed what it says.
             if count == 0 { Task { await model.load() } }
+        }
+        // Back from iOS Settings: notifications allowed there let Surprises send one now.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await model.load() } }
         }
     }
 }

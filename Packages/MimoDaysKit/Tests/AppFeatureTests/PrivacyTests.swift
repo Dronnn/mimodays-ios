@@ -137,6 +137,23 @@ struct AppLockTests {
         #expect(!lock.isLocked && owner.asked == 2)
     }
 
+    @Test func withADelayTheAppSwitcherStillSeesTheCover() async {
+        var settings = on
+        settings.lockAfter = .oneMinute
+        let owner = Owner([true])
+        let lock = lock(settings, owner: owner, clock: Clock())
+        await lock.didBecomeActive()
+        lock.didEnterBackground()
+        #expect(!lock.isLocked && lock.isCovered)
+        await lock.didBecomeActive()
+        #expect(!lock.isLocked && !lock.isCovered && owner.asked == 1)
+    }
+
+    @Test func timeAwayNeverRunsBackwards() {
+        let first = AppLock.uptime()
+        #expect(AppLock.uptime() >= first)
+    }
+
     @Test func leavingLocksAtOnceByDefault() async {
         let owner = Owner([true, true])
         let lock = lock(on, owner: owner, clock: Clock())

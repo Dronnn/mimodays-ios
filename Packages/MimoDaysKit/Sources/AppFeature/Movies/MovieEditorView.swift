@@ -88,6 +88,7 @@ struct MovieEditorView: View {
                 export()
             })
         }
+        .onAppear { model.observeTime() }
         .onDisappear { if !previewing { model.close() } }
     }
 

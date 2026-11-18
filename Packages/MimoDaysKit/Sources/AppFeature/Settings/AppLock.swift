@@ -31,6 +31,9 @@ final class AppLock {
     let biometry: Biometry
     /// True while MimoDays is covered by the lock screen.
     private(set) var isLocked: Bool
+    /// True while MimoDays is in the background with App Lock on, whatever the delay: the app switcher's picture
+    /// shows the cover, not a memory, even once the delay has passed.
+    private(set) var isCovered = false
     /// True while Face ID (or the passcode sheet) is up.
     private(set) var isAuthenticating = false
 
@@ -45,7 +48,7 @@ final class AppLock {
         settings: @escaping @MainActor () -> PrivacySettings,
         biometry: Biometry = .current,
         authenticate: @escaping Authenticate = AppLock.deviceOwner,
-        now: @escaping () -> Date = Date.init
+        now: @escaping () -> Date = AppLock.uptime
     ) {
         self.settings = settings
         self.biometry = biometry
@@ -61,6 +64,7 @@ final class AppLock {
         guard isEnabled else { return }
         leftAt = now()
         asksOnActive = true
+        isCovered = true
         if settings().lockAfter == .immediately { isLocked = true }
     }
 
@@ -68,10 +72,12 @@ final class AppLock {
     func didBecomeActive() async {
         guard isEnabled else {
             isLocked = false
+            isCovered = false
             return
         }
         if let leftAt, now().timeIntervalSince(leftAt) >= settings().lockAfter.seconds { isLocked = true }
         leftAt = nil
+        isCovered = false
         // After a failed Face ID the lock screen's button asks again.
         guard asksOnActive else { return }
         asksOnActive = false
@@ -92,6 +98,11 @@ final class AppLock {
         isAuthenticating = true
         defer { isAuthenticating = false }
         return await authenticate(reason)
+    }
+
+    /// Time that only goes forward, sleep included: setting the iPhone's clock back doesn't shorten the time away.
+    nonisolated static func uptime() -> Date {
+        Date(timeIntervalSinceReferenceDate: TimeInterval(clock_gettime_nsec_np(CLOCK_MONOTONIC)) / 1_000_000_000)
     }
 
     /// Face ID, Touch ID or Optic ID, falling back to the passcode.

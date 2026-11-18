@@ -215,6 +215,8 @@ extension ClipCameraLayout {
 struct CardSheet: View {
     let model: MovieEditorModel
     @State private var text = ""
+    /// The card this sheet opened on: playback moving the selection on doesn't send its text to another card.
+    @State private var card: MovieTextCard?
     @FocusState private var isEditing: Bool
 
     var body: some View {
@@ -263,9 +265,12 @@ struct CardSheet: View {
         .presentationDetents([.medium, .large])
         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
         .presentationDragIndicator(.visible)
-        .onAppear { text = model.selectedCard?.text ?? "" }
-        .onChange(of: isEditing) { _, editing in if !editing { model.setCardText(text) } }
-        .onDisappear { model.setCardText(text) }
+        .onAppear {
+            card = model.selectedCard
+            text = card?.text ?? ""
+        }
+        .onChange(of: isEditing) { _, editing in if !editing, let card { model.setCardText(text, of: card) } }
+        .onDisappear { if let card { model.setCardText(text, of: card) } }
     }
 
     /// The card as it shows, in small.

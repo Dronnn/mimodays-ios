@@ -6,6 +6,7 @@ struct OnboardingView: View {
     @Bindable var flow: OnboardingFlow
     let onFinish: (MainTab) -> Void
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
@@ -32,6 +33,9 @@ struct OnboardingView: View {
             }
         }
         .animation(.default, value: flow.step)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await flow.recheckReminders() } }
+        }
         .fullScreenCover(isPresented: $flow.isCapturing) {
             CaptureFlowView(request: CaptureRequest()) { saved in
                 flow.firstMomentSaved(SavedMoment(

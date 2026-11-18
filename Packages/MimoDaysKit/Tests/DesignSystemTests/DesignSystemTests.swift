@@ -50,41 +50,55 @@ struct DesignSystemTests {
     }
 }
 
-/// Settings › Appearance › Fonts (Andrew, 2026-11-18): each language is offered only faces with all its letters, and
-/// starts with the design's where they have them.
+/// Settings › Appearance › Fonts (Andrew, 2026-11-18): each language has its own few round faces for headlines,
+/// handwriting and body text, all with its letters; Latin languages start with the design's.
 struct TypefaceTests {
-    @Test(arguments: ["en", "de", "fr", "es", "it", "nl", "sv", "pl", "pt-BR", "ru", "uk", "be", "hy", "ka", "kk", "tr", "he", "ar", "ja", "ko", "zh-Hans", "zh-Hant"])
-    func everyLanguageHasFacesWithAllItsLetters(language: String) {
+    static let languages = ["en", "de", "fr", "es", "it", "nl", "sv", "pl", "pt-BR", "ru", "uk", "be", "hy", "ka", "kk", "tr", "he", "ar", "ja", "ko", "zh-Hans", "zh-Hant"]
+
+    @Test(arguments: languages)
+    func everyLanguageHasAFewFacesWithItsLetters(language: String) {
         let defaults = Typefaces(language: language)
-        for role in [Typeface.Role.heading, .hand] {
+        for role in [Typeface.Role.heading, .hand, .body] {
             let options = Typefaces.options(role, language: language)
-            #expect(!options.isEmpty)
-            #expect(options.contains(role == .heading ? defaults.heading : defaults.hand))
+            #expect((1 ... 6).contains(options.count))
+            #expect(options.first == defaults[role])
+            #expect(options.contains(.sfRounded))
         }
     }
 
-    @Test func defaultsFollowTheScript() {
-        #expect(Typefaces(language: "en") == .design)
-        #expect(Typefaces(language: "ru").heading.id == "lora")
+    @Test(arguments: ["en", "de", "fr", "es", "it", "nl", "sv", "pl", "pt-BR", "tr"])
+    func latinLanguagesKeepTheDesign(language: String) {
+        #expect(Typefaces(language: language) == .design)
+    }
+
+    @Test func otherScriptsStartWithTheirOwnFaces() {
+        #expect(Typefaces(language: "ru").heading.id == "mplusRounded")
         #expect(Typefaces(language: "ru").hand.id == "neucha")
-        #expect(Typefaces(language: "kk").hand.id == "caveat")
-        #expect(Typefaces(language: "he").heading.id == "frankRuhl")
-        #expect(Typefaces(language: "ar").heading.id == "amiri")
+        #expect(Typefaces(language: "ru").body == .nunito)
+        #expect(Typefaces(language: "kk").hand.id == "pangolin")
+        #expect(Typefaces(language: "he").heading.id == "fredoka")
+        #expect(Typefaces(language: "ar").body.id == "rubik")
+        #expect(Typefaces(language: "ko").heading.id == "jua")
         // Fraunces has no Cyrillic; a face made for one script isn't offered to another.
         #expect(!Typefaces.options(.heading, language: "ru").contains(.fraunces))
-        #expect(!Typefaces.options(.heading, language: "en").contains { $0.id == "amiri" })
+        #expect(!Typefaces.options(.heading, language: "en").contains { $0.id == "balooBhaijaan" })
     }
 
     @Test func aSavedChoiceHoldsAndAnUnknownOneFallsBack() {
-        #expect(Typefaces(language: "ru", heading: "playfair", hand: "caveat").heading.id == "playfair")
-        #expect(Typefaces(language: "ru", heading: "fraunces").heading.id == "lora")
+        #expect(Typefaces(language: "ru", heading: "rubik", hand: "playpen", body: "comfortaa").body.id == "comfortaa")
+        #expect(Typefaces(language: "ru", heading: "fraunces").heading.id == "mplusRounded")
     }
 
-    @Test func aChosenHeadingReplacesFraunces() {
-        let typefaces = Typefaces(language: "ru", heading: "alegreya")
-        let font = TextStyle.displayHero.ctFont(pointSize: 30, typefaces: typefaces)
-        #expect(CTFontCopyFamilyName(font) as String == "Alegreya")
-        // Body text keeps its face.
-        #expect(CTFontCopyFamilyName(TextStyle.body.ctFont(pointSize: 17, typefaces: typefaces)) as String == "Nunito")
+    @Test func theChosenFacesReplaceTheDesignsEverywhere() {
+        let typefaces = Typefaces(language: "ru", heading: "rubik", body: "comfortaa")
+        func family(_ style: TextStyle) -> String {
+            CTFontCopyFamilyName(style.ctFont(pointSize: 17, typefaces: typefaces)) as String
+        }
+        #expect(family(.displayHero) == "Rubik")
+        #expect(family(.hand) == "Neucha")
+        // Body text and the Inter labels go together.
+        #expect(family(.body) == "Comfortaa")
+        #expect(family(.labelCaps) == "Comfortaa")
+        #expect(CTFontCopyFamilyName(TextStyle.body.ctFont(pointSize: 17, typefaces: .design)) as String == "Nunito")
     }
 }

@@ -62,6 +62,8 @@ enum MovieComposer {
         /// The clips' sound level over time: (when, volume), in order.
         var soundLevels: [(CMTime, Double)] = []
         var cards: [Int: CIImage] = [:]
+        // One movie, one set of faces: the ones in use when it starts, even if Settings change while it renders.
+        let typefaces = Typefaces.current
         var cursor = CMTime.zero
         // The title opens the first clip; a text card before it speaks for itself.
         let titled = plan.clips.firstIndex { !$0.isCard }
@@ -78,7 +80,7 @@ enum MovieComposer {
                 mainTrack.scaleTimeRange(CMTimeRange(start: cursor, duration: fillerRange.duration), toDuration: length)
                 if case let .card(text, look) = clip.media {
                     let still = look == .overClip ? await firstFrame(after: index, in: plan, canvas: renderSize) : nil
-                    cards[index] = cardImage(text, look: look, still: still, canvas: renderSize)
+                    cards[index] = cardImage(text, look: look, still: still, canvas: renderSize, typefaces: typefaces)
                 }
             case let .video(start, selfieOffset, hasAudio):
                 guard let mainURL = clip.mainURL else { throw Failure.compositionFailed }
@@ -142,7 +144,7 @@ enum MovieComposer {
             instructions.append(MovieClipInstruction(
                 timeRange: range, clip: clip, index: index, video: video, canvas: renderSize, fit: plan.fit,
                 fadeIn: index > 0 && clip.transition == .fade, fadeOut: next?.transition == .fade, title: index == titled ? plan.title : nil,
-                card: cards[index], lead: clip.lead, backdrop: lead == nil ? nil : cards[index - 1]
+                card: cards[index], lead: clip.lead, backdrop: lead == nil ? nil : cards[index - 1], typefaces: typefaces
             ))
             cursor = cursor + length
         }
@@ -225,12 +227,12 @@ enum MovieComposer {
 
     /// `Editor / Text card`: the words in Fraunces, centred, on paper, on plum, or on the next clip's first frame
     /// under a soft shade. Drawn once per composition at the movie's size.
-    static func cardImage(_ text: String, look: TextCardLook, still: CGImage?, canvas: CGSize) -> CIImage? {
+    static func cardImage(_ text: String, look: TextCardLook, still: CGImage?, canvas: CGSize, typefaces: Typefaces = .current) -> CIImage? {
         let unit = min(canvas.width, canvas.height) / 402
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .center
         var attributes: [NSAttributedString.Key: Any] = [
-            .font: TextStyle.displayTitle.ctFont(pointSize: 44 * unit) as UIFont, .paragraphStyle: paragraph,
+            .font: TextStyle.displayTitle.ctFont(pointSize: 44 * unit, typefaces: typefaces) as UIFont, .paragraphStyle: paragraph,
             .foregroundColor: look == .paper ? plum : cream,
         ]
         if look == .overClip {
@@ -394,11 +396,15 @@ final class MovieClipInstruction: NSObject, AVVideoCompositionInstructionProtoco
     let lead: Double?
     /// U53: what shows during the lead: the card before, or black.
     let backdrop: CIImage?
+    /// The faces for the title and captions, fixed when the movie starts.
+    let typefaces: Typefaces
 
     init(
         timeRange: CMTimeRange, clip: MoviePlan.Clip, index: Int, video: Video?, canvas: CGSize, fit: MovieFit,
-        fadeIn: Bool, fadeOut: Bool, title: String? = nil, card: CIImage? = nil, lead: Double? = nil, backdrop: CIImage? = nil
+        fadeIn: Bool, fadeOut: Bool, title: String? = nil, card: CIImage? = nil, lead: Double? = nil, backdrop: CIImage? = nil,
+        typefaces: Typefaces = .design
     ) {
+        self.typefaces = typefaces
         self.title = title
         self.card = card
         self.lead = lead
@@ -556,8 +562,9 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         if let look = current.withLock({ $0 }), look.index == instruction.index { return look }
         let clip = instruction.clip
         let canvas = instruction.canvas
-        var look = Look(index: instruction.index, caption: clip.caption.flatMap { Self.caption($0, canvas: canvas) })
-        look.title = instruction.title.flatMap { Self.title($0, canvas: canvas) }
+        let typefaces = instruction.typefaces
+        var look = Look(index: instruction.index, caption: clip.caption.flatMap { Self.caption($0, canvas: canvas, typefaces: typefaces) })
+        look.title = instruction.title.flatMap { Self.title($0, canvas: canvas, typefaces: typefaces) }
         if instruction.video == nil {
             // Enough pixels for Fill on any shape and the drift.
             let pixels = Int(max(canvas.width, canvas.height) * 1.5)
@@ -593,9 +600,9 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 
     /// F08/F10 `Editor / Caption`: Patrick Hand 16 in cream on a plum pill at 55%, bottom left - drawn at the
     /// phone's scale (402 pt across the short side).
-    private static func caption(_ text: String, canvas: CGSize) -> CIImage? {
+    private static func caption(_ text: String, canvas: CGSize, typefaces: Typefaces) -> CIImage? {
         let unit = min(canvas.width, canvas.height) / 402
-        let font = TextStyle.dayCaption.ctFont(pointSize: 16 * unit) as UIFont
+        let font = TextStyle.dayCaption.ctFont(pointSize: 16 * unit, typefaces: typefaces) as UIFont
         let attributed = NSAttributedString(string: text, attributes: [.font: font, .foregroundColor: cream])
         let margin = 16 * unit
         let padding = 14 * unit
@@ -617,7 +624,7 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
     }
 
     /// F08 "Title at the start": the movie's name in Fraunces over the first clip, centred, with a soft shadow.
-    private static func title(_ text: String, canvas: CGSize) -> CIImage? {
+    private static func title(_ text: String, canvas: CGSize, typefaces: Typefaces) -> CIImage? {
         let unit = min(canvas.width, canvas.height) / 402
         let shadow = NSShadow()
         shadow.shadowColor = UIColor.black.withAlphaComponent(0.5)
@@ -625,7 +632,7 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .center
         let attributed = NSAttributedString(string: text, attributes: [
-            .font: TextStyle.displayTitle.ctFont(pointSize: 40 * unit) as UIFont, .foregroundColor: cream, .shadow: shadow, .paragraphStyle: paragraph,
+            .font: TextStyle.displayTitle.ctFont(pointSize: 40 * unit, typefaces: typefaces) as UIFont, .foregroundColor: cream, .shadow: shadow, .paragraphStyle: paragraph,
         ])
         let width = canvas.width - 48 * unit
         let bounds = attributed.boundingRect(with: CGSize(width: width, height: .greatestFiniteMagnitude), options: [.usesLineFragmentOrigin], context: nil)

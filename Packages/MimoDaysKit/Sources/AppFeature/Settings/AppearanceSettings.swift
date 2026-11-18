@@ -1,3 +1,4 @@
+import DesignSystem
 import Foundation
 import Persistence
 import SwiftUI
@@ -10,7 +11,7 @@ struct AppearanceSettings: Codable, Equatable, Sendable {
     var higherContrast = false
     /// H.9: which screens' video tiles play on their own.
     var motion = MotionSettings()
-    /// Headline and handwriting faces chosen per language ("ru"); a language without one uses its default.
+    /// Headline, handwriting and body faces chosen per language ("ru"); a language without one uses its default.
     var fonts: [String: FontPick] = [:]
 
     init() {}
@@ -37,6 +38,24 @@ struct AppearanceSettings: Codable, Equatable, Sendable {
 struct FontPick: Codable, Equatable, Sendable {
     var heading: String?
     var hand: String?
+    var body: String?
+
+    subscript(role: Typeface.Role) -> String? {
+        get {
+            switch role {
+            case .heading: heading
+            case .hand: hand
+            case .body: body
+            }
+        }
+        set {
+            switch role {
+            case .heading: heading = newValue
+            case .hand: hand = newValue
+            case .body: body = newValue
+            }
+        }
+    }
 }
 
 typealias AppearancePreferences = DevicePreference<AppearanceSettings>

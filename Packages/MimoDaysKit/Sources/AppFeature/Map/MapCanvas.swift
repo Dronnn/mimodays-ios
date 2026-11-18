@@ -66,7 +66,7 @@ final class PlaceAnnotation: NSObject, MKAnnotation {
 final class MarkerView: MKAnnotationView {
     static let placeID = "place"
     static let clusterID = "cluster"
-    private let host = UIHostingController(rootView: MapMarker(image: nil, count: 1, isSelected: false))
+    private let host = UIHostingController(rootView: AnyView(MapMarker(image: nil, count: 1, isSelected: false)))
 
     override init(annotation: (any MKAnnotation)?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
@@ -84,7 +84,8 @@ final class MarkerView: MKAnnotationView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func show(image: UIImage?, count: Int, label: String, isSelected: Bool) {
-        host.rootView = MapMarker(image: image, count: count, isSelected: isSelected)
+        // Its own hosting controller doesn't inherit the app's faces: the cluster count gets them here.
+        host.rootView = AnyView(MapMarker(image: image, count: count, isSelected: isSelected).environment(\.typefaces, Typefaces.current))
         accessibilityLabel = label
     }
 }

@@ -2,15 +2,17 @@ import Core
 import DesignSystem
 import SwiftUI
 
-/// Settings › Appearance › Fonts: the headline and handwriting faces for the language in use, each kept per
-/// language (Andrew, 2026-11-18). The sample on top shows the choice at once; each face is listed in itself, and only
+/// Settings › Appearance › Fonts: the headline, handwriting and body faces for the language in use, each kept per
+/// language (Andrew, 2026-11-18); together they set every text in the app. The sample on top shows the choice at once; each face is listed in itself, and only
 /// faces that have every letter of the language are offered.
 struct FontSettingsView: View {
     @Environment(AppearancePreferences.self) private var preferences: AppearancePreferences?
     @Environment(\.typefaces) private var typefaces
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .body) private var headingSize: CGFloat = 21
     @ScaledMetric(relativeTo: .body) private var handSize: CGFloat = 20
+    @ScaledMetric(relativeTo: .body) private var bodySize: CGFloat = 17
     /// The language whose faces these are: the one in use.
     var language = AppLanguage.shared.current
 
@@ -28,6 +30,10 @@ struct FontSettingsView: View {
                             Text("Catch a moment", bundle: .module)
                                 .textStyle(.captureLabel)
                                 .foregroundStyle(ColorToken.textBody.color)
+                            Text("Text size follows iOS Settings › Display & Brightness.", bundle: .module)
+                                .textStyle(.sheetBody)
+                                .foregroundStyle(ColorToken.textSecondary.color)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(18)
@@ -38,6 +44,8 @@ struct FontSettingsView: View {
                     section(.heading)
                         .padding(.top, 26)
                     section(.hand)
+                        .padding(.top, 26)
+                    section(.body)
                         .padding(.top, 26)
                     DataNote(text: Text(
                         "MimoDays keeps fonts for each language. These are for \(AppLanguage.nativeName(language)).",
@@ -57,10 +65,13 @@ struct FontSettingsView: View {
     private func section(_ role: Typeface.Role) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Group {
-                if role == .heading {
+                switch role {
+                case .heading:
                     Text("Headings", bundle: .module, comment: "Settings › Appearance › Fonts: section title over the fonts for titles")
-                } else {
+                case .hand:
                     Text("Handwriting", bundle: .module, comment: "Settings › Appearance › Fonts: section title over the handwritten fonts for captions and notes")
+                case .body:
+                    Text("Body text", bundle: .module, comment: "Settings › Appearance › Fonts: section title over the fonts for all other text - paragraphs, buttons, labels")
                 }
             }
             .textStyle(.labelCaps)
@@ -80,22 +91,30 @@ struct FontSettingsView: View {
     }
 
     private func row(_ face: Typeface, role: Typeface.Role) -> some View {
-        let isSelected = (role == .heading ? typefaces.heading : typefaces.hand) == face
+        let isSelected = typefaces[role] == face
         return Button {
             choose(face, role: role)
         } label: {
             HStack(spacing: 8) {
-                // The language's own name in the face shows how its letters look; the face's name beside it.
-                Text(verbatim: AppLanguage.nativeName(language))
-                    .font(face.sample(role, size: role == .heading ? headingSize : handSize))
-                    .foregroundStyle(ColorToken.textPrimary.color)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                Spacer(minLength: 8)
-                Text(verbatim: face.name)
-                    .textStyle(.rowDetail)
-                    .foregroundStyle(ColorToken.textTertiary.color)
-                    .lineLimit(1)
+                // The language's own name in the face shows how its letters look; the face's name with it - under
+                // it at accessibility sizes, where both don't fit on one line.
+                let layout = typeSize.isAccessibilitySize
+                    ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2))
+                    : AnyLayout(HStackLayout(spacing: 8))
+                layout {
+                    Text(verbatim: AppLanguage.nativeName(language))
+                        .font(face.sample(role, size: size(role)))
+                        .foregroundStyle(ColorToken.textPrimary.color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    if !typeSize.isAccessibilitySize { Spacer(minLength: 8) }
+                    Text(verbatim: face.name)
+                        .textStyle(.rowDetail)
+                        .foregroundStyle(ColorToken.textTertiary.color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+                if typeSize.isAccessibilitySize { Spacer(minLength: 8) }
                 if isSelected {
                     Icon.glyphCheck.image
                         .resizable()
@@ -110,16 +129,21 @@ struct FontSettingsView: View {
             .contentShape(Rectangle())
         }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
-        .accessibilityIdentifier("fonts.\(role == .heading ? "heading" : "hand").\(face.id)")
+        .accessibilityIdentifier("fonts.\(role).\(face.id)")
     }
 
     private func choose(_ face: Typeface, role: Typeface.Role) {
         guard let preferences else { return }
         var pick = preferences.value.fonts[language] ?? FontPick()
-        switch role {
-        case .heading: pick.heading = face.id
-        case .hand: pick.hand = face.id
-        }
+        pick[role] = face.id
         preferences.value.fonts[language] = pick
+    }
+
+    private func size(_ role: Typeface.Role) -> CGFloat {
+        switch role {
+        case .heading: headingSize
+        case .hand: handSize
+        case .body: bodySize
+        }
     }
 }

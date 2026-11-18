@@ -122,13 +122,13 @@ struct SettingsSnapshotTests {
         )
     }
 
-    /// Appearance › Fonts (Andrew, 2026-11-18): English starts with Fraunces and Patrick Hand; Russian is offered only
-    /// faces with Cyrillic, Lora and Neucha first chosen.
-    @Test(arguments: ["en", "ru"])
+    /// Appearance › Fonts (Andrew, 2026-11-18): English starts with Fraunces and Patrick Hand, then round faces; other
+    /// scripts have their own few round faces.
+    @Test(arguments: ["en", "ru", "uk", "he", "ar", "ja", "ko", "zh-Hans"])
     func fonts(language: String) {
         assertScreenSnapshots(
             of: page(FontSettingsView(language: language)).environment(\.typefaces, Typefaces(language: language)),
-            variants: language == "en" ? variants : [SnapshotVariant(.iPhone, .light)], testName: "fonts-\(language)"
+            variants: language == "en" ? variants : [SnapshotVariant(.iPhone, .light, language: language)], testName: "fonts-\(language)"
         )
     }
 

@@ -14,6 +14,7 @@ struct TodayView: View {
     @State private var width: CGFloat = 0
     @State private var height: CGFloat = 0
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.typefaces) private var typefaces
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @Environment(MemoriesPreferences.self) private var memoriesPreferences: MemoriesPreferences?
@@ -148,7 +149,7 @@ struct TodayView: View {
             Text(model.now, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day())
                 .textStyle(.labelCaps)
                 .padding(.leading, 3)
-            VStack(alignment: .leading, spacing: typeSize.isAccessibilitySize ? 0 : TextStyle.displayHero.lineGap(for: typeSize)) {
+            VStack(alignment: .leading, spacing: typeSize.isAccessibilitySize ? 0 : TextStyle.displayHero.lineGap(for: typeSize, typefaces: typefaces)) {
                 ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
                     Text(line)
                         .textStyle(.displayHero)

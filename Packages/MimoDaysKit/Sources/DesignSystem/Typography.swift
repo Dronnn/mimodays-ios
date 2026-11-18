@@ -222,20 +222,24 @@ public struct TextStyle: Equatable, Sendable {
     /// The Core Text font at `pointSize` with this style's variation axes.
     /// The space between single-line texts stacked so their lines sit `lineHeight` apart - negative when that is
     /// tighter than the font's own, which one text never draws (see TextStyleModifier).
-    public func lineGap(for dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+    public func lineGap(for dynamicTypeSize: DynamicTypeSize, typefaces: Typefaces = .current) -> CGFloat {
         guard let lineHeight else { return 0 }
         let size = scaledSize(for: dynamicTypeSize)
-        let font = ctFont(pointSize: size)
+        let font = ctFont(pointSize: size, typefaces: typefaces)
         return size * lineHeight - (CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font))
     }
 
-    /// The style's font; headlines and handwriting in the faces chosen for the language (`typefaces`).
+    /// The style's font, in the faces chosen for the language (`typefaces`).
     public func ctFont(pointSize: CGFloat, typefaces: Typefaces = .current) -> CTFont {
         if family == .fraunces, typefaces.heading != .fraunces {
             return typefaces.heading.font(for: self, pointSize: pointSize)
         }
         if family == .patrickHand, typefaces.hand != .patrickHand {
             return typefaces.hand.font(for: self, pointSize: pointSize)
+        }
+        // Body text and labels go together: Nunito and Inter as designed, or both in the chosen face.
+        if family == .nunito || family == .inter, typefaces.body != .nunito {
+            return typefaces.body.font(for: self, pointSize: pointSize)
         }
         guard let base = family.descriptor else {
             return UIFont.systemFont(ofSize: pointSize) as CTFont

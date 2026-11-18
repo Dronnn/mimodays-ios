@@ -86,7 +86,8 @@ struct MotionSettings: Codable, Equatable, Sendable {
         memories = try container.decodeIfPresent(Bool.self, forKey: .memories) ?? memories
         map = try container.decodeIfPresent(Bool.self, forKey: .map) ?? map
         search = try container.decodeIfPresent(Bool.self, forKey: .search) ?? search
-        atOnce = try container.decodeIfPresent(TilesAtOnce.self, forKey: .atOnce) ?? atOnce
+        // A count this version doesn't know keeps the default, not the rest of the settings.
+        atOnce = (try? container.decodeIfPresent(TilesAtOnce.self, forKey: .atOnce)).flatMap { $0 } ?? atOnce
     }
 
     subscript(screen: MotionScreen) -> Bool {
@@ -230,11 +231,13 @@ private struct TileMotionTile: ViewModifier {
                 }
                 .onScrollVisibilityChange(threshold: 0.3) { visible in
                     isOnScreen = visible
-                    motion.setOnScreen(id, visible)
+                    // A tile that only holds (Today's hero, which plays itself) takes no place among the playing
+                    // ones, and leaving doesn't stop the same moment's tile elsewhere on the screen.
+                    if plays { motion.setOnScreen(id, visible) }
                 }
                 .onDisappear {
                     isOnScreen = false
-                    motion.setOnScreen(id, false)
+                    if plays { motion.setOnScreen(id, false) }
                 }
             if !holds || open == nil {
                 tile
@@ -431,12 +434,14 @@ extension MediaLibrary {
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
         guard let moment = try? context.fetch(descriptor).first, moment.mediaType == .video,
-              let video = ViewerMoment(moment).video, var mainURL = try? store.url(for: video.mainPath) else { return nil }
-        if small, let preview = await LoopPreviews.shared.preview(of: video.mainPath, store: store) { mainURL = preview }
+              let video = ViewerMoment(moment).video, let mainURL = try? store.url(for: video.mainPath) else { return nil }
+        if small, let preview = await LoopPreviews.shared.preview(of: video.mainPath, store: store) {
+            if let main = try? await Self.picture(of: preview) { return (video, AVPlayerItem(asset: main.stream), nil) }
+            // A damaged copy: the original plays, and the next ask makes a new one.
+            await LoopPreviews.shared.discard(video.mainPath, store: store)
+        }
         do {
-            let duration = try await AVURLAsset(url: mainURL).load(.duration)
-            // The main stream's picture alone is the same as a selfie stream with no offset.
-            let main = try await VideoComposer.selfieStream(mainURL, offset: 0, mainDuration: duration)
+            let (main, duration) = try await Self.picture(of: mainURL)
             var selfie: AVPlayerItem?
             if withSelfie, let path = video.selfiePath, let selfieURL = try? store.url(for: path) {
                 selfie = AVPlayerItem(asset: try await VideoComposer.selfieStream(selfieURL, offset: video.timing.selfieOffset, mainDuration: duration))
@@ -445,5 +450,11 @@ extension MediaLibrary {
         } catch {
             return nil
         }
+    }
+
+    /// A video's picture alone, and its length: the same as a selfie stream with no offset.
+    private static func picture(of url: URL) async throws -> (stream: AVComposition, duration: CMTime) {
+        let duration = try await AVURLAsset(url: url).load(.duration)
+        return (try await VideoComposer.selfieStream(url, offset: 0, mainDuration: duration), duration)
     }
 }

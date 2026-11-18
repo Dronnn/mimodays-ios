@@ -221,6 +221,60 @@ struct MovieComposerTests {
         #expect(titles.isEmpty)
     }
 
+    /// The 2 s fixture clip with the 2 s voice fixture as its own sound, like a video recorded with the microphone.
+    private func clipWithSound() async throws -> URL {
+        let composition = AVMutableComposition()
+        let picture = AVURLAsset(url: Fixture.clip.url)
+        let sound = AVURLAsset(url: Fixture.voiceNote.url)
+        let video = try #require(try await picture.loadTracks(withMediaType: .video).first)
+        let audio = try #require(try await sound.loadTracks(withMediaType: .audio).first)
+        let range = try await video.load(.timeRange)
+        try composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)?.insertTimeRange(range, of: video, at: .zero)
+        let audioRange = CMTimeRange(start: .zero, duration: CMTimeMinimum(range.duration, try await audio.load(.timeRange).duration))
+        try composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)?.insertTimeRange(audioRange, of: audio, at: .zero)
+        let url = FileManager.default.temporaryDirectory.appending(path: "sound-\(UUID().uuidString).mov")
+        let session = try #require(AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetPassthrough))
+        try await session.export(to: url, as: .mov)
+        return url
+    }
+
+    /// Doc 01 §17: a clip's sound stays with its picture. Tolerance: one frame at 30 fps (33 ms), for every clip,
+    /// after photos and other clips before it.
+    @Test func aClipsSoundStaysWithItsPicture() async throws {
+        let saver = MomentSaver(context: context, store: store, clock: TestDateProvider(), freeBytes: { nil })
+        var ids: [UUID] = []
+        for index in 0..<3 {
+            let media: CaptureResult.Media
+            if index == 1 {
+                let engine = SimulatedCaptureEngine()
+                _ = await engine.start()
+                media = .photo(try await engine.capturePhoto(flash: .off, silent: true))
+            } else {
+                media = .video(CapturedVideo(mainURL: try await clipWithSound(), mainPosition: .back, selfieURL: nil, duration: 2, selfieOffset: 0, hasAudio: true))
+            }
+            let capture = CaptureResult(media: media, window: .init(), capturedAt: CaptureTime(instant: now.addingTimeInterval(Double(index)), timeZone: .gmt))
+            ids.append(try await saver.save(MomentDraft(capture: capture, caption: "", window: nil, promptID: nil)).id)
+        }
+        let plan = MoviePlan(try project(ids), store: store)
+        let composed = try await MovieComposer.compose(plan, renderSize: portrait)
+        let frame = 1.0 / 30
+        let main = try #require(composed.asset.tracks(withMediaType: .video).first)
+        let sound = try #require(composed.asset.tracks(withMediaType: .audio).first)
+        var start = 0.0
+        var checked = 0
+        for clip in plan.clips {
+            defer { start += clip.duration }
+            guard case .video = clip.media else { continue }
+            let picture = try #require(main.segments.first { !$0.isEmpty && abs($0.timeMapping.target.start.seconds - start) < frame })
+            let audio = try #require(sound.segments.first { !$0.isEmpty && abs($0.timeMapping.target.start.seconds - start) < frame })
+            #expect(abs(audio.timeMapping.source.start.seconds - picture.timeMapping.source.start.seconds) < frame)
+            // The sound may end sooner (this one is 1.9 s), never later than its picture.
+            #expect(audio.timeMapping.target.end.seconds <= picture.timeMapping.target.end.seconds + frame)
+            checked += 1
+        }
+        #expect(checked == 2)
+    }
+
     @Test func aVoiceNotePlaysWithItsClipAndTheMovieExports() async throws {
         let ids = try await save(2)
         let project = try project(ids)

@@ -44,6 +44,8 @@ enum MovieComposer {
     private static let timescale: CMTimeScale = 600
 
     static func compose(_ plan: MoviePlan, renderSize: CGSize) async throws -> Composed {
+        // One movie, one set of faces: the ones in use when it starts, even if Settings change while it renders.
+        let typefaces = Typefaces.current
         guard !plan.clips.isEmpty else { throw Failure.empty }
         let composition = AVMutableComposition()
         guard let mainTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid),
@@ -62,8 +64,6 @@ enum MovieComposer {
         /// The clips' sound level over time: (when, volume), in order.
         var soundLevels: [(CMTime, Double)] = []
         var cards: [Int: CIImage] = [:]
-        // One movie, one set of faces: the ones in use when it starts, even if Settings change while it renders.
-        let typefaces = Typefaces.current
         var cursor = CMTime.zero
         // The title opens the first clip; a text card before it speaks for itself.
         let titled = plan.clips.firstIndex { !$0.isCard }

@@ -83,9 +83,8 @@ final class MarkerView: MKAnnotationView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    func show(image: UIImage?, count: Int, label: String, isSelected: Bool) {
-        // Its own hosting controller doesn't inherit the app's faces: the cluster count gets them here.
-        host.rootView = AnyView(MapMarker(image: image, count: count, isSelected: isSelected).environment(\.typefaces, Typefaces.current))
+    func show(image: UIImage?, count: Int, label: String, isSelected: Bool, typefaces: Typefaces) {
+        host.rootView = AnyView(MapMarker(image: image, count: count, isSelected: isSelected).environment(\.typefaces, typefaces))
         accessibilityLabel = label
     }
 }
@@ -116,6 +115,8 @@ struct MapCanvas: UIViewRepresentable {
     var cover = EdgeInsets()
     let onLoad: (UUID) -> Void
     let onFailure: () -> Void
+    /// The markers' own hosting controllers don't inherit the app's faces; a change redraws them.
+    @Environment(\.typefaces) var typefaces
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
@@ -238,7 +239,7 @@ struct MapCanvas: UIViewRepresentable {
             view.show(
                 image: parent.images[cover.coverID], count: count,
                 label: String(appLocalized: "Map marker: \(name) · \(String(appLocalized: "\(count) moments", bundle: .module))", bundle: .module),
-                isSelected: members.count == 1 && parent.selection == cover.id
+                isSelected: members.count == 1 && parent.selection == cover.id, typefaces: parent.typefaces
             )
         }
 

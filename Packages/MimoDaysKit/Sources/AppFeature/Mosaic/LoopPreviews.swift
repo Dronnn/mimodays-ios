@@ -14,9 +14,18 @@ actor LoopPreviews {
     static let limit: Int64 = 400 << 20
     static let folder = "cache/loops"
 
-    private var making: [String: Task<URL?, Never>] = [:]
-    private var waiting: [String: Set<UUID>] = [:]
-    /// Copies that failed, and when: tried again after `retryAfter`.
+    /// One export, told apart from a later one for the same video (a tile that left and came back).
+    private struct Job {
+        let id: UUID
+        let task: Task<URL?, Never>
+    }
+
+    private enum Outcome { case made(URL), cancelled, failed, tooBig }
+
+    private var making: [String: Job] = [:]
+    /// Who waits for each job.
+    private var waiting: [UUID: Set<UUID>] = [:]
+    /// Copies that failed, and when: tried again after `retryAfter`; one too big for the folder is never tried again.
     private var failed: [String: Date] = [:]
     private let retryAfter: TimeInterval = 300
     private var last: Task<URL?, Never>?
@@ -39,15 +48,15 @@ actor LoopPreviews {
             return destination
         }
         if let when = failed[path], Date().timeIntervalSince(when) < retryAfter { return nil }
-        let task = making[path] ?? start(path, source: source, destination: destination, store: store)
+        let job = making[path] ?? start(path, source: source, destination: destination, store: store)
         let caller = UUID()
-        waiting[path, default: []].insert(caller)
+        waiting[job.id, default: []].insert(caller)
         let result = await withTaskCancellationHandler {
-            await task.value
+            await job.task.value
         } onCancel: {
-            Task { await self.leave(path, caller) }
+            Task { await self.leave(path, job: job.id, caller) }
         }
-        leave(path, caller)
+        leave(path, job: job.id, caller)
         return Task.isCancelled ? nil : result
     }
 
@@ -56,59 +65,79 @@ actor LoopPreviews {
         try? store.remove(Self.path(for: videoPath))
     }
 
-    private func start(_ path: String, source: URL, destination: URL, store: MediaStore) -> Task<URL?, Never> {
+    private func start(_ path: String, source: URL, destination: URL, store: MediaStore) -> Job {
         // One copy at a time: several tiles appearing at once don't start several exports.
         let previous = last
+        let id = UUID()
         let task = Task<URL?, Never> {
             _ = await previous?.value
-            guard !Task.isCancelled else { return nil }
-            let result = await Self.make(source, destination)
-            await self.finished(path, result, store: store)
-            return result
+            let outcome = Task.isCancelled ? .cancelled : await Self.make(source, destination)
+            await self.finished(path, job: id, outcome, store: store)
+            if case let .made(url) = outcome { return url }
+            return nil
         }
-        making[path] = task
+        let job = Job(id: id, task: task)
+        making[path] = job
         last = task
-        return task
+        return job
     }
 
-    private func leave(_ path: String, _ caller: UUID) {
-        guard waiting[path]?.remove(caller) != nil, waiting[path]?.isEmpty == true else { return }
-        waiting[path] = nil
-        making[path]?.cancel()
+    private func leave(_ path: String, job: UUID, _ caller: UUID) {
+        guard waiting[job]?.remove(caller) != nil, waiting[job]?.isEmpty == true else { return }
+        waiting[job] = nil
+        guard making[path]?.id == job else { return }
+        making[path]?.task.cancel()
         making[path] = nil
     }
 
-    private func finished(_ path: String, _ result: URL?, store: MediaStore) {
-        making[path] = nil
-        if result == nil {
-            // A cancelled copy isn't a failure; a real one waits before it is tried again.
-            if waiting[path]?.isEmpty == false { failed[path] = Date() }
-        } else {
+    private func finished(_ path: String, job: UUID, _ outcome: Outcome, store: MediaStore) {
+        // A job that was left and replaced by a newer one changes nothing of the newer one's.
+        if making[path]?.id == job { making[path] = nil }
+        waiting[job] = nil
+        switch outcome {
+        case .made:
             failed[path] = nil
             trim(store)
+        case .cancelled:
+            break
+        case .failed:
+            failed[path] = Date()
+        case .tooBig:
+            failed[path] = .distantFuture
         }
     }
 
-    /// The main stream's picture at 960 × 540 at most, without sound. Nothing is kept for a video deleted meanwhile.
-    private static func make(_ source: URL, _ destination: URL) async -> URL? {
+    /// The main stream's picture at 960 × 540 at most, without sound. Nothing is kept for a video deleted meanwhile, or
+    /// one whose copy would take a quarter of the folder or more (hours long).
+    private static func make(_ source: URL, _ destination: URL) async -> Outcome {
         let folder = destination.deletingLastPathComponent()
         let staging = folder.appendingPathComponent(".\(UUID().uuidString).partial.mp4")
         do {
             let duration = try await AVURLAsset(url: source).load(.duration)
             // The main stream's picture alone is the same as a selfie stream with no offset.
             let picture = try await VideoComposer.selfieStream(source, offset: 0, mainDuration: duration)
-            guard let session = AVAssetExportSession(asset: picture, presetName: AVAssetExportPreset960x540) else { return nil }
+            guard let session = AVAssetExportSession(asset: picture, presetName: AVAssetExportPreset960x540) else { return .failed }
             try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
             try await session.export(to: staging, as: .mp4)
             guard !Task.isCancelled, FileManager.default.fileExists(atPath: source.path) else {
                 try? FileManager.default.removeItem(at: staging)
-                return nil
+                return .cancelled
+            }
+            let size = (try? staging.resourceValues(forKeys: [.fileSizeKey]).fileSize).flatMap { $0 } ?? 0
+            guard Int64(size) < limit / 4 else {
+                try? FileManager.default.removeItem(at: staging)
+                return .tooBig
             }
             try FileManager.default.moveItem(at: staging, to: destination)
-            return destination
+            // Deleted forever while the copy was moved in: deletion found no copy to remove, so it goes here.
+            guard FileManager.default.fileExists(atPath: source.path) else {
+                try? FileManager.default.removeItem(at: destination)
+                return .cancelled
+            }
+            return .made(destination)
         } catch {
             try? FileManager.default.removeItem(at: staging)
-            return nil
+            return Task.isCancelled ? .cancelled : .failed
         }
     }
 

@@ -122,13 +122,18 @@ final class TileMotion {
     /// The screen's setting, and neither Reduce Motion nor Low Power Mode, and the screen in front.
     var isOn = false
     private var onScreen: [UUID] = []
+    /// How many tiles show each moment: Today's hero and its tile in the month can both be on screen, and one leaving
+    /// doesn't take the other's place.
+    private var tiles: [UUID: Int] = [:]
 
     func plays(_ id: UUID) -> Bool {
         isOn && onScreen.prefix(limit).contains(id)
     }
 
     func setOnScreen(_ id: UUID, _ isOnScreen: Bool) {
-        if isOnScreen {
+        let count = max(0, tiles[id, default: 0] + (isOnScreen ? 1 : -1))
+        tiles[id] = count == 0 ? nil : count
+        if count > 0 {
             if !onScreen.contains(id) { onScreen.append(id) }
         } else {
             onScreen.removeAll { $0 == id }
@@ -231,13 +236,11 @@ private struct TileMotionTile: ViewModifier {
                 }
                 .onScrollVisibilityChange(threshold: 0.3) { visible in
                     isOnScreen = visible
-                    // A tile that only holds (Today's hero, which plays itself) takes no place among the playing
-                    // ones, and leaving doesn't stop the same moment's tile elsewhere on the screen.
-                    if plays { motion.setOnScreen(id, visible) }
+                    motion.setOnScreen(id, visible)
                 }
                 .onDisappear {
+                    if isOnScreen { motion.setOnScreen(id, false) }
                     isOnScreen = false
-                    if plays { motion.setOnScreen(id, false) }
                 }
             if !holds || open == nil {
                 tile
@@ -440,6 +443,8 @@ extension MediaLibrary {
             // A damaged copy: the original plays, and the next ask makes a new one.
             await LoopPreviews.shared.discard(video.mainPath, store: store)
         }
+        // A tile that left while its copy was made doesn't load the original.
+        guard !Task.isCancelled else { return nil }
         do {
             let (main, duration) = try await Self.picture(of: mainURL)
             var selfie: AVPlayerItem?

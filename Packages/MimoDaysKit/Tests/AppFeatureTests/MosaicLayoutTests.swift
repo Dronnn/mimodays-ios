@@ -142,6 +142,18 @@ struct TileMotionTests {
         #expect(ids.filter(loops.plays).count == 8 && !loops.plays(ids[8]))
     }
 
+    @Test func aMomentShownTwiceKeepsPlayingWhileOneTileStays() {
+        let loops = TileMotion()
+        loops.isOn = true
+        let id = UUID()
+        loops.setOnScreen(id, true) // Today's hero
+        loops.setOnScreen(id, true) // its tile in the month
+        loops.setOnScreen(id, false)
+        #expect(loops.plays(id))
+        loops.setOnScreen(id, false)
+        #expect(!loops.plays(id))
+    }
+
     @Test func aTileCopyIsNamedAfterItsVideo() {
         #expect(LoopPreviews.path(for: "originals/c4/c4949e7f.mov") == "cache/loops/c4949e7f.mp4")
     }

@@ -27,7 +27,8 @@ enum HelpArticle: String, CaseIterable, Hashable {
     var paragraphs: [Text] {
         switch self {
         case .surprises: [
-            Text("At a random time within your hours, MimoDays sends a notification: a little moment is happening. Open it while it's fresh and capture whatever is around you.", bundle: .module),
+            Text("This is the heart of MimoDays. At a random time within your hours, a notification comes. Drop what you're doing and, wherever you are, capture what's around you right away, just as it is: a real piece of an ordinary day, not a perfect shot.", bundle: .module, comment: "Help › Surprises: the app's main idea"),
+            Text("Tap the notification and the camera opens at once. A surprise stays open for a while, 15 minutes unless you change it; what you capture in that time is marked Surprise.", bundle: .module, comment: "Help › Surprises: what a tap on the notification does; Surprise is the label on such moments"),
             Text("Missed one? Nothing happens. There are no streaks or scores.", bundle: .module),
             Text("Choose how often, on which days, between which hours and how long a surprise stays open in Settings › Surprises. You can pause them for the rest of today, for a week or until you resume them.", bundle: .module),
         ]

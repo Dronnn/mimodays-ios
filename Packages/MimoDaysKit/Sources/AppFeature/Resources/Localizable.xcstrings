@@ -1305,18 +1305,6 @@
         }
       }
     },
-    "A little surprise, every day." : {
-      "comment" : "OB-02 title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A little surprise, every day."
-          }
-        }
-      }
-    },
     "A photo taken at 11 PM in New York stays on that day, even if you are in Tbilisi now." : {
       "comment" : "Memories settings (S09): note explaining Days follow where you were",
       "extractionState" : "manual",
@@ -1433,18 +1421,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allow location in iOS Settings to see where you are."
-          }
-        }
-      }
-    },
-    "At a random time within your hours, MimoDays sends a notification: a little moment is happening. Open it while it's fresh and capture whatever is around you." : {
-      "comment" : "Help & about (S07): Surprises help",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "At a random time within your hours, MimoDays sends a notification: a little moment is happening. Open it while it's fresh and capture whatever is around you."
           }
         }
       }
@@ -2237,18 +2213,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "As you saw it"
-          }
-        }
-      }
-    },
-    "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties." : {
-      "comment" : "OB-02 body",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties."
           }
         }
       }
@@ -11965,6 +11929,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Each one goes to the day it was taken and is marked \"Imported\". They have no selfie window. The originals stay in Photos."
+          }
+        }
+      }
+    },
+    "A surprise comes. Capture it now." : {
+      "comment" : "Onboarding OB-02 title: the app's main idea",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A surprise comes. Capture it now."
+          }
+        }
+      }
+    },
+    "That's the whole idea: at a random time, MimoDays sends a notification. Drop what you're doing and, wherever you are, capture what's around you right away, just as it is. Busy? Skip it. No streaks, no penalties." : {
+      "comment" : "Onboarding OB-02: the app's main idea; a notification comes, you stop and capture at once",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That's the whole idea: at a random time, MimoDays sends a notification. Drop what you're doing and, wherever you are, capture what's around you right away, just as it is. Busy? Skip it. No streaks, no penalties."
+          }
+        }
+      }
+    },
+    "This is the heart of MimoDays. At a random time within your hours, a notification comes. Drop what you're doing and, wherever you are, capture what's around you right away, just as it is: a real piece of an ordinary day, not a perfect shot." : {
+      "comment" : "Help › Surprises: the app's main idea",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is the heart of MimoDays. At a random time within your hours, a notification comes. Drop what you're doing and, wherever you are, capture what's around you right away, just as it is: a real piece of an ordinary day, not a perfect shot."
+          }
+        }
+      }
+    },
+    "Tap the notification and the camera opens at once. A surprise stays open for a while, 15 minutes unless you change it; what you capture in that time is marked Surprise." : {
+      "comment" : "Help › Surprises: what a tap on the notification does; Surprise is the label on such moments (use the same word as the label \"%@ · Surprise\")",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the notification and the camera opens at once. A surprise stays open for a while, 15 minutes unless you change it; what you capture in that time is marked Surprise."
           }
         }
       }

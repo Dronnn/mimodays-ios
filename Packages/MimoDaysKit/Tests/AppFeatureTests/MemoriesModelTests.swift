@@ -227,4 +227,22 @@ struct MemoriesModelTests {
         #expect(day.places.isEmpty)
         #expect(day.image(day.moments.first?.mainPath) != nil)
     }
+
+    /// V8: the viewer replaces a thumbnail (window moved, halves chosen); the tile shows the new file.
+    @Test func aReplacedThumbnailIsReadAgain() async throws {
+        let id = try await save(at: Self.date(2026, 11, 10))
+        let model = model()
+        await model.load(id)
+        let before = try #require(model.images[id])
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>()).first { $0.id == id })
+        let thumbnail = try #require(moment.media.first { $0.role == .thumbnail })
+        let copy = try store.store(copyOf: try store.url(for: thumbnail.relativePath), in: .derived)
+        thumbnail.relativePath = copy.relativePath
+        try context.save()
+        await model.reloadChangedImages()
+        #expect(model.images[id] !== before)
+        let after = try #require(model.images[id])
+        await model.reloadChangedImages()
+        #expect(model.images[id] === after, "unchanged files aren't read again")
+    }
 }

@@ -77,6 +77,8 @@ final class MapModel {
     private(set) var images: [UUID: UIImage] = [:]
     /// A video's length, read with its picture (P02's `Badge / Video`).
     private(set) var durations: [UUID: Double] = [:]
+    /// The thumbnail each picture was read from.
+    private var imagePaths: [UUID: String] = [:]
     var filters = MapFilters() {
         didSet { if filters.collection != oldValue.collection { readCollection() } }
     }
@@ -133,11 +135,12 @@ final class MapModel {
             logger.error("Reading the map failed: \(error.localizedDescription, privacy: .public)")
         }
         isLoaded = true
+        Task { await reloadChangedImages() }
     }
 
     /// The place's picture, once.
-    func load(_ id: UUID) async {
-        guard images[id] == nil else { return }
+    func load(_ id: UUID, again: Bool = false) async {
+        guard again || images[id] == nil else { return }
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
         guard let moment = try? library.context.fetch(descriptor).first else { return }
@@ -146,6 +149,14 @@ final class MapModel {
               let url = try? library.store.url(for: path),
               let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: MemoriesModel.tilePixels) else { return }
         images[id] = UIImage(cgImage: image)
+        imagePaths[id] = path
+    }
+
+    /// Markers whose thumbnail file was replaced since it was read show the new one.
+    func reloadChangedImages() async {
+        for (id, path) in library.context.thumbnailPaths(of: Array(images.keys)) where imagePaths[id] != path {
+            await load(id, again: true)
+        }
     }
 
     private func readCollection() {

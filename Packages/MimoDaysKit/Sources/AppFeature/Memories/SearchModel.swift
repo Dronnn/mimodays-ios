@@ -85,6 +85,8 @@ final class SearchModel {
     private let clock: any DateProvider
     private let calendar: () -> Calendar
     private var imageOrder: [UUID] = []
+    /// The thumbnail each picture was read from.
+    private var imagePaths: [UUID: String] = [:]
     private let logger = Logger(subsystem: "MimoDays", category: "Search")
 
     init(library: MediaLibrary, clock: any DateProvider = SystemDateProvider(), calendar: @escaping () -> Calendar = { .current }) {
@@ -160,6 +162,7 @@ final class SearchModel {
             logger.error("Reading moments for search failed: \(error.localizedDescription, privacy: .public)")
         }
         isLoaded = true
+        Task { await reloadChangedImages() }
     }
 
     /// A Places row: its moments, without the words that found it.
@@ -174,17 +177,28 @@ final class SearchModel {
     }
 
     /// The row's picture, once.
-    func load(_ id: UUID) async {
-        guard images[id] == nil else { return }
+    func load(_ id: UUID, again: Bool = false) async {
+        guard again || images[id] == nil else { return }
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
         guard let moment = try? library.context.fetch(descriptor).first,
               let path = moment.media.first(where: { $0.role == .thumbnail })?.relativePath,
               let url = try? library.store.url(for: path),
               let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: MemoriesModel.tilePixels) else { return }
-        images[id] = UIImage(cgImage: image)
-        imageOrder.append(id)
-        if imageOrder.count > MemoriesModel.imageLimit { images[imageOrder.removeFirst()] = nil }
+        if images.updateValue(UIImage(cgImage: image), forKey: id) == nil { imageOrder.append(id) }
+        imagePaths[id] = path
+        if imageOrder.count > MemoriesModel.imageLimit {
+            let oldest = imageOrder.removeFirst()
+            images[oldest] = nil
+            imagePaths[oldest] = nil
+        }
+    }
+
+    /// Rows whose thumbnail file was replaced since it was read show the new one.
+    func reloadChangedImages() async {
+        for (id, path) in library.context.thumbnailPaths(of: Array(images.keys)) where imagePaths[id] != path {
+            await load(id, again: true)
+        }
     }
 
     // MARK: Matching

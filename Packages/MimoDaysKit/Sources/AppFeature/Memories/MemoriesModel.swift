@@ -94,6 +94,9 @@ final class MemoriesModel {
     private let clock: any DateProvider
     private let calendar: () -> Calendar
     private var imageOrder: [UUID] = []
+    /// The files each picture was read from: a moment whose files change (the viewer moved its window or chose
+    /// halves) is read again.
+    private var imagePaths: [UUID: [String]] = [:]
     private var loading: Set<UUID> = []
     private let logger = Logger(subsystem: "MimoDays", category: "Memories")
 
@@ -243,6 +246,18 @@ final class MemoriesModel {
         // An edit can change a voice note or a video's length; tiles read them again.
         details = [:]
         isLoaded = true
+        Task { await reloadChangedImages() }
+    }
+
+    /// Pictures whose files were replaced since they were read come again; the rest stay.
+    func reloadChangedImages() async {
+        let ids = Array(images.keys)
+        guard !ids.isEmpty else { return }
+        // One read for all the decoded tiles, not one each.
+        let moments = (try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { ids.contains($0.id) }))) ?? []
+        for moment in moments where imagePaths[moment.id] != Self.pictures(of: moment, separatesWindow: separatesWindow)?.all {
+            await loadImage(moment.id)
+        }
     }
 
     /// Months, then days, from items sorted by day and by time within a day, either way round.
@@ -275,29 +290,46 @@ final class MemoriesModel {
         guard let detail else { return }
         details[id] = detail
         guard images[id] == nil else { return }
-        let pictures = separatesWindow ? sources(id) : nil
-        guard let path = pictures?.main ?? detail.thumbnailPath, let url = try? store.url(for: path),
+        await loadImage(id)
+    }
+
+    /// The tile's picture (and its selfie, where the moment shows a window), read from `pictures(id)`.
+    private func loadImage(_ id: UUID) async {
+        guard let pictures = pictures(id), let url = try? store.url(for: pictures.main),
               let image = try? await thumbnails.thumbnail(for: url, maxPixelSize: Self.tilePixels) else { return }
-        if let selfie = pictures?.selfie, let url = try? store.url(for: selfie),
-           let window = try? await thumbnails.thumbnail(for: url, maxPixelSize: Self.selfiePixels) {
-            selfies[id] = UIImage(cgImage: window)
+        var window: UIImage?
+        if let selfie = pictures.selfie, let url = try? store.url(for: selfie),
+           let picture = try? await thumbnails.thumbnail(for: url, maxPixelSize: Self.selfiePixels) {
+            window = UIImage(cgImage: picture)
         }
-        images[id] = UIImage(cgImage: image)
-        imageOrder.append(id)
+        selfies[id] = window
+        if images.updateValue(UIImage(cgImage: image), forKey: id) == nil { imageOrder.append(id) }
+        imagePaths[id] = pictures.all
         if imageOrder.count > Self.imageLimit {
             let oldest = imageOrder.removeFirst()
             images[oldest] = nil
             selfies[oldest] = nil
+            imagePaths[oldest] = nil
         }
     }
 
-    /// The main picture and, where the moment shows its window, the selfie: as Today's hero picks them.
-    private func sources(_ id: UUID) -> (main: String?, selfie: String?)? {
+    /// Which files a tile shows now: the main picture and the selfie where it has its own window, otherwise the
+    /// thumbnail.
+    private func pictures(_ id: UUID) -> (main: String, selfie: String?, all: [String])? {
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
-        guard let moment = try? context.fetch(descriptor).first else { return nil }
-        let summary = MomentSummary(moment)
-        return (summary.picturePath, summary.windowPath)
+        return (try? context.fetch(descriptor).first).flatMap { Self.pictures(of: $0, separatesWindow: separatesWindow) }
+    }
+
+    private static func pictures(of moment: Moment, separatesWindow: Bool) -> (main: String, selfie: String?, all: [String])? {
+        if separatesWindow {
+            let summary = MomentSummary(moment)
+            if let main = summary.picturePath {
+                return (main, summary.windowPath, [main] + (summary.windowPath.map { [$0] } ?? []))
+            }
+        }
+        guard let path = moment.media.first(where: { $0.role == .thumbnail })?.relativePath else { return nil }
+        return (path, nil, [path])
     }
 
     private func fetchDetail(_ id: UUID) -> TileDetail? {

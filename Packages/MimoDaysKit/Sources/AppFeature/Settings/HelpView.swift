@@ -1,11 +1,13 @@
 import DesignSystem
+import MessageUI
 import StoreKit
 import SwiftUI
 import UIKit
 
 enum AppLinks {
-    /// S07 "Send feedback".
-    static let feedback = URL(string: "mailto:hello@mrmaier.com")
+    /// S07 "Send feedback": the same address as the site's Support page and the App Store listing.
+    static let feedbackAddress = "mimodays@mrmaier.com"
+    static let feedback = URL(string: "mailto:\(feedbackAddress)")
 }
 
 /// S07 "How it works": one short page each.
@@ -61,6 +63,8 @@ struct HelpView: View {
     @Environment(\.requestReview) private var requestReview
     @Environment(\.openURL) private var openURL
     @Environment(\.replayOnboarding) private var replayOnboarding
+    @State private var composesMail = false
+    @State private var showsAddress = false
 
     /// "1.0 (12)".
     static var appVersion: String {
@@ -113,7 +117,7 @@ struct HelpView: View {
                     .padding(.top, 6)
                     DataCard {
                         if let feedback = AppLinks.feedback {
-                            Button { openURL(feedback) } label: {
+                            Button { sendFeedback(feedback) } label: {
                                 DataIconRow(icon: .glyphNote, title: Text("Send feedback", bundle: .module))
                             }
                             .accessibilityIdentifier("help.feedback")
@@ -138,6 +142,58 @@ struct HelpView: View {
             }
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .sheet(isPresented: $composesMail) {
+            MailComposer(to: AppLinks.feedbackAddress, subject: "MimoDays \(version)") { composesMail = false }
+                .ignoresSafeArea()
+        }
+        .alert(Text("Send feedback", bundle: .module), isPresented: $showsAddress) {
+            Button { UIPasteboard.general.string = AppLinks.feedbackAddress } label: {
+                Text("Copy address", bundle: .module, comment: "Help › Send feedback, when no mail app can open: copies the feedback email address")
+            }
+            Button(role: .cancel) {} label: { Text("OK", bundle: .module) }
+        } message: {
+            Text("No mail app is set up on this device. Write to \(AppLinks.feedbackAddress) from any app.", bundle: .module, comment: "Help › Send feedback, when no mail app can open; the argument is the email address")
+        }
+    }
+
+    /// Mail in place when an account is set up; otherwise the person's own mail app; otherwise the address to copy.
+    /// A `mailto:` link alone does nothing visible when no app takes it.
+    private func sendFeedback(_ url: URL) {
+        if MFMailComposeViewController.canSendMail() {
+            composesMail = true
+        } else {
+            openURL(url) { accepted in
+                if !accepted { showsAddress = true }
+            }
+        }
+    }
+}
+
+/// The system's mail sheet, addressed and with a subject.
+private struct MailComposer: UIViewControllerRepresentable {
+    let to: String
+    let subject: String
+    let onFinish: () -> Void
+
+    func makeUIViewController(context: Context) -> MFMailComposeViewController {
+        let controller = MFMailComposeViewController()
+        controller.setToRecipients([to])
+        controller.setSubject(subject)
+        controller.mailComposeDelegate = context.coordinator
+        return controller
+    }
+
+    func updateUIViewController(_ controller: MFMailComposeViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator(onFinish: onFinish) }
+
+    final class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+        let onFinish: () -> Void
+        init(onFinish: @escaping () -> Void) { self.onFinish = onFinish }
+
+        func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+            onFinish()
+        }
     }
 }
 

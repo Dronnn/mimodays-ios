@@ -2,7 +2,8 @@ import Core
 import XCTest
 
 /// 15.2/15.3: VoiceOver's audit (labels, traits, 44 pt targets, Dynamic Type, clipped text) over the screens the
-/// other suites don't audit: the camera and Review, every Settings page, Movies and Search. Contrast is checked
+/// other suites don't audit: Today, the Memories timeline, the camera and Review, every Settings page, Movies and
+/// Search. Contrast is checked
 /// against the design instead.
 final class AccessibilityUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -99,6 +100,16 @@ final class AccessibilityUITests: XCTestCase {
             try audit("settings > \(page)")
             back.tap()
         }
+    }
+
+    @MainActor
+    func testTodayAndTheMemoriesTimelinePassTheAudit() throws {
+        launch(.populated)
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "today.hero").firstMatch.waitForExistence(timeout: 20))
+        try audit("today")
+        app.tabBars.firstMatch.buttons.element(boundBy: 1).tap()
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch.waitForExistence(timeout: 20))
+        try audit("memories")
     }
 
     @MainActor

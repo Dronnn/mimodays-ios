@@ -65,7 +65,7 @@ struct ArtCanvas: View {
         GeometryReader { proxy in
             ZStack(alignment: .topLeading) {
                 ForEach(layers.indices, id: \.self) { index in
-                    layer(layers[index])
+                    layer(layers[index], photo: photoFrame(before: index))
                         .accessibilityHidden(layers[index].isShape)
                 }
             }
@@ -83,8 +83,17 @@ struct ArtCanvas: View {
         }
     }
 
+    /// The photo a caption may be written on: the last photo frame drawn before it (used when the caption's centre
+    /// is on it).
+    private func photoFrame(before index: Int) -> CGRect? {
+        layers[..<index].reversed().lazy.compactMap { layer -> CGRect? in
+            if case let .shape(_, .photo(_, frame, _), _) = layer { return frame }
+            return nil
+        }.first
+    }
+
     @ViewBuilder
-    private func layer(_ layer: ArtLayer) -> some View {
+    private func layer(_ layer: ArtLayer, photo: CGRect?) -> some View {
         switch layer {
         case let .shape(asset, .photo(photo, frame, rotation), shadow):
             Image(photo, bundle: .module)
@@ -131,8 +140,9 @@ struct ArtCanvas: View {
                     .rotationEffect(.degrees(rotation))
                     .position(center)
             } else {
-                // A longer translation slides inward instead of running off the photo it is written on.
-                InsideArt(center: center) { label.rotationEffect(.degrees(rotation)) }
+                // A longer translation slides inward instead of running off the photo it is written on: light
+                // letters past the photo's edge vanish on the cream frames around it.
+                InsideArt(center: center, area: photo.flatMap { $0.contains(center) ? $0.insetBy(dx: 10, dy: 0) : nil }) { label.rotationEffect(.degrees(rotation)) }
                     .frame(width: size.width, height: size.height)
             }
         }
@@ -185,10 +195,11 @@ private struct ArtLoop: View {
     }
 }
 
-/// Centres a caption on its point, moved just enough to stay 20 pt inside the art; only a caption wider than the
-/// art itself shrinks.
+/// Centres a caption on its point, moved just enough to stay inside `area` (its photo), or 20 pt inside the art
+/// without one; only a caption wider than that shrinks.
 private struct InsideArt: Layout {
     let center: CGPoint
+    var area: CGRect?
     let inset: CGFloat = 20
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache _: inout ()) -> CGSize {
@@ -197,9 +208,10 @@ private struct InsideArt: Layout {
 
     func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
         guard let label = subviews.first else { return }
-        let size = label.sizeThatFits(ProposedViewSize(width: bounds.width - 2 * inset, height: nil))
+        let lane = area.map { ($0.minX, $0.maxX) } ?? (inset, bounds.width - inset)
+        let size = label.sizeThatFits(ProposedViewSize(width: lane.1 - lane.0, height: nil))
         let half = size.width / 2
-        let x = min(max(center.x, inset + half), bounds.width - inset - half)
+        let x = min(max(center.x, lane.0 + half), lane.1 - half)
         label.place(
             at: CGPoint(x: bounds.minX + x, y: bounds.minY + center.y), anchor: .center,
             proposal: ProposedViewSize(size)

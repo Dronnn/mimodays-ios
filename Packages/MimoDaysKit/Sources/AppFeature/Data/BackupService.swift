@@ -130,8 +130,11 @@ struct BackupService {
     /// any of whose files is damaged is skipped whole; links to it are dropped.
     func restore(_ check: BackupArchive.Check, mode: Mode, unpacked: [String: URL]) throws -> Outcome {
         let document = check.document
-        if mode == .replaceEverything { try removeEverything() }
-        let here = existingMomentIDs()
+        // Replacing: what is here goes in the same save as the backup comes in, so a failed save keeps it all; its
+        // files go only after that save. Until then the fetches below leave it out.
+        let replacing = mode == .replaceEverything
+        let oldFiles = replacing ? removeEverything() : []
+        let here = replacing ? [] : existingMomentIDs()
         var paths: [String: String] = [:]
         var stored: [String] = []
         func move(_ path: String) -> Bool {
@@ -162,9 +165,9 @@ struct BackupService {
             moments[record.id] = moment
             restored += 1
         }
-        let present = try existingMoments(adding: moments)
+        let present = replacing ? moments : try existingMoments(adding: moments)
 
-        let collections = Dictionary(((try? context.fetch(FetchDescriptor<MomentCollection>())) ?? []).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let collections = replacing ? [:] : Dictionary(((try? context.fetch(FetchDescriptor<MomentCollection>())) ?? []).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         for record in document.collections {
             let collection = collections[record.id] ?? {
                 let new = MomentCollection(id: record.id, title: record.title, sortOrder: record.sortOrder, createdAt: record.createdAt)
@@ -179,7 +182,7 @@ struct BackupService {
             }
         }
 
-        let projectsHere = existingProjectIDs()
+        let projectsHere = replacing ? [] : existingProjectIDs()
         for record in document.movies where !projectsHere.contains(record.id) {
             let project = MovieProject(
                 id: record.id, title: record.title, sourceRule: record.sourceRule,
@@ -245,6 +248,10 @@ struct BackupService {
             for path in stored { try? store.remove(path) }
             throw error
         }
+        for path in oldFiles {
+            do { try store.remove(path) } catch { Self.logger.error("Removing a file failed: \(error.localizedDescription, privacy: .public)") }
+            try? store.remove(LoopPreviews.path(for: path))
+        }
         let manifest = BackupManifest(
             archiveID: document.archiveID, formatVersion: document.formatVersion, createdAt: document.createdAt,
             checksums: document.files.mapValues(\.sha256), entityCounts: Self.counts(document)
@@ -261,7 +268,8 @@ struct BackupService {
 
     /// Everything goes before a backup replaces it: moments (Recently deleted too), collections, movies, and
     /// their files.
-    private func removeEverything() throws {
+    /// Marks every record for deletion, unsaved; their files, to remove once the restore has saved.
+    private func removeEverything() -> Set<String> {
         let moments = (try? context.fetch(FetchDescriptor<Moment>())) ?? []
         let projects = (try? context.fetch(FetchDescriptor<MovieProject>())) ?? []
         let paths = moments.flatMap { $0.media.map(\.relativePath) + $0.voiceNotes.map(\.relativePath) }
@@ -269,11 +277,7 @@ struct BackupService {
         for project in projects { context.delete(project) }
         for collection in (try? context.fetch(FetchDescriptor<MomentCollection>())) ?? [] { context.delete(collection) }
         for moment in moments { context.delete(moment) }
-        try context.save()
-        for path in Set(paths) {
-            do { try store.remove(path) } catch { Self.logger.error("Removing a file failed: \(error.localizedDescription, privacy: .public)") }
-            try? store.remove(LoopPreviews.path(for: path))
-        }
+        return Set(paths)
     }
 
     private func liveMoments() -> [Moment] {

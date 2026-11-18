@@ -184,11 +184,17 @@ struct BackupTests {
         _ = try restore(url, into: other)
         #expect(try other.context.fetchCount(FetchDescriptor<Moment>()) == 7)
 
+        let ownFiles = try other.context.fetch(FetchDescriptor<Moment>()).filter { own.contains($0.id) }.flatMap { $0.media.map(\.relativePath) }
+        #expect(!ownFiles.isEmpty)
         _ = try restore(url, into: other, mode: .replaceEverything)
         let ids = Set(try other.context.fetch(FetchDescriptor<Moment>()).map(\.id))
         #expect(ids == Set(check.document.moments.map(\.id)))
         #expect(ids.isDisjoint(with: own))
         #expect(records(other) == records(phone))
+        // The old library's files go once the new one is saved; the new one's are all there.
+        #expect(ownFiles.allSatisfy { !FileManager.default.fileExists(atPath: (try? other.store.url(for: $0).path) ?? "") })
+        let newFiles = try other.context.fetch(FetchDescriptor<Moment>()).flatMap { $0.media.map(\.relativePath) }
+        #expect(newFiles.allSatisfy { FileManager.default.fileExists(atPath: (try? other.store.url(for: $0).path) ?? "/") })
     }
 
     @Test func aDamagedFileSkipsOnlyItsMoment() async throws {

@@ -31,10 +31,136 @@
       "comment" : "System camera permission prompt",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم MimoDays الكاميرا لالتقاط لحظاتك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays выкарыстоўвае камеру, каб здымаць твае моманты."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays nutzt die Kamera, um deine Momente festzuhalten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "MimoDays uses the camera to capture your moments."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays usa la cámara para capturar tus momentos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays utilise la caméra pour capturer tes moments."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays משתמשת במצלמה כדי לתפוס את הרגעים שלך."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ն օգտագործում է տեսախցիկը՝ քո պահերը նկարելու համար։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays usa la fotocamera per catturare i tuoi momenti."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysは、モーメントを撮影するためにカメラを使用します。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays კამერას შენი მომენტების გადასაღებად იყენებს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays сәттеріңді түсіру үшін камераны пайдаланады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays가 순간을 담기 위해 카메라를 사용해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays gebruikt de camera om je momenten vast te leggen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays używa aparatu, aby łapać twoje chwile."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O MimoDays usa a câmera para capturar seus momentos."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays использует камеру, чтобы снимать твои моменты."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays använder kameran för att fånga dina ögonblick."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays, anlarını yakalamak için kamerayı kullanır."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays використовує камеру, щоб знімати твої моменти."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 使用相机来捕捉你的瞬间。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 使用相機來記錄瞬間。"
           }
         }
       }
@@ -43,10 +169,136 @@
       "comment" : "System Face ID permission prompt, shown the first time App Lock asks",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم MimoDays بصمة الوجه لفتح قفل التطبيق عند تشغيل قفل التطبيق."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays выкарыстоўвае Face ID для разблакіроўкі праграмы, калі ўключана блакіроўка праграмы."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays nutzt Face ID, um die App zu entsperren, wenn die App-Sperre an ist."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "MimoDays uses Face ID to unlock the app when App Lock is on."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays usa Face ID para desbloquear la app cuando el bloqueo de la app está activado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays utilise Face ID pour déverrouiller l’app quand le Verrouillage de l’app est activé."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays משתמשת ב־Face ID כדי לבטל את נעילת האפליקציה כשנעילת האפליקציה מופעלת."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ն օգտագործում է Face ID-ն՝ հավելվածն ապակողպելու համար, երբ հավելվածի կողպումը միացված է։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays usa Face ID per sbloccare l'app quando il Blocco app è attivo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysは、アプリロックがオンのときに、Face IDでアプリのロックを解除します。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays Face ID-ს აპის განსაბლოკად იყენებს, როცა აპის ჩაკეტვა ჩართულია."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қолданба құлпы қосулы болғанда, MimoDays құлыпты ашу үшін Face ID пайдаланады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앱 잠금이 켜져 있으면 MimoDays가 앱 잠금을 해제하기 위해 Face ID를 사용해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays gebruikt Face ID om de app te ontgrendelen als App-vergrendeling aan staat."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays używa Face ID do odblokowywania aplikacji, gdy Blokada aplikacji jest włączona."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O MimoDays usa o Face ID para desbloquear o app quando o Bloqueio do app está ativado."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays использует Face ID, чтобы разблокировать приложение, когда включена блокировка приложения."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays använder Face ID för att låsa upp appen när Applås är på."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays, Uygulama Kilidi açıkken uygulamanın kilidini açmak için Face ID kullanır."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays використовує Face ID, щоб розблоковувати застосунок, коли ввімкнено блокування застосунку."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开启应用锁后，MimoDays 使用面容 ID 解锁 App。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟「App 鎖定」時，MimoDays 會使用 Face ID 解鎖 App。"
           }
         }
       }
@@ -55,10 +307,136 @@
       "comment" : "System location permission prompt (while using the app)",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحفظ MimoDays مكان حدوث اللحظة، لتتمكن من العثور عليها على خريطتك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays захоўвае месца, дзе адбыўся момант, каб яго можна было знайсці на тваёй карце."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays speichert, wo ein Moment passiert ist, damit du ihn auf deiner Karte findest."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "MimoDays saves where a moment happened, so you can find it on your map."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays guarda dónde ocurrió un momento para que puedas encontrarlo en tu mapa."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays enregistre où un moment s’est passé, pour que tu puisses le retrouver sur ta carte."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays שומרת את המקום שבו קרה רגע, כדי שיהיה אפשר למצוא אותו במפה שלך."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ը պահպանում է, թե որտեղ է պահը տեղի ունեցել, որ կարողանաս այն գտնել քո քարտեզին։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays salva dove è successo un momento, così puoi ritrovarlo sulla mappa."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysは、地図でモーメントを見つけられるように、撮影した場所を保存します。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays ინახავს მომენტის ადგილს, რომ შენს რუკაზე იპოვო."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays сәттің қай жерде болғанын сақтайды, сонда оны картаңнан таба аласың."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays가 순간이 일어난 장소를 저장해 지도에서 찾을 수 있게 해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays bewaart waar een moment gebeurde, zodat je het op je kaart kunt terugvinden."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays zapisuje, gdzie wydarzyła się chwila, aby można było ją znaleźć na mapie."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O MimoDays salva onde um momento aconteceu, para você encontrá-lo no seu mapa."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays сохраняет, где случился момент, чтобы его можно было найти на карте."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays sparar var ett ögonblick hände, så att du kan hitta det på din karta."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays, anın yaşandığı yeri kaydeder. Böylece onu haritanda bulabilirsin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays зберігає, де стався момент, щоб його можна було знайти на мапі."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 会保存瞬间发生的地点，方便你在地图上找到它。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 會儲存瞬間發生的地點，方便在地圖上尋找。"
           }
         }
       }
@@ -67,10 +445,136 @@
       "comment" : "System microphone permission prompt",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم MimoDays الميكروفون لإضافة الصوت إلى فيديوهاتك وتسجيل الملاحظات الصوتية."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays выкарыстоўвае мікрафон, каб дадаваць гук да тваіх відэа і запісваць галасавыя нататкі."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays nutzt das Mikrofon, um deinen Videos Ton hinzuzufügen und Sprachnotizen aufzunehmen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "MimoDays uses the microphone to add sound to your videos and record voice notes."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays usa el micrófono para añadir sonido a tus videos y grabar notas de voz."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays utilise le micro pour ajouter le son à tes vidéos et enregistrer des notes vocales."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays משתמשת במיקרופון כדי להוסיף קול לסרטונים שלך ולהקליט הערות קוליות."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ն օգտագործում է խոսափողը՝ տեսանյութերիդ ձայն ավելացնելու և ձայնային գրառումներ անելու համար։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays usa il microfono per aggiungere l'audio ai tuoi video e registrare note vocali."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysは、ビデオに音声を付けたり、音声メモを録音したりするためにマイクを使用します。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays მიკროფონს შენს ვიდეოებში ხმის დასამატებლად და ხმოვანი ჩანაწერების ჩასაწერად იყენებს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays бейнелеріңе дыбыс қосу және дауыстық жазбаларды жазып алу үшін микрофонды пайдаланады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays가 동영상에 소리를 넣고 음성 메모를 녹음하기 위해 마이크를 사용해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays gebruikt de microfoon om geluid aan je video's toe te voegen en spraaknotities op te nemen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays używa mikrofonu, aby dodawać dźwięk do twoich wideo i nagrywać notatki głosowe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O MimoDays usa o microfone para adicionar som aos seus vídeos e gravar notas de voz."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays использует микрофон, чтобы добавлять звук к видео и записывать голосовые заметки."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays använder mikrofonen för att lägga till ljud i dina videor och spela in röstanteckningar."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays, videolarına ses eklemek ve sesli not kaydetmek için mikrofonu kullanır."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays використовує мікрофон, щоб додавати звук до відео й записувати голосові нотатки."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 使用麦克风为视频录制声音，并录制语音备注。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 使用麥克風為影片加入聲音，並錄製語音筆記。"
           }
         }
       }
@@ -79,10 +583,136 @@
       "comment" : "System prompt for adding to Photos (add-only access)",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحفظ MimoDays الصور والفيديوهات والأفلام التي تصدّرها في مكتبتك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays захоўвае фота, відэа і фільмы, якія ты экспартуеш, у тваёй медыятэцы."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays sichert die Fotos, Videos und Filme, die du exportierst, in deiner Mediathek."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "MimoDays saves the photos, videos and movies you export to your library."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays guarda en tu fototeca las fotos, los videos y las películas que exportas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays enregistre dans ta photothèque les photos, vidéos et films que tu exportes."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays שומרת בספרייה שלך את התמונות, הסרטונים והסרטים שנבחרו לייצוא."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ը քո լուսադարանում պահպանում է արտահանածդ լուսանկարները, տեսանյութերը և ֆիլմերը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays salva nella tua libreria le foto, i video e i film che esporti."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysは、書き出した写真、ビデオ、ムービーをライブラリに保存します。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays შენს ბიბლიოთეკაში ინახავს ფოტოებს, ვიდეოებსა და ფილმებს, რომელთა ექსპორტსაც აკეთებ."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays сен экспорттаған фото, бейне және фильмдерді медиатекаңа сақтайды."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays가 내보내는 사진, 동영상, 무비를 보관함에 저장해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays bewaart de foto's, video's en films die je exporteert in je bibliotheek."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays zapisuje eksportowane zdjęcia, wideo i filmy w twojej bibliotece."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O MimoDays salva na sua fototeca as fotos, vídeos e filmes que você exporta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays сохраняет в медиатеку фото, видео и фильмы, которые ты экспортируешь."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays sparar bilderna, videorna och filmerna du exporterar i ditt bibliotek."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays, dışa aktardığın fotoğrafları, videoları ve filmleri arşivine kaydeder."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays зберігає в медіатеку фото, відео й фільми, які ти експортуєш."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 会把你导出的照片、视频和影片存储到图库中。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 會將匯出的照片、影片和短片儲存到圖庫。"
           }
         }
       }

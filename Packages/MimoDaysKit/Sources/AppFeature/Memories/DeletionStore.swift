@@ -43,6 +43,7 @@ struct DeletionStore {
         try save()
         for path in paths {
             do { try store.remove(path) } catch { Self.logger.error("Removing a file failed: \(error.localizedDescription, privacy: .public)") }
+            try? store.remove(LoopPreviews.path(for: path))
         }
     }
 

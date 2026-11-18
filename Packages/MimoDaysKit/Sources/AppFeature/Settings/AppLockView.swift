@@ -44,10 +44,13 @@ struct AppLockView: View {
 struct AppLockWindow: UIViewRepresentable {
     let lock: AppLock
     let isLocked: Bool
+    /// Settings › Appearance › Fonts, for the lock screen's headline.
+    var fonts: [String: FontPick] = [:]
 
     func makeUIView(context: Context) -> Anchor { Anchor(lock: lock) }
 
     func updateUIView(_ view: Anchor, context: Context) {
+        view.fonts = fonts
         view.update(isLocked: isLocked)
     }
 
@@ -55,6 +58,7 @@ struct AppLockWindow: UIViewRepresentable {
         private let lock: AppLock
         private var window_: UIWindow?
         private var isLocked = false
+        var fonts: [String: FontPick] = [:]
 
         init(lock: AppLock) {
             self.lock = lock
@@ -70,12 +74,16 @@ struct AppLockWindow: UIViewRepresentable {
             guard window_ == nil, let scene = window?.windowScene else { return }
             let window = UIWindow(windowScene: scene)
             window.windowLevel = .alert + 1
-            let lock = lock
-            let host = UIHostingController(rootView: AppLockView(biometry: lock.biometry) { Task { await lock.unlock() } }.appLanguage())
+            let host = UIHostingController(rootView: lockScreen())
             host.view.backgroundColor = .clear
             window.rootViewController = host
             window_ = window
             update(isLocked: isLocked)
+        }
+
+        private func lockScreen() -> AnyView {
+            let lock = lock
+            return AnyView(AppLockView(biometry: lock.biometry) { Task { await lock.unlock() } }.appLanguage(fonts: fonts))
         }
 
         func update(isLocked: Bool) {
@@ -91,6 +99,7 @@ struct AppLockWindow: UIViewRepresentable {
                         window_.traitOverrides.remove(UITraitAccessibilityContrast.self)
                     }
                 }
+                (window_.rootViewController as? UIHostingController<AnyView>)?.rootView = lockScreen()
                 window_.makeKeyAndVisible()
             } else {
                 window_.isHidden = true

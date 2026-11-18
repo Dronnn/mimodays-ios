@@ -97,7 +97,8 @@ struct MosaicLayoutTests {
     }
 }
 
-/// U16/H.9: at most four videos loop at once, the first on screen; a fifth takes over when one leaves.
+/// U16/H.9: as many videos loop at once as Motion says (four here), the first on screen; the next takes over when one
+/// leaves.
 @MainActor
 struct TileMotionTests {
     @Test func theFirstFourVideosOnScreenLoop() {
@@ -122,5 +123,26 @@ struct TileMotionTests {
         var settings = MotionSettings()
         settings[.map] = false
         #expect(!settings.map && settings.search)
+        #expect(old.motion.atOnce == .automatic && old.fonts.isEmpty)
+    }
+
+    /// Playing at once (Andrew, 2026-11-18): the chosen count, fewer while the iPhone is hot.
+    @Test func playingAtOnceFollowsTheSettingAndTheHeat() {
+        #expect(TilesAtOnce.eight.count(thermal: .nominal) == 8)
+        #expect(TilesAtOnce.twelve.count(thermal: .fair) == 12)
+        #expect(TilesAtOnce.all.count(thermal: .nominal) == .max)
+        #expect(TilesAtOnce.all.count(thermal: .serious) == 4)
+        #expect(TilesAtOnce.four.count(thermal: .critical) == 1)
+        #expect([4, 8, 12].contains(TilesAtOnce.automatic.count(thermal: .nominal)))
+        let loops = TileMotion()
+        loops.isOn = true
+        loops.limit = 8
+        let ids = (0..<9).map { _ in UUID() }
+        for id in ids { loops.setOnScreen(id, true) }
+        #expect(ids.filter(loops.plays).count == 8 && !loops.plays(ids[8]))
+    }
+
+    @Test func aTileCopyIsNamedAfterItsVideo() {
+        #expect(LoopPreviews.path(for: "originals/c4/c4949e7f.mov") == "cache/loops/c4949e7f.mp4")
     }
 }

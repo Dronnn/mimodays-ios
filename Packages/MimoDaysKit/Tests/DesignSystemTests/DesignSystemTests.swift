@@ -49,3 +49,42 @@ struct DesignSystemTests {
         #expect((light == dark) == staysTheSame.contains(token))
     }
 }
+
+/// Settings › Appearance › Fonts (Andrew, 2026-11-18): each language is offered only faces with all its letters, and
+/// starts with the design's where they have them.
+struct TypefaceTests {
+    @Test(arguments: ["en", "de", "fr", "es", "it", "nl", "sv", "pl", "pt-BR", "ru", "uk", "be", "hy", "ka", "kk", "tr", "he", "ar", "ja", "ko", "zh-Hans", "zh-Hant"])
+    func everyLanguageHasFacesWithAllItsLetters(language: String) {
+        let defaults = Typefaces(language: language)
+        for role in [Typeface.Role.heading, .hand] {
+            let options = Typefaces.options(role, language: language)
+            #expect(!options.isEmpty)
+            #expect(options.contains(role == .heading ? defaults.heading : defaults.hand))
+        }
+    }
+
+    @Test func defaultsFollowTheScript() {
+        #expect(Typefaces(language: "en") == .design)
+        #expect(Typefaces(language: "ru").heading.id == "lora")
+        #expect(Typefaces(language: "ru").hand.id == "neucha")
+        #expect(Typefaces(language: "kk").hand.id == "caveat")
+        #expect(Typefaces(language: "he").heading.id == "frankRuhl")
+        #expect(Typefaces(language: "ar").heading.id == "amiri")
+        // Fraunces has no Cyrillic; a face made for one script isn't offered to another.
+        #expect(!Typefaces.options(.heading, language: "ru").contains(.fraunces))
+        #expect(!Typefaces.options(.heading, language: "en").contains { $0.id == "amiri" })
+    }
+
+    @Test func aSavedChoiceHoldsAndAnUnknownOneFallsBack() {
+        #expect(Typefaces(language: "ru", heading: "playfair", hand: "caveat").heading.id == "playfair")
+        #expect(Typefaces(language: "ru", heading: "fraunces").heading.id == "lora")
+    }
+
+    @Test func aChosenHeadingReplacesFraunces() {
+        let typefaces = Typefaces(language: "ru", heading: "alegreya")
+        let font = TextStyle.displayHero.ctFont(pointSize: 30, typefaces: typefaces)
+        #expect(CTFontCopyFamilyName(font) as String == "Alegreya")
+        // Body text keeps its face.
+        #expect(CTFontCopyFamilyName(TextStyle.body.ctFont(pointSize: 17, typefaces: typefaces)) as String == "Nunito")
+    }
+}

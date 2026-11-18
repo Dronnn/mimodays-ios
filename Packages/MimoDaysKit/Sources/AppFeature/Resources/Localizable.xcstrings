@@ -26379,6 +26379,143 @@
         }
       }
     },
+    "All on screen" : {
+      "comment" : "Settings › Appearance › Motion: every video on screen plays at once",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كل الفيديوهات الظاهرة"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Усе на экране"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle auf dem Bildschirm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All on screen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos en pantalla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes à l’écran"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כל הסרטונים שעל המסך"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Էկրանին երևացող բոլորը"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutti sullo schermo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画面内のすべて"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ეკრანზე ხილული ყველა ვიდეო"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экрандағы барлық бейне"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화면 내 전체"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles op het scherm"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystkie na ekranie"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos na tela"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все на экране"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alla på skärmen"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ekrandakilerin tümü"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Усі на екрані"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "屏幕上所有视频"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "畫面上所有影片"
+          }
+        }
+      }
+    },
     "All places" : {
       "comment" : "Map (P01): opens every place as a list - the map's accessible alternative; also that list's title.",
       "extractionState" : "manual",
@@ -29135,6 +29272,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自動"
+          }
+        }
+      }
+    },
+    "Automatic (%lld)" : {
+      "comment" : "Settings › Appearance › Motion: how many videos play at once, chosen by the iPhone; the argument is that number",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلقائي (%lld)"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аўтаматычна (%lld)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch (%lld)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic (%lld)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automático (%lld)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatique (%lld)"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אוטומטי (%lld)"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ավտոմատ (%lld)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatico (%lld)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動（%lld）"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ავტომატურად (%lld)"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматты (%lld)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자동 (%lld)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch (%lld)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatycznie (%lld)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automático (%lld)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически (%lld)"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatiskt (%lld)"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otomatik (%lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматично (%lld)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动（%lld）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動（%lld）"
           }
         }
       }
@@ -54842,6 +55116,143 @@
         }
       }
     },
+    "Fonts" : {
+      "comment" : "Settings › Appearance: the row opening the fonts for headings and handwriting",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الخطوط"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шрыфты"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schriften"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fuentes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Polices"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "גופנים"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Տառատեսակներ"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォント"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შრიფტები"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қаріптер"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "글꼴"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lettertypen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czcionki"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fontes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шрифты"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typsnitt"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yazı Tipleri"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шрифти"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "字体"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "字體"
+          }
+        }
+      }
+    },
     "For a week" : {
       "comment" : "Surprise settings (S02): pause choice, for seven days",
       "extractionState" : "manual",
@@ -56498,6 +56909,143 @@
         }
       }
     },
+    "Handwriting" : {
+      "comment" : "Settings › Appearance › Fonts: section title over the handwritten fonts for captions and notes",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خط اليد"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рукапісны шрыфт"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handschrift"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handwriting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escritura a mano"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écriture manuscrite"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כתב יד"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ձեռագիր"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrittura a mano"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手書き"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ხელნაწერი შრიფტი"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қолжазба қаріп"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "손글씨"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handschrift"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pismo odręczne"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escrita à mão"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рукописный шрифт"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handstil"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Yazısı"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рукописний шрифт"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手写体"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手寫體"
+          }
+        }
+      }
+    },
     "Has a voice note" : {
       "comment" : "Filters (M08b): switch for moments with a voice note.",
       "extractionState" : "manual",
@@ -56770,6 +57318,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "有文字筆記"
+          }
+        }
+      }
+    },
+    "Headings" : {
+      "comment" : "Settings › Appearance › Fonts: section title over the fonts for titles",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العناوين"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загалоўкі"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschriften"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Headings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Títulos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titres"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כותרות"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Վերնագրեր"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titoli"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "見出し"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "სათაურები"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тақырыптар"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제목"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koppen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagłówki"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Títulos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заголовки"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rubriker"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Başlıklar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заголовки"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标题"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標題"
           }
         }
       }
@@ -67882,6 +68567,143 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "MimoDays keeps fonts for each language. These are for %@." : {
+      "comment" : "Settings › Appearance › Fonts: the note at the bottom; the argument is the language's own name, e.g. 'Русский'",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحفظ MimoDays اختيارات الخطوط لكل لغة على حدة. هذه الخطوط للغة «%@»."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays захоўвае выбар шрыфтоў асобна для кожнай мовы. Гэтыя шрыфты прызначаныя для мовы «%@»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays speichert deine Schriftwahl für jede Sprache separat. Diese Schriften sind für „%@“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays keeps fonts for each language. These are for %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays guarda tus fuentes por separado para cada idioma. Estas son para «%@»."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays garde tes choix de polices pour chaque langue. Les polices affichées ici sont celles de « %@ »."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays שומרת את בחירת הגופנים לכל שפה בנפרד. הגופנים האלה מיועדים לשפה ״%@״."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ը յուրաքանչյուր լեզվի համար առանձին է պահում տառատեսակների ընտրությունը։ Սրանք «%@» լեզվի համար են։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays salva la scelta dei font per ogni lingua. Questi font sono per «%@»."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysでは、言語ごとにフォントの設定が保存されます。ここに表示されているフォントは「%@」用です。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays თითოეული ენისთვის ცალ-ცალკე ინახავს შრიფტების არჩევანს. ეს შრიფტები „%@“ ენისთვისაა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays қаріп таңдауыңды әр тіл үшін бөлек сақтайды. Бұл қаріптер «%@» тіліне арналған."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays는 언어마다 글꼴 설정을 따로 저장해요. 이 설정은 ‘%@’에 적용돼요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays bewaart je lettertypekeuze per taal. Deze lettertypen zijn voor ‘%@’."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays zapamiętuje wybór czcionek osobno dla każdego języka. Te czcionki są dla języka „%@”."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O MimoDays guarda suas escolhas de fontes por idioma. Estas fontes são para “%@”."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays запоминает выбор шрифтов для каждого языка отдельно. Эти шрифты для языка «%@»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays sparar dina typsnittsval för varje språk. De här typsnitten gäller ”%@”."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays yazı tipi seçimlerini her dil için ayrı ayrı saklar. Bu yazı tipleri “%@” için."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays зберігає вибір шрифтів окремо для кожної мови. Ці шрифти для мови «%@»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 会按语言分别保存字体设置。这里的设置适用于「%@」。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 會分別儲存各語言的字體設定。這裡的設定適用於「%@」。"
           }
         }
       }
@@ -90819,6 +91641,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "播放位置"
+          }
+        }
+      }
+    },
+    "Playing at once" : {
+      "comment" : "Settings › Appearance › Motion: the row choosing how many videos play in their tiles at the same time",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التشغيل المتزامن"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відэа адначасова"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos gleichzeitig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playing at once"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos a la vez"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vidéos à la fois"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "סרטונים במקביל"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Միաժամանակյա նվագարկում"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video simultanei"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同時再生数"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ერთდროული დაკვრა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бір мезетте ойнату"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동시 재생 수"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video’s tegelijk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wideo jednocześnie"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vídeos por vez"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видео одновременно"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videor samtidigt"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aynı anda oynatma"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відео одночасно"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同时播放数量"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同時播放數量"
           }
         }
       }
@@ -141849,140 +142808,139 @@
         }
       }
     },
-    "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger." : {
-      "comment" : "Settings › Appearance (H.9): the note under the Motion switches",
-      "extractionState" : "manual",
+    "Videos play in their tiles without sound, fewer when the iPhone is hot - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger." : {
+      "comment" : "Settings › Appearance (H.9): the note under the Motion switches and the Playing at once row",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تُشغّل الفيديوهات داخل مربعاتها، أربعة في كل مرة وبلا صوت، ولا تُشغّل أبدًا في نمط الطاقة المنخفضة أو عند تشغيل تقليل الحركة. باللمس مطولًا على فيديو، يمكنك تشغيله بحجم أكبر."
+            "value" : "تُشغّل الفيديوهات داخل مربعاتها بلا صوت. عندما يسخن iPhone، يقلّ عدد الفيديوهات التي تُشغّل في الوقت نفسه. ولا تُشغّل أبدًا في نمط الطاقة المنخفضة أو عند تشغيل تقليل الحركة. باللمس مطولًا على فيديو، يمكنك تشغيله بحجم أكبر."
           }
         },
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відэа прайграюцца ў сваіх плітках, па чатыры адначасова, без гуку, але ніколі ў рэжыме энергазберажэння або з памяншэннем руху. Націсні і ўтрымлівай відэа, каб прайграць яго буйней."
+            "value" : "Відэа прайграюцца ў сваіх плітках без гуку. Калі iPhone награваецца, адначасова прайграецца менш відэа. У рэжыме энергазберажэння або з уключаным памяншэннем руху відэа ў плітках не прайграюцца. Націсні і ўтрымлівай відэа, каб прайграць яго ў большым памеры."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Videos spielen in ihren Kacheln, vier gleichzeitig, ohne Ton – nie im Stromsparmodus oder mit „Bewegung reduzieren“. Halte ein Video gedrückt, um es größer abzuspielen."
+            "value" : "Videos werden in ihren Kacheln ohne Ton abgespielt. Wenn das iPhone heiß wird, laufen weniger Videos gleichzeitig. Im Stromsparmodus oder mit „Bewegung reduzieren“ werden sie nie abgespielt. Halte ein Video gedrückt, um es größer abzuspielen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger."
+            "value" : "Videos play in their tiles without sound, fewer when the iPhone is hot - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los videos se reproducen en sus miniaturas, hasta cuatro a la vez y sin sonido, nunca con el modo de bajo consumo ni con Reducir movimiento. Mantén pulsado un video para verlo más grande."
+            "value" : "Los videos se reproducen en sus miniaturas y sin sonido. Si el iPhone se calienta, se reproducen menos videos a la vez. Nunca se reproducen con el modo de bajo consumo ni con Reducir movimiento. Mantén pulsado un video para verlo más grande."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les vidéos se lisent dans leurs vignettes, quatre à la fois, sans le son – jamais en mode Économie d’énergie ni avec Réduire les animations. Maintiens le doigt sur une vidéo pour la lire en plus grand."
+            "value" : "Les vidéos se lisent dans leurs vignettes, sans le son. Quand l’iPhone chauffe, moins de vidéos se lisent en même temps. Elles ne se lisent jamais en mode Économie d’énergie ni avec Réduire les animations. Maintiens le doigt sur une vidéo pour la lire en plus grand."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "סרטונים מתנגנים באריחים שלהם, ארבעה בכל פעם, בלי קול. הם לא מתנגנים במצב סוללה חלשה או כשהפחתת תזוזות מופעלת. לגעת בסרטון ולהחזיק כדי לנגן אותו בגדול."
+            "value" : "סרטונים מתנגנים באריחים שלהם בלי קול. כשמכשיר ה-iPhone מתחמם, פחות סרטונים מתנגנים במקביל. הם לא מתנגנים במצב סוללה חלשה או כשהפחתת תזוזות מופעלת. לגעת בסרטון ולהחזיק כדי לנגן אותו בגדול."
           }
         },
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Տեսանյութերը նվագարկվում են իրենց սալիկներում՝ չորսը միաժամանակ, առանց ձայնի։ Էներգախնայողության կամ շարժման նվազեցման ռեժիմում դրանք երբեք չեն նվագարկվում։ Հպիր ու պահիր տեսանյութը՝ ավելի մեծ չափով նվագարկելու համար։"
+            "value" : "Տեսանյութերը նվագարկվում են իրենց սալիկներում՝ առանց ձայնի։ Երբ iPhone-ը տաքանում է, միաժամանակ ավելի քիչ տեսանյութ է նվագարկվում։ Էներգախնայողության կամ շարժման նվազեցման ռեժիմում դրանք երբեք չեն նվագարկվում։ Հպիր ու պահիր տեսանյութը՝ ավելի մեծ չափով նվագարկելու համար։"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I video si riproducono nei loro tasselli, quattro alla volta, senza audio – mai con Modalità risparmio energetico o Riduci movimento. Tieni premuto un video per riprodurlo più grande."
+            "value" : "I video si riproducono nei loro tasselli senza audio. Quando l’iPhone si scalda, se ne riproducono meno alla volta. Non si riproducono mai con Modalità risparmio energetico o Riduci movimento. Tieni premuto un video per riprodurlo più grande."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ビデオはタイル内で、一度に4本まで無音で再生されます。低電力モード中や「視差効果を減らす」がオンのときは再生されません。長押しすると、大きく再生できます。"
+            "value" : "ビデオはタイル内で無音で再生されます。iPhoneが熱くなると、同時に再生する本数が減ります。低電力モード中や「視差効果を減らす」がオンのときは再生されません。ビデオを長押しすると、大きく再生できます。"
           }
         },
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ვიდეოები თავიანთ უჯრებში უკრავს, ერთდროულად ოთხი, უხმოდ. ენერგიის დაზოგვის რეჟიმში ან მოძრაობის შემცირებისას ისინი არასდროს უკრავს. ვიდეოს ხანგრძლივად შეეხე, რომ უფრო დიდად ნახო."
+            "value" : "ვიდეოები თავიანთ უჯრებში უხმოდ უკრავს. როცა iPhone ცხელდება, ერთდროულად ნაკლები ვიდეო უკრავს. ენერგიის დაზოგვის რეჟიმში ან მოძრაობის შემცირებისას ისინი არასდროს უკრავს. ვიდეოს ხანგრძლივად შეეხე, რომ უფრო დიდად ნახო."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Бейнелер өз ұяшықтарында дыбыссыз, бір мезетте төртеуден ойнатылады. Қуатты үнемдеу режимінде немесе «Қозғалысты азайту» қосулы кезде ойнатылмайды. Бейнені үлкейтіп ойнату үшін басып ұстап тұр."
+            "value" : "Бейнелер өз ұяшықтарында дыбыссыз ойнатылады. iPhone қызғанда, бір мезетте азырақ бейне ойнатылады. Қуатты үнемдеу режимінде немесе «Қозғалысты азайту» қосулы кезде ойнатылмайды. Бейнені үлкейтіп ойнату үшін басып ұстап тұр."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "동영상이 타일 안에서 한 번에 네 개씩 소리 없이 재생돼요. 저전력 모드나 동작 줄이기가 켜져 있으면 재생되지 않아요. 동영상을 길게 터치하면 크게 재생할 수 있어요."
+            "value" : "동영상은 타일 안에서 소리 없이 재생돼요. iPhone이 뜨거워지면 동시에 재생되는 동영상 수가 줄어요. 저전력 모드나 동작 줄이기가 켜져 있으면 재생되지 않아요. 동영상을 길게 터치하면 크게 재생할 수 있어요."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Video's spelen in hun tegels, vier tegelijk, zonder geluid – nooit in de energiebesparingsmodus of met 'Verminder beweging'. Houd een video ingedrukt om hem groter af te spelen."
+            "value" : "Video’s spelen in hun tegels zonder geluid. Als de iPhone warm wordt, spelen er minder video’s tegelijk. Ze spelen nooit in de energiebesparingsmodus of met ‘Verminder beweging’. Houd een video ingedrukt om hem groter af te spelen."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Materiały wideo odtwarzają się w swoich kafelkach, po cztery naraz, bez dźwięku – nigdy w trybie niskiego zużycia energii ani przy włączonej funkcji Redukuj ruch. Dotknij wideo i przytrzymaj, aby odtworzyć je w powiększeniu."
+            "value" : "Materiały wideo odtwarzają się w swoich kafelkach bez dźwięku. Gdy iPhone się nagrzewa, mniej materiałów odtwarza się jednocześnie. Nie odtwarzają się w trybie niskiego zużycia energii ani przy włączonej funkcji Redukuj ruch. Dotknij wideo i przytrzymaj, aby odtworzyć je w powiększeniu."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Os vídeos tocam nos blocos, quatro por vez, sem som – nunca no Modo de Pouca Energia ou com Reduzir Movimento. Toque e segure um vídeo para vê-lo maior."
+            "value" : "Os vídeos tocam nos blocos, sem som. Quando o iPhone esquenta, menos vídeos tocam ao mesmo tempo. Eles nunca tocam no Modo de Pouca Energia ou com Reduzir Movimento ativado. Toque e segure um vídeo para vê-lo em tamanho maior."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Видео воспроизводятся в своих плитках, по четыре сразу и без звука – но никогда в режиме энергосбережения или с включенным «Уменьшением движения». Нажми и удерживай видео, чтобы посмотреть его крупнее."
+            "value" : "Видео воспроизводятся в своих плитках без звука. Когда iPhone нагревается, одновременно воспроизводится меньше видео. В режиме энергосбережения или при включённой функции «Уменьшение движения» видео в плитках не воспроизводятся. Нажми и удерживай видео, чтобы посмотреть его крупнее."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Videor spelas i sina rutor, fyra åt gången, utan ljud – aldrig i Strömsparläge eller med Minska rörelse. Tryck och håll på en video för att spela den större."
+            "value" : "Videor spelas i sina rutor utan ljud. När iPhone blir varm spelas färre videor samtidigt. De spelas aldrig i Strömsparläge eller när Minska rörelse är aktiverat. Tryck och håll på en video för att spela upp den i större format."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Videolar, kutucuklarında aynı anda dörder tane ve sessiz oynatılır. Düşük Güç Modu'nda veya Hareketi Azalt açıkken asla oynatılmaz. Daha büyük oynatmak için videoya basılı tut."
+            "value" : "Videolar kutucuklarında sessiz oynatılır. iPhone ısındığında aynı anda daha az video oynatılır. Düşük Güç Modu’nda veya Hareketi Azalt açıkken asla oynatılmaz. Videoyu daha büyük oynatmak için üzerine basılı tut."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відео відтворюються у своїх плитках, по чотири одночасно, без звуку — і ніколи в режимі енергозбереження чи зі зменшенням руху. Торкнись і утримуй відео, щоб відтворити його більшим."
+            "value" : "Відео відтворюються у своїх плитках без звуку. Коли iPhone нагрівається, одночасно відтворюється менше відео. У режимі енергозбереження чи з увімкненим зменшенням руху відео в плитках не відтворюються. Торкнись і утримуй відео, щоб відтворити його в більшому розмірі."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "视频会在各自的方块中无声播放，每次最多四个；在低电量模式下或开启“减弱动态效果”时不会播放。按住视频即可放大播放。"
+            "value" : "视频会在各自的方块中无声播放。iPhone 发热时，同时播放的视频会减少。在低电量模式下或开启「减弱动态效果」时不会播放。按住视频即可放大播放。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "影片會在縮圖中靜音播放，一次四部；「低耗電模式」或「減少動態效果」開啟時則不會播放。按住影片即可放大播放。"
+            "value" : "影片會在縮圖中靜音播放。iPhone 發熱時，同時播放的影片會減少。「低耗電模式」或「減少動態效果」開啟時則不會播放。按住影片即可放大播放。"
           }
         }
       }

@@ -7,19 +7,24 @@ import UIKit
 /// S04 with the app's preferences.
 struct AppearanceSettingsScreen: View {
     @Environment(AppearancePreferences.self) private var preferences: AppearancePreferences?
+    @Environment(\.typefaces) private var typefaces
 
     var body: some View {
         if let preferences {
             @Bindable var preferences = preferences
-            AppearanceSettingsView(settings: $preferences.value, language: AppLanguage.nativeName(AppLanguage.shared.locale.identifier))
+            AppearanceSettingsView(
+                settings: $preferences.value, language: AppLanguage.nativeName(AppLanguage.shared.locale.identifier), headingFont: typefaces.heading.name
+            )
         }
     }
 }
 
-/// S04: Light, Dark or System, higher contrast, and the language.
+/// S04: Light, Dark or System, higher contrast, the language and its fonts.
 struct AppearanceSettingsView: View {
     @Binding var settings: AppearanceSettings
     let language: String
+    /// The headline face in use, named on the Fonts row.
+    var headingFont = Typeface.fraunces.name
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -52,6 +57,14 @@ struct AppearanceSettingsView: View {
                             SettingsValueRow(title: Text("Language", bundle: .module), value: Text(verbatim: language))
                         }
                         .accessibilityIdentifier("appearanceSettings.language")
+                        DataSeparator()
+                        NavigationLink(value: SettingsRoute.fonts) {
+                            SettingsValueRow(
+                                title: Text("Fonts", bundle: .module, comment: "Settings › Appearance: the row opening the fonts for headings and handwriting"),
+                                value: Text(verbatim: headingFont)
+                            )
+                        }
+                        .accessibilityIdentifier("appearanceSettings.fonts")
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 26)
@@ -81,15 +94,32 @@ extension AppearanceSettingsView {
                     DataToggleRow(title: screen.title, isOn: $settings.motion[screen])
                         .accessibilityIdentifier("appearanceSettings.motion.\(index)")
                 }
+                DataSeparator()
+                Menu {
+                    Picker(selection: $settings.motion.atOnce) {
+                        ForEach(TilesAtOnce.allCases, id: \.self) { $0.title.tag($0) }
+                    } label: {
+                        playingAtOnce
+                    }
+                } label: {
+                    SettingsValueRow(title: playingAtOnce, value: settings.motion.atOnce.title)
+                }
+                .accessibilityIdentifier("appearanceSettings.motion.atOnce")
             }
             .padding(.horizontal, 16)
             DataNote(text: Text(
-                "Videos play in their tiles, four at a time, without sound - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger.",
-                bundle: .module, comment: "Settings › Appearance (H.9): the note under the Motion switches"
+                "Videos play in their tiles without sound, fewer when the iPhone is hot - never in Low Power Mode or with Reduce Motion. Touch and hold a video to play it larger.",
+                bundle: .module, comment: "Settings › Appearance (H.9): the note under the Motion switches and the Playing at once row"
             ))
             .padding(.horizontal, 22)
             .padding(.top, 12)
         }
+    }
+}
+
+extension AppearanceSettingsView {
+    private var playingAtOnce: Text {
+        Text("Playing at once", bundle: .module, comment: "Settings › Appearance › Motion: the row choosing how many videos play in their tiles at the same time")
     }
 }
 

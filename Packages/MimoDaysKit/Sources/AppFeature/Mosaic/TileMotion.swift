@@ -25,6 +25,48 @@ enum MotionScreen: CaseIterable, Sendable {
     }
 }
 
+/// How many tiles of a screen play at once (Andrew, 2026-11-18); Automatic goes by the iPhone.
+enum TilesAtOnce: String, Codable, CaseIterable, Sendable {
+    case automatic
+    case four
+    case eight
+    case twelve
+    case all
+
+    /// Automatic's count: twelve with 8 GB of memory or more (iPhone 15 Pro and later), eight with 6 GB, four below.
+    static let deviceDefault: Int = {
+        let gigabytes = Double(ProcessInfo.processInfo.physicalMemory) / Double(1 << 30)
+        return gigabytes >= 7.5 ? 12 : gigabytes >= 5.5 ? 8 : 4
+    }()
+
+    /// Tiles playing at once; fewer while the iPhone is hot.
+    func count(thermal: ProcessInfo.ThermalState) -> Int {
+        let count = switch self {
+        case .automatic: Self.deviceDefault
+        case .four: 4
+        case .eight: 8
+        case .twelve: 12
+        case .all: Int.max
+        }
+        switch thermal {
+        case .serious: return min(count, 4)
+        case .critical: return min(count, 1)
+        default: return count
+        }
+    }
+
+    var title: Text {
+        switch self {
+        case .automatic:
+            Text("Automatic (\(Self.deviceDefault))", bundle: .module, comment: "Settings › Appearance › Motion: how many videos play at once, chosen by the iPhone; the argument is that number")
+        case .four: Text(4, format: .number)
+        case .eight: Text(8, format: .number)
+        case .twelve: Text(12, format: .number)
+        case .all: Text("All on screen", bundle: .module, comment: "Settings › Appearance › Motion: every video on screen plays at once")
+        }
+    }
+}
+
 /// Which screens' video tiles play on their own; all on until switched off.
 struct MotionSettings: Codable, Equatable, Sendable {
     var today = true
@@ -32,6 +74,7 @@ struct MotionSettings: Codable, Equatable, Sendable {
     var memories = true
     var map = true
     var search = true
+    var atOnce = TilesAtOnce.automatic
 
     init() {}
 
@@ -43,6 +86,7 @@ struct MotionSettings: Codable, Equatable, Sendable {
         memories = try container.decodeIfPresent(Bool.self, forKey: .memories) ?? memories
         map = try container.decodeIfPresent(Bool.self, forKey: .map) ?? map
         search = try container.decodeIfPresent(Bool.self, forKey: .search) ?? search
+        atOnce = try container.decodeIfPresent(TilesAtOnce.self, forKey: .atOnce) ?? atOnce
     }
 
     subscript(screen: MotionScreen) -> Bool {
@@ -67,17 +111,19 @@ struct MotionSettings: Codable, Equatable, Sendable {
     }
 }
 
-/// One screen's moving tiles: whether they play on their own, and which do - the first four videos on screen.
+/// One screen's moving tiles: whether they play on their own, and which do - the first videos on screen, as many as
+/// Settings › Appearance › Motion says.
 @MainActor
 @Observable
 final class TileMotion {
-    static let limit = 4
+    /// How many play at once.
+    var limit = 4
     /// The screen's setting, and neither Reduce Motion nor Low Power Mode, and the screen in front.
     var isOn = false
     private var onScreen: [UUID] = []
 
     func plays(_ id: UUID) -> Bool {
-        isOn && onScreen.prefix(Self.limit).contains(id)
+        isOn && onScreen.prefix(limit).contains(id)
     }
 
     func setOnScreen(_ id: UUID, _ isOnScreen: Bool) {
@@ -137,6 +183,7 @@ private struct TileMotionScreen: ViewModifier {
     let isActive: Bool
     @State private var motion = TileMotion()
     @State private var lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+    @State private var thermal = ProcessInfo.processInfo.thermalState
     @Environment(AppearancePreferences.self) private var preferences: AppearancePreferences?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -144,12 +191,20 @@ private struct TileMotionScreen: ViewModifier {
         isActive && (preferences?.value.motion[screen] ?? true) && !reduceMotion && !lowPower
     }
 
+    private var limit: Int {
+        (preferences?.value.motion.atOnce ?? .automatic).count(thermal: thermal)
+    }
+
     func body(content: Content) -> some View {
         content
             .environment(\.tileMotion, motion)
             .onChange(of: isOn, initial: true) { motion.isOn = $1 }
+            .onChange(of: limit, initial: true) { motion.limit = $1 }
             .onReceive(NotificationCenter.default.publisher(for: .NSProcessInfoPowerStateDidChange).receive(on: RunLoop.main)) { _ in
                 lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+            }
+            .onReceive(NotificationCenter.default.publisher(for: ProcessInfo.thermalStateDidChangeNotification).receive(on: RunLoop.main)) { _ in
+                thermal = ProcessInfo.processInfo.thermalState
             }
     }
 }
@@ -308,7 +363,7 @@ struct TileLoop: View {
         .allowsHitTesting(false)
         .accessibilityHidden(true)
         .task {
-            guard let loaded = await library.loop(id), !Task.isCancelled else { return }
+            guard let loaded = await library.loop(id, small: true), !Task.isCancelled else { return }
             let player = ViewerVideoPlayer(duration: loaded.video.timing.duration, silent: true)
             await player.load(main: loaded.main, selfie: nil)
             guard !Task.isCancelled else { return player.stop() }
@@ -370,13 +425,14 @@ private struct WindowShape: View {
 
 extension MediaLibrary {
     /// A video moment's main stream as a silent loop item, and what places it; its selfie stream too where asked
-    /// (Today's hero).
+    /// (Today's hero). A tile (`small`) plays the stream's small copy.
     @MainActor
-    func loop(_ id: UUID, withSelfie: Bool = false) async -> (video: ViewerMoment.VideoSource, main: AVPlayerItem, selfie: AVPlayerItem?)? {
+    func loop(_ id: UUID, withSelfie: Bool = false, small: Bool = false) async -> (video: ViewerMoment.VideoSource, main: AVPlayerItem, selfie: AVPlayerItem?)? {
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
         guard let moment = try? context.fetch(descriptor).first, moment.mediaType == .video,
-              let video = ViewerMoment(moment).video, let mainURL = try? store.url(for: video.mainPath) else { return nil }
+              let video = ViewerMoment(moment).video, var mainURL = try? store.url(for: video.mainPath) else { return nil }
+        if small, let preview = await LoopPreviews.shared.preview(of: video.mainPath, store: store) { mainURL = preview }
         do {
             let duration = try await AVURLAsset(url: mainURL).load(.duration)
             // The main stream's picture alone is the same as a selfie stream with no offset.

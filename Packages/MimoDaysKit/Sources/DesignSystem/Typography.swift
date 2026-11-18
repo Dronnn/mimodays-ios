@@ -229,7 +229,14 @@ public struct TextStyle: Equatable, Sendable {
         return size * lineHeight - (CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font))
     }
 
-    public func ctFont(pointSize: CGFloat) -> CTFont {
+    /// The style's font; headlines and handwriting in the faces chosen for the language (`typefaces`).
+    public func ctFont(pointSize: CGFloat, typefaces: Typefaces = .current) -> CTFont {
+        if family == .fraunces, typefaces.heading != .fraunces {
+            return typefaces.heading.font(for: self, pointSize: pointSize)
+        }
+        if family == .patrickHand, typefaces.hand != .patrickHand {
+            return typefaces.hand.font(for: self, pointSize: pointSize)
+        }
         guard let base = family.descriptor else {
             return UIFont.systemFont(ofSize: pointSize) as CTFont
         }
@@ -254,7 +261,7 @@ public struct TextStyle: Equatable, Sendable {
         return CTFontCreateWithFontDescriptor(descriptor, pointSize, nil)
     }
 
-    private static func tag(_ string: String) -> NSNumber {
+    static func tag(_ string: String) -> NSNumber {
         NSNumber(value: string.unicodeScalars.reduce(UInt32(0)) { ($0 << 8) | $1.value })
     }
 }
@@ -262,10 +269,11 @@ public struct TextStyle: Equatable, Sendable {
 private struct TextStyleModifier: ViewModifier {
     let style: TextStyle
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.typefaces) private var typefaces
 
     func body(content: Content) -> some View {
         let size = style.scaledSize(for: dynamicTypeSize)
-        let font = style.ctFont(pointSize: size)
+        let font = style.ctFont(pointSize: size, typefaces: typefaces)
         let styled = content
             .font(Font(font))
             .tracking(style.tracking)

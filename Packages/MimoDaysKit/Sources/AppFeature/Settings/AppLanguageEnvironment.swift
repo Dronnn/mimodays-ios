@@ -1,21 +1,34 @@
 import Core
+import DesignSystem
 import SwiftUI
 
 extension View {
-    /// The language chosen in MimoDays, for everything under this view: its words, dates and numbers, and the
-    /// direction of its layout. Reads `AppLanguage.shared`, so a switch redraws at once.
-    func appLanguage() -> some View {
-        modifier(AppLanguageEnvironment())
+    /// The language chosen in MimoDays, for everything under this view: its words, dates and numbers, the
+    /// direction of its layout, and its headline and handwriting faces (`fonts`, Settings › Appearance › Fonts).
+    /// Reads `AppLanguage.shared`, so a switch redraws at once.
+    func appLanguage(fonts: [String: FontPick] = [:]) -> some View {
+        modifier(AppLanguageEnvironment(fonts: fonts))
     }
 }
 
+extension AppLanguage {
+    /// The language in use: the one chosen, or the iPhone's.
+    var current: String { code ?? systemCode }
+}
+
 private struct AppLanguageEnvironment: ViewModifier {
+    let fonts: [String: FontPick]
+
     func body(content: Content) -> some View {
         let language = AppLanguage.shared
         let direction: LayoutDirection = language.isRightToLeft ? .rightToLeft : .leftToRight
+        let pick = fonts[language.current]
+        let typefaces = Typefaces(language: language.current, heading: pick?.heading, hand: pick?.hand)
         content
             .environment(\.locale, language.locale)
             .environment(\.layoutDirection, direction)
+            .environment(\.typefaces, typefaces)
+            .onChange(of: typefaces, initial: true) { Typefaces.current = $1 }
             .background(SceneLayoutDirection(direction: direction))
     }
 }

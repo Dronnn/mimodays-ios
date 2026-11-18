@@ -267,7 +267,10 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
             logger.error("Saving the edit failed: \(error.localizedDescription, privacy: .public)")
             throw error
         }
-        for path in replaced { try? library.store.remove(path) }
+        for path in replaced {
+            try? library.store.remove(path)
+            try? library.store.remove(LoopPreviews.path(for: path))
+        }
         if case let .recorded(recorded) = voice { try? FileManager.default.removeItem(at: recorded.url) }
     }
 }

@@ -115,8 +115,20 @@ struct SettingsSnapshotTests {
     /// S04.
     @Test func appearance() {
         var settings = AppearanceSettings()
+        // Automatic's count depends on the machine's memory.
+        settings.motion.atOnce = .eight
         assertScreenSnapshots(
             of: page(AppearanceSettingsView(settings: Binding { settings } set: { settings = $0 }, language: "English")), variants: variants
+        )
+    }
+
+    /// Appearance › Fonts (Andrew, 2026-11-18): English starts with Fraunces and Patrick Hand; Russian is offered only
+    /// faces with Cyrillic, Lora and Neucha first chosen.
+    @Test(arguments: ["en", "ru"])
+    func fonts(language: String) {
+        assertScreenSnapshots(
+            of: page(FontSettingsView(language: language)).environment(\.typefaces, Typefaces(language: language)),
+            variants: language == "en" ? variants : [SnapshotVariant(.iPhone, .light)], testName: "fonts-\(language)"
         )
     }
 

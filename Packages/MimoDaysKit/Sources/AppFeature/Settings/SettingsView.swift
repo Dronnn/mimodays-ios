@@ -20,6 +20,8 @@ enum SettingsRoute: Hashable {
     case deleteAll
     /// Appearance › Language.
     case language
+    /// Appearance › Fonts.
+    case fonts
 }
 
 /// What the back button says on a page opened from more than one place: the page it goes back to.
@@ -79,6 +81,7 @@ private struct SettingsHost: View {
                     case let .dataUse(back): DataUseView(back: back.label).settingsPage()
                     case .deleteAll: DeleteAllScreen().settingsPage()
                     case .language: LanguageSettingsView().settingsPage()
+                    case .fonts: FontSettingsView().settingsPage()
                     }
                 }
                 .navigationDestination(for: DataRoute.self) { route in

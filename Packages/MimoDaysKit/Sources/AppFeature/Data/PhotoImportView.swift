@@ -111,7 +111,7 @@ struct PhotoImportView: View {
                 .accessibilityAddTraits(.isHeader)
                 .padding(.horizontal, 2)
                 .padding(.top, 12)
-            Text("Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos.", bundle: .module)
+            Text("Each one goes to the day it was taken and is marked \"Imported\". They have no selfie window. The originals stay in Photos.", bundle: .module)
                 .textStyle(TextStyle(.nunito, size: 14.5, weight: 500, lineHeight: 1.2, relativeTo: .subheadline))
                 .foregroundStyle(ColorToken.textBody.color)
                 .fixedSize(horizontal: false, vertical: true)

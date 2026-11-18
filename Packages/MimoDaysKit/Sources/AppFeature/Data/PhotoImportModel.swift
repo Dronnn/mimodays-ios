@@ -10,7 +10,7 @@ import SwiftData
 import UIKit
 import UniformTypeIdentifiers
 
-/// E05: photos and videos picked in Photos become moments on the day they were taken, marked "From Photos",
+/// E05: photos and videos picked in Photos become moments on the day they were taken, marked "Imported",
 /// without a selfie window. When and where come from the files themselves, so no Photos access is asked for;
 /// the place is kept at city level only when chosen. Files already in MimoDays (same bytes) are skipped.
 @MainActor

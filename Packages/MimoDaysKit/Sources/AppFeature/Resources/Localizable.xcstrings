@@ -143,40 +143,6 @@
         }
       }
     },
-    "%@ has %lld moments. A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips." : {
-      "comment" : "New movie (F16): why there's no movie. %@: the source, e.g. Last month; then its moment count",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ has %#@moments@. A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips."
-          },
-          "substitutions" : {
-            "moments" : {
-              "argNum" : 2,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg moment"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "%arg moments"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "%@ is ready" : {
       "comment" : "Movies library (F01): suggestion card title. %@: a month's name, e.g. October",
       "extractionState" : "manual",
@@ -3927,18 +3893,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Each one finds its place here, month by month. Tap any piece to open it."
-          }
-        }
-      }
-    },
-    "Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos." : {
-      "comment" : "Import from Photos (E05): what happens to the picked files",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Each one goes to the day it was taken and is marked \"From Photos\". They have no selfie window. The originals stay in Photos."
           }
         }
       }
@@ -9967,18 +9921,6 @@
         }
       }
     },
-    "These dates" : {
-      "comment" : "New movie (F16): sentence subject for picked dates",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "These dates"
-          }
-        }
-      }
-    },
     "They move to Recently deleted with their notes and voice notes. You can bring them back within 30 days." : {
       "comment" : "Delete sheet (M15) body for several moments.",
       "extractionState" : "manual",
@@ -10015,18 +9957,6 @@
         }
       }
     },
-    "This choice" : {
-      "comment" : "New movie (F16): sentence subject for moments chosen by hand",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This choice"
-          }
-        }
-      }
-    },
     "This clip has no selfie." : {
       "comment" : "Movie editor (F07): shown instead of the selfie options",
       "extractionState" : "manual",
@@ -10035,18 +9965,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This clip has no selfie."
-          }
-        }
-      }
-    },
-    "This collection" : {
-      "comment" : "New movie (F16): sentence subject for a collection",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This collection"
           }
         }
       }
@@ -10215,18 +10133,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This movie can't play right now."
-          }
-        }
-      }
-    },
-    "This place" : {
-      "comment" : "New movie (F16): sentence subject for a place",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This place"
           }
         }
       }
@@ -11867,6 +11773,198 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your support keeps the app going."
+          }
+        }
+      }
+    },
+    "Last month has %lld moments." : {
+      "comment" : "New movie (F16): why there's no movie yet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Last month has %lld moment."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Last month has %lld moments."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "This year has %lld moments." : {
+      "comment" : "New movie (F16): why there's no movie yet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This year has %lld moment."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This year has %lld moments."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Last year has %lld moments." : {
+      "comment" : "New movie (F16): why there's no movie yet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Last year has %lld moment."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Last year has %lld moments."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "These dates have %lld moments." : {
+      "comment" : "New movie (F16): why there's no movie yet; the dates chosen in the wizard",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "These dates have %lld moment."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "These dates have %lld moments."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "This collection has %lld moments." : {
+      "comment" : "New movie (F16): why there's no movie yet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This collection has %lld moment."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This collection has %lld moments."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "This place has %lld moments." : {
+      "comment" : "New movie (F16): why there's no movie yet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This place has %lld moment."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This place has %lld moments."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Your choice has %lld moments." : {
+      "comment" : "New movie (F16): why there's no movie yet; the moments picked one by one",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your choice has %lld moment."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your choice has %lld moments."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips." : {
+      "comment" : "New movie (F16): after the sentence with the moment count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips."
+          }
+        }
+      }
+    },
+    "Each one goes to the day it was taken and is marked \"Imported\". They have no selfie window. The originals stay in Photos." : {
+      "comment" : "Import from Photos (E05): what happens to the picked files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each one goes to the day it was taken and is marked \"Imported\". They have no selfie window. The originals stay in Photos."
           }
         }
       }

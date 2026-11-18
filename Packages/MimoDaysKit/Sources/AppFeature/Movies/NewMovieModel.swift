@@ -249,16 +249,18 @@ final class NewMovieModel {
         }
     }
 
-    /// The source in F16's sentence: "Last month has 3 moments."
-    var sourceName: String {
-        switch source {
-        case .lastMonth: String(appLocalized: "Last month", bundle: .module)
-        case .thisYear: String(appLocalized: "This year", bundle: .module)
-        case .lastYear: String(appLocalized: "Last year", bundle: .module)
-        case .dates: String(appLocalized: "These dates", bundle: .module)
-        case .collection: String(appLocalized: "This collection", bundle: .module)
-        case .place: String(appLocalized: "This place", bundle: .module)
-        case .moments: String(appLocalized: "This choice", bundle: .module)
+    /// F16's first sentence, "Last month has 3 moments.": one whole sentence per source, so each language can make
+    /// its subject and verb agree (a source name put into one shared sentence couldn't).
+    var notEnoughCount: String {
+        let count = candidates.count
+        return switch source {
+        case .lastMonth: String(appLocalized: "Last month has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet")
+        case .thisYear: String(appLocalized: "This year has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet")
+        case .lastYear: String(appLocalized: "Last year has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet")
+        case .dates: String(appLocalized: "These dates have \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet; the dates chosen in the wizard")
+        case .collection: String(appLocalized: "This collection has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet")
+        case .place: String(appLocalized: "This place has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet")
+        case .moments: String(appLocalized: "Your choice has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet; the moments picked one by one")
         }
     }
 

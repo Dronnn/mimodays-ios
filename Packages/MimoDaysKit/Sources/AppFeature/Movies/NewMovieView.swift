@@ -373,10 +373,10 @@ struct SourceStep: View {
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .padding(.top, 18)
                 .accessibilityAddTraits(.isHeader)
-            Text(
-                "\(model.sourceName) has \(model.candidates.count) moments. A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips.",
-                bundle: .module
-            )
+            Text(verbatim: model.notEnoughCount + " " + String(
+                appLocalized: "A movie needs at least 5 so it doesn't feel stretched. We never repeat or pad clips.",
+                bundle: .module, comment: "New movie (F16): after the sentence with the moment count"
+            ))
             .textStyle(.emptyBody)
             .foregroundStyle(ColorToken.textBody.color)
             .multilineTextAlignment(.center)

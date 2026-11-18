@@ -132,7 +132,7 @@ struct MoviesModelTests {
         model.source = .lastMonth
         #expect(!model.loadCandidates())
         #expect(model.candidates.count == 3)
-        #expect(model.sourceName == "Last month")
+        #expect(model.notEnoughCount == "Last month has 3 moments.")
     }
 
     // MARK: F04, F05

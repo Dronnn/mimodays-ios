@@ -42,6 +42,8 @@ struct MapView: View {
     @State private var fitToken = 0
     @State private var failed = false
     @State private var retry = 0
+    /// Whether the map already had its quiet second go.
+    @State private var retriedQuietly = false
     @State private var location = PermissionStatus.notDetermined
     @State private var showsUser = false
     /// Show where I am was tapped with location turned off in iOS Settings.
@@ -300,7 +302,7 @@ struct MapView: View {
             places: model.places, images: model.images, selection: $selection, fitToken: fitToken, showsUser: showsUser,
             cover: isWide ? EdgeInsets(top: 0, leading: Self.panelWidth + 16, bottom: 0, trailing: 0)
                 : EdgeInsets(top: 0, leading: 0, bottom: panelCover, trailing: 0),
-            onLoad: { id in Task { await model.load(id) } }, onFailure: { failed = true }
+            onLoad: { id in Task { await model.load(id) } }, onFailure: failedToLoad
         )
         .id(retry)
     }
@@ -408,12 +410,27 @@ struct MapView: View {
         }
     }
 
+    /// A first failure is often a passing hiccup as the map opens (seen on the simulator: Try again then loads it),
+    /// so the map gets one quiet go before P06 says so.
+    private func failedToLoad() {
+        guard !retriedQuietly else {
+            failed = true
+            return
+        }
+        retriedQuietly = true
+        Task {
+            try? await Task.sleep(for: .seconds(1.5))
+            retry += 1
+        }
+    }
+
     // MARK: P06
 
     /// The map didn't load: say so plainly and list every place instead.
     private var cannotLoad: some View {
         MapUnavailableView(model: model) {
             failed = false
+            retriedQuietly = false
             retry += 1
             fitToken += 1
         }

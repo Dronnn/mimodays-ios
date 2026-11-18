@@ -89,6 +89,11 @@ final class SettingsModel {
         await reloadPause()
     }
 
+    /// "Send a surprise now": false when it couldn't be sent (notifications not allowed).
+    func sendSurpriseNow() async -> Bool {
+        await surprises?.sendNow() ?? false
+    }
+
     func resume() async {
         await surprises?.resume()
         await reloadPause()

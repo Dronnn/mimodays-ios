@@ -8,6 +8,7 @@ import SwiftUI
 struct SurpriseSettingsView: View {
     @Bindable var model: SettingsModel
     @State private var pausing = false
+    @State private var sentNow = false
     @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
     @Environment(\.dismiss) private var dismiss
@@ -53,7 +54,21 @@ struct SurpriseSettingsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 18)
-                    if model.surprisesOn, model.notifications == .denied || model.notifications == .restricted {
+                    DataCard {
+                        Button { Task { sentNow = await model.sendSurpriseNow() } } label: {
+                            SettingsValueRow(title: Text("Send a surprise now", bundle: .module, comment: "Surprises settings (S02): sends one surprise in a few seconds, to see how it works"), value: Text(verbatim: ""))
+                        }
+                        .disabled(!model.surprisesOn || notificationsBlocked)
+                        .accessibilityIdentifier("surprises.sendNow")
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 18)
+                    DataNote(text: sentNow
+                        ? Text("On its way. It arrives in a few seconds, like any other surprise.", bundle: .module, comment: "Surprises settings (S02): after Send a surprise now")
+                        : Text("See how it works: a surprise arrives in a few seconds. Tap it and the camera opens.", bundle: .module, comment: "Surprises settings (S02): under Send a surprise now"))
+                        .padding(.horizontal, 22)
+                        .padding(.top, 10)
+                    if model.surprisesOn, notificationsBlocked {
                         notificationsOff
                             .padding(.horizontal, 22)
                             .padding(.top, 12)
@@ -76,6 +91,10 @@ struct SurpriseSettingsView: View {
         } message: {
             Text("No surprises come while paused, and none are sent later for the time missed.", bundle: .module)
         }
+    }
+
+    private var notificationsBlocked: Bool {
+        model.notifications == .denied || model.notifications == .restricted
     }
 
     private var surprisesOn: Binding<Bool> {

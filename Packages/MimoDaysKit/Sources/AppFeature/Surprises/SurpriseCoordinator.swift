@@ -97,6 +97,33 @@ final class SurpriseCoordinator {
         }
     }
 
+    // MARK: Send one now
+
+    /// How far ahead "Send a surprise now" plans its surprise: time to leave the app and see it arrive.
+    static let sendNowDelay: TimeInterval = 10
+
+    /// "Send a surprise now" (S02): one surprise in a few seconds, whatever the hours and days, so a person (and App
+    /// Review) can see how surprises work. It is a prompt like any other: its notification opens the camera, and
+    /// what's caught in time is a Surprise. False when notifications aren't allowed.
+    func sendNow() async -> Bool {
+        var sent = false
+        await serially {
+            guard await self.permissions.status(of: .notifications).isUsable else { return }
+            let now = self.clock.now()
+            let id = UUID()
+            let time = now.addingTimeInterval(Self.sendNowDelay)
+            let minutes = self.fetchSchedule()?.expiryMinutes ?? SurpriseSchedule().expiryMinutes
+            self.context.insert(SurprisePrompt(
+                id: id, plannedAt: time, expiresAt: time.addingTimeInterval(TimeInterval(minutes * 60)),
+                notificationRequestID: id.uuidString
+            ))
+            self.save()
+            await self.syncNotifications(now: now)
+            sent = true
+        }
+        return sent
+    }
+
     // MARK: Today
 
     /// What Today's ribbon says (T02-T07), and when that may change on its own (a prompt fires or expires,
@@ -167,7 +194,10 @@ final class SurpriseCoordinator {
         for prompt in prompts where prompt.outcome == .pending && prompt.expiresAt <= now {
             prompt.outcome = .expired
         }
-        let upcoming = prompts.filter { $0.outcome == .pending && $0.plannedAt > now }
+        // A prompt due within the minute is left alone: iOS may be delivering it already, and "Send a surprise now"
+        // plans one seconds ahead, outside the hours and days.
+        let settled = now.addingTimeInterval(60)
+        let upcoming = prompts.filter { $0.outcome == .pending && $0.plannedAt > settled }
 
         if let schedule, schedule.isEnabled, !schedule.isPausedIndefinitely, status.isUsable {
             let rules = schedule.rules

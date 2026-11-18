@@ -295,6 +295,28 @@ struct SurpriseCoordinatorTests {
 
     // MARK: Changes
 
+    @Test func sendingOneNowArrivesInSecondsAndStaysThroughAReplan() async throws {
+        clock.set(date("2026-11-11 23:30")) // outside the hours
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        #expect(await coordinator.sendNow())
+        let now = try #require(try prompts(.pending).first)
+        #expect(now.plannedAt == date("2026-11-11 23:30").addingTimeInterval(10))
+        #expect(now.expiresAt == now.plannedAt.addingTimeInterval(15 * 60))
+        await coordinator.settingsChanged()
+        #expect(try prompts(.pending).first?.id == now.id)
+        let pending = await notifications.pending()
+        #expect(pending.first?.id == now.id.uuidString)
+        #expect(pending.first?.fireDate == now.plannedAt)
+        clock.set(now.plannedAt.addingTimeInterval(5))
+        #expect(coordinator.open(promptID: now.id))
+    }
+
+    @Test func sendingOneNowNeedsNotifications() async throws {
+        #expect(await coordinator(.denied).sendNow() == false)
+        #expect(try prompts().isEmpty)
+    }
+
     @Test func newSettingsReplaceTheFuturePlan() async throws {
         let coordinator = coordinator()
         await coordinator.refresh()

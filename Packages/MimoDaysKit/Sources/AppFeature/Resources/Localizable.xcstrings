@@ -155140,6 +155140,420 @@
           }
         }
       }
+    },
+    "Send a surprise now" : {
+      "comment" : "Surprises settings (S02): sends one surprise in a few seconds, to see how it works",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال مفاجأة الآن"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Даслаць сюрпрыз зараз"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt Überraschung senden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send a surprise now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar sorpresa ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une surprise maintenant"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לשלוח הפתעה עכשיו"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Անակնկալ ուղարկել հիմա"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia una sorpresa ora"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今すぐサプライズを送る"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "სიურპრიზის ახლავე გაგზავნა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қазір тосын сый жіберу"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 서프라이즈 보내기"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu een verrassing sturen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyślij niespodziankę teraz"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar surpresa agora"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить сюрприз сейчас"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skicka överraskning nu"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi sürpriz gönder"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надіслати сюрприз зараз"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即发送惊喜"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即傳送驚喜"
+          }
+        }
+      }
+    },
+    "On its way. It arrives in a few seconds, like any other surprise." : {
+      "comment" : "Surprises settings (S02): after Send a surprise now",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في الطريق. ستصلك خلال ثوانٍ قليلة، مثل أي مفاجأة أخرى."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ужо ў дарозе. Прыйдзе праз некалькі секунд, як і любы іншы сюрпрыз."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterwegs. Sie kommt in ein paar Sekunden, wie jede andere Überraschung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On its way. It arrives in a few seconds, like any other surprise."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En camino. Llegará en unos segundos, como cualquier otra sorpresa."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En route. Elle arrive dans quelques secondes, comme toute autre surprise."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בדרך. היא תגיע בעוד כמה שניות, כמו כל הפתעה אחרת."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ճանապարհին է։ Կհասնի մի քանի վայրկյանից՝ ինչպես ցանկացած այլ անակնկալ։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È in arrivo. Arriverà tra pochi secondi, come qualsiasi altra sorpresa."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お届け中です。ほかのサプライズと同じように、数秒後に届きます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "უკვე გზაშია. რამდენიმე წამში მოვა, როგორც ნებისმიერი სხვა სიურპრიზი."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жолда. Кез келген басқа тосын сый сияқты, бірнеше секундтан кейін келеді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "찾아오고 있어요. 다른 서프라이즈처럼 몇 초 뒤에 도착해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onderweg. De verrassing komt over een paar seconden, net als elke andere."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Już w drodze. Dotrze za kilka sekund, jak każda inna niespodzianka."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A caminho. Ela chega em alguns segundos, como qualquer outra surpresa."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уже в пути. Придёт через несколько секунд, как и любой другой сюрприз."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "På väg. Den kommer om några sekunder, precis som alla andra överraskningar."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yolda. Diğer sürprizler gibi birkaç saniye içinde gelecek."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уже в дорозі. Надійде за кілька секунд, як і будь-який інший сюрприз."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在路上。和其他惊喜一样，几秒后就会送达。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在路上。和其他驚喜一樣，幾秒後就會送達。"
+          }
+        }
+      }
+    },
+    "See how it works: a surprise arrives in a few seconds. Tap it and the camera opens." : {
+      "comment" : "Surprises settings (S02): under Send a surprise now",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتشف كيف تعمل المفاجآت: ستصلك مفاجأة خلال ثوانٍ قليلة. اضغط عليها لتفتح الكاميرا."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Паглядзі, як гэта працуе: праз некалькі секунд прыйдзе сюрпрыз. Націсні на яго, і адкрыецца камера."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieh, wie es funktioniert: In ein paar Sekunden kommt eine Überraschung. Tippe darauf und die Kamera öffnet sich."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See how it works: a surprise arrives in a few seconds. Tap it and the camera opens."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mira cómo funciona: una sorpresa llegará en unos segundos. Tócala y se abrirá la cámara."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Découvre comment ça marche : une surprise arrive dans quelques secondes. Touche-la et la caméra s’ouvre."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כך זה עובד: הפתעה תגיע בעוד כמה שניות. הקשה עליה תפתח את המצלמה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Տես՝ ինչպես է սա աշխատում․ մի քանի վայրկյանից անակնկալ կգա։ Հպվիր դրան, և տեսախցիկը կբացվի։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scopri come funziona: una sorpresa arriva tra pochi secondi. Toccala e si apre la fotocamera."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仕組みを試してみましょう。数秒後にサプライズが届きます。タップするとカメラが開きます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ნახე, როგორ მუშაობს: რამდენიმე წამში სიურპრიზი მოვა. შეეხე მას და კამერა გაიხსნება."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қалай жұмыс істейтінін көр: бірнеше секундтан кейін тосын сый келеді. Оны түртсең, камера ашылады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "어떻게 작동하는지 확인해 보세요. 몇 초 뒤에 서프라이즈가 도착해요. 누르면 카메라가 열려요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ontdek hoe het werkt: over een paar seconden komt er een verrassing. Tik erop en de camera opent."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobacz, jak to działa: niespodzianka dotrze za kilka sekund. Dotknij jej, a otworzy się aparat."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veja como funciona: uma surpresa chega em alguns segundos. Toque nela e a câmera abre."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посмотри, как это работает: через несколько секунд придёт сюрприз. Нажми на него, и откроется камера."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hur det fungerar: en överraskning kommer om några sekunder. Tryck på den så öppnas kameran."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nasıl çalıştığını gör: birkaç saniye içinde bir sürpriz gelecek. Ona dokununca kamera açılır."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подивись, як це працює: за кілька секунд надійде сюрприз. Торкнися його, і відкриється камера."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "看看惊喜如何运作：几秒后就会收到一个惊喜。轻点它，相机就会打开。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "看看驚喜如何運作：幾秒後就會收到一個驚喜。點一下，相機就會開啟。"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

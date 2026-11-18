@@ -28,19 +28,23 @@ struct ReviewView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var topInset: CGFloat = 0
+    private static let captionID = "review.caption"
     @FocusState private var editsCaption: Bool
 
     var body: some View {
-        MediaThenPanel(aspectRatio: model.aspectRatio, topInset: topInset, chrome: chrome) {
-            media
-            Group {
-                if let interruption = model.interruption {
-                    interruptedPanel(interruption)
-                } else {
-                    panel
+        // The keyboard covers the bottom instead of shrinking the card (Andrew, 2026-11-18).
+        KeyboardScroll(focusedID: editsCaption ? Self.captionID : nil) {
+            MediaThenPanel(aspectRatio: model.aspectRatio, topInset: topInset, chrome: chrome) {
+                media
+                Group {
+                    if let interruption = model.interruption {
+                        interruptedPanel(interruption)
+                    } else {
+                        panel
+                    }
                 }
+                .padding(.horizontal, 16)
             }
-            .padding(.horizontal, 16)
         }
         .ignoresSafeArea(.container, edges: .top)
         .background(ColorToken.canvas.color.ignoresSafeArea())
@@ -262,6 +266,7 @@ struct ReviewView: View {
     private var panel: some View {
         VStack(alignment: .leading, spacing: 0) {
             CaptionField(text: $model.caption, isFocused: $editsCaption)
+                .id(Self.captionID)
                 .padding(.top, 20)
             if let voice = model.voice {
                 VoiceNoteCard(model: model, voice: voice)
@@ -360,6 +365,41 @@ private struct MediaThenPanel: Layout {
         let media = max(topInset, min(topInset + chrome + card, bounds.height - panel))
         subviews[0].place(at: bounds.origin, proposal: ProposedViewSize(width: bounds.width, height: media))
         subviews[1].place(at: CGPoint(x: bounds.minX, y: bounds.minY + media), proposal: ProposedViewSize(width: bounds.width, height: panel))
+    }
+}
+
+/// `content` laid out on the screen's height as if the keyboard were down, in a scroll that gains the keyboard's
+/// height below and brings `focusedID` above the keyboard when it comes up. The content is built by the caller, so
+/// what it reads keeps updating the caller (built in here, the Place sheet got a stale location answer).
+private struct KeyboardScroll<Content: View>: View {
+    var focusedID: String?
+    @ViewBuilder let content: Content
+    /// How much of the screen the keyboard covers; 0 when it is down (or a hardware keyboard keeps it away).
+    @State private var keyboardHeight: CGFloat = 0
+
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollViewReader { reader in
+                ScrollView {
+                    content.frame(height: proxy.size.height)
+                }
+                .contentMargins(.bottom, keyboardHeight, for: .scrollContent)
+                .scrollBounceBehavior(.basedOnSize)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: keyboardHeight) { _, height in
+                    guard let focusedID, height > 0 else { return }
+                    withAnimation { reader.scrollTo(focusedID, anchor: UnitPoint(x: 0.5, y: 0.35)) }
+                }
+            }
+        }
+        .ignoresSafeArea(.keyboard)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+            guard let frame = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                  let screen = (note.object as? UIScreen) ?? UIApplication.shared.connectedScenes.compactMap({ ($0 as? UIWindowScene)?.screen }).first
+            else { return }
+            keyboardHeight = max(0, screen.bounds.maxY - frame.minY)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardHeight = 0 }
     }
 }
 

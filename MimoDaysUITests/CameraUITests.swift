@@ -209,6 +209,30 @@ final class CameraUITests: XCTestCase {
         add(attachment)
     }
 
+    /// The keyboard for the caption covers the bottom of Review instead of shrinking the card (Andrew, 2026-11-18);
+    /// the field scrolls above it and the rest stays reachable by scrolling.
+    @MainActor
+    func testTheKeyboardLeavesTheCardItsSize() throws {
+        openCamera()
+        app.buttons["camera.shutter"].tap()
+        let media = app.descendants(matching: .any)["review.media"].firstMatch
+        XCTAssertTrue(media.waitForExistence(timeout: 5))
+        let height = media.frame.height
+        let caption = app.textFields["review.caption"]
+        caption.tap()
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 5))
+        sleep(1)
+        // A simulator with a hardware keyboard keeps the on-screen one below the screen.
+        try XCTSkipIf(keyboard.frame.minY >= app.frame.maxY, "the on-screen keyboard is off (hardware keyboard)")
+        attachScreenshot("review with the keyboard")
+        XCTAssertEqual(media.frame.height, height, accuracy: 1, "the card changed its size")
+        XCTAssertLessThanOrEqual(caption.frame.maxY, keyboard.frame.minY, "the keyboard covers the caption field")
+        caption.typeText("Morning tea")
+        app.swipeUp()
+        XCTAssertTrue(app.buttons["review.save"].isHittable, "Save can't be reached")
+    }
+
     /// C08: a note shows on its chip, Retake asks before dropping it, and Save keeps it.
     @MainActor
     func testANoteIsKeptAndRetakeAsksBeforeDroppingIt() {

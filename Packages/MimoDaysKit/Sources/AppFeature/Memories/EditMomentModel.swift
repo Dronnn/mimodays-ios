@@ -228,38 +228,40 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
         guard let moment = try library.context.fetch(descriptor).first else { return }
-        let caption = caption.trimmingCharacters(in: .whitespacesAndNewlines)
-        moment.title = caption.isEmpty ? nil : caption
-        let note = note.trimmingCharacters(in: .whitespacesAndNewlines)
-        moment.note = note.isEmpty ? nil : note
-        moment.isFavorite = isFavorite
-        if placeWasChosen, place != original.place {
-            if let location = moment.location { library.context.delete(location) }
-            moment.location = place.map {
-                MomentLocation(latitude: $0.latitude, longitude: $0.longitude, precision: $0.precision, source: $0.source, placeLabel: $0.label)
-            }
-        }
         var written: [String] = []
         var replaced: [String] = []
-        if voice != original.voice {
-            replaced = moment.voiceNotes.map(\.relativePath)
-            for old in moment.voiceNotes { library.context.delete(old) }
-            moment.voiceNotes = []
-            if case let .recorded(recorded) = voice {
-                let file = try library.store.store(copyOf: recorded.url, in: .originals)
-                written.append(file.relativePath)
-                let transcript = recorded.transcript?.trimmingCharacters(in: .whitespacesAndNewlines)
-                moment.voiceNotes = [MomentVoiceNote(
-                    relativePath: file.relativePath, duration: recorded.duration, recordedAt: recorded.recordedAt,
-                    transcript: transcript?.isEmpty == false ? transcript : nil
-                )]
-            }
-        }
-        if collectionIDs != originalCollections {
-            try CollectionStore(context: library.context).place(id, in: collectionIDs)
-        }
-        moment.modifiedAt = Date()
+        // All or nothing: a voice note that can't be copied (no space) or a collection that can't be placed leaves the
+        // moment as it was, not with its old voice note marked for deletion by the next save.
         do {
+            let caption = caption.trimmingCharacters(in: .whitespacesAndNewlines)
+            moment.title = caption.isEmpty ? nil : caption
+            let note = note.trimmingCharacters(in: .whitespacesAndNewlines)
+            moment.note = note.isEmpty ? nil : note
+            moment.isFavorite = isFavorite
+            if placeWasChosen, place != original.place {
+                if let location = moment.location { library.context.delete(location) }
+                moment.location = place.map {
+                    MomentLocation(latitude: $0.latitude, longitude: $0.longitude, precision: $0.precision, source: $0.source, placeLabel: $0.label)
+                }
+            }
+            if voice != original.voice {
+                replaced = moment.voiceNotes.map(\.relativePath)
+                for old in moment.voiceNotes { library.context.delete(old) }
+                moment.voiceNotes = []
+                if case let .recorded(recorded) = voice {
+                    let file = try library.store.store(copyOf: recorded.url, in: .originals)
+                    written.append(file.relativePath)
+                    let transcript = recorded.transcript?.trimmingCharacters(in: .whitespacesAndNewlines)
+                    moment.voiceNotes = [MomentVoiceNote(
+                        relativePath: file.relativePath, duration: recorded.duration, recordedAt: recorded.recordedAt,
+                        transcript: transcript?.isEmpty == false ? transcript : nil
+                    )]
+                }
+            }
+            if collectionIDs != originalCollections {
+                try CollectionStore(context: library.context).place(id, in: collectionIDs)
+            }
+            moment.modifiedAt = Date()
             try library.context.save()
         } catch {
             library.context.rollback()

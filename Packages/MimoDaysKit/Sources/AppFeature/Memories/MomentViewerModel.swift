@@ -205,8 +205,10 @@ final class MomentViewerModel {
         }
     }
 
+    /// Moments deleted elsewhere meanwhile (another viewer opened from this one) leave the pager too.
     func reload() async {
         for id in moments.keys { await load(id) }
+        for id in ids where fetch(id).map({ $0.deletedAt != nil }) ?? true { removeFromPager(id) }
     }
 
     func toggleFavorite(_ id: UUID) {

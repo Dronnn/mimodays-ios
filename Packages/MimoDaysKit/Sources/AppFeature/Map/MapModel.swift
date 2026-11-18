@@ -149,6 +149,11 @@ final class MapModel {
     }
 
     private func readCollection() {
+        // A collection deleted meanwhile: the filter goes with it (the sheet shows "Any collection" too).
+        if let id = filters.collection, (try? CollectionStore(context: library.context).collection(id)) == nil {
+            filters.collection = nil
+            return
+        }
         collectionMembers = Self.members(of: filters.collection, in: library.context)
     }
 

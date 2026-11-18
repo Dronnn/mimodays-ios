@@ -67,6 +67,7 @@ struct DeletionTests {
         let paths = try #require(try moment(id)).media.map(\.relativePath)
         #expect(!paths.isEmpty && paths.allSatisfy { FileManager.default.fileExists(atPath: (try? store.url(for: $0).path()) ?? "") })
 
+        try deletion(at: .now).moveToRecentlyDeleted([id])
         try deletion(at: .now).deleteForever([id])
         #expect(try moment(id) == nil)
         #expect(try context.fetchCount(FetchDescriptor<CollectionMembership>()) == 0)
@@ -108,6 +109,7 @@ struct DeletionTests {
         let deletion = deletion(at: .now)
         #expect(try deletion.movieDrafts(using: [a]) == 2)
         #expect(try deletion.movieDrafts(using: [b]) == 0)
+        try deletion.moveToRecentlyDeleted([a])
         try deletion.deleteForever([a])
         #expect(try context.fetchCount(FetchDescriptor<MovieProject>()) == 2)
         #expect(try context.fetchCount(FetchDescriptor<MovieClip>()) == 0)
@@ -132,6 +134,22 @@ struct DeletionTests {
         let edit = try #require(EditMomentModel(id: id, library: library, voice: .simulated, places: .simulated))
         #expect(edit.movieDrafts == 0)
         #expect(edit.delete())
+        #expect(try moment(id)?.deletedAt != nil)
+    }
+
+    @Test func aMomentRecoveredMeanwhileIsNotDeletedForGood() async throws {
+        let id = try await save()
+        let deletion = deletion(at: .now)
+        try deletion.moveToRecentlyDeleted([id])
+        try deletion.recover([id])
+        try deletion.deleteForever([id])
+        #expect(try moment(id)?.deletedAt == nil)
+    }
+
+    @Test func aMomentPastItsThirtyDaysIsNotRecovered() async throws {
+        let id = try await save()
+        try deletion(at: .now).moveToRecentlyDeleted([id])
+        try deletion(at: .now.addingTimeInterval(31 * 86_400)).recover([id])
         #expect(try moment(id)?.deletedAt != nil)
     }
 }

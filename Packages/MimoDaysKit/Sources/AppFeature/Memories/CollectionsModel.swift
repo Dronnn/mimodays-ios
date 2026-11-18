@@ -197,7 +197,9 @@ final class CollectionModel {
 
     /// The first and last local days, yyyymmdd.
     var span: (first: Int, last: Int)? {
-        guard let first = items.first?.localDay, let last = items.last?.localDay else { return nil }
+        // By day, not by order: a moment taken later can fall on an earlier local day (another time zone).
+        let days = items.map(\.localDay)
+        guard let first = days.min(), let last = days.max() else { return nil }
         return (first, last)
     }
 

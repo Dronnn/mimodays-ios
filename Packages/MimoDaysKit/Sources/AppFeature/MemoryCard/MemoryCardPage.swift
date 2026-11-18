@@ -91,11 +91,17 @@ struct MemoryCardPage: View {
                 playback = nil
                 return
             }
-            guard moment.mediaType == .video, playback == nil, let items = await model.playerItems(moment.id) else { return }
+            // A swipe on while the streams load cancels this: the card left behind stays silent.
+            guard moment.mediaType == .video, playback == nil, let items = await model.playerItems(moment.id), !Task.isCancelled else { return }
             let player = ViewerVideoPlayer(duration: moment.video?.timing.duration ?? 0)
             player.isOnBack = flip.showsBack
             playback = player
             await player.load(main: items.main, selfie: items.selfie)
+            guard !Task.isCancelled else {
+                player.stop()
+                if playback === player { playback = nil }
+                return
+            }
             player.play()
         }
         .onDisappear {

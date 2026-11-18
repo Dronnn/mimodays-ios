@@ -24,19 +24,22 @@ struct DeletionStore {
         try save()
     }
 
+    /// Not what is past its 30 days (Recently Deleted left open across the deadline): that goes at the next purge.
     func recover(_ ids: Set<UUID>) throws {
         let date = now()
-        for moment in try moments(ids) where moment.deletedAt != nil {
+        let cutoff = date.addingTimeInterval(-Double(Self.keepDays) * 86_400)
+        for moment in try moments(ids) where moment.deletedAt.map({ $0 >= cutoff }) == true {
             moment.deletedAt = nil
             moment.modifiedAt = date
         }
         try save()
     }
 
-    /// The moments, their media and voice notes go; files are removed once the store has saved.
+    /// The moments, their media and voice notes go; files are removed once the store has saved. Only moments in
+    /// Recently Deleted: one recovered meanwhile (from another screen) stays.
     func deleteForever(_ ids: Set<UUID>) throws {
         var paths: [String] = []
-        for moment in try moments(ids) {
+        for moment in try moments(ids) where moment.deletedAt != nil {
             paths += moment.media.map(\.relativePath) + moment.voiceNotes.map(\.relativePath)
             context.delete(moment)
         }

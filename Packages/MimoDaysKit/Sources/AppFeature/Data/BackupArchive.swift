@@ -94,21 +94,27 @@ enum BackupArchive {
             }
         }
         let document = try Self.document(manifest)
+        // A file a record needs that isn't in the archive (gone from the iPhone it was made on) counts as damaged too.
+        let referenced = Set(document.moments.flatMap(\.paths) + document.movies.flatMap(\.paths))
         let damaged = Set(document.files.compactMap { path, entry in hashes[path] == entry.sha256 ? nil : path })
+            .union(referenced.subtracting(document.files.keys))
         return Check(document: document, damaged: damaged)
     }
 
     /// Writes the wanted files to `folder` (named by their store path) and hands each one over as it lands.
+    /// One whose bytes no longer match `checksums` (the file changed since it was checked) isn't handed over.
     static func extract(
-        _ url: URL, paths wanted: Set<String>, into folder: URL,
+        _ url: URL, paths wanted: Set<String>, checksums: [String: String] = [:], into folder: URL,
         progress: (Double) -> Void = { _ in }, isCancelled: () -> Bool = { false }, received: (String, URL) throws -> Void
     ) throws {
+        guard !wanted.isEmpty else { return }
         let total = max(Self.size(url), 1)
         var read: Int64 = 0
         try entries(of: url) { entry, _, next in
             let relativePath = entry.hasPrefix(BackupDocument.mediaFolder + "/") ? String(entry.dropFirst(BackupDocument.mediaFolder.count + 1)) : nil
             guard let relativePath, wanted.contains(relativePath) else {
                 while let piece = try next() {
+                    if isCancelled() { throw Failure.cancelled }
                     read += Int64(piece.count)
                     progress(min(Double(read) / Double(total), 1))
                 }
@@ -117,10 +123,12 @@ enum BackupArchive {
             let target = folder.appendingPathComponent(UUID().uuidString).appendingPathExtension((relativePath as NSString).pathExtension)
             FileManager.default.createFile(atPath: target.path, contents: nil)
             let handle = try FileHandle(forWritingTo: target)
+            var hasher = SHA256()
             do {
                 while let piece = try next() {
                     if isCancelled() { throw Failure.cancelled }
                     try handle.write(contentsOf: piece)
+                    hasher.update(data: piece)
                     read += Int64(piece.count)
                     progress(min(Double(read) / Double(total), 1))
                 }
@@ -129,6 +137,10 @@ enum BackupArchive {
                 try? handle.close()
                 try? FileManager.default.removeItem(at: target)
                 throw error
+            }
+            if let expected = checksums[relativePath], Self.hex(hasher.finalize()) != expected {
+                try? FileManager.default.removeItem(at: target)
+                return
             }
             try received(relativePath, target)
         }

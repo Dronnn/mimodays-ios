@@ -102,6 +102,7 @@ final class RestoreModel {
         let folder = library.store.root.appending(path: MediaStore.stagingPrefix + UUID().uuidString, directoryHint: .isDirectory)
         let url = url
         let mode = mode
+        let checksums = check.document.files.mapValues(\.sha256)
         phase = .restoring(0)
         task = Task { [weak self] in
             let report: @Sendable (Double) -> Void = { progress in Task { @MainActor in self?.progress(restoring: progress) } }
@@ -111,7 +112,7 @@ final class RestoreModel {
                 var files: [String: URL] = [:]
                 do {
                     try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-                    try BackupArchive.extract(url, paths: wanted, into: folder, progress: report, isCancelled: { Task.isCancelled }) { path, file in
+                    try BackupArchive.extract(url, paths: wanted, checksums: checksums, into: folder, progress: report, isCancelled: { Task.isCancelled }) { path, file in
                         files[path] = file
                     }
                     return files

@@ -95,14 +95,15 @@ final class PhotoImportModel: Identifiable {
     func load(_ items: [some PhotoPickerItemLoading]) async {
         var files: [(url: URL, isVideo: Bool)] = []
         for (index, item) in items.enumerated() {
-            guard let file = try? await item.loadFile() else { continue }
-            received.append(file.url)
+            let file = Task.isCancelled ? nil : try? await item.loadFile()
+            if let file { received.append(file.url) }
             guard !Task.isCancelled else {
-                // The screen closed while this one was copied: it and any copied before it go.
+                // The screen closed: what was copied, this one included, goes, and nothing more is loaded.
                 received.forEach { try? FileManager.default.removeItem(at: $0) }
                 received = []
                 return
             }
+            guard let file else { continue }
             files.append((file.url, file.isVideo))
             phase = .loading(Double(index + 1) / Double(items.count) / 2)
         }

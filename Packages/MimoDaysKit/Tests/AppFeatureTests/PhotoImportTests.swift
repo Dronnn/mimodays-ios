@@ -68,14 +68,15 @@ struct PhotoImportTests {
         var slow = false
 
         func loadFile() async throws -> PickedFile? {
-            if slow { try await Task.sleep(for: .seconds(5)) }
+            // Like the picker, the slow one finishes its copy even after the screen closed.
+            if slow { try? await Task.sleep(for: .seconds(1)) }
             let url = folder.appending(path: "\(UUID().uuidString).jpg")
             try PhotoImportTests.photo.write(to: url)
             return PickedFile(url: url, isVideo: false)
         }
     }
 
-    /// W2: closing the import while the picker still copies leaves no copy behind, the ones done before included.
+    /// W2: closing the import while the picker still copies leaves no copy behind, and loads nothing more.
     @Test func closingMidLoadLeavesNoCopies() async throws {
         let folder = FileManager.default.temporaryDirectory.appending(path: "Picked-\(UUID().uuidString)", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -84,10 +85,8 @@ struct PhotoImportTests {
         try await Task.sleep(for: .milliseconds(300))
         #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).count == 1)
         model.discard()
-        for _ in 0..<40 where try !FileManager.default.contentsOfDirectory(atPath: folder.path).isEmpty {
-            try await Task.sleep(for: .milliseconds(50))
-        }
-        try await Task.sleep(for: .milliseconds(200))
+        // The slow copy lands after the close and goes too; the third is never loaded.
+        try await Task.sleep(for: .seconds(1.6))
         #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).isEmpty)
         #expect(model.picked.isEmpty)
     }

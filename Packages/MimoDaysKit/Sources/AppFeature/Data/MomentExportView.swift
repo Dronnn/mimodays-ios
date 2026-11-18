@@ -26,7 +26,7 @@ final class MomentExportModel: Identifiable {
     var failure: Failure?
 
     private let exporter: MomentExporter
-    private var folder: URL?
+    private(set) var folder: URL?
     private var work: Task<[URL], any Error>?
 
     /// `exactPlace`: S06's "Exact place in exported files".
@@ -84,7 +84,9 @@ final class MomentExportModel: Identifiable {
             }
             return files
         } catch {
-            if work.isCancelled { discard(root) } else { failure = .other }
+            // What was written before it failed or was cancelled is no use to anyone.
+            discard(root)
+            if !work.isCancelled { failure = .other }
             return nil
         }
     }
@@ -125,6 +127,8 @@ struct MomentExportSheet: View {
     @State var model: MomentExportModel
     @State private var sharing: [URL]?
     @State private var saved = false
+    /// Photos is still reading the written files: nothing may remove or replace them yet.
+    @State private var savingToPhotos = false
     @State private var photosProblem: PhotosSaveProblem?
     @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
@@ -164,7 +168,7 @@ struct MomentExportSheet: View {
                     }
                 }
                 .buttonStyle(SecondaryButtonStyle())
-                .disabled(saved || model.progress != nil)
+                .disabled(saved || savingToPhotos || model.progress != nil)
                 .accessibilityIdentifier("exportMoment.photos")
                 Button { Task { sharing = await model.files() } } label: {
                     HStack(spacing: 8) {
@@ -177,7 +181,7 @@ struct MomentExportSheet: View {
                     }
                 }
                 .buttonStyle(.primary)
-                .disabled(model.progress != nil)
+                .disabled(savingToPhotos || model.progress != nil)
                 .accessibilityIdentifier("exportMoment.share")
             }
             .padding(.top, 30)
@@ -190,7 +194,8 @@ struct MomentExportSheet: View {
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(28)
         .presentationBackground(ColorToken.canvas.color)
-        .onDisappear { model.cancel() }
+        // While Photos reads the files, the save removes them itself when it's done.
+        .onDisappear { if !savingToPhotos { model.cancel() } }
         .sheet(isPresented: Binding(get: { sharing != nil }, set: { if !$0 { sharing = nil; model.removeFiles() } })) {
             ShareSheet(items: sharing ?? [])
         }
@@ -236,7 +241,11 @@ struct MomentExportSheet: View {
     private func saveToPhotos() async {
         _ = await asker.request(.photoLibrary, using: permissions)
         guard let files = await model.files() else { return }
-        defer { model.removeFiles() }
+        savingToPhotos = true
+        defer {
+            savingToPhotos = false
+            model.removeFiles()
+        }
         do {
             try await MovieFiles.saveToPhotos(MomentExportModel.pictures(files))
             saved = true

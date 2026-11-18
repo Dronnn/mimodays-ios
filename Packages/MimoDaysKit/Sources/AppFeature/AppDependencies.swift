@@ -103,6 +103,7 @@ public final class AppDependencies {
         }
         // Before any screen: files a save or a deletion left behind when iOS ended the app mid-way.
         OrphanFiles.remove(context: modelContainer.mainContext, store: momentSaver.store)
+        OrphanFiles.removeScratch()
         appLock = AppLock(settings: { privacyPreferences.value })
         if configuration.isUITesting {
             tipStore = SampleTipStore()

@@ -63,7 +63,7 @@ struct MomentExporterTests {
         let files = try await MomentExporter.write(items, into: folder(), list: false)
         // Nov 11, 2026 12:00 UTC is 16:00 in Yerevan.
         // Voice notes, like exact places, only when turned on (doc 01 §17).
-        #expect(names(files) == ["2026-11-11 16.00.00.heic", "2026-11-11 16.00.00 note.txt", "2026-11-11 17.00.00.mp4"])
+        try #require(names(files) == ["2026-11-11 16.00.00.heic", "2026-11-11 16.00.00 note.txt", "2026-11-11 17.00.00.mp4"])
         let note = try String(contentsOf: files[1], encoding: .utf8)
         #expect(note.contains("Lunch") && note.contains("the good one"))
         #expect(!note.contains("Kentron") && !note.contains("40.18"))
@@ -77,6 +77,7 @@ struct MomentExporterTests {
         options.exactPlace = true
         options.voiceNotes = true
         let files = try await MomentExporter.write(MomentExporter(library: library).items(ids, options: options), into: folder(), list: true)
+        try #require(files.count > 2)
         let note = try String(contentsOf: files[2], encoding: .utf8)
         #expect(note.contains("Kentron") && note.contains("40.18110, 44.51360"))
         let gps = try #require(gps(files[0]))
@@ -127,8 +128,9 @@ struct MomentExporterTests {
         let seen = exporter.estimatedBytes(ids, options: options)
         options.originals = true
         #expect(exporter.estimatedBytes(ids, options: options) > seen)
-        options.voiceNotes = false
-        #expect(exporter.estimatedBytes(ids, options: options) == exporter.estimatedBytes(ids, options: options))
+        let withoutVoice = exporter.estimatedBytes(ids, options: options)
+        options.voiceNotes = true
+        #expect(exporter.estimatedBytes(ids, options: options) > withoutVoice)
     }
 
     private func gps(_ url: URL) -> [String: Any]? {

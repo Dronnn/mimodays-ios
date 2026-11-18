@@ -118,7 +118,7 @@ struct MovieComposerTests {
         project.showsPlaces = false
         project.orderedClips[2].clipAudio = .muted
         let plan = MoviePlan(project, store: store)
-        #expect(plan.clips.map(\.momentID) == ids)
+        try #require(plan.clips.map(\.momentID) == ids)
         #expect(plan.clips[0].duration == MovieSelection.photoSeconds)
         #expect(plan.clips[1].duration > 0.9 && plan.clips[1].duration < 1.2, "the 1 s video at 10 fps: \(plan.clips[1].duration)")
         #expect(plan.clips[0].caption == "Wed, Nov 11")
@@ -258,6 +258,9 @@ struct MovieComposerTests {
         let plan = MoviePlan(try project(ids), store: store)
         let composed = try await MovieComposer.compose(plan, renderSize: portrait)
         let frame = 1.0 / 30
+        // The sound as a clip carries it (AAC in a .mov runs a little short of the voice file's 2 s).
+        let soundTrack = try #require(try await AVURLAsset(url: try await clipWithSound()).loadTracks(withMediaType: .audio).first)
+        let soundLength = try await soundTrack.load(.timeRange).duration.seconds
         let main = try #require(composed.asset.tracks(withMediaType: .video).first)
         let sound = try #require(composed.asset.tracks(withMediaType: .audio).first)
         var start = 0.0
@@ -267,8 +270,11 @@ struct MovieComposerTests {
             guard case .video = clip.media else { continue }
             let picture = try #require(main.segments.first { !$0.isEmpty && abs($0.timeMapping.target.start.seconds - start) < frame })
             let audio = try #require(sound.segments.first { !$0.isEmpty && abs($0.timeMapping.target.start.seconds - start) < frame })
+            #expect(abs(audio.timeMapping.target.start.seconds - picture.timeMapping.target.start.seconds) < frame)
             #expect(abs(audio.timeMapping.source.start.seconds - picture.timeMapping.source.start.seconds) < frame)
-            // The sound may end sooner (this one is 1.9 s), never later than its picture.
+            // All of the sound plays (this one is 1.9 s, its picture 2 s), and never past its picture.
+            let expected = min(soundLength, picture.timeMapping.target.duration.seconds)
+            #expect(abs(audio.timeMapping.target.duration.seconds - expected) < frame, "\(audio.timeMapping.target.duration.seconds) vs \(expected) (sound \(soundLength))")
             #expect(audio.timeMapping.target.end.seconds <= picture.timeMapping.target.end.seconds + frame)
             checked += 1
         }

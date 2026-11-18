@@ -27,6 +27,17 @@ enum OrphanFiles {
         return paths
     }
 
+    /// What a backup, an export or an import put in tmp, left when iOS ended the app before it was handed on.
+    /// Captures and review drafts are left alone: a recovered draft may still need them.
+    static func removeScratch(in folder: URL = FileManager.default.temporaryDirectory) {
+        let scratch = ["Backup-", "Export-", "Movie-", "MimoDays-"]
+        for item in (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? [] {
+            let name = item.lastPathComponent
+            guard name == "Import" || scratch.contains(where: name.hasPrefix) else { continue }
+            try? FileManager.default.removeItem(at: item)
+        }
+    }
+
     /// Removes them; how many went. A failed read of the records removes nothing.
     @MainActor
     @discardableResult

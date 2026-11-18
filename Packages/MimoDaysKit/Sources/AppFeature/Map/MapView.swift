@@ -42,8 +42,8 @@ struct MapView: View {
     @State private var fitToken = 0
     @State private var failed = false
     @State private var retry = 0
-    /// Whether the map already had its quiet second go.
-    @State private var retriedQuietly = false
+    /// The map whose failure got the quiet second go; nil until one failed.
+    @State private var quietRetry: Int?
     @State private var location = PermissionStatus.notDetermined
     @State private var showsUser = false
     /// Show where I am was tapped with location turned off in iOS Settings.
@@ -413,11 +413,12 @@ struct MapView: View {
     /// A first failure is often a passing hiccup as the map opens (seen on the simulator: Try again then loads it),
     /// so the map gets one quiet go before P06 says so.
     private func failedToLoad() {
-        guard !retriedQuietly else {
-            failed = true
+        if let quietRetry {
+            // A second report from the map already being retried changes nothing; the new map failing does.
+            if retry > quietRetry { failed = true }
             return
         }
-        retriedQuietly = true
+        quietRetry = retry
         Task {
             try? await Task.sleep(for: .seconds(1.5))
             retry += 1
@@ -430,7 +431,7 @@ struct MapView: View {
     private var cannotLoad: some View {
         MapUnavailableView(model: model) {
             failed = false
-            retriedQuietly = false
+            quietRetry = nil
             retry += 1
             fitToken += 1
         }

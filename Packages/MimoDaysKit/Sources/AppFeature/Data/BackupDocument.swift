@@ -63,6 +63,11 @@ struct BackupDocument: Codable, Equatable {
             var record = self
             record.media.removeAll { isMissing($0.path) }
             record.voiceNotes.removeAll { isMissing($0.path) }
+            // The window's stream alone is left: it becomes the picture, with no window.
+            if let window = record.pipLayout?.source.rawValue,
+               !record.media.contains(where: { $0.role != window && ($0.role == MediaRole.rearSource.rawValue || $0.role == MediaRole.frontSource.rawValue) }) {
+                record.pipLayout = nil
+            }
             return record
         }
     }

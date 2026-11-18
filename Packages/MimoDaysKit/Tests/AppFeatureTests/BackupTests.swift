@@ -103,7 +103,9 @@ struct BackupTests {
         let folder = temporary("unpacked")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         var unpacked: [String: URL] = [:]
-        try BackupArchive.extract(url, paths: wanted, into: folder) { path, file in unpacked[path] = file }
+        try BackupArchive.extract(url, paths: wanted, checksums: check.document.files.mapValues(\.sha256), into: folder) { path, file in
+            unpacked[path] = file
+        }
         // Files that couldn't be unpacked (no space).
         for path in unpacked.keys.sorted().prefix(lost) { unpacked[path] = nil }
         return try service.restore(check, mode: mode, unpacked: unpacked)
@@ -154,7 +156,7 @@ struct BackupTests {
             #expect(moment.voiceNotes.allSatisfy { newPhone.store.fileExists($0.relativePath) })
         }
         let project = try #require(try newPhone.context.fetch(FetchDescriptor<MovieProject>()).first)
-        #expect(project.orderedClips.count == 3)
+        try #require(project.orderedClips.count == 3)
         #expect(project.orderedClips[2].cameraLayout == .sideBySide)
         #expect(project.textCards.map(\.text) == ["The end"])
         #expect(try newPhone.context.fetch(FetchDescriptor<Moment>()).filter { $0.captureFormat == .square }.count == 1)
@@ -169,7 +171,7 @@ struct BackupTests {
         let phone = try library()
         _ = try await fill(phone)
         let (url, written) = try backUp(phone, renders: false)
-        #expect(written.movies[0].render == nil)
+        #expect(try #require(written.movies.first).render == nil)
         let newPhone = try library()
         _ = try restore(url, into: newPhone)
         let project = try #require(try newPhone.context.fetch(FetchDescriptor<MovieProject>()).first)
@@ -305,7 +307,7 @@ struct BackupTests {
         let ids = try await fill(phone)
         let (url, document) = try backUp(phone)
         let hurt = try #require(document.moments.first { $0.id == ids[1] })
-        let outcome = try restore(url, into: phone, mode: .replaceEverything, damaging: [hurt.paths[0]])
+        let outcome = try restore(url, into: phone, mode: .replaceEverything, damaging: [try #require(hurt.paths.first)])
         let moments = try phone.context.fetch(FetchDescriptor<Moment>())
         #expect(Set(moments.map(\.id)) == Set(ids.prefix(3)))
         let kept = try #require(moments.first { $0.id == ids[1] })
@@ -329,6 +331,62 @@ struct BackupTests {
         let newPhone = try library()
         let outcome = try restore(url, into: newPhone)
         #expect(outcome.restored == 3 && outcome.skipped.isEmpty)
+    }
+
+    /// W2 review: a backup, export or import cut off when iOS ended the app goes at the next launch; captures stay.
+    @Test func scratchLeftByAnEndedAppGoesAtLaunch() throws {
+        let tmp = temporary("tmp")
+        let names = ["Backup-1", "Export-2", "Movie-3.mp4", "MimoDays-4.mp4", "Import", "Capture", "Review-5", "MovieFiller-1.mov"]
+        for name in names { try FileManager.default.createDirectory(at: tmp.appending(path: name), withIntermediateDirectories: true) }
+        OrphanFiles.removeScratch(in: tmp)
+        #expect(Set(try FileManager.default.contentsOfDirectory(atPath: tmp.path)) == ["Capture", "Review-5", "MovieFiller-1.mov"])
+    }
+
+    /// W2 review: a backup that changed after it was checked brings in nothing that no longer matches.
+    @Test func aFileChangedAfterTheCheckIsntBroughtIn() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let (url, _) = try backUp(phone)
+        let check = try BackupArchive.check(url)
+        let wanted = BackupService(library: try library(), now: { [clock] in clock.now() }).files(for: check, mode: .addMissing)
+        let folder = temporary("unpacked")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        var unpacked: [String: URL] = [:]
+        let first = try #require(wanted.sorted().first)
+        var checksums = check.document.files.mapValues(\.sha256)
+        checksums[first] = String(repeating: "0", count: 64)
+        try BackupArchive.extract(url, paths: wanted, checksums: checksums, into: folder) { path, file in unpacked[path] = file }
+        #expect(unpacked[first] == nil)
+        #expect(unpacked.count == wanted.count - 1)
+        #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).count == wanted.count - 1)
+    }
+
+    /// W2 review: a moment whose camera files are all gone can't come back, and doesn't stop a replacement either.
+    @Test func aMomentWithNoPictureLeftDoesntStopAReplacement() async throws {
+        let phone = try library()
+        let ids = try await fill(phone)
+        let first = try #require(try phone.context.fetch(FetchDescriptor<Moment>()).first { $0.id == ids[0] })
+        for media in first.media where media.role == .rearSource || media.role == .frontSource { try phone.store.remove(media.relativePath) }
+        let (url, _) = try backUp(phone)
+        #expect(try BackupArchive.check(url).damaged.isEmpty == false)
+        let outcome = try restore(url, into: try library(), mode: .replaceEverything)
+        #expect(outcome.restored == 2 && outcome.skipped.count == 1, "\(outcome)")
+    }
+
+    /// W2 review: when only the selfie stream is left, it comes back as the picture, without a window.
+    @Test func aLoneSelfieComesBackAsThePicture() async throws {
+        let phone = try library()
+        let ids = try await fill(phone)
+        let first = try #require(try phone.context.fetch(FetchDescriptor<Moment>()).first { $0.id == ids[0] })
+        let window = try #require(first.pipLayout?.source)
+        let main = try #require(first.media.first { ($0.role == .rearSource || $0.role == .frontSource) && $0.role != window })
+        try phone.store.remove(main.relativePath)
+        let (url, document) = try backUp(phone)
+        #expect(try #require(document.moments.first { $0.id == ids[0] }).pipLayout == nil)
+        let newPhone = try library()
+        _ = try restore(url, into: newPhone)
+        let restored = try #require(try newPhone.context.fetch(FetchDescriptor<Moment>()).first { $0.id == ids[0] })
+        #expect(MomentSummary(restored).mainPath != nil)
     }
 
     /// W2: a moment recovered from Recently deleted after a backup isn't in it, though it's older.

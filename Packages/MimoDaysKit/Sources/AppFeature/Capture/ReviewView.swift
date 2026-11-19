@@ -20,6 +20,8 @@ struct ReviewView: View {
     @State private var recording: VoiceRecording?
     @State private var microphoneOff = false
     @State private var choosesPlace = false
+    /// Place or Voice note is asking for its permission: one at a time, claimed at the tap.
+    @State private var opensTool = false
     @State private var locationAllowed = false
     @Environment(\.permissions) private var permissions
     @State private var asker = PermissionAsker()
@@ -169,10 +171,14 @@ struct ReviewView: View {
 
     /// Our explainer and the system prompt the first time, then one fix for the city (Andrew, 2026-11-13).
     private func choosePlace() {
-        guard !isSaving, !asker.isAsking else { return }
+        guard !isSaving, !opensTool, !asker.isAsking else { return }
+        opensTool = true
         Task {
             let status = await asker.request(.location, using: permissions)
+            opensTool = false
             locationAllowed = status.isUsable
+            // Saving started meanwhile: no sheet over it.
+            guard !isSaving else { return }
             choosesPlace = true
             if status.isUsable { await model.locate() }
         }
@@ -180,11 +186,15 @@ struct ReviewView: View {
 
     /// Our explainer and the system prompt the first time; once it is off, the way to Settings.
     private func recordVoice() {
-        guard !isSaving, !asker.isAsking else { return }
+        guard !isSaving, !opensTool, !asker.isAsking else { return }
+        opensTool = true
         Task {
             let status = await asker.request(.microphone, using: permissions)
+            opensTool = false
+            // The microphone only records with its sheet up: not once Save started or something else opened.
+            guard !isSaving, !editsNote, !choosesPlace, recording == nil else { return }
             guard status.isUsable else {
-                microphoneOff = true
+                if status.needsSettings { microphoneOff = true }
                 return
             }
             model.playback?.pause()

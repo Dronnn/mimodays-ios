@@ -56,12 +56,15 @@ struct MoviePlan: Sendable, Equatable {
         }
     }
 
-    /// The movie's one track (F09), played from the start at `gain`: the person's own audio file, fading in and out,
-    /// or their voice recorded over the movie, which doesn't fade (its first and last words would).
+    /// The movie's one track (F09), played at `gain`: the person's own audio file from the start, fading in and out,
+    /// or their voice from where the movie was when it was recorded, which doesn't fade (its first and last words
+    /// would).
     struct Music: Sendable, Equatable {
         var url: URL
         var gain: Double
         var fades = true
+        /// Seconds into the movie where it starts.
+        var start: Double = 0
     }
 
     var clips: [Clip]
@@ -88,7 +91,9 @@ struct MoviePlan: Sendable, Equatable {
         clipSoundLevel = project.clipSoundLevel
         voiceNoteLevel = project.voiceNoteLevel
         music = project.audioTracks.first.flatMap { track in
-            (try? store.url(for: track.relativePath)).map { Music(url: $0, gain: track.gain, fades: track.kind == .soundtrack) }
+            (try? store.url(for: track.relativePath)).map {
+                Music(url: $0, gain: track.gain, fades: track.kind == .soundtrack, start: max(track.startOffset, 0))
+            }
         }
         let clips: [(Int, Clip)] = MovieStore.liveClips(of: project).compactMap { clip in
             guard let moment = clip.moment,

@@ -246,6 +246,21 @@ struct MovieComposerTests {
         }
     }
 
+    /// F09: a voice whose microphone started part way into the movie plays from there, and stops with the movie.
+    @Test func theVoicePlaysFromWhereItWasRecorded() async throws {
+        let ids = try await save(2)
+        let project = try project(ids)
+        let voice = try store.store(copyOf: Fixture.voiceNote.url, in: .originals, fileExtension: "m4a")
+        project.audioTracks.append(MovieAudioTrack(kind: .voiceover, relativePath: voice.relativePath, startOffset: 0.5))
+        let plan = MoviePlan(project, store: store)
+        #expect(plan.music?.start == 0.5)
+        let composed = try await MovieComposer.compose(plan, renderSize: portrait)
+        let track = try #require(composed.asset.tracks(withMediaType: .audio).first)
+        let segment = try #require(track.segments.first { !$0.isEmpty })
+        #expect(abs(segment.timeMapping.target.start.seconds - 0.5) < 0.01)
+        #expect(segment.timeMapping.target.end.seconds <= plan.duration + 0.01)
+    }
+
     /// The 2 s fixture clip with the 2 s voice fixture as its own sound, like a video recorded with the microphone.
     private func clipWithSound() async throws -> URL {
         let composition = AVMutableComposition()

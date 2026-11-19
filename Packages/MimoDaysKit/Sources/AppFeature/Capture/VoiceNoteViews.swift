@@ -10,7 +10,8 @@ final class VoiceRecording: Identifiable {
     static let bars = 54
 
     let url: URL
-    let limit: TimeInterval
+    /// How long it can run; the movie editor's voice sets it as it starts, to what's left of the movie.
+    var limit: TimeInterval
     let startedAt = Date()
     var elapsed: TimeInterval = 0
     /// One level (0...1) per bar recorded so far, the loudest moment in it.
@@ -59,6 +60,9 @@ final class VoiceRecording: Identifiable {
 struct VoiceRecordingSheet: View {
     let recording: VoiceRecording
     var title = Text("Voice note", bundle: .module)
+    /// Starts the recording once the sheet is up (the movie editor's voice); false closes it. A voice note's recording
+    /// has started already.
+    var start: (() async -> Bool)?
     /// Once, when the sheet goes away for any reason.
     let onFinish: (VoiceRecording) -> Void
     @Environment(\.dismiss) private var dismiss
@@ -114,6 +118,7 @@ struct VoiceRecordingSheet: View {
         .presentationCornerRadius(28)
         .presentationBackground(ColorToken.surfaceSheet.color)
         .task {
+            if let start, !(await start()) { return dismiss() }
             await recording.run()
             dismiss()
         }

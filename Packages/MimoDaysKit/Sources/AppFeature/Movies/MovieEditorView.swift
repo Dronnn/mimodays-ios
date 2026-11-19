@@ -119,7 +119,10 @@ struct MovieEditorView: View {
             }
         }
         .sheet(item: $voiceover) { recording in
-            VoiceRecordingSheet(recording: recording, title: Text("Your voice", bundle: .module)) { model.finishVoiceover($0) }
+            // Up at once, so nothing behind it changes while the movie gets ready; it starts the take from there.
+            VoiceRecordingSheet(recording: recording, title: Text("Your voice", bundle: .module), start: { await model.startVoiceover(recording) }) {
+                model.finishVoiceover($0)
+            }
         }
         .permissionExplainers(asker)
         .sheet(isPresented: $microphoneOff) {
@@ -164,10 +167,7 @@ struct MovieEditorView: View {
                 if status.needsSettings { microphoneOff = true }
                 return
             }
-            guard let take = await model.startVoiceover() else { return }
-            // Gone while the movie got ready: the take ends here, as it would have with its sheet.
-            guard isShown, scenePhase != .background else { return model.finishVoiceover(take) }
-            voiceover = take
+            voiceover = model.newVoiceover()
         }
     }
 

@@ -156,15 +156,19 @@ enum MovieComposer {
             ))
             cursor = cursor + length
         }
-        // F09's music or voice: from the start, as long as the movie or the file, music fading in and out.
+        // F09's music or voice: from where it starts (music at once), as long as the movie or the file, music fading in
+        // and out.
         let musicAsset = plan.music.map { AVURLAsset(url: $0.url) }
         var musicRamp: CMTimeRange?
         if let musicAsset, let song = try await musicAsset.loadTracks(withMediaType: .audio).first,
            let musicTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
             let available = try await song.load(.timeRange)
-            let played = CMTimeRange(start: available.start, duration: CMTimeMinimum(available.duration, cursor))
-            try musicTrack.insertTimeRange(played, of: song, at: .zero)
-            musicRamp = CMTimeRange(start: .zero, duration: played.duration)
+            let start = CMTimeMinimum(time(plan.music?.start ?? 0), cursor)
+            let played = CMTimeRange(start: available.start, duration: CMTimeMinimum(available.duration, cursor - start))
+            if played.duration > .zero {
+                try musicTrack.insertTimeRange(played, of: song, at: start)
+                musicRamp = CMTimeRange(start: start, duration: played.duration)
+            }
         }
         // Tracks nothing was put in would make players and exporters stumble.
         for track in [selfieTrack, soundTrack, voiceTrack] where track.segments.allSatisfy(\.isEmpty) {
@@ -191,7 +195,7 @@ enum MovieComposer {
                     break
                 }
                 let fade = CMTimeMinimum(time(musicFadeSeconds), CMTimeMultiplyByFloat64(ramp.duration, multiplier: 0.5))
-                parameters.setVolumeRamp(fromStartVolume: 0, toEndVolume: Float(gain), timeRange: CMTimeRange(start: .zero, duration: fade))
+                parameters.setVolumeRamp(fromStartVolume: 0, toEndVolume: Float(gain), timeRange: CMTimeRange(start: ramp.start, duration: fade))
                 parameters.setVolumeRamp(fromStartVolume: Float(gain), toEndVolume: 0, timeRange: CMTimeRange(start: ramp.end - fade, duration: fade))
             }
             return parameters

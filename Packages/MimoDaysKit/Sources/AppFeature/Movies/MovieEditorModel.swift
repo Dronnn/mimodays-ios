@@ -96,6 +96,8 @@ final class MovieEditorModel {
         var relativePath: String
         var name: String?
         var gain: Double
+        /// Seconds into the movie where it starts: a voice recorded as the movie played.
+        var startOffset = 0.0
     }
 
     let project: MovieProject
@@ -541,7 +543,7 @@ final class MovieEditorModel {
     private func put(_ new: Track?) {
         for track in project.audioTracks { library.context.delete(track) }
         guard let new else { return }
-        let track = MovieAudioTrack(kind: new.kind, relativePath: new.relativePath, gain: new.gain)
+        let track = MovieAudioTrack(kind: new.kind, relativePath: new.relativePath, startOffset: new.startOffset, gain: new.gain)
         track.name = new.name
         track.project = project
         library.context.insert(track)
@@ -549,64 +551,80 @@ final class MovieEditorModel {
 
     // MARK: Voice over the movie (F09)
 
-    /// The voice over the movie from its start until it's finished; one at a time.
+    /// The take of the voice over the movie, from `newVoiceover` until it's finished; one at a time.
     private(set) var voiceover: VoiceRecording?
+    /// Where the movie was when the take's microphone started.
+    private var voiceoverStart = 0.0
 
-    /// The movie plays from the start, silent so its sound isn't recorded into the voice, while the microphone records
-    /// up to its end. Both start together, once the stage is ready on the first frame, so the words stay with the
-    /// pictures. Nil when either can't start, or the take was finished meanwhile; the track stays as it was.
-    func startVoiceover() async -> VoiceRecording? {
+    /// A take getting ready: the stage stops and goes silent, so the movie's sound isn't recorded into the voice.
+    /// Its sheet comes up at once and starts it (`startVoiceover`). Nil while another one is on.
+    func newVoiceover() -> VoiceRecording? {
         guard voiceover == nil, duration > 0, let url = try? CaptureFiles.temporaryURL("m4a") else { return nil }
-        let recording = VoiceRecording(recorder: voice.makeRecorder(), url: url, limit: duration)
-        voiceover = recording
+        let take = VoiceRecording(recorder: voice.makeRecorder(), url: url, limit: duration)
+        voiceover = take
+        voiceoverStart = 0
         pause()
         player.isMuted = true
-        await rebuild?.value
-        time = 0
-        var atStart = await stageReady()
-        if atStart { atStart = await player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero) }
-        // Finished meanwhile (the app left): that already put everything back.
-        guard voiceover === recording else { return nil }
-        guard atStart else {
-            voiceover = nil
-            restorePlayback()
-            return nil
-        }
-        let session = AVAudioSession.sharedInstance()
-        playbackSession = (session.category, session.mode)
-        guard recording.start() else {
-            voiceover = nil
-            restorePlayback()
-            try? session.setActive(false, options: .notifyOthersOnDeactivation)
-            try? FileManager.default.removeItem(at: url)
-            return nil
-        }
-        player.play()
-        isPlaying = true
-        return recording
+        return take
     }
 
-    /// The stage's movie can play: waits for it to load if it hasn't yet, three seconds at most.
-    private func stageReady() async -> Bool {
-        for _ in 0 ..< 100 where !failed {
-            switch player.currentItem?.status {
-            case .readyToPlay: return true
-            case .failed: return false
-            default: try? await Task.sleep(for: .milliseconds(30))
-            }
+    /// Once the stage has caught up with every change and is ready at the start, the movie plays; the microphone starts
+    /// as soon as it really moves, and records from there to the end, so the words stay with the pictures. False when
+    /// it can't; nothing starts once the take was finished meanwhile (its sheet went away, the editor closed).
+    func startVoiceover(_ take: VoiceRecording) async -> Bool {
+        while let pending = rebuild, !pending.isCancelled {
+            await pending.value
+            guard voiceover === take else { return false }
+        }
+        time = 0
+        guard duration > 0, await wait(for: take, until: { player.currentItem?.status == .readyToPlay }),
+              await player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero), voiceover === take
+        else { return abandon(take) }
+        player.play()
+        isPlaying = true
+        guard await wait(for: take, until: { player.timeControlStatus == .playing }) else { return abandon(take) }
+        let start = max(player.currentTime().seconds, 0)
+        guard start < duration else { return abandon(take) }
+        take.limit = duration - start
+        let session = AVAudioSession.sharedInstance()
+        playbackSession = (session.category, session.mode)
+        guard take.start() else {
+            try? session.setActive(false, options: .notifyOthersOnDeactivation)
+            return abandon(take)
+        }
+        voiceoverStart = start
+        return true
+    }
+
+    /// Up to three seconds for `condition`; false at once when `take` is finished meanwhile or the stage failed.
+    private func wait(for take: VoiceRecording, until condition: () -> Bool) async -> Bool {
+        for _ in 0 ..< 100 {
+            guard voiceover === take, !failed, player.currentItem?.status != .failed else { return false }
+            if condition() { return true }
+            try? await Task.sleep(for: .milliseconds(30))
         }
         return false
     }
 
-    /// Stop, the movie's end, the sheet or the app left: what was recorded becomes the movie's track. Once per take,
-    /// whichever comes first.
-    func finishVoiceover(_ recording: VoiceRecording) {
-        guard voiceover === recording else { return }
+    /// A take that couldn't start: everything as it was, nothing recorded.
+    private func abandon(_ take: VoiceRecording) -> Bool {
+        guard voiceover === take else { return false }
         voiceover = nil
-        recording.finish()
         pause()
         restorePlayback()
-        addVoiceover(at: recording.url)
+        try? FileManager.default.removeItem(at: take.url)
+        return false
+    }
+
+    /// Stop, the movie's end, the sheet or the app left, the editor closed: what was recorded becomes the movie's
+    /// track. Once per take, whichever comes first; a take that hadn't started yet leaves everything as it was.
+    func finishVoiceover(_ take: VoiceRecording) {
+        guard voiceover === take else { return }
+        voiceover = nil
+        take.finish()
+        pause()
+        restorePlayback()
+        addVoiceover(at: take.url, startingAt: voiceoverStart)
     }
 
     private func restorePlayback() {
@@ -616,17 +634,18 @@ final class MovieEditorModel {
         self.playbackSession = nil
     }
 
-    /// A recording replaces the music or an earlier voice; it's moved in. Too short (for a movie that short, shorter
-    /// than the movie) or unreadable, it's dropped and the track stays as it was.
-    func addVoiceover(at url: URL) {
-        guard let seconds = Self.seconds(of: url), seconds >= min(Self.shortestVoiceover, duration) else {
+    /// A recording replaces the music or an earlier voice; it's moved in, to play from `start` seconds into the movie.
+    /// Too short (for a movie that short, shorter than what's left of it) or unreadable, it's dropped and the track
+    /// stays as it was.
+    func addVoiceover(at url: URL, startingAt start: Double = 0) {
+        guard let seconds = Self.seconds(of: url), seconds >= min(Self.shortestVoiceover, duration - start) else {
             try? FileManager.default.removeItem(at: url)
             return
         }
         do {
             let file = try library.store.store(moving: url, in: .originals, fileExtension: "m4a")
             audioFiles.insert(file.relativePath)
-            edit { put(Track(kind: .voiceover, relativePath: file.relativePath, name: nil, gain: Self.voiceoverGain)) }
+            edit { put(Track(kind: .voiceover, relativePath: file.relativePath, name: nil, gain: Self.voiceoverGain, startOffset: start)) }
         } catch {
             try? FileManager.default.removeItem(at: url)
             logger.error("Adding the voice failed: \(error.localizedDescription, privacy: .public)")
@@ -781,9 +800,11 @@ final class MovieEditorModel {
     /// Waits for the stage to catch up with the last change (tests, export).
     func settled() async { await rebuild?.value }
 
-    /// Music and voice files no project uses any more go when the editor closes. Ones Undo can still bring back stay:
-    /// going to Export closes it too, and the editor is still there to come back to. The launch sweep takes them later.
+    /// A take still on ends with it, kept as recorded. Music and voice files no project uses any more go when the
+    /// editor closes. Ones Undo can still bring back stay: going to Export closes it too, and the editor is still there
+    /// to come back to. The launch sweep takes them later.
     func close() {
+        if let voiceover { finishVoiceover(voiceover) }
         pause()
         rebuild?.cancel()
         if let timeObserver { player.removeTimeObserver(timeObserver) }
@@ -794,6 +815,6 @@ final class MovieEditorModel {
 
 private extension MovieEditorModel.Track {
     init(_ track: MovieAudioTrack) {
-        self.init(kind: track.kind, relativePath: track.relativePath, name: track.name, gain: track.gain)
+        self.init(kind: track.kind, relativePath: track.relativePath, name: track.name, gain: track.gain, startOffset: track.startOffset)
     }
 }

@@ -42,6 +42,8 @@ final class PhotoImportModel: Identifiable {
     var thumbnails: [Int: UIImage] = [:]
     /// Picked files whose bytes are already in a moment (or picked twice).
     var skipped: Set<Int> = []
+    /// Picked items that couldn't be loaded (an iCloud download that failed) or read: Import then says some didn't come in.
+    private(set) var unreadable = 0
 
     /// Every copy the picker handed over, read or not yet, so closing mid-load leaves none behind.
     private var received: [URL] = []
@@ -73,6 +75,7 @@ final class PhotoImportModel: Identifiable {
         for (index, file) in files.enumerated() {
             guard !Task.isCancelled else { return }
             guard let item = await Task.detached(priority: .userInitiated, operation: { await Self.read(file.url, isVideo: file.isVideo, id: index) }).value else {
+                unreadable += 1
                 continue
             }
             if !seen.insert(item.checksum).inserted { skipped.insert(item.id) }
@@ -103,17 +106,22 @@ final class PhotoImportModel: Identifiable {
                 received = []
                 return
             }
-            guard let file else { continue }
+            guard let file else {
+                unreadable += 1
+                continue
+            }
             files.append((file.url, file.isVideo))
             phase = .loading(Double(index + 1) / Double(items.count) / 2)
         }
         await load(files)
     }
 
-    /// "Import N": each new file becomes a moment. True when all of them did.
+    /// "Import N": each new file becomes a moment. True when all of them did, and every picked item could be read.
     func importAll() async -> Bool {
         guard phase == .ready else { return false }
         let new = new
+        // One choice for the whole batch, as it was when Import was tapped.
+        let keepsPlace = keepsPlace
         phase = .importing(0)
         var cities: [String: String?] = [:]
         var failures = 0
@@ -142,7 +150,7 @@ final class PhotoImportModel: Identifiable {
             phase = .importing(Double(index + 1) / Double(new.count))
         }
         phase = failures == 0 ? .ready : .failed
-        return failures == 0
+        return failures == 0 && unreadable == 0
     }
 
     /// Stops loading and removes the tmp copies nobody imported.

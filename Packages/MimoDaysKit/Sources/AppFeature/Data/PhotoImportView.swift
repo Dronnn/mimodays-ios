@@ -9,6 +9,8 @@ struct PhotoImportView: View {
     let close: () -> Void
     let imported: () -> Void
     @State private var failed = false
+    /// False once the screen is gone (a notification took over): a batch that ends then doesn't move the app.
+    @State private var isShown = true
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 4)
 
@@ -45,7 +47,9 @@ struct PhotoImportView: View {
             }
             Button {
                 Task {
-                    if await model.importAll() { imported() } else { failed = true }
+                    let done = await model.importAll()
+                    guard isShown else { return model.discard() }
+                    if done { imported() } else { failed = true }
                 }
             } label: {
                 if case let .importing(progress) = model.phase {
@@ -62,6 +66,7 @@ struct PhotoImportView: View {
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .interactiveDismissDisabled(isImporting)
+        .onDisappear { isShown = false }
         .alert(Text("Some files couldn't be imported", bundle: .module), isPresented: $failed) {
             Button(action: imported) { Text("OK", bundle: .module) }
         } message: {
@@ -119,6 +124,7 @@ struct PhotoImportView: View {
                 .padding(.top, 7)
             DataCard {
                 DataToggleRow(title: Text("Keep the place from Photos", bundle: .module), detail: Text("city level", bundle: .module), isOn: $model.keepsPlace)
+                    .disabled(isImporting)
                     .accessibilityIdentifier("import.place")
                 if !model.skipped.isEmpty {
                     DataSeparator()

@@ -70,9 +70,12 @@ struct PhotoImportTests {
         let name: String
         var slow = false
         var failsWhenCancelled = false
+        /// An iCloud item whose download fails.
+        var fails = false
 
         func loadFile() async throws -> PickedFile? {
             FileManager.default.createFile(atPath: log.appending(path: name).path, contents: nil)
+            if fails { throw URLError(.networkConnectionLost) }
             if slow {
                 // Long enough that only the close ends it, however slow the machine.
                 try? await Task.sleep(for: .seconds(30))
@@ -82,6 +85,19 @@ struct PhotoImportTests {
             try PhotoImportTests.photo.write(to: url)
             return PickedFile(url: url, isVideo: false)
         }
+    }
+
+    /// One picked item that won't download: the others come in, and Import says some didn't.
+    @Test func anItemThatWontLoadIsReported() async throws {
+        let folder = FileManager.default.temporaryDirectory.appending(path: "Picked-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let log = FileManager.default.temporaryDirectory.appending(path: "PickedLog-\(UUID().uuidString)", directoryHint: .isDirectory)
+        for url in [folder, log] { try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true) }
+        defer { for url in [folder, log] { try? FileManager.default.removeItem(at: url) } }
+        let model = model()
+        await model.load([Item(folder: folder, log: log, name: "here"), Item(folder: folder, log: log, name: "cloud", fails: true)])
+        #expect(model.unreadable == 1)
+        #expect(await !model.importAll())
+        #expect(try moments().count == 1)
     }
 
     /// W2: closing the import while the picker still copies leaves no copy behind, and loads nothing more.

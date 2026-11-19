@@ -122,16 +122,6 @@ struct SettingsSnapshotTests {
         )
     }
 
-    /// Appearance › Fonts (Andrew, 2026-11-18): English starts with Fraunces and Patrick Hand, then round faces; other
-    /// scripts have their own few round faces.
-    @Test(arguments: ["en", "ru", "uk", "he", "ar", "ja", "ko", "zh-Hans"])
-    func fonts(language: String) {
-        assertScreenSnapshots(
-            of: page(FontSettingsView(language: language)).environment(\.typefaces, Typefaces(language: language)),
-            variants: language == "en" ? variants : [SnapshotVariant(.iPhone, .light, language: language)], testName: "fonts-\(language)"
-        )
-    }
-
     /// Appearance › Language: the iPhone's language, then MimoDays' own, each named in its own words.
     @Test func language() {
         assertScreenSnapshots(of: page(LanguageSettingsView(language: AppLanguage(defaults: UserDefaults(suiteName: "language-snapshot")!, domain: nil))), variants: variants)

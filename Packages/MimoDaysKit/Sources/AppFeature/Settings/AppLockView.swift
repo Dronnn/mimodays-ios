@@ -44,13 +44,10 @@ struct AppLockView: View {
 struct AppLockWindow: UIViewRepresentable {
     let lock: AppLock
     let isLocked: Bool
-    /// Settings › Appearance › Fonts, for the lock screen's headline.
-    var fonts: [String: FontPick] = [:]
 
     func makeUIView(context: Context) -> Anchor { Anchor(lock: lock) }
 
     func updateUIView(_ view: Anchor, context: Context) {
-        view.fonts = fonts
         view.update(isLocked: isLocked)
     }
 
@@ -58,7 +55,6 @@ struct AppLockWindow: UIViewRepresentable {
         private let lock: AppLock
         private var window_: UIWindow?
         private var isLocked = false
-        var fonts: [String: FontPick] = [:]
 
         init(lock: AppLock) {
             self.lock = lock
@@ -83,7 +79,7 @@ struct AppLockWindow: UIViewRepresentable {
 
         private func lockScreen() -> AnyView {
             let lock = lock
-            return AnyView(AppLockView(biometry: lock.biometry) { Task { await lock.unlock() } }.appLanguage(fonts: fonts))
+            return AnyView(AppLockView(biometry: lock.biometry) { Task { await lock.unlock() } }.appLanguage())
         }
 
         func update(isLocked: Bool) {

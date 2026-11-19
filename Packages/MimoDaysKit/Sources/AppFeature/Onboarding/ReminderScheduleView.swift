@@ -91,7 +91,7 @@ struct BackButton: View {
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .flipsForRightToLeftLayoutDirection(true)
                 Text(LocalizedStringResource("Back", bundle: .atURL(Bundle.module.bundleURL)))
-                    .textStyle(TextStyle(.nunito, size: 17, weight: 600, relativeTo: .body))
+                    .textStyle(TextStyle(.body, size: 17, weight: 600, relativeTo: .body))
                     .foregroundStyle(ColorToken.textLink.color)
             }
             .padding(.leading, 8)
@@ -118,7 +118,7 @@ struct WeekdayPicker: View {
                     schedule.toggle(day)
                 } label: {
                     Text(verbatim: calendar.speaking(locale).veryShortStandaloneWeekdaySymbols[day - 1])
-                        .textStyle(TextStyle(.nunito, size: 16, weight: isOn ? 800 : 700, relativeTo: .body, maximumScale: 1.35))
+                        .textStyle(TextStyle(.body, size: 16, weight: isOn ? 800 : 700, relativeTo: .body, maximumScale: 1.35))
                         .foregroundStyle((isOn ? ColorToken.textOnCoral : .textSecondary).color)
                         .frame(width: 44, height: 44)
                         .background(Circle().fill((isOn ? ColorToken.actionCoral : .surfaceChip).color))

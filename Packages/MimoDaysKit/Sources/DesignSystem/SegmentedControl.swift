@@ -33,7 +33,7 @@ public struct SegmentedControl<Value: Hashable>: View {
                     withAnimation(reduceMotion ? nil : .snappy) { selection = option }
                 } label: {
                     label(option)
-                        .textStyle(TextStyle(.nunito, size: labelSize, weight: isSelected ? 700 : 600, relativeTo: .subheadline, maximumScale: 1.35))
+                        .textStyle(TextStyle(.body, size: labelSize, weight: isSelected ? 700 : 600, relativeTo: .subheadline, maximumScale: 1.35))
                         .foregroundStyle((isSelected ? ColorToken.textLink : .textPrimary).color)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 6)

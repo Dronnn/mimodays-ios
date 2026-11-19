@@ -4,10 +4,10 @@ import SwiftUI
 
 extension View {
     /// The language chosen in MimoDays, for everything under this view: its words, dates and numbers, the
-    /// direction of its layout, and its faces (`fonts`, Settings › Appearance › Fonts).
+    /// direction of its layout, and the faces for its alphabet.
     /// Reads `AppLanguage.shared`, so a switch redraws at once.
-    func appLanguage(fonts: [String: FontPick] = [:]) -> some View {
-        modifier(AppLanguageEnvironment(fonts: fonts))
+    func appLanguage() -> some View {
+        modifier(AppLanguageEnvironment())
     }
 }
 
@@ -17,13 +17,10 @@ extension AppLanguage {
 }
 
 private struct AppLanguageEnvironment: ViewModifier {
-    let fonts: [String: FontPick]
-
     func body(content: Content) -> some View {
         let language = AppLanguage.shared
         let direction: LayoutDirection = language.isRightToLeft ? .rightToLeft : .leftToRight
-        let pick = fonts[language.current]
-        let typefaces = Typefaces(language: language.current, heading: pick?.heading, hand: pick?.hand, body: pick?.body)
+        let typefaces = Typefaces(language: language.current)
         content
             .environment(\.locale, language.locale)
             .environment(\.layoutDirection, direction)

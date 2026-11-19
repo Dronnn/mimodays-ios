@@ -21,7 +21,6 @@ enum SettingsRoute: Hashable {
     /// Appearance › Language.
     case language
     /// Appearance › Fonts.
-    case fonts
 }
 
 /// What the back button says on a page opened from more than one place: the page it goes back to.
@@ -82,7 +81,6 @@ private struct SettingsHost: View {
                     case let .dataUse(back): DataUseView(back: back.label).settingsPage()
                     case .deleteAll: DeleteAllScreen().settingsPage()
                     case .language: LanguageSettingsView().settingsPage()
-                    case .fonts: FontSettingsView().settingsPage()
                     }
                 }
                 .navigationDestination(for: DataRoute.self) { route in
@@ -139,7 +137,7 @@ struct SettingsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     Text("Settings", bundle: .module)
-                        .textStyle(TextStyle(.fraunces, size: 34, weight: 600, relativeTo: .largeTitle, maximumScale: 1.35))
+                        .textStyle(TextStyle(.heading, size: 34, weight: 600, relativeTo: .largeTitle, maximumScale: 1.35))
                         .foregroundStyle(ColorToken.textPrimary.color)
                         .accessibilityAddTraits(.isHeader)
                         .padding(.horizontal, 4)

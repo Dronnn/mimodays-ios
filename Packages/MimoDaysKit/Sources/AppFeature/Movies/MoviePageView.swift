@@ -62,7 +62,7 @@ struct MoviePageView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     cover.padding(.horizontal, 16).padding(.top, 8)
                     Text(project.title)
-                        .textStyle(TextStyle(.fraunces, size: 30, weight: 600, tracking: -0.4, relativeTo: .title1, maximumScale: 1.35))
+                        .textStyle(TextStyle(.heading, size: 30, weight: 600, tracking: -0.4, relativeTo: .title1, maximumScale: 1.35))
                         .foregroundStyle(ColorToken.textPrimary.color)
                         .padding(.horizontal, 18)
                         .padding(.top, 14)
@@ -114,7 +114,7 @@ struct MoviePageView: View {
                     .padding(.top, 16)
                     .accessibilityIdentifier("movie.delete")
                     Text("Copies saved to Photos or Files stay there.", bundle: .module)
-                        .textStyle(TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote))
+                        .textStyle(TextStyle(.body, size: 13, weight: 500, relativeTo: .footnote))
                         .foregroundStyle(ColorToken.textSecondary.color)
                         .padding(.horizontal, 18)
                 }
@@ -214,7 +214,7 @@ struct MoviePageView: View {
                     title.textStyle(.rowTitle).foregroundStyle(ColorToken.textPrimary.color)
                     if let detail {
                         detail
-                            .textStyle(TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote))
+                            .textStyle(TextStyle(.body, size: 13, weight: 500, relativeTo: .footnote))
                             .foregroundStyle(ColorToken.textSecondary.color)
                     }
                 }
@@ -287,7 +287,7 @@ struct HalfButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(.titleAndIcon)
-            .textStyle(TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
+            .textStyle(TextStyle(.body, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
             .foregroundStyle(ColorToken.textPrimary.color)
             .padding(.horizontal, 12)
             .frame(maxWidth: .infinity, minHeight: 44)

@@ -7,24 +7,21 @@ import UIKit
 /// S04 with the app's preferences.
 struct AppearanceSettingsScreen: View {
     @Environment(AppearancePreferences.self) private var preferences: AppearancePreferences?
-    @Environment(\.typefaces) private var typefaces
 
     var body: some View {
         if let preferences {
             @Bindable var preferences = preferences
             AppearanceSettingsView(
-                settings: $preferences.value, language: AppLanguage.nativeName(AppLanguage.shared.locale.identifier), headingFont: typefaces.heading.name
+                settings: $preferences.value, language: AppLanguage.nativeName(AppLanguage.shared.locale.identifier)
             )
         }
     }
 }
 
-/// S04: Light, Dark or System, higher contrast, the language and its fonts.
+/// S04: Light, Dark or System, higher contrast, and the language.
 struct AppearanceSettingsView: View {
     @Binding var settings: AppearanceSettings
     let language: String
-    /// The headline face in use, named on the Fonts row.
-    var headingFont = Typeface.fraunces.name
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -57,14 +54,6 @@ struct AppearanceSettingsView: View {
                             SettingsValueRow(title: Text("Language", bundle: .module), value: Text(verbatim: language))
                         }
                         .accessibilityIdentifier("appearanceSettings.language")
-                        DataSeparator()
-                        NavigationLink(value: SettingsRoute.fonts) {
-                            SettingsValueRow(
-                                title: Text("Fonts", bundle: .module, comment: "Settings › Appearance: the row opening the fonts for headings and handwriting"),
-                                value: Text(verbatim: headingFont)
-                            )
-                        }
-                        .accessibilityIdentifier("appearanceSettings.fonts")
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 26)
@@ -142,7 +131,7 @@ private struct ThemeChoice: View {
             VStack(spacing: 10) {
                 phone
                 title
-                    .textStyle(TextStyle(.nunito, size: 14, weight: isSelected ? 800 : 600, relativeTo: .subheadline))
+                    .textStyle(TextStyle(.body, size: 14, weight: isSelected ? 800 : 600, relativeTo: .subheadline))
                     .foregroundStyle((isSelected ? ColorToken.textLink : ColorToken.textPrimary).color)
             }
             .padding(.top, 4)

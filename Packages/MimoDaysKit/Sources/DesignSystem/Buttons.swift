@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// `Button / Primary`: hand-cut coral shape, Fraunces label, soft coral shadow. Full width, 54 pt tall.
+/// `Button / Primary`: hand-cut coral shape, heading-face label, soft coral shadow. Full width, 54 pt tall.
 public struct PrimaryButtonStyle: ButtonStyle {
     public init() {}
 
@@ -22,7 +22,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
     }
 }
 
-/// `Button / Text`: coral Nunito label, 44 pt tall hit area.
+/// `Button / Text`: coral body-face label, 44 pt tall hit area.
 public struct TextButtonStyle: ButtonStyle {
     public init() {}
 

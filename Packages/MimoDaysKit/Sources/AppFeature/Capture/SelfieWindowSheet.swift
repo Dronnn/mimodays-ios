@@ -25,7 +25,7 @@ struct SelfieWindowSheet: View {
                 withAnimation(.snappy) { placement = CameraSettings.SelfieWindow() }
             } label: {
                 Text("Reset to default", bundle: .module)
-                    .textStyle(TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
+                    .textStyle(TextStyle(.body, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .multilineTextAlignment(.center)
                     .padding(.vertical, 12)

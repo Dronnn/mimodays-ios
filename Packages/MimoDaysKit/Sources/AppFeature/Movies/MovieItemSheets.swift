@@ -3,7 +3,7 @@ import DesignSystem
 import Persistence
 import SwiftUI
 
-/// The U51-U53 sheets' top: the title on the left in Fraunces, Done in coral. Every change is already saved.
+/// The U51-U53 sheets' top: the title on the left in the heading face, Done in coral. Every change is already saved.
 private struct ItemSheetBar: View {
     let title: Text
     @Environment(\.dismiss) private var dismiss
@@ -33,13 +33,13 @@ private struct ItemSheetBar: View {
 /// A small caps-free label over a group of controls ("Cameras", "Look").
 @MainActor private func groupLabel(_ text: Text) -> some View {
     text
-        .textStyle(TextStyle(.nunito, size: 14, weight: 700, relativeTo: .subheadline))
+        .textStyle(TextStyle(.body, size: 14, weight: 700, relativeTo: .subheadline))
         .foregroundStyle(ColorToken.textSecondary.color)
 }
 
 @MainActor private func footnote(_ text: Text) -> some View {
     text
-        .textStyle(TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote))
+        .textStyle(TextStyle(.body, size: 13, weight: 500, relativeTo: .footnote))
         .foregroundStyle(ColorToken.textSecondary.color)
         .fixedSize(horizontal: false, vertical: true)
 }
@@ -105,7 +105,7 @@ struct ClipSheet: View {
                         LayoutGlyph(layout: layout)
                             .frame(width: 30, height: 40)
                         layout.title
-                            .textStyle(TextStyle(.nunito, size: 11, weight: 800, relativeTo: .caption2, maximumScale: 1.35))
+                            .textStyle(TextStyle(.body, size: 11, weight: 800, relativeTo: .caption2, maximumScale: 1.35))
                             .foregroundStyle(ColorToken.textPrimary.color)
                             .lineLimit(1)
                             .fixedSize()
@@ -137,7 +137,7 @@ struct ClipSheet: View {
                     rowTitle(Text("Volume", bundle: .module))
                     Spacer()
                     Text(clip?.clipVolume ?? 1, format: .percent.precision(.fractionLength(0)))
-                        .textStyle(TextStyle(.nunito, size: 14, weight: 600, relativeTo: .footnote))
+                        .textStyle(TextStyle(.body, size: 14, weight: 600, relativeTo: .footnote))
                         .foregroundStyle(ColorToken.textSecondary.color)
                 }
                 .padding(.top, 10)
@@ -277,7 +277,7 @@ struct CardSheet: View {
     private func preview(_ card: MovieTextCard) -> some View {
         let dark = card.look != .paper
         return Text(text.isEmpty ? card.text : text)
-            .textStyle(TextStyle(.fraunces, size: 17, weight: 700, relativeTo: .headline, maximumScale: 1))
+            .textStyle(TextStyle(.heading, size: 17, weight: 700, relativeTo: .headline, maximumScale: 1))
             .foregroundStyle(dark ? ColorToken.mediaFrame.color : ColorToken.textPrimary.color)
             .multilineTextAlignment(.center)
             .padding(8)
@@ -298,7 +298,7 @@ struct CardSheet: View {
                 .onChange(of: text) { _, new in if new.count > MovieEditorModel.cardLimit { text = String(new.prefix(MovieEditorModel.cardLimit)) } }
                 .accessibilityIdentifier("card.text")
             Text("Up to \(MovieEditorModel.cardLimit) characters", bundle: .module)
-                .textStyle(TextStyle(.nunito, size: 12, weight: 500, relativeTo: .caption1))
+                .textStyle(TextStyle(.body, size: 12, weight: 500, relativeTo: .caption1))
                 .foregroundStyle(ColorToken.textSecondary.color)
         }
         .padding(14)
@@ -319,7 +319,7 @@ struct CardSheet: View {
                 HStack(spacing: 8) {
                     Icon.glyphMic.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
                     Text("Voice comment from \(note.recordedAt.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))) · \(MovieEditorView.clock(note.duration))", bundle: .module)
-                        .textStyle(TextStyle(.nunito, size: 14, weight: 700, relativeTo: .subheadline))
+                        .textStyle(TextStyle(.body, size: 14, weight: 700, relativeTo: .subheadline))
                         .lineLimit(1)
                     Spacer(minLength: 8)
                     Menu {
@@ -332,7 +332,7 @@ struct CardSheet: View {
                         }
                     } label: {
                         Text("Change", bundle: .module)
-                            .textStyle(TextStyle(.nunito, size: 14, weight: 800, relativeTo: .subheadline))
+                            .textStyle(TextStyle(.body, size: 14, weight: 800, relativeTo: .subheadline))
                             .foregroundStyle(ColorToken.textLink.color)
                             .frame(minHeight: Size.minimumTapTarget)
                     }
@@ -388,7 +388,7 @@ struct TransitionSheet: View {
                         rowTitle(Text("Sound leads by", bundle: .module))
                         Spacer()
                         Text(Self.seconds(atmosphere.lead))
-                            .textStyle(TextStyle(.nunito, size: 14, weight: 600, relativeTo: .footnote))
+                            .textStyle(TextStyle(.body, size: 14, weight: 600, relativeTo: .footnote))
                             .foregroundStyle(ColorToken.textSecondary.color)
                     }
                     .padding(.horizontal, 20)
@@ -482,7 +482,7 @@ private struct AtmosphereDiagram: View {
                         .stroke(ColorToken.actionCoral.color, style: StrokeStyle(lineWidth: 2, dash: [2, 4]))
                         Rectangle().fill(ColorToken.textSecondary.color).frame(width: 1, height: 12).offset(x: leadWidth)
                         Text(verbatim: TransitionSheet.seconds(lead))
-                            .textStyle(TextStyle(.nunito, size: 11, weight: 800, relativeTo: .caption2, maximumScale: 1))
+                            .textStyle(TextStyle(.body, size: 11, weight: 800, relativeTo: .caption2, maximumScale: 1))
                             .foregroundStyle(ColorToken.actionCoral.color)
                             .offset(y: 14)
                     }
@@ -498,7 +498,7 @@ private struct AtmosphereDiagram: View {
 
     private func label(_ text: Text) -> some View {
         text
-            .textStyle(TextStyle(.nunito, size: 11, weight: 800, relativeTo: .caption2, maximumScale: 1))
+            .textStyle(TextStyle(.body, size: 11, weight: 800, relativeTo: .caption2, maximumScale: 1))
             .textCase(.uppercase)
             .foregroundStyle(ColorToken.textSecondary.color)
             .frame(width: 60, alignment: .leading)

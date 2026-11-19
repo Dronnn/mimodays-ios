@@ -11,8 +11,6 @@ struct AppearanceSettings: Codable, Equatable, Sendable {
     var higherContrast = false
     /// H.9: which screens' video tiles play on their own.
     var motion = MotionSettings()
-    /// Headline, handwriting and body faces chosen per language ("ru"); a language without one uses its default.
-    var fonts: [String: FontPick] = [:]
 
     init() {}
 
@@ -22,7 +20,6 @@ struct AppearanceSettings: Codable, Equatable, Sendable {
         appearance = try container.decodeIfPresent(AppearancePreference.self, forKey: .appearance) ?? appearance
         higherContrast = try container.decodeIfPresent(Bool.self, forKey: .higherContrast) ?? higherContrast
         motion = try container.decodeIfPresent(MotionSettings.self, forKey: .motion) ?? motion
-        fonts = try container.decodeIfPresent([String: FontPick].self, forKey: .fonts) ?? fonts
     }
 
     var interfaceStyle: UIUserInterfaceStyle {
@@ -30,30 +27,6 @@ struct AppearanceSettings: Codable, Equatable, Sendable {
         case .system: .unspecified
         case .light: .light
         case .dark: .dark
-        }
-    }
-}
-
-/// One language's faces, by `Typeface.id`; nil keeps the language's default.
-struct FontPick: Codable, Equatable, Sendable {
-    var heading: String?
-    var hand: String?
-    var body: String?
-
-    subscript(role: Typeface.Role) -> String? {
-        get {
-            switch role {
-            case .heading: heading
-            case .hand: hand
-            case .body: body
-            }
-        }
-        set {
-            switch role {
-            case .heading: heading = newValue
-            case .hand: hand = newValue
-            case .body: body = newValue
-            }
         }
     }
 }

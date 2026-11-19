@@ -1,27 +1,24 @@
 import CoreText
-import DesignSystem
+@testable import DesignSystem
+import Foundation
 import SwiftUI
 import Testing
 import UIKit
 
 struct DesignSystemTests {
+    /// Andrew's picks for Latin letters (2026-11-19).
     @Test(arguments: [
-        (TextStyle.displayHero, "Fraunces"), (TextStyle.body, "Nunito"),
-        (TextStyle.labelCaps, "Inter"), (TextStyle.hand, "Patrick Hand"),
+        (TextStyle.displayHero, "Grandstander"), (TextStyle.body, "Comfortaa"),
+        (TextStyle.labelCaps, "Comfortaa"), (TextStyle.hand, "Shantell Sans"),
     ])
-    func bundledFontsLoad(style: TextStyle, family: String) {
-        let font = style.ctFont(pointSize: 17)
-        #expect(CTFontCopyFamilyName(font) as String == family)
+    func latinFacesLoad(style: TextStyle, family: String) {
+        #expect(CTFontCopyFamilyName(style.ctFont(pointSize: 17, typefaces: .latin)) as String == family)
     }
 
-    @Test func headlinesUseSuperSoftOpticalCut() throws {
-        let variation = try #require(CTFontCopyVariation(TextStyle.displayHero.ctFont(pointSize: 38)) as? [NSNumber: NSNumber])
-        func axis(_ tag: String) -> Double? {
-            variation[NSNumber(value: tag.unicodeScalars.reduce(UInt32(0)) { ($0 << 8) | $1.value })]?.doubleValue
-        }
-        #expect(axis("wght") == 650)
-        #expect(axis("opsz") == 72)
-        #expect(axis("SOFT") == 100)
+    @Test func variableFacesTakeTheStylesWeight() throws {
+        let font = TextStyle.displayHero.ctFont(pointSize: 38, typefaces: .latin)
+        let variation = try #require(CTFontCopyVariation(font) as? [NSNumber: NSNumber])
+        #expect(variation[TextStyle.tag("wght")]?.doubleValue == 650)
     }
 
     @Test func textScalesWithDynamicType() {
@@ -50,55 +47,35 @@ struct DesignSystemTests {
     }
 }
 
-/// Settings › Appearance › Fonts (Andrew, 2026-11-18): each language has its own few round faces for headlines,
-/// handwriting and body text, all with its letters; Latin languages start with the design's.
+/// One set of faces per alphabet, picked by Andrew (2026-11-19); no choice in Settings.
 struct TypefaceTests {
-    static let languages = ["en", "de", "fr", "es", "it", "nl", "sv", "pl", "pt-BR", "ru", "uk", "be", "hy", "ka", "kk", "tr", "he", "ar", "ja", "ko", "zh-Hans", "zh-Hant"]
+    static let languages = ["en", "de", "fr", "es", "it", "nl", "sv", "pl", "pt-BR", "tr", "ru", "uk", "be", "kk", "he", "ar", "hy", "ka", "ja", "ko", "zh-Hans", "zh-Hant"]
 
+    @Test func languagesThatShareLettersShareFaces() {
+        for language in ["de", "fr", "es", "it", "nl", "sv", "pl", "pt-BR", "tr", "xx"] {
+            #expect(Typefaces(language: language) == .latin)
+        }
+        for language in ["uk", "be", "kk"] {
+            #expect(Typefaces(language: language) == Typefaces(language: "ru"))
+        }
+        #expect(Typefaces(language: "ru") == Typefaces(heading: .balsamiq, hand: .shantell, body: .comfortaa))
+        #expect(Typefaces(language: "ko").hand == .jua)
+    }
+
+    /// Every bundled face is in the package and has all of its language's letters (CJK is drawn as iOS cascades).
     @Test(arguments: languages)
-    func everyLanguageHasAFewFacesWithItsLetters(language: String) {
-        let defaults = Typefaces(language: language)
+    func everyFaceLoadsWithTheLanguagesLetters(language: String) throws {
+        let typefaces = Typefaces(language: language)
         for role in [Typeface.Role.heading, .hand, .body] {
-            let options = Typefaces.options(role, language: language)
-            #expect((1 ... 6).contains(options.count))
-            #expect(options.first == defaults[role])
-            #expect(options.contains(.sfRounded))
+            guard case let .bundled(file, _) = typefaces[role].source else { continue }
+            let font = typefaces[role].font(weight: 500, pointSize: 17)
+            #expect(CTFontCopyPostScriptName(font) as String != CTFontCopyPostScriptName(UIFont.systemFont(ofSize: 17)) as String, "\(file) missing")
+            guard !["ja", "ko", "zh-Hans", "zh-Hant"].contains(language) else { continue }
+            let exemplar = try #require(NSLocale(localeIdentifier: language).object(forKey: .exemplarCharacterSet) as? CharacterSet)
+            let letters = exemplar.intersection(.letters).subtracting(.nonBaseCharacters)
+            let characters = CTFontCopyCharacterSet(font) as CharacterSet
+            let missing = (0x20 ... 0x2FFF).compactMap(Unicode.Scalar.init).filter { letters.contains($0) && !characters.contains($0) }
+            #expect(missing.isEmpty, "\(file) lacks \(String(String.UnicodeScalarView(missing))) for \(language)")
         }
-    }
-
-    @Test(arguments: ["en", "de", "fr", "es", "it", "nl", "sv", "pl", "pt-BR", "tr"])
-    func latinLanguagesKeepTheDesign(language: String) {
-        #expect(Typefaces(language: language) == .design)
-    }
-
-    @Test func otherScriptsStartWithTheirOwnFaces() {
-        #expect(Typefaces(language: "ru").heading.id == "mplusRounded")
-        #expect(Typefaces(language: "ru").hand.id == "neucha")
-        #expect(Typefaces(language: "ru").body == .nunito)
-        #expect(Typefaces(language: "kk").hand.id == "pangolin")
-        #expect(Typefaces(language: "he").heading.id == "fredoka")
-        #expect(Typefaces(language: "ar").body.id == "rubik")
-        #expect(Typefaces(language: "ko").heading.id == "jua")
-        // Fraunces has no Cyrillic; a face made for one script isn't offered to another.
-        #expect(!Typefaces.options(.heading, language: "ru").contains(.fraunces))
-        #expect(!Typefaces.options(.heading, language: "en").contains { $0.id == "balooBhaijaan" })
-    }
-
-    @Test func aSavedChoiceHoldsAndAnUnknownOneFallsBack() {
-        #expect(Typefaces(language: "ru", heading: "rubik", hand: "playpen", body: "comfortaa").body.id == "comfortaa")
-        #expect(Typefaces(language: "ru", heading: "fraunces").heading.id == "mplusRounded")
-    }
-
-    @Test func theChosenFacesReplaceTheDesignsEverywhere() {
-        let typefaces = Typefaces(language: "ru", heading: "rubik", body: "comfortaa")
-        func family(_ style: TextStyle) -> String {
-            CTFontCopyFamilyName(style.ctFont(pointSize: 17, typefaces: typefaces)) as String
-        }
-        #expect(family(.displayHero) == "Rubik")
-        #expect(family(.hand) == "Neucha")
-        // Body text and the Inter labels go together.
-        #expect(family(.body) == "Comfortaa")
-        #expect(family(.labelCaps) == "Comfortaa")
-        #expect(CTFontCopyFamilyName(TextStyle.body.ctFont(pointSize: 17, typefaces: .design)) as String == "Nunito")
     }
 }

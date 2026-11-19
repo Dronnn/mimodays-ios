@@ -119,12 +119,12 @@ struct RotateHint: View {
                 .frame(width: 64, height: 64)
                 .accessibilityHidden(true)
             title
-                .textStyle(TextStyle(.nunito, size: 17, weight: 800, relativeTo: .headline, maximumScale: 1.35))
+                .textStyle(TextStyle(.body, size: 17, weight: 800, relativeTo: .headline, maximumScale: 1.35))
                 .foregroundStyle(CameraPalette.cream)
                 .multilineTextAlignment(.center)
                 .padding(.top, 8)
             body(format)
-                .textStyle(TextStyle(.nunito, size: 13, weight: 600, relativeTo: .footnote, maximumScale: 1.35))
+                .textStyle(TextStyle(.body, size: 13, weight: 600, relativeTo: .footnote, maximumScale: 1.35))
                 .foregroundStyle(CameraPalette.cream.opacity(0.7))
                 .multilineTextAlignment(.center)
                 .padding(.top, 5)
@@ -187,7 +187,7 @@ struct RotateReason: View {
 
     var body: some View {
         text
-            .textStyle(TextStyle(.nunito, size: 12, weight: 600, relativeTo: .caption1, maximumScale: 1.35))
+            .textStyle(TextStyle(.body, size: 12, weight: 600, relativeTo: .caption1, maximumScale: 1.35))
             .foregroundStyle(CameraPalette.cream.opacity(0.7))
             .multilineTextAlignment(.center)
             // Fixed lines at every size; the shutter's VoiceOver hint says the same.

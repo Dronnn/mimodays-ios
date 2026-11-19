@@ -3,7 +3,7 @@ import DesignSystem
 import Persistence
 import SwiftUI
 
-/// U30-U34: the Memory Card's back, the same size as its front. The day (Fraunces) over a brush stroke, the time
+/// U30-U34: the Memory Card's back, the same size as its front. The day (heading face) over a brush stroke, the time
 /// and the place, the note (or the caption when there is no note) in the hand-written face, the voice note, the collections, and a small live
 /// window of the front, still playing (muted) on a video, kept at the card's bottom. Missing parts are "+" links to
 /// Edit moment. It scrolls when it holds more than a short card shows.

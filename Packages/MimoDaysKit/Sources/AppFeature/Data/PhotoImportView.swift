@@ -112,7 +112,7 @@ struct PhotoImportView: View {
                 .padding(.horizontal, 2)
                 .padding(.top, 12)
             Text("Each one goes to the day it was taken and is marked \"Imported\". They have no selfie window. The originals stay in Photos.", bundle: .module)
-                .textStyle(TextStyle(.nunito, size: 14.5, weight: 500, lineHeight: 1.2, relativeTo: .subheadline))
+                .textStyle(TextStyle(.body, size: 14.5, weight: 500, lineHeight: 1.2, relativeTo: .subheadline))
                 .foregroundStyle(ColorToken.textBody.color)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 2)

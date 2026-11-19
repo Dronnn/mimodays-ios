@@ -268,7 +268,7 @@ struct SuggestionCard: View {
     }
 }
 
-/// `Button / Small primary`: 120×38, the coral shape with a Fraunces label.
+/// `Button / Small primary`: 120×38, the coral shape with a heading-face label.
 struct SmallPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

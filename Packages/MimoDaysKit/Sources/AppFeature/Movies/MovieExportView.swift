@@ -79,7 +79,7 @@ struct MovieExportOptions: View {
                             .shadow(color: Color(hex: 0x4B2938).opacity(0.15), radius: 4, y: 2)
                         VStack(alignment: .leading, spacing: 5) {
                             Text(model.project.title)
-                                .textStyle(TextStyle(.fraunces, size: 24, weight: 600, relativeTo: .title2, maximumScale: 1.35))
+                                .textStyle(TextStyle(.heading, size: 24, weight: 600, relativeTo: .title2, maximumScale: 1.35))
                                 .foregroundStyle(ColorToken.textPrimary.color)
                             Text(MovieCard.length(model.plan.duration, model.project.aspectRatio, clips: model.plan.clips.count))
                                 .textStyle(.noteMeta)
@@ -238,7 +238,7 @@ struct MovieRendering: View {
                 VStack(spacing: 0) {
                     TiltedPoster(image: cover, degrees: -2).padding(.top, 93)
                     Text("Making your movie", bundle: .module)
-                        .textStyle(TextStyle(.fraunces, size: 26, weight: 600, relativeTo: .title1, maximumScale: 1.35))
+                        .textStyle(TextStyle(.heading, size: 26, weight: 600, relativeTo: .title1, maximumScale: 1.35))
                         .foregroundStyle(ColorToken.textPrimary.color)
                         .multilineTextAlignment(.center)
                         .padding(.top, 37)
@@ -318,7 +318,7 @@ struct MovieReady: View {
                     }
                     .padding(.top, 43)
                     Text("Your movie is ready", bundle: .module)
-                        .textStyle(TextStyle(.fraunces, size: 28, weight: 600, relativeTo: .title1, maximumScale: 1.35))
+                        .textStyle(TextStyle(.heading, size: 28, weight: 600, relativeTo: .title1, maximumScale: 1.35))
                         .foregroundStyle(ColorToken.textPrimary.color)
                         .multilineTextAlignment(.center)
                         .padding(.top, 36)
@@ -497,14 +497,14 @@ enum MovieFiles {
     }
 }
 
-/// `Button / Secondary`: a 20 pt glyph and Nunito words on the hand-cut chip shape, 48 pt tall.
+/// `Button / Secondary`: a 20 pt glyph and body-face words on the hand-cut chip shape, 48 pt tall.
 struct SecondaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(SecondaryLabelStyle())
-            .textStyle(TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
+            .textStyle(TextStyle(.body, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
             .foregroundStyle(ColorToken.textPrimary.color)
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, minHeight: 48)
@@ -571,7 +571,7 @@ struct MovieExportFailed: View {
                 VStack(spacing: 0) {
                     ExplainerArt(glyph: .explainerWarning, ink: .textLink).padding(.top, 116)
                     Text("The movie couldn't be finished", bundle: .module)
-                        .textStyle(TextStyle(.fraunces, size: 26, weight: 600, relativeTo: .title1, maximumScale: 1.35))
+                        .textStyle(TextStyle(.heading, size: 26, weight: 600, relativeTo: .title1, maximumScale: 1.35))
                         .foregroundStyle(ColorToken.textPrimary.color)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: 260)

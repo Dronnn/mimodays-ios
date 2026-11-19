@@ -123,7 +123,10 @@ struct TileMotionTests {
         var settings = MotionSettings()
         settings[.map] = false
         #expect(!settings.map && settings.search)
-        #expect(old.motion.atOnce == .automatic && old.fonts.isEmpty)
+        #expect(old.motion.atOnce == .automatic)
+        // Fonts chosen in an earlier version are left behind; the rest of the settings still read.
+        let withFonts = try JSONDecoder().decode(AppearanceSettings.self, from: Data(#"{"appearance":"dark","fonts":{"ru":{"heading":"rubik"}}}"#.utf8))
+        #expect(withFonts.appearance == .dark)
     }
 
     /// Playing at once (Andrew, 2026-11-18): the chosen count, fewer while the iPhone is hot.

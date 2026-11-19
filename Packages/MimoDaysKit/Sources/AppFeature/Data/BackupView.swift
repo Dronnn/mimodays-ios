@@ -113,7 +113,7 @@ struct BackupView: View {
                 title.textStyle(.rowTitle).foregroundStyle(ColorToken.textPrimary.color)
                 if let warning {
                     warning
-                        .textStyle(TextStyle(.nunito, size: 13.5, weight: 600, relativeTo: .footnote))
+                        .textStyle(TextStyle(.body, size: 13.5, weight: 600, relativeTo: .footnote))
                         .foregroundStyle(model.newSince > 0 ? ColorToken.textDestructive.color : ColorToken.textSecondary.color)
                 }
             }
@@ -356,7 +356,7 @@ struct StepRow: View {
             .frame(width: 26, height: 26)
             .accessibilityHidden(true)
             title
-                .textStyle(TextStyle(.nunito, size: 15, weight: state == .now ? 800 : state == .done ? 700 : 600, relativeTo: .subheadline))
+                .textStyle(TextStyle(.body, size: 15, weight: state == .now ? 800 : state == .done ? 700 : 600, relativeTo: .subheadline))
                 .foregroundStyle((state == .toDo ? ColorToken.textTertiary : ColorToken.textPrimary).color)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -382,7 +382,7 @@ struct BackupSavedView: View {
                         .accessibilityAddTraits(.isHeader)
                         .padding(.top, 14)
                     Text(verbatim: "\(saved.url.lastPathComponent) · \(StorageView.bytes(saved.bytes))")
-                        .textStyle(TextStyle(.nunito, size: 13.5, weight: 600, relativeTo: .footnote))
+                        .textStyle(TextStyle(.body, size: 13.5, weight: 600, relativeTo: .footnote))
                         .foregroundStyle(ColorToken.textSecondary.color)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 20)

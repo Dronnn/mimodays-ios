@@ -225,7 +225,7 @@ enum MovieComposer {
         }
     }
 
-    /// `Editor / Text card`: the words in Fraunces, centred, on paper, on plum, or on the next clip's first frame
+    /// `Editor / Text card`: the words in the heading face, centred, on paper, on plum, or on the next clip's first frame
     /// under a soft shade. Drawn once per composition at the movie's size.
     static func cardImage(_ text: String, look: TextCardLook, still: CGImage?, canvas: CGSize, typefaces: Typefaces = .current) -> CIImage? {
         let unit = min(canvas.width, canvas.height) / 402
@@ -402,7 +402,7 @@ final class MovieClipInstruction: NSObject, AVVideoCompositionInstructionProtoco
     init(
         timeRange: CMTimeRange, clip: MoviePlan.Clip, index: Int, video: Video?, canvas: CGSize, fit: MovieFit,
         fadeIn: Bool, fadeOut: Bool, title: String? = nil, card: CIImage? = nil, lead: Double? = nil, backdrop: CIImage? = nil,
-        typefaces: Typefaces = .design
+        typefaces: Typefaces = .latin
     ) {
         self.typefaces = typefaces
         self.title = title
@@ -600,7 +600,7 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
             .composited(over: frame)
     }
 
-    /// F08/F10 `Editor / Caption`: Patrick Hand 16 in cream on a plum pill at 55%, bottom left - drawn at the
+    /// F08/F10 `Editor / Caption`: the handwriting face at 16 in cream on a plum pill at 55%, bottom left - drawn at the
     /// phone's scale (402 pt across the short side).
     private static func caption(_ text: String, canvas: CGSize, typefaces: Typefaces) -> CIImage? {
         let unit = min(canvas.width, canvas.height) / 402
@@ -625,7 +625,7 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         return CIImage(cgImage: cgImage).transformed(by: CGAffineTransform(translationX: margin, y: MovieComposer.captionBottom * unit))
     }
 
-    /// F08 "Title at the start": the movie's name in Fraunces over the first clip, centred, with a soft shadow.
+    /// F08 "Title at the start": the movie's name in the heading face over the first clip, centred, with a soft shadow.
     private static func title(_ text: String, canvas: CGSize, typefaces: Typefaces) -> CIImage? {
         let unit = min(canvas.width, canvas.height) / 402
         let shadow = NSShadow()

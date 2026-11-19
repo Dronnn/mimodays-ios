@@ -1,3 +1,4 @@
+import DesignSystem
 import SnapshotTesting
 import SwiftUI
 import Testing
@@ -114,8 +115,13 @@ public func assertScreenSnapshots(
     column: UInt = #column
 ) {
     for variant in variants {
+        // The faces of the variant's alphabet, as the app's language environment sets them.
+        let typefaces = Typefaces(language: variant.language ?? "en")
+        Typefaces.current = typefaces
+        defer { Typefaces.current = .latin }
         let controller = UIHostingController(
             rootView: view
+                .environment(\.typefaces, typefaces)
                 .environment(\.layoutDirection, variant.isRightToLeft ? .rightToLeft : .leftToRight)
                 .environment(\.locale, variant.language.map(Locale.init(identifier:)) ?? snapshotLocale)
                 .environment(\.calendar, snapshotCalendar)

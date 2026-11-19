@@ -149,10 +149,10 @@ struct MovieTimeline: View {
         let dark = card.look != .paper
         return VStack(alignment: .leading, spacing: 0) {
             Text(verbatim: "Aa")
-                .textStyle(TextStyle(.nunito, size: 11, weight: 800, relativeTo: .caption2, maximumScale: 1))
+                .textStyle(TextStyle(.body, size: 11, weight: 800, relativeTo: .caption2, maximumScale: 1))
                 .foregroundStyle(ColorToken.actionCoral.color)
             Text(card.text)
-                .textStyle(TextStyle(.nunito, size: 12, weight: 700, relativeTo: .caption2, maximumScale: 1))
+                .textStyle(TextStyle(.body, size: 12, weight: 700, relativeTo: .caption2, maximumScale: 1))
                 .foregroundStyle(dark ? ColorToken.mediaFrame.color : ColorToken.textPrimary.color)
                 .lineLimit(1)
         }
@@ -200,7 +200,7 @@ struct MovieTimeline: View {
                                 .overlay(alignment: .top) {
                                     if clip.volume < 0.995 {
                                         Text(clip.volume, format: .percent.precision(.fractionLength(0)))
-                                            .textStyle(TextStyle(.nunito, size: 10, weight: 800, relativeTo: .caption2, maximumScale: 1))
+                                            .textStyle(TextStyle(.body, size: 10, weight: 800, relativeTo: .caption2, maximumScale: 1))
                                             .foregroundStyle(ColorToken.textPrimary.color)
                                             .offset(y: -2)
                                     }
@@ -210,7 +210,7 @@ struct MovieTimeline: View {
                                 .stroke(ColorToken.textSecondary.color, style: StrokeStyle(lineWidth: 1.2, dash: [4, 3]))
                                 .overlay {
                                     Text("muted", bundle: .module, comment: "U50: a clip whose own sound is off")
-                                        .textStyle(TextStyle(.nunito, size: 10, weight: 700, relativeTo: .caption2, maximumScale: 1))
+                                        .textStyle(TextStyle(.body, size: 10, weight: 700, relativeTo: .caption2, maximumScale: 1))
                                         .foregroundStyle(ColorToken.textSecondary.color)
                                 }
                                 .padding(.vertical, 8)
@@ -260,7 +260,7 @@ struct MovieTimeline: View {
                     .overlay { MusicEnvelope().stroke(Color(hex: 0x4F6B4A), lineWidth: 1.5) }
                     .overlay(alignment: .leading) {
                         Text(verbatim: "\(music.name ?? String(appLocalized: "Music", bundle: .module)) · \(music.gain.formatted(.percent.precision(.fractionLength(0)).locale(locale)))")
-                            .textStyle(TextStyle(.nunito, size: 11, weight: 700, relativeTo: .caption2, maximumScale: 1))
+                            .textStyle(TextStyle(.body, size: 11, weight: 700, relativeTo: .caption2, maximumScale: 1))
                             .foregroundStyle(Color(hex: 0x3B4E37))
                             .lineLimit(1)
                             .padding(.leading, 40)

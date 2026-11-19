@@ -24,6 +24,7 @@ let package = Package(
             name: "TestSupport",
             dependencies: [
                 "Core",
+                "DesignSystem",
                 "Persistence",
                 .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
             ],

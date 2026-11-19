@@ -183,7 +183,7 @@ private struct TipTile: View {
     @ViewBuilder private var pill: some View {
         let waiting = isPurchasing || price == nil
         Text(verbatim: waiting ? "…" : price ?? "")
-            .textStyle(TextStyle(.nunito, size: 14, weight: 800, relativeTo: .subheadline))
+            .textStyle(TextStyle(.body, size: 14, weight: 800, relativeTo: .subheadline))
             .foregroundStyle((waiting ? ColorToken.textPrimary : ColorToken.textOnCoral).color)
             .padding(.horizontal, 12)
             .frame(minWidth: 62, minHeight: 26)

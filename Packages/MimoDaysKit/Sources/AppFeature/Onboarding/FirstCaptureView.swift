@@ -103,7 +103,7 @@ struct FirstMomentView: View {
                     .textStyle(.body)
                     .foregroundStyle(ColorToken.textSecondary.color)
                     .padding(.top, 12)
-                    // 320 in the design; Penpot measures Nunito slightly wider, so 46 keeps its line breaks.
+                    // 320 in the design; Penpot measured the design's body face slightly wider, so 46 keeps its line breaks.
                     .padding(.horizontal, 46)
             }
             .multilineTextAlignment(.center)

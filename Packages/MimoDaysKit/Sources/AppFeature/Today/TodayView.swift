@@ -143,7 +143,7 @@ struct TodayView: View {
     private func greeting(oneLine: Bool) -> some View {
         let headline = String(appLocalized: "Today headline", bundle: .module)
         let marks = !typeSize.isAccessibilitySize
-        // T02's 0.98 line height is tighter than Fraunces' own, which one text never draws: each line is its own
+        // T02's 0.98 line height is tighter than the heading face's own, which one text never draws: each line is its own
         // text, stacked that close. At accessibility sizes lines wrap inside each text, so they keep the font's own.
         let lines = oneLine ? [headline.replacingOccurrences(of: "\n", with: " ")] : headline.components(separatedBy: "\n")
         return VStack(alignment: .leading, spacing: -3) {

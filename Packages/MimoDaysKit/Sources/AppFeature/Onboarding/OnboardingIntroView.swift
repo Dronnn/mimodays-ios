@@ -27,7 +27,7 @@ struct OnboardingIntroView: View {
             if page.canSkip {
                 Button(action: onFinish) {
                     Text("Skip", bundle: .module)
-                        .textStyle(TextStyle(.nunito, size: 17, weight: 700, relativeTo: .body))
+                        .textStyle(TextStyle(.body, size: 17, weight: 700, relativeTo: .body))
                         .foregroundStyle(ColorToken.textLink.color)
                         .frame(minWidth: Size.minimumTapTarget, minHeight: Size.minimumTapTarget, alignment: .trailing)
                 }

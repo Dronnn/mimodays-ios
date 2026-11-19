@@ -82,11 +82,11 @@ struct HelpView: View {
                     VStack(spacing: 0) {
                         AppIconMark()
                         Text(verbatim: "MimoDays")
-                            .textStyle(TextStyle(.fraunces, size: 24, weight: 600, relativeTo: .title2, maximumScale: 1.35))
+                            .textStyle(TextStyle(.heading, size: 24, weight: 600, relativeTo: .title2, maximumScale: 1.35))
                             .foregroundStyle(ColorToken.textPrimary.color)
                             .padding(.top, 12)
                         Text("Version \(version)", bundle: .module, comment: "Help & about (S07): the app's version and build, e.g. 'Version 1.0 (12)'")
-                            .textStyle(TextStyle(.nunito, size: 13.5, weight: 600, relativeTo: .footnote))
+                            .textStyle(TextStyle(.body, size: 13.5, weight: 600, relativeTo: .footnote))
                             .foregroundStyle(ColorToken.textSecondary.color)
                     }
                     .frame(maxWidth: .infinity)

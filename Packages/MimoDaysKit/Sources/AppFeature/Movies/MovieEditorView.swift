@@ -193,7 +193,7 @@ struct MovieEditorView: View {
         } trailing: {
             Button(action: export) {
                 Text("Export", bundle: .module)
-                    .textStyle(TextStyle(.nunito, size: 17, weight: 700, relativeTo: .body, maximumScale: 1.35))
+                    .textStyle(TextStyle(.body, size: 17, weight: 700, relativeTo: .body, maximumScale: 1.35))
                     .foregroundStyle(ColorToken.textLink.color)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -253,7 +253,7 @@ struct MovieEditorView: View {
                 .foregroundStyle(ColorToken.mediaFrame.color.opacity(0.9))
             Spacer()
             Text("Atmosphere · sound first", bundle: .module)
-                .textStyle(TextStyle(.nunito, size: 13, weight: 800, relativeTo: .footnote, maximumScale: 1.2))
+                .textStyle(TextStyle(.body, size: 13, weight: 800, relativeTo: .footnote, maximumScale: 1.2))
                 .foregroundStyle(ColorToken.mediaFrame.color)
                 .padding(.horizontal, 12)
                 .frame(minHeight: 30)
@@ -366,7 +366,7 @@ struct MovieEditorView: View {
             .accessibilityIdentifier("editor.play")
             .padding(.leading, -8)
             Text(verbatim: "\(Self.clock(model.time)) / \(Self.clock(model.duration))")
-                .textStyle(TextStyle(.nunito, size: 14, weight: 700, relativeTo: .footnote))
+                .textStyle(TextStyle(.body, size: 14, weight: 700, relativeTo: .footnote))
                 .monospacedDigit()
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .padding(.leading, 2)
@@ -428,7 +428,7 @@ struct MovieEditorView: View {
                             .frame(width: 60, height: 32)
                             .background { if isOn { Capsule().fill(ColorToken.accentPeach.color) } }
                         tool.title
-                            .textStyle(TextStyle(.nunito, size: 12, weight: 700, relativeTo: .caption2, maximumScale: 1.35))
+                            .textStyle(TextStyle(.body, size: 12, weight: 700, relativeTo: .caption2, maximumScale: 1.35))
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                     }
@@ -497,7 +497,7 @@ struct ClipsPanel: View {
             .padding(.horizontal, 18)
             .padding(.top, 6)
             Text("Long-press and drag to move. Tap a dot between two to change how one leads into the next.", bundle: .module)
-                .textStyle(TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote))
+                .textStyle(TextStyle(.body, size: 13, weight: 500, relativeTo: .footnote))
                 .foregroundStyle(ColorToken.textSecondary.color)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 18)
@@ -527,7 +527,7 @@ struct ClipsPanel: View {
     private func quiet(_ title: Text, id: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             title
-                .textStyle(TextStyle(.nunito, size: 14, weight: 700, relativeTo: .subheadline))
+                .textStyle(TextStyle(.body, size: 14, weight: 700, relativeTo: .subheadline))
                 .foregroundStyle(ColorToken.textLink.color)
                 .frame(minHeight: Size.minimumTapTarget)
                 .contentShape(Rectangle())
@@ -543,7 +543,7 @@ struct PeachButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .textStyle(TextStyle(.nunito, size: 15, weight: 800, relativeTo: .subheadline, maximumScale: 1.35))
+            .textStyle(TextStyle(.body, size: 15, weight: 800, relativeTo: .subheadline, maximumScale: 1.35))
             .foregroundStyle(ColorToken.textPrimary.color)
             // Long translations wrap rather than lose letters.
             .lineLimit(2)
@@ -564,7 +564,7 @@ struct ThirdButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(ThirdLabelStyle())
-            .textStyle(TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
+            .textStyle(TextStyle(.body, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
             .foregroundStyle(ColorToken.textPrimary.color)
             .padding(.horizontal, 10)
             .frame(maxWidth: .infinity, minHeight: 44)
@@ -627,7 +627,7 @@ struct ShapePanel: View {
             .padding(.top, 8)
             .accessibilityIdentifier("editor.fit")
             Text("Selfie window for this clip", bundle: .module)
-                .textStyle(TextStyle(.nunito, size: 15, weight: 700, relativeTo: .subheadline))
+                .textStyle(TextStyle(.body, size: 15, weight: 700, relativeTo: .subheadline))
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .padding(.horizontal, 20)
                 .padding(.top, 14)
@@ -808,7 +808,7 @@ struct AudioPanel: View {
                             Text("None", bundle: .module, comment: "F09: no music chosen")
                         }
                     }
-                    .textStyle(TextStyle(.nunito, size: 14, weight: 600, relativeTo: .footnote))
+                    .textStyle(TextStyle(.body, size: 14, weight: 600, relativeTo: .footnote))
                     .foregroundStyle(ColorToken.textLink.color)
                     .lineLimit(1)
                     Icon.glyphChevron.image
@@ -830,7 +830,7 @@ struct AudioPanel: View {
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("editor.music")
             Text("Your own audio file from Files. Fades in and out.", bundle: .module)
-                .textStyle(TextStyle(.nunito, size: 13, weight: 500, relativeTo: .footnote))
+                .textStyle(TextStyle(.body, size: 13, weight: 500, relativeTo: .footnote))
                 .foregroundStyle(ColorToken.textSecondary.color)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 18)
@@ -847,7 +847,7 @@ struct AudioPanel: View {
             title.textStyle(.rowTitle).foregroundStyle(ColorToken.textPrimary.color)
             Spacer(minLength: 8)
             detail
-                .textStyle(TextStyle(.nunito, size: 14, weight: 600, relativeTo: .footnote))
+                .textStyle(TextStyle(.body, size: 14, weight: 600, relativeTo: .footnote))
                 .foregroundStyle(ColorToken.textSecondary.color)
         }
         .padding(.leading, 18)

@@ -271,11 +271,16 @@ struct DeleteAllTests {
         #expect(!FileManager.default.fileExists(atPath: drafts.root.path))
         #expect(!store.fileExists(kept.relativePath))
         #expect(FileManager.default.fileExists(atPath: locked.appending(path: "a.heic").path))
-        // The next launch goes on with it, once the file can go.
+        // The next launch goes on with it, once the file can go: the cache empties, and a moment taken meanwhile
+        // keeps its file while the orphan sweep takes the leftover.
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: locked.path)
+        let cached = try store.store(Data("frame".utf8), in: .cache, fileExtension: "jpg")
+        let newShot = try store.store(Data("new".utf8), in: .originals, fileExtension: "heic")
         #expect(store.finishPendingErase())
-        #expect(!FileManager.default.fileExists(atPath: locked.path))
+        #expect(!store.fileExists(cached.relativePath) && store.fileExists(newShot.relativePath))
         #expect(!store.finishPendingErase())
+        OrphanFiles.remove(context: context, store: store)
+        #expect(!FileManager.default.fileExists(atPath: locked.appending(path: "a.heic").path))
     }
 
     /// The backup reminder isn't a surprise, so `pending()` doesn't list it; it goes all the same.

@@ -115,11 +115,23 @@ public struct MediaStore: Sendable {
     /// Every stored file goes, unpacked restores left by a stopped app too; the empty areas stay (S08 Delete all data).
     /// Tries every file even when one won't go, then throws the first failure.
     public func removeAll() throws {
+        try remove(Area.allCases)
+    }
+
+    /// At launch: what a Delete All left behind goes on. The cache and unpacked restores here; originals and derived
+    /// are the orphan sweep's, which keeps a moment taken since. True when there was one and it's now done.
+    @discardableResult
+    public func finishPendingErase() -> Bool {
+        guard FileManager.default.fileExists(atPath: root.appending(path: Self.erasePending).path) else { return false }
+        return (try? remove([.cache])) != nil
+    }
+
+    private func remove(_ areas: [Area]) throws {
         var failure: (any Error)?
         func attempt(_ work: () throws -> Void) {
             do { try work() } catch { failure = failure ?? error }
         }
-        for area in Area.allCases {
+        for area in areas {
             let folder = root.appendingPathComponent(area.rawValue, isDirectory: true)
             attempt {
                 for item in try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil) {
@@ -129,18 +141,11 @@ public struct MediaStore: Sendable {
         }
         attempt { try removeStaging() }
         if let failure {
-            // Tried again at every launch until it's done (the cache, for one, isn't in the orphan sweep).
+            // Tried again at every launch until it's done: the cache isn't in the orphan sweep.
             FileManager.default.createFile(atPath: root.appending(path: Self.erasePending).path, contents: nil)
             throw failure
         }
         try? FileManager.default.removeItem(at: root.appending(path: Self.erasePending))
-    }
-
-    /// At launch: a Delete All that left files behind goes on. True when there was one and it's now done.
-    @discardableResult
-    public func finishPendingErase() -> Bool {
-        guard FileManager.default.fileExists(atPath: root.appending(path: Self.erasePending).path) else { return false }
-        return (try? removeAll()) != nil
     }
 
     private static let erasePending = ".erase-pending"

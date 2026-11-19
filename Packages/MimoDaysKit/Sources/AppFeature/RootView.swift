@@ -174,7 +174,6 @@ public struct RootView: View {
     private func resumeLaunch() {
         guard !resumedLaunch else { return }
         resumedLaunch = true
-        if let launchRoute { router.open(launchRoute) }
         if let draft = camera.drafts.load() {
             if let onboarding {
                 if onboarding.step == .firstCapture { onboarding.startFirstCapture() }
@@ -182,6 +181,8 @@ public struct RootView: View {
                 router.open(.capture(promptID: draft.promptID))
             }
         }
+        // After the review: it waits for Review to close.
+        if let launchRoute { router.open(launchRoute) }
     }
 
     private func startOver() {
@@ -233,15 +234,18 @@ public struct RootView: View {
         open(.capture(promptID: promptID))
     }
 
-    /// Behind App Lock nothing opens (a recovered Review would play under the lock screen): it waits for the unlock,
-    /// and a surprise is checked then.
     private func openHeldRoute() {
-        guard let heldRoute else { return }
+        // Not before the launch's review is back, which would then close what this opened.
+        guard resumedLaunch, let heldRoute else { return }
         self.heldRoute = nil
         open(heldRoute)
     }
 
+    /// Behind App Lock nothing opens (a recovered Review would play under the lock screen): it waits for the unlock,
+    /// and a surprise is checked then. With the camera or Review up, a surprise is left for Today to offer while it's
+    /// in time (and a link waits in the router).
     private func open(_ route: Route) {
+        if router.capture != nil, case .capture = route { return }
         guard !appLock.isLockedOrDue else {
             heldRoute = route
             return

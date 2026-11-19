@@ -72,7 +72,17 @@ public struct CaptureRequest: Equatable, Identifiable, Sendable {
 public final class AppRouter {
     public var selectedTab: MainTab
     public var isSettingsPresented = false
-    public var capture: CaptureRequest?
+    /// The camera, then Review. A route that comes while it's up waits until it closes (Andrew, 2026-11-19): a Review
+    /// left behind would go on saving and writing while its draft opened again.
+    public var capture: CaptureRequest? {
+        didSet {
+            guard capture == nil, let held else { return }
+            self.held = nil
+            open(held)
+        }
+    }
+    /// A route waiting for the camera to close; a later one takes its place.
+    private(set) var held: Route?
     public var newMovie: NewMovieRequest?
     /// What's pushed on Movies.
     var moviesPath: [MovieRoute] = []
@@ -84,12 +94,17 @@ public final class AppRouter {
     }
 
     public func open(_ route: Route) {
+        // Another camera over the open one would start over its capture; it stays as it is.
+        if capture != nil {
+            if case .capture = route { return }
+            held = route
+            return
+        }
         switch route {
         case let .tab(tab):
             dismissAll()
             selectedTab = tab
         case .settings:
-            capture = nil
             isSettingsPresented = true
         case let .newMovie(source):
             dismissAll()

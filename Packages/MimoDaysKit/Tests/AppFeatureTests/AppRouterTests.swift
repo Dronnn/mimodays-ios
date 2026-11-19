@@ -20,12 +20,17 @@ struct AppRouterTests {
         #expect(router.capture == nil)
     }
 
-    @Test func settingsRouteClosesCamera() {
+    /// The camera or Review isn't cut short by a link: it opens once they close, the latest one.
+    @Test func aLinkWaitsForTheCameraToClose() {
         let router = AppRouter(selectedTab: .movies)
         router.open(.capture(promptID: nil))
+        let shown = router.capture
+        router.open(.tab(.map))
         router.open(.settings)
-        #expect(router.isSettingsPresented)
-        #expect(router.capture == nil)
+        router.open(.capture(promptID: UUID()))
+        #expect(router.capture == shown && !router.isSettingsPresented && router.selectedTab == .today)
+        router.capture = nil
+        #expect(router.isSettingsPresented && router.held == nil)
     }
 
     @Test func surpriseOpensCameraOnTodayOverSettings() {
@@ -49,8 +54,12 @@ struct AppRouterTests {
         let router = AppRouter()
         router.open(.capture(promptID: nil))
         let first = router.capture?.id
+        // Over an open camera nothing starts again; once it's closed, the next one is new.
         router.open(.capture(promptID: nil))
-        #expect(router.capture?.id != first)
+        #expect(router.capture?.id == first)
+        router.capture = nil
+        router.open(.capture(promptID: nil))
+        #expect(router.capture != nil && router.capture?.id != first)
     }
 
     @Test(arguments: [

@@ -6,19 +6,30 @@ import Testing
 import UIKit
 
 struct DesignSystemTests {
-    /// Andrew's picks for Latin letters (2026-11-19).
+    /// Latin letters keep the design's faces (Andrew, 2026-11-19).
     @Test(arguments: [
-        (TextStyle.displayHero, "Grandstander"), (TextStyle.body, "Comfortaa"),
-        (TextStyle.labelCaps, "Comfortaa"), (TextStyle.hand, "Shantell Sans"),
+        (TextStyle.displayHero, "Fraunces"), (TextStyle.body, "Nunito"),
+        (TextStyle.labelCaps, "Inter"), (TextStyle.hand, "Patrick Hand"),
     ])
     func latinFacesLoad(style: TextStyle, family: String) {
         #expect(CTFontCopyFamilyName(style.ctFont(pointSize: 17, typefaces: .latin)) as String == family)
     }
 
-    @Test func variableFacesTakeTheStylesWeight() throws {
+    @Test func headlinesUseSuperSoftOpticalCut() throws {
         let font = TextStyle.displayHero.ctFont(pointSize: 38, typefaces: .latin)
         let variation = try #require(CTFontCopyVariation(font) as? [NSNumber: NSNumber])
         #expect(variation[TextStyle.tag("wght")]?.doubleValue == 650)
+        #expect(variation[TextStyle.tag("opsz")]?.doubleValue == 72)
+        #expect(variation[TextStyle.tag("SOFT")]?.doubleValue == 100)
+    }
+
+    @Test func otherAlphabetsTakeTheStylesWeight() throws {
+        let font = TextStyle.body.ctFont(pointSize: 16, typefaces: Typefaces(language: "ru"))
+        let variation = try #require(CTFontCopyVariation(font) as? [NSNumber: NSNumber])
+        #expect(CTFontCopyFamilyName(font) as String == "Comfortaa")
+        #expect(variation[TextStyle.tag("wght")]?.doubleValue == 500)
+        // Labels follow the body face outside Latin letters.
+        #expect(CTFontCopyFamilyName(TextStyle.labelCaps.ctFont(pointSize: 12, typefaces: Typefaces(language: "ru"))) as String == "Comfortaa")
     }
 
     @Test func textScalesWithDynamicType() {
@@ -66,7 +77,7 @@ struct TypefaceTests {
     @Test(arguments: languages)
     func everyFaceLoadsWithTheLanguagesLetters(language: String) throws {
         let typefaces = Typefaces(language: language)
-        for role in [Typeface.Role.heading, .hand, .body] {
+        for role in [Typeface.Role.heading, .hand, .body, .label] {
             guard case let .bundled(file, _) = typefaces[role].source else { continue }
             let font = typefaces[role].font(weight: 500, pointSize: 17)
             #expect(CTFontCopyPostScriptName(font) as String != CTFontCopyPostScriptName(UIFont.systemFont(ofSize: 17)) as String, "\(file) missing")

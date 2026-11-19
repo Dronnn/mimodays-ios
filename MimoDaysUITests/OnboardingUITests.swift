@@ -80,6 +80,9 @@ final class OnboardingUITests: XCTestCase {
         tap("reminders.continue")
         tap("firstCapture.capture")
         tap("permission.primary")
+        // The camera opens in Video, so the microphone is explained next.
+        XCTAssertTrue(app.descendants(matching: .any)["permission.microphone"].waitForExistence(timeout: 5))
+        tap("permission.primary")
         tap("capture.close")
         XCTAssertTrue(app.buttons["firstCapture.capture"].waitForExistence(timeout: 5))
     }

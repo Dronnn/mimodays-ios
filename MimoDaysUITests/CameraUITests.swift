@@ -2,7 +2,8 @@ import Core
 import XCTest
 
 /// C04: the selfie window moves by touch and hold (sheet) or by dragging it to a corner.
-/// C06c: the microphone is explained the first time the camera is in Video.
+/// C06c: the microphone is explained the first time the camera is in Video, which is where it opens until the
+/// person picks Photo in Settings.
 final class CameraUITests: XCTestCase {
     private var app: XCUIApplication!
 
@@ -14,8 +15,9 @@ final class CameraUITests: XCTestCase {
         app.descendants(matching: .any)["camera.selfieWindow"]
     }
 
+    /// The camera, switched to Photo unless `inPhoto` is false (it opens in Video).
     @MainActor
-    private func openCamera(permissions: PermissionStatus = .granted) {
+    private func openCamera(permissions: PermissionStatus = .granted, inPhoto: Bool = true) {
         app = XCUIApplication()
         app.launchArguments = LaunchConfiguration(
             isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: permissions
@@ -23,10 +25,13 @@ final class CameraUITests: XCTestCase {
         app.launch()
         app.buttons["capture"].tap()
         if permissions == .notDetermined {
-            // C06 camera explainer first.
+            // C06 camera explainer first, then C06c: the camera opens in Video, so the microphone is next.
+            app.buttons["permission.primary"].tap()
+            XCTAssertTrue(app.descendants(matching: .any)["permission.microphone"].waitForExistence(timeout: 5))
             app.buttons["permission.primary"].tap()
         }
         XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
+        if inPhoto { app.buttons["camera.mode.photo"].tap() }
     }
 
     /// C.3/C.6: the screen stays upright while the camera turns its own controls with the phone, and 16:9 waits
@@ -396,13 +401,19 @@ final class CameraUITests: XCTestCase {
     }
 
     @MainActor
-    func testFirstVideoExplainsTheMicrophoneThenRecordsSound() {
-        openCamera(permissions: .notDetermined)
-        app.buttons["camera.mode.video"].tap()
+    func testTheCameraOpensInVideoExplainingTheMicrophoneThenRecordsSound() {
+        app = XCUIApplication()
+        app.launchArguments = LaunchConfiguration(
+            isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: .notDetermined
+        ).arguments
+        app.launch()
+        app.buttons["capture"].tap()
+        app.buttons["permission.primary"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["permission.microphone"].waitForExistence(timeout: 5))
         let allow = app.buttons["permission.primary"]
-        XCTAssertTrue(allow.waitForExistence(timeout: 5))
         allow.tap()
         XCTAssertTrue(allow.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["camera.mode.video"].isSelected)
         let sound = app.buttons["camera.sound"]
         XCTAssertTrue(sound.waitForExistence(timeout: 5))
         XCTAssertEqual(sound.value as? String, "On")

@@ -106,6 +106,7 @@ final class TodayUITests: XCTestCase {
         capture.tap()
         let shutter = app.buttons["camera.shutter"]
         XCTAssertTrue(shutter.waitForExistence(timeout: 5))
+        app.buttons["camera.mode.photo"].tap()
         shutter.tap()
         let save = app.buttons["review.save"]
         XCTAssertTrue(save.waitForExistence(timeout: 10))

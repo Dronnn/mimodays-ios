@@ -64,7 +64,8 @@ struct CameraSettings: Codable, Equatable, Sendable {
         var scale = Scale.medium
     }
 
-    var opensIn = Mode.photo
+    /// Video until the person picks otherwise in Settings › Camera (or the camera's ••• sheet).
+    var opensIn = Mode.video
     var videoLength = VideoLength.short
     var videoQuality = VideoQuality.hd1080
     var recordsSound = true

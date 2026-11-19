@@ -3,7 +3,7 @@ import DesignSystem
 import SwiftUI
 
 /// The explainers shown before a system prompt, and the screen shown once access is off.
-enum PermissionScreen: CaseIterable {
+enum PermissionScreen: String, CaseIterable {
     /// C06: before the camera prompt.
     case camera
     /// C06c: before the microphone prompt, on the first video.
@@ -138,6 +138,7 @@ struct PermissionExplainerView: View {
                     .textStyle(.displaySheet)
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("permission.\(screen.rawValue)")
                     .padding(.top, 30)
                     .padding(.horizontal, 52)
                 Text(screen.message)

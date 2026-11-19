@@ -82,6 +82,7 @@ final class AccessibilityUITests: XCTestCase {
         XCTAssertTrue(app.buttons["cameraSettings.done"].waitForExistence(timeout: 5))
         try audit("camera ••• sheet")
         app.buttons["cameraSettings.done"].tap()
+        app.buttons["camera.mode.photo"].tap()
         app.buttons["camera.shutter"].tap()
         XCTAssertTrue(app.buttons["review.save"].waitForExistence(timeout: 10))
         try audit("review")

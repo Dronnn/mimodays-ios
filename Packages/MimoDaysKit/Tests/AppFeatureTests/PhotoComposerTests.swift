@@ -40,6 +40,7 @@ struct PhotoComposerTests {
         var results: [CaptureResult] = []
         var settings = CameraSettings()
         settings.selfieWindow = CameraSettings.SelfieWindow(corner: .bottomLeft, scale: .large)
+        settings.opensIn = .photo
         let model = CameraModel(
             engine: SimulatedCaptureEngine(), store: InMemoryCameraSettingsStore(settings), isSurprise: false,
             clock: TestDateProvider(Date(timeIntervalSince1970: 1_000)),

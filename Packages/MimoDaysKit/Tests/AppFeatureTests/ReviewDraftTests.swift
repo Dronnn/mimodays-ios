@@ -80,6 +80,17 @@ struct ReviewDraftTests {
         #expect(drafts.load() == nil)
     }
 
+    /// A retaken review changed late (a place lookup finishing) doesn't write over the next capture's draft.
+    @Test func aRetakenReviewDoesntWriteOverTheNextDraft() async throws {
+        defer { drafts.clear() }
+        let old = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        old.discard()
+        let next = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        old.caption = "Late"
+        let draft = try #require(drafts.load())
+        #expect(draft.capture == next.capture && draft.caption == "")
+    }
+
     @Test func theNoteIsCappedAndCountsAsSomethingToKeep() async throws {
         let review = ReviewModel(capture: try await capture())
         defer { review.discard() }

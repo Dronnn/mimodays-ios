@@ -122,7 +122,12 @@ final class ReviewModel {
     /// Something Retake would throw away besides the capture.
     var hasAnnotations: Bool { !note.isEmpty || voice != nil }
 
+    /// Retaken or saved: the draft file belongs to the next capture now, and a lookup still finishing for this one
+    /// mustn't write over it.
+    private var isFinished = false
+
     private func keepDraft() {
+        guard !isFinished else { return }
         drafts?.save(ReviewDraft(
             capture: capture, caption: caption, note: note, window: window, promptID: promptID, voice: voice,
             place: place, placeWasChosen: placeWasChosen
@@ -131,6 +136,7 @@ final class ReviewModel {
 
     /// The pending draft is done with: the moment was saved.
     func clearDraft() {
+        isFinished = true
         stopVoice()
         if drafts == nil, let voice { try? FileManager.default.removeItem(at: voice.url) }
         drafts?.clear()
@@ -145,9 +151,11 @@ final class ReviewModel {
         guard privacy.savesPlace, fix == nil, !isLocating else { return }
         isLocating = true
         defer { isLocating = false }
-        guard let fix = try? await places.location.currentLocation() else { return }
+        guard let fix = try? await places.location.currentLocation(), !isFinished else { return }
         self.fix = fix
-        currentPlace = ReviewPlace.current(city: await places.lookup.city(at: fix), at: fix, precision: privacy.precision)
+        let city = await places.lookup.city(at: fix)
+        guard !isFinished else { return }
+        currentPlace = ReviewPlace.current(city: city, at: fix, precision: privacy.precision)
         if fillsPlace, !placeWasChosen, place == nil { place = currentPlace }
     }
 
@@ -306,6 +314,7 @@ final class ReviewModel {
 
     /// Retake / Record again: nothing is kept.
     func discard() {
+        isFinished = true
         stopPlayback()
         removeVoice()
         capture.discardFiles()

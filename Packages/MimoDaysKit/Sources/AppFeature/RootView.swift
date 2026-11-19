@@ -35,6 +35,8 @@ public struct RootView: View {
     @State private var showsSavedToast = false
     /// Off on iPhone Duo's outer display, where the status bar sits on the side.
     @State private var statusBarOnTop = true
+    /// The launch route and a draft left by iOS have been opened (once, after App Lock if it's on).
+    @State private var resumedLaunch = false
     private let launchRoute: Route?
     @Environment(\.scenePhase) private var scenePhase
 
@@ -110,15 +112,11 @@ public struct RootView: View {
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)
-            if let launchRoute { router.open(launchRoute) }
-            // iOS closed the app mid-review: back to it, as it was.
-            if let draft = camera.drafts.load() {
-                if let onboarding {
-                    if onboarding.step == .firstCapture { onboarding.startFirstCapture() }
-                } else {
-                    router.open(.capture(promptID: draft.promptID))
-                }
-            }
+            if !appLock.isLocked { resumeLaunch() }
+        }
+        // Behind App Lock nothing opens: a recovered video in Review would play its sound under the lock screen.
+        .onChange(of: appLock.isLocked) { _, locked in
+            if !locked { resumeLaunch() }
         }
         // mimodays://today (and the other tabs), …/settings, …/capture?prompt=<uuid>; a prompt is checked as a
         // notification's is. Not during onboarding.
@@ -164,6 +162,20 @@ public struct RootView: View {
     }
 
     /// S08: everything is gone, so MimoDays starts again from onboarding with nothing open.
+    /// The route the app was opened with, and the review iOS closed the app in, back as it was. Once.
+    private func resumeLaunch() {
+        guard !resumedLaunch else { return }
+        resumedLaunch = true
+        if let launchRoute { router.open(launchRoute) }
+        if let draft = camera.drafts.load() {
+            if let onboarding {
+                if onboarding.step == .firstCapture { onboarding.startFirstCapture() }
+            } else {
+                router.open(.capture(promptID: draft.promptID))
+            }
+        }
+    }
+
     private func startOver() {
         router.isSettingsPresented = false
         router.capture = nil

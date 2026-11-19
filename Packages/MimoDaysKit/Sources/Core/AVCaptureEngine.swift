@@ -144,7 +144,13 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                 changed = try self.configureWithinBudget()
             } catch {
                 self.backLens = .wide
-                changed = try self.configureWithinBudget()
+                do {
+                    changed = try self.configureWithinBudget()
+                } catch {
+                    // No camera left: no setup, so captures fail instead of waiting for outputs that are gone.
+                    self.setup = nil
+                    throw error
+                }
             }
             self.setup = changed
             self.applyPressure()
@@ -174,13 +180,16 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             self.session.beginConfiguration()
             defer { self.session.commitConfiguration() }
             self.removeCamera(position)
+            // The new camera is the first one while it's added: it may take the plain microphone.
+            self.setup = flipped
             do {
                 try self.addCamera(position.other, formatWidth: self.maxFormatWidth)
             } catch {
-                try? self.addCamera(position, formatWidth: self.maxFormatWidth)
+                self.setup = setup
+                // Not even the old one back: no setup, so the shutter says the camera isn't there instead of waiting.
+                if (try? self.addCamera(position, formatWidth: self.maxFormatWidth)) == nil { self.setup = nil }
                 throw error
             }
-            self.setup = flipped
             return flipped
         }
     }
@@ -207,7 +216,17 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             guard self.session.canAddInput(input) else { throw CaptureError.configurationFailed }
             self.session.addInputWithNoConnections(input)
             self.microphone = input
-            for (position, camera) in self.cameras { try self.connectMicrophone(to: camera.movie, position) }
+            do {
+                for (position, camera) in self.cameras { try self.connectMicrophone(to: camera.movie, position) }
+            } catch {
+                // Kept, it would make the next "on" a no-op while nothing records sound.
+                for connection in self.session.connections where connection.inputPorts.contains(where: { $0.input === input }) {
+                    self.session.removeConnection(connection)
+                }
+                self.session.removeInput(input)
+                self.microphone = nil
+                throw error
+            }
         }
     }
 
@@ -286,8 +305,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     continuation.resume(throwing: CaptureError.notRunning)
                     return
                 }
-                let batch = PhotoBatch(positions: setup.positions) { continuation.resume(with: $0) }
-                for position in setup.positions {
+                // Only cameras that are there: the batch waits for every position it's given.
+                let positions = setup.positions.filter { self.cameras[$0] != nil }
+                guard !positions.isEmpty else {
+                    continuation.resume(throwing: CaptureError.notRunning)
+                    return
+                }
+                let batch = PhotoBatch(positions: positions) { continuation.resume(with: $0) }
+                for position in positions {
                     guard let output = self.cameras[position]?.photo else { continue }
                     let hevc = output.availablePhotoCodecTypes.contains(.hevc)
                     let settings = hevc ? AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc]) : AVCapturePhotoSettings()
@@ -460,18 +485,31 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         let input = try deviceInput(device)
         guard session.canAddInput(input) else { throw CaptureError.configurationFailed }
         session.addInputWithNoConnections(input)
-        guard let port = input.ports(for: .video, sourceDeviceType: device.deviceType, sourceDevicePosition: device.position).first
-        else { throw CaptureError.configurationFailed }
-
         let photo = AVCapturePhotoOutput()
         let movie = AVCaptureMovieFileOutput()
-        for output in [photo, movie] as [AVCaptureOutput] {
-            guard session.canAddOutput(output) else { throw CaptureError.configurationFailed }
-            session.addOutputWithNoConnections(output)
-            try connect(AVCaptureConnection(inputPorts: [port], output: output), position)
-        }
-        if let preview = previews[position] {
-            try connect(AVCaptureConnection(inputPort: port, videoPreviewLayer: preview), position)
+        var added: [AVCaptureOutput] = []
+        // All of it or none: a camera half added isn't in `cameras`, so nothing would ever take it out again.
+        do {
+            guard let port = input.ports(for: .video, sourceDeviceType: device.deviceType, sourceDevicePosition: device.position).first
+            else { throw CaptureError.configurationFailed }
+            for output in [photo, movie] as [AVCaptureOutput] {
+                guard session.canAddOutput(output) else { throw CaptureError.configurationFailed }
+                session.addOutputWithNoConnections(output)
+                added.append(output)
+                try connect(AVCaptureConnection(inputPorts: [port], output: output), position)
+            }
+            if let preview = previews[position] {
+                try connect(AVCaptureConnection(inputPort: port, videoPreviewLayer: preview), position)
+            }
+            if microphone != nil { try connectMicrophone(to: movie, position) }
+        } catch {
+            for connection in session.connections where connection.inputPorts.contains(where: { $0.input === input })
+                || added.contains(where: { $0 === connection.output }) {
+                session.removeConnection(connection)
+            }
+            added.forEach(session.removeOutput)
+            session.removeInput(input)
+            throw error
         }
         if let largest = device.activeFormat.supportedMaxPhotoDimensions.last { photo.maxPhotoDimensions = largest }
         cameras[position] = Camera(input: input, photo: photo, movie: movie)
@@ -480,7 +518,6 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             let level = CapturePressurePolicy.Level(device.systemPressureState.level)
             engine.queue.async { engine.pressureChanged(level, on: position) }
         }
-        if microphone != nil { try connectMicrophone(to: movie, position) }
     }
 
     /// Portrait, and mirrored for the front camera, the way people see themselves.

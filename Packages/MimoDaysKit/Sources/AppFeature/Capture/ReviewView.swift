@@ -22,6 +22,8 @@ struct ReviewView: View {
     @State private var choosesPlace = false
     /// Place or Voice note is asking for its permission: one at a time, claimed at the tap.
     @State private var opensTool = false
+    /// Off screen (left through a link while a permission was asked): nothing starts recording.
+    @State private var isShown = false
     @State private var locationAllowed = false
     @Environment(\.permissions) private var permissions
     @State private var asker = PermissionAsker()
@@ -61,7 +63,11 @@ struct ReviewView: View {
             locationAllowed = true
             await model.locate()
         }
-        .onDisappear { model.stopPlayback() }
+        .onAppear { isShown = true }
+        .onDisappear {
+            isShown = false
+            model.stopPlayback()
+        }
         .fullScreenCover(isPresented: $editsNote) {
             NoteEditorView(model: model)
         }
@@ -192,7 +198,7 @@ struct ReviewView: View {
             let status = await asker.request(.microphone, using: permissions)
             opensTool = false
             // The microphone only records with its sheet up: not once Save started or something else opened.
-            guard !isSaving, !editsNote, !choosesPlace, recording == nil else { return }
+            guard isShown, !isSaving, !editsNote, !choosesPlace, recording == nil else { return }
             guard status.isUsable else {
                 if status.needsSettings { microphoneOff = true }
                 return

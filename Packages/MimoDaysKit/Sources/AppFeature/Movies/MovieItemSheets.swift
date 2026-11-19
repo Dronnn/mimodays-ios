@@ -270,6 +270,14 @@ struct CardSheet: View {
             text = card?.text ?? ""
         }
         .onChange(of: isEditing) { _, editing in if !editing, let card { model.setCardText(text, of: card) } }
+        // Another card picked on the timeline behind the sheet (iPad, medium): the words follow it too, the first
+        // card's kept. Playback moving on to a clip leaves the card as it is.
+        .onChange(of: model.selectedCard?.id) {
+            guard let next = model.selectedCard, next.id != card?.id else { return }
+            if let card { model.setCardText(text, of: card) }
+            card = next
+            text = next.text
+        }
         .onDisappear { if let card { model.setCardText(text, of: card) } }
     }
 

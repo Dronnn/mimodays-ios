@@ -218,7 +218,10 @@ public struct RootView: View {
     }
 
     /// In time it's "A little surprise"; too late it's a plain capture, never backdated (doc 01).
+    /// Not during onboarding: the camera would open only once it ends, long after. The surprise stays unopened, and
+    /// Today offers it while it's still in time.
     private func openSurprise(_ promptID: UUID) {
+        guard onboarding == nil else { return }
         router.open(.capture(promptID: surprises.open(promptID: promptID) ? promptID : nil))
     }
 

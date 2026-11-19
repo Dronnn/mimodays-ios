@@ -137,18 +137,20 @@ struct MomentExporter {
         let date = moment.capturedAt.formatted(Date.FormatStyle(date: .complete, time: .shortened, timeZone: zone).locale(AppLanguage.shared.locale))
         let placeLine = options.exactPlace ? location?.placeLabel : nil
         var lines = [date]
-        if let title = moment.title, !title.isEmpty { lines.append(title) }
+        // Notes off leaves out all of the person's words: the caption as well as the note (Andrew, 2026-11-19).
+        let title = options.notes ? moment.title : nil
+        if let title, !title.isEmpty { lines.append(title) }
         if options.notes, let note = moment.note, !note.isEmpty { lines.append(note) }
         if options.voiceNotes, let transcript = moment.voiceNotes.first?.transcript, !transcript.isEmpty { lines.append(transcript) }
         if let placeLine { lines.append(placeLine) }
         if let place { lines.append(String(format: "%.5f, %.5f", place.0, place.1)) }
-        let hasText = (moment.title?.isEmpty == false) || (options.notes && moment.note?.isEmpty == false)
+        let hasText = (title?.isEmpty == false) || (options.notes && moment.note?.isEmpty == false)
         let firstFile = pictures.first.map { "\(name)\($0.1).\($0.2)" } ?? ""
         let row = [
             firstFile,
             moment.capturedAt.formatted(Date.ISO8601FormatStyle(timeZoneSeparator: .colon, timeZone: zone)),
             moment.timeZoneID,
-            moment.title ?? "",
+            title ?? "",
             options.notes ? (moment.note ?? "") : "",
             voice == nil ? "" : "\(name) voice.m4a",
             placeLine ?? "",

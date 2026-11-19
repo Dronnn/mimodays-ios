@@ -95,8 +95,13 @@ struct MomentExporterTests {
         options.voiceNotes = false
         options.notes = false
         let files = try await MomentExporter.write(MomentExporter(library: library).items(ids, options: options), into: folder(), list: false)
-        // The title still names the picture in the list, but there's no note file without notes.
+        // There's no note file without notes.
         #expect(names(files) == ["2026-11-11 16.00.00.heic", "2026-11-11 17.00.00.mp4"])
+        // Nor the caption in the archive's list: Notes off leaves out all of the person's words (Andrew, 2026-11-19).
+        let listed = try await MomentExporter.write(MomentExporter(library: library).items(ids, options: options), into: folder(), list: true)
+        let csv = try String(contentsOf: try #require(listed.last), encoding: .utf8)
+        #expect(csv.contains("2026-11-11 16.00.00.heic,2026-11-11T16:00:00+04:00,Asia/Yerevan,,,"))
+        #expect(!csv.contains("Lunch"))
     }
 
     @Test func originalsAreTheCamerasOwnFiles() async throws {

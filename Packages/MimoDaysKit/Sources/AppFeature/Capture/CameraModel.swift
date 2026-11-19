@@ -224,11 +224,17 @@ final class CameraModel {
         // and a second start (Retake, the screen appearing again) doesn't drop what came before.
         // Set up before the first wait, so two starts overlapping can't both subscribe.
         if events == nil { listenForEvents(engine.events) }
+        isClosed = false
         do {
             try? await engine.setBackLens(settings.backLens)
             // A setup change reported while starting (heat dropped the selfie camera) is newer than what start saw.
             let changes = setupChanges
             let started = try await engine.start()
+            // Closed while the camera was starting: its stop ran first, so the camera goes off again.
+            guard !isClosed else {
+                await engine.stop()
+                return
+            }
             if setupChanges == changes { setup = started }
             lenses = await engine.backLenses()
             showsSingleCameraNote = setup != .dual
@@ -239,6 +245,15 @@ final class CameraModel {
             phase = .failed(error as? CaptureError ?? .cameraUnavailable)
         }
     }
+
+    /// The camera screen went away (closed, or Review took its place): a photo or clip still finishing is thrown
+    /// away instead of opening a review nobody sees, which would come back at the next launch.
+    func close() {
+        isClosed = true
+        Task { await stop() }
+    }
+
+    private var isClosed = false
 
     func stop() async {
         holds?.cancel()
@@ -274,10 +289,16 @@ final class CameraModel {
         switch (mode, phase) {
         case (.photo, .ready) where canCapture: await takePhoto()
         case (.video, .ready) where canCapture: await record()
-        case (.video, .recording): await engine.stopRecording()
+        case (.video, .recording):
+            // Stop can come while the recording is still starting (torch, microphone): it's kept for it.
+            stopsRecording = true
+            await engine.stopRecording()
         default: break
         }
     }
+
+    /// Stop was tapped for the recording now starting or running.
+    private var stopsRecording = false
 
     private func takePhoto() async {
         phase = .busy
@@ -290,7 +311,7 @@ final class CameraModel {
             let captured = arranged(try await engine.capturePhoto(flash: settings.flash, silent: !settings.cameraSounds), swapped: swapped)
             guard let photo = MediaCheck.checked(captured) else { throw CaptureError.photoFailed }
             phase = .ready
-            onCapture(result(.photo(photo), selfie: photo.selfieURL, at: capturedAt))
+            deliver(result(.photo(photo), selfie: photo.selfieURL, at: capturedAt))
         } catch {
             phase = .ready
             failure = CaptureFailure(error)
@@ -302,6 +323,7 @@ final class CameraModel {
         // The big camera as it was at the shutter: heat dropping the front camera as the clip ends resets the swap.
         let swapped = isSwapped
         phase = .recording(startedAt: nil)
+        stopsRecording = false
         shutterAt = Date()
         recordingHold = hold
         defer { recordingHold = nil }
@@ -311,17 +333,31 @@ final class CameraModel {
         if settings.flash != .off { await setTorch(settings.flash).value }
         // The sound setting as it is at the shutter, whatever an earlier change left behind.
         try? await engine.setMicrophone(microphoneOn)
+        // Stopped before anything was recorded: no clip, and no recording running on to its limit.
+        guard !stopsRecording else {
+            await setTorch(.off).value
+            phase = .ready
+            return
+        }
         do {
             let recorded = arranged(try await engine.record(limit: settings.videoLength.duration), swapped: swapped)
             await setTorch(.off).value
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready
-            onCapture(result(.video(video), selfie: video.selfieURL, at: capturedAt))
+            deliver(result(.video(video), selfie: video.selfieURL, at: capturedAt))
         } catch {
             await setTorch(.off).value
             phase = .ready
             failure = CaptureFailure(error)
         }
+    }
+
+    private func deliver(_ capture: CaptureResult) {
+        guard !isClosed else {
+            capture.discardFiles()
+            return
+        }
+        onCapture(capture)
     }
 
     /// The flash button: off, auto, on, round again.

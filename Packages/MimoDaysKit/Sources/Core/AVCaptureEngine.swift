@@ -365,6 +365,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     public func stopRecording() async {
         _ = try? await onQueue {
+            // An output asked to start that hasn't yet isn't `isRecording`: it stops as soon as it starts.
+            self.recording?.requestStop()
             for camera in self.cameras.values where camera.movie.isRecording {
                 camera.movie.stopRecording()
             }
@@ -626,6 +628,7 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
     }
 
     private let streams: Mutex<[ObjectIdentifier: Stream]>
+    private let stopRequested = Mutex(false)
     private let hasAudio: Bool
     /// Once, as the first stream begins writing.
     private let started: @Sendable () -> Void
@@ -655,7 +658,13 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
         if let outcome { completion(outcome) }
     }
 
+    /// Stop, also for outputs still starting.
+    func requestStop() {
+        stopRequested.withLock { $0 = true }
+    }
+
     func fileOutput(_ output: AVCaptureFileOutput, didStartRecordingTo _: URL, from _: [AVCaptureConnection]) {
+        if stopRequested.withLock({ $0 }) { output.stopRecording() }
         let now = CACurrentMediaTime()
         let isFirst = streams.withLock { streams in
             let first = !streams.values.contains { $0.started != nil }

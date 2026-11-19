@@ -1,6 +1,7 @@
 @testable import AppFeature
 @testable import Core
 import Foundation
+import QuartzCore
 import Testing
 
 @MainActor
@@ -104,6 +105,72 @@ struct CameraModelInterruptionTests {
         await engine.simulateInterruptionEnded()
         for _ in 0..<50 where model.interruption != nil { try await Task.sleep(for: .milliseconds(20)) }
         #expect(model.canCapture)
+    }
+
+    /// Closed while a photo is being taken: the photo goes, and no review opens for it.
+    @Test func aPhotoFinishingAfterCloseIsThrownAway() async throws {
+        let engine = HeldPhotoEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .photo
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        async let shot: Void = model.shutter()
+        while await !engine.isHolding { try await Task.sleep(for: .milliseconds(10)) }
+        model.close()
+        await engine.release()
+        await shot
+        #expect(results.isEmpty)
+    }
+
+    /// The simulated camera, with a photo that comes only once released and a stop that doesn't cut it short.
+    private actor HeldPhotoEngine: CaptureEngine {
+        private let base = SimulatedCaptureEngine()
+        private var held: CheckedContinuation<Void, Never>?
+        var isHolding: Bool { held != nil }
+        func release() { held?.resume(); held = nil }
+
+        func start() async throws -> CameraSetup { try await base.start() }
+        func stop() async {}
+        func backLenses() async -> [BackLens] { await base.backLenses() }
+        func setBackLens(_ lens: BackLens) async throws { try await base.setBackLens(lens) }
+        func flip() async throws -> CameraSetup { try await base.flip() }
+        func setMicrophone(_ enabled: Bool) async throws { try await base.setMicrophone(enabled) }
+        func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto {
+            await withCheckedContinuation { held = $0 }
+            return try await base.capturePhoto(flash: flash, silent: silent)
+        }
+        func record(limit: Duration?) async throws -> CapturedVideo { try await base.record(limit: limit) }
+        func stopRecording() async { await base.stopRecording() }
+        func setTorch(_ mode: FlashMode) async { await base.setTorch(mode) }
+        func setCaptureHold(_ hold: DeviceHold) async { await base.setCaptureHold(hold) }
+        @MainActor func previewLayer(for _: CameraPosition) -> CALayer? { nil }
+        @MainActor func setPreviewHold(_: DeviceHold) {}
+        nonisolated var events: AsyncStream<CaptureEvent> { base.events }
+    }
+
+    /// Stop tapped while the recording is still starting (here, the torch) ends it: it doesn't run to its limit.
+    @Test func aStopWhileTheRecordingStartsIsKept() async throws {
+        let engine = SimulatedCaptureEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.videoLength = .long
+        settings.flash = .on
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        async let recording: Void = model.shutter()
+        while !model.isRecording { await Task.yield() }
+        await model.shutter()
+        await recording
+        #expect(results.isEmpty && !model.isRecording)
+        #expect(await !engine.isRecording)
     }
 
     /// 9.19: the flash button lights the rear camera while a video records, also when pressed mid-recording.

@@ -72,7 +72,7 @@ struct CameraView: View {
         // Sideways the status bar would run down the buttons' column; the Camera app hides it too.
         .statusBarHidden(model.layoutHold.isLandscape || followsWindow)
         .task { await model.start() }
-        .onDisappear { Task { await model.stop() } }
+        .onDisappear { model.close() }
         .sheet(isPresented: $showsSettings, onDismiss: explainMicrophone) {
             CameraSettingsSheet(settings: $model.settings, lenses: model.lenses)
         }

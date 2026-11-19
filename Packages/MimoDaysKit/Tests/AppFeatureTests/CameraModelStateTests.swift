@@ -89,7 +89,8 @@ struct CameraModelStateTests {
         let captures = Captures()
         let model = await camera(mode: .video, captures: captures)
         async let first: Void = model.shutter()
-        try await eventually { model.isRecording }
+        // Begun, not only starting: a Stop while it starts ends it with no clip.
+        try await eventually { model.recordingHasBegun }
         #expect(model.isRecording && !model.canCapture)
         model.toggleSelfie()
         await model.flip()

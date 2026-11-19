@@ -18,6 +18,24 @@ struct ReviewDraftTests {
         return CaptureResult(media: media, window: .init(corner: .bottomLeft), capturedAt: time)
     }
 
+    /// iOS ended the app after the capture moved in but before its draft was written, or a draft lost its main file:
+    /// at launch nothing private stays behind. A draft that reopens keeps its files.
+    @Test func filesNoDraftPointsToGoAtLaunch() async throws {
+        defer { drafts.clear() }
+        _ = try drafts.adopt(try await capture())
+        drafts.removeLeftovers()
+        #expect(!FileManager.default.fileExists(atPath: drafts.root.path))
+
+        let review = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        review.caption = "kept"
+        let stray = drafts.root.appending(path: "stray.jpg")
+        try Data([1]).write(to: stray)
+        drafts.removeLeftovers()
+        #expect(!FileManager.default.fileExists(atPath: stray.path))
+        #expect(drafts.load()?.caption == "kept")
+        #expect(FileManager.default.fileExists(atPath: review.capture.mainURL.path))
+    }
+
     @Test func adoptingMovesTheFilesOutOfTemporaryStorage() async throws {
         defer { drafts.clear() }
         let original = try await capture()

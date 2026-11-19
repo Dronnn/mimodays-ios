@@ -89,6 +89,17 @@ struct ReviewDraftStore: Sendable {
         return FileManager.default.fileExists(atPath: draft.capture.mainURL.path) ? draft : nil
     }
 
+    /// At launch: files no draft points to, such as a capture moved in just before iOS ended the app, ahead of its
+    /// `draft.json`. With no draft to reopen, all of them.
+    func removeLeftovers() {
+        guard let draft = load() else { return clear() }
+        let kept = Set([draft.capture.mainURL, draft.capture.selfieURL, draft.voice?.url].compactMap { $0?.lastPathComponent } + [Self.draftName])
+        for item in (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)) ?? []
+        where !kept.contains(item.lastPathComponent) {
+            try? FileManager.default.removeItem(at: item)
+        }
+    }
+
     /// Removes the draft and every file with it.
     func clear() {
         try? FileManager.default.removeItem(at: root)

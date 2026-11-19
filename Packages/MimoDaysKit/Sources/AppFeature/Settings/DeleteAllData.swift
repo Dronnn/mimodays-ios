@@ -61,8 +61,7 @@ struct AppEraser {
             context.rollback()
             throw error
         }
-        // The records are gone, so the erase goes on to the end: a file that won't go now has no record and
-        // launch's orphan sweep takes it.
+        // The records are gone, so the erase goes on to the end: what won't go now, the next launch removes.
         do { try store.removeAll() } catch {
             Self.logger.error("Some files stayed after Delete All: \(error.localizedDescription, privacy: .public)")
         }

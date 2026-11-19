@@ -271,6 +271,11 @@ struct DeleteAllTests {
         #expect(!FileManager.default.fileExists(atPath: drafts.root.path))
         #expect(!store.fileExists(kept.relativePath))
         #expect(FileManager.default.fileExists(atPath: locked.appending(path: "a.heic").path))
+        // The next launch goes on with it, once the file can go.
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: locked.path)
+        #expect(store.finishPendingErase())
+        #expect(!FileManager.default.fileExists(atPath: locked.path))
+        #expect(!store.finishPendingErase())
     }
 
     /// The backup reminder isn't a surprise, so `pending()` doesn't list it; it goes all the same.

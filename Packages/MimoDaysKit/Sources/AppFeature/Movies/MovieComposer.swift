@@ -2,10 +2,12 @@
 import Core
 import CoreImage
 import DesignSystem
+import ImageIO
 import os
 import Persistence
 import Synchronization
 import UIKit
+import UniformTypeIdentifiers
 
 /// A movie plan as one playable, exportable asset (11.7): clips back to back on one timeline, every frame drawn
 /// by `MovieCompositor` - the picture fitted to the movie's shape, the selfie window placed on the movie's frame,
@@ -81,9 +83,12 @@ enum MovieComposer {
                 try mainTrack.insertTimeRange(fillerRange, of: filler, at: cursor)
                 mainTrack.scaleTimeRange(CMTimeRange(start: cursor, duration: fillerRange.duration), toDuration: length)
                 if case let .card(text, look) = clip.media {
-                    let still = look == .overClip ? await firstFrame(after: index, in: plan, canvas: renderSize) : nil
+                    // Kept compressed until the card is drawn: a decoded 4K frame per card would add up.
+                    let still = look == .overClip ? await firstFrame(after: index, in: plan, canvas: renderSize).flatMap(Self.compressed) : nil
                     let canvas = renderSize
-                    cards[index] = CardRaster(pool: pool) { cardImage(text, look: look, still: still, canvas: canvas, typefaces: typefaces) }
+                    cards[index] = CardRaster(pool: pool) {
+                        cardImage(text, look: look, still: still.flatMap(Self.decoded), canvas: canvas, typefaces: typefaces)
+                    }
                 }
             case let .video(start, selfieOffset, hasAudio):
                 guard let mainURL = clip.mainURL else { throw Failure.compositionFailed }
@@ -212,6 +217,17 @@ enum MovieComposer {
     // MARK: Text cards (U51)
 
     /// The first picture of the first clip after `index`, filling the movie's frame: an "Over clip" card's ground.
+    private static func compressed(_ image: CGImage) -> Data? {
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: 0.9] as CFDictionary)
+        return CGImageDestinationFinalize(destination) ? data as Data : nil
+    }
+
+    private static func decoded(_ data: Data) -> CGImage? {
+        CGImageSourceCreateWithData(data as CFData, nil).flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) }
+    }
+
     private static func firstFrame(after index: Int, in plan: MoviePlan, canvas: CGSize) async -> CGImage? {
         guard let clip = plan.clips.dropFirst(index + 1).first(where: { !$0.isCard }), let url = clip.mainURL else { return nil }
         let pixels = Int(max(canvas.width, canvas.height))
@@ -673,8 +689,13 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 /// last in a movie stay in memory (a card and the one leading into it); an older one is drawn again if needed again.
 final class CardRaster: @unchecked Sendable {
     /// One movie's cards.
+    /// Weakly: the cards hold their pool, so the pool holding them back would keep two frames per movie alive.
     final class Pool: Sendable {
-        fileprivate let recent = Mutex<[CardRaster]>([])
+        fileprivate let recent = Mutex<[Entry]>([])
+    }
+
+    fileprivate struct Entry: @unchecked Sendable {
+        weak var raster: CardRaster?
     }
 
     private let pool: Pool
@@ -692,11 +713,11 @@ final class CardRaster: @unchecked Sendable {
         let image = draw()
         drawn.withLock { $0 = image }
         let evicted = pool.recent.withLock { recent -> [CardRaster] in
-            recent.removeAll { $0 === self }
-            recent.append(self)
+            recent.removeAll { $0.raster == nil || $0.raster === self }
+            recent.append(Entry(raster: self))
             let over = max(recent.count - Self.kept, 0)
             defer { recent.removeFirst(over) }
-            return Array(recent.prefix(over))
+            return recent.prefix(over).compactMap(\.raster)
         }
         evicted.forEach { $0.drawn.withLock { $0 = nil } }
         return image

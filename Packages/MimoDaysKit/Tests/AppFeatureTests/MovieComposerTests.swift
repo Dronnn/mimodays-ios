@@ -339,6 +339,14 @@ struct MovieComposerTests {
         #expect(rasters.map(\.isDrawn) == [false, true, true])
         _ = rasters[0].image
         #expect(rasters.map(\.isDrawn) == [true, false, true])
+        // A drawn card and its pool go with the movie: they don't keep each other.
+        weak var gone: CardRaster?
+        do {
+            let raster = CardRaster(pool: CardRaster.Pool()) { CIImage(color: .red) }
+            _ = raster.image
+            gone = raster
+        }
+        #expect(gone == nil)
 
         let ids = try await save(2)
         let composed = try await MovieComposer.compose(MoviePlan(try carded(ids, look: .paper), store: store), renderSize: portrait)

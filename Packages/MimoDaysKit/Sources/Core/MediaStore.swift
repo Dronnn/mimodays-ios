@@ -128,8 +128,22 @@ public struct MediaStore: Sendable {
             }
         }
         attempt { try removeStaging() }
-        if let failure { throw failure }
+        if let failure {
+            // Tried again at every launch until it's done (the cache, for one, isn't in the orphan sweep).
+            FileManager.default.createFile(atPath: root.appending(path: Self.erasePending).path, contents: nil)
+            throw failure
+        }
+        try? FileManager.default.removeItem(at: root.appending(path: Self.erasePending))
     }
+
+    /// At launch: a Delete All that left files behind goes on. True when there was one and it's now done.
+    @discardableResult
+    public func finishPendingErase() -> Bool {
+        guard FileManager.default.fileExists(atPath: root.appending(path: Self.erasePending).path) else { return false }
+        return (try? removeAll()) != nil
+    }
+
+    private static let erasePending = ".erase-pending"
 
     /// Folders a restore unpacks into next to the areas (`.restore-…`); one left by an app that was stopped
     /// mid-restore holds private media nothing points to.

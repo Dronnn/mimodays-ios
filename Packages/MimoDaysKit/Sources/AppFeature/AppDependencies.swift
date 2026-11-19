@@ -101,7 +101,9 @@ public final class AppDependencies {
         } catch {
             fatalError("MimoDays can't open its media folder: \(error)")
         }
-        // Before any screen: files a save or a deletion left behind when iOS ended the app mid-way.
+        // Before any screen: what a Delete All couldn't remove, and files a save or a deletion left behind when iOS
+        // ended the app mid-way.
+        momentSaver.store.finishPendingErase()
         OrphanFiles.remove(context: modelContainer.mainContext, store: momentSaver.store)
         OrphanFiles.removeScratch()
         camera.drafts.removeLeftovers()

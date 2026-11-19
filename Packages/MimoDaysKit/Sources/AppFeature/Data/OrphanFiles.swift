@@ -48,7 +48,10 @@ enum OrphanFiles {
         try? store.removeStaging()
         do {
             let orphans = try store.orphans(referenced: try referenced(in: context))
-            for path in orphans { try store.remove(path) }
+            // One that won't go doesn't keep the rest.
+            for path in orphans {
+                do { try store.remove(path) } catch { logger.error("Removing a file no record points to failed: \(error.localizedDescription, privacy: .public)") }
+            }
             if !orphans.isEmpty { logger.notice("Removed \(orphans.count) files no record points to") }
             return orphans.count
         } catch {

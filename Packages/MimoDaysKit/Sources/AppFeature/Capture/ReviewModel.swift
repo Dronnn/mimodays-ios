@@ -96,6 +96,7 @@ final class ReviewModel {
         self.places = places
         fillsPlace = true
         window = capture.window ?? CameraSettings.SelfieWindow()
+        drafts?.claim.writer = self
         keepDraft()
     }
 
@@ -113,6 +114,7 @@ final class ReviewModel {
         caption = draft.caption
         note = draft.note
         voice = draft.voice
+        drafts?.claim.writer = self
         if let voice = draft.voice {
             voiceLevels = VoiceWaveform.read(voice.url, bars: Self.voiceBars)?.levels ?? []
             transcribe()
@@ -126,12 +128,12 @@ final class ReviewModel {
     /// mustn't write over it.
     private var isFinished = false
 
+    /// Only the newest Review writes the draft: one left open behind a link, its draft reopened (or retaken and
+    /// followed by the next capture) since, mustn't write over it when a late lookup lands.
     private func keepDraft() {
-        guard !isFinished, let drafts else { return }
-        // Only its own draft: a Review left open behind a link, whose twin was then retaken, mustn't write over the
-        // next capture's draft (or bring back one whose files are gone).
+        guard !isFinished, let drafts, drafts.claim.writer === self else { return }
+        // Nor bring back one whose files are gone.
         guard FileManager.default.fileExists(atPath: capture.mainURL.path) else { return }
-        if let onDisk = drafts.load(), onDisk.capture.mainURL.lastPathComponent != capture.mainURL.lastPathComponent { return }
         drafts.save(ReviewDraft(
             capture: capture, caption: caption, note: note, window: window, promptID: promptID, voice: voice,
             place: place, placeWasChosen: placeWasChosen
@@ -143,6 +145,8 @@ final class ReviewModel {
         isFinished = true
         stopVoice()
         if drafts == nil, let voice { try? FileManager.default.removeItem(at: voice.url) }
+        // A save that ended after its Review was left: the draft there may be the next capture's by now.
+        if let drafts, let onDisk = drafts.load(), onDisk.capture.mainURL.lastPathComponent != capture.mainURL.lastPathComponent { return }
         drafts?.clear()
     }
 

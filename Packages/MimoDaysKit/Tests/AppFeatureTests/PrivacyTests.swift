@@ -137,6 +137,19 @@ struct AppLockTests {
         #expect(!lock.isLocked && owner.asked == 2)
     }
 
+    /// Back after the delay, a notification tap can come before the lock does: it already counts as locked.
+    @Test func pastTheDelayItCountsAsLockedBeforeBecomingActive() async {
+        var settings = on
+        settings.lockAfter = .oneMinute
+        let clock = Clock()
+        let lock = lock(settings, owner: Owner([true]), clock: clock)
+        await lock.didBecomeActive()
+        lock.didEnterBackground()
+        #expect(!lock.isLockedOrDue)
+        clock.now += 61
+        #expect(!lock.isLocked && lock.isLockedOrDue)
+    }
+
     @Test func withADelayTheAppSwitcherStillSeesTheCover() async {
         var settings = on
         settings.lockAfter = .oneMinute

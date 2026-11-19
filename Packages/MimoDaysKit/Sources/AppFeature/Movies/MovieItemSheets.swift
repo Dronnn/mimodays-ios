@@ -215,8 +215,9 @@ extension ClipCameraLayout {
 struct CardSheet: View {
     let model: MovieEditorModel
     @State private var text = ""
-    /// The card this sheet opened on: playback moving the selection on doesn't send its text to another card.
-    @State private var card: MovieTextCard?
+    /// The card this sheet opened on: playback moving the selection on doesn't send its text to another card. By
+    /// id, so an Undo that brings it back as a new row still gets the words.
+    @State private var cardID: UUID?
     @FocusState private var isEditing: Bool
 
     var body: some View {
@@ -266,19 +267,24 @@ struct CardSheet: View {
         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
         .presentationDragIndicator(.visible)
         .onAppear {
-            card = model.selectedCard
-            text = card?.text ?? ""
+            cardID = model.selectedCard?.id
+            text = model.selectedCard?.text ?? ""
         }
-        .onChange(of: isEditing) { _, editing in if !editing, let card { model.setCardText(text, of: card) } }
+        .onChange(of: isEditing) { _, editing in if !editing { keepText() } }
         // Another card picked on the timeline behind the sheet (iPad, medium): the words follow it too, the first
         // card's kept. Playback moving on to a clip leaves the card as it is.
         .onChange(of: model.selectedCard?.id) {
-            guard let next = model.selectedCard, next.id != card?.id else { return }
-            if let card { model.setCardText(text, of: card) }
-            card = next
+            guard let next = model.selectedCard, next.id != cardID else { return }
+            keepText()
+            cardID = next.id
             text = next.text
         }
-        .onDisappear { if let card { model.setCardText(text, of: card) } }
+        .onDisappear { keepText() }
+    }
+
+    private func keepText() {
+        guard let card = model.items.lazy.compactMap(\.card).first(where: { $0.id == cardID }) else { return }
+        model.setCardText(text, of: card)
     }
 
     /// The card as it shows, in small.

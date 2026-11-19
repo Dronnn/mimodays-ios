@@ -59,6 +59,13 @@ final class AppLock {
 
     var isEnabled: Bool { settings().appLock }
 
+    /// Locked, or about to be: back after the timeout, before `didBecomeActive` ran (a notification tap comes first).
+    var isLockedOrDue: Bool {
+        guard !isLocked else { return true }
+        guard isEnabled, let leftAt else { return false }
+        return now().timeIntervalSince(leftAt) >= settings().lockAfter.seconds
+    }
+
     /// MimoDays went to the background. "Leaving the app" covers it at once, so the app switcher shows nothing.
     func didEnterBackground() {
         guard isEnabled else { return }

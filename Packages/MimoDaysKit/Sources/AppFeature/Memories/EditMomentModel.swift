@@ -194,12 +194,13 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     var movieDrafts: Int { (try? deletionStore.movieDrafts(using: [id])) ?? 0 }
 
     /// Drops what was recorded here and moves the moment to Recently deleted; false when that failed.
+    /// One that failed (no space) leaves the editor as it was, Save working.
     func delete() -> Bool {
-        // A Save still waiting for its transcript writes nothing into the deleted moment (Recover would show it).
-        isDiscarded = true
-        discardRecording()
         do {
             try deletionStore.moveToRecentlyDeleted([id])
+            // A Save still waiting for its transcript writes nothing into the deleted moment (Recover would show it).
+            isDiscarded = true
+            discardRecording()
             return true
         } catch {
             logger.error("Deleting the moment failed: \(error.localizedDescription, privacy: .public)")

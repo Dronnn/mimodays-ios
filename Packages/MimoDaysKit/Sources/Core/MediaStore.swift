@@ -126,7 +126,13 @@ public struct MediaStore: Sendable {
         return (try? remove([.cache])) != nil
     }
 
+    /// Delete All has begun: until it's done, every launch empties the cache (a quit mid-way included).
+    public func markErasePending() {
+        FileManager.default.createFile(atPath: root.appending(path: Self.erasePending).path, contents: nil)
+    }
+
     private func remove(_ areas: [Area]) throws {
+        markErasePending()
         var failure: (any Error)?
         func attempt(_ work: () throws -> Void) {
             do { try work() } catch { failure = failure ?? error }
@@ -140,11 +146,8 @@ public struct MediaStore: Sendable {
             }
         }
         attempt { try removeStaging() }
-        if let failure {
-            // Tried again at every launch until it's done: the cache isn't in the orphan sweep.
-            FileManager.default.createFile(atPath: root.appending(path: Self.erasePending).path, contents: nil)
-            throw failure
-        }
+        // Left in place on a failure: tried again at every launch until it's done (the cache isn't in the orphan sweep).
+        if let failure { throw failure }
         try? FileManager.default.removeItem(at: root.appending(path: Self.erasePending))
     }
 

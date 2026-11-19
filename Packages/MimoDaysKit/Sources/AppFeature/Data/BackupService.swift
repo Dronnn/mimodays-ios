@@ -121,10 +121,12 @@ struct BackupService {
             guard let members = collectionsHere[record.id] else { return true }
             return record.members.contains { !members.contains($0.momentID) && here.contains($0.momentID) }
         }
+        // A record with no picture is no moment: it isn't counted, so Add doesn't offer it.
+        let moments = document.moments.filter(\.hasPicture)
         return Summary(
-            createdAt: document.createdAt, moments: document.moments.count, collections: document.collections.count,
-            projects: document.movies.count, alreadyHere: document.moments.count { here.contains($0.id) }, isClean: check.damaged.isEmpty,
-            restorable: document.moments.count { $0.hasPicture && !$0.paths.contains(where: check.damaged.contains) }, addsMore: addsMore
+            createdAt: document.createdAt, moments: moments.count, collections: document.collections.count,
+            projects: document.movies.count, alreadyHere: moments.count { here.contains($0.id) }, isClean: check.damaged.isEmpty,
+            restorable: moments.count { !$0.paths.contains(where: check.damaged.contains) }, addsMore: addsMore
         )
     }
 
@@ -158,9 +160,12 @@ struct BackupService {
         // Replacing: what is here goes in the same save as the backup comes in, so a failed save keeps it all; its
         // files go only after that save. Until then the fetches below leave it out.
         let replacing = mode == .replaceEverything
-        // Replacing still keeps the moments here whose copy in the backup is damaged: better this iPhone's than none.
+        // Replacing still keeps the moments here whose copy in the backup is damaged or has no picture: better this
+        // iPhone's than none.
         let here = replacing
-            ? existingMomentIDs().intersection(document.moments.filter { $0.paths.contains(where: check.damaged.contains) }.map(\.id))
+            ? existingMomentIDs().intersection(
+                document.moments.filter { !$0.hasPicture || $0.paths.contains(where: check.damaged.contains) }.map(\.id)
+            )
             : existingMomentIDs()
         let projectsHere = replacing ? [] : existingProjectIDs()
         // A movie here whose soundtrack the backup can't bring: replacing would lose the only good copy.

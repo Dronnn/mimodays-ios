@@ -109,8 +109,9 @@ struct CameraModelStateTests {
         #expect(model.recordingLabel(at: start.addingTimeInterval(7.5)) == "00:07 / 00:10")
         #expect(abs(model.recordingProgress(at: start.addingTimeInterval(7.5)) - 0.75) < 0.001)
         #expect(model.recordingProgress(at: start.addingTimeInterval(20)) == 1)
+        // A length picked while recording is for the next one: this one keeps its own.
         model.settings.videoLength = .long
-        #expect(model.recordingLabel(at: start.addingTimeInterval(61)) == "01:00 / 01:00")
+        #expect(model.recordingLabel(at: start.addingTimeInterval(61)) == "00:10 / 00:10")
     }
 
     /// From the shutter until the files are written the timer doesn't run: someone speaking at once would see

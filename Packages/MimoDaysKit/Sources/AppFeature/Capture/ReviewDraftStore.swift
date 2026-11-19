@@ -31,6 +31,13 @@ struct ReviewVoiceNote: Codable, Equatable {
 struct ReviewDraftStore: Sendable {
     let root: URL
     private static let draftName = "draft.json"
+    /// Which Review writes the draft: the newest one.
+    let claim = Claim()
+
+    @MainActor final class Claim {
+        weak var writer: AnyObject?
+        nonisolated init() {}
+    }
 
     init(root: URL) {
         self.root = root

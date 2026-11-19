@@ -249,7 +249,7 @@ struct BackupTests {
         let newPhone = try library()
         let check = try BackupArchive.check(url)
         let summary = BackupService(library: newPhone, now: { [clock] in clock.now() }).summary(check)
-        #expect(summary.restorable == 0)
+        #expect(summary.restorable == 0 && summary.new == 0)
         let outcome = try restore(url, into: newPhone)
         #expect(outcome.restored == 0)
         #expect(try newPhone.context.fetchCount(FetchDescriptor<Moment>()) == 0)
@@ -354,6 +354,28 @@ struct BackupTests {
         service.record(document)
         #expect(service.status().last == clock.now())
         #expect(service.status().newSince == 0)
+    }
+
+    /// Replacing keeps a moment whose copy in the backup has no picture (a damaged manifest) instead of losing it.
+    @Test func replacingKeepsAMomentWhoseBackupCopyHasNoPicture() async throws {
+        let phone = try library()
+        let ids = try await fill(phone)
+        let (url, _) = try backUp(phone)
+        let service = BackupService(library: phone, now: { [clock] in clock.now() })
+        var check = try BackupArchive.check(url)
+        let index = try #require(check.document.moments.firstIndex { $0.id == ids[1] })
+        check.document.moments[index].media = []
+        check.document.moments[index].voiceNotes = []
+        let folder = temporary("unpacked")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        var unpacked: [String: URL] = [:]
+        let wanted = service.files(for: check, mode: .replaceEverything)
+        try BackupArchive.extract(url, paths: wanted, checksums: check.document.files.mapValues(\.sha256), into: folder) { path, file in
+            unpacked[path] = file
+        }
+        _ = try service.restore(check, mode: .replaceEverything, unpacked: unpacked)
+        let kept = try #require(try phone.context.fetch(FetchDescriptor<Moment>()).first { $0.id == ids[1] })
+        #expect(!kept.media.isEmpty && kept.media.allSatisfy { phone.store.fileExists($0.relativePath) })
     }
 
     /// W2: replacing keeps a moment whose copy in the backup is damaged, in its collection again.

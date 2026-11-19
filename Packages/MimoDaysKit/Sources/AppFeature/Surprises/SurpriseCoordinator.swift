@@ -115,10 +115,13 @@ final class SurpriseCoordinator {
             // A second tap while the first is still on its way sends no second one; on its way means iOS has it.
             let soon = now.addingTimeInterval(Self.sendNowDelay)
             let scheduled = Set(await self.notifications.pending().map(\.id))
-            if self.fetchUpcomingPending(now: now).contains(where: { $0.plannedAt <= soon && scheduled.contains($0.notificationRequestID) }) {
+            let dueSoon = self.fetchUpcomingPending(now: now).filter { $0.plannedAt <= soon }
+            if dueSoon.contains(where: { scheduled.contains($0.notificationRequestID) }) {
                 sent = true
                 return
             }
+            // One iOS doesn't have won't come: it doesn't go out next to this one either.
+            for prompt in dueSoon { prompt.outcome = .cancelled }
             let id = UUID()
             let time = soon
             let minutes = self.fetchSchedule()?.expiryMinutes ?? SurpriseSchedule().expiryMinutes

@@ -40,6 +40,8 @@ struct AppEraser {
         let pending = await notifications.pending()
         await notifications.cancel(ids: pending.map(\.id) + [BackupReminder.notificationID])
         await notifications.removeAll()
+        // Before the records go: a quit from here on still has the cache emptied at the next launch.
+        store.markErasePending()
         do {
             // Children before their parents, so no rule is left pointing at a deleted row.
             try deleteAll(MovieAudioTrack.self)

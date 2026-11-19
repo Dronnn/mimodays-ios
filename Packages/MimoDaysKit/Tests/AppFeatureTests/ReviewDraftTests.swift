@@ -126,6 +126,23 @@ struct ReviewDraftTests {
         #expect(drafts.load()?.caption == "Next")
     }
 
+    /// The same draft reopened while the first Review was left open: the first one's late change doesn't undo the
+    /// new one's, and a save of the first ending after the next capture leaves that capture's draft.
+    @Test func aReviewLeftBehindWritesNothingOverItsReopenedDraft() async throws {
+        defer { drafts.clear() }
+        let left = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        let reopened = ReviewModel(draft: try #require(drafts.load()), drafts: drafts)
+        reopened.caption = "New"
+        left.caption = "Late"
+        #expect(drafts.load()?.caption == "New")
+
+        reopened.discard()
+        let next = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        left.clearDraft()
+        #expect(drafts.load()?.capture == next.capture)
+        #expect(FileManager.default.fileExists(atPath: next.capture.mainURL.path))
+    }
+
     @Test func theNoteIsCappedAndCountsAsSomethingToKeep() async throws {
         let review = ReviewModel(capture: try await capture())
         defer { review.discard() }

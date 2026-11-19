@@ -120,10 +120,7 @@ public struct RootView: View {
         .onChange(of: appLock.isLocked) { _, locked in
             guard !locked else { return }
             resumeLaunch()
-            if let heldRoute {
-                self.heldRoute = nil
-                open(heldRoute)
-            }
+            openHeldRoute()
         }
         // mimodays://today (and the other tabs), …/settings, …/capture?prompt=<uuid>; a prompt is checked as a
         // notification's is. Not during onboarding.
@@ -147,7 +144,11 @@ public struct RootView: View {
         .onChange(of: scenePhase, initial: true) { _, phase in
             if phase == .background { appLock.didEnterBackground() }
             guard phase == .active else { return }
-            Task { await appLock.didBecomeActive() }
+            Task {
+                await appLock.didBecomeActive()
+                // Held for a lock that didn't come after all.
+                if !appLock.isLocked { openHeldRoute() }
+            }
             refreshSurprises()
             purgeRecentlyDeleted()
             // The iPhone may be in another zone now.
@@ -234,8 +235,14 @@ public struct RootView: View {
 
     /// Behind App Lock nothing opens (a recovered Review would play under the lock screen): it waits for the unlock,
     /// and a surprise is checked then.
+    private func openHeldRoute() {
+        guard let heldRoute else { return }
+        self.heldRoute = nil
+        open(heldRoute)
+    }
+
     private func open(_ route: Route) {
-        guard !appLock.isLocked else {
+        guard !appLock.isLockedOrDue else {
             heldRoute = route
             return
         }

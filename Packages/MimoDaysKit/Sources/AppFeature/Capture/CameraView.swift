@@ -664,13 +664,13 @@ extension CameraModel {
     /// 0...1 of the video limit.
     func recordingProgress(at date: Date) -> CGFloat {
         guard case let .recording(startedAt?) = phase else { return 0 }
-        return CGFloat(min(1, max(0, date.timeIntervalSince(startedAt) / Double(settings.videoLength.rawValue))))
+        return CGFloat(min(1, max(0, date.timeIntervalSince(startedAt) / Double(recordingLength.rawValue))))
     }
 
     /// "00:07 / 00:10".
     func recordingLabel(at date: Date) -> String {
         guard case let .recording(startedAt?) = phase else { return "" }
-        let limit = settings.videoLength.rawValue
+        let limit = recordingLength.rawValue
         let elapsed = min(limit, max(0, Int(date.timeIntervalSince(startedAt))))
         return "\(Self.clock(elapsed)) / \(Self.clock(limit))"
     }

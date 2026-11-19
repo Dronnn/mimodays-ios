@@ -203,6 +203,8 @@ final class CameraModel {
 
     /// When the shutter started the current recording; for the log of how long the cameras took to begin.
     private var shutterAt: Date?
+    /// The length chosen at the shutter, which the recording, its timer and its ring keep.
+    private(set) var recordingLength = CameraSettings.VideoLength.short
 
     var microphoneOn: Bool { settings.recordsSound && microphone.isUsable }
     private(set) var microphone = PermissionStatus.notDetermined
@@ -330,7 +332,8 @@ final class CameraModel {
         // The big camera as it was at the shutter: heat dropping the front camera as the clip ends resets the swap.
         let shot = shot
         // The length chosen at the shutter, not one picked while the torch and microphone start.
-        let limit = settings.videoLength.duration
+        recordingLength = settings.videoLength
+        let limit = recordingLength.duration
         phase = .recording(startedAt: nil)
         stopsRecording = false
         shutterAt = Date()

@@ -38,18 +38,10 @@ final class VoiceRecording: Identifiable {
         }
     }
 
-    func pause() {
-        if !isFinished { recorder.pause() }
-    }
-
-    func resume() {
-        if !isFinished { recorder.resume() }
-    }
-
     func tick() {
         guard !isFinished else { return }
         elapsed = recorder.elapsed
-        let bar = min(Self.bars, Int(elapsed / limit * Double(Self.bars)) + 1)
+        let bar = limit > 0 ? min(Self.bars, Int(elapsed / limit * Double(Self.bars)) + 1) : Self.bars
         while levels.count < bar { levels.append(0) }
         levels[bar - 1] = max(levels[bar - 1], recorder.level)
         if !recorder.isRecording { finish() }

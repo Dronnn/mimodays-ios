@@ -555,8 +555,8 @@ final class MovieEditorModel {
     private(set) var voiceover: VoiceRecording?
     /// Where the movie was when the take's microphone started.
     private var voiceoverStart = 0.0
-    /// Holds the microphone while the movie doesn't move, so the words stay with the pictures.
-    private var voiceoverPace: NSKeyValueObservation?
+    /// The movie's end finishes the take.
+    private var voiceoverEnd: (any NSObjectProtocol)?
 
     /// A take getting ready: the stage stops and goes silent, so the movie's sound isn't recorded into the voice.
     /// Its sheet comes up at once and starts it (`startVoiceover`). Nil while another one is on.
@@ -593,26 +593,24 @@ final class MovieEditorModel {
             try? session.setActive(false, options: .notifyOthersOnDeactivation)
             return abandon(take)
         }
-        // Where the movie is now the microphone has really started: the voice goes there.
-        voiceoverStart = min(max(player.currentTime().seconds, 0), duration)
+        // Where the movie is now the microphone has really started: the voice goes there. Already at its end, there's
+        // nothing to record over.
+        voiceoverStart = max(player.currentTime().seconds, 0)
+        guard voiceoverStart < duration, let item = player.currentItem, !Self.atEnd(item) else { return abandon(take) }
         take.limit = duration - voiceoverStart
-        voiceoverPace = player.observe(\.timeControlStatus, options: [.initial]) { @Sendable [weak self] _, _ in
-            Task { @MainActor in self?.keepPace(with: take) }
+        voiceoverEnd = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.finishVoiceover(take) }
         }
         return true
     }
 
-    /// The movie stalls (buffering) or the audio session change held it: the microphone waits with it. At the movie's
-    /// end the take is done.
-    private func keepPace(with take: VoiceRecording) {
-        guard voiceover === take else { return }
-        if player.timeControlStatus == .playing {
-            take.resume()
-        } else if player.currentTime().seconds >= duration - 0.05 {
-            finishVoiceover(take)
-        } else {
-            take.pause()
-        }
+    private static func atEnd(_ item: AVPlayerItem) -> Bool {
+        item.duration.isNumeric && item.currentTime() >= item.duration
+    }
+
+    private func stopWatchingTheEnd() {
+        if let voiceoverEnd { NotificationCenter.default.removeObserver(voiceoverEnd) }
+        voiceoverEnd = nil
     }
 
     /// Up to three seconds for `condition`; false at once when `take` is finished meanwhile or the stage failed.
@@ -629,7 +627,8 @@ final class MovieEditorModel {
     private func abandon(_ take: VoiceRecording) -> Bool {
         guard voiceover === take else { return false }
         voiceover = nil
-        voiceoverPace = nil
+        stopWatchingTheEnd()
+        take.finish()
         pause()
         restorePlayback()
         try? FileManager.default.removeItem(at: take.url)
@@ -641,7 +640,7 @@ final class MovieEditorModel {
     func finishVoiceover(_ take: VoiceRecording) {
         guard voiceover === take else { return }
         voiceover = nil
-        voiceoverPace = nil
+        stopWatchingTheEnd()
         take.finish()
         pause()
         restorePlayback()

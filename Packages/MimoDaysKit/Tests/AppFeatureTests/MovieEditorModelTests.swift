@@ -333,7 +333,7 @@ struct MovieEditorModelTests {
         #expect(await model.startVoiceover(take))
         #expect(model.isPlaying && model.player.isMuted && model.player.timeControlStatus == .playing)
         // The microphone records what's left of the movie from where it was when it started.
-        #expect(take.limit <= model.duration && take.limit > model.duration - 0.5)
+        #expect(take.limit > 0 && take.limit <= model.duration)
         recorderClock.advance(by: 1.5)
         model.finishVoiceover(take)
         #expect(!model.isPlaying && !model.player.isMuted && model.voiceover == nil)
@@ -392,24 +392,41 @@ struct MovieEditorModelTests {
         #expect(abs(take.limit - (model.duration - track.startOffset)) < 0.001)
     }
 
-    /// The movie stalls mid-take: the microphone waits with it and carries on when it moves again; at the movie's
-    /// end the take is done and kept.
-    @Test func aStalledMovieHoldsTheMicrophoneAndItsEndFinishesTheTake() async throws {
+    /// The movie plays to its end: the take is done there and kept.
+    @Test func theMoviesEndFinishesTheTake() async throws {
         let ids = try await save(2)
         let recorderClock = TestDateProvider()
-        let spy = SpyRecorder(now: recorderClock.now)
-        let model = try editor(ids, voice: VoiceServices(makeRecorder: { spy }, transcriber: SimulatedTranscriber()))
+        let model = try editor(ids, voice: VoiceServices(makeRecorder: { SimulatedVoiceRecorder(now: recorderClock.now) }, transcriber: SimulatedTranscriber()))
         let take = try #require(model.newVoiceover())
         #expect(await model.startVoiceover(take))
-        model.player.pause()
-        #expect(await eventually { spy.isPaused })
-        #expect(model.voiceover === take, "held, not over")
-        model.player.play()
-        #expect(await eventually { !spy.isPaused })
         recorderClock.advance(by: 1)
         await model.player.seek(to: CMTime(seconds: model.duration - 0.1, preferredTimescale: 600))
         #expect(await eventually { model.voiceover == nil })
-        #expect(model.track?.kind == .voiceover && !model.player.isMuted)
+        #expect(take.isFinished && model.track?.kind == .voiceover && !model.player.isMuted && !model.isPlaying)
+    }
+
+    /// The movie reached its end while the microphone started: nothing to record over, so nothing is kept and
+    /// everything is as it was.
+    @Test func aMovieThatEndedAsTheMicrophoneStartedKeepsNothing() async throws {
+        let ids = try await save(2)
+        let spy = SpyRecorder()
+        let model = try editor(ids, voice: VoiceServices(makeRecorder: { spy }, transcriber: SimulatedTranscriber()))
+        spy.onStart = {
+            let end = model.player.currentItem?.duration ?? .zero
+            model.player.currentItem?.seek(to: end, toleranceBefore: .zero, toleranceAfter: .zero, completionHandler: nil)
+            Thread.sleep(forTimeInterval: 0.3)
+        }
+        let take = try #require(model.newVoiceover())
+        #expect(await model.startVoiceover(take) == false)
+        #expect(spy.starts == 1 && take.isFinished && model.voiceover == nil && model.track == nil)
+        #expect(!model.isPlaying && !model.player.isMuted && !model.canUndo)
+        #expect(!FileManager.default.fileExists(atPath: take.url.path()))
+    }
+
+    @Test func aTakeWithNoTimeLeftDrawsWithoutDividingByZero() {
+        let take = VoiceRecording(recorder: SimulatedVoiceRecorder(), url: URL(filePath: "/dev/null"), limit: 0)
+        take.tick()
+        #expect(take.levels.count == VoiceRecording.bars)
     }
 
     /// A start that comes after its take was finished leaves the editor where it was.
@@ -611,17 +628,14 @@ private final class FailingRecorder: VoiceRecorder {
     var elapsed: TimeInterval { 0 }
     var level: Float { 0 }
     var isRecording: Bool { false }
-    func pause() {}
-    func resume() {}
     func stop() {}
 }
 
-/// The simulated microphone, watched: how often it started, whether it's held, and a hook as it starts.
+/// The simulated microphone, watched: how often it started, and a hook as it starts.
 @MainActor
 private final class SpyRecorder: VoiceRecorder {
     private let inner: SimulatedVoiceRecorder
     private(set) var starts = 0
-    private(set) var isPaused = false
     var onStart: () -> Void = {}
 
     init(now: @escaping () -> Date = Date.init) {
@@ -637,17 +651,6 @@ private final class SpyRecorder: VoiceRecorder {
     var elapsed: TimeInterval { inner.elapsed }
     var level: Float { inner.level }
     var isRecording: Bool { inner.isRecording }
-
-    func pause() {
-        inner.pause()
-        isPaused = true
-    }
-
-    func resume() {
-        inner.resume()
-        isPaused = false
-    }
-
     func stop() { inner.stop() }
 }
 

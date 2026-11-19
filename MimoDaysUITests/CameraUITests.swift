@@ -11,6 +11,12 @@ final class CameraUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    // A failure stops a test before its own `defer`, and a sideways simulator breaks every test after it.
+    override func tearDown() {
+        XCUIDevice.shared.orientation = .portrait
+        super.tearDown()
+    }
+
     private var selfieWindow: XCUIElement {
         app.descendants(matching: .any)["camera.selfieWindow"]
     }
@@ -82,7 +88,9 @@ final class CameraUITests: XCTestCase {
         XCTAssertEqual(card.width / max(card.height, 1), 1, accuracy: 0.05, "a 1:1 card: \(card)")
         app.buttons["viewer.back"].tap()
 
+        // The camera opens in Video again: Photo is only kept once picked in Settings.
         app.buttons["capture"].tap()
+        app.buttons["camera.mode.photo"].tap()
         app.buttons["camera.format.landscape"].tap()
         XCUIDevice.shared.orientation = .landscapeLeft
         let enabled = expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: shutter)
@@ -267,7 +275,7 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
     }
 
-    /// C09/C10: the first Voice note shows our explainer, whose Continue leads to the system prompt; it records until
+    /// C09/C10: the microphone was explained when the camera opened in Video, so a Voice note records at once until
     /// Stop, then shows as a card with its words that plays; Retake asks before dropping it, and Save keeps it.
     @MainActor
     func testAVoiceNoteIsRecordedPlayedAndKept() {
@@ -276,10 +284,7 @@ final class CameraUITests: XCTestCase {
         let chip = app.buttons["review.voiceNote"]
         XCTAssertTrue(chip.waitForExistence(timeout: 5))
         chip.tap()
-        let explainerContinue = app.buttons["permission.primary"]
-        XCTAssertTrue(explainerContinue.waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["permission.secondary"].exists)
-        explainerContinue.tap()
+        XCTAssertFalse(app.buttons["permission.primary"].exists)
         let stop = app.buttons["voice.stop"]
         XCTAssertTrue(stop.waitForExistence(timeout: 5))
         // Let it record a little over a second.

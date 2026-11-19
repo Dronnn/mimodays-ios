@@ -113650,6 +113650,144 @@
         }
       }
     },
+    "Speak over your movie?" : {
+      "comment" : "Explainer title before the system microphone prompt, from the movie editor's Record voice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد التحدث فوق فيلمك؟"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Агучыш свой фільм?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etwas über deinen Film sprechen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speak over your movie?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Quieres hablar sobre tu película?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envie de parler sur ton film ?"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לדבר על הסרט שלך?"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Կխոսե՞ս ֆիլմիդ վրա։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi parlare sopra il tuo film?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ムービーに声を重ねますか？"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ფილმს შენი ხმით გააჟღერებ?"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильміңе дауыс қосасың ба?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영상 위에 목소리를 입혀 볼까요?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over je film inspreken?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrasz głos do filmu?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quer falar por cima do seu filme?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Озвучишь свой фильм?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prata över din film?"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filminin üzerine konuşmak ister misin?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Озвучиш свій фільм?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要为影片配上你的声音吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要為影片配上你的聲音嗎？"
+          }
+        }
+      }
+    },
     "Spring" : {
       "comment" : "Season label under a sample movie clip",
       "extractionState" : "manual",
@@ -121512,6 +121650,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "麥克風只會在錄製語音筆記時收音。語音筆記只會留在裝置上。"
+          }
+        }
+      }
+    },
+    "The microphone records only while you speak over your movie. Your voice stays on your device." : {
+      "comment" : "Explainer message before the system microphone prompt, from the movie editor's Record voice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يسجّل الميكروفون إلا أثناء حديثك فوق فيلمك. يبقى صوتك على جهازك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мікрафон піша, толькі пакуль ты агучваеш фільм. Твой голас застаецца на прыладзе."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Mikrofon nimmt nur auf, während du über deinen Film sprichst. Deine Stimme bleibt auf deinem Gerät."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The microphone records only while you speak over your movie. Your voice stays on your device."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El micrófono solo graba mientras hablas sobre tu película. Tu voz se queda en tu dispositivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le micro n’enregistre que pendant que tu parles sur ton film. Ta voix reste sur ton appareil."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "המיקרופון מקליט רק בזמן שאתה מדבר על הסרט. הקול שלך נשאר במכשיר."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Խոսափողը ձայնագրում է միայն այն ժամանակ, երբ խոսում ես ֆիլմիդ վրա։ Ձայնդ մնում է սարքում։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il microfono registra solo mentre parli sopra il tuo film. La tua voce resta sul dispositivo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイクで録音するのは、ムービーに声を重ねているときだけです。声はデバイス内に保存されます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მიკროფონი იწერს მხოლოდ მაშინ, როცა ფილმს ახმოვანებ. შენი ხმა მოწყობილობაზე რჩება."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Микрофон тек фильміңе дауыс қосып жатқанда ғана жазады. Дауысың құрылғыңда қалады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이크는 영상 위에 목소리를 입히는 동안에만 녹음해요. 목소리는 기기에만 저장돼요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De microfoon neemt alleen op terwijl je over je film inspreekt. Je stem blijft op je apparaat."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mikrofon nagrywa tylko wtedy, gdy mówisz do filmu. Twój głos zostaje na urządzeniu."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O microfone só grava enquanto você fala por cima do seu filme. Sua voz fica no seu dispositivo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Микрофон пишет, только пока ты озвучиваешь фильм. Твой голос остаётся на устройстве."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mikrofonen spelar bara in medan du pratar över din film. Din röst stannar på din enhet."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mikrofon yalnızca filminin üzerine konuşurken kayıt yapar. Sesin cihazında kalır."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мікрофон записує лише тоді, коли ти озвучуєш фільм. Твій голос лишається на твоєму пристрої."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只有在你为影片配音时，麦克风才会录音。你的声音只保存在设备上。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只有在你為影片配音時，麥克風才會錄音。你的聲音只保存在裝置上。"
           }
         }
       }
@@ -134894,6 +135170,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "若要錄製語音筆記，請在 iOS「設定」中允許取用麥克風。仍然可以寫下文字筆記。"
+          }
+        }
+      }
+    },
+    "To speak over your movie, allow microphone access in iOS Settings. You can still add music." : {
+      "comment" : "Microphone off screen from the movie editor's Record voice: message under the title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "للتحدث فوق فيلمك، اسمح بالوصول إلى الميكروفون في إعدادات iOS. لا يزال بإمكانك إضافة موسيقى."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каб агучыць фільм, дазволь доступ да мікрафона ў Наладах iOS. Дадаць музыку можна і без гэтага."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaube in den iOS-Einstellungen den Mikrofonzugriff, um über deinen Film zu sprechen. Musik hinzufügen kannst du trotzdem."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To speak over your movie, allow microphone access in iOS Settings. You can still add music."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para hablar sobre tu película, permite el acceso al micrófono en Ajustes de iOS. Aun así puedes añadir música."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour parler sur ton film, autorise l’accès au micro dans les Réglages iOS. Tu peux quand même ajouter de la musique."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כדי לדבר על הסרט, אפשר גישה למיקרופון בהגדרות iOS. עדיין אפשר להוסיף מוזיקה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ֆիլմիդ վրա խոսելու համար թույլատրիր խոսափողի հասանելիությունը iOS-ի Կարգավորումներում։ Երաժշտություն ավելացնել կարող ես նաև առանց դրա։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per parlare sopra il tuo film, consenti l’accesso al microfono in Impostazioni di iOS. Puoi comunque aggiungere musica."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ムービーに声を重ねるには、iOSの「設定」でマイクへのアクセスを許可してください。音楽は追加できます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ფილმის გასახმოვანებლად iOS-ის პარამეტრებში მიკროფონზე წვდომა დაუშვი. მუსიკის დამატება მაინც შეგიძლია."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильміңе дауыс қосу үшін iOS Параметрлерінде микрофонға рұқсат бер. Музыка қоса беруге болады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영상 위에 목소리를 입히려면 iOS 설정에서 마이크 접근을 허용해 주세요. 음악은 그래도 추가할 수 있어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sta in iOS-instellingen toegang tot de microfoon toe om over je film in te spreken. Muziek toevoegen kan nog steeds."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby nagrać głos do filmu, zezwól na dostęp do mikrofonu w Ustawieniach iOS. Muzykę możesz dodać i tak."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para falar por cima do seu filme, permita o acesso ao microfone nos Ajustes do iOS. Você ainda pode adicionar música."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы озвучить фильм, разреши доступ к микрофону в Настройках iOS. Добавить музыку можно и без этого."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillåt mikrofonåtkomst i iOS-inställningar för att prata över din film. Du kan fortfarande lägga till musik."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filminin üzerine konuşmak için iOS Ayarlar’da mikrofon erişimine izin ver. Yine de müzik ekleyebilirsin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Щоб озвучити фільм, дозволь доступ до мікрофона в Параметрах iOS. Додати музику можна й так."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要为影片配音，请在 iOS 设置中允许访问麦克风。你仍然可以添加音乐。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要為影片配音，請在 iOS 設定中允許取用麥克風。你仍然可以加入音樂。"
           }
         }
       }

@@ -14,6 +14,10 @@ enum PermissionScreen: String, CaseIterable {
     case microphoneOff
     /// Before the microphone prompt from Voice note.
     case voiceNote
+    /// Before the microphone prompt from the movie editor's Record voice (F09).
+    case movieVoice
+    /// Like C13a, when Record voice is tapped with the microphone off.
+    case movieVoiceOff
     /// Before the location prompt: a moment's place, or where I am on the map.
     case location
     /// Before the notifications prompt: surprises turned on in onboarding, on Today or in Settings.
@@ -37,7 +41,7 @@ enum PermissionScreen: String, CaseIterable {
         case .camera: .explainerCamera
         case .microphone: .explainerMicrophone
         case .cameraOff: .explainerCameraOff
-        case .microphoneOff, .voiceNote: .explainerMicrophone
+        case .microphoneOff, .voiceNote, .movieVoice, .movieVoiceOff: .explainerMicrophone
         case .location: .explainerPin
         case .notifications: .explainerBell
         case .photos: .explainerPhotos
@@ -49,7 +53,8 @@ enum PermissionScreen: String, CaseIterable {
         case .camera: LocalizedStringResource("Let MimoDays use the camera", bundle: .atURL(Bundle.module.bundleURL))
         case .microphone: LocalizedStringResource("Add sound to your videos?", bundle: .atURL(Bundle.module.bundleURL))
         case .cameraOff: LocalizedStringResource("The camera is turned off for MimoDays", bundle: .atURL(Bundle.module.bundleURL))
-        case .microphoneOff: LocalizedStringResource("The microphone is turned off for MimoDays", bundle: .atURL(Bundle.module.bundleURL))
+        case .microphoneOff, .movieVoiceOff: LocalizedStringResource("The microphone is turned off for MimoDays", bundle: .atURL(Bundle.module.bundleURL))
+        case .movieVoice: LocalizedStringResource("Speak over your movie?", bundle: .atURL(Bundle.module.bundleURL))
         case .voiceNote: LocalizedStringResource("Say a few words?", bundle: .atURL(Bundle.module.bundleURL))
         case .location: LocalizedStringResource("Remember where it happened?", bundle: .atURL(Bundle.module.bundleURL))
         case .notifications: LocalizedStringResource("Get a little surprise?", bundle: .atURL(Bundle.module.bundleURL))
@@ -84,6 +89,16 @@ enum PermissionScreen: String, CaseIterable {
                 "The microphone records only while you are recording a voice note. Voice notes stay on your device.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
+        case .movieVoice:
+            LocalizedStringResource(
+                "The microphone records only while you speak over your movie. Your voice stays on your device.",
+                bundle: .atURL(Bundle.module.bundleURL)
+            )
+        case .movieVoiceOff:
+            LocalizedStringResource(
+                "To speak over your movie, allow microphone access in iOS Settings. You can still add music.",
+                bundle: .atURL(Bundle.module.bundleURL)
+            )
         case .location:
             LocalizedStringResource(
                 "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. Places are kept on your device; to name them, MimoDays asks Apple's map service.",
@@ -104,8 +119,9 @@ enum PermissionScreen: String, CaseIterable {
 
     var primaryAction: LocalizedStringResource {
         switch self {
-        case .camera, .microphone, .voiceNote, .location, .notifications, .photos: LocalizedStringResource("Continue", bundle: .atURL(Bundle.module.bundleURL))
-        case .cameraOff, .microphoneOff: LocalizedStringResource("Open iOS Settings", bundle: .atURL(Bundle.module.bundleURL))
+        case .camera, .microphone, .voiceNote, .movieVoice, .location, .notifications, .photos:
+            LocalizedStringResource("Continue", bundle: .atURL(Bundle.module.bundleURL))
+        case .cameraOff, .microphoneOff, .movieVoiceOff: LocalizedStringResource("Open iOS Settings", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
@@ -113,13 +129,13 @@ enum PermissionScreen: String, CaseIterable {
     /// (App Review Guideline 5.1.1).
     var secondaryAction: LocalizedStringResource? {
         switch self {
-        case .camera, .microphone, .voiceNote, .location, .notifications, .photos: nil
-        case .cameraOff, .microphoneOff: LocalizedStringResource("Not now", bundle: .atURL(Bundle.module.bundleURL))
+        case .camera, .microphone, .voiceNote, .movieVoice, .location, .notifications, .photos: nil
+        case .cameraOff, .microphoneOff, .movieVoiceOff: LocalizedStringResource("Not now", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
 
     /// Explainers keep their button at the bottom; the "turned off" screen keeps them under the text.
-    var pinsActions: Bool { self != .cameraOff && self != .microphoneOff }
+    var pinsActions: Bool { ![.cameraOff, .microphoneOff, .movieVoiceOff].contains(self) }
 }
 
 /// Layout of C06 / C06c / C13a. The system prompt itself is never drawn.

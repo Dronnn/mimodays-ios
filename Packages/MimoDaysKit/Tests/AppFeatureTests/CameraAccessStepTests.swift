@@ -15,6 +15,6 @@ struct CameraAccessStepTests {
     }
 
     @Test func onlyTheTurnedOffScreensKeepActionsUnderTheText() {
-        #expect(PermissionScreen.allCases.filter { !$0.pinsActions } == [.cameraOff, .microphoneOff])
+        #expect(PermissionScreen.allCases.filter { !$0.pinsActions } == [.cameraOff, .microphoneOff, .movieVoiceOff])
     }
 }

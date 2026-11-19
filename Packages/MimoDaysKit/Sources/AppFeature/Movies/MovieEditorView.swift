@@ -126,7 +126,7 @@ struct MovieEditorView: View {
         }
         .permissionExplainers(asker)
         .sheet(isPresented: $microphoneOff) {
-            PermissionExplainerView(screen: .microphoneOff) {
+            PermissionExplainerView(screen: .movieVoiceOff) {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
             } secondary: {
                 microphoneOff = false
@@ -160,7 +160,7 @@ struct MovieEditorView: View {
     private func recordVoice() {
         guard !asker.isAsking, model.voiceover == nil else { return }
         Task {
-            let status = await asker.request(.microphone, using: permissions)
+            let status = await asker.request(.microphone, screen: .movieVoice, using: permissions)
             // The microphone only records with its sheet up: not once the editor is gone or something else opened.
             guard isShown, sheet == nil, !previewing, model.voiceover == nil else { return }
             guard status.isUsable else {

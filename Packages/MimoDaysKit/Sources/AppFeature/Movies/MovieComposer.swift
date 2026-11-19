@@ -219,7 +219,10 @@ enum MovieComposer {
     /// The first picture of the first clip after `index`, filling the movie's frame: an "Over clip" card's ground.
     private static func compressed(_ image: CGImage) -> Data? {
         let data = NSMutableData()
-        guard let destination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else { return nil }
+        // PNG for a picture with see-through parts: JPEG would turn them white.
+        let opaque = [.none, .noneSkipFirst, .noneSkipLast].contains(image.alphaInfo)
+        let type = opaque ? UTType.jpeg : UTType.png
+        guard let destination = CGImageDestinationCreateWithData(data, type.identifier as CFString, 1, nil) else { return nil }
         CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: 0.9] as CFDictionary)
         return CGImageDestinationFinalize(destination) ? data as Data : nil
     }

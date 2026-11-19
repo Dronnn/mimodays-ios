@@ -130,7 +130,8 @@ final class NewMovieModel {
         do {
             let all = try library.context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)]))
             collections = all.map { collection in
-                Choice(id: collection.id, title: collection.title, count: collection.orderedMoments.count(where: { $0.deletedAt == nil }))
+                // Each moment once, as the wizard takes them.
+                Choice(id: collection.id, title: collection.title, count: Set(collection.orderedMoments.filter { $0.deletedAt == nil }.map(\.id)).count)
             }
         } catch {
             logger.error("Reading collections failed: \(error.localizedDescription, privacy: .public)")

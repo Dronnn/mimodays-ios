@@ -113669,7 +113669,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Etwas über deinen Film sprechen?"
+            "value" : "Deinen Film vertonen?"
           }
         },
         "en" : {
@@ -113681,19 +113681,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Quieres hablar sobre tu película?"
+            "value" : "¿Quieres narrar tu película?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envie de parler sur ton film ?"
+            "value" : "Envie d’enregistrer une voix off pour ton film ?"
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "לדבר על הסרט שלך?"
+            "value" : "להקליט קריינות לסרט שלך?"
           }
         },
         "hy" : {
@@ -113765,7 +113765,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Filminin üzerine konuşmak ister misin?"
+            "value" : "Filmini seslendirmek ister misin?"
           }
         },
         "uk" : {
@@ -121673,7 +121673,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Mikrofon nimmt nur auf, während du über deinen Film sprichst. Deine Stimme bleibt auf deinem Gerät."
+            "value" : "Das Mikrofon nimmt nur auf, während du deinen Film vertonst. Deine Stimme bleibt auf deinem Gerät."
           }
         },
         "en" : {
@@ -121685,19 +121685,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El micrófono solo graba mientras hablas sobre tu película. Tu voz se queda en tu dispositivo."
+            "value" : "El micrófono solo graba mientras narras tu película. Tu voz se queda en tu dispositivo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le micro n’enregistre que pendant que tu parles sur ton film. Ta voix reste sur ton appareil."
+            "value" : "Le micro n’enregistre que pendant que tu enregistres ta voix off. Ta voix reste sur ton appareil."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "המיקרופון מקליט רק בזמן שאתה מדבר על הסרט. הקול שלך נשאר במכשיר."
+            "value" : "המיקרופון מקליט רק בזמן שאתה מקליט קריינות לסרט. הקול שלך נשאר במכשיר."
           }
         },
         "hy" : {
@@ -121769,7 +121769,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mikrofon yalnızca filminin üzerine konuşurken kayıt yapar. Sesin cihazında kalır."
+            "value" : "Mikrofon yalnızca filmini seslendirirken kayıt yapar. Sesin cihazında kalır."
           }
         },
         "uk" : {
@@ -135193,7 +135193,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erlaube in den iOS-Einstellungen den Mikrofonzugriff, um über deinen Film zu sprechen. Musik hinzufügen kannst du trotzdem."
+            "value" : "Erlaube in den iOS-Einstellungen den Mikrofonzugriff, um deinen Film zu vertonen. Musik hinzufügen kannst du trotzdem."
           }
         },
         "en" : {
@@ -135205,19 +135205,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para hablar sobre tu película, permite el acceso al micrófono en Ajustes de iOS. Aun así puedes añadir música."
+            "value" : "Para narrar tu película, permite el acceso al micrófono en Ajustes de iOS. Aun así puedes añadir música."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pour parler sur ton film, autorise l’accès au micro dans les Réglages iOS. Tu peux quand même ajouter de la musique."
+            "value" : "Pour enregistrer une voix off, autorise l’accès au micro dans les Réglages iOS. Tu peux quand même ajouter de la musique."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "כדי לדבר על הסרט, אפשר גישה למיקרופון בהגדרות iOS. עדיין אפשר להוסיף מוזיקה."
+            "value" : "כדי להקליט קריינות לסרט, אפשר גישה למיקרופון בהגדרות iOS. עדיין אפשר להוסיף מוזיקה."
           }
         },
         "hy" : {
@@ -135289,7 +135289,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Filminin üzerine konuşmak için iOS Ayarlar’da mikrofon erişimine izin ver. Yine de müzik ekleyebilirsin."
+            "value" : "Filmini seslendirmek için iOS Ayarlar’da mikrofon erişimine izin ver. Yine de müzik ekleyebilirsin."
           }
         },
         "uk" : {

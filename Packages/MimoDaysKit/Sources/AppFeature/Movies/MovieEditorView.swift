@@ -150,8 +150,9 @@ struct MovieEditorView: View {
         }
         .onDisappear {
             isShown = false
-            // The microphone's explainer covers the editor without leaving it.
-            if !previewing, asker.screen == nil { model.close() }
+            // The microphone's explainer covers the editor without leaving it, and so does a take's sheet, full screen
+            // on a landscape iPhone: the sheet ends its take itself.
+            if !previewing, asker.screen == nil, voiceover == nil { model.close() }
         }
     }
 
@@ -945,6 +946,7 @@ struct LevelSlider: View {
     /// True when a drag starts, false when it ends.
     let changing: (Bool) -> Void
     @State private var dragging = false
+    @GestureState private var pressed = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -971,11 +973,19 @@ struct LevelSlider: View {
                         }
                         value = Double(min(max((drag.location.x - knob / 2) / span, 0), 1))
                     }
+                    .updating($pressed) { _, pressed, _ in pressed = true }
                     .onEnded { _ in
                         dragging = false
                         changing(false)
                     }
             )
+            // A drag cancelled (a call coming in) never ends: the change is kept all the same.
+            .onChange(of: pressed) { _, pressed in
+                if !pressed, dragging {
+                    dragging = false
+                    changing(false)
+                }
+            }
         }
         .frame(height: 24)
         // 24 pt as drawn; the touch area reaches 10 pt further each way.

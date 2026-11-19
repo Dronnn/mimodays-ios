@@ -578,6 +578,7 @@ final class MovieEditorModel {
         // Finished meanwhile: that put everything back already.
         guard voiceover === take else { return false }
         time = 0
+        selected = 0
         guard duration > 0, await wait(for: take, until: { player.currentItem?.status == .readyToPlay }),
               await player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero), voiceover === take
         else { return abandon(take) }

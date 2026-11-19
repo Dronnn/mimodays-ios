@@ -205,7 +205,15 @@ struct MovieEditorModelTests {
         model.undo()
         #expect(model.music?.relativePath == path)
         model.removeMusic()
+        // Closing (Export pushed over it too) keeps what Undo can bring back; nothing else points to it, so the
+        // launch sweep takes it.
         model.close()
+        #expect(store.fileExists(path))
+        model.undo()
+        #expect(model.music?.relativePath == path && store.fileExists(path))
+        model.removeMusic()
+        model.close()
+        OrphanFiles.remove(context: context, store: store)
         #expect(!store.fileExists(path))
     }
 

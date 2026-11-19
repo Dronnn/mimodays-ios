@@ -75,6 +75,10 @@ struct MovieEditorView: View {
             case let .transition(index): TransitionSheet(model: model, index: index)
             }
         }
+        // Playback moves the selection on: a sheet edits the item it opened for, so playing stops.
+        .onChange(of: sheet) { _, sheet in
+            if sheet != nil { model.pause() }
+        }
         .fileImporter(isPresented: $choosingMusic, allowedContentTypes: [.audio]) { result in
             if case let .success(url) = result { model.setMusic(from: url) }
         }

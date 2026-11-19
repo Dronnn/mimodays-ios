@@ -109,6 +109,20 @@ struct MovieExportModelTests {
         #expect(store.fileExists(second.relativePath))
     }
 
+    /// Two Export taps before the options make way render once.
+    @Test func aSecondStartWhileRenderingDoesNothing() async throws {
+        let project = try await project(photos: 2)
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil })
+        model.resolution = .p720
+        model.start()
+        let first = try #require(model.task)
+        model.start()
+        #expect(model.task == first)
+        model.cancel()
+        await first.value
+        #expect(project.render == nil)
+    }
+
     /// Settings' quality is only where the movie starts; one made before keeps the quality it was made in.
     @Test func anEarlierRenderKeepsItsQuality() async throws {
         let project = try await project(photos: 2)

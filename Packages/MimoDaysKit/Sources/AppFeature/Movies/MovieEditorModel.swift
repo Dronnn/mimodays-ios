@@ -667,12 +667,13 @@ final class MovieEditorModel {
     /// Waits for the stage to catch up with the last change (tests, export).
     func settled() async { await rebuild?.value }
 
-    /// Music files no project uses any more go when the editor closes.
+    /// Music files no project uses any more go when the editor closes. Ones Undo can still bring back stay: going
+    /// to Export closes it too, and the editor is still there to come back to. The launch sweep takes them later.
     func close() {
         pause()
         rebuild?.cancel()
         if let timeObserver { player.removeTimeObserver(timeObserver) }
         timeObserver = nil
-        store.removeUnusedAudio(musicFiles)
+        store.removeUnusedAudio(musicFiles.subtracting(undoStack.compactMap(\.music?.relativePath)))
     }
 }

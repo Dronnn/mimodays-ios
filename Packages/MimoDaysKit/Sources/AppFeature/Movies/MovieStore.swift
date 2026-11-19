@@ -121,7 +121,9 @@ struct MovieStore {
     /// Music files the editor let go of (replaced or removed) once no project points at them; their paths are
     /// remembered while the editor is open so Undo can bring them back.
     func removeUnusedAudio(_ paths: Set<String>) {
-        let stillUsed = Set((try? context.fetch(FetchDescriptor<MovieAudioTrack>()).map(\.relativePath)) ?? [])
+        // Unread is not unused: a failed fetch removes nothing.
+        guard let tracks = try? context.fetch(FetchDescriptor<MovieAudioTrack>()) else { return }
+        let stillUsed = Set(tracks.map(\.relativePath))
         for path in paths where !stillUsed.contains(path) { removeFile(path) }
     }
 

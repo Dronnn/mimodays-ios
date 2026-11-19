@@ -36,7 +36,7 @@ final class MovieExportModel {
     private let library: MediaLibrary
     private let clock: any DateProvider
     private let freeSpace: () -> Int64?
-    private var task: Task<Void, Never>?
+    private(set) var task: Task<Void, Never>?
     private var background = UIBackgroundTaskIdentifier.invalid
     private let logger = Logger(subsystem: "MimoDays", category: "Movies")
 
@@ -81,6 +81,8 @@ final class MovieExportModel {
     // MARK: Render
 
     func start() {
+        // Two taps before the options make way: one render, or Cancel would stop only the second.
+        if case .rendering = phase { return }
         let needed = estimatedBytes(resolution)
         if let free = freeSpace(), free < needed + needed / 5 {
             phase = .failed(.space(needed: needed + needed / 5 - free))
@@ -98,6 +100,11 @@ final class MovieExportModel {
             defer { if background == id { endBackgroundTask() } }
             do {
                 let render = try await render(started: started)
+                // Cancelled while the file was being stored: it isn't kept.
+                guard !Task.isCancelled else {
+                    try? library.store.remove(render.relativePath)
+                    return
+                }
                 try store.attach(render, to: project)
                 phase = .ready(render)
                 notifyIfAway()

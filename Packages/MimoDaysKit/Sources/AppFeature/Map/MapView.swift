@@ -811,8 +811,9 @@ struct PlacesList: View {
                 .foregroundStyle(ColorToken.textSecondary.color)
                 .accessibilityAddTraits(.isHeader)
                 .padding(.horizontal, 22)
+            let places = model.places
             VStack(spacing: 0) {
-                ForEach(Array(model.places.enumerated()), id: \.element.id) { index, place in
+                ForEach(Array(places.enumerated()), id: \.element.id) { index, place in
                     NavigationLink(value: MapRoute.place(place.id)) {
                         HStack(spacing: 14) {
                             Icon.glyphPin.image
@@ -834,7 +835,7 @@ struct PlacesList: View {
                         .padding(.horizontal, 14)
                         .frame(minHeight: 64)
                         .overlay(alignment: .bottom) {
-                            if index < model.places.count - 1 { ColorToken.separator.color.frame(height: 1).padding(.leading, 64) }
+                            if index < places.count - 1 { ColorToken.separator.color.frame(height: 1).padding(.leading, 64) }
                         }
                         .contentShape(Rectangle())
                     }
@@ -845,6 +846,17 @@ struct PlacesList: View {
             }
             .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
             .padding(.horizontal, 16)
+            // Moments still without a place stay reachable once others have one (the empty map's card is gone then).
+            if model.unlocatedCount > 0 {
+                NavigationLink(value: MapRoute.unplaced) {
+                    Text("Add places to \(model.unlocatedCount) moments", bundle: .module)
+                        .textStyle(.control)
+                        .foregroundStyle(ColorToken.textLink.color)
+                        .frame(minHeight: Size.minimumTapTarget)
+                }
+                .padding(.horizontal, 22)
+                .accessibilityIdentifier("map.addPlaces")
+            }
         }
     }
 }

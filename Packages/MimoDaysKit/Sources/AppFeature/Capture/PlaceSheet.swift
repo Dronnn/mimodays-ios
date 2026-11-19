@@ -82,7 +82,10 @@ struct PlaceSheet<Model: PlaceChoosing>: View {
             guard !text.isEmpty else { return }
             try? await Task.sleep(for: .milliseconds(300))
             guard !Task.isCancelled else { return }
-            results = await model.searchPlaces(text)
+            let found = await model.searchPlaces(text)
+            // A lookup that ends after the next query was typed would show (and let someone pick) the old results.
+            guard !Task.isCancelled, text == query.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+            results = found
         }
     }
 

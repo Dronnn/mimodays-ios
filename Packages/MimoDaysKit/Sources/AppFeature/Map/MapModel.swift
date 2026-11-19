@@ -70,7 +70,7 @@ struct MapPlace: Equatable, Identifiable {
 @MainActor
 @Observable
 final class MapModel {
-    private(set) var moments: [MapMoment] = []
+    private(set) var moments: [MapMoment] = [] { didSet { revision &+= 1 } }
     /// Alive moments without coordinates (P05 says how many).
     private(set) var unlocatedCount = 0
     private(set) var isLoaded = false
@@ -80,11 +80,17 @@ final class MapModel {
     /// The thumbnail each picture was read from.
     private var imagePaths: [UUID: String] = [:]
     var filters = MapFilters() {
-        didSet { if filters.collection != oldValue.collection { readCollection() } }
+        didSet {
+            if filters.collection != oldValue.collection { readCollection() }
+            revision &+= 1
+        }
     }
 
     let library: MediaLibrary
-    private var collectionMembers: Set<UUID>?
+    private var collectionMembers: Set<UUID>? { didSet { revision &+= 1 } }
+    /// Moves with whatever `places` is made from, so the grouping runs once per change, not once per row reading it.
+    private var revision = 0
+    @ObservationIgnored private var cachedPlaces: (revision: Int, places: [MapPlace])?
     private let logger = Logger(subsystem: "MimoDays", category: "Map")
 
     init(library: MediaLibrary) {
@@ -95,7 +101,12 @@ final class MapModel {
     var filtered: [MapMoment] { moments.filter { Self.passes($0, filters, members: collectionMembers) } }
 
     /// The filtered moments by place, the place with most moments first (the accessible list's order).
-    var places: [MapPlace] { Self.places(filtered) }
+    var places: [MapPlace] {
+        if let cachedPlaces, cachedPlaces.revision == revision { return cachedPlaces.places }
+        let places = Self.places(filtered)
+        cachedPlaces = (revision, places)
+        return places
+    }
 
     /// P01's Recent places: the place visited last first.
     var recentPlaces: [MapPlace] {

@@ -56,7 +56,7 @@ struct EditMomentView: View {
         .onDisappear { model.stopVoice() }
         .confirmationDialog(Text("Discard your changes?", bundle: .module), isPresented: $confirmsDiscard, titleVisibility: .visible) {
             Button(role: .destructive) {
-                model.discardRecording()
+                model.discard()
                 dismiss()
             } label: { Text("Discard changes", bundle: .module) }
             Button(role: .cancel) {} label: { Text("Keep editing", bundle: .module) }
@@ -324,6 +324,8 @@ struct EditMomentView: View {
             do {
                 try await model.save()
                 dismiss()
+            } catch is CancellationError {
+                // Another Save is closing the screen, or the changes were discarded.
             } catch {
                 saveFailed = true
             }

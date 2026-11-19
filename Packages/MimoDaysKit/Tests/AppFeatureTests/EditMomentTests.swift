@@ -143,6 +143,20 @@ struct EditMomentTests {
         #expect(try moment().voiceNotes.count == 1)
     }
 
+    /// Save waits for the transcript; Discard while it waits writes nothing, and a second Save doesn't pass as done.
+    @Test func discardingWhileSaveWaitsWritesNothing() async throws {
+        let edit = try edit(try await save())
+        edit.caption = "Changed"
+        edit.addVoice(at: try tone(seconds: 2), recordedAt: .now)
+        let saving = Task { try await edit.save() }
+        await Task.yield()
+        await #expect(throws: CancellationError.self) { try await edit.save() }
+        edit.discard()
+        await #expect(throws: CancellationError.self) { try await saving.value }
+        let kept = try moment()
+        #expect(kept.title == "First snow" && kept.voiceNotes.isEmpty)
+    }
+
     @Test func aTooShortRecordingIsDropped() async throws {
         let edit = try edit(try await save())
         let recording = try tone(seconds: 0.2)

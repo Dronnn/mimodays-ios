@@ -207,6 +207,14 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
 
     private var deletionStore: DeletionStore { DeletionStore(context: library.context, store: library.store) }
 
+    /// Discard changes: drops the recording, and a Save still waiting for its transcript writes nothing.
+    func discard() {
+        isDiscarded = true
+        discardRecording()
+    }
+
+    private var isDiscarded = false
+
     func discardRecording() {
         transcription?.cancel()
         transcription = nil
@@ -218,12 +226,14 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
 
     // MARK: Save
 
-    /// Writes what changed. A failure leaves the stored moment as it was.
+    /// Writes what changed. A failure leaves the stored moment as it was. Throws `CancellationError` when another
+    /// save is already running or the changes were discarded while this one waited: nothing was written by it.
     func save() async throws {
-        guard !isSaving else { return }
+        guard !isSaving, !isDiscarded else { throw CancellationError() }
         isSaving = true
         defer { isSaving = false }
         await transcription?.value
+        guard !isDiscarded else { throw CancellationError() }
         let id = id
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1

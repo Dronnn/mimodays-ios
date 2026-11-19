@@ -112,6 +112,22 @@ struct CameraModelStateTests {
         #expect(model.recordingLabel(at: start.addingTimeInterval(61)) == "01:00 / 01:00")
     }
 
+    /// From the shutter until the files are written the timer doesn't run: someone speaking at once would see
+    /// "recording" while nothing was kept yet. The engine saying it began starts it.
+    @Test func theTimerWaitsForTheRecordingToBegin() async throws {
+        let model = await camera(mode: .video)
+        model.phase = .recording(startedAt: nil)
+        #expect(model.isRecording && !model.recordingHasBegun)
+        #expect(model.recordingLabel(at: .now).isEmpty && model.recordingProgress(at: .now) == 0)
+        model.phase = .ready
+        let recording = Task { await model.shutter() }
+        try await eventually { model.recordingHasBegun }
+        #expect(model.recordingLabel(at: .now).hasSuffix(" / 00:10"))
+        await model.shutter()
+        await recording.value
+        #expect(model.phase == .ready)
+    }
+
     @Test func droppingTheSelfieCameraUnderPressureEndsTheSwap() async throws {
         let engine = SimulatedCaptureEngine()
         let model = await camera(engine)

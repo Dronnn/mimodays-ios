@@ -102,6 +102,8 @@ public enum CaptureEvent: Equatable, Sendable {
     case interrupted(CaptureInterruption)
     /// The camera is back after an interruption or a media services reset.
     case resumed
+    /// A recording asked for has begun writing: from now on what the cameras and the microphone take is kept.
+    case recordingStarted
 }
 
 /// How much a recording may write (doc 01: handle low disk space). Pure, so it is tested without a disk.

@@ -1,6 +1,7 @@
 import AVFoundation
 import Core
 import ImageIO
+import OSLog
 
 /// Never hand on empty or corrupt media (doc 01). The main file must be readable; an unreadable selfie file is
 /// dropped and the moment kept without it. Everything of a rejected capture is deleted.
@@ -23,6 +24,7 @@ enum MediaCheck {
             remove([video.mainURL, video.selfieURL])
             return nil
         }
+        if video.hasAudio { await logSoundStart(video.mainURL) }
         var video = video
         if let selfie = video.selfieURL, !(await isPlayableVideo(selfie)) {
             remove([selfie])
@@ -43,6 +45,22 @@ enum MediaCheck {
         guard let (playable, duration) = try? await asset.load(.isPlayable, .duration),
               let tracks = try? await asset.loadTracks(withMediaType: .video) else { return false }
         return playable && duration.seconds > 0 && !tracks.isEmpty
+    }
+
+    private static let logger = Logger(subsystem: "MimoDays", category: "Camera")
+
+    /// How long after the picture the sound begins in a recording: the device check reads it in Console.
+    private static func logSoundStart(_ url: URL) async {
+        let asset = AVURLAsset(url: url)
+        guard let picture = try? await asset.loadTracks(withMediaType: .video).first,
+              let sound = try? await asset.loadTracks(withMediaType: .audio).first,
+              let pictureRange = try? await picture.load(.timeRange), let soundRange = try? await sound.load(.timeRange)
+        else {
+            logger.error("Recording has no sound track")
+            return
+        }
+        let late = (soundRange.start - pictureRange.start).seconds
+        logger.info("Sound begins \(Int(late * 1000), privacy: .public) ms after the picture, lasts \(soundRange.duration.seconds, privacy: .public) of \(pictureRange.duration.seconds, privacy: .public) s")
     }
 
     private static func remove(_ urls: [URL?]) {

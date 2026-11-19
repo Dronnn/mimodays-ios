@@ -113,6 +113,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         isRecording = true
         stopReason = nil
         defer { isRecording = false }
+        eventSink.yield(.recordingStarted)
 
         let clock = ContinuousClock()
         let started = clock.now

@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import OSLog
 import Observation
 import Persistence
 
@@ -69,12 +70,15 @@ enum CameraNotice: Equatable {
 @MainActor
 @Observable
 final class CameraModel {
+    private static let logger = Logger(subsystem: "MimoDays", category: "Camera")
+
     enum Phase: Equatable {
         case starting
         case ready
         /// A photo is being taken.
         case busy
-        case recording(startedAt: Date)
+        /// Nil from the shutter until the files are being written: only then do the timer and its pill show.
+        case recording(startedAt: Date?)
         case failed(CaptureError)
     }
 
@@ -192,6 +196,14 @@ final class CameraModel {
         if case .recording = phase { true } else { false }
     }
 
+    /// The files are being written (the shutter was pressed a moment before).
+    var recordingHasBegun: Bool {
+        if case .recording(startedAt: _?) = phase { true } else { false }
+    }
+
+    /// When the shutter started the current recording; for the log of how long the cameras took to begin.
+    private var shutterAt: Date?
+
     var microphoneOn: Bool { settings.recordsSound && microphone.isUsable }
     private(set) var microphone = PermissionStatus.notDetermined
     /// The last capture that didn't work; cleared by the next try.
@@ -289,7 +301,8 @@ final class CameraModel {
         let capturedAt = now
         // The big camera as it was at the shutter: heat dropping the front camera as the clip ends resets the swap.
         let swapped = isSwapped
-        phase = .recording(startedAt: capturedAt.instant)
+        phase = .recording(startedAt: nil)
+        shutterAt = Date()
         recordingHold = hold
         defer { recordingHold = nil }
         await engine.setCaptureHold(hold)
@@ -401,6 +414,11 @@ final class CameraModel {
                     interruption = reason
                 case .resumed:
                     interruption = nil
+                case .recordingStarted:
+                    guard case let .recording(startedAt) = phase, startedAt == nil else { break }
+                    let now = Date()
+                    if let shutterAt { Self.logger.info("Recording began \(Int(now.timeIntervalSince(shutterAt) * 1000), privacy: .public) ms after the shutter") }
+                    phase = .recording(startedAt: now)
                 }
             }
         }

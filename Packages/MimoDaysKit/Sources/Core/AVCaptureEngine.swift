@@ -332,6 +332,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                 Self.logger.info("Recording, sound \(hasAudio), sound connections \(outputs.map { $0.1.connections.filter { $0.isEnabled && $0.inputPorts.contains { $0.mediaType == .audio } }.count }, privacy: .public)")
                 let delegate = RecordingDelegate(
                     outputs: outputs.map { ($0.0, ObjectIdentifier($0.1)) }, hasAudio: hasAudio,
+                    started: { self.eventSink.yield(.recordingStarted) },
                     // One stream failing ends the others too.
                     streamFailed: { Task { await self.stopRecording() } }
                 ) { result in
@@ -623,15 +624,18 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
 
     private let streams: Mutex<[ObjectIdentifier: Stream]>
     private let hasAudio: Bool
+    /// Once, as the first stream begins writing.
+    private let started: @Sendable () -> Void
     private let streamFailed: @Sendable () -> Void
     private let completion: @Sendable (Result<CapturedVideo, any Error>) -> Void
 
     init(
-        outputs: [(CameraPosition, ObjectIdentifier)], hasAudio: Bool, streamFailed: @escaping @Sendable () -> Void,
-        completion: @escaping @Sendable (Result<CapturedVideo, any Error>) -> Void
+        outputs: [(CameraPosition, ObjectIdentifier)], hasAudio: Bool, started: @escaping @Sendable () -> Void,
+        streamFailed: @escaping @Sendable () -> Void, completion: @escaping @Sendable (Result<CapturedVideo, any Error>) -> Void
     ) {
         streams = Mutex(Dictionary(uniqueKeysWithValues: outputs.map { ($0.1, Stream(position: $0.0)) }))
         self.hasAudio = hasAudio
+        self.started = started
         self.streamFailed = streamFailed
         self.completion = completion
     }
@@ -650,7 +654,12 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
 
     func fileOutput(_ output: AVCaptureFileOutput, didStartRecordingTo _: URL, from _: [AVCaptureConnection]) {
         let now = CACurrentMediaTime()
-        streams.withLock { $0[ObjectIdentifier(output)]?.started = now }
+        let isFirst = streams.withLock { streams in
+            let first = !streams.values.contains { $0.started != nil }
+            streams[ObjectIdentifier(output)]?.started = now
+            return first
+        }
+        if isFirst { started() }
     }
 
     func fileOutput(

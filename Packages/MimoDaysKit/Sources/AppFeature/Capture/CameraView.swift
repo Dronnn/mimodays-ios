@@ -178,7 +178,7 @@ struct CameraView: View {
                     .turned(CGRect(x: shape.midX - 150, y: shape.midY - 150, width: 300, height: 300), turn, direction: direction)
                     .transition(.opacity)
             }
-            if model.isRecording {
+            if model.recordingHasBegun {
                 RecordingPill(model: model)
                     .rotationEffect(spin(turn))
                     .turned(chrome.timer, turn, direction: direction)
@@ -663,13 +663,13 @@ struct CameraPreview: UIViewRepresentable {
 extension CameraModel {
     /// 0...1 of the video limit.
     func recordingProgress(at date: Date) -> CGFloat {
-        guard case let .recording(startedAt) = phase else { return 0 }
+        guard case let .recording(startedAt?) = phase else { return 0 }
         return CGFloat(min(1, max(0, date.timeIntervalSince(startedAt) / Double(settings.videoLength.rawValue))))
     }
 
     /// "00:07 / 00:10".
     func recordingLabel(at date: Date) -> String {
-        guard case let .recording(startedAt) = phase else { return "" }
+        guard case let .recording(startedAt?) = phase else { return "" }
         let limit = settings.videoLength.rawValue
         let elapsed = min(limit, max(0, Int(date.timeIntervalSince(startedAt))))
         return "\(Self.clock(elapsed)) / \(Self.clock(limit))"

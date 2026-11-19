@@ -54,9 +54,11 @@ final class VoiceRecording: Identifiable {
     }
 }
 
-/// `Sheet / Voice note` (C09): title, the minute as bars (coral so far), "0:12 / 1:00", the coral stop button.
+/// `Sheet / Voice note` (C09): title, the minute as bars (coral so far), "0:12 / 1:00", the coral stop button. The
+/// movie editor's voice over the movie (F09) uses it too, over the movie's length.
 struct VoiceRecordingSheet: View {
     let recording: VoiceRecording
+    var title = Text("Voice note", bundle: .module)
     /// Once, when the sheet goes away for any reason.
     let onFinish: (VoiceRecording) -> Void
     @Environment(\.dismiss) private var dismiss
@@ -64,7 +66,7 @@ struct VoiceRecordingSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Text("Voice note", bundle: .module)
+            title
                 .textStyle(.sheetTitle)
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .accessibilityAddTraits(.isHeader)

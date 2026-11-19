@@ -68,10 +68,10 @@ struct LocalizationTests {
         "This iPhone ran out of space, so the recording stopped at %@. The part before is kept.",
         "The recording stopped at %@. The part before is kept.",
         // Movie editor, export and movie page (Phase 11).
-        "Music", "Choose another file", "Remove music", "Export", "This movie can't play right now.", "Movie preview", "Undo", "Clips", "Text",
+        "Music", "Choose another file", "Remove music", "Choose music", "Record voice", "Movie voice: record again", "Remove your voice", "Your voice", "Music or voice", "Export", "This movie can't play right now.", "Movie preview", "Undo", "Clips", "Text",
         "Audio", "Cut", "Fade", "Atmosphere", "A few words", "Transition title: clip %lld", "the start", "the text card", "Trim", "Replace", "Remove", "Fill", "Show all",
         "Selfie window for this clip", "This clip has no selfie.", "Bottom", "Hidden", "Date on each clip", "Place on each clip",
-        "Title at the start", "Sound from clips", "Voice notes", "Your own audio file from Files. Fades in and out.", "Seconds on screen", "Start",
+        "Title at the start", "Sound from clips", "Voice notes", "A song from Files, or your voice over the movie.", "Seconds on screen", "Start",
         "End", "Replace with", "Every moment is already in the movie.", "Title", "Movie title", "Show it at the start", "Export movie", "Quality",
         "Privacy", "Date in the file", "Exact place in the file",
         "Captions you added are part of the picture. File details are hidden unless you turn them on.", "4K", "Making your movie", "Progress",

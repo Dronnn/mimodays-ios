@@ -85,12 +85,14 @@ final class MovieEditorModel {
         var showsTitle: Bool
         var clipSoundLevel: Double
         var voiceNoteLevel: Double
-        var music: Music?
+        var track: Track?
         var clips: [ClipState]
         var cards: [CardState]
     }
 
-    struct Music: Equatable {
+    /// The movie's one track: the person's music or their voice (F09).
+    struct Track: Equatable {
+        var kind: AudioTrackKind
         var relativePath: String
         var name: String?
         var gain: Double
@@ -111,11 +113,14 @@ final class MovieEditorModel {
     private(set) var failed = false
     private let library: MediaLibrary
     private let clock: any DateProvider
+    private let voice: VoiceServices
     private var undoStack: [Snapshot] = []
     private var rebuild: Task<Void, Never>?
     private var timeObserver: Any?
-    /// Every music file this editor has seen; the ones nothing points at go when it closes.
-    private var musicFiles: Set<String> = []
+    /// Every music or voice file this editor has seen; the ones nothing points at go when it closes.
+    private var audioFiles: Set<String> = []
+    /// The audio session as it was before the microphone took it, so playback goes back to headphones after.
+    private var playbackSession: (category: AVAudioSession.Category, mode: AVAudioSession.Mode)?
     private let logger = Logger(subsystem: "MimoDays", category: "Movies")
     /// Undo keeps this many steps.
     static let undoLimit = 50
@@ -123,14 +128,19 @@ final class MovieEditorModel {
     static let previewResolution = MovieResolution.p720
     /// Music sits under the clips' own sound and the voice notes.
     static let musicGain = 0.8
+    /// The voice over the movie starts as loud as the voice notes; its slider sets it after.
+    static let voiceoverGain = 1.0
+    /// A shorter voice over the movie is dropped, as a voice note is.
+    static let shortestVoiceover = 0.5
 
-    init(project: MovieProject, library: MediaLibrary, clock: any DateProvider = SystemDateProvider()) {
+    init(project: MovieProject, library: MediaLibrary, clock: any DateProvider = SystemDateProvider(), voice: VoiceServices = .simulated) {
         self.project = project
         self.library = library
         self.clock = clock
+        self.voice = voice
         tiles = MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails, clock: clock)
         plan = MoviePlan(clips: [], aspectRatio: project.aspectRatio, fit: project.fit)
-        musicFiles = Set(project.audioTracks.map(\.relativePath))
+        audioFiles = Set(project.audioTracks.map(\.relativePath))
         reload()
         observeTime()
     }
@@ -488,7 +498,8 @@ final class MovieEditorModel {
     /// Clips with a voice note of their own ("6 of 24 clips").
     var voiceNoteCount: Int { plan.clips.filter { !$0.isCard && $0.voiceURL != nil }.count }
 
-    var music: MovieAudioTrack? { project.audioTracks.first { $0.kind == .soundtrack } }
+    /// The movie's one track under everything: the person's music or their voice.
+    var track: MovieAudioTrack? { project.audioTracks.first }
 
     /// A slider started moving: one Undo step for the whole drag.
     func beginLevelChange() { pushUndo() }
@@ -496,6 +507,7 @@ final class MovieEditorModel {
     /// While a slider moves the level changes at once; the movie is rebuilt when it stops.
     func setClipSoundLevel(_ level: Double) { project.clipSoundLevel = min(max(level, 0), 1) }
     func setVoiceNoteLevel(_ level: Double) { project.voiceNoteLevel = min(max(level, 0), 1) }
+    func setTrackLevel(_ level: Double) { track?.gain = min(max(level, 0), 1) }
 
     func endLevelChange() { saved() }
 
@@ -505,25 +517,86 @@ final class MovieEditorModel {
         defer { if accessing { url.stopAccessingSecurityScopedResource() } }
         do {
             let file = try library.store.store(copyOf: url, in: .originals, fileExtension: url.pathExtension.isEmpty ? nil : url.pathExtension)
-            musicFiles.insert(file.relativePath)
-            edit {
-                for track in project.audioTracks where track.kind == .soundtrack { library.context.delete(track) }
-                let track = MovieAudioTrack(kind: .soundtrack, relativePath: file.relativePath, gain: Self.musicGain)
-                track.name = url.deletingPathExtension().lastPathComponent
-                track.project = project
-                library.context.insert(track)
-            }
+            audioFiles.insert(file.relativePath)
+            edit { put(Track(kind: .soundtrack, relativePath: file.relativePath, name: url.deletingPathExtension().lastPathComponent, gain: Self.musicGain)) }
         } catch {
             logger.error("Adding music failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     /// The file stays until the editor closes, so Undo can bring it back.
-    func removeMusic() {
-        guard music != nil else { return }
-        edit {
-            for track in project.audioTracks where track.kind == .soundtrack { library.context.delete(track) }
+    func removeTrack() {
+        guard track != nil else { return }
+        edit { put(nil) }
+    }
+
+    /// The movie's track becomes `new`, or goes; the old one's file is left for `close`.
+    private func put(_ new: Track?) {
+        for track in project.audioTracks { library.context.delete(track) }
+        guard let new else { return }
+        let track = MovieAudioTrack(kind: new.kind, relativePath: new.relativePath, gain: new.gain)
+        track.name = new.name
+        track.project = project
+        library.context.insert(track)
+    }
+
+    // MARK: Voice over the movie (F09)
+
+    /// The movie plays from the start, silent so its sound isn't recorded into the voice, while the microphone records
+    /// up to its end. Nil when the microphone can't start; the track stays as it was.
+    func startVoiceover() -> VoiceRecording? {
+        guard duration > 0, let url = try? CaptureFiles.temporaryURL("m4a") else { return nil }
+        pause()
+        let session = AVAudioSession.sharedInstance()
+        playbackSession = (session.category, session.mode)
+        let recording = VoiceRecording(recorder: voice.makeRecorder(), url: url, limit: duration)
+        guard recording.start() else {
+            restorePlayback()
+            try? FileManager.default.removeItem(at: url)
+            return nil
         }
+        seek(to: 0)
+        player.isMuted = true
+        player.play()
+        isPlaying = true
+        return recording
+    }
+
+    /// Stop, the movie's end, the sheet or the app left: what was recorded becomes the movie's track.
+    func finishVoiceover(_ recording: VoiceRecording) {
+        recording.finish()
+        pause()
+        restorePlayback()
+        addVoiceover(at: recording.url)
+    }
+
+    private func restorePlayback() {
+        player.isMuted = false
+        guard let playbackSession else { return }
+        try? AVAudioSession.sharedInstance().setCategory(playbackSession.category, mode: playbackSession.mode)
+        self.playbackSession = nil
+    }
+
+    /// A recording replaces the music or an earlier voice; it's moved in. Too short or unreadable, it's dropped and
+    /// the track stays as it was.
+    func addVoiceover(at url: URL) {
+        guard let seconds = Self.seconds(of: url), seconds >= Self.shortestVoiceover else {
+            try? FileManager.default.removeItem(at: url)
+            return
+        }
+        do {
+            let file = try library.store.store(moving: url, in: .originals, fileExtension: "m4a")
+            audioFiles.insert(file.relativePath)
+            edit { put(Track(kind: .voiceover, relativePath: file.relativePath, name: nil, gain: Self.voiceoverGain)) }
+        } catch {
+            try? FileManager.default.removeItem(at: url)
+            logger.error("Adding the voice failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private static func seconds(of url: URL) -> Double? {
+        guard let file = try? AVAudioFile(forReading: url), file.length > 0 else { return nil }
+        return Double(file.length) / file.processingFormat.sampleRate
     }
 
     // MARK: Undo
@@ -539,7 +612,7 @@ final class MovieEditorModel {
         Snapshot(
             title: project.title, aspectRatio: project.aspectRatio, fit: project.fit, showsDates: project.showsDates,
             showsPlaces: project.showsPlaces, showsTitle: project.showsTitle, clipSoundLevel: project.clipSoundLevel,
-            voiceNoteLevel: project.voiceNoteLevel, music: music.map { Music(relativePath: $0.relativePath, name: $0.name, gain: $0.gain) },
+            voiceNoteLevel: project.voiceNoteLevel, track: track.map(Track.init),
             clips: project.orderedClips.compactMap { clip in
                 clip.moment.map {
                     ClipState(
@@ -568,15 +641,7 @@ final class MovieEditorModel {
         project.showsTitle = snapshot.showsTitle
         project.clipSoundLevel = snapshot.clipSoundLevel
         project.voiceNoteLevel = snapshot.voiceNoteLevel
-        if music.map({ Music(relativePath: $0.relativePath, name: $0.name, gain: $0.gain) }) != snapshot.music {
-            for track in project.audioTracks where track.kind == .soundtrack { library.context.delete(track) }
-            if let music = snapshot.music {
-                let track = MovieAudioTrack(kind: .soundtrack, relativePath: music.relativePath, gain: music.gain)
-                track.name = music.name
-                track.project = project
-                library.context.insert(track)
-            }
-        }
+        if track.map(Track.init) != snapshot.track { put(snapshot.track) }
         if self.snapshot.clips != snapshot.clips {
             for clip in project.clips { library.context.delete(clip) }
             let ids = snapshot.clips.map(\.momentID)
@@ -675,13 +740,19 @@ final class MovieEditorModel {
     /// Waits for the stage to catch up with the last change (tests, export).
     func settled() async { await rebuild?.value }
 
-    /// Music files no project uses any more go when the editor closes. Ones Undo can still bring back stay: going
-    /// to Export closes it too, and the editor is still there to come back to. The launch sweep takes them later.
+    /// Music and voice files no project uses any more go when the editor closes. Ones Undo can still bring back stay:
+    /// going to Export closes it too, and the editor is still there to come back to. The launch sweep takes them later.
     func close() {
         pause()
         rebuild?.cancel()
         if let timeObserver { player.removeTimeObserver(timeObserver) }
         timeObserver = nil
-        store.removeUnusedAudio(musicFiles.subtracting(undoStack.compactMap(\.music?.relativePath)))
+        store.removeUnusedAudio(audioFiles.subtracting(undoStack.compactMap(\.track?.relativePath)))
+    }
+}
+
+private extension MovieEditorModel.Track {
+    init(_ track: MovieAudioTrack) {
+        self.init(kind: track.kind, relativePath: track.relativePath, name: track.name, gain: track.gain)
     }
 }

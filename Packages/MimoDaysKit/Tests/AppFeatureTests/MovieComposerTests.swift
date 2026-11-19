@@ -224,6 +224,28 @@ struct MovieComposerTests {
         #expect(titles.isEmpty)
     }
 
+    /// F09: the person's voice over the movie plays from the start at its level, without music's fades.
+    @Test func theVoiceOverTheMoviePlaysAtItsLevelWithoutFades() async throws {
+        let ids = try await save(2)
+        let project = try project(ids)
+        let voice = try store.store(copyOf: Fixture.voiceNote.url, in: .originals, fileExtension: "m4a")
+        project.audioTracks.append(MovieAudioTrack(kind: .voiceover, relativePath: voice.relativePath, gain: 0.6))
+        let plan = MoviePlan(project, store: store)
+        #expect(plan.music == MoviePlan.Music(url: try store.url(for: voice.relativePath), gain: 0.6, fades: false))
+        let composed = try await MovieComposer.compose(plan, renderSize: portrait)
+        let track = try #require(composed.asset.tracks(withMediaType: .audio).first)
+        #expect(composed.asset.tracks(withMediaType: .audio).count == 1, "photos only: the voice is the sound")
+        #expect(track.segments.first { !$0.isEmpty }?.timeMapping.target.start == .zero)
+        let parameters = try #require(composed.audioMix.inputParameters.first { $0.trackID == track.trackID })
+        var start: Float = -1
+        var end: Float = -1
+        var range = CMTimeRange.zero
+        for seconds in [0, 1.9] {
+            #expect(parameters.getVolumeRamp(for: CMTime(seconds: seconds, preferredTimescale: 600), startVolume: &start, endVolume: &end, timeRange: &range))
+            #expect(start == 0.6 && end == 0.6, "no fade at \(seconds) s")
+        }
+    }
+
     /// The 2 s fixture clip with the 2 s voice fixture as its own sound, like a video recorded with the microphone.
     private func clipWithSound() async throws -> URL {
         let composition = AVMutableComposition()

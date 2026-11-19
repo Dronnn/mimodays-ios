@@ -250,16 +250,18 @@ struct MovieTimeline: View {
 
     // MARK: Music
 
-    /// The song under the whole movie: its name and level on a sage band, with its fade in and out drawn.
+    /// The song or the voice under the whole movie: its name and level on a sage band, with a song's fade in and out
+    /// drawn.
     private func musicLane(_ widths: [CGFloat]) -> some View {
         let total = widths.reduce(0, +) + Self.spacing * CGFloat(max(widths.count - 1, 0))
         return lane {
-            if let music = model.music {
+            if let music = model.track {
                 RibbonBlob()
                     .fill(ColorToken.accentSage.color.opacity(0.55))
-                    .overlay { MusicEnvelope().stroke(Color(hex: 0x4F6B4A), lineWidth: 1.5) }
+                    // The voice doesn't fade.
+                    .overlay { if music.kind == .soundtrack { MusicEnvelope().stroke(Color(hex: 0x4F6B4A), lineWidth: 1.5) } }
                     .overlay(alignment: .leading) {
-                        Text(verbatim: "\(music.name ?? String(appLocalized: "Music", bundle: .module)) · \(music.gain.formatted(.percent.precision(.fractionLength(0)).locale(locale)))")
+                        Text(verbatim: "\(music.title) · \(music.gain.formatted(.percent.precision(.fractionLength(0)).locale(locale)))")
                             .textStyle(TextStyle(.body, size: 11, weight: 700, relativeTo: .caption2, maximumScale: 1))
                             .foregroundStyle(Color(hex: 0x3B4E37))
                             .lineLimit(1)

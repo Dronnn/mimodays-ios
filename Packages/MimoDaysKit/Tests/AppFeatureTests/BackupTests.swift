@@ -168,6 +168,25 @@ struct BackupTests {
         #expect(restored.count == 1 && restored[0].restoredAt != nil)
     }
 
+    /// F09: a voice recorded over a movie comes back as the person's voice, with its file and level.
+    @Test func aVoiceOverTheMovieComesBack() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let track = try #require(try phone.context.fetch(FetchDescriptor<MovieAudioTrack>()).first)
+        track.kind = .voiceover
+        track.name = nil
+        track.gain = 0.4
+        try phone.context.save()
+        let (url, _) = try backUp(phone)
+
+        let newPhone = try library()
+        _ = try restore(url, into: newPhone)
+        let restored = try #require(try newPhone.context.fetch(FetchDescriptor<MovieAudioTrack>()).first)
+        #expect(restored.kind == .voiceover && restored.name == nil && restored.gain == 0.4 && restored.startOffset == 0)
+        #expect(newPhone.store.fileExists(restored.relativePath))
+        #expect(records(newPhone) == records(phone))
+    }
+
     @Test func withoutRendersTheMovieComesBackAsADraft() async throws {
         let phone = try library()
         _ = try await fill(phone)

@@ -42,12 +42,12 @@ struct MovieEditorModelTests {
         return ids
     }
 
-    private func editor(_ ids: [UUID]) throws -> MovieEditorModel {
+    private func editor(_ ids: [UUID], voice: VoiceServices = .simulated) throws -> MovieEditorModel {
         let project = try movies.create(
             title: "October 2026", source: MovieSourceRule(kind: .selection, momentIDs: ids), length: .full,
             aspectRatio: .portrait9x16, fit: .fill, momentIDs: ids
         )
-        return MovieEditorModel(project: project, library: library, clock: clock)
+        return MovieEditorModel(project: project, library: library, clock: clock, voice: voice)
     }
 
     private func order(_ model: MovieEditorModel) -> [UUID] { model.clips.compactMap { $0.moment?.id } }
@@ -194,27 +194,123 @@ struct MovieEditorModelTests {
         let song = FileManager.default.temporaryDirectory.appending(path: "Sunday song.m4a")
         try Data([1, 2, 3]).write(to: song)
         model.setMusic(from: song)
-        let track = try #require(model.music)
+        let track = try #require(model.track)
         #expect(track.name == "Sunday song")
         #expect(store.fileExists(track.relativePath))
         let path = track.relativePath
-        model.removeMusic()
-        #expect(model.music == nil)
+        model.removeTrack()
+        #expect(model.track == nil)
         // Undo can still bring it back while the editor is open.
         #expect(store.fileExists(path))
         model.undo()
-        #expect(model.music?.relativePath == path)
-        model.removeMusic()
+        #expect(model.track?.relativePath == path)
+        model.removeTrack()
         // Closing (Export pushed over it too) keeps what Undo can bring back; nothing else points to it, so the
         // launch sweep takes it.
         model.close()
         #expect(store.fileExists(path))
         model.undo()
-        #expect(model.music?.relativePath == path && store.fileExists(path))
-        model.removeMusic()
+        #expect(model.track?.relativePath == path && store.fileExists(path))
+        model.removeTrack()
         model.close()
         OrphanFiles.remove(context: context, store: store)
         #expect(!store.fileExists(path))
+    }
+
+    // MARK: Voice over the movie (F09)
+
+    /// A recorded voice, `seconds` long, where a recording would leave it.
+    private func recordedVoice(seconds: TimeInterval = 2) throws -> URL {
+        let url = try CaptureFiles.temporaryURL("m4a")
+        try SimulatedVoiceRecorder.writeTone(to: url, seconds: seconds)
+        return url
+    }
+
+    @Test func aRecordedVoiceBecomesTheMoviesTrackInPlaceOfMusic() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        let song = FileManager.default.temporaryDirectory.appending(path: "Sunday song.m4a")
+        try Data([1, 2, 3]).write(to: song)
+        model.setMusic(from: song)
+        let music = try #require(model.track).relativePath
+        let recorded = try recordedVoice()
+        model.addVoiceover(at: recorded)
+        #expect(model.project.audioTracks.count == 1, "one track under the movie")
+        let track = try #require(model.track)
+        #expect(track.kind == .voiceover && track.startOffset == 0 && track.name == nil)
+        #expect(track.gain == MovieEditorModel.voiceoverGain)
+        #expect(track.relativePath.hasPrefix(MediaStore.Area.originals.rawValue))
+        #expect(store.fileExists(track.relativePath) && !FileManager.default.fileExists(atPath: recorded.path()), "moved in")
+        // The movie plays it, as it is: no fades over the first and last words.
+        #expect(model.plan.music == MoviePlan.Music(url: try store.url(for: track.relativePath), gain: MovieEditorModel.voiceoverGain, fades: false))
+        // Its level is the person's to set, one Undo step for the drag.
+        model.beginLevelChange()
+        model.setTrackLevel(0.3)
+        model.endLevelChange()
+        #expect(model.track?.gain == 0.3 && model.plan.music?.gain == 0.3)
+        model.undo()
+        #expect(model.track?.gain == MovieEditorModel.voiceoverGain)
+        // Undo brings the music back; its file stayed for that.
+        model.undo()
+        #expect(model.track?.kind == .soundtrack && model.track?.relativePath == music && store.fileExists(music))
+    }
+
+    @Test func recordingAgainReplacesTheVoiceAndTheOldFileGoesOnceNothingUsesIt() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        model.addVoiceover(at: try recordedVoice())
+        let first = try #require(model.track).relativePath
+        model.addVoiceover(at: try recordedVoice(seconds: 1))
+        let second = try #require(model.track).relativePath
+        #expect(first != second && model.project.audioTracks.count == 1)
+        // Undo can still bring the first one back while the editor is open.
+        #expect(store.fileExists(first))
+        model.removeTrack()
+        #expect(model.track == nil && model.plan.music == nil)
+        model.close()
+        OrphanFiles.remove(context: context, store: store)
+        #expect(!store.fileExists(first) && !store.fileExists(second))
+    }
+
+    @Test func aTooShortOrUnreadableRecordingLeavesTheTrackAsItWas() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        model.addVoiceover(at: try recordedVoice())
+        let kept = try #require(model.track).relativePath
+        let short = try recordedVoice(seconds: 0.2)
+        model.addVoiceover(at: short)
+        let broken = try CaptureFiles.temporaryURL("m4a")
+        try Data([1, 2, 3]).write(to: broken)
+        model.addVoiceover(at: broken)
+        #expect(model.track?.relativePath == kept && model.project.audioTracks.count == 1)
+        #expect(!FileManager.default.fileExists(atPath: short.path()) && !FileManager.default.fileExists(atPath: broken.path()), "dropped")
+        model.undo()
+        #expect(model.track == nil, "only the first recording was a step")
+    }
+
+    @Test func theMoviePlaysFromTheStartWhileTheVoiceRecordsAndItsLengthIsTheLimit() async throws {
+        let ids = try await save(2, videos: [0])
+        let recorderClock = TestDateProvider()
+        let model = try editor(ids, voice: VoiceServices(makeRecorder: { SimulatedVoiceRecorder(now: recorderClock.now) }, transcriber: SimulatedTranscriber()))
+        await model.settled()
+        model.select(1)
+        let recording = try #require(model.startVoiceover())
+        #expect(recording.limit == model.duration)
+        #expect(model.isPlaying && model.time == 0 && model.player.isMuted, "silent, so its sound isn't recorded into the voice")
+        recorderClock.advance(by: 1.5)
+        model.finishVoiceover(recording)
+        #expect(!model.isPlaying && !model.player.isMuted)
+        let track = try #require(model.track)
+        #expect(track.kind == .voiceover && store.fileExists(track.relativePath))
+    }
+
+    @Test func aMicrophoneThatCantStartRecordsNothing() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids, voice: VoiceServices(makeRecorder: { FailingRecorder() }, transcriber: SimulatedTranscriber()))
+        model.addVoiceover(at: try recordedVoice())
+        let kept = try #require(model.track).relativePath
+        #expect(model.startVoiceover() == nil)
+        #expect(!model.isPlaying && !model.player.isMuted && model.track?.relativePath == kept)
     }
 
     @Test func deletedMomentsDropOutOfTheMovie() async throws {
@@ -349,4 +445,14 @@ struct MovieEditorModelTests {
         for _ in 0..<5 { model.undo() }
         #expect(model.clips[1].cameraLayout == nil && model.clips[1].pipFrame == nil && model.clips[1].clipAudio != .muted)
     }
+}
+
+/// A microphone that won't start (taken by a call, or not allowed).
+@MainActor
+private final class FailingRecorder: VoiceRecorder {
+    func start(to _: URL, limit _: TimeInterval) throws { throw VoiceRecorderError.couldNotStart }
+    var elapsed: TimeInterval { 0 }
+    var level: Float { 0 }
+    var isRecording: Bool { false }
+    func stop() {}
 }

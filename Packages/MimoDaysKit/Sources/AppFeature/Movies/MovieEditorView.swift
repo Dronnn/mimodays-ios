@@ -10,11 +10,15 @@ import UniformTypeIdentifiers
 struct MovieEditorScreen: View {
     let projectID: UUID
     @Environment(\.mediaLibrary) private var library
+    @Environment(\.camera) private var camera
     @Environment(AppRouter.self) private var router
 
     var body: some View {
         if let library, let project = MovieStore.project(projectID, in: library.context) {
-            MovieEditorHost(model: MovieEditorModel(project: project, library: library), export: { router.moviesPath.append(.export(projectID)) })
+            MovieEditorHost(
+                model: MovieEditorModel(project: project, library: library, voice: (camera ?? .simulated).voice),
+                export: { router.moviesPath.append(.export(projectID)) }
+            )
         }
     }
 }
@@ -34,6 +38,15 @@ struct MovieEditorView: View {
     @State private var sheet: Sheet?
     @State private var choosingMusic = false
     @State private var musicOptions = false
+    /// The voice over the movie while it records (F09).
+    @State private var voiceover: VoiceRecording?
+    @State private var microphoneOff = false
+    @State private var asker = PermissionAsker()
+    /// Off screen (left while the microphone was asked for): nothing starts recording.
+    @State private var isShown = false
+    @Environment(\.permissions) private var permissions
+    @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
     @State private var previewing = false
     /// U52: the window while a finger moves it on the stage, in movie pixels.
     @State private var movingWindow: CGRect?
@@ -83,8 +96,45 @@ struct MovieEditorView: View {
             if case let .success(url) = result { model.setMusic(from: url) }
         }
         .confirmationDialog(Text("Music", bundle: .module), isPresented: $musicOptions, titleVisibility: .hidden) {
-            Button { choosingMusic = true } label: { Text("Choose another file", bundle: .module) }
-            Button(role: .destructive) { model.removeMusic() } label: { Text("Remove music", bundle: .module) }
+            switch model.track?.kind {
+            case nil:
+                Button { choosingMusic = true } label: {
+                    Text("Choose music", bundle: .module, comment: "Movie editor (F09): menu action that picks a music file for the movie")
+                }
+                Button(action: recordVoice) {
+                    Text("Record voice", bundle: .module, comment: "Movie editor (F09): menu action that records the person's voice over the whole movie")
+                }
+            case .soundtrack:
+                Button { choosingMusic = true } label: { Text("Choose another file", bundle: .module) }
+                Button(action: recordVoice) { Text("Record voice", bundle: .module) }
+                Button(role: .destructive, action: model.removeTrack) { Text("Remove music", bundle: .module) }
+            case .voiceover:
+                Button(action: recordVoice) {
+                    Text("Movie voice: record again", bundle: .module, comment: "Movie editor (F09): menu action that records the voice over the movie again, replacing the old one. English: Record again")
+                }
+                Button { choosingMusic = true } label: { Text("Choose music", bundle: .module) }
+                Button(role: .destructive, action: model.removeTrack) {
+                    Text("Remove your voice", bundle: .module, comment: "Movie editor (F09): menu action that takes the recorded voice out of the movie")
+                }
+            }
+        }
+        .sheet(item: $voiceover) { recording in
+            VoiceRecordingSheet(recording: recording, title: Text("Your voice", bundle: .module)) { model.finishVoiceover($0) }
+        }
+        .permissionExplainers(asker)
+        .sheet(isPresented: $microphoneOff) {
+            PermissionExplainerView(screen: .microphoneOff) {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            } secondary: {
+                microphoneOff = false
+            }
+        }
+        // Leaving MimoDays stops the recording; what was recorded is kept.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background, let voiceover {
+                voiceover.finish()
+                self.voiceover = nil
+            }
         }
         .fullScreenCover(isPresented: $previewing) {
             MoviePreviewView(model: model, export: {
@@ -92,8 +142,31 @@ struct MovieEditorView: View {
                 export()
             })
         }
-        .onAppear { model.observeTime() }
-        .onDisappear { if !previewing { model.close() } }
+        .onAppear {
+            isShown = true
+            model.observeTime()
+        }
+        .onDisappear {
+            isShown = false
+            // The microphone's explainer covers the editor without leaving it.
+            if !previewing, asker.screen == nil { model.close() }
+        }
+    }
+
+    /// F09's voice over the movie: our explainer and the system prompt the first time; once it is off, the way to
+    /// Settings.
+    private func recordVoice() {
+        guard !asker.isAsking, voiceover == nil else { return }
+        Task {
+            let status = await asker.request(.microphone, using: permissions)
+            // The microphone only records with its sheet up: not once the editor is gone or something else opened.
+            guard isShown, sheet == nil, !previewing, voiceover == nil else { return }
+            guard status.isUsable else {
+                if status.needsSettings { microphoneOff = true }
+                return
+            }
+            voiceover = model.startVoiceover()
+        }
     }
 
     // MARK: Layouts
@@ -411,9 +484,7 @@ struct MovieEditorView: View {
                 model.addCard()
                 sheet = .card
             })
-        case .audio: AudioPanel(model: model, music: {
-                if model.music == nil { choosingMusic = true } else { musicOptions = true }
-            })
+        case .audio: AudioPanel(model: model, music: { musicOptions = true })
         }
     }
 
@@ -801,13 +872,13 @@ struct AudioPanel: View {
                 .accessibilityIdentifier("editor.voiceLevel")
             Button(action: music) {
                 HStack(spacing: 4) {
-                    Text("Music", bundle: .module)
+                    Text("Music or voice", bundle: .module, comment: "Movie editor (F09): the row of the movie's one track, a music file or the person's voice")
                         .textStyle(.rowTitle)
                         .foregroundStyle(ColorToken.textPrimary.color)
                     Spacer(minLength: 8)
                     Group {
-                        if let track = model.music {
-                            Text(track.name ?? String(appLocalized: "On", bundle: .module))
+                        if let track = model.track {
+                            Text(track.kind == .voiceover ? track.title : track.name ?? String(appLocalized: "On", bundle: .module))
                         } else {
                             Text("None", bundle: .module, comment: "F09: no music chosen")
                         }
@@ -833,7 +904,14 @@ struct AudioPanel: View {
             .padding(.top, 10)
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("editor.music")
-            Text("Your own audio file from Files. Fades in and out.", bundle: .module)
+            if let track = model.track {
+                LevelSlider(value: Binding(get: { track.gain }, set: model.setTrackLevel), changing: changing)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 10)
+                    .accessibilityLabel(Text(track.title))
+                    .accessibilityIdentifier("editor.trackLevel")
+            }
+            Text("A song from Files, or your voice over the movie.", bundle: .module, comment: "Movie editor (F09): note under the music or voice row")
                 .textStyle(TextStyle(.body, size: 13, weight: 500, relativeTo: .footnote))
                 .foregroundStyle(ColorToken.textSecondary.color)
                 .fixedSize(horizontal: false, vertical: true)
@@ -932,5 +1010,19 @@ struct MoviePlayerSurface: UIViewRepresentable {
     final class PlayerView: UIView {
         override static var layerClass: AnyClass { AVPlayerLayer.self }
         var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+    }
+}
+
+extension MovieAudioTrack {
+    /// F09's name for the movie's track: "Your voice", or the song's file name.
+    var title: String {
+        switch kind {
+        case .voiceover:
+            String(
+                appLocalized: "Your voice", bundle: .module,
+                comment: "Movie editor (F09): the person's voice recorded over the movie, where a song's name would show; the recording sheet's title"
+            )
+        case .soundtrack: name ?? String(appLocalized: "Music", bundle: .module)
+        }
     }
 }

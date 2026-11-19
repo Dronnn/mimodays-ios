@@ -156,7 +156,7 @@ enum MovieComposer {
             ))
             cursor = cursor + length
         }
-        // F09's music: from the start, as long as the movie or the song, fading in and out.
+        // F09's music or voice: from the start, as long as the movie or the file, music fading in and out.
         let musicAsset = plan.music.map { AVURLAsset(url: $0.url) }
         var musicRamp: CMTimeRange?
         if let musicAsset, let song = try await musicAsset.loadTracks(withMediaType: .audio).first,
@@ -184,7 +184,12 @@ enum MovieComposer {
             case soundTrack.trackID: glide(parameters, through: soundLevels)
             case voiceTrack.trackID: parameters.setVolume(Float(plan.voiceNoteLevel), at: .zero)
             default:
-                guard let ramp = musicRamp, let gain = plan.music?.gain else { break }
+                guard let ramp = musicRamp, let music = plan.music else { break }
+                let gain = music.gain
+                guard music.fades else {
+                    parameters.setVolume(Float(gain), at: .zero)
+                    break
+                }
                 let fade = CMTimeMinimum(time(musicFadeSeconds), CMTimeMultiplyByFloat64(ramp.duration, multiplier: 0.5))
                 parameters.setVolumeRamp(fromStartVolume: 0, toEndVolume: Float(gain), timeRange: CMTimeRange(start: .zero, duration: fade))
                 parameters.setVolumeRamp(fromStartVolume: Float(gain), toEndVolume: 0, timeRange: CMTimeRange(start: ramp.end - fade, duration: fade))

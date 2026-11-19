@@ -103,6 +103,15 @@ struct MovieEditorSnapshotTests {
         assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
+    /// F09 with the person's voice recorded over the movie: named as theirs, with its level.
+    @Test func audioWithVoice() async throws {
+        let model = try await editor(.audio)
+        let recorded = try CaptureFiles.temporaryURL("m4a")
+        try SimulatedVoiceRecorder.writeTone(to: recorded, seconds: 2)
+        model.addVoiceover(at: recorded)
+        assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
     /// U50: a text card first, an Atmosphere dot, a muted clip; the playhead in the lead shows U54's badge.
     @Test func timeline() async throws {
         let model = try await editor(.clips)

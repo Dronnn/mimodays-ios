@@ -244,11 +244,17 @@ final class MemoriesModel {
         } catch {
             logger.error("Reading moments failed: \(error.localizedDescription, privacy: .public)")
         }
-        // An edit can change a voice note or a video's length; tiles read them again.
-        details = [:]
+        // An edit can change a voice note or a video's length: shown tiles read them again here, in place. Emptied,
+        // a tile already on screen would keep its badges off, as its load ran once.
+        let shown = Array(details.keys)
+        let fresh = (try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { shown.contains($0.id) }))) ?? []
+        details = Dictionary(uniqueKeysWithValues: fresh.map { ($0.id, Self.detail(of: $0)) })
         isLoaded = true
-        Task { await reloadChangedImages() }
+        reloading = Task { await reloadChangedImages() }
     }
+
+    /// The pictures read again after the last refresh (tests wait for it).
+    private(set) var reloading: Task<Void, Never>?
 
     /// Pictures whose files were replaced since they were read come again; the rest stay.
     func reloadChangedImages() async {
@@ -339,7 +345,11 @@ final class MemoriesModel {
         var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
         guard let moment = try? context.fetch(descriptor).first else { return nil }
-        return TileDetail(
+        return Self.detail(of: moment)
+    }
+
+    private static func detail(of moment: Moment) -> TileDetail {
+        TileDetail(
             thumbnailPath: moment.media.first { $0.role == .thumbnail }?.relativePath,
             duration: moment.mediaType == .video ? moment.media.compactMap(\.duration).max() : nil,
             hasVoiceNote: !moment.voiceNotes.isEmpty

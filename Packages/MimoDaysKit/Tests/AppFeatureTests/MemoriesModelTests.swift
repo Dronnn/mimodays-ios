@@ -105,6 +105,18 @@ struct MemoriesModelTests {
         #expect(model.images[video] != nil)
     }
 
+    /// Back in the app (or after a save elsewhere), a tile already on screen keeps its video length: it isn't loaded
+    /// again, so the refresh fills it in.
+    @Test func aRefreshKeepsTheBadgesOfTilesOnScreen() async throws {
+        let video = try await save(at: Self.date(2026, 11, 10), video: true)
+        let model = model()
+        await model.load(video)
+        let duration = try #require(model.details[video]?.duration)
+        model.refresh()
+        #expect(model.details[video]?.duration == duration)
+        await model.reloading?.value
+    }
+
     /// U16/H.9: a video tile loops its main stream, pictures only, so other apps' sound plays on; the selfie stays
     /// the composed still.
     @Test func aVideoTileLoopsItsMainStreamWithoutSound() async throws {

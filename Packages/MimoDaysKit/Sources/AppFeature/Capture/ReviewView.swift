@@ -283,6 +283,8 @@ struct ReviewView: View {
                 .padding(.top, 20)
             if let voice = model.voice {
                 VoiceNoteCard(model: model, voice: voice)
+                    // Its trash would take the file the save is copying.
+                    .disabled(isSaving)
                     .padding(.top, 14)
             }
             // One row; under each other once large text no longer fits them side by side.

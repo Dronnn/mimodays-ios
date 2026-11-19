@@ -49,7 +49,7 @@ struct PlaceSheet<Model: PlaceChoosing>: View {
                 .padding(.horizontal, 4)
             searchField
                 .padding(.top, 13)
-            if query.isEmpty {
+            if trimmed.isEmpty {
                 card { suggestions }
                     .padding(.top, 14)
                 Text("Places are stored on this iPhone only. You can choose how precise they are in Settings.", bundle: .module)
@@ -67,8 +67,8 @@ struct PlaceSheet<Model: PlaceChoosing>: View {
         .padding(.horizontal, 16)
         .padding(.top, 24)
         .padding(.bottom, 8)
-        .frame(maxHeight: query.isEmpty ? nil : .infinity, alignment: .top)
-        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { if query.isEmpty { height = $0 } }
+        .frame(maxHeight: trimmed.isEmpty ? nil : .infinity, alignment: .top)
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { if trimmed.isEmpty { height = $0 } }
         .presentationDetents([.height(height), .large], selection: $detent)
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(28)
@@ -76,18 +76,21 @@ struct PlaceSheet<Model: PlaceChoosing>: View {
         .onChange(of: height) { if detent != .large { detent = .height(height) } }
         .onChange(of: searches) { if searches { detent = .large } }
         .task(id: model.currentPlace) { await model.loadNearby() }
-        .task(id: query) {
+        // By the trimmed text: spaces alone are no search (and no endless spinner); a trailing space is no new one.
+        .task(id: trimmed) {
             results = nil
-            let text = query.trimmingCharacters(in: .whitespacesAndNewlines)
+            let text = trimmed
             guard !text.isEmpty else { return }
             try? await Task.sleep(for: .milliseconds(300))
             guard !Task.isCancelled else { return }
             let found = await model.searchPlaces(text)
             // A lookup that ends after the next query was typed would show (and let someone pick) the old results.
-            guard !Task.isCancelled, text == query.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+            guard !Task.isCancelled, text == trimmed else { return }
             results = found
         }
     }
+
+    private var trimmed: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     private var searchField: some View {
         HStack(spacing: 8) {

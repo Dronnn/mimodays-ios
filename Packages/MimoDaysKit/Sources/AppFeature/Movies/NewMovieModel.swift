@@ -41,9 +41,21 @@ final class NewMovieModel {
     /// The same moments as F05's tiles, in the order they happened.
     private(set) var items: [MemoryItem] = []
     private(set) var seed: UInt64
-    /// Moments chosen elsewhere (a selection, a place), and the place's name.
+    /// Moments chosen before the wizard opened (a selection in Memories).
     private(set) var presetIDs: [UUID] = []
+    /// The chosen place's moments and name: apart from `presetIDs`, so going back from a place to choose moments by
+    /// hand offers all of them.
+    private(set) var placeIDs: [UUID] = []
     private(set) var placeName: String?
+    /// What the automatic pick was made from: Next again with the same source and length keeps the hand-made changes.
+    private var pickedFor: PickInputs?
+    private struct PickInputs: Equatable {
+        let source: Source
+        let target: Double?
+        let candidates: [UUID]
+    }
+    /// The draft Build made; a second Build (two taps) makes no other.
+    private var builtID: UUID?
     private(set) var collections: [Choice] = []
     private(set) var places: [MapPlace] = []
     let tiles: MemoriesModel
@@ -161,7 +173,7 @@ final class NewMovieModel {
                 // Choose moments from everything: none picked until tapped (F05).
                 return try MoviesModel.candidates(in: library.context, from: 0, through: 99_999_999)
             }
-            let ids = presetIDs
+            let ids = source == .moments ? presetIDs : placeIDs
             return Self.candidates(try library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { ids.contains($0.id) })))
         }
     }
@@ -180,7 +192,7 @@ final class NewMovieModel {
     func choosePlace(_ place: MapPlace) {
         source = .place(place.id)
         placeName = place.label
-        presetIDs = place.moments.map(\.id)
+        placeIDs = place.moments.map(\.id)
     }
 
     // MARK: Step 2 (F04)
@@ -202,6 +214,9 @@ final class NewMovieModel {
 
     /// The automatic pick for the chosen length; choosing moments by hand starts with none.
     func pickAutomatically() {
+        let inputs = PickInputs(source: source, target: target, candidates: candidates.map(\.id))
+        guard inputs != pickedFor else { return }
+        pickedFor = inputs
         if source == .moments, presetIDs.isEmpty {
             picked = []
         } else {
@@ -217,6 +232,7 @@ final class NewMovieModel {
 
     /// The draft, its moments in the order they happened.
     func build() -> UUID? {
+        guard builtID == nil else { return nil }
         let ordered = candidates.filter { picked.contains($0.id) }.map(\.id)
         do {
             let project = try MovieStore(context: library.context, store: library.store, now: { [clock] in clock.now() }).create(
@@ -225,6 +241,7 @@ final class NewMovieModel {
             )
             if length == .custom { project.customLength = Double(customMinutes) * 60 }
             try library.context.save()
+            builtID = project.id
             return project.id
         } catch {
             logger.error("Building the movie failed: \(error.localizedDescription, privacy: .public)")
@@ -291,7 +308,7 @@ final class NewMovieModel {
             let days = days(of: source) ?? today...today
             return MovieSourceRule(kind: .dateRange, start: MemoriesView.dayDate(days.lowerBound), end: MemoriesView.dayDate(days.upperBound))
         case let .collection(id): return MovieSourceRule(kind: .collection, collectionID: id)
-        case .place: return MovieSourceRule(kind: .place, momentIDs: presetIDs)
+        case .place: return MovieSourceRule(kind: .place, momentIDs: placeIDs)
         case .moments: return MovieSourceRule(kind: .selection, momentIDs: Array(picked))
         }
     }
@@ -307,7 +324,7 @@ final class NewMovieModel {
             if let id = rule.collectionID { source = .collection(id) }
         case .place:
             source = .place(rule.momentIDs.first?.uuidString ?? "")
-            presetIDs = rule.momentIDs
+            placeIDs = rule.momentIDs
             placeName = placeLabel(of: rule.momentIDs)
         case .selection, .onThisDay:
             source = .moments

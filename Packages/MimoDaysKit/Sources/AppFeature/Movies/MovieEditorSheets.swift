@@ -173,22 +173,30 @@ private struct TrimRange: View {
                     .frame(width: max(x1 - x0, 0))
                     .offset(x: x0)
                 handle.offset(x: x0 - 10)
-                    .gesture(DragGesture().onChanged { start = min(max($0.location.x / width * length, 0), end - shortest) })
+                    // In the strip's space: the handle's own would put the finger's x near zero.
+                    .gesture(DragGesture(coordinateSpace: .named(Self.strip)).onChanged {
+                        start = min(max($0.location.x / width * length, 0), end - shortest)
+                    })
                     .accessibilityElement()
                     .accessibilityLabel(Text("Start", bundle: .module))
                     .accessibilityValue(Text(MovieEditorView.clock(start)))
                     .accessibilityAdjustableAction { start = min(max(start + ($0 == .increment ? 0.5 : -0.5), 0), end - shortest) }
                     .accessibilityIdentifier("trim.start")
                 handle.offset(x: x1)
-                    .gesture(DragGesture().onChanged { end = max(min($0.location.x / width * length, length), start + shortest) })
+                    .gesture(DragGesture(coordinateSpace: .named(Self.strip)).onChanged {
+                        end = max(min($0.location.x / width * length, length), start + shortest)
+                    })
                     .accessibilityElement()
                     .accessibilityLabel(Text("End", bundle: .module))
                     .accessibilityValue(Text(MovieEditorView.clock(end)))
                     .accessibilityAdjustableAction { end = max(min(end + ($0 == .increment ? 0.5 : -0.5), length), start + shortest) }
                     .accessibilityIdentifier("trim.end")
             }
+            .coordinateSpace(.named(Self.strip))
         }
     }
+
+    private static let strip = "trim.strip"
 
     private var handle: some View {
         RoundedRectangle(cornerRadius: 5, style: .continuous)

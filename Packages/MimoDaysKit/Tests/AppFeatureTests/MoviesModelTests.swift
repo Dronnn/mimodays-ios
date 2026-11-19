@@ -226,6 +226,39 @@ struct MoviesModelTests {
         #expect(model.items.count == 6)
     }
 
+    /// From a place back to "Choose moments": every moment is offered, not the place's.
+    @Test func choosingMomentsAfterAPlaceOffersEveryMoment() async throws {
+        let ids = try await save([20260101, 20260202, 20260303, 20260404, 20260505, 20261010])
+        let model = wizard(MovieSourceRule(kind: .place, momentIDs: Array(ids.prefix(5))))
+        #expect(model.loadCandidates())
+        model.source = .moments
+        #expect(model.loadCandidates())
+        #expect(model.candidates.count == 6)
+    }
+
+    /// Back only to change the shape: Next keeps the moments picked by hand.
+    @Test func nextAgainKeepsHandPicks() async throws {
+        let ids = try await save([20261001, 20261002, 20261003, 20261004, 20261005, 20261006])
+        let model = wizard()
+        #expect(model.loadCandidates())
+        model.pickAutomatically()
+        model.toggle(ids[0])
+        let picked = model.picked
+        model.aspectRatio = .square1x1
+        model.pickAutomatically()
+        #expect(model.picked == picked)
+    }
+
+    @Test func aSecondBuildMakesNoSecondDraft() async throws {
+        try await save([20261001, 20261002, 20261003, 20261004, 20261005])
+        let model = wizard()
+        #expect(model.loadCandidates())
+        model.pickAutomatically()
+        #expect(model.build() != nil)
+        #expect(model.build() == nil)
+        #expect(try context.fetchCount(FetchDescriptor<MovieProject>()) == 1)
+    }
+
     @Test func lastYearIsCalledTheWholeYear() {
         let model = wizard()
         model.source = .lastYear

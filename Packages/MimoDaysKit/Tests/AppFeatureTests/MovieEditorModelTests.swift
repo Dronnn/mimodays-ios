@@ -241,6 +241,19 @@ struct MovieEditorModelTests {
         #expect(abs((model.playhead?.fraction ?? 0) - 0.5) < 0.001)
     }
 
+    /// Scrubbed to the third clip in the preview, Edit lands on it: Trim or Remove act on what was last seen.
+    @Test func backFromThePreviewTheClipThereIsSelected() async throws {
+        let ids = try await save(3)
+        let model = try editor(ids)
+        await model.settled()
+        #expect(model.selected == 0)
+        await model.player.seek(
+            to: CMTime(seconds: MovieSelection.photoSeconds * 2.5, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero
+        )
+        model.caughtUp()
+        #expect(model.selected == 2)
+    }
+
     @Test func theStageGetsAPlayableMovie() async throws {
         let ids = try await save(2, videos: [1])
         let model = try editor(ids)

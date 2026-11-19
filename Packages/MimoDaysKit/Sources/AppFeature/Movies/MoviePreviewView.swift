@@ -25,14 +25,6 @@ struct MoviePreviewView: View {
     }
 }
 
-extension MovieEditorModel {
-    /// The preview played the same player; the editor picks up where it stopped.
-    func caughtUp() {
-        pause()
-        seek(to: player.currentTime().seconds.isFinite ? player.currentTime().seconds : time)
-    }
-}
-
 /// F10's frame: the movie fitted to the screen on plum, × top left, the scrubber with its times, play or pause,
 /// and whatever buttons go at the bottom. Also plays a rendered movie (F15).
 struct MovieWatchView<Actions: View>: View {
@@ -42,7 +34,8 @@ struct MovieWatchView<Actions: View>: View {
     @State private var time = 0.0
     @State private var length = 0.0
     @State private var isPlaying = false
-    @State private var scrubbing = false
+    /// Cleared also when the drag is cut off (the phone locked), so playback moves the knob again.
+    @GestureState private var scrubbing = false
     @State private var observer: Any?
 
     var body: some View {
@@ -117,12 +110,11 @@ struct MovieWatchView<Actions: View>: View {
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
+                        .updating($scrubbing) { _, state, _ in state = true }
                         .onChanged { drag in
-                            scrubbing = true
                             time = min(max(drag.location.x / width, 0), 1) * length
                             player.seek(to: CMTime(seconds: time, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
                         }
-                        .onEnded { _ in scrubbing = false }
                 )
             }
             // Touched across 44 pt; laid out in 16.

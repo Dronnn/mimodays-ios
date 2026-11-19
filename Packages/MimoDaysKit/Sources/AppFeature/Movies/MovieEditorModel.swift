@@ -199,6 +199,14 @@ final class MovieEditorModel {
         isPlaying = false
     }
 
+    /// The preview played the same player; the editor picks up where it stopped, on the clip there, so Trim or
+    /// Remove act on what was last seen.
+    func caughtUp() {
+        pause()
+        seek(to: player.currentTime().seconds.isFinite ? player.currentTime().seconds : time)
+        if let index = playhead?.index { selected = index }
+    }
+
     func seek(to seconds: Double) {
         time = min(max(seconds, 0), duration)
         player.seek(to: CMTime(seconds: time, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)

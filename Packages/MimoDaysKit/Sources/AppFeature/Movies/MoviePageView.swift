@@ -18,15 +18,12 @@ struct MoviePageScreen: View {
 private struct MoviePageHost: View {
     let project: MovieProject
     let library: MediaLibrary
-    @State private var tiles: MemoriesModel
 
-    init(project: MovieProject, library: MediaLibrary) {
-        self.project = project
-        self.library = library
-        _tiles = State(initialValue: MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails))
+    var body: some View {
+        ModelHost({ MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails) }) {
+            MoviePageView(project: project, library: library, tiles: $0)
+        }
     }
-
-    var body: some View { MoviePageView(project: project, library: library, tiles: tiles) }
 }
 
 /// F15: a rendered movie - play it, share or save it; edit, duplicate or rename its project; delete both.

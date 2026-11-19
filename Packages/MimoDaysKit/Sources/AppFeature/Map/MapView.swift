@@ -16,7 +16,7 @@ enum MapRoute: Hashable {
 struct MapScreen: View {
     @Environment(\.mediaLibrary) private var library
     var body: some View {
-        if let library { MapHost(model: MapModel(library: library)) }
+        if let library { ModelHost({ MapModel(library: library) }) { MapHost(model: $0) } }
     }
 }
 

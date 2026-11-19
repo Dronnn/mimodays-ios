@@ -90,7 +90,7 @@ struct UnplacedScreen: View {
     @Environment(\.camera) private var camera
 
     var body: some View {
-        if let library { UnplacedView(model: UnplacedModel(library: library, places: (camera ?? .simulated).places)) }
+        if let library { ModelHost({ UnplacedModel(library: library, places: (camera ?? .simulated).places) }) { UnplacedView(model: $0) } }
     }
 }
 

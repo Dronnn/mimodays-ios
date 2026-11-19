@@ -9,7 +9,7 @@ struct MoviesScreen: View {
     @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
 
     var body: some View {
-        if let library { MoviesHost(model: MoviesModel(library: library, movieDefaults: moviePreferences?.value ?? MovieDefaults())) }
+        if let library { ModelHost({ MoviesModel(library: library, movieDefaults: moviePreferences?.value ?? MovieDefaults()) }) { MoviesHost(model: $0) } }
     }
 }
 

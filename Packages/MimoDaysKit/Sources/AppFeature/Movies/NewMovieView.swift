@@ -21,7 +21,9 @@ struct NewMovieScreen: View {
 
     var body: some View {
         if let library {
-            NewMovieFlow(model: NewMovieModel(library: library, source: source, defaults: moviePreferences?.value ?? MovieDefaults()), built: built)
+            ModelHost({ NewMovieModel(library: library, source: source, defaults: moviePreferences?.value ?? MovieDefaults()) }) {
+                NewMovieFlow(model: $0, built: built)
+            }
         }
     }
 }

@@ -15,16 +15,13 @@ struct PlaceView: View {
     var body: some View {
         Group {
             if let library, let place = model.place(id) {
-                PlaceContent(place: place, image: model.images[place.moments.first?.id ?? UUID()], tiles: tiles(library))
+                ModelHost({ MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails) }) {
+                    PlaceContent(place: place, image: model.images[place.moments.first?.id ?? UUID()], tiles: $0)
+                }
             }
         }
         // Its last moment deleted or moved: the place is gone, so is its page.
         .onChange(of: model.place(id) == nil) { _, isGone in if isGone { dismiss() } }
-    }
-
-    @MainActor
-    private func tiles(_ library: MediaLibrary) -> MemoriesModel {
-        MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails)
     }
 }
 

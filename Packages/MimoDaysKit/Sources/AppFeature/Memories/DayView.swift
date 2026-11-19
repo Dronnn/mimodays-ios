@@ -76,7 +76,7 @@ struct DayScreen: View {
 
     var body: some View {
         if let library {
-            DayHost(model: DayModel(day: day, library: library), thisYear: thisYear)
+            ModelHost({ DayModel(day: day, library: library) }) { DayHost(model: $0, thisYear: thisYear) }
         }
     }
 }

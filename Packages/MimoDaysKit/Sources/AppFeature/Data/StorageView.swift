@@ -14,7 +14,7 @@ struct StorageScreen: View {
     @Environment(\.mediaLibrary) private var library
 
     var body: some View {
-        if let library { StorageHost(model: StorageModel(library: library)) }
+        if let library { ModelHost({ StorageModel(library: library) }) { StorageHost(model: $0) } }
     }
 }
 

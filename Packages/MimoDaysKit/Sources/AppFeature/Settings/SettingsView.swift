@@ -51,7 +51,7 @@ struct SettingsScreen: View {
 
     var body: some View {
         if let library {
-            SettingsHost(model: SettingsModel(library: library, surprises: surprises, permissions: permissions))
+            ModelHost({ SettingsModel(library: library, surprises: surprises, permissions: permissions) }) { SettingsHost(model: $0) }
         }
     }
 }

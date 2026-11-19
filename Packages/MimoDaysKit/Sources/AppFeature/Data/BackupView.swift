@@ -9,7 +9,7 @@ struct BackupScreen: View {
     @Environment(\.mediaLibrary) private var library
 
     var body: some View {
-        if let library { BackupHost(model: BackupModel(library: library), library: library, back: back) }
+        if let library { ModelHost({ BackupModel(library: library) }) { BackupHost(model: $0, library: library, back: back) } }
     }
 }
 

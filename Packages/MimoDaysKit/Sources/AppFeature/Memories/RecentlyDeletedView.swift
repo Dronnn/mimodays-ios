@@ -189,7 +189,7 @@ struct RecentlyDeletedScreen: View {
                 AppLockView(biometry: lock.biometry) { Task { await ask(lock) } }
                     .task { await ask(lock) }
             } else {
-                RecentlyDeletedHost(model: RecentlyDeletedModel(library: library))
+                ModelHost({ RecentlyDeletedModel(library: library) }) { RecentlyDeletedHost(model: $0) }
             }
         }
     }
@@ -338,7 +338,7 @@ struct DeletedMomentScreen: View {
     let id: UUID
     @Environment(\.mediaLibrary) private var library
     var body: some View {
-        if let library { DeletedMomentHost(model: RecentlyDeletedModel(library: library), id: id) }
+        if let library { ModelHost({ RecentlyDeletedModel(library: library) }) { DeletedMomentHost(model: $0, id: id) } }
     }
 }
 

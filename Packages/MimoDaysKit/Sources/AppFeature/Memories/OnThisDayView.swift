@@ -74,7 +74,7 @@ final class OnThisDayModel {
 struct OnThisDayScreen: View {
     @Environment(\.mediaLibrary) private var library
     var body: some View {
-        if let library { OnThisDayHost(model: OnThisDayModel(library: library)) }
+        if let library { ModelHost({ OnThisDayModel(library: library) }) { OnThisDayHost(model: $0) } }
     }
 }
 

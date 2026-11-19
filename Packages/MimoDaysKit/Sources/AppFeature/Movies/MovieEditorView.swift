@@ -15,10 +15,10 @@ struct MovieEditorScreen: View {
 
     var body: some View {
         if let library, let project = MovieStore.project(projectID, in: library.context) {
-            MovieEditorHost(
-                model: MovieEditorModel(project: project, library: library, voice: (camera ?? .simulated).voice),
-                export: { router.moviesPath.append(.export(projectID)) }
-            )
+            // Made once: each one composes the whole movie.
+            ModelHost({ MovieEditorModel(project: project, library: library, voice: (camera ?? .simulated).voice) }) { model in
+                MovieEditorHost(model: model, export: { router.moviesPath.append(.export(projectID)) })
+            }
         }
     }
 }

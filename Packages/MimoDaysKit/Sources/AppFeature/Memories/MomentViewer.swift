@@ -16,10 +16,10 @@ struct MomentViewerScreen: View {
         if let library {
             if pager.origin == .mosaic, let mosaicZoom {
                 // U40: the piece grows into the card, the Mosaic dimming behind; closing shrinks it back.
-                MomentViewerHost(model: MomentViewerModel(pager: pager, library: library))
+                ModelHost({ MomentViewerModel(pager: pager, library: library) }) { MomentViewerHost(model: $0) }
                     .navigationTransition(.zoom(sourceID: pager.start, in: mosaicZoom))
             } else {
-                MomentViewerHost(model: MomentViewerModel(pager: pager, library: library))
+                ModelHost({ MomentViewerModel(pager: pager, library: library) }) { MomentViewerHost(model: $0) }
             }
         }
     }

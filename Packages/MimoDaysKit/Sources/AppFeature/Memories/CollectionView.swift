@@ -9,7 +9,7 @@ struct CollectionScreen: View {
     @Environment(\.mediaLibrary) private var library
 
     var body: some View {
-        if let library { CollectionHost(model: CollectionModel(id: id, library: library)) }
+        if let library { ModelHost({ CollectionModel(id: id, library: library) }) { CollectionHost(model: $0) } }
     }
 }
 

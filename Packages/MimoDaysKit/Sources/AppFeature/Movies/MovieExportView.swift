@@ -13,10 +13,11 @@ struct MovieExportScreen: View {
 
     var body: some View {
         if let library, let project = MovieStore.project(projectID, in: library.context) {
-            MovieExportHost(
-                model: MovieExportModel(project: project, library: library, defaults: moviePreferences?.value ?? MovieDefaults()),
-                tiles: MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails)
-            )
+            ModelHost({ MovieExportModel(project: project, library: library, defaults: moviePreferences?.value ?? MovieDefaults()) }) { model in
+                ModelHost({ MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails) }) { tiles in
+                    MovieExportHost(model: model, tiles: tiles)
+                }
+            }
         }
     }
 }

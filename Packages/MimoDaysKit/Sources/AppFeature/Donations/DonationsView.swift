@@ -7,7 +7,7 @@ struct DonationsScreen: View {
 
     var body: some View {
         if let store {
-            DonationsHost(model: DonationsModel(store: store))
+            ModelHost({ DonationsModel(store: store) }) { DonationsHost(model: $0) }
         }
     }
 }

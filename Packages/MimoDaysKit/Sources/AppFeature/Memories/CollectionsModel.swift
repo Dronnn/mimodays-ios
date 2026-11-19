@@ -209,7 +209,10 @@ final class CollectionModel {
             return
         }
         title = collection.title
-        let moments = collection.memberships.compactMap(\.moment).filter { $0.deletedAt == nil }.sorted { $0.capturedAt < $1.capturedAt }
+        // Once each, even if the store holds two rows for one moment (an older restore could).
+        var seen = Set<UUID>()
+        let moments = collection.memberships.compactMap(\.moment).filter { $0.deletedAt == nil && seen.insert($0.id).inserted }
+            .sorted { $0.capturedAt < $1.capturedAt }
         items = moments.map {
             MemoryItem(
                 id: $0.id, localDay: $0.localDay, capturedAt: $0.capturedAt, timeZoneID: $0.timeZoneID,

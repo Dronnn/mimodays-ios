@@ -218,6 +218,40 @@ struct BackupTests {
         #expect(newFiles.allSatisfy { FileManager.default.fileExists(atPath: (try? other.store.url(for: $0).path) ?? "/") })
     }
 
+    /// A backup none of whose moments can come in whole can't replace the library: that would leave nothing.
+    @Test func aBackupWithNothingWholeCantReplaceTheLibrary() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let (url, _) = try backUp(phone)
+        var check = try BackupArchive.check(url)
+        check.damaged.formUnion(check.document.moments.compactMap(\.paths.first))
+        let summary = BackupService(library: try library(), now: { [clock] in clock.now() }).summary(check)
+        #expect(summary.restorable == 0)
+        #expect(summary.moments > 0)
+
+        let model = RestoreModel(url: url, library: try library())
+        model.phase = .ready(summary)
+        model.mode = .replaceEverything
+        #expect(model.adding == 0 && !model.canRestore)
+    }
+
+    /// A manifest listing a moment twice in a collection gives it one row, and the collection still opens.
+    @Test func aMomentListedTwiceInACollectionComesBackOnce() async throws {
+        let phone = try library()
+        let ids = try await fill(phone)
+        let collection = try #require(try phone.context.fetch(FetchDescriptor<MomentCollection>()).first)
+        let moment = try #require(try phone.context.fetch(FetchDescriptor<Moment>()).first { $0.id == ids[0] })
+        phone.context.insert(CollectionMembership(collection: collection, moment: moment, position: 5, addedAt: clock.now()))
+        try phone.context.save()
+        let (url, document) = try backUp(phone)
+        #expect(document.collections[0].members.count == 3)
+
+        let newPhone = try library()
+        _ = try restore(url, into: newPhone)
+        let restored = try #require(try newPhone.context.fetch(FetchDescriptor<MomentCollection>()).first)
+        #expect(restored.memberships.count == 2)
+    }
+
     @Test func aDamagedFileSkipsOnlyItsMoment() async throws {
         let phone = try library()
         _ = try await fill(phone)
@@ -237,7 +271,7 @@ struct BackupTests {
         let outcome = try restore(url, into: newPhone)
         let hitsAMoment = check.document.moments.contains { !Set($0.paths).isDisjoint(with: check.damaged) }
         #expect(outcome.restored == (hitsAMoment ? 2 : 3))
-        #expect(outcome.damagedFiles == (hitsAMoment ? 1 : 0))
+        #expect(outcome.damagedFiles == 1)
     }
 
     @Test func anArchiveFromBeforeFormatsAndTextCardsStillReads() async throws {
@@ -326,7 +360,10 @@ struct BackupTests {
         let phone = try library()
         let ids = try await fill(phone)
         let first = try #require(try phone.context.fetch(FetchDescriptor<Moment>()).first { $0.id == ids[0] })
+        #expect(!BackupService(library: phone).plan(includesRenders: true).missesFiles)
         try phone.store.remove(try #require(first.voiceNotes.first).relativePath)
+        // E04 says so instead of "every file" alone.
+        #expect(BackupService(library: phone).plan(includesRenders: true).missesFiles)
         let (url, document) = try backUp(phone)
         #expect(try #require(document.moments.first { $0.id == ids[0] }).voiceNotes.isEmpty)
         let newPhone = try library()

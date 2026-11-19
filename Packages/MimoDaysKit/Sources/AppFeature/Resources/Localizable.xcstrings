@@ -111166,6 +111166,144 @@
         }
       }
     },
+    "Some files were already missing on this iPhone and aren't included" : {
+      "comment" : "Backup saved (E04): files the library points to were already gone, so the backup can't bring them back",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بعض الملفات كانت مفقودة بالفعل على هذا الـ iPhone ولم تُضمَّن"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некаторых файлаў ужо не было на гэтым iPhone, яны не ўвайшлі"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Dateien fehlten schon auf diesem iPhone und sind nicht enthalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some files were already missing on this iPhone and aren't included"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos archivos ya faltaban en este iPhone y no están incluidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains fichiers manquaient déjà sur cet iPhone et ne sont pas inclus"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "חלק מהקבצים כבר חסרו ב-iPhone הזה ולא נכללו"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Որոշ ֆայլեր արդեն բացակայում էին այս iPhone-ում և ներառված չեն"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni file mancavano già su questo iPhone e non sono inclusi"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一部のファイルはこのiPhoneにすでになかったため、含まれていません"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ზოგიერთი ფაილი ამ iPhone-ზე უკვე აღარ იყო და არ შევიდა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кейбір файлдар бұл iPhone-да бұрыннан жоқ еді, олар енгізілмеді"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일부 파일은 이 iPhone에 이미 없어서 포함되지 않았어요"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige bestanden ontbraken al op deze iPhone en zitten er niet in"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektórych plików już brakowało na tym iPhonie i nie zostały dołączone"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alguns arquivos já não estavam neste iPhone e não foram incluídos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторых файлов уже не было на этом iPhone, они не вошли"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vissa filer saknades redan på den här iPhonen och är inte med"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bazı dosyalar bu iPhone'da zaten yoktu ve eklenmedi"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Деяких файлів уже не було на цьому iPhone, вони не ввійшли"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分文件在这台 iPhone 上已经不存在，未包含在内"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分檔案在這部 iPhone 上已經不存在，未包含在內"
+          }
+        }
+      }
+    },
     "Something went wrong while making it.\nYour draft is safe." : {
       "comment" : "Export failed (F14): message for any other failure",
       "extractionState" : "manual",

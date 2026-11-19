@@ -390,6 +390,9 @@ struct BackupSavedView: View {
                     VStack(alignment: .leading, spacing: 18) {
                         StepRow(state: .done, title: Text("\(saved.moments) moments packed", bundle: .module))
                         StepRow(state: .done, title: Text("Every file checked and readable", bundle: .module))
+                        if saved.missesFiles {
+                            StepRow(state: .toDo, title: Text("Some files were already missing on this iPhone and aren't included", bundle: .module))
+                        }
                         StepRow(state: .done, title: Text("Saved to Files › \(saved.url.deletingLastPathComponent().lastPathComponent)", bundle: .module))
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

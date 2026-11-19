@@ -97,7 +97,7 @@ struct DataSnapshotTests {
     @Test func restoreReady() async throws {
         let model = RestoreModel(url: URL(filePath: "/tmp/x.mimodays"), library: library)
         model.phase = .ready(BackupService.Summary(
-            createdAt: Date(timeIntervalSince1970: 1_792_843_200), moments: 1140, collections: 6, projects: 3, alreadyHere: 1110, isClean: true
+            createdAt: Date(timeIntervalSince1970: 1_792_843_200), moments: 1140, collections: 6, projects: 3, alreadyHere: 1110, isClean: true, restorable: 1140
         ))
         assertScreenSnapshots(of: page(RestoreView(model: model, close: {})), variants: variants)
     }

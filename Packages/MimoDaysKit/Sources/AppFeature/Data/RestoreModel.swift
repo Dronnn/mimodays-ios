@@ -45,10 +45,11 @@ final class RestoreModel {
         service = BackupService(library: library, now: now)
     }
 
-    /// How many moments the chosen way would add (E07's button).
+    /// How many moments the chosen way would add (E07's button). Replacing counts only the ones that can come in
+    /// whole, so a backup with none can't replace the library with nothing.
     var adding: Int {
         guard case let .ready(summary) = phase else { return 0 }
-        return mode == .addMissing ? summary.new : summary.moments
+        return mode == .addMissing ? summary.new : summary.restorable
     }
 
     /// Whether E07's button has anything to do: moments, or (adding) only movies and collections.

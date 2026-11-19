@@ -75,28 +75,34 @@ enum BackupArchive {
     /// Reads every entry, hashing it, then holds the hashes against the manifest (E07's "checked").
     static func check(_ url: URL, progress: (Double) -> Void = { _ in }, isCancelled: () -> Bool = { false }) throws -> Check {
         var hashes: [String: String] = [:]
+        var sizes: [String: Int64] = [:]
         var manifest: Data?
         let total = max(Self.size(url), 1)
         var read: Int64 = 0
         try entries(of: url) { entry, size, next in
             var hasher = SHA256()
             var bytes = Data()
+            var length: Int64 = 0
             while let piece = try next() {
                 if isCancelled() { throw Failure.cancelled }
                 if entry == BackupDocument.manifestPath { bytes.append(piece) } else { hasher.update(data: piece) }
+                length += Int64(piece.count)
                 read += Int64(piece.count)
                 progress(min(Double(read) / Double(total), 1))
             }
             if entry == BackupDocument.manifestPath {
                 manifest = bytes
             } else if entry.hasPrefix(BackupDocument.mediaFolder + "/") {
-                hashes[String(entry.dropFirst(BackupDocument.mediaFolder.count + 1))] = Self.hex(hasher.finalize())
+                let path = String(entry.dropFirst(BackupDocument.mediaFolder.count + 1))
+                hashes[path] = Self.hex(hasher.finalize())
+                sizes[path] = length
             }
         }
         let document = try Self.document(manifest)
         // A file a record needs that isn't in the archive (gone from the iPhone it was made on) counts as damaged too.
         let referenced = Set(document.moments.flatMap(\.paths) + document.movies.flatMap(\.paths))
-        let damaged = Set(document.files.compactMap { path, entry in hashes[path] == entry.sha256 ? nil : path })
+        // A size the manifest gets wrong counts as damage: restore adds the sizes up to check the free space.
+        let damaged = Set(document.files.compactMap { path, entry in hashes[path] == entry.sha256 && sizes[path] == entry.bytes ? nil : path })
             .union(referenced.subtracting(document.files.keys))
         return Check(document: document, damaged: damaged)
     }
@@ -164,9 +170,9 @@ enum BackupArchive {
                     try entry(path, 0) { nil }
                     continue
                 }
-                var left = Int64(size)
+                var left = Int64(clamping: size)
                 var buffer = [UInt8](repeating: 0, count: Self.chunk)
-                try entry(path, Int64(size)) {
+                try entry(path, left) {
                     guard left > 0 else { return nil }
                     let count = Int(min(Int64(Self.chunk), left))
                     try buffer.withUnsafeMutableBytes { raw in

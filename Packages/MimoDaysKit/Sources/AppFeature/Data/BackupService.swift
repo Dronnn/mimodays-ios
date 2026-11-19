@@ -41,9 +41,12 @@ struct BackupService {
     }
 
     /// The manifest's records and the files to pack (store path -> file). Recently deleted moments stay out.
-    func plan(includesRenders: Bool) -> (document: BackupDocument, files: [(path: String, url: URL)]) {
+    /// The manifest, the files to pack, and whether any file a record points to was already gone from this iPhone
+    /// (so the backup can't bring it back).
+    func plan(includesRenders: Bool) -> (document: BackupDocument, files: [(path: String, url: URL)], missesFiles: Bool) {
         var document = BackupDocument(createdAt: now())
-        document.moments = liveMoments().map { BackupDocument.MomentRecord($0).leavingOut { !exists($0) } }
+        let records = liveMoments().map(BackupDocument.MomentRecord.init)
+        document.moments = records.map { $0.leavingOut { !exists($0) } }
         document.collections = ((try? context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)]))) ?? [])
             .map(BackupDocument.CollectionRecord.init)
         document.movies = projects().map { BackupDocument.MovieRecord($0, includesRender: includesRenders) }
@@ -53,7 +56,8 @@ struct BackupService {
             guard seen.insert(path).inserted, let url = try? store.url(for: path), FileManager.default.fileExists(atPath: url.path) else { return nil }
             return (path, url)
         }
-        return (document, files)
+        let missesFiles = (records.flatMap(\.paths) + document.movies.flatMap(\.paths)).contains { !exists($0) }
+        return (document, files, missesFiles)
     }
 
     private func exists(_ relativePath: String) -> Bool {
@@ -98,6 +102,8 @@ struct BackupService {
         var projects: Int
         var alreadyHere: Int
         var isClean: Bool
+        /// Moments none of whose files is damaged: what Replace everything would bring.
+        var restorable: Int
         /// Movies, collections or collection places the backup has and this iPhone doesn't.
         var addsMore = false
         var new: Int { moments - alreadyHere }
@@ -118,7 +124,7 @@ struct BackupService {
         return Summary(
             createdAt: document.createdAt, moments: document.moments.count, collections: document.collections.count,
             projects: document.movies.count, alreadyHere: document.moments.count { here.contains($0.id) }, isClean: check.damaged.isEmpty,
-            addsMore: addsMore
+            restorable: document.moments.count { !$0.paths.contains(where: check.damaged.contains) }, addsMore: addsMore
         )
     }
 
@@ -240,14 +246,17 @@ struct BackupService {
                 context.insert(new)
                 return new
             }()
-            let members = Set(collection.memberships.compactMap { $0.moment?.id })
-            for member in record.members where !members.contains(member.momentID) {
+            var members = Set(collection.memberships.compactMap { $0.moment?.id })
+            // Once each: a manifest listing a moment twice would give the collection two rows for it.
+            for member in record.members where members.insert(member.momentID).inserted {
                 guard let moment = present[member.momentID] else { continue }
                 context.insert(CollectionMembership(collection: collection, moment: moment, position: member.position, addedAt: member.addedAt))
             }
         }
 
         for record in document.movies where !projectsHere.contains(record.id) {
+            // A render or soundtrack that can't come back is damage too, even though the movie does.
+            damagedFiles += record.paths.count(where: check.damaged.contains)
             let project = MovieProject(
                 id: record.id, title: record.title, sourceRule: record.sourceRule,
                 aspectRatio: MovieAspectRatio(rawValue: record.aspectRatio) ?? .portrait9x16,

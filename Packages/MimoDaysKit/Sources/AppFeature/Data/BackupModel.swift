@@ -30,6 +30,8 @@ final class BackupModel {
         var url: URL
         var bytes: Int64
         var moments: Int
+        /// Files the library points to were already gone from this iPhone, so they aren't in it.
+        var missesFiles = false
     }
 
     enum Failure: Equatable {
@@ -59,6 +61,7 @@ final class BackupModel {
     private let scheduleReminder: (BackupReminder, Date) -> Void
     private var task: Task<Void, Never>?
     private var document: BackupDocument?
+    private var missesFiles = false
     private static let logger = Logger(subsystem: "MimoDays", category: "Backup")
 
     init(
@@ -99,6 +102,7 @@ final class BackupModel {
         }
         phase = .working(.collecting, progress: 0)
         let plan = service.plan(includesRenders: includesRenders)
+        missesFiles = plan.missesFiles
         // A folder of its own per attempt: a cancelled one still winding down never shares a file with the next.
         let url = FileManager.default.temporaryDirectory.appending(path: "Backup-\(UUID().uuidString)", directoryHint: .isDirectory)
             .appending(path: Self.fileName(plan.document.createdAt))
@@ -139,7 +143,7 @@ final class BackupModel {
         if let packed { Self.remove(packed) }
         packed = nil
         scheduleReminder(reminder, document.createdAt)
-        phase = .saved(Saved(url: destination, bytes: document.files.values.reduce(Int64(0)) { $0 + $1.bytes }, moments: document.moments.count))
+        phase = .saved(Saved(url: destination, bytes: document.files.values.reduce(Int64(0)) { $0 + $1.bytes }, moments: document.moments.count, missesFiles: missesFiles))
         refresh()
     }
 

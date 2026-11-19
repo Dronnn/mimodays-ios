@@ -165,6 +165,8 @@ final class SurpriseCoordinator {
     func open(promptID: UUID) -> Bool {
         guard let prompt = fetchPrompt(promptID), prompt.outcome == .pending else { return false }
         let now = clock.now()
+        // Not before it has come either: a link naming a later surprise opens a plain capture.
+        guard prompt.plannedAt <= now else { return false }
         guard now < prompt.expiresAt else {
             prompt.outcome = .expired
             save()
@@ -175,11 +177,18 @@ final class SurpriseCoordinator {
         return true
     }
 
+    /// When the prompt stops being answerable: a shot taken at or after it is a plain capture (Help: "what you capture
+    /// in that time is marked Surprise"), even though the camera was opened in time.
+    func expiry(of promptID: UUID) -> Date? {
+        fetchPrompt(promptID)?.expiresAt
+    }
+
     /// Links a saved moment to the prompt it answered. Only a prompt that was opened in time counts,
     /// even when the moment is saved after the window closed; a manual capture never answers a prompt.
     func captured(promptID: UUID, momentID: UUID) {
         guard let prompt = fetchPrompt(promptID), prompt.openedAt != nil,
-              prompt.outcome == .pending || prompt.outcome == .expired else { return }
+              prompt.outcome == .pending || prompt.outcome == .expired,
+              let moment = fetchMoment(momentID), moment.capturedAt < prompt.expiresAt else { return }
         prompt.outcome = .captured
         prompt.capturedMomentID = momentID
         save()
@@ -295,6 +304,12 @@ final class SurpriseCoordinator {
             predicate: #Predicate { $0.plannedAt >= cutoff || $0.outcomeRaw == pending },
             sortBy: [SortDescriptor(\.plannedAt)]
         ))
+    }
+
+    private func fetchMoment(_ id: UUID) -> Moment? {
+        var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return fetch(descriptor).first
     }
 
     private func fetchPrompt(_ id: UUID) -> SurprisePrompt? {

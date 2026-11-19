@@ -184,14 +184,42 @@ struct SurpriseCoordinatorTests {
         let prompt = try #require(try prompts().first)
         clock.set(prompt.plannedAt.addingTimeInterval(14 * 60))
         #expect(coordinator.open(promptID: prompt.id))
+        let moment = shot(at: clock.now())
         // Reviewing takes a while; the window closes before the save.
         clock.advance(by: 5 * 60)
         await coordinator.refresh()
         #expect(prompt.outcome == .expired)
-        let moment = UUID()
         coordinator.captured(promptID: prompt.id, momentID: moment)
         #expect(prompt.outcome == .captured)
         #expect(prompt.capturedMomentID == moment)
+    }
+
+    /// The camera opened in time but the shutter pressed after the window: a plain capture (Help › Surprises).
+    @Test func aShotAfterTheWindowDoesntAnswerThePrompt() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let prompt = try #require(try prompts().first)
+        clock.set(prompt.plannedAt.addingTimeInterval(14 * 60))
+        #expect(coordinator.open(promptID: prompt.id))
+        #expect(coordinator.expiry(of: prompt.id) == prompt.expiresAt)
+        clock.set(prompt.expiresAt.addingTimeInterval(5 * 60))
+        coordinator.captured(promptID: prompt.id, momentID: shot(at: clock.now()))
+        #expect(prompt.outcome != .captured)
+    }
+
+    @Test func aLaterSurpriseDoesntOpenEarly() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let prompt = try #require(try prompts().first)
+        #expect(clock.now() < prompt.plannedAt)
+        #expect(!coordinator.open(promptID: prompt.id))
+        #expect(prompt.outcome == .pending && prompt.openedAt == nil)
+    }
+
+    private func shot(at date: Date) -> UUID {
+        let moment = Moment(captured: CaptureTime(instant: date, timeZone: device.calendar.timeZone), origin: .randomPrompt, mediaType: .photo, createdAt: date)
+        context.insert(moment)
+        return moment.id
     }
 
     @Test func aPromptThatWasNeverOpenedIsNotAnswered() async throws {

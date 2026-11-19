@@ -275,7 +275,7 @@ public struct RootView: View {
             SettingsScreen(surprises: surprises)
         }
         .fullScreenCover(item: $router.capture) { request in
-            CaptureFlowView(request: request, lastCapture: lastCapture) { saved in
+            CaptureFlowView(request: request, lastCapture: lastCapture, promptExpiry: request.promptID.flatMap(surprises.expiry)) { saved in
                 if let promptID = saved.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
                 showsSavedToast = true
             }
@@ -300,6 +300,8 @@ public struct RootView: View {
 struct CaptureFlowView: View {
     let request: CaptureRequest
     var lastCapture: LastCapture?
+    /// The surprise's end: a shot taken from then on isn't its answer.
+    var promptExpiry: Date?
     /// After the save, before the flow closes.
     var onSaved: @MainActor (SavedCapture) -> Void = { _ in }
     @Environment(\.permissions) private var permissions
@@ -411,7 +413,8 @@ struct CaptureFlowView: View {
                 onCapture: { capture in
                     let drafts = services.drafts
                     let adopted = try? drafts.adopt(capture)
-                    review = ReviewModel(capture: adopted ?? capture, promptID: request.promptID, drafts: adopted == nil ? nil : drafts, voice: services.voice, places: services.places)
+                    let inTime = promptExpiry.map { capture.capturedAt.instant < $0 } ?? true
+                    review = ReviewModel(capture: adopted ?? capture, promptID: inTime ? request.promptID : nil, drafts: adopted == nil ? nil : drafts, voice: services.voice, places: services.places)
                 }
             )
         }

@@ -129,9 +129,21 @@ public struct MediaStore: Sendable {
     /// A Delete All isn't done yet.
     public var isErasePending: Bool { FileManager.default.fileExists(atPath: root.appending(path: Self.erasePending).path) }
 
-    /// Delete All has begun: until it's done, every launch empties the cache (a quit mid-way included).
+    /// When the Delete All that isn't done yet began: what was made later isn't its to remove.
+    public var erasePendingSince: Date? {
+        (try? FileManager.default.attributesOfItem(atPath: root.appending(path: Self.erasePending).path))?[.creationDate] as? Date
+    }
+
+    /// Delete All has begun: until it's done, every launch empties the cache (a quit mid-way included). Kept as it
+    /// is when already there, so it keeps the first attempt's time.
     public func markErasePending() {
+        guard !isErasePending else { return }
         FileManager.default.createFile(atPath: root.appending(path: Self.erasePending).path, contents: nil)
+    }
+
+    /// The erase didn't happen after all (its records stayed).
+    public func clearErasePending() {
+        try? FileManager.default.removeItem(at: root.appending(path: Self.erasePending))
     }
 
     private func remove(_ areas: [Area]) throws {

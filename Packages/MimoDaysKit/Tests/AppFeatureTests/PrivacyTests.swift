@@ -284,6 +284,17 @@ struct DeleteAllTests {
         #expect(!FileManager.default.fileExists(atPath: drafts.root.path))
         #expect(!store.fileExists(kept.relativePath))
         #expect(FileManager.default.fileExists(atPath: locked.appending(path: "a.heic").path))
+        // The erase keeps the time it began, so a capture reviewed since isn't one for it to take.
+        let since = try #require(store.erasePendingSince)
+        store.markErasePending()
+        #expect(store.erasePendingSince == since)
+        try await Task.sleep(for: .milliseconds(20))
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let shot = CaptureResult(media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(), capturedAt: CaptureTime(instant: .now, timeZone: .gmt))
+        drafts.save(ReviewDraft(capture: shot, window: .init()))
+        #expect(try #require(drafts.savedAt) > since)
+        drafts.clear()
         // The next launch goes on with it, once the file can go: the cache empties, and a moment taken meanwhile
         // keeps its file while the orphan sweep takes the leftover.
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: locked.path)

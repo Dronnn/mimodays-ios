@@ -103,8 +103,9 @@ public final class AppDependencies {
         }
         // Before any screen: what a Delete All couldn't remove, and files a save or a deletion left behind when iOS
         // ended the app mid-way.
-        // The capture in review goes too: the erase may have been cut short before it.
-        if momentSaver.store.isErasePending { camera.drafts.clear() }
+        // The capture in review goes too when it's older than the erase, which may have been cut short before it; one
+        // taken since stays.
+        if let since = momentSaver.store.erasePendingSince, let saved = camera.drafts.savedAt, saved <= since { camera.drafts.clear() }
         momentSaver.store.finishPendingErase()
         OrphanFiles.remove(context: modelContainer.mainContext, store: momentSaver.store)
         OrphanFiles.removeScratch()

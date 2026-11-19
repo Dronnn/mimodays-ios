@@ -121,8 +121,8 @@ final class SurpriseCoordinator {
                 return
             }
             // One not yet due that iOS doesn't have won't come: it doesn't go out next to this one either. One due by
-            // now may just have been shown.
-            let checked = self.clock.now()
+            // now may just have been shown (iOS fires on the whole second, so a second's margin).
+            let checked = self.clock.now().addingTimeInterval(1)
             for prompt in dueSoon where prompt.plannedAt > checked { prompt.outcome = .cancelled }
             let id = UUID()
             let time = soon

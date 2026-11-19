@@ -82,7 +82,7 @@ public final class AppRouter {
         }
     }
     /// A route waiting for the camera to close; a later one takes its place.
-    private(set) var held: Route?
+    var held: Route?
     public var newMovie: NewMovieRequest?
     /// What's pushed on Movies.
     var moviesPath: [MovieRoute] = []

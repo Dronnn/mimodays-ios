@@ -108,6 +108,11 @@ struct ReviewDraftStore: Sendable {
     }
 
     /// Removes the draft and every file with it.
+    /// When the draft was last written; nil without one.
+    var savedAt: Date? {
+        (try? FileManager.default.attributesOfItem(atPath: root.appending(path: Self.draftName).path))?[.modificationDate] as? Date
+    }
+
     func clear() {
         try? FileManager.default.removeItem(at: root)
     }

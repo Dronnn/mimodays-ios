@@ -114,7 +114,9 @@ public struct RootView: View {
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)
-            if !appLock.isLocked { resumeLaunch() }
+            guard !appLock.isLocked else { return }
+            resumeLaunch()
+            openHeldRoute()
         }
         // Behind App Lock nothing opens: a recovered video in Review would play its sound under the lock screen.
         .onChange(of: appLock.isLocked) { _, locked in
@@ -246,7 +248,8 @@ public struct RootView: View {
     /// in time (and a link waits in the router).
     private func open(_ route: Route) {
         if router.capture != nil, case .capture = route { return }
-        guard !appLock.isLockedOrDue else {
+        // Before the launch's review is back (a tap iOS kept for the app as it opens), it waits for it.
+        guard resumedLaunch, !appLock.isLockedOrDue else {
             heldRoute = route
             return
         }
@@ -266,6 +269,8 @@ public struct RootView: View {
         guard let latest = today.latest else { return nil }
         let image = today.image(latest.thumbnailPath, TodayModel.tilePixels) ?? today.image(latest.picturePath, TodayModel.heroPixels)
         return LastCapture(image: image) { [router, today] in
+            // A tap on the last capture wins over a link that waited for the camera to close.
+            router.held = nil
             router.capture = nil
             router.selectedTab = .today
             var path = NavigationPath()

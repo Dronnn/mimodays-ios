@@ -40,6 +40,9 @@ struct AppEraser {
         let pending = await notifications.pending()
         await notifications.cancel(ids: pending.map(\.id) + [BackupReminder.notificationID])
         await notifications.removeAll()
+        // Before the records go: a quit from here on has the rest done at the next launch.
+        let wasPending = store.isErasePending
+        store.markErasePending()
         do {
             // Children before their parents, so no rule is left pointing at a deleted row.
             try deleteAll(MovieAudioTrack.self)
@@ -59,11 +62,11 @@ struct AppEraser {
             try context.save()
         } catch {
             context.rollback()
+            if !wasPending { store.clearErasePending() }
             throw error
         }
         // The records are gone, so the erase goes on to the end: what won't go now, or a quit cuts short, the next
         // launch removes (the capture in review first).
-        store.markErasePending()
         drafts?.clear()
         do { try store.removeAll() } catch {
             Self.logger.error("Some files stayed after Delete All: \(error.localizedDescription, privacy: .public)")

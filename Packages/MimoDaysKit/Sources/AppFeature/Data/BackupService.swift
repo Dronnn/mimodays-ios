@@ -339,7 +339,7 @@ struct BackupService {
         context.insert(manifest)
         try? context.save()
         return Outcome(
-            restored: restored, wanted: wanted, damagedFiles: damagedFiles, alreadyHere: document.moments.count - wanted, skipped: skipped.sorted()
+            restored: restored, wanted: wanted, damagedFiles: damagedFiles, alreadyHere: document.moments.count(where: \.hasPicture) - wanted, skipped: skipped.sorted()
         )
     }
 

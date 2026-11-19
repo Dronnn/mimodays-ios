@@ -38,7 +38,7 @@ struct CollectionsView: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 8, alignment: .top)], spacing: 6) {
                         ForEach(model.collections) { collection in
                             NavigationLink(value: MemoriesRoute.collection(collection.id)) {
-                                CollectionCard(summary: collection, cover: model.covers[collection.id])
+                                CollectionCard(summary: collection, cover: collection.coverPath.flatMap { model.covers[$0] })
                             }
                             .buttonStyle(.plain)
                             .task(id: collection.coverPath) { await model.loadCover(collection) }

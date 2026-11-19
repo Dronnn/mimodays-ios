@@ -123,7 +123,8 @@ final class CollectionsModel {
     private(set) var isLoaded = false
     /// Moments in Recently deleted (M16's row at the bottom of M11).
     private(set) var deletedCount = 0
-    private(set) var covers: [UUID: UIImage] = [:]
+    /// By the cover's file: a collection whose cover moment was removed or trashed shows its new cover, not the old one.
+    private(set) var covers: [String: UIImage] = [:]
 
     let library: MediaLibrary
     private let logger = Logger(subsystem: "MimoDays", category: "Collections")
@@ -138,6 +139,8 @@ final class CollectionsModel {
         do {
             collections = try library.context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)])).map(Self.summary)
             deletedCount = try library.context.fetchCount(FetchDescriptor<Moment>(predicate: #Predicate { $0.deletedAt != nil }))
+            let paths = Set(collections.compactMap(\.coverPath))
+            covers = covers.filter { paths.contains($0.key) }
         } catch {
             logger.error("Reading collections failed: \(error.localizedDescription, privacy: .public)")
         }
@@ -155,9 +158,9 @@ final class CollectionsModel {
     }
 
     func loadCover(_ summary: CollectionSummary) async {
-        guard covers[summary.id] == nil, let path = summary.coverPath, let url = try? library.store.url(for: path),
+        guard let path = summary.coverPath, covers[path] == nil, let url = try? library.store.url(for: path),
               let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: 480) else { return }
-        covers[summary.id] = UIImage(cgImage: image)
+        covers[path] = UIImage(cgImage: image)
     }
 
     @discardableResult
@@ -179,7 +182,8 @@ final class CollectionModel {
     private(set) var title = ""
     private(set) var items: [MemoryItem] = []
     private(set) var details: [UUID: TileDetail] = [:]
-    private(set) var images: [UUID: UIImage] = [:]
+    /// By thumbnail file, so a moment whose picture was edited shows the new one.
+    private var images: [String: UIImage] = [:]
     private(set) var cover: UIImage?
     /// False once the collection is gone (deleted here or elsewhere).
     private(set) var exists = true
@@ -231,15 +235,21 @@ final class CollectionModel {
         coverPath = path
     }
 
+    func image(_ id: UUID) -> UIImage? {
+        details[id]?.thumbnailPath.flatMap { images[$0] }
+    }
+
     func load(_ id: UUID) async {
-        guard images[id] == nil, let path = details[id]?.thumbnailPath, let url = try? library.store.url(for: path),
+        guard let path = details[id]?.thumbnailPath, images[path] == nil, let url = try? library.store.url(for: path),
               let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: MemoriesModel.tilePixels) else { return }
-        images[id] = UIImage(cgImage: image)
+        images[path] = UIImage(cgImage: image)
     }
 
     func loadCover() async {
-        guard cover == nil, let coverPath, let url = try? library.store.url(for: coverPath),
-              let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: 1000) else { return }
+        guard cover == nil, let path = coverPath, let url = try? library.store.url(for: path),
+              let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: 1000),
+              // The cover changed while this one was drawn.
+              path == coverPath else { return }
         cover = UIImage(cgImage: image)
     }
 

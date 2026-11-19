@@ -171,6 +171,15 @@ struct MemoriesModelTests {
         #expect(MemoriesModel.month(202611, adding: -23) == 202412)
     }
 
+    @Test func oldestFirstKeepsTheEarliestMonthReachable() async throws {
+        try await save(at: Self.date(2024, 3, 14))
+        try await save(at: Self.date(2026, 11, 2))
+        let model = model()
+        model.newestFirst = false
+        model.refresh()
+        #expect(model.earliestMonth == 202403)
+    }
+
     @Test func theCalendarOpensOnTodayAndStaysBetweenTheFirstMomentAndNow() async throws {
         try await save(at: Self.date(2026, 9, 14))
         try await save(at: Self.date(2026, 9, 20))

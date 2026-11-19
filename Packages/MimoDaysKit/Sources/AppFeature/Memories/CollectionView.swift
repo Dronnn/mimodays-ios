@@ -59,7 +59,7 @@ struct CollectionView: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 4)], spacing: 4) {
                     ForEach(model.items) { item in
                         MomentTileLink(MemoriesRoute.moment(MomentPager(ids: model.items.map(\.id), start: item.id, origin: .collection(model.title)))) {
-                            MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id])
+                            MemoryTile(item: item, detail: model.details[item.id], image: model.image(item.id))
                         }
                         .buttonStyle(.plain)
                         .contextMenu {
@@ -67,7 +67,7 @@ struct CollectionView: View {
                                 Label { Text("Remove from collection", bundle: .module) } icon: { Icon.glyphClose.image }
                             }
                         }
-                        .task { await model.load(item.id) }
+                        .task(id: model.details[item.id]?.thumbnailPath) { await model.load(item.id) }
                     }
                 }
                 .padding(.horizontal, 20)

@@ -131,7 +131,8 @@ final class MemoriesModel {
     var today: Int { LocalDay(clock.now(), in: calendar().timeZone).key }
     var thisMonth: Int { today / 100 }
     /// The first month with a moment; the calendar goes no further back.
-    var earliestMonth: Int { min(rows.last.map { $0.id > 999_999 ? $0.id / 100 : $0.id } ?? thisMonth, thisMonth) }
+    /// Rows come newest or oldest first (the person's choice), so the smallest month is taken, not the last row's.
+    var earliestMonth: Int { min(rows.map { $0.id > 999_999 ? $0.id / 100 : $0.id }.min() ?? thisMonth, thisMonth) }
 
     func dayModel(_ day: Int) -> DayModel {
         DayModel(day: day, context: context, store: store, thumbnails: thumbnails)

@@ -103,6 +103,26 @@ struct CollectionTests {
         #expect(detail.items.map(\.id) == [older])
     }
 
+    /// The list shows the cover of the moment that covers it now, not the one drawn before it was removed.
+    @Test func aNewCoverIsDrawnAfterTheOldOneLeaves() async throws {
+        let older = try await save(at: Self.date(3, 1))
+        let newer = try await save(at: Self.date(11, 1))
+        let id = try #require(try collections.create("Firsts", with: [older, newer]))
+        let model = CollectionsModel(library: library)
+        model.refresh()
+        let first = try #require(model.collections.first)
+        await model.loadCover(first)
+        let oldCover = try #require(first.coverPath.flatMap { model.covers[$0] })
+        try collections.remove([newer], from: id)
+        model.refresh()
+        let second = try #require(model.collections.first)
+        #expect(second.coverPath != first.coverPath)
+        #expect(second.coverPath.flatMap { model.covers[$0] } == nil)
+        await model.loadCover(second)
+        let newCover = try #require(second.coverPath.flatMap { model.covers[$0] })
+        #expect(newCover !== oldCover)
+    }
+
     @Test func aCollectionReadsOldestFirstWithItsSpan() async throws {
         let late = try await save(at: Self.date(11, 2))
         let early = try await save(at: Self.date(3, 14))

@@ -8,7 +8,7 @@ enum AppLinks {
     static let feedbackAddress = "mimodays@mrmaier.com"
     static let feedback = URL(string: "mailto:\(feedbackAddress)")
     /// S07 "Rate MimoDays": the App Store's review page (the system's rating prompt may not show when asked).
-    static let review = URL(string: "https://apps.apple.com/app/id6831612247?action=write-review")
+    static let review = URL(string: "https://apps.apple.com/app/id6835025354?action=write-review")
 }
 
 /// S07 "How it works": one short page each.

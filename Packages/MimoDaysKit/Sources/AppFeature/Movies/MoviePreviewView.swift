@@ -125,11 +125,9 @@ struct MovieWatchView<Actions: View>: View {
                         .onEnded { _ in scrubbing = false }
                 )
             }
-            // Touched across 44 pt; laid out in 16. Left to right in every language, so the fill, the knob and a
-            // touch agree.
+            // Touched across 44 pt; laid out in 16.
             .frame(height: 44)
             .padding(.vertical, -14)
-            .environment(\.layoutDirection, .leftToRight)
             .accessibilityElement()
             .accessibilityLabel(Text("Position", bundle: .module))
             .accessibilityValue(Text(MovieEditorView.clock(time)))
@@ -147,6 +145,8 @@ struct MovieWatchView<Actions: View>: View {
             .foregroundStyle(ColorToken.mediaFrame.color)
             .accessibilityHidden(true)
         }
+        // Left to right in every language, so the fill, the knob, a touch and the times under them agree.
+        .environment(\.layoutDirection, .leftToRight)
     }
 
     private func toggle() {

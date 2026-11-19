@@ -363,14 +363,19 @@ private struct MediaThenPanel: Layout {
         let size = proposal.replacingUnspecifiedDimensions()
         guard subviews.count == 2 else { return size }
         let panel = subviews[1].sizeThatFits(ProposedViewSize(width: size.width, height: nil)).height
-        return CGSize(width: size.width, height: max(size.height, topInset + chrome + panel))
+        return CGSize(width: size.width, height: max(size.height, topInset + chrome + leastCard(screen: size.width) + panel))
+    }
+
+    /// However large the text, the capture stays big enough to see what it is.
+    private func leastCard(screen: CGFloat) -> CGFloat {
+        min(MemoryCardGeometry.slotWidth(screen: screen) / aspectRatio, 96)
     }
 
     func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
         guard subviews.count == 2 else { return }
         let panel = subviews[1].sizeThatFits(ProposedViewSize(width: bounds.width, height: nil)).height
         let card = MemoryCardGeometry.slotWidth(screen: bounds.width) / aspectRatio
-        let media = max(topInset + chrome, min(topInset + chrome + card, bounds.height - panel))
+        let media = max(topInset + chrome + leastCard(screen: bounds.width), min(topInset + chrome + card, bounds.height - panel))
         subviews[0].place(at: bounds.origin, proposal: ProposedViewSize(width: bounds.width, height: media))
         subviews[1].place(at: CGPoint(x: bounds.minX, y: bounds.minY + media), proposal: ProposedViewSize(width: bounds.width, height: panel))
     }

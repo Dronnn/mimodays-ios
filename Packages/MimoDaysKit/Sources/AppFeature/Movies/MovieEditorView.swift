@@ -219,6 +219,12 @@ struct MovieEditorView: View {
                     .frame(width: size.width, height: size.height)
                     .background(Color.black)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    // The movie is one element and the selfie window over it another, each with its own actions.
+                    .accessibilityElement()
+                    .accessibilityLabel(Text("Movie preview", bundle: .module))
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAction { previewing = true }
+                    .accessibilityIdentifier("editor.stage")
                     .overlay { if sheet == .clip { windowHandle(size) } }
                     .overlay(alignment: .bottom) { if let lead = model.leadProgress { leadBadge(lead) } }
                 if model.failed {
@@ -236,11 +242,6 @@ struct MovieEditorView: View {
         // iPad's taller screen goes to the stage; on iPhone it is as tall as drawn at most.
         .frame(minHeight: 140, maxHeight: sizeClass == .regular ? .infinity : 330)
         .background(Color(hex: 0x2A1B21))
-        .accessibilityElement()
-        .accessibilityLabel(Text("Movie preview", bundle: .module))
-        .accessibilityAddTraits(.isButton)
-        .accessibilityAction { previewing = true }
-        .accessibilityIdentifier("editor.stage")
     }
 
     /// U54: while an Atmosphere's sound leads, the sound drawn in the dark and a coral pill naming it.
@@ -286,10 +287,7 @@ struct MovieEditorView: View {
                             .onEnded { _ in placeWindow(picture: picture, canvas: canvas) }
                             .simultaneously(with: MagnifyGesture()
                                 .onChanged { pinch in
-                                    let base = movingWindow ?? rect
-                                    let width = min(max(base.width * pinch.magnification, canvas.width * 0.15), canvas.width * 0.5)
-                                    let height = width * base.height / base.width
-                                    movingWindow = CGRect(x: base.midX - width / 2, y: base.midY - height / 2, width: width, height: height)
+                                    movingWindow = Self.resized(movingWindow ?? rect, by: pinch.magnification, canvas: canvas)
                                 }
                                 .onEnded { _ in placeWindow(picture: picture, canvas: canvas) })
                     )
@@ -302,10 +300,7 @@ struct MovieEditorView: View {
                         }
                     }
                     .accessibilityAdjustableAction { direction in
-                        let factor: CGFloat = direction == .increment ? 1.2 : 1 / 1.2
-                        let width = min(max(rect.width * factor, canvas.width * 0.15), canvas.width * 0.5)
-                        let height = width * rect.height / rect.width
-                        movingWindow = CGRect(x: rect.midX - width / 2, y: rect.midY - height / 2, width: width, height: height)
+                        movingWindow = Self.resized(rect, by: direction == .increment ? 1.2 : 1 / 1.2, canvas: canvas)
                         placeWindow(picture: picture, canvas: canvas)
                     }
                     .accessibilityIdentifier("editor.window")
@@ -314,6 +309,15 @@ struct MovieEditorView: View {
     }
 
     /// The moved window kept as a share of the picture, the way the movie reads it.
+    /// The window scaled about its centre: at least 15 % of the movie's width, at most half its width and half its
+    /// height, so a tall window in a wide movie still fits.
+    static func resized(_ rect: CGRect, by factor: CGFloat, canvas: CGSize) -> CGRect {
+        let largest = min(canvas.width * 0.5, canvas.height * 0.5 * rect.width / rect.height)
+        let width = min(max(rect.width * factor, canvas.width * 0.15), largest)
+        let height = width * rect.height / rect.width
+        return CGRect(x: rect.midX - width / 2, y: rect.midY - height / 2, width: width, height: height)
+    }
+
     /// VoiceOver's corner actions: the window into that corner of the picture, a little in from its edges.
     private func moveWindow(_ rect: CGRect, to corner: CameraSettings.SelfieWindow.Corner, picture: CGRect, canvas: CGSize) {
         let inset = min(picture.width, picture.height) * 0.04

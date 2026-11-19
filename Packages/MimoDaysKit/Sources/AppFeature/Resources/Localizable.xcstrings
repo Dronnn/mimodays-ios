@@ -104979,7 +104979,7 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "See all %lld moment"
+                  "value" : "See %lld moment"
                 }
               },
               "other" : {

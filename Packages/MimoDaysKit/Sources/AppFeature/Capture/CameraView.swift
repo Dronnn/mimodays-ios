@@ -616,7 +616,7 @@ private struct CameraNote: View {
         .background(CameraPalette.background.opacity(0.88), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier(id)
-        .onAppear {
+        .onChange(of: announcement, initial: true) { _, announcement in
             if let announcement { AccessibilityNotification.Announcement(announcement).post() }
         }
     }

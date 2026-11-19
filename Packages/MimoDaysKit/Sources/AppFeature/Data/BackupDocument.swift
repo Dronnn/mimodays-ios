@@ -54,6 +54,11 @@ struct BackupDocument: Codable, Equatable {
 
         /// Every file the moment needs.
         var paths: [String] { media.map(\.path) + voiceNotes.map(\.path) }
+        /// Something to show: at least one camera file. A record without one (a damaged or hand-made manifest) is no
+        /// moment to restore.
+        var hasPicture: Bool {
+            media.contains { $0.role == MediaRole.rearSource.rawValue || $0.role == MediaRole.frontSource.rawValue }
+        }
 
         /// Without the files that are gone from this iPhone, so a restore brings back the rest of the moment
         /// instead of skipping it. One whose camera files are all gone stays as it is: there is nothing to restore.

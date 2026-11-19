@@ -127,8 +127,12 @@ final class ReviewModel {
     private var isFinished = false
 
     private func keepDraft() {
-        guard !isFinished else { return }
-        drafts?.save(ReviewDraft(
+        guard !isFinished, let drafts else { return }
+        // Only its own draft: a Review left open behind a link, whose twin was then retaken, mustn't write over the
+        // next capture's draft (or bring back one whose files are gone).
+        guard FileManager.default.fileExists(atPath: capture.mainURL.path) else { return }
+        if let onDisk = drafts.load(), onDisk.capture.mainURL.lastPathComponent != capture.mainURL.lastPathComponent { return }
+        drafts.save(ReviewDraft(
             capture: capture, caption: caption, note: note, window: window, promptID: promptID, voice: voice,
             place: place, placeWasChosen: placeWasChosen
         ))

@@ -37,6 +37,8 @@ public struct RootView: View {
     @State private var statusBarOnTop = true
     /// The launch route and a draft left by iOS have been opened (once, after App Lock if it's on).
     @State private var resumedLaunch = false
+    /// A notification tap or link that came while App Lock was on: opened once unlocked.
+    @State private var heldRoute: Route?
     private let launchRoute: Route?
     @Environment(\.scenePhase) private var scenePhase
 
@@ -116,13 +118,18 @@ public struct RootView: View {
         }
         // Behind App Lock nothing opens: a recovered video in Review would play its sound under the lock screen.
         .onChange(of: appLock.isLocked) { _, locked in
-            if !locked { resumeLaunch() }
+            guard !locked else { return }
+            resumeLaunch()
+            if let heldRoute {
+                self.heldRoute = nil
+                open(heldRoute)
+            }
         }
         // mimodays://today (and the other tabs), …/settings, …/capture?prompt=<uuid>; a prompt is checked as a
         // notification's is. Not during onboarding.
         .onOpenURL { url in
             guard onboarding == nil, let route = AppRouter.route(from: url) else { return }
-            if case let .capture(promptID?) = route { openSurprise(promptID) } else { router.open(route) }
+            open(route)
         }
         // Planned surprises carry their words: drawn again in the language just chosen.
         .onChange(of: AppLanguage.shared.code) { Task { await surprises.settingsChanged() } }
@@ -222,7 +229,21 @@ public struct RootView: View {
     /// Today offers it while it's still in time.
     private func openSurprise(_ promptID: UUID) {
         guard onboarding == nil else { return }
-        router.open(.capture(promptID: surprises.open(promptID: promptID) ? promptID : nil))
+        open(.capture(promptID: promptID))
+    }
+
+    /// Behind App Lock nothing opens (a recovered Review would play under the lock screen): it waits for the unlock,
+    /// and a surprise is checked then.
+    private func open(_ route: Route) {
+        guard !appLock.isLocked else {
+            heldRoute = route
+            return
+        }
+        if case let .capture(promptID?) = route {
+            router.open(.capture(promptID: surprises.open(promptID: promptID) ? promptID : nil))
+        } else {
+            router.open(route)
+        }
     }
 
     private func refreshSurprises() {

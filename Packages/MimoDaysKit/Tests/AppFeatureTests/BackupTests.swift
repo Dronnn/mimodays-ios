@@ -235,6 +235,26 @@ struct BackupTests {
         #expect(model.adding == 0 && !model.canRestore)
     }
 
+    /// A moment with no camera file (a damaged or hand-made manifest) counts as nothing to restore: Replace Everything
+    /// can't empty the library for it, and Add brings in no empty moment.
+    @Test func aMomentWithoutPicturesIsNothingToRestore() async throws {
+        let phone = try library()
+        phone.context.insert(Moment(
+            captured: CaptureTime(instant: clock.now(), timeZone: .gmt), origin: .manual, mediaType: .photo, createdAt: clock.now()
+        ))
+        try phone.context.save()
+        let (url, document) = try backUp(phone)
+        #expect(document.moments.count == 1)
+        #expect(document.moments.first?.media.isEmpty == true)
+        let newPhone = try library()
+        let check = try BackupArchive.check(url)
+        let summary = BackupService(library: newPhone, now: { [clock] in clock.now() }).summary(check)
+        #expect(summary.restorable == 0)
+        let outcome = try restore(url, into: newPhone)
+        #expect(outcome.restored == 0)
+        #expect(try newPhone.context.fetchCount(FetchDescriptor<Moment>()) == 0)
+    }
+
     /// A manifest listing a moment twice in a collection gives it one row, and the collection still opens.
     @Test func aMomentListedTwiceInACollectionComesBackOnce() async throws {
         let phone = try library()

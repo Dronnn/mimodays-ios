@@ -109,6 +109,23 @@ struct ReviewDraftTests {
         #expect(draft.capture == next.capture && draft.caption == "")
     }
 
+    /// A Review left open behind a link (never retaken itself) whose recovered twin was retaken: when its late
+    /// change lands, the next capture's draft stays.
+    @Test func aReviewLeftBehindDoesntWriteOverTheNextDraft() async throws {
+        defer { drafts.clear() }
+        let left = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        let twin = ReviewModel(draft: try #require(drafts.load()), drafts: drafts)
+        twin.discard()
+        let next = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        next.caption = "Next"
+        left.caption = "Late"
+        let draft = try #require(drafts.load())
+        #expect(draft.capture == next.capture && draft.caption == "Next")
+        // Before the next capture came, it brought back no draft whose files are gone either.
+        twin.caption = "Gone"
+        #expect(drafts.load()?.caption == "Next")
+    }
+
     @Test func theNoteIsCappedAndCountsAsSomethingToKeep() async throws {
         let review = ReviewModel(capture: try await capture())
         defer { review.discard() }

@@ -124,7 +124,7 @@ struct BackupService {
         return Summary(
             createdAt: document.createdAt, moments: document.moments.count, collections: document.collections.count,
             projects: document.movies.count, alreadyHere: document.moments.count { here.contains($0.id) }, isClean: check.damaged.isEmpty,
-            restorable: document.moments.count { !$0.paths.contains(where: check.damaged.contains) }, addsMore: addsMore
+            restorable: document.moments.count { $0.hasPicture && !$0.paths.contains(where: check.damaged.contains) }, addsMore: addsMore
         )
     }
 
@@ -227,7 +227,7 @@ struct BackupService {
             let damaged = record.paths.filter { check.damaged.contains($0) }
             damagedFiles += damaged.count
             // Its files came in above, all of them, or none did.
-            guard damaged.isEmpty, record.paths.allSatisfy({ paths[$0] != nil }) else {
+            guard record.hasPicture, damaged.isEmpty, record.paths.allSatisfy({ paths[$0] != nil }) else {
                 skipped.append(record.capturedAt)
                 continue
             }

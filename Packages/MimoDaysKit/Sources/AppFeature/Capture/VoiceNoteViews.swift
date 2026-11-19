@@ -38,6 +38,14 @@ final class VoiceRecording: Identifiable {
         }
     }
 
+    func pause() {
+        if !isFinished { recorder.pause() }
+    }
+
+    func resume() {
+        if !isFinished { recorder.resume() }
+    }
+
     func tick() {
         guard !isFinished else { return }
         elapsed = recorder.elapsed
@@ -63,10 +71,11 @@ struct VoiceRecordingSheet: View {
     /// Starts the recording once the sheet is up (the movie editor's voice); false closes it. A voice note's recording
     /// has started already.
     var start: (() async -> Bool)?
-    /// Once, when the sheet goes away for any reason.
+    /// Once: on Stop, or when the sheet goes away for any other reason.
     let onFinish: (VoiceRecording) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var height: CGFloat = 293
+    @State private var ended = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -91,6 +100,8 @@ struct VoiceRecordingSheet: View {
                 .padding(.top, 22)
                 .accessibilityHidden(true)
             Button {
+                // Ends here, not once the sheet is gone: a movie voice still getting ready mustn't start meanwhile.
+                end()
                 dismiss()
             } label: {
                 RoundedRectangle(cornerRadius: 6)
@@ -122,10 +133,14 @@ struct VoiceRecordingSheet: View {
             await recording.run()
             dismiss()
         }
-        .onDisappear {
-            recording.finish()
-            onFinish(recording)
-        }
+        .onDisappear { end() }
+    }
+
+    private func end() {
+        guard !ended else { return }
+        ended = true
+        recording.finish()
+        onFinish(recording)
     }
 
     /// "0:12".

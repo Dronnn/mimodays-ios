@@ -10,8 +10,11 @@ public protocol VoiceRecorder: AnyObject {
     var elapsed: TimeInterval { get }
     /// The input level right now, 0...1.
     var level: Float { get }
-    /// False once stopped: by `stop()`, at the limit, or by an interruption such as a call.
+    /// False once stopped: by `stop()`, at the limit, or by an interruption such as a call. Still true while paused.
     var isRecording: Bool { get }
+    /// Holds the recording, nothing heard meanwhile goes in; `resume()` carries on in the same file.
+    func pause()
+    func resume()
     /// Ends the recording and closes the file.
     func stop()
 }
@@ -24,6 +27,7 @@ public enum VoiceRecorderError: Error {
 public final class AVVoiceRecorder: VoiceRecorder {
     private var recorder: AVAudioRecorder?
     private var lastElapsed: TimeInterval = 0
+    private var paused = false
 
     public init() {}
 
@@ -43,6 +47,7 @@ public final class AVVoiceRecorder: VoiceRecorder {
         guard recorder.record(forDuration: limit) else { throw VoiceRecorderError.couldNotStart }
         self.recorder = recorder
         lastElapsed = 0
+        paused = false
     }
 
     public var elapsed: TimeInterval {
@@ -57,13 +62,27 @@ public final class AVVoiceRecorder: VoiceRecorder {
         return max(0, min(1, (recorder.averagePower(forChannel: 0) + 50) / 50))
     }
 
-    public var isRecording: Bool { recorder?.isRecording ?? false }
+    public var isRecording: Bool { recorder.map { $0.isRecording || paused } ?? false }
+
+    public func pause() {
+        guard let recorder, recorder.isRecording else { return }
+        _ = elapsed
+        recorder.pause()
+        paused = true
+    }
+
+    public func resume() {
+        guard let recorder, paused else { return }
+        paused = false
+        recorder.record()
+    }
 
     public func stop() {
         guard let recorder else { return }
         _ = elapsed
         recorder.stop()
         self.recorder = nil
+        paused = false
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 }
@@ -72,7 +91,11 @@ public final class AVVoiceRecorder: VoiceRecorder {
 @MainActor
 public final class SimulatedVoiceRecorder: VoiceRecorder {
     private let now: () -> Date
-    private var startedAt: Date?
+    private var started = false
+    /// Since when it runs; nil while paused.
+    private var runningSince: Date?
+    /// Recorded before the last pause.
+    private var before: TimeInterval = 0
     private var url: URL?
     private var limit: TimeInterval = 0
     private var stoppedAt: TimeInterval?
@@ -84,21 +107,33 @@ public final class SimulatedVoiceRecorder: VoiceRecorder {
     public func start(to url: URL, limit: TimeInterval) throws {
         self.url = url
         self.limit = limit
-        startedAt = now()
+        started = true
+        runningSince = now()
+        before = 0
         stoppedAt = nil
     }
 
     public var elapsed: TimeInterval {
         if let stoppedAt { return stoppedAt }
-        guard let startedAt else { return 0 }
-        return min(limit, now().timeIntervalSince(startedAt))
+        return min(limit, before + (runningSince.map { now().timeIntervalSince($0) } ?? 0))
     }
 
     public var level: Float {
         isRecording ? Float(0.45 + 0.35 * sin(elapsed * 7)) : 0
     }
 
-    public var isRecording: Bool { startedAt != nil && stoppedAt == nil && elapsed < limit }
+    public var isRecording: Bool { started && stoppedAt == nil && elapsed < limit }
+
+    public func pause() {
+        guard runningSince != nil, isRecording else { return }
+        before = elapsed
+        runningSince = nil
+    }
+
+    public func resume() {
+        guard runningSince == nil, isRecording else { return }
+        runningSince = now()
+    }
 
     public func stop() {
         guard let url, stoppedAt == nil else { return }

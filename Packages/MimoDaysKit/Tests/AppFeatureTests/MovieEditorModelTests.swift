@@ -371,6 +371,60 @@ struct MovieEditorModelTests {
         #expect(model.project.clipSoundLevel == 0.7 && !model.canUndo)
     }
 
+    /// The microphone takes a moment to start while the movie already plays: the voice goes where the movie was once it
+    /// had started, not before.
+    @Test func theVoiceGoesWhereTheMovieWasOnceTheMicrophoneStarted() async throws {
+        let ids = try await save(2)
+        let recorderClock = TestDateProvider()
+        let spy = SpyRecorder(now: recorderClock.now)
+        let model = try editor(ids, voice: VoiceServices(makeRecorder: { spy }, transcriber: SimulatedTranscriber()))
+        var before = 0.0
+        spy.onStart = {
+            before = model.player.currentTime().seconds
+            Thread.sleep(forTimeInterval: 0.25)
+        }
+        let take = try #require(model.newVoiceover())
+        #expect(await model.startVoiceover(take))
+        recorderClock.advance(by: 1)
+        model.finishVoiceover(take)
+        let track = try #require(model.track)
+        #expect(track.startOffset >= before + 0.2)
+        #expect(abs(take.limit - (model.duration - track.startOffset)) < 0.001)
+    }
+
+    /// The movie stalls mid-take: the microphone waits with it and carries on when it moves again; at the movie's
+    /// end the take is done and kept.
+    @Test func aStalledMovieHoldsTheMicrophoneAndItsEndFinishesTheTake() async throws {
+        let ids = try await save(2)
+        let recorderClock = TestDateProvider()
+        let spy = SpyRecorder(now: recorderClock.now)
+        let model = try editor(ids, voice: VoiceServices(makeRecorder: { spy }, transcriber: SimulatedTranscriber()))
+        let take = try #require(model.newVoiceover())
+        #expect(await model.startVoiceover(take))
+        model.player.pause()
+        #expect(await eventually { spy.isPaused })
+        #expect(model.voiceover === take, "held, not over")
+        model.player.play()
+        #expect(await eventually { !spy.isPaused })
+        recorderClock.advance(by: 1)
+        await model.player.seek(to: CMTime(seconds: model.duration - 0.1, preferredTimescale: 600))
+        #expect(await eventually { model.voiceover == nil })
+        #expect(model.track?.kind == .voiceover && !model.player.isMuted)
+    }
+
+    /// A start that comes after its take was finished leaves the editor where it was.
+    @Test func aStaleStartTouchesNothing() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        await model.settled()
+        model.select(1)
+        let time = model.time
+        let take = try #require(model.newVoiceover())
+        model.finishVoiceover(take)
+        #expect(await model.startVoiceover(take) == false)
+        #expect(model.time == time && time > 0 && !model.isPlaying && model.voiceover == nil)
+    }
+
     /// Export pushed over the editor (or the editor left) while a take records: it ends there, kept, and coming back
     /// doesn't pick it up again.
     @Test func closingTheEditorFinishesTheTake() async throws {
@@ -557,19 +611,52 @@ private final class FailingRecorder: VoiceRecorder {
     var elapsed: TimeInterval { 0 }
     var level: Float { 0 }
     var isRecording: Bool { false }
+    func pause() {}
+    func resume() {}
     func stop() {}
 }
 
-/// Counts the times the microphone was started.
+/// The simulated microphone, watched: how often it started, whether it's held, and a hook as it starts.
 @MainActor
 private final class SpyRecorder: VoiceRecorder {
+    private let inner: SimulatedVoiceRecorder
     private(set) var starts = 0
-    private(set) var isRecording = false
-    func start(to _: URL, limit _: TimeInterval) throws {
-        starts += 1
-        isRecording = true
+    private(set) var isPaused = false
+    var onStart: () -> Void = {}
+
+    init(now: @escaping () -> Date = Date.init) {
+        inner = SimulatedVoiceRecorder(now: now)
     }
-    var elapsed: TimeInterval { 0 }
-    var level: Float { 0 }
-    func stop() { isRecording = false }
+
+    func start(to url: URL, limit: TimeInterval) throws {
+        starts += 1
+        try inner.start(to: url, limit: limit)
+        onStart()
+    }
+
+    var elapsed: TimeInterval { inner.elapsed }
+    var level: Float { inner.level }
+    var isRecording: Bool { inner.isRecording }
+
+    func pause() {
+        inner.pause()
+        isPaused = true
+    }
+
+    func resume() {
+        inner.resume()
+        isPaused = false
+    }
+
+    func stop() { inner.stop() }
+}
+
+/// Up to three seconds for `condition`.
+@MainActor
+private func eventually(_ condition: () -> Bool) async -> Bool {
+    for _ in 0 ..< 100 {
+        if condition() { return true }
+        try? await Task.sleep(for: .milliseconds(30))
+    }
+    return condition()
 }

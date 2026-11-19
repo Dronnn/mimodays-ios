@@ -555,6 +555,8 @@ final class MovieEditorModel {
     private(set) var voiceover: VoiceRecording?
     /// Where the movie was when the take's microphone started.
     private var voiceoverStart = 0.0
+    /// Holds the microphone while the movie doesn't move, so the words stay with the pictures.
+    private var voiceoverPace: NSKeyValueObservation?
 
     /// A take getting ready: the stage stops and goes silent, so the movie's sound isn't recorded into the voice.
     /// Its sheet comes up at once and starts it (`startVoiceover`). Nil while another one is on.
@@ -572,10 +574,9 @@ final class MovieEditorModel {
     /// as soon as it really moves, and records from there to the end, so the words stay with the pictures. False when
     /// it can't; nothing starts once the take was finished meanwhile (its sheet went away, the editor closed).
     func startVoiceover(_ take: VoiceRecording) async -> Bool {
-        while let pending = rebuild, !pending.isCancelled {
-            await pending.value
-            guard voiceover === take else { return false }
-        }
+        while let pending = rebuild, !pending.isCancelled { await pending.value }
+        // Finished meanwhile: that put everything back already.
+        guard voiceover === take else { return false }
         time = 0
         guard duration > 0, await wait(for: take, until: { player.currentItem?.status == .readyToPlay }),
               await player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero), voiceover === take
@@ -583,17 +584,35 @@ final class MovieEditorModel {
         player.play()
         isPlaying = true
         guard await wait(for: take, until: { player.timeControlStatus == .playing }) else { return abandon(take) }
-        let start = max(player.currentTime().seconds, 0)
-        guard start < duration else { return abandon(take) }
-        take.limit = duration - start
+        // At most what's left of the movie; the movie's end stops it anyway.
+        take.limit = duration - max(player.currentTime().seconds, 0)
+        guard take.limit > 0 else { return abandon(take) }
         let session = AVAudioSession.sharedInstance()
         playbackSession = (session.category, session.mode)
         guard take.start() else {
             try? session.setActive(false, options: .notifyOthersOnDeactivation)
             return abandon(take)
         }
-        voiceoverStart = start
+        // Where the movie is now the microphone has really started: the voice goes there.
+        voiceoverStart = min(max(player.currentTime().seconds, 0), duration)
+        take.limit = duration - voiceoverStart
+        voiceoverPace = player.observe(\.timeControlStatus, options: [.initial]) { @Sendable [weak self] _, _ in
+            Task { @MainActor in self?.keepPace(with: take) }
+        }
         return true
+    }
+
+    /// The movie stalls (buffering) or the audio session change held it: the microphone waits with it. At the movie's
+    /// end the take is done.
+    private func keepPace(with take: VoiceRecording) {
+        guard voiceover === take else { return }
+        if player.timeControlStatus == .playing {
+            take.resume()
+        } else if player.currentTime().seconds >= duration - 0.05 {
+            finishVoiceover(take)
+        } else {
+            take.pause()
+        }
     }
 
     /// Up to three seconds for `condition`; false at once when `take` is finished meanwhile or the stage failed.
@@ -610,6 +629,7 @@ final class MovieEditorModel {
     private func abandon(_ take: VoiceRecording) -> Bool {
         guard voiceover === take else { return false }
         voiceover = nil
+        voiceoverPace = nil
         pause()
         restorePlayback()
         try? FileManager.default.removeItem(at: take.url)
@@ -621,6 +641,7 @@ final class MovieEditorModel {
     func finishVoiceover(_ take: VoiceRecording) {
         guard voiceover === take else { return }
         voiceover = nil
+        voiceoverPace = nil
         take.finish()
         pause()
         restorePlayback()

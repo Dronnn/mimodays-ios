@@ -145,12 +145,14 @@ final class MovieEditorModel {
         observeTime()
     }
 
-    /// The playhead follows playback; again after Export was pushed over the editor and popped (which closed it).
+    /// The playhead follows playback; again after Export was pushed over the editor and popped (which closed it),
+    /// when the stage is built again if closing stopped that half way (a change made just before).
     func observeTime() {
         guard timeObserver == nil else { return }
         timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 30), queue: .main) { [weak self] time in
             MainActor.assumeIsolated { self?.tick(time.seconds) }
         }
+        if rebuild?.isCancelled == true { reload() }
     }
 
     private var store: MovieStore { MovieStore(context: library.context, store: library.store, now: { [clock] in clock.now() }) }
@@ -511,10 +513,15 @@ final class MovieEditorModel {
 
     func endLevelChange() { saved() }
 
-    /// The person's own file (from Files) plays under the movie; it's copied in, so the original can go.
+    /// The person's own file (from Files) plays under the movie; it's copied in, so the original can go. A file
+    /// that isn't readable audio is left out and the track stays as it was.
     func setMusic(from url: URL) {
         let accessing = url.startAccessingSecurityScopedResource()
         defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+        guard Self.seconds(of: url) != nil else {
+            logger.error("Adding music failed: the file isn't readable audio")
+            return
+        }
         do {
             let file = try library.store.store(copyOf: url, in: .originals, fileExtension: url.pathExtension.isEmpty ? nil : url.pathExtension)
             audioFiles.insert(file.relativePath)
@@ -542,28 +549,60 @@ final class MovieEditorModel {
 
     // MARK: Voice over the movie (F09)
 
+    /// The voice over the movie from its start until it's finished; one at a time.
+    private(set) var voiceover: VoiceRecording?
+
     /// The movie plays from the start, silent so its sound isn't recorded into the voice, while the microphone records
-    /// up to its end. Nil when the microphone can't start; the track stays as it was.
-    func startVoiceover() -> VoiceRecording? {
-        guard duration > 0, let url = try? CaptureFiles.temporaryURL("m4a") else { return nil }
+    /// up to its end. Both start together, once the stage is ready on the first frame, so the words stay with the
+    /// pictures. Nil when either can't start, or the take was finished meanwhile; the track stays as it was.
+    func startVoiceover() async -> VoiceRecording? {
+        guard voiceover == nil, duration > 0, let url = try? CaptureFiles.temporaryURL("m4a") else { return nil }
+        let recording = VoiceRecording(recorder: voice.makeRecorder(), url: url, limit: duration)
+        voiceover = recording
         pause()
+        player.isMuted = true
+        await rebuild?.value
+        time = 0
+        var atStart = await stageReady()
+        if atStart { atStart = await player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero) }
+        // Finished meanwhile (the app left): that already put everything back.
+        guard voiceover === recording else { return nil }
+        guard atStart else {
+            voiceover = nil
+            restorePlayback()
+            return nil
+        }
         let session = AVAudioSession.sharedInstance()
         playbackSession = (session.category, session.mode)
-        let recording = VoiceRecording(recorder: voice.makeRecorder(), url: url, limit: duration)
         guard recording.start() else {
+            voiceover = nil
             restorePlayback()
+            try? session.setActive(false, options: .notifyOthersOnDeactivation)
             try? FileManager.default.removeItem(at: url)
             return nil
         }
-        seek(to: 0)
-        player.isMuted = true
         player.play()
         isPlaying = true
         return recording
     }
 
-    /// Stop, the movie's end, the sheet or the app left: what was recorded becomes the movie's track.
+    /// The stage's movie can play: waits for it to load if it hasn't yet, three seconds at most.
+    private func stageReady() async -> Bool {
+        for _ in 0 ..< 100 where !failed {
+            switch player.currentItem?.status {
+            case .readyToPlay: return true
+            case .failed: return false
+            default: try? await Task.sleep(for: .milliseconds(30))
+            }
+        }
+        return false
+    }
+
+    /// Stop, the movie's end, the sheet or the app left: what was recorded becomes the movie's track. Once per take,
+    /// whichever comes first.
     func finishVoiceover(_ recording: VoiceRecording) {
+        guard voiceover === recording else { return }
+        voiceover = nil
         recording.finish()
         pause()
         restorePlayback()
@@ -577,10 +616,10 @@ final class MovieEditorModel {
         self.playbackSession = nil
     }
 
-    /// A recording replaces the music or an earlier voice; it's moved in. Too short or unreadable, it's dropped and
-    /// the track stays as it was.
+    /// A recording replaces the music or an earlier voice; it's moved in. Too short (for a movie that short, shorter
+    /// than the movie) or unreadable, it's dropped and the track stays as it was.
     func addVoiceover(at url: URL) {
-        guard let seconds = Self.seconds(of: url), seconds >= Self.shortestVoiceover else {
+        guard let seconds = Self.seconds(of: url), seconds >= min(Self.shortestVoiceover, duration) else {
             try? FileManager.default.removeItem(at: url)
             return
         }
@@ -734,6 +773,8 @@ final class MovieEditorModel {
                 failed = true
                 logger.error("Composing the movie failed: \(error.localizedDescription, privacy: .public)")
             }
+            // Finished: only a rebuild `close` stopped is left behind, for `observeTime` to start again.
+            if !Task.isCancelled { rebuild = nil }
         }
     }
 

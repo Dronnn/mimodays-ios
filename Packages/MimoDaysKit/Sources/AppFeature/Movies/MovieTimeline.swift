@@ -26,7 +26,7 @@ struct MovieTimeline: View {
                 laneIcon(.glyphPhotos, Text("Picture", bundle: .module))
                 laneIcon(.glyphSpeaker, Text("Original sound", bundle: .module))
                 laneIcon(.glyphMic, Text("Voice comments", bundle: .module))
-                laneIcon(.glyphMusic, Text("Music", bundle: .module))
+                laneIcon(.glyphMusic, model.track?.kind == .voiceover ? Text("Your voice", bundle: .module) : Text("Music", bundle: .module))
             }
             .frame(width: Self.gutter)
             ScrollViewReader { reader in

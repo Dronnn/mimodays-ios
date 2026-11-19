@@ -129,12 +129,11 @@ struct MovieEditorView: View {
                 microphoneOff = false
             }
         }
-        // Leaving MimoDays stops the recording; what was recorded is kept.
+        // Leaving MimoDays stops the recording; what was recorded is kept, whether or not its sheet came up.
         .onChange(of: scenePhase) { _, phase in
-            if phase == .background, let voiceover {
-                voiceover.finish()
-                self.voiceover = nil
-            }
+            guard phase == .background, let take = model.voiceover else { return }
+            model.finishVoiceover(take)
+            voiceover = nil
         }
         .fullScreenCover(isPresented: $previewing) {
             MoviePreviewView(model: model, export: {
@@ -156,16 +155,19 @@ struct MovieEditorView: View {
     /// F09's voice over the movie: our explainer and the system prompt the first time; once it is off, the way to
     /// Settings.
     private func recordVoice() {
-        guard !asker.isAsking, voiceover == nil else { return }
+        guard !asker.isAsking, model.voiceover == nil else { return }
         Task {
             let status = await asker.request(.microphone, using: permissions)
             // The microphone only records with its sheet up: not once the editor is gone or something else opened.
-            guard isShown, sheet == nil, !previewing, voiceover == nil else { return }
+            guard isShown, sheet == nil, !previewing, model.voiceover == nil else { return }
             guard status.isUsable else {
                 if status.needsSettings { microphoneOff = true }
                 return
             }
-            voiceover = model.startVoiceover()
+            guard let take = await model.startVoiceover() else { return }
+            // Gone while the movie got ready: the take ends here, as it would have with its sheet.
+            guard isShown, scenePhase != .background else { return model.finishVoiceover(take) }
+            voiceover = take
         }
     }
 

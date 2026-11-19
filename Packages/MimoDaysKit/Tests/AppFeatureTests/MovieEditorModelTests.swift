@@ -188,12 +188,18 @@ struct MovieEditorModelTests {
         #expect(model.project.clipSoundLevel == 0.7)
     }
 
+    /// A song in Files: the voice fixture under a song's name.
+    private func song() throws -> URL {
+        let url = FileManager.default.temporaryDirectory.appending(path: "\(UUID().uuidString)/Sunday song.m4a")
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.copyItem(at: Fixture.voiceNote.url, to: url)
+        return url
+    }
+
     @Test func musicIsCopiedInAndItsFileGoesWhenNothingUsesIt() async throws {
         let ids = try await save(2)
         let model = try editor(ids)
-        let song = FileManager.default.temporaryDirectory.appending(path: "Sunday song.m4a")
-        try Data([1, 2, 3]).write(to: song)
-        model.setMusic(from: song)
+        model.setMusic(from: try song())
         let track = try #require(model.track)
         #expect(track.name == "Sunday song")
         #expect(store.fileExists(track.relativePath))
@@ -217,6 +223,35 @@ struct MovieEditorModelTests {
         #expect(!store.fileExists(path))
     }
 
+    @Test func aFileThatIsntAudioLeavesTheMusicAsItWas() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        model.setMusic(from: try song())
+        let kept = try #require(model.track).relativePath
+        let files = Set(try store.orphans(referenced: []))
+        let broken = FileManager.default.temporaryDirectory.appending(path: "\(UUID().uuidString).mp3")
+        try Data([1, 2, 3]).write(to: broken)
+        model.setMusic(from: broken)
+        #expect(model.track?.relativePath == kept && model.project.audioTracks.count == 1)
+        #expect(Set(try store.orphans(referenced: [])) == files, "nothing copied in")
+        model.undo()
+        #expect(model.track == nil, "only the song was a step")
+    }
+
+    /// Export pushed over the editor right after a change closes it before the stage caught up; coming back builds
+    /// the stage again, so it plays the movie as it now is.
+    @Test func comingBackAfterAChangeTheStageHadntCaughtUpWithPlaysIt() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        await model.settled()
+        #expect((model.player.currentItem?.asset as? AVComposition)?.tracks(withMediaType: .audio).isEmpty == true, "photos only: no sound yet")
+        model.addVoiceover(at: try recordedVoice())
+        model.close()
+        model.observeTime()
+        await model.settled()
+        #expect((model.player.currentItem?.asset as? AVComposition)?.tracks(withMediaType: .audio).count == 1, "the voice")
+    }
+
     // MARK: Voice over the movie (F09)
 
     /// A recorded voice, `seconds` long, where a recording would leave it.
@@ -229,9 +264,7 @@ struct MovieEditorModelTests {
     @Test func aRecordedVoiceBecomesTheMoviesTrackInPlaceOfMusic() async throws {
         let ids = try await save(2)
         let model = try editor(ids)
-        let song = FileManager.default.temporaryDirectory.appending(path: "Sunday song.m4a")
-        try Data([1, 2, 3]).write(to: song)
-        model.setMusic(from: song)
+        model.setMusic(from: try song())
         let music = try #require(model.track).relativePath
         let recorded = try recordedVoice()
         model.addVoiceover(at: recorded)
@@ -294,14 +327,41 @@ struct MovieEditorModelTests {
         let model = try editor(ids, voice: VoiceServices(makeRecorder: { SimulatedVoiceRecorder(now: recorderClock.now) }, transcriber: SimulatedTranscriber()))
         await model.settled()
         model.select(1)
-        let recording = try #require(model.startVoiceover())
+        let recording = try #require(await model.startVoiceover())
         #expect(recording.limit == model.duration)
         #expect(model.isPlaying && model.time == 0 && model.player.isMuted, "silent, so its sound isn't recorded into the voice")
+        // The microphone started with the movie on its first frame.
+        #expect(model.player.currentItem?.status == .readyToPlay && model.player.currentTime().seconds < 0.1)
+        #expect(await model.startVoiceover() == nil, "one take at a time")
         recorderClock.advance(by: 1.5)
         model.finishVoiceover(recording)
-        #expect(!model.isPlaying && !model.player.isMuted)
+        #expect(!model.isPlaying && !model.player.isMuted && model.voiceover == nil)
         let track = try #require(model.track)
         #expect(track.kind == .voiceover && store.fileExists(track.relativePath))
+        // The sheet going away later finishes nothing more.
+        model.finishVoiceover(recording)
+        model.undo()
+        #expect(model.track == nil, "one take, one step")
+    }
+
+    /// The app left before the recording's sheet came up: the take ends there and the preview's sound comes back.
+    @Test func aTakeFinishedBeforeItsSheetCameUpIsKept() async throws {
+        let ids = try await save(2)
+        let recorderClock = TestDateProvider()
+        let model = try editor(ids, voice: VoiceServices(makeRecorder: { SimulatedVoiceRecorder(now: recorderClock.now) }, transcriber: SimulatedTranscriber()))
+        _ = try #require(await model.startVoiceover())
+        recorderClock.advance(by: 1)
+        model.finishVoiceover(try #require(model.voiceover))
+        #expect(model.track?.kind == .voiceover && !model.player.isMuted && !model.isPlaying)
+    }
+
+    @Test func aShortMovieKeepsAShortTake() async throws {
+        let ids = try await save(1, videos: [0])
+        let model = try editor(ids)
+        model.trim(start: 0, end: 0.3)
+        #expect(model.duration < MovieEditorModel.shortestVoiceover)
+        model.addVoiceover(at: try recordedVoice(seconds: 0.4))
+        #expect(model.track?.kind == .voiceover)
     }
 
     @Test func aMicrophoneThatCantStartRecordsNothing() async throws {
@@ -309,8 +369,9 @@ struct MovieEditorModelTests {
         let model = try editor(ids, voice: VoiceServices(makeRecorder: { FailingRecorder() }, transcriber: SimulatedTranscriber()))
         model.addVoiceover(at: try recordedVoice())
         let kept = try #require(model.track).relativePath
-        #expect(model.startVoiceover() == nil)
-        #expect(!model.isPlaying && !model.player.isMuted && model.track?.relativePath == kept)
+        await model.settled()
+        #expect(await model.startVoiceover() == nil)
+        #expect(!model.isPlaying && !model.player.isMuted && model.voiceover == nil && model.track?.relativePath == kept)
     }
 
     @Test func deletedMomentsDropOutOfTheMovie() async throws {

@@ -306,12 +306,12 @@ final class CameraModel {
         failure = nil
         do {
             let capturedAt = now
-            let swapped = isSwapped
+            let shot = shot
             await engine.setCaptureHold(hold)
-            let captured = arranged(try await engine.capturePhoto(flash: settings.flash, silent: !settings.cameraSounds), swapped: swapped)
+            let captured = arranged(try await engine.capturePhoto(flash: settings.flash, silent: !settings.cameraSounds), as: shot)
             guard let photo = MediaCheck.checked(captured) else { throw CaptureError.photoFailed }
             phase = .ready
-            deliver(result(.photo(photo), selfie: photo.selfieURL, at: capturedAt))
+            deliver(result(.photo(photo), selfie: photo.selfieURL, at: capturedAt, as: shot))
         } catch {
             phase = .ready
             failure = CaptureFailure(error)
@@ -321,7 +321,7 @@ final class CameraModel {
     private func record() async {
         let capturedAt = now
         // The big camera as it was at the shutter: heat dropping the front camera as the clip ends resets the swap.
-        let swapped = isSwapped
+        let shot = shot
         phase = .recording(startedAt: nil)
         stopsRecording = false
         shutterAt = Date()
@@ -340,11 +340,11 @@ final class CameraModel {
             return
         }
         do {
-            let recorded = arranged(try await engine.record(limit: settings.videoLength.duration), swapped: swapped)
+            let recorded = arranged(try await engine.record(limit: settings.videoLength.duration), as: shot)
             await setTorch(.off).value
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready
-            deliver(result(.video(video), selfie: video.selfieURL, at: capturedAt))
+            deliver(result(.video(video), selfie: video.selfieURL, at: capturedAt, as: shot))
         } catch {
             await setTorch(.off).value
             phase = .ready
@@ -378,13 +378,27 @@ final class CameraModel {
         return task
     }
 
+    /// What the screen showed at the shutter. A photo finishes after the flash and a clip after Stop: a format,
+    /// window or Halves change made meanwhile is for the next one, not this.
+    private struct Shot {
+        var swapped: Bool
+        var showsSelfie: Bool
+        var halves: Bool
+        var format: CaptureFormat
+        var window: CameraSettings.SelfieWindow
+    }
+
+    private var shot: Shot {
+        Shot(swapped: isSwapped, showsSelfie: showsSelfie, halves: showsHalves, format: format, window: settings.selfieWindow)
+    }
+
     /// Big camera first; a hidden selfie window is never kept.
-    private func arranged(_ photo: CapturedPhoto, swapped: Bool) -> CapturedPhoto {
+    private func arranged(_ photo: CapturedPhoto, as shot: Shot) -> CapturedPhoto {
         var photo = photo
-        if swapped, let selfie = photo.selfieURL {
+        if shot.swapped, let selfie = photo.selfieURL {
             photo = CapturedPhoto(mainURL: selfie, mainPosition: photo.mainPosition.other, selfieURL: photo.mainURL)
         }
-        if !showsSelfie, let selfie = photo.selfieURL {
+        if !shot.showsSelfie, let selfie = photo.selfieURL {
             try? FileManager.default.removeItem(at: selfie)
             photo.selfieURL = nil
         }
@@ -393,23 +407,22 @@ final class CameraModel {
 
     private var now: CaptureTime { CaptureTime(instant: clock.now(), timeZone: .current) }
 
-    /// The window can't move while capturing, so the current placement is where it was.
-    private func result(_ media: CaptureResult.Media, selfie: URL?, at time: CaptureTime) -> CaptureResult {
+    private func result(_ media: CaptureResult.Media, selfie: URL?, at time: CaptureTime, as shot: Shot) -> CaptureResult {
         CaptureResult(
-            media: media, window: selfie == nil ? nil : settings.selfieWindow, capturedAt: time, format: format,
-            arrangement: selfie != nil && showsHalves ? .halves : nil
+            media: media, window: selfie == nil ? nil : shot.window, capturedAt: time, format: shot.format,
+            arrangement: selfie != nil && shot.halves ? .halves : nil
         )
     }
 
-    private func arranged(_ video: CapturedVideo, swapped: Bool) -> CapturedVideo {
+    private func arranged(_ video: CapturedVideo, as shot: Shot) -> CapturedVideo {
         var video = video
-        if swapped, let selfie = video.selfieURL {
+        if shot.swapped, let selfie = video.selfieURL {
             video.selfieURL = video.mainURL
             video.mainURL = selfie
             video.mainPosition = video.mainPosition.other
             video.selfieOffset = -video.selfieOffset
         }
-        if !showsSelfie, let selfie = video.selfieURL {
+        if !shot.showsSelfie, let selfie = video.selfieURL {
             try? FileManager.default.removeItem(at: selfie)
             video.selfieURL = nil
             video.selfieOffset = 0

@@ -126,6 +126,29 @@ struct CameraModelInterruptionTests {
         #expect(results.isEmpty)
     }
 
+    /// What the screen showed at the shutter is the photo's: a format or selfie change during the flash is for the next.
+    @Test func changesWhileThePhotoFinishesAreForTheNextOne() async throws {
+        let engine = HeldPhotoEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .photo
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        let format = model.format
+        async let shot: Void = model.shutter()
+        while await !engine.isHolding { try await Task.sleep(for: .milliseconds(10)) }
+        model.setFormat(format == .square ? .portrait : .square)
+        model.toggleSelfie()
+        await engine.release()
+        await shot
+        let result = try #require(results.first)
+        #expect(result.format == format)
+        #expect(result.selfieURL != nil)
+    }
+
     /// The simulated camera, with a photo that comes only once released and a stop that doesn't cut it short.
     private actor HeldPhotoEngine: CaptureEngine {
         private let base = SimulatedCaptureEngine()

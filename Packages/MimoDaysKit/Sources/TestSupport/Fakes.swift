@@ -50,6 +50,8 @@ public actor FakeNotificationScheduler: NotificationScheduler {
 
     public init() {}
 
+    public func setScheduleError(_ error: FakeServiceError?) { scheduleError = error }
+
     public func pending() -> [SurpriseNotification] {
         scheduled.values.sorted { $0.fireDate < $1.fireDate }
     }

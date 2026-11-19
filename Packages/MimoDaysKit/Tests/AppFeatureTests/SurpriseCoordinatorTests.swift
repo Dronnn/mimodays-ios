@@ -335,6 +335,27 @@ struct SurpriseCoordinatorTests {
         #expect(await !notifications.pending().contains { $0.id == soon.notificationRequestID })
     }
 
+    @Test func aSecondTapSendsNoSecondSurprise() async throws {
+        clock.set(date("2026-11-11 23:30"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        #expect(await coordinator.sendNow())
+        #expect(await coordinator.sendNow())
+        let soon = clock.now().addingTimeInterval(SurpriseCoordinator.sendNowDelay)
+        #expect(try prompts(.pending).count { $0.plannedAt <= soon } == 1)
+    }
+
+    /// iOS turned the request down: Settings doesn't say it's on its way, and Today doesn't wait for it.
+    @Test func aSendIOSRefusesIsNotReportedAsSent() async throws {
+        clock.set(date("2026-11-11 23:30"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        await notifications.setScheduleError(.unavailable)
+        #expect(await !coordinator.sendNow())
+        let soon = clock.now().addingTimeInterval(SurpriseCoordinator.sendNowDelay)
+        #expect(try prompts(.pending).count { $0.plannedAt <= soon } == 0)
+    }
+
     @Test func sendingOneNowNeedsNotifications() async throws {
         #expect(await coordinator(.denied).sendNow() == false)
         #expect(try prompts().isEmpty)

@@ -112,8 +112,14 @@ final class SurpriseCoordinator {
         await serially {
             guard await self.permissions.status(of: .notifications).isUsable else { return }
             let now = self.clock.now()
+            // A second tap while the first is still on its way sends no second one.
+            let soon = now.addingTimeInterval(Self.sendNowDelay)
+            if !self.fetchUpcomingPending(now: now).filter({ $0.plannedAt <= soon }).isEmpty {
+                sent = true
+                return
+            }
             let id = UUID()
-            let time = now.addingTimeInterval(Self.sendNowDelay)
+            let time = soon
             let minutes = self.fetchSchedule()?.expiryMinutes ?? SurpriseSchedule().expiryMinutes
             self.context.insert(SurprisePrompt(
                 id: id, plannedAt: time, expiresAt: time.addingTimeInterval(TimeInterval(minutes * 60)),
@@ -121,6 +127,12 @@ final class SurpriseCoordinator {
             ))
             self.save()
             await self.syncNotifications(now: now)
+            // iOS turned it down: nothing is on its way, so Settings doesn't say so and Today doesn't wait for it.
+            guard await self.notifications.pending().contains(where: { $0.id == id.uuidString }) else {
+                self.fetchPrompt(id)?.outcome = .cancelled
+                self.save()
+                return
+            }
             sent = true
         }
         return sent

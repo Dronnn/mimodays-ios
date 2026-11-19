@@ -335,9 +335,14 @@ struct CaptureFlowView: View {
         // The screen stays upright; the camera turns its own controls with the phone (C.3).
         .onAppear { OrientationLock.set(.portrait) }
         .onDisappear { OrientationLock.set(nil) }
-        // Coming back from Settings with access turned on.
+        // Coming back from Settings with access turned on, or to a camera an error stopped.
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await refresh() } }
+            if phase == .active {
+                Task {
+                    await refresh()
+                    await camera?.recover()
+                }
+            }
         }
     }
 

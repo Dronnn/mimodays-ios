@@ -86,12 +86,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         ]
     }
 
-    /// Media services reset: the session can simply start again. Anything else is an interruption.
+    /// The session stopped on an error: it's started again at once; when it won't run, it's an interruption that
+    /// the next `start()` (the app coming back) tries again.
     private func runtimeError(mediaServicesWereReset: Bool) {
         guard isActive else { return }
-        if mediaServicesWereReset {
-            session.startRunning()
-            if session.isRunning { eventSink.yield(.resumed) }
+        session.startRunning()
+        if session.isRunning, !session.isInterrupted {
+            if lastInterruption != nil || mediaServicesWereReset { eventSink.yield(.resumed) }
+            lastInterruption = nil
         } else {
             lastInterruption = .other
             eventSink.yield(.interrupted(.other))

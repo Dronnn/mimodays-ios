@@ -63,6 +63,11 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         let setup = setup ?? (multiCam ? .dual : .single(.back))
         self.setup = setup
         isRunning = true
+        // As on a device: starting again clears what an error stopped.
+        if interruption == .other {
+            interruption = nil
+            eventSink.yield(.resumed)
+        }
         return setup
     }
 

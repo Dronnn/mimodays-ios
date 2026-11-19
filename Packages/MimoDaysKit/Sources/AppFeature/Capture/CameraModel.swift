@@ -246,6 +246,13 @@ final class CameraModel {
         }
     }
 
+    /// Back in the app with the camera still stopped by an error: it's started again, so the shutter doesn't stay off
+    /// until the camera is closed and reopened. A call or another app ending sends its own "resumed".
+    func recover() async {
+        guard interruption == .other, phase == .ready, !isClosed else { return }
+        _ = try? await engine.start()
+    }
+
     /// The camera screen went away (closed, or Review took its place): a photo or clip still finishing is thrown
     /// away instead of opening a review nobody sees, which would come back at the next launch.
     func close() {

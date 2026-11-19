@@ -36,6 +36,16 @@ struct CameraModelMicrophoneTests {
         #expect(await eventually { await MainActor.run { model.interruption == nil } })
     }
 
+    /// An error stopped the camera and nothing says it ended: back in the app, it starts again and the shutter works.
+    @Test func comingBackRestartsACameraAnErrorStopped() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: true)
+        await engine.simulateInterruption(.other)
+        #expect(await eventually { await MainActor.run { model.interruption == .other } })
+        await model.recover()
+        #expect(await eventually { await MainActor.run { model.interruption == nil && model.canCapture } })
+    }
+
     @Test func aCallEndingWhileReviewShowsFreesTheShutter() async {
         let engine = SimulatedCaptureEngine()
         let model = await videoCamera(engine: engine, allowed: true)

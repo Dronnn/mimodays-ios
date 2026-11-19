@@ -251,7 +251,7 @@ struct BackupTests {
         let summary = BackupService(library: newPhone, now: { [clock] in clock.now() }).summary(check)
         #expect(summary.restorable == 0 && summary.new == 0)
         let outcome = try restore(url, into: newPhone)
-        #expect(outcome.restored == 0)
+        #expect(outcome.restored == 0 && outcome.wanted == 0)
         #expect(try newPhone.context.fetchCount(FetchDescriptor<Moment>()) == 0)
     }
 

@@ -94,6 +94,12 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     /// the next `start()` (the app coming back) tries again.
     private func runtimeError(mediaServicesWereReset: Bool) {
         guard isActive else { return }
+        // Running again: an error queued behind one the restart already got past.
+        if session.isRunning, !session.isInterrupted {
+            if lastInterruption != nil || mediaServicesWereReset { eventSink.yield(.resumed) }
+            lastInterruption = nil
+            return
+        }
         // Not again within seconds: a start that fails posts another error, which mustn't start it over and over.
         // It's tried once the pause is over.
         if let restartedAfterError, case let wait = 5 - Date().timeIntervalSince(restartedAfterError), wait > 0 {
@@ -104,7 +110,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             queue.asyncAfter(deadline: .now() + wait) { [weak self] in
                 guard let self else { return }
                 retriesAfterError = false
-                if isActive, !session.isRunning { runtimeError(mediaServicesWereReset: mediaServicesWereReset) }
+                runtimeError(mediaServicesWereReset: mediaServicesWereReset)
             }
             return
         }

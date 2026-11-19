@@ -134,7 +134,7 @@ struct BackupService {
     func files(for check: BackupArchive.Check, mode: Mode) -> Set<String> {
         let here = mode == .addMissing ? existingMomentIDs() : []
         let projectsHere = mode == .addMissing ? existingProjectIDs() : []
-        let moments = check.document.moments.filter { !here.contains($0.id) }.flatMap(\.paths)
+        let moments = check.document.moments.filter { $0.hasPicture && !here.contains($0.id) }.flatMap(\.paths)
         let projects = check.document.movies.filter { !projectsHere.contains($0.id) }.flatMap(\.paths)
         return Set(moments + projects).subtracting(check.damaged)
     }
@@ -198,7 +198,7 @@ struct BackupService {
         // Files first: nothing in the library changes until every file that should come in is here, so a
         // replacement that can't bring one in leaves the library untouched (no records to roll back).
         // A moment comes in whole or not at all: none of its files move unless all of them were unpacked.
-        for record in document.moments where !here.contains(record.id) && !record.paths.contains(where: check.damaged.contains) {
+        for record in document.moments where record.hasPicture && !here.contains(record.id) && !record.paths.contains(where: check.damaged.contains) {
             if record.paths.allSatisfy({ unpacked[$0] != nil }) {
                 for path in record.paths { _ = move(path) }
             } else {
@@ -227,12 +227,13 @@ struct BackupService {
         var damagedFiles = 0
         var skipped: [Date] = []
         var moments: [UUID: Moment] = [:]
-        for record in document.moments where !here.contains(record.id) {
+        // A record with no picture is no moment: not counted, not brought in.
+        for record in document.moments where record.hasPicture && !here.contains(record.id) {
             wanted += 1
             let damaged = record.paths.filter { check.damaged.contains($0) }
             damagedFiles += damaged.count
             // Its files came in above, all of them, or none did.
-            guard record.hasPicture, damaged.isEmpty, record.paths.allSatisfy({ paths[$0] != nil }) else {
+            guard damaged.isEmpty, record.paths.allSatisfy({ paths[$0] != nil }) else {
                 skipped.append(record.capturedAt)
                 continue
             }

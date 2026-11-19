@@ -122,9 +122,12 @@ public struct MediaStore: Sendable {
     /// are the orphan sweep's, which keeps a moment taken since. True when there was one and it's now done.
     @discardableResult
     public func finishPendingErase() -> Bool {
-        guard FileManager.default.fileExists(atPath: root.appending(path: Self.erasePending).path) else { return false }
+        guard isErasePending else { return false }
         return (try? remove([.cache])) != nil
     }
+
+    /// A Delete All isn't done yet.
+    public var isErasePending: Bool { FileManager.default.fileExists(atPath: root.appending(path: Self.erasePending).path) }
 
     /// Delete All has begun: until it's done, every launch empties the cache (a quit mid-way included).
     public func markErasePending() {

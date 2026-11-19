@@ -218,6 +218,8 @@ struct CardSheet: View {
     /// The card this sheet opened on: playback moving the selection on doesn't send its text to another card. By
     /// id, so an Undo that brings it back as a new row still gets the words.
     @State private var cardID: UUID?
+    /// The words as last saved: untouched, nothing is written (an Undo behind the sheet stays undone).
+    @State private var savedText = ""
     @FocusState private var isEditing: Bool
 
     var body: some View {
@@ -269,6 +271,7 @@ struct CardSheet: View {
         .onAppear {
             cardID = model.selectedCard?.id
             text = model.selectedCard?.text ?? ""
+            savedText = text
         }
         .onChange(of: isEditing) { _, editing in if !editing { keepText() } }
         // Another card picked on the timeline behind the sheet (iPad, medium): the words follow it too, the first
@@ -278,13 +281,15 @@ struct CardSheet: View {
             keepText()
             cardID = next.id
             text = next.text
+            savedText = text
         }
         .onDisappear { keepText() }
     }
 
     private func keepText() {
-        guard let card = model.items.lazy.compactMap(\.card).first(where: { $0.id == cardID }) else { return }
+        guard text != savedText, let card = model.items.lazy.compactMap(\.card).first(where: { $0.id == cardID }) else { return }
         model.setCardText(text, of: card)
+        savedText = text
     }
 
     /// The card as it shows, in small.

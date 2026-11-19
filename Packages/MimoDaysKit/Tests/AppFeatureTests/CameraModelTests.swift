@@ -330,6 +330,16 @@ struct MediaCheckTests {
         [good.mainURL, good.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
     }
 
+    /// A photo cut off part-way (its size still reads) isn't a moment.
+    @Test func aCutOffPhotoIsRejected() async throws {
+        let good = try await goodPhoto()
+        let data = try Data(contentsOf: good.mainURL)
+        let cut = try file("jpg", Array(data.prefix(data.count / 2)))
+        #expect(!MediaCheck.isReadableImage(cut))
+        #expect(MediaCheck.isReadableImage(good.mainURL))
+        [cut, good.mainURL, good.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
+    }
+
     @Test func anEmptyVideoIsRejected() async throws {
         let empty = CapturedVideo(mainURL: try file("mov", []), mainPosition: .back, selfieURL: nil, duration: 0, selfieOffset: 0, hasAudio: false)
         #expect(await MediaCheck.checked(empty) == nil)

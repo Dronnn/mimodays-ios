@@ -195,6 +195,8 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
 
     /// Drops what was recorded here and moves the moment to Recently deleted; false when that failed.
     func delete() -> Bool {
+        // A Save still waiting for its transcript writes nothing into the deleted moment (Recover would show it).
+        isDiscarded = true
         discardRecording()
         do {
             try deletionStore.moveToRecentlyDeleted([id])

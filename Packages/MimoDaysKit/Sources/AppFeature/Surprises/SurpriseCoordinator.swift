@@ -112,9 +112,10 @@ final class SurpriseCoordinator {
         await serially {
             guard await self.permissions.status(of: .notifications).isUsable else { return }
             let now = self.clock.now()
-            // A second tap while the first is still on its way sends no second one.
+            // A second tap while the first is still on its way sends no second one; on its way means iOS has it.
             let soon = now.addingTimeInterval(Self.sendNowDelay)
-            if !self.fetchUpcomingPending(now: now).filter({ $0.plannedAt <= soon }).isEmpty {
+            let scheduled = Set(await self.notifications.pending().map(\.id))
+            if self.fetchUpcomingPending(now: now).contains(where: { $0.plannedAt <= soon && scheduled.contains($0.notificationRequestID) }) {
                 sent = true
                 return
             }

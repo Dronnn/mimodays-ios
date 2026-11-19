@@ -157,6 +157,20 @@ struct EditMomentTests {
         #expect(kept.title == "First snow" && kept.voiceNotes.isEmpty)
     }
 
+    /// Delete moment while Save waits for the transcript: the trashed moment keeps what it had, so Recover shows no
+    /// edit that was never saved.
+    @Test func deletingWhileSaveWaitsWritesNothing() async throws {
+        let edit = try edit(try await save())
+        edit.caption = "Changed"
+        edit.addVoice(at: try tone(seconds: 2), recordedAt: .now)
+        let saving = Task { try await edit.save() }
+        await Task.yield()
+        #expect(edit.delete())
+        await #expect(throws: CancellationError.self) { try await saving.value }
+        let kept = try moment()
+        #expect(kept.deletedAt != nil && kept.title == "First snow" && kept.voiceNotes.isEmpty)
+    }
+
     @Test func aTooShortRecordingIsDropped() async throws {
         let edit = try edit(try await save())
         let recording = try tone(seconds: 0.2)

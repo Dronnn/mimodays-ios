@@ -56,19 +56,22 @@ enum MediaCheck {
         return (try? handle.read(upToCount: 2)) == Data([0xFF, 0xD9])
     }
 
-    /// Playable, with a length, and its first picture reads.
+    /// Playable, with a length, and its first picture decodes.
     static func isPlayableVideo(_ url: URL) async -> Bool {
         let asset = AVURLAsset(url: url)
         guard let (playable, duration) = try? await asset.load(.isPlayable, .duration), playable, duration.seconds > 0,
               let track = try? await asset.loadTracks(withMediaType: .video).first,
               let reader = try? AVAssetReader(asset: asset) else { return false }
-        let output = AVAssetReaderTrackOutput(track: track, outputSettings: nil)
+        // Decoded, not passed through: a sample table can list frames that don't decode.
+        let output = AVAssetReaderTrackOutput(
+            track: track, outputSettings: [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange]
+        )
         guard reader.canAdd(output) else { return false }
         reader.add(output)
         defer { reader.cancelReading() }
         guard reader.startReading() else { return false }
         while let sample = output.copyNextSampleBuffer() {
-            if CMSampleBufferGetNumSamples(sample) > 0 { return true }
+            if CMSampleBufferGetImageBuffer(sample) != nil { return true }
         }
         return false
     }

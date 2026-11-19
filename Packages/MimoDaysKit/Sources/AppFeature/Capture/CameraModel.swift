@@ -329,6 +329,8 @@ final class CameraModel {
         let capturedAt = now
         // The big camera as it was at the shutter: heat dropping the front camera as the clip ends resets the swap.
         let shot = shot
+        // The length chosen at the shutter, not one picked while the torch and microphone start.
+        let limit = settings.videoLength.duration
         phase = .recording(startedAt: nil)
         stopsRecording = false
         shutterAt = Date()
@@ -347,7 +349,7 @@ final class CameraModel {
             return
         }
         do {
-            let recorded = arranged(try await engine.record(limit: settings.videoLength.duration), as: shot)
+            let recorded = arranged(try await engine.record(limit: limit), as: shot)
             await setTorch(.off).value
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             phase = .ready

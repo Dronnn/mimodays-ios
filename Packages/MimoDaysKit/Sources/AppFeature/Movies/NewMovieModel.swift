@@ -146,7 +146,7 @@ final class NewMovieModel {
             candidates = try readCandidates()
             let ids = candidates.map(\.id)
             let moments = try library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { ids.contains($0.id) }))
-            let order = Dictionary(uniqueKeysWithValues: ids.enumerated().map { ($1, $0) })
+            let order = Dictionary(ids.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
             items = moments.sorted { (order[$0.id] ?? 0) < (order[$1.id] ?? 0) }.map {
                 MemoryItem(
                     id: $0.id, localDay: $0.localDay, capturedAt: $0.capturedAt, timeZoneID: $0.timeZoneID,
@@ -179,7 +179,9 @@ final class NewMovieModel {
     }
 
     private static func candidates(_ moments: [Moment]) -> [MovieSelection.Candidate] {
-        moments.filter { $0.deletedAt == nil }
+        // Once each: a collection restored by an older build can list a moment twice.
+        var seen = Set<UUID>()
+        return moments.filter { $0.deletedAt == nil && seen.insert($0.id).inserted }
             .sorted { $0.capturedAt < $1.capturedAt }
             .map { moment in
                 MovieSelection.Candidate(

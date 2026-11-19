@@ -88,8 +88,19 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     /// The session stopped on an error: it's started again at once; when it won't run, it's an interruption that
     /// the next `start()` (the app coming back) tries again.
+    /// When the session was last started again after an error.
+    private var restartedAfterError: Date?
+
     private func runtimeError(mediaServicesWereReset: Bool) {
         guard isActive else { return }
+        // Not again within seconds: a start that fails posts another error, which mustn't start it over and over.
+        // The app coming back tries once more.
+        if let restartedAfterError, Date().timeIntervalSince(restartedAfterError) < 5 {
+            lastInterruption = .other
+            eventSink.yield(.interrupted(.other))
+            return
+        }
+        restartedAfterError = Date()
         session.startRunning()
         if session.isRunning, !session.isInterrupted {
             if lastInterruption != nil || mediaServicesWereReset { eventSink.yield(.resumed) }
@@ -105,6 +116,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     public func start() async throws -> CameraSetup {
         try await onQueue {
             self.isActive = true
+            self.restartedAfterError = nil
             if let setup = self.setup {
                 if !self.session.isRunning {
                     self.session.startRunning()

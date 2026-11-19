@@ -252,7 +252,7 @@ final class PermissionAsker {
     private func dropIfNotShown(_ request: Int) async {
         try? await Task.sleep(for: .seconds(2))
         guard request == attempt, !appeared, answer != nil else { return }
-        dismissed()
+        resolve()
     }
 
     /// Continue on the explainer: it starts to close.
@@ -265,10 +265,17 @@ final class PermissionAsker {
     /// recording sheet) isn't presented while the explainer is still on screen or on its way out: the recording
     /// sheet was dropped at once and the recording stopped after a second (UI test, 2026-11-17).
     func dismissed() {
+        // Only this request's explainer: a late dismissal of one dropped before it showed mustn't answer the next.
+        guard appeared else { return }
+        resolve()
+    }
+
+    private func resolve() {
         screen = nil
         answer?.resume(returning: continued)
         answer = nil
         continued = false
+        appeared = false
     }
 }
 

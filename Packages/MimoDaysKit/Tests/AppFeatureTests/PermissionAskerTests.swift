@@ -60,8 +60,25 @@ struct PermissionAskerTests {
         let asker = PermissionAsker()
         let request = Task { await asker.request(.location, using: service) }
         while asker.screen == nil { await Task.yield() }
+        asker.shown()
         asker.dismissed()
         #expect(await request.value == .notDetermined)
+    }
+
+    /// A dismissal of an explainer that was dropped before it showed doesn't answer the next request.
+    @Test func aLateDismissalDoesntAnswerTheNextRequest() async {
+        let service = PresetPermissionService(status: .notDetermined, requestResult: .granted)
+        let asker = PermissionAsker()
+        // Never shown: gives up after its two seconds.
+        #expect(await asker.request(.location, using: service) == .notDetermined)
+        let next = Task { await asker.request(.location, using: service) }
+        while asker.screen == nil { await Task.yield() }
+        asker.dismissed()
+        #expect(asker.screen != nil)
+        asker.shown()
+        asker.proceed()
+        asker.dismissed()
+        #expect(await next.value == .granted)
     }
 
     @Test(arguments: [PermissionStatus.granted, .denied, .limited, .restricted])

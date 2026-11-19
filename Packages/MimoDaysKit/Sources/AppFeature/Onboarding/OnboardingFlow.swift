@@ -72,13 +72,26 @@ final class OnboardingFlow {
     }
 
     func backToIntro() {
+        guard !isEnablingReminders else { return }
         step = .intro
     }
 
-    /// "Enable reminders": the system prompt, or its earlier answer.
-    func enableReminders() async {
+    /// From "Enable reminders" until iOS has answered: Back and Maybe later wait, so a late answer can't undo them.
+    private(set) var isEnablingReminders = false
+
+    /// "Enable reminders": our explainer and the system prompt (through `request`), or the earlier answer.
+    func enableReminders(request: ((Permission) async -> PermissionStatus)? = nil) async {
+        guard !isEnablingReminders else { return }
+        isEnablingReminders = true
+        defer { isEnablingReminders = false }
+        let wasEnabled = remindersEnabled
         remindersEnabled = true
-        let status = await permissions.request(.notifications)
+        let status = if let request { await request(.notifications) } else { await permissions.request(.notifications) }
+        // Our explainer closed without Continue: nothing was asked, so the schedule stays as it was, to try again.
+        if request != nil, status == .notDetermined {
+            remindersEnabled = wasEnabled
+            return
+        }
         remindersAllowed = status.isUsable
         step = .reminders(status.isUsable ? .on : status.needsSettings ? .denied : .later)
         await remindersChanged()
@@ -95,6 +108,7 @@ final class OnboardingFlow {
     /// "Maybe later". On a replay (Help › "Show the introduction again") the person's existing reminders setting
     /// stays as it is.
     func remindLater() {
+        guard !isEnablingReminders else { return }
         if !isCompleted { remindersEnabled = false }
         step = .reminders(.later)
     }

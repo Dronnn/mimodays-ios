@@ -17,8 +17,8 @@ struct CameraView: View {
     @State private var topInset: CGFloat = 0
     /// The surprise chip's height: a selfie window in its corner starts below it.
     @State private var chipHeight: CGFloat?
-    /// C06c, before the microphone prompt.
-    @State private var explainsMicrophone = false
+    /// C06c, our explainer before the microphone prompt.
+    @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -73,28 +73,28 @@ struct CameraView: View {
         .statusBarHidden(model.layoutHold.isLandscape || followsWindow)
         .task { await model.start() }
         .onDisappear { Task { await model.stop() } }
-        .sheet(isPresented: $showsSettings) {
+        .sheet(isPresented: $showsSettings, onDismiss: explainMicrophone) {
             CameraSettingsSheet(settings: $model.settings, lenses: model.lenses)
         }
-        .sheet(isPresented: $adjustsSelfie) {
+        .sheet(isPresented: $adjustsSelfie, onDismiss: explainMicrophone) {
             SelfieWindowSheet(placement: $model.settings.selfieWindow)
         }
-        // First time in Video with sound on and the microphone not asked yet (Andrew, 2026-11-13).
-        .onChange(of: model.mode == .video && model.settings.recordsSound, initial: true) { _, wantsSound in
-            guard wantsSound else { return }
-            Task { if await permissions.status(of: .microphone) == .notDetermined { explainsMicrophone = true } }
-        }
-        .fullScreenCover(isPresented: $explainsMicrophone) {
-            PermissionExplainerView(screen: .microphone) {
-                Task {
-                    _ = await permissions.request(.microphone)
-                    explainsMicrophone = false
-                    await model.refreshMicrophone()
-                }
-            }
-        }
+        // First time in Video with sound on and the microphone not asked yet (Andrew, 2026-11-13). Sound turned on in
+        // the camera's sheet waits for it to close: the explainer can't be shown over it.
+        .onChange(of: model.mode == .video && model.settings.recordsSound, initial: true) { explainMicrophone() }
+        .permissionExplainers(asker)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("camera")
+    }
+
+    /// Our explainer, then the system prompt, once Video wants sound and iOS hasn't asked yet.
+    private func explainMicrophone() {
+        guard model.mode == .video, model.settings.recordsSound, !showsSettings, !adjustsSelfie else { return }
+        Task {
+            guard await permissions.status(of: .microphone) == .notDetermined else { return }
+            _ = await asker.request(.microphone, screen: .microphone, using: permissions)
+            await model.refreshMicrophone()
+        }
     }
 
     /// With Reduce Motion the controls are replaced (and cross-fade) when the phone turns, instead of moving.

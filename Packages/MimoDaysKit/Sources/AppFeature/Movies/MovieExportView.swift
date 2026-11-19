@@ -384,6 +384,8 @@ struct MovieFileButtons: View {
     @State private var saved = false
     @State private var problem: PhotosSaveProblem?
     @State private var exporting = false
+    @State private var sharing = false
+    @State private var savingToPhotos = false
     @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
 
@@ -398,8 +400,8 @@ struct MovieFileButtons: View {
             .buttonStyle(.primary)
             .disabled(url == nil || saved)
             .accessibilityIdentifier("ready.photos")
-            if let url {
-                ShareLink(item: url) {
+            if url != nil {
+                Button { sharing = true } label: {
                     Label { Text("Share", bundle: .module) } icon: { Icon.glyphShare.image.resizable().frame(width: 20, height: 20) }
                 }
                 .buttonStyle(SecondaryButtonStyle())
@@ -415,13 +417,20 @@ struct MovieFileButtons: View {
         .sheet(isPresented: $exporting) {
             if let url { FileExportSheet(url: url).ignoresSafeArea() }
         }
+        .sheet(isPresented: $sharing) {
+            if let url { ShareSheet(items: [url]) }
+        }
         .permissionExplainers(asker)
         .photosSaveAlert($problem)
     }
 
     private func saveToPhotos() async {
-        guard let url else { return }
-        _ = await asker.request(.photoLibrary, using: permissions)
+        // Taken before the first wait: a second tap doesn't save the movie twice.
+        guard let url, !savingToPhotos else { return }
+        savingToPhotos = true
+        defer { savingToPhotos = false }
+        // Our explainer closed without Continue: nothing is asked or saved.
+        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
         do {
             try await MovieFiles.saveToPhotos(url)
             saved = true
@@ -475,8 +484,9 @@ enum MovieFiles {
     }
 
     /// Each photo or video as its own item in Photos.
+    /// Never asks by itself: callers show our explainer first (`PermissionAsker`).
     static func saveToPhotos(_ urls: [URL]) async throws {
-        let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
         guard status == .authorized || status == .limited else { throw Failure.notAllowed }
         try await PHPhotoLibrary.shared().performChanges {
             for url in urls {

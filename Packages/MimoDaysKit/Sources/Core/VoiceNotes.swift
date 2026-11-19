@@ -27,7 +27,9 @@ public final class AVVoiceRecorder: VoiceRecorder {
 
     public init() {}
 
+    /// Only once the microphone is allowed: recording before would raise the system prompt without our explainer.
     public func start(to url: URL, limit: TimeInterval) throws {
+        guard AVCaptureDevice.authorizationStatus(for: .audio) == .authorized else { throw VoiceRecorderError.couldNotStart }
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
         try session.setActive(true)

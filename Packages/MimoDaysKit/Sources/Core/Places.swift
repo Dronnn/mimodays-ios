@@ -94,19 +94,11 @@ public struct SystemLocationProvider: LocationProvider {
 
     public init() {}
 
+    /// Only with location allowed, through `requestLocation`: unlike `CLLocationUpdate.liveUpdates`, it never raises
+    /// the system prompt itself, so an Allow Once that has run out isn't asked again without our explainer.
     public func currentLocation() async throws -> GeoPoint {
         try await withThrowingTaskGroup(of: GeoPoint.self) { group in
-            group.addTask {
-                for try await update in CLLocationUpdate.liveUpdates() {
-                    if let location = update.location, location.horizontalAccuracy >= 0 {
-                        return GeoPoint(
-                            latitude: location.coordinate.latitude, longitude: location.coordinate.longitude,
-                            horizontalAccuracy: location.horizontalAccuracy
-                        )
-                    }
-                }
-                throw CLError(.locationUnknown)
-            }
+            group.addTask { try await Self.oneFix() }
             group.addTask {
                 try await Task.sleep(for: Self.timeout)
                 throw CLError(.locationUnknown)
@@ -115,6 +107,52 @@ public struct SystemLocationProvider: LocationProvider {
             guard let first = try await group.next() else { throw CLError(.locationUnknown) }
             return first
         }
+    }
+
+    @MainActor
+    private static func oneFix() async throws -> GeoPoint {
+        try await OneFix().location()
+    }
+}
+
+/// One `requestLocation` answer. Core Location calls back on the thread that made the manager: the main one.
+@MainActor
+private final class OneFix: NSObject, CLLocationManagerDelegate {
+    private let manager = CLLocationManager()
+    private var answer: CheckedContinuation<GeoPoint, any Error>?
+
+    func location() async throws -> GeoPoint {
+        let status = manager.authorizationStatus
+        guard status == .authorizedWhenInUse || status == .authorizedAlways else { throw CLError(.denied) }
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                answer = continuation
+                manager.delegate = self
+                manager.requestLocation()
+            }
+        } onCancel: {
+            Task { @MainActor in self.finish(.failure(CancellationError())) }
+        }
+    }
+
+    private func finish(_ result: Result<GeoPoint, any Error>) {
+        manager.stopUpdatingLocation()
+        answer?.resume(with: result)
+        answer = nil
+    }
+
+    nonisolated func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        MainActor.assumeIsolated {
+            guard let location = locations.last(where: { $0.horizontalAccuracy >= 0 }) else { return }
+            finish(.success(GeoPoint(
+                latitude: location.coordinate.latitude, longitude: location.coordinate.longitude,
+                horizontalAccuracy: location.horizontalAccuracy
+            )))
+        }
+    }
+
+    nonisolated func locationManager(_: CLLocationManager, didFailWithError error: any Error) {
+        MainActor.assumeIsolated { finish(.failure(error)) }
     }
 }
 

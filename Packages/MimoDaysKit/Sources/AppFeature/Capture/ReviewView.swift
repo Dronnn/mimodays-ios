@@ -169,7 +169,7 @@ struct ReviewView: View {
 
     /// Our explainer and the system prompt the first time, then one fix for the city (Andrew, 2026-11-13).
     private func choosePlace() {
-        guard !isSaving else { return }
+        guard !isSaving, !asker.isAsking else { return }
         Task {
             let status = await asker.request(.location, using: permissions)
             locationAllowed = status.isUsable
@@ -180,7 +180,7 @@ struct ReviewView: View {
 
     /// Our explainer and the system prompt the first time; once it is off, the way to Settings.
     private func recordVoice() {
-        guard !isSaving else { return }
+        guard !isSaving, !asker.isAsking else { return }
         Task {
             let status = await asker.request(.microphone, using: permissions)
             guard status.isUsable else {

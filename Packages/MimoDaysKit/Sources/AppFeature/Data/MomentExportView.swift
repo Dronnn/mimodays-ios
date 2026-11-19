@@ -243,7 +243,8 @@ struct MomentExportSheet: View {
         guard !savingToPhotos else { return }
         savingToPhotos = true
         defer { savingToPhotos = false }
-        _ = await asker.request(.photoLibrary, using: permissions)
+        // Our explainer closed without Continue: nothing is asked or saved.
+        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
         guard let files = await model.files() else { return }
         defer { model.removeFiles() }
         do {

@@ -2,6 +2,7 @@
 import Core
 import DesignSystem
 import Persistence
+import Photos
 import SwiftData
 import SwiftUI
 
@@ -404,11 +405,16 @@ struct CollectingMoment: Identifiable {
     var selection: Set<UUID>
 }
 
-/// The system share sheet for files.
+/// The system share sheet for files. Its Save Image / Save Video would raise the Photos prompt without our
+/// explainer, so it's offered only once Photos is allowed; until then our own Save to Photos asks first.
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
     func makeUIViewController(context _: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        if !PermissionStatus(PHPhotoLibrary.authorizationStatus(for: .addOnly)).isUsable {
+            controller.excludedActivityTypes = [.saveToCameraRoll]
+        }
+        return controller
     }
 
     func updateUIViewController(_: UIActivityViewController, context _: Context) {}

@@ -46,6 +46,8 @@ struct MapView: View {
     @State private var quietRetry: Int?
     @State private var location = PermissionStatus.notDetermined
     @State private var showsUser = false
+    /// The dot was on when MimoDays was left; it comes back if location is still allowed.
+    @State private var resumesUserDot = false
     /// Show where I am was tapped with location turned off in iOS Settings.
     @State private var locationOff = false
     /// How much of the map the places panel covers at its strip height, from the map's bottom edge (iPhone).
@@ -114,8 +116,20 @@ struct MapView: View {
         .onChange(of: model.filters) { fitToken += 1 }
         .onChange(of: panelCover) { fitToken += 1 }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else { return }
-            Task { location = await permissions.status(of: .location) }
+            switch phase {
+            case .background:
+                // An Allow Once runs out once MimoDays is left: the dot goes, so MapKit doesn't ask again by itself.
+                resumesUserDot = showsUser
+                showsUser = false
+            case .active:
+                Task {
+                    location = await permissions.status(of: .location)
+                    if resumesUserDot, location.isUsable { showsUser = true }
+                    resumesUserDot = false
+                }
+            default:
+                break
+            }
         }
     }
 
@@ -299,7 +313,7 @@ struct MapView: View {
 
     private var mapCanvas: some View {
         MapCanvas(
-            places: model.places, images: model.images, selection: $selection, fitToken: fitToken, showsUser: showsUser,
+            places: model.places, images: model.images, selection: $selection, fitToken: fitToken, showsUser: showsUser && location.isUsable && scenePhase == .active,
             cover: isWide ? EdgeInsets(top: 0, leading: Self.panelWidth + 16, bottom: 0, trailing: 0)
                 : EdgeInsets(top: 0, leading: 0, bottom: panelCover, trailing: 0),
             onLoad: { id in Task { await model.load(id) } }, onFailure: { [retry] in failedToLoad(map: retry) }
@@ -346,11 +360,14 @@ struct MapView: View {
     /// Where I am when location is allowed (asking first if it never was); once it's off, the way to iOS Settings.
     /// A second tap, or a no given just now, shows all places.
     private func locate() async {
+        guard !asker.isAsking else { return }
         if showsUser {
             showsUser = false
             fitToken += 1
             return
         }
+        // Not the answer from before MimoDays was left: an Allow Once has run out by now.
+        location = await permissions.status(of: .location)
         if location.needsSettings {
             locationOff = true
             return
@@ -403,6 +420,7 @@ struct MapView: View {
     }
 
     private func turnOnLocation() async {
+        guard !asker.isAsking else { return }
         if location == .notDetermined {
             location = await asker.request(.location, using: permissions)
         } else if let url = URL(string: UIApplication.openSettingsURLString) {

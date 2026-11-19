@@ -300,6 +300,8 @@ struct CaptureFlowView: View {
     @State private var camera: CameraModel?
     @State private var review: ReviewModel?
     @State private var restoredDraft = false
+    /// From the camera explainer's Continue until iOS has answered.
+    @State private var requestsCamera = false
 
     var body: some View {
         Group {
@@ -332,7 +334,16 @@ struct CaptureFlowView: View {
             CameraPalette.background.ignoresSafeArea()
         case .explain:
             PermissionExplainerView(screen: .camera) {
-                Task { show(CameraAccessStep(await permissions.request(.camera))) }
+                // The explainer goes first, so the system prompt never shows over it.
+                guard !requestsCamera else { return }
+                requestsCamera = true
+                withAnimation(.easeOut(duration: 0.2)) { step = nil } completion: {
+                    Task {
+                        let status = await permissions.request(.camera)
+                        requestsCamera = false
+                        show(CameraAccessStep(status))
+                    }
+                }
             }
         case .openSettings:
             PermissionExplainerView(screen: .cameraOff) {
@@ -361,7 +372,11 @@ struct CaptureFlowView: View {
     }
 
     private func refresh() async {
-        show(CameraAccessStep(await permissions.status(of: .camera)))
+        guard !requestsCamera else { return }
+        let status = await permissions.status(of: .camera)
+        // The system prompt may have come up meanwhile: its answer decides.
+        guard !requestsCamera else { return }
+        show(CameraAccessStep(status))
     }
 
     private func show(_ step: CameraAccessStep) {

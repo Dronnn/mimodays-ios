@@ -531,7 +531,10 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         device.unlockForConfiguration()
     }
 
+    /// Only once allowed: an input made before would raise the system prompt itself, without our explainer.
     private func deviceInput(_ device: AVCaptureDevice) throws -> AVCaptureDeviceInput {
+        let media: AVMediaType = device.hasMediaType(.audio) ? .audio : .video
+        guard AVCaptureDevice.authorizationStatus(for: media) == .authorized else { throw CaptureError.cameraUnavailable }
         do {
             return try AVCaptureDeviceInput(device: device)
         } catch {

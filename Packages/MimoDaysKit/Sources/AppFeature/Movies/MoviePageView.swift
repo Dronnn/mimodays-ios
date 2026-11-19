@@ -41,6 +41,8 @@ struct MoviePageView: View {
     @State private var deleting = false
     @State private var saved = false
     @State private var problem: PhotosSaveProblem?
+    @State private var sharing = false
+    @State private var savingToPhotos = false
     @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
 
@@ -73,8 +75,8 @@ struct MoviePageView: View {
                             .padding(.top, 6)
                     }
                     HStack(spacing: 16) {
-                        if let url {
-                            ShareLink(item: url) {
+                        if url != nil {
+                            Button { sharing = true } label: {
                                 Label { Text("Share", bundle: .module) } icon: { Icon.glyphShare.image.resizable().frame(width: 20, height: 20) }
                             }
                             .buttonStyle(HalfButtonStyle())
@@ -139,6 +141,9 @@ struct MoviePageView: View {
             } label: { Text("Delete", bundle: .module) }
         } message: {
             Text("Copies saved to Photos or Files stay there.", bundle: .module)
+        }
+        .sheet(isPresented: $sharing) {
+            if let url { ShareSheet(items: [url]) }
         }
         .permissionExplainers(asker)
         .photosSaveAlert($problem)
@@ -243,8 +248,12 @@ struct MoviePageView: View {
     }
 
     private func save() async {
-        guard let url else { return }
-        _ = await asker.request(.photoLibrary, using: permissions)
+        // Taken before the first wait: a second tap doesn't save the movie twice.
+        guard let url, !savingToPhotos else { return }
+        savingToPhotos = true
+        defer { savingToPhotos = false }
+        // Our explainer closed without Continue: nothing is asked or saved.
+        guard await asker.request(.photoLibrary, using: permissions) != .notDetermined else { return }
         do {
             try await MovieFiles.saveToPhotos(url)
             saved = true

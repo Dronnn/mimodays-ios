@@ -16,7 +16,7 @@ enum PermissionScreen: String, CaseIterable {
     case voiceNote
     /// Before the location prompt: a moment's place, or where I am on the map.
     case location
-    /// Before the notifications prompt when surprises are turned on outside onboarding.
+    /// Before the notifications prompt: surprises turned on in onboarding, on Today or in Settings.
     case notifications
     /// Before the add-only Photos prompt on the first save to Photos.
     case photos
@@ -207,33 +207,68 @@ extension EnvironmentValues {
 }
 
 /// Our explainer before a system prompt, for screens that ask on a tap. Shown only while iOS hasn't asked yet;
-/// its Continue always leads to the system prompt.
+/// its Continue always leads to the system prompt, and nothing else does.
 @MainActor @Observable
 final class PermissionAsker {
     private(set) var screen: PermissionScreen?
-    @ObservationIgnored private var answer: CheckedContinuation<Void, Never>?
+    /// From a request until iOS has answered. Buttons that would present something else wait for it: a second
+    /// explainer or a sheet presented meanwhile would be dropped.
+    private(set) var isAsking = false
+    @ObservationIgnored private var answer: CheckedContinuation<Bool, Never>?
+    @ObservationIgnored private var continued = false
+    @ObservationIgnored private var appeared = false
+    @ObservationIgnored private var attempt = 0
 
-    /// The status after the explainer and the system prompt.
-    func request(_ permission: Permission, using service: any PermissionService) async -> PermissionStatus {
+    /// The status after the explainer and the system prompt; `screen` when the permission has a more specific one
+    /// (the camera's microphone). A request while one is going on asks nothing and returns `.notDetermined`, like
+    /// an explainer closed without Continue: a double tap on Save to Photos reached iOS directly.
+    func request(_ permission: Permission, screen explainer: PermissionScreen? = nil, using service: any PermissionService) async -> PermissionStatus {
+        guard !isAsking else { return .notDetermined }
+        isAsking = true
+        defer { isAsking = false }
         let status = await service.status(of: permission)
-        guard status == .notDetermined, answer == nil else { return status }
-        screen = PermissionScreen(explaining: permission)
-        await withCheckedContinuation { answer = $0 }
+        guard status == .notDetermined else { return status }
+        continued = false
+        appeared = false
+        attempt += 1
+        let current = attempt
+        screen = explainer ?? PermissionScreen(explaining: permission)
+        let wentOn = await withCheckedContinuation { continuation in
+            answer = continuation
+            Task { await dropIfNotShown(current) }
+        }
+        // Closed some other way (its screen went away, or it never showed): iOS isn't asked.
+        guard wentOn else { return await service.status(of: permission) }
         return await service.request(permission)
+    }
+
+    /// The explainer is on screen.
+    func shown() {
+        appeared = true
+    }
+
+    /// SwiftUI drops a presentation it can't make (another one on the way in or out). Without this the request
+    /// would wait for ever and the screen's buttons with it.
+    private func dropIfNotShown(_ request: Int) async {
+        try? await Task.sleep(for: .seconds(2))
+        guard request == attempt, !appeared, answer != nil else { return }
+        dismissed()
     }
 
     /// Continue on the explainer: it starts to close.
     func proceed() {
+        continued = true
         screen = nil
     }
 
-    /// The explainer has finished closing. Only now does the request go on, so what it leads to (the system prompt,
-    /// the voice note's recording sheet) isn't presented while the explainer is still on its way out: the recording
+    /// The explainer has finished closing. Only now does the request go on, so the system prompt (or the voice note's
+    /// recording sheet) isn't presented while the explainer is still on screen or on its way out: the recording
     /// sheet was dropped at once and the recording stopped after a second (UI test, 2026-11-17).
     func dismissed() {
         screen = nil
-        answer?.resume()
+        answer?.resume(returning: continued)
         answer = nil
+        continued = false
     }
 }
 
@@ -244,8 +279,9 @@ extension PermissionScreen: Identifiable {
 extension View {
     /// Presents `asker`'s explainers over this view.
     func permissionExplainers(_ asker: PermissionAsker) -> some View {
-        fullScreenCover(item: Binding { asker.screen } set: { if $0 == nil { asker.proceed() } }, onDismiss: asker.dismissed) { screen in
+        fullScreenCover(item: Binding { asker.screen } set: { _ in }, onDismiss: asker.dismissed) { screen in
             PermissionExplainerView(screen: screen) { asker.proceed() }
+                .onAppear(perform: asker.shown)
         }
     }
 }

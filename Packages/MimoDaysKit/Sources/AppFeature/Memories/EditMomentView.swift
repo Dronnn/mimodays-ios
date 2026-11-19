@@ -332,6 +332,7 @@ struct EditMomentView: View {
 
     /// Our explainer and the system prompt the first time; once it is off, the way to Settings.
     private func recordVoice() {
+        guard !asker.isAsking else { return }
         model.stopVoice()
         Task {
             let status = await asker.request(.microphone, using: permissions)

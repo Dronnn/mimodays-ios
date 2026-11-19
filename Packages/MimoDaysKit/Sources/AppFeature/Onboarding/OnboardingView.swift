@@ -1,3 +1,4 @@
+import Core
 import SwiftUI
 
 /// Flow 01 after launch: intro pages, reminder setup and its outcome, the first capture.
@@ -7,6 +8,8 @@ struct OnboardingView: View {
     let onFinish: (MainTab) -> Void
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.permissions) private var permissions
+    @State private var asker = PermissionAsker()
 
     var body: some View {
         Group {
@@ -17,7 +20,7 @@ struct OnboardingView: View {
                 ReminderScheduleView(
                     schedule: $flow.schedule,
                     back: flow.backToIntro,
-                    enable: { Task { await flow.enableReminders() } },
+                    enable: { Task { await flow.enableReminders { await asker.request($0, using: permissions) } } },
                     later: flow.remindLater
                 )
             case let .reminders(outcome):
@@ -33,6 +36,7 @@ struct OnboardingView: View {
             }
         }
         .animation(.default, value: flow.step)
+        .permissionExplainers(asker)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await flow.recheckReminders() } }
         }

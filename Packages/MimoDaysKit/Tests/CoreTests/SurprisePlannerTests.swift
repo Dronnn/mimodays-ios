@@ -177,6 +177,17 @@ struct SurprisePlannerTests {
         #expect(draw(Self.rules(.weekly(3)), now: monday, planned: first, seed: 5).isEmpty)
     }
 
+    /// A surprise that already came this week counts against its three; the rest go on other days, not none.
+    @Test func aSurpriseThatCameLeavesTheRestOfTheWeek() {
+        let monday = Self.date("2026-11-09 06:00", in: calendar)
+        let week = calendar.dateInterval(of: .weekOfYear, for: monday)!
+        let came = Self.date("2026-11-09 12:00", in: calendar)
+        let tuesday = Self.date("2026-11-10 06:00", in: calendar)
+        let times = draw(Self.rules(.weekly(3)), now: tuesday, planned: [came]).filter { week.contains($0) }
+        #expect(times.count == 2)
+        #expect(!times.contains { calendar.isDate($0, inSameDayAs: came) })
+    }
+
     // MARK: Time changes
 
     @Test func daylightSavingDaysKeepTheirLocalWindow() {

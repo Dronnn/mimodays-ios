@@ -247,6 +247,32 @@ struct DeleteAllTests {
         #expect(defaults.data(forKey: "privacySettings") == nil && defaults.data(forKey: "memoriesSettings") == nil)
     }
 
+    /// Once the records are committed, a file that won't go doesn't stop the rest: settings reset, the draft goes,
+    /// onboarding starts again, and the file no record points to is swept at the next launch.
+    @Test func aFileThatWontGoDoesntStopTheErase() async throws {
+        let onboarding = SwiftDataOnboardingStore(context: context)
+        var record = onboarding.load()
+        record.isCompleted = true
+        onboarding.save(record)
+        let locked = store.root.appending(path: "originals/locked", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: locked, withIntermediateDirectories: true)
+        try Data("photo".utf8).write(to: locked.appending(path: "a.heic"))
+        try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: locked.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: locked.path) }
+        let kept = try store.store(Data("voice".utf8), in: .originals, fileExtension: "m4a")
+        _ = try drafts.newVoiceURL()
+        var didReset = false
+        let eraser = AppEraser(context: context, store: store, notifications: InMemoryNotificationScheduler(), drafts: drafts) { didReset = true }
+
+        try await eraser.eraseEverything()
+
+        #expect(didReset)
+        #expect(!onboarding.load().isCompleted)
+        #expect(!FileManager.default.fileExists(atPath: drafts.root.path))
+        #expect(!store.fileExists(kept.relativePath))
+        #expect(FileManager.default.fileExists(atPath: locked.appending(path: "a.heic").path))
+    }
+
     /// The backup reminder isn't a surprise, so `pending()` doesn't list it; it goes all the same.
     @Test func theBackupReminderGoesToo() async throws {
         let notifications = CancelRecorder()

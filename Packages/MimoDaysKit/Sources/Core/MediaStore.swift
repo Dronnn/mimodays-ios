@@ -113,14 +113,22 @@ public struct MediaStore: Sendable {
     }
 
     /// Every stored file goes, unpacked restores left by a stopped app too; the empty areas stay (S08 Delete all data).
+    /// Tries every file even when one won't go, then throws the first failure.
     public func removeAll() throws {
+        var failure: (any Error)?
+        func attempt(_ work: () throws -> Void) {
+            do { try work() } catch { failure = failure ?? error }
+        }
         for area in Area.allCases {
             let folder = root.appendingPathComponent(area.rawValue, isDirectory: true)
-            for item in try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil) {
-                try FileManager.default.removeItem(at: item)
+            attempt {
+                for item in try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil) {
+                    attempt { try FileManager.default.removeItem(at: item) }
+                }
             }
         }
-        try removeStaging()
+        attempt { try removeStaging() }
+        if let failure { throw failure }
     }
 
     /// Folders a restore unpacks into next to the areas (`.restore-…`); one left by an app that was stopped

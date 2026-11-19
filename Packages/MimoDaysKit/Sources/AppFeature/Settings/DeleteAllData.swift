@@ -1,6 +1,7 @@
 import Core
 import DesignSystem
 import Foundation
+import OSLog
 import Persistence
 import SwiftData
 import SwiftUI
@@ -22,6 +23,8 @@ struct AppEraser {
     let resetSettings: @MainActor () -> Void
     /// The app's temporary folder, emptied too (exports, backups and picked photos waiting there); nil leaves it.
     var temporaryDirectory: URL?
+
+    private static let logger = Logger(subsystem: "MimoDays", category: "Storage")
 
     func counts() -> Counts {
         Counts(
@@ -58,7 +61,11 @@ struct AppEraser {
             context.rollback()
             throw error
         }
-        try store.removeAll()
+        // The records are gone, so the erase goes on to the end: a file that won't go now has no record and
+        // launch's orphan sweep takes it.
+        do { try store.removeAll() } catch {
+            Self.logger.error("Some files stayed after Delete All: \(error.localizedDescription, privacy: .public)")
+        }
         if let temporaryDirectory { Self.removeTemporaryFiles(keeping: store.root, in: temporaryDirectory) }
         drafts?.clear()
         resetSettings()

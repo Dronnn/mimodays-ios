@@ -323,6 +323,18 @@ struct SurpriseCoordinatorTests {
         #expect(coordinator.open(promptID: now.id))
     }
 
+    /// A pause stops even the surprise due in a few seconds: nothing more comes once the person said so.
+    @Test func aPauseStopsASurpriseDueWithinTheMinute() async throws {
+        clock.set(date("2026-11-11 23:30"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        #expect(await coordinator.sendNow())
+        let soon = try #require(try prompts(.pending).first)
+        await coordinator.pause(.today)
+        #expect(soon.outcome == .cancelled)
+        #expect(await !notifications.pending().contains { $0.id == soon.notificationRequestID })
+    }
+
     @Test func sendingOneNowNeedsNotifications() async throws {
         #expect(await coordinator(.denied).sendNow() == false)
         #expect(try prompts().isEmpty)

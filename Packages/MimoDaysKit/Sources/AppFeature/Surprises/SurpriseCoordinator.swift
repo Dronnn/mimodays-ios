@@ -71,7 +71,7 @@ final class SurpriseCoordinator {
             case .indefinitely: schedule.pausedUntil = nil
             }
             schedule.isPausedIndefinitely = length == .indefinitely
-            await self.performRefresh(replan: false)
+            await self.performRefresh(replan: false, stopsAll: true)
         }
     }
 
@@ -185,7 +185,8 @@ final class SurpriseCoordinator {
         await task.value
     }
 
-    private func performRefresh(replan: Bool) async {
+    /// `stopsAll`: the person paused, so even a surprise due within the minute goes.
+    private func performRefresh(replan: Bool, stopsAll: Bool = false) async {
         let status = await permissions.status(of: .notifications)
         let now = clock.now()
         let schedule = fetchSchedule()
@@ -198,7 +199,8 @@ final class SurpriseCoordinator {
         }
         // A prompt due within the minute is left alone: iOS may be delivering it already, and "Send a surprise now"
         // plans one seconds ahead, outside the hours and days.
-        let settled = now.addingTimeInterval(60)
+        // Not when the person paused or turned surprises off: then nothing more comes, however soon it was due.
+        let settled = stopsAll || schedule?.isEnabled != true ? now : now.addingTimeInterval(60)
         let upcoming = prompts.filter { $0.outcome == .pending && $0.plannedAt > settled }
 
         if let schedule, schedule.isEnabled, !schedule.isPausedIndefinitely, status.isUsable {

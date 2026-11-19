@@ -56,10 +56,10 @@ struct MovieStoreTests {
         #expect(project.selectionSeed == 7)
         #expect(project.status == .draft)
         #expect(project.render == nil)
-        // F07-F09 as drawn: selfie where recorded, cut, dates and places on, clip sound at 70%, voice notes in.
+        // F07-F09 as drawn: selfie where recorded, cut, dates and places on, clip sound at 70%; voice notes stay out until turned on.
         #expect(project.showsDates && project.showsPlaces)
         #expect(project.clipSoundLevel == 0.7)
-        #expect(project.orderedClips.allSatisfy { $0.selfiePlacement == nil && $0.transition == .cut && $0.includesVoiceNote })
+        #expect(project.orderedClips.allSatisfy { $0.selfiePlacement == nil && $0.transition == .cut && !$0.includesVoiceNote })
         #expect(try movies.drafts().map(\.id) == [project.id])
         #expect(try movies.movies().isEmpty)
     }

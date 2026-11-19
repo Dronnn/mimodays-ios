@@ -197,6 +197,7 @@ struct MovieComposerTests {
         project.voiceNoteLevel = 0.5
         let voiceFile = try store.store(copyOf: Fixture.voiceNote.url, in: .originals, fileExtension: "m4a")
         try #require(project.orderedClips[1].moment).voiceNotes.append(MomentVoiceNote(relativePath: voiceFile.relativePath, duration: 2, recordedAt: now))
+        project.orderedClips[1].includesVoiceNote = true
         let song = try store.store(copyOf: Fixture.voiceNote.url, in: .originals, fileExtension: "m4a")
         project.audioTracks.append(MovieAudioTrack(kind: .soundtrack, relativePath: song.relativePath, gain: 0.8))
         let composed = try await MovieComposer.compose(MoviePlan(project, store: store), renderSize: portrait)
@@ -284,11 +285,21 @@ struct MovieComposerTests {
         #expect(checked == 2)
     }
 
+    /// Doc 01 §17: a voice note stays out of a movie until it's turned on for its clip.
+    @Test func aNewClipLeavesItsVoiceNoteOut() async throws {
+        let ids = try await save(1)
+        let project = try project(ids)
+        let file = try store.store(copyOf: Fixture.voiceNote.url, in: .originals, fileExtension: "m4a")
+        try #require(project.orderedClips[0].moment).voiceNotes.append(MomentVoiceNote(relativePath: file.relativePath, duration: 2, recordedAt: now))
+        #expect(MoviePlan(project, store: store).clips.allSatisfy { $0.voiceURL == nil })
+    }
+
     @Test func aVoiceNotePlaysWithItsClipAndTheMovieExports() async throws {
         let ids = try await save(2)
         let project = try project(ids)
         let file = try store.store(copyOf: Fixture.voiceNote.url, in: .originals, fileExtension: "m4a")
         try #require(project.orderedClips[0].moment).voiceNotes.append(MomentVoiceNote(relativePath: file.relativePath, duration: 2, recordedAt: now))
+        project.orderedClips[0].includesVoiceNote = true
         let composed = try await MovieComposer.compose(MoviePlan(project, store: store), renderSize: portrait)
         let voice = try #require(composed.asset.tracks(withMediaType: .audio).first)
         let segment = try #require(voice.segments.first { !$0.isEmpty })

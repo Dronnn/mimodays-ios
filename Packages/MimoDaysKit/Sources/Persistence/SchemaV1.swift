@@ -378,7 +378,7 @@ public enum SchemaV1: VersionedSchema {
         public var transitionRaw: String = MovieTransition.cut.rawValue
         public var clipAudioRaw: String
         public var clipVolume: Double
-        /// F09: the moment's voice note plays over its clip.
+        /// F09: the moment's voice note plays over its clip; off for a new clip (see `init`).
         public var includesVoiceNote: Bool = true
         /// U52; nil uses the layout saved with the moment.
         public var cameraLayoutRaw: String?
@@ -395,6 +395,9 @@ public enum SchemaV1: VersionedSchema {
             self.position = position
             clipAudioRaw = ClipAudio.original.rawValue
             clipVolume = 1
+            // Voice notes are private: a new clip leaves its out until it's turned on in the editor (doc 01 §17).
+            // Set here rather than as the stored default, which the store's schema keeps.
+            includesVoiceNote = false
         }
 
         public var clipAudio: ClipAudio {

@@ -1,6 +1,7 @@
 @preconcurrency import AVFoundation
 @testable import AppFeature
 @testable import Core
+import CoreImage
 import Foundation
 import Persistence
 import SwiftData
@@ -327,6 +328,22 @@ struct MovieComposerTests {
         project.orderedClips[1].position = 2
         context.insert(MovieTextCard(project: project, position: 1, text: "The long way home", look: look, duration: 3))
         return project
+    }
+
+    /// A card is drawn when the compositor first needs it, and only the two drawn last stay in memory (32 MB each at 4K).
+    @Test func cardsAreDrawnWhenNeededAndOnlyTwoAreKept() async throws {
+        let pool = CardRaster.Pool()
+        let rasters = (0..<3).map { _ in CardRaster(pool: pool) { CIImage(color: .red) } }
+        #expect(rasters.allSatisfy { !$0.isDrawn })
+        for raster in rasters { #expect(raster.image != nil) }
+        #expect(rasters.map(\.isDrawn) == [false, true, true])
+        _ = rasters[0].image
+        #expect(rasters.map(\.isDrawn) == [true, false, true])
+
+        let ids = try await save(2)
+        let composed = try await MovieComposer.compose(MoviePlan(try carded(ids, look: .paper), store: store), renderSize: portrait)
+        let card = try #require(composed.videoComposition.instructions.compactMap { $0 as? MovieClipInstruction }.first { $0.clip.isCard })
+        #expect(card.card != nil)
     }
 
     @Test func aTextCardPlaysInItsPlaceOnPaperOrPlum() async throws {

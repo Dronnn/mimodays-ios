@@ -4,6 +4,7 @@ import CoreImage
 import DesignSystem
 import os
 import Persistence
+import Synchronization
 import UIKit
 
 /// A movie plan as one playable, exportable asset (11.7): clips back to back on one timeline, every frame drawn
@@ -63,7 +64,8 @@ enum MovieComposer {
         var instructions: [MovieClipInstruction] = []
         /// The clips' sound level over time: (when, volume), in order.
         var soundLevels: [(CMTime, Double)] = []
-        var cards: [Int: CIImage] = [:]
+        var cards: [Int: CardRaster] = [:]
+        let pool = CardRaster.Pool()
         var cursor = CMTime.zero
         // The title opens the first clip; a text card before it speaks for itself.
         let titled = plan.clips.firstIndex { !$0.isCard }
@@ -80,7 +82,8 @@ enum MovieComposer {
                 mainTrack.scaleTimeRange(CMTimeRange(start: cursor, duration: fillerRange.duration), toDuration: length)
                 if case let .card(text, look) = clip.media {
                     let still = look == .overClip ? await firstFrame(after: index, in: plan, canvas: renderSize) : nil
-                    cards[index] = cardImage(text, look: look, still: still, canvas: renderSize, typefaces: typefaces)
+                    let canvas = renderSize
+                    cards[index] = CardRaster(pool: pool) { cardImage(text, look: look, still: still, canvas: canvas, typefaces: typefaces) }
                 }
             case let .video(start, selfieOffset, hasAudio):
                 guard let mainURL = clip.mainURL else { throw Failure.compositionFailed }
@@ -391,24 +394,26 @@ final class MovieClipInstruction: NSObject, AVVideoCompositionInstructionProtoco
     /// The movie's title, on the first clip only.
     let title: String?
     /// U51: the whole frame of a text card.
-    let card: CIImage?
+    var card: CIImage? { cardRaster?.image }
+    private let cardRaster: CardRaster?
     /// U53: seconds of sound before the picture fades in.
     let lead: Double?
     /// U53: what shows during the lead: the card before, or black.
-    let backdrop: CIImage?
+    var backdrop: CIImage? { backdropRaster?.image }
+    private let backdropRaster: CardRaster?
     /// The faces for the title and captions, fixed when the movie starts.
     let typefaces: Typefaces
 
     init(
         timeRange: CMTimeRange, clip: MoviePlan.Clip, index: Int, video: Video?, canvas: CGSize, fit: MovieFit,
-        fadeIn: Bool, fadeOut: Bool, title: String? = nil, card: CIImage? = nil, lead: Double? = nil, backdrop: CIImage? = nil,
+        fadeIn: Bool, fadeOut: Bool, title: String? = nil, card: CardRaster? = nil, lead: Double? = nil, backdrop: CardRaster? = nil,
         typefaces: Typefaces = .latin
     ) {
         self.typefaces = typefaces
         self.title = title
-        self.card = card
+        cardRaster = card
         self.lead = lead
-        self.backdrop = backdrop
+        backdropRaster = backdrop
         self.timeRange = timeRange
         self.clip = clip
         self.index = index
@@ -662,4 +667,41 @@ final class MovieCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         let image = CIImage(cvPixelBuffer: buffer).oriented(orientation)
         return image.transformed(by: CGAffineTransform(translationX: -image.extent.minX, y: -image.extent.minY))
     }
+}
+
+/// A text card's frame, drawn the first time the compositor needs it. At 4K one is about 32 MB, so only the two drawn
+/// last in a movie stay in memory (a card and the one leading into it); an older one is drawn again if needed again.
+final class CardRaster: @unchecked Sendable {
+    /// One movie's cards.
+    final class Pool: Sendable {
+        fileprivate let recent = Mutex<[CardRaster]>([])
+    }
+
+    private let pool: Pool
+    private let draw: @Sendable () -> CIImage?
+    private let drawn = Mutex<CIImage?>(nil)
+    static let kept = 2
+
+    init(pool: Pool, draw: @escaping @Sendable () -> CIImage?) {
+        self.pool = pool
+        self.draw = draw
+    }
+
+    var image: CIImage? {
+        if let image = drawn.withLock({ $0 }) { return image }
+        let image = draw()
+        drawn.withLock { $0 = image }
+        let evicted = pool.recent.withLock { recent -> [CardRaster] in
+            recent.removeAll { $0 === self }
+            recent.append(self)
+            let over = max(recent.count - Self.kept, 0)
+            defer { recent.removeFirst(over) }
+            return Array(recent.prefix(over))
+        }
+        evicted.forEach { $0.drawn.withLock { $0 = nil } }
+        return image
+    }
+
+    /// Whether the frame is in memory now (tests).
+    var isDrawn: Bool { drawn.withLock { $0 != nil } }
 }

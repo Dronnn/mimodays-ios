@@ -52,8 +52,8 @@ final class SettingsModel {
     private var context: ModelContext { library.context }
 
     func load() async {
+        // Only while the fields are filled in: a change made while the notification status is read below is saved.
         isLoading = true
-        defer { isLoading = false }
         if let stored = schedule() {
             reminders = ReminderSchedule(
                 frequency: stored.frequency, weekdayMask: stored.weekdayMask, earliestMinute: stored.earliestMinute, latestMinute: stored.latestMinute
@@ -64,9 +64,9 @@ final class SettingsModel {
         }
         let backups = (try? context.fetch(FetchDescriptor<BackupManifest>(predicate: #Predicate { $0.restoredAt == nil }))) ?? []
         lastBackup = backups.map(\.createdAt).max()
-        let storage = StorageModel(library: library)
-        storage.load()
-        storageBytes = storage.usage.total
+        isLoading = false
+        // Its initializer measures once.
+        storageBytes = StorageModel(library: library).usage.total
         notifications = await permissions.status(of: .notifications)
     }
 

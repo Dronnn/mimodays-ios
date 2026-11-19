@@ -53,6 +53,21 @@ struct SettingsModelTests {
         #expect(relaunched.expiryMinutes == 30)
     }
 
+    /// Back from iOS Settings, a change made while the notification status is still being read is kept.
+    @Test func aChangeWhileLoadingIsSaved() async throws {
+        let first = model()
+        await first.load()
+        await first.setSurprises(true)
+        await first.replanning?.value
+        let model = model()
+        let loading = Task { await model.load() }
+        while model.surprisesOn == false { await Task.yield() }
+        model.reminders.frequency = .twiceADay
+        await loading.value
+        await model.replanning?.value
+        #expect(try #require(try schedule()).frequency == .twiceADay)
+    }
+
     @Test func aChangeDrawsTheComingSurprisesAgain() async throws {
         let model = model()
         await model.load()

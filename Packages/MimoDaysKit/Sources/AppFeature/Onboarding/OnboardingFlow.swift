@@ -84,14 +84,11 @@ final class OnboardingFlow {
         guard !isEnablingReminders else { return }
         isEnablingReminders = true
         defer { isEnablingReminders = false }
-        let wasEnabled = remindersEnabled
-        remindersEnabled = true
         let status = if let request { await request(.notifications) } else { await permissions.request(.notifications) }
         // Our explainer closed without Continue: nothing was asked, so the schedule stays as it was, to try again.
-        if request != nil, status == .notDetermined {
-            remindersEnabled = wasEnabled
-            return
-        }
+        // Set only after the answer: a schedule edit saved while it waited mustn't store reminders as on.
+        if request != nil, status == .notDetermined { return }
+        remindersEnabled = true
         remindersAllowed = status.isUsable
         step = .reminders(status.isUsable ? .on : status.needsSettings ? .denied : .later)
         await remindersChanged()
@@ -99,7 +96,9 @@ final class OnboardingFlow {
 
     /// Back from iOS Settings on "Notifications are off": allowed there, the outcome says they are on.
     func recheckReminders() async {
-        guard step == .reminders(.denied), await permissions.status(of: .notifications).isUsable else { return }
+        guard step == .reminders(.denied), await permissions.status(of: .notifications).isUsable,
+              // Continue tapped while the status was read: the flow has moved on.
+              step == .reminders(.denied) else { return }
         remindersAllowed = true
         step = .reminders(.on)
         await remindersChanged()

@@ -42,6 +42,8 @@ final class OnboardingFlow {
     private(set) var firstMoment: SavedMoment?
     /// Surprises are on: the reminders choice, or on a replay the person's existing setting.
     private(set) var remindersEnabled = false
+    /// Whether iOS lets the reminders through: O10 promises a surprise only then.
+    private(set) var remindersAllowed = false
     private(set) var isCompleted = false
 
     private let permissions: any PermissionService
@@ -77,6 +79,7 @@ final class OnboardingFlow {
     func enableReminders() async {
         remindersEnabled = true
         let status = await permissions.request(.notifications)
+        remindersAllowed = status.isUsable
         step = .reminders(status.isUsable ? .on : status.needsSettings ? .denied : .later)
         await remindersChanged()
     }
@@ -84,6 +87,7 @@ final class OnboardingFlow {
     /// Back from iOS Settings on "Notifications are off": allowed there, the outcome says they are on.
     func recheckReminders() async {
         guard step == .reminders(.denied), await permissions.status(of: .notifications).isUsable else { return }
+        remindersAllowed = true
         step = .reminders(.on)
         await remindersChanged()
     }
@@ -110,6 +114,8 @@ final class OnboardingFlow {
         isCapturing = false
         isCompleted = true
         step = .firstMomentSaved
+        // Relaunched after the reminders step, or allowed in Settings since.
+        Task { remindersAllowed = await permissions.status(of: .notifications).isUsable }
     }
 
     /// Help › "Show the introduction again": from the first page. A finished onboarding stays finished, so closing

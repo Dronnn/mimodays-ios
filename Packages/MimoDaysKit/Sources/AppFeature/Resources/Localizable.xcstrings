@@ -69121,140 +69121,140 @@
         }
       }
     },
-    "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device." : {
+    "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. Places are kept on your device; to name them, MimoDays asks Apple's map service." : {
       "comment" : "Explainer message before the system location prompt",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا يستخدم MimoDays موقعك إلا عندما يكون مفتوحًا، لإضافة مكان إلى اللحظة وإظهار موقعك على الخريطة. ويبقى الموقع على جهازك."
+            "value" : "لا يستخدم MimoDays موقعك إلا عندما يكون مفتوحًا، لإضافة مكان إلى اللحظة وإظهار موقعك على الخريطة. تُحفظ الأماكن على جهازك، ولتسميتها يستعين MimoDays بخدمة الخرائط من Apple."
           }
         },
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays выкарыстоўвае тваё месцазнаходжанне толькі тады, калі праграма адкрыта: каб дадаць месца да моманту і паказаць на карце, дзе ты. Яно застаецца на тваёй прыладзе."
+            "value" : "MimoDays выкарыстоўвае тваё месцазнаходжанне толькі тады, калі праграма адкрыта: каб дадаць месца да моманту і паказаць на карце, дзе ты. Месцы захоўваюцца на тваёй прыладзе, а каб назваць іх, MimoDays звяртаецца да картаў Apple."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays nutzt deinen Standort nur, solange die App geöffnet ist: um einem Moment einen Ort hinzuzufügen und um auf der Karte zu zeigen, wo du bist. Er bleibt auf deinem Gerät."
+            "value" : "MimoDays nutzt deinen Standort nur, solange die App geöffnet ist: um einem Moment einen Ort hinzuzufügen und um auf der Karte zu zeigen, wo du bist. Orte bleiben auf deinem Gerät; um sie zu benennen, fragt MimoDays den Kartendienst von Apple."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device."
+            "value" : "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. Places are kept on your device; to name them, MimoDays asks Apple's map service."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays solo usa tu ubicación mientras está abierta: para añadir un lugar a un momento y mostrar dónde estás en el mapa. No sale de tu dispositivo."
+            "value" : "MimoDays solo usa tu ubicación mientras está abierta: para añadir un lugar a un momento y mostrar dónde estás en el mapa. Los lugares se guardan en tu dispositivo; para ponerles nombre, MimoDays consulta el servicio de mapas de Apple."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays n’utilise ta position que lorsque l’app est ouverte : pour ajouter un lieu à un moment et afficher où tu es sur la carte. Elle reste sur ton appareil."
+            "value" : "MimoDays n’utilise ta position que lorsque l’app est ouverte : pour ajouter un lieu à un moment et afficher où tu es sur la carte. Les lieux restent sur ton appareil ; pour les nommer, MimoDays interroge le service de cartes d’Apple."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays משתמשת במיקום שלך רק כשהיא פתוחה: להוספת מקום לרגע ולהצגת המיקום הנוכחי במפה. הוא נשאר במכשיר שלך."
+            "value" : "MimoDays משתמשת במיקום שלך רק כשהיא פתוחה: להוספת מקום לרגע ולהצגת המיקום הנוכחי במפה. המקומות נשמרים במכשיר שלך; כדי לתת להם שם, MimoDays פונה לשירות המפות של Apple."
           }
         },
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays-ը քո տեղադրությունն օգտագործում է միայն բաց եղած ժամանակ՝ պահին վայր ավելացնելու և քարտեզին ցույց տալու համար, թե որտեղ ես։ Այդ տվյալները մնում են քո սարքում։"
+            "value" : "MimoDays-ը քո տեղադրությունն օգտագործում է միայն բաց եղած ժամանակ՝ պահին վայր ավելացնելու և քարտեզին ցույց տալու համար, թե որտեղ ես։ Վայրերը պահվում են քո սարքում, իսկ դրանց անունը գտնելու համար MimoDays-ը դիմում է Apple-ի քարտեզների ծառայությանը։"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays usa la tua posizione solo mentre l'app è aperta: per aggiungere un luogo a un momento e per mostrare dove ti trovi sulla mappa. Resta sul tuo dispositivo."
+            "value" : "MimoDays usa la tua posizione solo mentre l'app è aperta: per aggiungere un luogo a un momento e per mostrare dove ti trovi sulla mappa. I luoghi restano sul tuo dispositivo; per dare loro un nome, MimoDays chiede al servizio mappe di Apple."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDaysが位置情報を使うのは、アプリを開いているときだけです。モーメントに場所を追加したり、地図上に現在地を表示したりするために使います。位置情報はデバイス内に保存されます。"
+            "value" : "MimoDaysが位置情報を使うのは、アプリを開いているときだけです。モーメントに場所を追加したり、地図上に現在地を表示したりするために使います。場所はデバイス内に保存されます。場所の名前を調べるために、AppleのマップサービスにMimoDaysが問い合わせます。"
           }
         },
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays შენს მდებარეობას მხოლოდ მაშინ იყენებს, როცა გახსნილია: მომენტისთვის ადგილის დასამატებლად და რუკაზე შენი მდებარეობის საჩვენებლად. ის შენს მოწყობილობაზე რჩება."
+            "value" : "MimoDays შენს მდებარეობას მხოლოდ მაშინ იყენებს, როცა გახსნილია: მომენტისთვის ადგილის დასამატებლად და რუკაზე შენი მდებარეობის საჩვენებლად. ადგილები შენს მოწყობილობაზე ინახება, მათი სახელის დასადგენად კი MimoDays Apple-ის რუკების სერვისს მიმართავს."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays орналасқан жеріңді тек ашық тұрғанда пайдаланады: сәтке орын қосу және картада қайда екеніңді көрсету үшін. Бұл ақпарат құрылғыңда қалады."
+            "value" : "MimoDays орналасқан жеріңді тек ашық тұрғанда пайдаланады: сәтке орын қосу және картада қайда екеніңді көрсету үшін. Орындар құрылғыңда сақталады, ал олардың атауын табу үшін MimoDays Apple карталар қызметіне жүгінеді."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays는 앱이 열려 있을 때만 위치를 사용해요. 순간에 장소를 추가하고 지도에 현재 위치를 보여 주기 위해서예요. 위치는 기기에만 보관돼요."
+            "value" : "MimoDays는 앱이 열려 있을 때만 위치를 사용해요. 순간에 장소를 추가하고 지도에 현재 위치를 보여 주기 위해서예요. 장소는 기기에 보관돼요. 장소 이름을 알아내려고 MimoDays가 Apple 지도 서비스에 물어봐요."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays gebruikt je locatie alleen terwijl de app open is: om een plek aan een moment toe te voegen en om op de kaart te tonen waar je bent. Je locatie blijft op je apparaat."
+            "value" : "MimoDays gebruikt je locatie alleen terwijl de app open is: om een plek aan een moment toe te voegen en om op de kaart te tonen waar je bent. Plekken blijven op je apparaat; om ze een naam te geven, vraagt MimoDays het de kaartdienst van Apple."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays używa twojej lokalizacji tylko wtedy, gdy aplikacja jest otwarta: aby dodać miejsce do chwili i pokazać na mapie, gdzie jesteś. Lokalizacja zostaje na twoim urządzeniu."
+            "value" : "MimoDays używa twojej lokalizacji tylko wtedy, gdy aplikacja jest otwarta: aby dodać miejsce do chwili i pokazać na mapie, gdzie jesteś. Miejsca zostają na twoim urządzeniu; aby je nazwać, MimoDays pyta usługę map Apple."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O MimoDays usa sua localização só enquanto está aberto: para adicionar um lugar a um momento e mostrar onde você está no mapa. Ela fica no seu dispositivo."
+            "value" : "O MimoDays usa sua localização só enquanto está aberto: para adicionar um lugar a um momento e mostrar onde você está no mapa. Os lugares ficam no seu dispositivo; para dar nome a eles, o MimoDays consulta o serviço de mapas da Apple."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays использует геопозицию, только пока приложение открыто: чтобы добавить место к моменту и показать на карте, где ты. Данные остаются на устройстве."
+            "value" : "MimoDays использует геопозицию, только пока приложение открыто: чтобы добавить место к моменту и показать на карте, где ты. Места хранятся на устройстве, а чтобы узнать их название, MimoDays обращается к картам Apple."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays använder din plats bara medan appen är öppen: för att lägga till en plats i ett ögonblick och visa var du är på kartan. Den stannar på din enhet."
+            "value" : "MimoDays använder din plats bara medan appen är öppen: för att lägga till en plats i ett ögonblick och visa var du är på kartan. Platserna sparas på din enhet; för att namnge dem frågar MimoDays Apples karttjänst."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays konumunu yalnızca açıkken kullanır: anlara yer eklemek ve haritada nerede olduğunu göstermek için. Konumun aygıtında kalır."
+            "value" : "MimoDays konumunu yalnızca açıkken kullanır: anlara yer eklemek ve haritada nerede olduğunu göstermek için. Yerler aygıtında saklanır; onlara ad vermek için MimoDays Apple’ın harita hizmetine başvurur."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays використовує твою геолокацію лише тоді, коли відкритий: щоб додати місце до моменту й показати на мапі, де ти. Вона лишається на твоєму пристрої."
+            "value" : "MimoDays використовує твою геолокацію лише тоді, коли відкритий: щоб додати місце до моменту й показати на мапі, де ти. Місця зберігаються на твоєму пристрої, а щоб дізнатися їхню назву, MimoDays звертається до карт Apple."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays 只在打开时使用你的位置：为瞬间添加地点，并在地图上显示你的位置。位置信息只保留在设备上。"
+            "value" : "MimoDays 只在打开时使用你的位置：为瞬间添加地点，并在地图上显示你的位置。地点保存在设备上；为了给地点命名，MimoDays 会询问 Apple 地图服务。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays 只會在開啟時使用位置資訊，為瞬間加入地點，並在地圖上顯示目前所在位置。位置資訊只會留在裝置上。"
+            "value" : "MimoDays 只會在開啟時使用位置資訊，為瞬間加入地點，並在地圖上顯示目前所在位置。地點會保存在裝置上；為了替地點命名，MimoDays 會詢問 Apple 地圖服務。"
           }
         }
       }
@@ -105213,7 +105213,7 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Смотреть все %lld момент"
+                  "value" : "Смотреть %lld момент"
                 }
               },
               "few" : {
@@ -118889,6 +118889,144 @@
         }
       }
     },
+    "The App Store couldn't confirm this tip. Check your purchase history before trying again." : {
+      "comment" : "Donations (D02): a tip the App Store may have charged but MimoDays couldn't verify; Purchase History is in the person's Apple Account settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The App Store couldn't confirm this tip. Check your purchase history before trying again."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر على App Store تأكيد هذه الإكرامية. راجع سجل مشترياتك قبل المحاولة مرة أخرى."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store не змог пацвердзіць гэты данат. Правер гісторыю пакупак, перш чым спрабаваць зноў."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der App Store konnte dieses Trinkgeld nicht bestätigen. Sieh in deinem Kaufverlauf nach, bevor du es noch einmal versuchst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El App Store no ha podido confirmar esta propina. Revisa tu historial de compras antes de volver a intentarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’App Store n’a pas pu confirmer ce pourboire. Vérifie ton historique d’achats avant de réessayer."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ה‑App Store לא הצליח לאשר את התשר הזה. כדאי לבדוק את היסטוריית הרכישות לפני שמנסים שוב."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store-ը չկարողացավ հաստատել այս թեյավճարը։ Նորից փորձելուց առաջ ստուգիր գնումների պատմությունը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’App Store non è riuscito a confermare questa mancia. Controlla la cronologia degli acquisti prima di riprovare."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Storeでこのチップを確認できませんでした。もう一度試す前に購入履歴を確認してください。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store-მა ვერ დაადასტურა ეს ჩაის ფული. ხელახლა ცდამდე შეამოწმე შესყიდვების ისტორია."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store бұл демеуді растай алмады. Қайта көрмес бұрын сатып алу тарихын тексер."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store에서 이 후원을 확인하지 못했어요. 다시 시도하기 전에 구입 내역을 확인해 주세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De App Store kon deze fooi niet bevestigen. Kijk in je aankoopgeschiedenis voordat je het opnieuw probeert."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store nie mógł potwierdzić tego napiwku. Zanim spróbujesz ponownie, sprawdź historię zakupów."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A App Store não conseguiu confirmar esta gorjeta. Confira seu histórico de compras antes de tentar de novo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store не смог подтвердить этот донат. Проверь историю покупок, прежде чем пробовать снова."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store kunde inte bekräfta den här dricksen. Kolla din köphistorik innan du försöker igen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store bu bahşişi doğrulayamadı. Yeniden denemeden önce satın alma geçmişini kontrol et."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store не зміг підтвердити цей донат. Перевір історію покупок, перш ніж пробувати знову."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store 无法确认这笔打赏。请先查看购买记录，再重新尝试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store 無法確認這筆贊助。請先查看購買記錄，再重新嘗試。"
+          }
+        }
+      }
+    },
     "The app is designed, built and maintained by one developer. If it helps you, a tip is appreciated. Every feature stays available either way." : {
       "comment" : "Donations (D01-D04): why",
       "extractionState" : "manual",
@@ -121097,140 +121235,140 @@
         }
       }
     },
-    "The moments stay. This can't be undone." : {
+    "The moments stay. Imported photos and videos keep any location saved in their files. This can't be undone." : {
       "comment" : "Privacy settings (S05): confirmation message before removing every place",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تبقى اللحظات. لا يمكن التراجع عن هذا الإجراء."
+            "value" : "تبقى اللحظات. تحتفظ الصور ومقاطع الفيديو المستوردة بأي موقع محفوظ في ملفاتها. لا يمكن التراجع عن هذا الإجراء."
           }
         },
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Моманты застануцца. Гэта немагчыма адмяніць."
+            "value" : "Моманты застануцца. Імпартаваныя фота і відэа захоўваюць месцазнаходжанне, запісанае ў іх файлах. Гэта немагчыма адмяніць."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Momente bleiben. Das lässt sich nicht rückgängig machen."
+            "value" : "Die Momente bleiben. Importierte Fotos und Videos behalten einen in ihren Dateien gespeicherten Standort. Das lässt sich nicht rückgängig machen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The moments stay. This can't be undone."
+            "value" : "The moments stay. Imported photos and videos keep any location saved in their files. This can't be undone."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los momentos se conservan. Esto no se puede deshacer."
+            "value" : "Los momentos se conservan. Las fotos y los vídeos importados conservan la ubicación guardada en sus archivos. Esto no se puede deshacer."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les moments restent. Cette action est irréversible."
+            "value" : "Les moments restent. Les photos et vidéos importées gardent la position enregistrée dans leurs fichiers. Cette action est irréversible."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "הרגעים נשארים. אי אפשר לבטל את הפעולה."
+            "value" : "הרגעים נשארים. תמונות וסרטונים שיובאו שומרים כל מיקום שמור בקבצים שלהם. אי אפשר לבטל את הפעולה."
           }
         },
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Պահերը մնում են։ Սա հետարկել չի լինի։"
+            "value" : "Պահերը մնում են։ Ներմուծված լուսանկարներն ու տեսանյութերը պահպանում են իրենց ֆայլերում պահված տեղադրությունը։ Սա հետարկել չի լինի։"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I momenti restano. L'operazione non si può annullare."
+            "value" : "I momenti restano. Le foto e i video importati mantengono la posizione salvata nei loro file. L'operazione non si può annullare."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "モーメントは残ります。この操作は取り消せません。"
+            "value" : "モーメントは残ります。読み込んだ写真やビデオのファイルに保存されている位置情報は残ります。この操作は取り消せません。"
           }
         },
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "მომენტები დარჩება. ამის გაუქმება შეუძლებელია."
+            "value" : "მომენტები დარჩება. იმპორტირებული ფოტოები და ვიდეოები ინარჩუნებს მათ ფაილებში შენახულ მდებარეობას. ამის გაუქმება შეუძლებელია."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сәттер қалады. Мұны кері қайтару мүмкін емес."
+            "value" : "Сәттер қалады. Импортталған фотолар мен видеолар өз файлдарында сақталған орналасқан жерді сақтайды. Мұны кері қайтару мүмкін емес."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "순간은 그대로 남아요. 이 작업은 되돌릴 수 없어요."
+            "value" : "순간은 그대로 남아요. 가져온 사진과 비디오의 파일에 저장된 위치는 그대로 남아요. 이 작업은 되돌릴 수 없어요."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "De momenten blijven. Dit kan niet ongedaan worden gemaakt."
+            "value" : "De momenten blijven. Geïmporteerde foto’s en video’s houden de locatie die in hun bestanden is opgeslagen. Dit kan niet ongedaan worden gemaakt."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chwile zostają. Tej czynności nie można cofnąć."
+            "value" : "Chwile zostają. Zaimportowane zdjęcia i filmy zachowują lokalizację zapisaną w swoich plikach. Tej czynności nie można cofnąć."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Os momentos continuam. Não é possível desfazer."
+            "value" : "Os momentos continuam. Fotos e vídeos importados mantêm a localização salva nos próprios arquivos. Não é possível desfazer."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Моменты останутся. Это действие нельзя отменить."
+            "value" : "Моменты останутся. Импортированные фото и видео сохраняют геопозицию, записанную в их файлах. Это действие нельзя отменить."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ögonblicken finns kvar. Det här kan inte ångras."
+            "value" : "Ögonblicken finns kvar. Importerade bilder och videor behåller platsen som sparats i deras filer. Det här kan inte ångras."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anlar kalır. Bu işlem geri alınamaz."
+            "value" : "Anlar kalır. İçe aktarılan fotoğraf ve videolar, dosyalarında kayıtlı konumu korur. Bu işlem geri alınamaz."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Моменти лишаться. Це не можна скасувати."
+            "value" : "Моменти лишаться. Імпортовані фото й відео зберігають геолокацію, записану в їхніх файлах. Це не можна скасувати."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "瞬间会保留。此操作无法撤销。"
+            "value" : "瞬间会保留。导入的照片和视频仍会保留文件中存储的位置。此操作无法撤销。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "瞬間會保留。此操作無法復原。"
+            "value" : "瞬間會保留。匯入的照片和影片仍會保留檔案中儲存的位置。此操作無法復原。"
           }
         }
       }

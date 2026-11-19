@@ -240,12 +240,12 @@ struct MomentExporter {
         }.joined(separator: "\r\n") + "\r\n"
     }
 
-    /// A lossless copy without its GPS, or with the moment's place written in.
+    /// A lossless copy without its GPS, or with the moment's place written in. A format Image I/O can't write fails
+    /// the export rather than leave with the original's GPS.
     nonisolated static func copyPhoto(_ url: URL, to target: URL, place: (latitude: Double, longitude: Double)?) throws {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil), let type = CGImageSourceGetType(source),
               let destination = CGImageDestinationCreateWithURL(target as CFURL, type, 1, nil) else {
-            try FileManager.default.copyItem(at: url, to: target)
-            return
+            throw CocoaError(.fileWriteUnknown)
         }
         var options: [CFString: Any] = [kCGImageMetadataShouldExcludeGPS: true]
         if let place {

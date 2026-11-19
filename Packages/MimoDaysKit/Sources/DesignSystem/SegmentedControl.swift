@@ -12,6 +12,7 @@ public struct SegmentedControl<Value: Hashable>: View {
     let labelSize: CGFloat
     let label: (Value) -> Text
     @Namespace private var pill
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init(
         selection: Binding<Value>, options: [Value], fitsLabels: Bool = false, labelSize: CGFloat = 14, label: @escaping (Value) -> Text
@@ -29,7 +30,7 @@ public struct SegmentedControl<Value: Hashable>: View {
             ForEach(options, id: \.self) { option in
                 let isSelected = option == selection
                 Button {
-                    withAnimation(.snappy) { selection = option }
+                    withAnimation(reduceMotion ? nil : .snappy) { selection = option }
                 } label: {
                     label(option)
                         .textStyle(TextStyle(.nunito, size: labelSize, weight: isSelected ? 700 : 600, relativeTo: .subheadline, maximumScale: 1.35))

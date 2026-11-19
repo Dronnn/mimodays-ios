@@ -1,6 +1,5 @@
 import DesignSystem
 import MessageUI
-import StoreKit
 import SwiftUI
 import UIKit
 
@@ -8,6 +7,8 @@ enum AppLinks {
     /// S07 "Send feedback": the same address as the site's Support page and the App Store listing.
     static let feedbackAddress = "mimodays@mrmaier.com"
     static let feedback = URL(string: "mailto:\(feedbackAddress)")
+    /// S07 "Rate MimoDays": the App Store's review page (the system's rating prompt may not show when asked).
+    static let review = URL(string: "https://apps.apple.com/app/id6831612247?action=write-review")
 }
 
 /// S07 "How it works": one short page each.
@@ -60,7 +61,6 @@ enum HelpArticle: String, CaseIterable, Hashable {
 struct HelpView: View {
     var version = HelpView.appVersion
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.requestReview) private var requestReview
     @Environment(\.openURL) private var openURL
     @Environment(\.replayOnboarding) private var replayOnboarding
     @State private var composesMail = false
@@ -123,7 +123,7 @@ struct HelpView: View {
                             .accessibilityIdentifier("help.feedback")
                             DataSeparator(leading: 64)
                         }
-                        Button { requestReview() } label: {
+                        Button { if let review = AppLinks.review { openURL(review) } } label: {
                             DataIconRow(icon: .glyphStar, title: Text("Rate MimoDays", bundle: .module))
                         }
                         .accessibilityIdentifier("help.rate")

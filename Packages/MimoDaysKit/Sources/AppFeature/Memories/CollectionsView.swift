@@ -90,7 +90,9 @@ struct CollectionsView: View {
                 Spacer(minLength: 8)
                 HStack(spacing: 6) {
                     Text(model.deletedCount, format: .number).textStyle(.sheetBody).foregroundStyle(ColorToken.textSecondary.color)
-                    Icon.glyphChevron.image.resizable().frame(width: 20, height: 20).accessibilityHidden(true)
+                    Icon.glyphChevron.image.resizable().frame(width: 20, height: 20)
+                        .flipsForRightToLeftLayoutDirection(true)
+                        .accessibilityHidden(true)
                 }
             }
             .foregroundStyle(ColorToken.textPrimary.color)

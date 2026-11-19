@@ -18,6 +18,8 @@ public struct MomentHero: View {
     let place: Text?
     let tag: Text?
     @Environment(\.colorSchemeContrast) private var contrast
+    /// The app's reading direction: the picture is laid out left to right, the caption's words read as they do.
+    @Environment(\.layoutDirection) private var readingDirection
 
     public init(photo: HeroMedia, selfie: HeroMedia?, caption: Text, place: Text? = nil, tag: Text? = nil) {
         self.photo = photo
@@ -53,6 +55,7 @@ public struct MomentHero: View {
                     }
                     .clipShape(HeroBlob())
                 captionBlock
+                    .environment(\.layoutDirection, readingDirection)
                     .foregroundStyle(.white)
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     .padding(.leading, 22 * scale)

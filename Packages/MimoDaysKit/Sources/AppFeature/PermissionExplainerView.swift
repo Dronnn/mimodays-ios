@@ -86,7 +86,7 @@ enum PermissionScreen: CaseIterable {
             )
         case .location:
             LocalizedStringResource(
-                "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. It stays on your device.",
+                "MimoDays uses your location only while it is open: to add a place to a moment and to show where you are on the map. Places are kept on your device; to name them, MimoDays asks Apple's map service.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
         case .notifications:

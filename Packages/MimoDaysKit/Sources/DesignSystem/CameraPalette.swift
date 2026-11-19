@@ -5,6 +5,8 @@ public enum CameraPalette {
     public static let background = Color(hex: 0x2A1B21)
     /// Round control backgrounds over the preview: background at 42 %.
     public static let controlScrim = Color(hex: 0x2A1B21).opacity(0.42)
+    /// Increase Contrast: nearly opaque, so a bright scene doesn't wash out the icons.
+    public static let controlScrimIncreased = Color(hex: 0x2A1B21).opacity(0.85)
     public static let cream = Color(hex: 0xFBF6EF)
     public static let coral = Color(hex: 0xF06E45)
     public static let recording = Color(hex: 0xBA4923)

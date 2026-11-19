@@ -78,7 +78,11 @@ public struct SnapshotVariant: Sendable {
 
     var name: String {
         let styleName = style == .dark ? "dark" : "light"
-        let sizeName = contentSize == .large ? "default" : "AX3"
+        let sizeName = switch contentSize {
+        case .large: "default"
+        case .accessibilityExtraExtraExtraLarge: "AX5"
+        default: "AX3"
+        }
         if let language { return "\(device.rawValue)-\(styleName)-\(sizeName)-\(language)" }
         return "\(device.rawValue)-\(styleName)-\(sizeName)" + (isRightToLeft ? "-rtl" : "") + (isHighContrast ? "-hc" : "")
     }

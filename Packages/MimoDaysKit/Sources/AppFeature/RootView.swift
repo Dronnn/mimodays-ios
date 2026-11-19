@@ -112,8 +112,12 @@ public struct RootView: View {
             notificationTaps.listen(openSurprise)
             if let launchRoute { router.open(launchRoute) }
             // iOS closed the app mid-review: back to it, as it was.
-            if onboarding == nil, let draft = camera.drafts.load() {
-                router.open(.capture(promptID: draft.promptID))
+            if let draft = camera.drafts.load() {
+                if let onboarding {
+                    if onboarding.step == .firstCapture { onboarding.startFirstCapture() }
+                } else {
+                    router.open(.capture(promptID: draft.promptID))
+                }
             }
         }
         // mimodays://today (and the other tabs), …/settings, …/capture?prompt=<uuid>; a prompt is checked as a

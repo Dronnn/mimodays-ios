@@ -14,6 +14,7 @@ struct TodayView: View {
     @State private var width: CGFloat = 0
     @State private var height: CGFloat = 0
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.layoutDirection) private var readingDirection
     @Environment(\.typefaces) private var typefaces
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
@@ -187,6 +188,8 @@ struct TodayView: View {
         let ring = !typeSize.isAccessibilitySize
         VStack(spacing: 0) {
             hero
+                // The marks sit where the picture has them; the hero reads its caption in the app's direction.
+                .environment(\.layoutDirection, readingDirection)
                 .overlay(alignment: .topTrailing) {
                     mark(.markTicksA, 26.7, 22.5, ColorToken.accentApricot).offset(x: -6, y: -23)
                 }

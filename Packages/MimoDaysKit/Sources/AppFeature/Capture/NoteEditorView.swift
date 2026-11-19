@@ -9,6 +9,7 @@ struct NoteEditorView: View {
     @State private var text: String
     @FocusState private var isFocused: Bool
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
 
     init(model: ReviewModel) {
         self.model = model
@@ -40,7 +41,7 @@ struct NoteEditorView: View {
                 .onChange(of: text) { _, new in
                     if new.count > ReviewModel.noteLimit { text = String(new.prefix(ReviewModel.noteLimit)) }
                 }
-            Text(verbatim: "\(text.count) / \(ReviewModel.noteLimit)")
+            Text(verbatim: "\(text.count.formatted(.number.locale(locale))) / \(ReviewModel.noteLimit.formatted(.number.locale(locale)))")
                 .textStyle(.noteCount)
                 .monospacedDigit()
                 .foregroundStyle(ColorToken.textTertiary.color)

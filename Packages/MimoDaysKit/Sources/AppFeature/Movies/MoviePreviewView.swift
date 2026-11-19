@@ -125,7 +125,11 @@ struct MovieWatchView<Actions: View>: View {
                         .onEnded { _ in scrubbing = false }
                 )
             }
-            .frame(height: 16)
+            // Touched across 44 pt; laid out in 16. Left to right in every language, so the fill, the knob and a
+            // touch agree.
+            .frame(height: 44)
+            .padding(.vertical, -14)
+            .environment(\.layoutDirection, .leftToRight)
             .accessibilityElement()
             .accessibilityLabel(Text("Position", bundle: .module))
             .accessibilityValue(Text(MovieEditorView.clock(time)))

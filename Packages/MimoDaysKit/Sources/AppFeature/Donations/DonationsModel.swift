@@ -19,6 +19,8 @@ final class DonationsModel {
         case failed
         /// Ask to Buy: it goes through once approved.
         case pending
+        /// The App Store answered, but the purchase couldn't be verified: it may have been charged.
+        case unconfirmed
     }
 
     private(set) var phase = Phase.loading
@@ -55,6 +57,13 @@ final class DonationsModel {
         phase = prices.isEmpty ? .unavailable : .ready
     }
 
+    /// A tip that was waiting for approval went through.
+    func finishedLater() {
+        guard notice == .pending else { return }
+        notice = nil
+        showsThankYou = true
+    }
+
     func buy(_ tier: TipTier) async {
         guard phase == .ready, purchasing == nil else { return }
         purchasing = tier
@@ -66,6 +75,8 @@ final class DonationsModel {
             case .pending: notice = .pending
             case .cancelled: break
             }
+        } catch StoreKitTipStore.Failure.unverified {
+            notice = .unconfirmed
         } catch {
             notice = .failed
         }

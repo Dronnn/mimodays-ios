@@ -295,12 +295,38 @@ struct MovieEditorView: View {
                     )
                     .accessibilityElement()
                     .accessibilityLabel(Text("Selfie window", bundle: .module))
+                    // VoiceOver: a corner from the actions, the size by swiping up or down.
+                    .accessibilityActions {
+                        ForEach(CameraSettings.SelfieWindow.Corner.allCases, id: \.self) { corner in
+                            Button { moveWindow(rect, to: corner, picture: picture, canvas: canvas) } label: { Text(corner.title) }
+                        }
+                    }
+                    .accessibilityAdjustableAction { direction in
+                        let factor: CGFloat = direction == .increment ? 1.2 : 1 / 1.2
+                        let width = min(max(rect.width * factor, canvas.width * 0.15), canvas.width * 0.5)
+                        let height = width * rect.height / rect.width
+                        movingWindow = CGRect(x: rect.midX - width / 2, y: rect.midY - height / 2, width: width, height: height)
+                        placeWindow(picture: picture, canvas: canvas)
+                    }
                     .accessibilityIdentifier("editor.window")
             }
         }
     }
 
     /// The moved window kept as a share of the picture, the way the movie reads it.
+    /// VoiceOver's corner actions: the window into that corner of the picture, a little in from its edges.
+    private func moveWindow(_ rect: CGRect, to corner: CameraSettings.SelfieWindow.Corner, picture: CGRect, canvas: CGSize) {
+        let inset = min(picture.width, picture.height) * 0.04
+        let left = corner == .topLeft || corner == .bottomLeft
+        let top = corner == .topLeft || corner == .topRight
+        movingWindow = CGRect(
+            x: left ? picture.minX + inset : picture.maxX - inset - rect.width,
+            y: top ? picture.minY + inset : picture.maxY - inset - rect.height,
+            width: rect.width, height: rect.height
+        )
+        placeWindow(picture: picture, canvas: canvas)
+    }
+
     private func placeWindow(picture: CGRect, canvas: CGSize) {
         guard let rect = movingWindow, let window = model.selectedPlan?.window, picture.width > 0, picture.height > 0 else { return }
         var frame = window

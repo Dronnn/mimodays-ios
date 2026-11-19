@@ -6,6 +6,8 @@ import SwiftUI
 /// transition), each clip's own sound, the voice comments and the music, scrolled together under one playhead.
 /// Items are as wide as they play long. Tap to choose, long-press and drag to move, tap a dot to change it.
 struct MovieTimeline: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.locale) private var locale
     let model: MovieEditorModel
     /// A transition dot: the item it leads into.
     let transition: (Int) -> Void
@@ -40,7 +42,7 @@ struct MovieTimeline: View {
                 }
                 .scrollIndicators(.hidden)
                 .onChange(of: model.selected) { _, index in
-                    withAnimation(.snappy) { reader.scrollTo(index, anchor: .center) }
+                    withAnimation(reduceMotion ? nil : .snappy) { reader.scrollTo(index, anchor: .center) }
                 }
             }
         }
@@ -257,7 +259,7 @@ struct MovieTimeline: View {
                     .fill(ColorToken.accentSage.color.opacity(0.55))
                     .overlay { MusicEnvelope().stroke(Color(hex: 0x4F6B4A), lineWidth: 1.5) }
                     .overlay(alignment: .leading) {
-                        Text(verbatim: "\(music.name ?? String(appLocalized: "Music", bundle: .module)) · \(Int((music.gain * 100).rounded()))%")
+                        Text(verbatim: "\(music.name ?? String(appLocalized: "Music", bundle: .module)) · \(music.gain.formatted(.percent.precision(.fractionLength(0)).locale(locale)))")
                             .textStyle(TextStyle(.nunito, size: 11, weight: 700, relativeTo: .caption2, maximumScale: 1))
                             .foregroundStyle(Color(hex: 0x3B4E37))
                             .lineLimit(1)

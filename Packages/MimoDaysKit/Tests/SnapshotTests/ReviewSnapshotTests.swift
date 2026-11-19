@@ -133,6 +133,21 @@ struct ReviewSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
+    /// The largest text on the smaller iPhone, with everything filled in: the panel outgrows the screen and scrolls,
+    /// Save at its end.
+    @Test func everythingAtTheLargestText() async throws {
+        let model = try await review()
+        defer { model.discard() }
+        await model.locate()
+        model.note = "Lena finally rode without training wheels"
+        model.caption = "Lena finally rode without training wheels"
+        let url = FileManager.default.temporaryDirectory.appending(path: "snapshot-voice-\(UUID().uuidString).m4a")
+        try SimulatedVoiceRecorder.writeTone(to: url, seconds: 12)
+        model.addVoice(at: url, recordedAt: time.instant)
+        model.voice?.transcript = "She did it, she actually did it, look at her go, all the way to the corner"
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhoneCompact, .light, .accessibilityExtraExtraExtraLarge)])
+    }
+
     /// 7.6: a capture answering a surprise says so by its time (Penpot §H20).
     @Test func photoFromASurprise() async throws {
         let engine = SimulatedCaptureEngine()

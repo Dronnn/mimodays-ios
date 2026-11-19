@@ -54,6 +54,9 @@ final class StoreKitTipStore: TipStore {
         }
     }
 
+    /// Posted on the main actor when a tip arrives through `listenForTransactions`.
+    static let finishedLater = Notification.Name("MimoDaysTipFinishedLater")
+
     /// Tips approved later (Ask to Buy) or bought on another device arrive here; each is finished once verified.
     /// Runs for the app's lifetime.
     static func listenForTransactions() -> Task<Void, Never> {
@@ -64,6 +67,7 @@ final class StoreKitTipStore: TipStore {
                     continue
                 }
                 await transaction.finish()
+                await MainActor.run { NotificationCenter.default.post(name: finishedLater, object: nil) }
             }
         }
     }

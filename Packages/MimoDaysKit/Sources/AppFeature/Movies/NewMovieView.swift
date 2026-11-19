@@ -586,7 +586,7 @@ struct MonthDays: View {
                     let key = month * 100 + day
                     let isChosen = chosen.contains(key)
                     Button { choose(key) } label: {
-                        Text(verbatim: "\(day)")
+                        Text(day, format: .number)
                             .textStyle(isChosen ? .calendarChosenDay : .calendarDay16)
                             .foregroundStyle((isChosen ? ColorToken.textOnCoral : .textPrimary).color)
                             .frame(width: 38, height: 38)

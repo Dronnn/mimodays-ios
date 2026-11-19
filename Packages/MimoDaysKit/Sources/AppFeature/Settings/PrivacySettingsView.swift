@@ -136,7 +136,7 @@ struct PrivacySettingsView: View {
         ) {
             Button(role: .destructive, action: removePlaces) { Text("Remove places", bundle: .module) }
         } message: {
-            Text("The moments stay. This can't be undone.", bundle: .module)
+            Text("The moments stay. Imported photos and videos keep any location saved in their files. This can't be undone.", bundle: .module)
         }
     }
 

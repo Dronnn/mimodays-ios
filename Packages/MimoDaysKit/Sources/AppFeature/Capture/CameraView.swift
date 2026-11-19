@@ -316,6 +316,7 @@ private struct RoundButton: View {
     /// Says more than on or off (the flash's Auto).
     var value: Text?
     let action: () -> Void
+    @Environment(\.colorSchemeContrast) private var contrast
 
     var body: some View {
         Button(action: action) {
@@ -323,7 +324,7 @@ private struct RoundButton: View {
                 .frame(width: 24, height: 24)
                 .foregroundStyle(CameraPalette.cream)
                 .frame(width: 40, height: 40)
-                .background(CameraPalette.controlScrim, in: Circle())
+                .background(contrast == .increased ? CameraPalette.controlScrimIncreased : CameraPalette.controlScrim, in: Circle())
                 .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
                 .contentShape(Rectangle())
         }
@@ -563,11 +564,14 @@ private struct CameraNote: View {
     let icon: Icon
     let text: Text
     let id: String
+    /// Said by VoiceOver as the note comes up: a shutter tap that came to nothing.
+    var announcement: String?
 
-    init(icon: Icon, text: Text, id: String) {
+    init(icon: Icon, text: Text, id: String, announcement: String? = nil) {
         self.icon = icon
         self.text = text
         self.id = id
+        self.announcement = announcement
     }
 
     init(_ notice: CameraNotice) {
@@ -575,7 +579,10 @@ private struct CameraNote: View {
         case .microphoneOff:
             self.init(icon: .glyphMute, text: Text("Videos will be silent. Turn on the microphone in iOS Settings to add sound.", bundle: .module), id: "camera.notice")
         case .lowStorage:
-            self.init(icon: .glyphInfo, text: Text("Not enough space to record. Free up some space on this iPhone and try again.", bundle: .module), id: "camera.notice")
+            self.init(
+                icon: .glyphInfo, text: Text("Not enough space to record. Free up some space on this iPhone and try again.", bundle: .module), id: "camera.notice",
+                announcement: String(appLocalized: "Not enough space to record. Free up some space on this iPhone and try again.", bundle: .module)
+            )
         case .interrupted(.anotherApp):
             self.init(icon: .glyphInfo, text: Text("The camera is busy with a call or another app. It comes back on its own.", bundle: .module), id: "camera.notice")
         case .interrupted(.tooWarm):
@@ -585,7 +592,10 @@ private struct CameraNote: View {
         case .unavailable:
             self.init(icon: .glyphInfo, text: Text("The camera isn't available right now. Close and try again in a moment.", bundle: .module), id: "camera.notice")
         case .captureFailed:
-            self.init(icon: .glyphInfo, text: Text("That one didn't come out. Try again.", bundle: .module), id: "camera.notice")
+            self.init(
+                icon: .glyphInfo, text: Text("That one didn't come out. Try again.", bundle: .module), id: "camera.notice",
+                announcement: String(appLocalized: "That one didn't come out. Try again.", bundle: .module)
+            )
         }
     }
 
@@ -606,6 +616,9 @@ private struct CameraNote: View {
         .background(CameraPalette.background.opacity(0.88), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier(id)
+        .onAppear {
+            if let announcement { AccessibilityNotification.Announcement(announcement).post() }
+        }
     }
 }
 

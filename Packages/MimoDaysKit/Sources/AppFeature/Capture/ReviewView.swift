@@ -358,15 +358,19 @@ private struct MediaThenPanel: Layout {
     /// Above and below the card: Retake, Swap cameras.
     let chrome: CGFloat
 
-    func sizeThatFits(proposal: ProposedViewSize, subviews _: Subviews, cache _: inout ()) -> CGSize {
-        proposal.replacingUnspecifiedDimensions()
+    /// The screen's height, or more when the panel and the least of the media don't fit in it (the largest text).
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache _: inout ()) -> CGSize {
+        let size = proposal.replacingUnspecifiedDimensions()
+        guard subviews.count == 2 else { return size }
+        let panel = subviews[1].sizeThatFits(ProposedViewSize(width: size.width, height: nil)).height
+        return CGSize(width: size.width, height: max(size.height, topInset + chrome + panel))
     }
 
     func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
         guard subviews.count == 2 else { return }
         let panel = subviews[1].sizeThatFits(ProposedViewSize(width: bounds.width, height: nil)).height
         let card = MemoryCardGeometry.slotWidth(screen: bounds.width) / aspectRatio
-        let media = max(topInset, min(topInset + chrome + card, bounds.height - panel))
+        let media = max(topInset + chrome, min(topInset + chrome + card, bounds.height - panel))
         subviews[0].place(at: bounds.origin, proposal: ProposedViewSize(width: bounds.width, height: media))
         subviews[1].place(at: CGPoint(x: bounds.minX, y: bounds.minY + media), proposal: ProposedViewSize(width: bounds.width, height: panel))
     }
@@ -385,7 +389,7 @@ private struct KeyboardScroll<Content: View>: View {
         GeometryReader { proxy in
             ScrollViewReader { reader in
                 ScrollView {
-                    content.frame(height: proxy.size.height)
+                    content.frame(width: proxy.size.width).frame(minHeight: proxy.size.height)
                 }
                 .contentMargins(.bottom, keyboardHeight, for: .scrollContent)
                 .scrollBounceBehavior(.basedOnSize)

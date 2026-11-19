@@ -28,7 +28,7 @@ struct OnboardingView: View {
                 FirstCaptureView(capture: flow.startFirstCapture) { finish(on: .today) }
             case .firstMomentSaved:
                 if let moment = flow.firstMoment {
-                    FirstMomentView(moment: moment, surprisesOn: flow.remindersEnabled) { finish(on: .memories) } done: { finish(on: .today) }
+                    FirstMomentView(moment: moment, surprisesOn: flow.remindersEnabled && flow.remindersAllowed) { finish(on: .memories) } done: { finish(on: .today) }
                 }
             }
         }

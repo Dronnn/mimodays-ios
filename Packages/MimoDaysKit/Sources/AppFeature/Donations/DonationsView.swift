@@ -68,6 +68,10 @@ struct DonationsView: View {
             }
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .onReceive(NotificationCenter.default.publisher(for: StoreKitTipStore.finishedLater)) { _ in model.finishedLater() }
+        .onChange(of: model.notice) { _, notice in
+            if let notice { AccessibilityNotification.Announcement(noticeString(notice)).post() }
+        }
         .sheet(isPresented: $model.showsThankYou) {
             ThankYouSheet()
         }
@@ -98,19 +102,38 @@ struct DonationsView: View {
                 .foregroundStyle(ColorToken.textPrimary.color)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+            // Back online: the prices load again here.
+            Button { Task { await model.load() } } label: {
+                Text("Try again", bundle: .module)
+                    .textStyle(.control)
+                    .foregroundStyle(ColorToken.textLink.color)
+                    .frame(minHeight: Size.minimumTapTarget)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("donations.retry")
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 22)
         .frame(maxWidth: .infinity, minHeight: 118)
         .background { InfoCardBlob().fill(ColorToken.surfaceCard.color) }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("donations.unavailable")
     }
 
     private func noticeText(_ notice: DonationsModel.Notice) -> Text {
+        Text(noticeString(notice))
+    }
+
+    /// Shown under the tips and said by VoiceOver when it changes.
+    private func noticeString(_ notice: DonationsModel.Notice) -> String {
         switch notice {
-        case .failed: Text("The tip didn't go through. Please try again.", bundle: .module)
-        case .pending: Text("Waiting for approval. The tip goes through once it's approved.", bundle: .module)
+        case .failed: String(appLocalized: "The tip didn't go through. Please try again.", bundle: .module)
+        case .pending: String(appLocalized: "Waiting for approval. The tip goes through once it's approved.", bundle: .module)
+        case .unconfirmed: String(
+            appLocalized: "The App Store couldn't confirm this tip. Check your purchase history before trying again.", bundle: .module,
+            comment: "Donations (D02): a tip the App Store may have charged but MimoDays couldn't verify; Purchase History is in the person's Apple Account settings"
+        )
         }
     }
 }

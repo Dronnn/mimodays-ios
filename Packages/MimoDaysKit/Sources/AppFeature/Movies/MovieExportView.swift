@@ -56,7 +56,8 @@ struct MovieExportView: View {
         .task { if let id = coverID { await tiles.load(id) } }
     }
 
-    private var coverID: UUID? { model.plan.clips.first?.momentID }
+    /// The first moment, as on Movies and the movie's page: a text card that opens the movie has no picture.
+    private var coverID: UUID? { MovieStore.liveClips(of: model.project).first?.moment?.id }
     private var cover: UIImage? { coverID.flatMap { tiles.images[$0] } }
 }
 

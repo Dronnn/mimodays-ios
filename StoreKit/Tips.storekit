@@ -1,0 +1,117 @@
+{
+  "appPolicies": {
+    "eula": "",
+    "policies": [
+      {
+        "locale": "en_US",
+        "policyText": "",
+        "policyURL": ""
+      }
+    ]
+  },
+  "identifier": "5E0B7C1A-0D0E-4D5B-9E52-6B1F0A3C7D21",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "6700000000",
+      "localizations": [
+        {
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
+          "displayName": "Small tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.mrmaier.MimoDays.tip.small",
+      "referenceName": "Small tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "6700000001",
+      "localizations": [
+        {
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
+          "displayName": "Medium tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.mrmaier.MimoDays.tip.medium",
+      "referenceName": "Medium tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "7.99",
+      "familyShareable": false,
+      "internalID": "6700000002",
+      "localizations": [
+        {
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
+          "displayName": "Large tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.mrmaier.MimoDays.tip.large",
+      "referenceName": "Large tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "19.99",
+      "familyShareable": false,
+      "internalID": "6700000003",
+      "localizations": [
+        {
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
+          "displayName": "Generous tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.mrmaier.MimoDays.tip.generous",
+      "referenceName": "Generous tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "49.99",
+      "familyShareable": false,
+      "internalID": "6700000004",
+      "localizations": [
+        {
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
+          "displayName": "Patron tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.mrmaier.MimoDays.tip.patron",
+      "referenceName": "Patron tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "99.99",
+      "familyShareable": false,
+      "internalID": "6700000005",
+      "localizations": [
+        {
+          "description": "Keeps MimoDays independent. It unlocks nothing.",
+          "displayName": "Extraordinary tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.mrmaier.MimoDays.tip.extraordinary",
+      "referenceName": "Extraordinary tip",
+      "type": "Consumable"
+    }
+  ],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}

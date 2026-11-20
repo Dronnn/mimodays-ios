@@ -64,12 +64,14 @@ final class SurpriseCoordinator {
             guard let schedule = self.fetchSchedule() else { return }
             let calendar = self.calendar(for: schedule)
             let today = calendar.startOfDay(for: self.clock.now())
+            // One pause at a time: a week chosen after "until I resume them" ends in a week.
             switch length {
             case .today: schedule.pausedUntil = calendar.date(byAdding: .day, value: 1, to: today)
             case .week: schedule.pausedUntil = calendar.date(byAdding: .day, value: 7, to: today)
-            case .indefinitely: schedule.isPausedIndefinitely = true
+            case .indefinitely: schedule.pausedUntil = nil
             }
-            await self.performRefresh(replan: false)
+            schedule.isPausedIndefinitely = length == .indefinitely
+            await self.performRefresh(replan: false, stopsAll: true)
         }
     }
 
@@ -82,6 +84,85 @@ final class SurpriseCoordinator {
         }
     }
 
+    /// Today's "Turn on" (T07): surprises back on with the saved settings, or the defaults when there are none.
+    func turnOn() async {
+        await serially {
+            let schedule = self.fetchSchedule() ?? {
+                let schedule = SurpriseSchedule()
+                self.context.insert(schedule)
+                return schedule
+            }()
+            schedule.isEnabled = true
+            schedule.pausedUntil = nil
+            schedule.isPausedIndefinitely = false
+            await self.performRefresh(replan: true)
+        }
+    }
+
+    // MARK: Send one now
+
+    /// How far ahead "Send a surprise now" plans its surprise: time to leave the app and see it arrive.
+    static let sendNowDelay: TimeInterval = 10
+
+    /// "Send a surprise now" (S02): one surprise in a few seconds, whatever the hours and days, so a person (and App
+    /// Review) can see how surprises work. It is a prompt like any other: its notification opens the camera, and
+    /// what's caught in time is a Surprise. False when notifications aren't allowed.
+    func sendNow() async -> Bool {
+        var sent = false
+        await serially {
+            guard await self.permissions.status(of: .notifications).isUsable else { return }
+            let now = self.clock.now()
+            // A second tap while the first is still on its way sends no second one; on its way means iOS has it.
+            let soon = now.addingTimeInterval(Self.sendNowDelay)
+            let scheduled = Set(await self.notifications.pending().map(\.id))
+            let dueSoon = self.fetchUpcomingPending(now: now).filter { $0.plannedAt <= soon }
+            if dueSoon.contains(where: { scheduled.contains($0.notificationRequestID) }) {
+                sent = true
+                return
+            }
+            // One not yet due that iOS doesn't have won't come: it doesn't go out next to this one either. One due by
+            // now may just have been shown (iOS fires on the whole second, so a second's margin).
+            let checked = self.clock.now().addingTimeInterval(1)
+            for prompt in dueSoon where prompt.plannedAt > checked { prompt.outcome = .cancelled }
+            let id = UUID()
+            let time = soon
+            let minutes = self.fetchSchedule()?.expiryMinutes ?? SurpriseSchedule().expiryMinutes
+            self.context.insert(SurprisePrompt(
+                id: id, plannedAt: time, expiresAt: time.addingTimeInterval(TimeInterval(minutes * 60)),
+                notificationRequestID: id.uuidString
+            ))
+            self.save()
+            await self.syncNotifications(now: now)
+            // iOS turned it down: nothing is on its way, so Settings doesn't say so and Today doesn't wait for it.
+            guard await self.notifications.pending().contains(where: { $0.id == id.uuidString }) else {
+                self.fetchPrompt(id)?.outcome = .cancelled
+                self.save()
+                return
+            }
+            sent = true
+        }
+        return sent
+    }
+
+    // MARK: Today
+
+    /// What Today's ribbon says (T02-T07), and when that may change on its own (a prompt fires or expires,
+    /// a pause ends). `latestCapture` is the newest moment: after it, a missed surprise is no longer news.
+    func todayStatus(latestCapture: Date?) async -> (status: SurpriseStatus, changesAt: Date?) {
+        let notifications = await permissions.status(of: .notifications)
+        let now = clock.now()
+        let schedule = fetchSchedule()
+        let calendar = calendar(for: schedule)
+        let prompts = fetchRecentPrompts(now: now, calendar: calendar)
+        let status = SurpriseStatus(
+            schedule: schedule, prompts: prompts, notificationsAllowed: notifications.isUsable,
+            latestCapture: latestCapture, now: now, calendar: calendar
+        )
+        let pending = prompts.filter { $0.outcome == .pending }
+        let changes = pending.map(\.expiresAt) + pending.map(\.plannedAt) + [schedule?.pausedUntil].compactMap(\.self)
+        return (status, changes.filter { $0 > now }.min())
+    }
+
     // MARK: Prompt lifecycle
 
     /// A notification tap (or Today) opening a prompt. True while it can still be answered as a surprise:
@@ -90,6 +171,8 @@ final class SurpriseCoordinator {
     func open(promptID: UUID) -> Bool {
         guard let prompt = fetchPrompt(promptID), prompt.outcome == .pending else { return false }
         let now = clock.now()
+        // Not before it has come either: a link naming a later surprise opens a plain capture.
+        guard prompt.plannedAt <= now else { return false }
         guard now < prompt.expiresAt else {
             prompt.outcome = .expired
             save()
@@ -100,11 +183,18 @@ final class SurpriseCoordinator {
         return true
     }
 
+    /// When the prompt stops being answerable: a shot taken at or after it is a plain capture (Help: "what you capture
+    /// in that time is marked Surprise"), even though the camera was opened in time.
+    func expiry(of promptID: UUID) -> Date? {
+        fetchPrompt(promptID)?.expiresAt
+    }
+
     /// Links a saved moment to the prompt it answered. Only a prompt that was opened in time counts,
     /// even when the moment is saved after the window closed; a manual capture never answers a prompt.
     func captured(promptID: UUID, momentID: UUID) {
         guard let prompt = fetchPrompt(promptID), prompt.openedAt != nil,
-              prompt.outcome == .pending || prompt.outcome == .expired else { return }
+              prompt.outcome == .pending || prompt.outcome == .expired,
+              let moment = fetchMoment(momentID), moment.capturedAt < prompt.expiresAt else { return }
         prompt.outcome = .captured
         prompt.capturedMomentID = momentID
         save()
@@ -122,7 +212,8 @@ final class SurpriseCoordinator {
         await task.value
     }
 
-    private func performRefresh(replan: Bool) async {
+    /// `stopsAll`: the person paused, so even a surprise due within the minute goes.
+    private func performRefresh(replan: Bool, stopsAll: Bool = false) async {
         let status = await permissions.status(of: .notifications)
         let now = clock.now()
         let schedule = fetchSchedule()
@@ -133,7 +224,11 @@ final class SurpriseCoordinator {
         for prompt in prompts where prompt.outcome == .pending && prompt.expiresAt <= now {
             prompt.outcome = .expired
         }
-        let upcoming = prompts.filter { $0.outcome == .pending && $0.plannedAt > now }
+        // A prompt due within the minute is left alone: iOS may be delivering it already, and "Send a surprise now"
+        // plans one seconds ahead, outside the hours and days.
+        // Not when the person paused or turned surprises off: then nothing more comes, however soon it was due.
+        let settled = stopsAll || schedule?.isEnabled != true ? now : now.addingTimeInterval(60)
+        let upcoming = prompts.filter { $0.outcome == .pending && $0.plannedAt > settled }
 
         if let schedule, schedule.isEnabled, !schedule.isPausedIndefinitely, status.isUsable {
             let rules = schedule.rules
@@ -171,7 +266,7 @@ final class SurpriseCoordinator {
         for prompt in wanted where fireDates[prompt.id] != prompt.fireDate {
             let notification = SurpriseNotification(
                 id: prompt.id, fireDate: prompt.fireDate,
-                title: String(localized: Self.title), body: String(localized: Self.bodies.randomElement(using: &generator)!)
+                title: String(appLocalized: Self.title), body: String(appLocalized: Self.bodies.randomElement(using: &generator)!)
             )
             do {
                 try await notifications.schedule(notification)
@@ -217,6 +312,12 @@ final class SurpriseCoordinator {
         ))
     }
 
+    private func fetchMoment(_ id: UUID) -> Moment? {
+        var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return fetch(descriptor).first
+    }
+
     private func fetchPrompt(_ id: UUID) -> SurprisePrompt? {
         var descriptor = FetchDescriptor<SurprisePrompt>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1
@@ -248,6 +349,50 @@ final class SurpriseCoordinator {
         } catch {
             logger.error("Saving surprises failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+}
+
+/// The surprise ribbon on Today. No countdowns and no pressure (doc 03 §H5).
+enum SurpriseStatus: Equatable {
+    /// T02: one is planned, or will be.
+    case onItsWay
+    /// T03: a prompt fired and can still be answered.
+    case ready(promptID: UUID)
+    /// T04: today's last prompt expired and nothing was caught since.
+    case passed
+    /// T05: until the start of `until`, or until resumed when nil.
+    case paused(until: Date?)
+    /// T07: notifications aren't allowed, or surprises were never turned on.
+    case off
+
+    init(
+        schedule: SurpriseSchedule?, prompts: [SurprisePrompt], notificationsAllowed: Bool, latestCapture: Date?,
+        now: Date, calendar: Calendar
+    ) {
+        if let ready = prompts.first(where: { $0.outcome == .pending && $0.plannedAt <= now && now < $0.expiresAt }) {
+            self = .ready(promptID: ready.id)
+            return
+        }
+        guard let schedule, schedule.isEnabled, notificationsAllowed else {
+            self = .off
+            return
+        }
+        if schedule.isPausedIndefinitely {
+            self = .paused(until: nil)
+            return
+        }
+        if let until = schedule.pausedUntil, until > now {
+            self = .paused(until: until)
+            return
+        }
+        let last = prompts.filter { $0.plannedAt <= now && $0.outcome != .cancelled }.max { $0.plannedAt < $1.plannedAt }
+        if let last, calendar.isDate(last.plannedAt, inSameDayAs: now),
+           last.outcome == .expired || (last.outcome == .pending && last.expiresAt <= now),
+           (latestCapture ?? .distantPast) < last.plannedAt {
+            self = .passed
+            return
+        }
+        self = .onItsWay
     }
 }
 

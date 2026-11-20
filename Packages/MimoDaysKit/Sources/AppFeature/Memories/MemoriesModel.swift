@@ -1,0 +1,358 @@
+@preconcurrency import AVFoundation
+import Core
+import Foundation
+import Observation
+import os
+import Persistence
+import SwiftData
+import UIKit
+
+/// One moment in the grid: only what grouping and the tile's words need.
+struct MemoryItem: Equatable, Identifiable {
+    var id: UUID
+    /// The day in the moment's own time zone, yyyymmdd (§H20).
+    var localDay: Int
+    var capturedAt: Date
+    var timeZoneID: String
+    var mediaType: MediaType
+    var origin: MomentOrigin
+    var isFavorite: Bool
+
+    var captured: CaptureTime { CaptureTime(instant: capturedAt, timeZoneID: timeZoneID) }
+}
+
+/// What a tile shows beyond the item, read when the tile first appears.
+struct TileDetail: Equatable {
+    var thumbnailPath: String?
+    /// Videos: the clip's length.
+    var duration: Double?
+    var hasVoiceNote: Bool
+}
+
+/// The timeline as rows: a month's title, then its days, newest first. Flat, so the list stays lazy
+/// and a day can be the scroll anchor.
+enum MemoryRow: Equatable, Identifiable {
+    /// yyyymm and how many moments it holds.
+    case month(Int, count: Int)
+    /// yyyymmdd and its moments, newest first.
+    case day(Int, [MemoryItem])
+
+    var id: Int {
+        switch self {
+        case let .month(key, _): key
+        case let .day(key, _): key
+        }
+    }
+}
+
+enum MemoriesMode: Hashable {
+    case timeline
+    case calendar
+}
+
+/// The calendar shows a month (M02) or a whole year of dots (M03).
+enum CalendarScale: Hashable {
+    case month
+    case year
+}
+
+/// Memories (M01): every moment, grouped by month and by each moment's own local day.
+/// Rows are light; tiles fetch their thumbnail, length and voice note when they appear.
+@MainActor
+@Observable
+final class MemoriesModel {
+    private(set) var rows: [MemoryRow] = []
+    private(set) var isLoaded = false
+    private(set) var details: [UUID: TileDetail] = [:]
+    private(set) var images: [UUID: UIImage] = [:]
+    /// U13: a Mosaic piece shows the main picture with the selfie in its own small window, so `images` holds the
+    /// main picture and this the selfie (only where the moment shows a window).
+    let separatesWindow: Bool
+    private(set) var selfies: [UUID: UIImage] = [:]
+    /// The day row at the top. Kept while the app runs, so leaving and coming back finds the same place.
+    var scrolledRow: Int?
+    /// Moments by local day (yyyymmdd), newest first, for the calendar.
+    private(set) var days: [Int: [MemoryItem]] = [:]
+    var mode = MemoriesMode.timeline
+    /// S09 "Newest first"; off shows the oldest month and day at the top.
+    var newestFirst = true
+    var scale = CalendarScale.month
+    /// The month (yyyymm) or, at year scale, the year the calendar shows.
+    private(set) var shownMonth: Int
+    private(set) var shownYear: Int
+    /// The day under the calendar, yyyymmdd.
+    var selectedDay: Int?
+
+    static let tilePixels = 360
+    static let selfiePixels = 160
+    /// Decoded tiles kept at once; the oldest go first.
+    static let imageLimit = 400
+
+    private let context: ModelContext
+    private let store: MediaStore
+    private let thumbnails: ThumbnailPipeline
+    private let clock: any DateProvider
+    private let calendar: () -> Calendar
+    private var imageOrder: [UUID] = []
+    /// The files each picture was read from: a moment whose files change (the viewer moved its window or chose
+    /// halves) is read again.
+    private var imagePaths: [UUID: [String]] = [:]
+    private var loading: Set<UUID> = []
+    private let logger = Logger(subsystem: "MimoDays", category: "Memories")
+
+    init(
+        context: ModelContext, store: MediaStore, thumbnails: ThumbnailPipeline, clock: any DateProvider = SystemDateProvider(),
+        calendar: @escaping () -> Calendar = { .current }, separatesWindow: Bool = false
+    ) {
+        self.separatesWindow = separatesWindow
+        self.context = context
+        self.store = store
+        self.thumbnails = thumbnails
+        self.clock = clock
+        self.calendar = calendar
+        let today = LocalDay(clock.now(), in: calendar().timeZone).key
+        shownMonth = today / 100
+        shownYear = today / 10_000
+        selectedDay = today
+    }
+
+    var isEmpty: Bool { isLoaded && rows.isEmpty }
+    /// M10: favourites in timeline order.
+    var favorites: [MemoryItem] {
+        rows.flatMap { row -> [MemoryItem] in
+            guard case let .day(_, items) = row else { return [] }
+            return items.filter(\.isFavorite)
+        }
+    }
+    /// Every moment in timeline order, for swiping in the viewer.
+    private(set) var allIDs: [UUID] = []
+    var now: Date { clock.now() }
+    /// Today on this device, yyyymmdd.
+    var today: Int { LocalDay(clock.now(), in: calendar().timeZone).key }
+    var thisMonth: Int { today / 100 }
+    /// The first month with a moment; the calendar goes no further back.
+    /// Rows come newest or oldest first (the person's choice), so the smallest month is taken, not the last row's.
+    var earliestMonth: Int { min(rows.map { $0.id > 999_999 ? $0.id / 100 : $0.id }.min() ?? thisMonth, thisMonth) }
+
+    func dayModel(_ day: Int) -> DayModel {
+        DayModel(day: day, context: context, store: store, thumbnails: thumbnails)
+    }
+
+    var library: MediaLibrary { MediaLibrary(context: context, store: store, thumbnails: thumbnails) }
+
+    // MARK: Select (M13)
+
+    /// The moment's kind when only one is chosen, for M15's words.
+    /// What a single chosen moment has, for the delete sheet (M15); nil for several.
+    func parts(of ids: Set<UUID>) -> MomentParts? {
+        guard ids.count == 1, let id = ids.first else { return nil }
+        var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return (try? context.fetch(descriptor).first).map(MomentParts.init)
+    }
+
+    func movieDrafts(using ids: Set<UUID>) -> Int {
+        (try? deletion.movieDrafts(using: ids)) ?? 0
+    }
+
+    /// Moves them to Recently deleted; false when that failed.
+    func delete(_ ids: Set<UUID>) -> Bool {
+        do {
+            try deletion.moveToRecentlyDeleted(ids)
+            return true
+        } catch {
+            logger.error("Deleting moments failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
+    /// Adds them, in timeline order, to each chosen collection.
+    func collect(_ ids: Set<UUID>, into collections: Set<UUID>) {
+        let ordered = allIDs.filter(ids.contains)
+        let store = CollectionStore(context: context)
+        do {
+            for collection in collections { try store.add(ordered, to: collection) }
+        } catch {
+            logger.error("Adding to a collection failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private var deletion: DeletionStore { DeletionStore(context: context, store: store) }
+
+    // MARK: Calendar
+
+    /// A month (yyyymm), with the day under it: today there, else its newest day with moments.
+    func show(month: Int) {
+        shownMonth = min(max(month, earliestMonth), thisMonth)
+        shownYear = shownMonth / 100
+        scale = .month
+        selectedDay = shownMonth == thisMonth ? today : days.keys.filter { $0 / 100 == shownMonth }.max()
+    }
+
+    func show(year: Int) {
+        shownYear = min(max(year, earliestMonth / 100), today / 10_000)
+        scale = .year
+    }
+
+    /// Pinching the calendar closed: from a month to its year.
+    func zoomOut() {
+        guard scale == .month else { return }
+        show(year: shownMonth / 100)
+    }
+
+    /// Pinching it open: from a year to the month shown before, or that year's first month.
+    func zoomIn() {
+        guard scale == .year else { return }
+        show(month: shownMonth / 100 == shownYear ? shownMonth : shownYear * 100 + 1)
+    }
+
+    var canGoBack: Bool { scale == .month ? shownMonth > earliestMonth : shownYear > earliestMonth / 100 }
+    var canGoForward: Bool { scale == .month ? shownMonth < thisMonth : shownYear < today / 10_000 }
+
+    func step(_ direction: Int) {
+        switch scale {
+        case .month: show(month: Self.month(shownMonth, adding: direction))
+        case .year: show(year: shownYear + direction)
+        }
+    }
+
+    /// yyyymm plus or minus whole months.
+    static func month(_ key: Int, adding months: Int) -> Int {
+        let index = (key / 100) * 12 + (key % 100 - 1) + months
+        return (index / 12) * 100 + index % 12 + 1
+    }
+
+    func refresh() {
+        var descriptor = FetchDescriptor<Moment>(
+            predicate: #Predicate { $0.deletedAt == nil },
+            sortBy: [
+                SortDescriptor(\.localDay, order: newestFirst ? .reverse : .forward),
+                SortDescriptor(\.capturedAt, order: newestFirst ? .reverse : .forward),
+            ]
+        )
+        descriptor.propertiesToFetch = [\.id, \.localDay, \.capturedAt, \.timeZoneID, \.mediaTypeRaw, \.originRaw, \.isFavorite]
+        do {
+            let items = try context.fetch(descriptor).map {
+                MemoryItem(
+                    id: $0.id, localDay: $0.localDay, capturedAt: $0.capturedAt, timeZoneID: $0.timeZoneID,
+                    mediaType: $0.mediaType, origin: $0.origin, isFavorite: $0.isFavorite
+                )
+            }
+            rows = Self.rows(items)
+            days = Dictionary(grouping: items, by: \.localDay)
+            allIDs = items.map(\.id)
+        } catch {
+            logger.error("Reading moments failed: \(error.localizedDescription, privacy: .public)")
+        }
+        // An edit can change a voice note or a video's length: shown tiles read them again here, in place. Emptied,
+        // a tile already on screen would keep its badges off, as its load ran once.
+        let shown = Array(details.keys)
+        let fresh = (try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { shown.contains($0.id) }))) ?? []
+        details = Dictionary(uniqueKeysWithValues: fresh.map { ($0.id, Self.detail(of: $0)) })
+        isLoaded = true
+        reloading = Task { await reloadChangedImages() }
+    }
+
+    /// The pictures read again after the last refresh (tests wait for it).
+    private(set) var reloading: Task<Void, Never>?
+
+    /// Pictures whose files were replaced since they were read come again; the rest stay.
+    func reloadChangedImages() async {
+        let ids = Array(images.keys)
+        guard !ids.isEmpty else { return }
+        // One read for all the decoded tiles, not one each.
+        let moments = (try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { ids.contains($0.id) }))) ?? []
+        for moment in moments where imagePaths[moment.id] != Self.pictures(of: moment, separatesWindow: separatesWindow)?.all {
+            await loadImage(moment.id)
+        }
+    }
+
+    /// Months, then days, from items sorted by day and by time within a day, either way round.
+    static func rows(_ items: [MemoryItem]) -> [MemoryRow] {
+        var rows: [MemoryRow] = []
+        var start = 0
+        while start < items.count {
+            let month = items[start].localDay / 100
+            var end = start
+            while end < items.count, items[end].localDay / 100 == month { end += 1 }
+            rows.append(.month(month, count: end - start))
+            var dayStart = start
+            while dayStart < end {
+                let day = items[dayStart].localDay
+                var dayEnd = dayStart
+                while dayEnd < end, items[dayEnd].localDay == day { dayEnd += 1 }
+                rows.append(.day(day, Array(items[dayStart..<dayEnd])))
+                dayStart = dayEnd
+            }
+            start = end
+        }
+        return rows
+    }
+
+    /// The tile's details and picture, once.
+    func load(_ id: UUID) async {
+        guard details[id] == nil || images[id] == nil, loading.insert(id).inserted else { return }
+        defer { loading.remove(id) }
+        let detail = details[id] ?? fetchDetail(id)
+        guard let detail else { return }
+        details[id] = detail
+        guard images[id] == nil else { return }
+        await loadImage(id)
+    }
+
+    /// The tile's picture (and its selfie, where the moment shows a window), read from `pictures(id)`.
+    private func loadImage(_ id: UUID) async {
+        guard let pictures = pictures(id), let url = try? store.url(for: pictures.main),
+              let image = try? await thumbnails.thumbnail(for: url, maxPixelSize: Self.tilePixels) else { return }
+        var window: UIImage?
+        if let selfie = pictures.selfie, let url = try? store.url(for: selfie),
+           let picture = try? await thumbnails.thumbnail(for: url, maxPixelSize: Self.selfiePixels) {
+            window = UIImage(cgImage: picture)
+        }
+        // Replaced while it was read (the viewer saved a new layout meanwhile): the new one instead.
+        guard self.pictures(id)?.all == pictures.all else { return await loadImage(id) }
+        selfies[id] = window
+        if images.updateValue(UIImage(cgImage: image), forKey: id) == nil { imageOrder.append(id) }
+        imagePaths[id] = pictures.all
+        if imageOrder.count > Self.imageLimit {
+            let oldest = imageOrder.removeFirst()
+            images[oldest] = nil
+            selfies[oldest] = nil
+            imagePaths[oldest] = nil
+        }
+    }
+
+    /// Which files a tile shows now: the main picture and the selfie where it has its own window, otherwise the
+    /// thumbnail.
+    private func pictures(_ id: UUID) -> (main: String, selfie: String?, all: [String])? {
+        var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return (try? context.fetch(descriptor).first).flatMap { Self.pictures(of: $0, separatesWindow: separatesWindow) }
+    }
+
+    private static func pictures(of moment: Moment, separatesWindow: Bool) -> (main: String, selfie: String?, all: [String])? {
+        if separatesWindow {
+            let summary = MomentSummary(moment)
+            if let main = summary.picturePath {
+                return (main, summary.windowPath, [main] + (summary.windowPath.map { [$0] } ?? []))
+            }
+        }
+        guard let path = moment.media.first(where: { $0.role == .thumbnail })?.relativePath else { return nil }
+        return (path, nil, [path])
+    }
+
+    private func fetchDetail(_ id: UUID) -> TileDetail? {
+        var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        guard let moment = try? context.fetch(descriptor).first else { return nil }
+        return Self.detail(of: moment)
+    }
+
+    private static func detail(of moment: Moment) -> TileDetail {
+        TileDetail(
+            thumbnailPath: moment.media.first { $0.role == .thumbnail }?.relativePath,
+            duration: moment.mediaType == .video ? moment.media.compactMap(\.duration).max() : nil,
+            hasVoiceNote: !moment.voiceNotes.isEmpty
+        )
+    }
+}

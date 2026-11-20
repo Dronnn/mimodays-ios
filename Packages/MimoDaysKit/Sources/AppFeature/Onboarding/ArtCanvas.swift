@@ -1,3 +1,4 @@
+import AVFoundation
 import DesignSystem
 import SwiftUI
 
@@ -5,14 +6,25 @@ import SwiftUI
 enum ArtLayer {
     /// A vector template image covering the whole canvas.
     case shape(_ asset: String, _ fill: ArtFill, shadow: ArtShadow?)
-    /// Live text, so it can be translated; placed by its centre, like in the design.
-    case text(_ content: ArtText, _ style: TextStyle, _ color: ColorToken, center: CGPoint, rotation: Double)
+    /// Live text, so it can be translated; placed by its centre, like in the design. A longer translation shrinks
+    /// on its line to `width`: by default as wide as the picture allows around the centre.
+    case text(_ content: ArtText, _ style: TextStyle, _ color: ColorToken, center: CGPoint, rotation: Double, width: CGFloat? = nil)
+}
+
+extension ArtLayer {
+    var isShape: Bool {
+        if case .shape = self { true } else { false }
+    }
 }
 
 enum ArtFill {
     case token(ColorToken, opacity: Double = 1)
     /// Flat tone standing in for a photo until real images are added.
     case placeholder(UInt32)
+    /// A photo filling the shape: drawn over `frame` (the shape's bounds, before `rotation` about its centre) and
+    /// cut to the shape. Where `Resources/OnboardingLoops` has a clip of the same name ("onboardingPhotoX" plays
+    /// "onboardingLoopX.mp4"), it loops over the photo while the canvas plays loops.
+    case photo(String, frame: CGRect, rotation: Double = 0)
     /// The app icon's coral gradient.
     case brandGradient
 }
@@ -38,16 +50,23 @@ struct ArtShadow {
 }
 
 /// Draws layers at the design size and scales the whole picture to the available width.
-/// Decorative: hidden from VoiceOver, never mirrored, and its text doesn't follow Dynamic Type.
+/// One image to VoiceOver, read by its captions (its shapes are hidden); never mirrored, and its text doesn't follow
+/// Dynamic Type. Captions stay readable to VoiceOver because they are visible words: hidden ones failed the
+/// accessibility audit once photos made them stand out (CI, 2026-11-17).
 struct ArtCanvas: View {
     let layers: [ArtLayer]
     var size = CGSize(width: 362, height: 360)
+    /// Photo frames play their clips: on the page in view, not with Reduce Motion or in Low Power Mode.
+    var playsLoops = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
 
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .topLeading) {
                 ForEach(layers.indices, id: \.self) { index in
-                    layer(layers[index])
+                    layer(layers[index], photo: photoFrame(before: index))
+                        .accessibilityHidden(layers[index].isShape)
                 }
             }
             .frame(width: size.width, height: size.height)
@@ -57,12 +76,46 @@ struct ArtCanvas: View {
         .frame(maxWidth: size.width)
         .environment(\.layoutDirection, .leftToRight)
         .environment(\.dynamicTypeSize, .large)
-        .accessibilityHidden(true)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isImage)
+        .onReceive(NotificationCenter.default.publisher(for: .NSProcessInfoPowerStateDidChange).receive(on: RunLoop.main)) { _ in
+            lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+        }
+    }
+
+    /// The photo a caption may be written on: the last photo frame drawn before it (used when the caption's centre
+    /// is on it).
+    private func photoFrame(before index: Int) -> CGRect? {
+        layers[..<index].reversed().lazy.compactMap { layer -> CGRect? in
+            if case let .shape(_, .photo(_, frame, _), _) = layer { return frame }
+            return nil
+        }.first
     }
 
     @ViewBuilder
-    private func layer(_ layer: ArtLayer) -> some View {
+    private func layer(_ layer: ArtLayer, photo: CGRect?) -> some View {
         switch layer {
+        case let .shape(asset, .photo(photo, frame, rotation), shadow):
+            Image(photo, bundle: .module)
+                .resizable()
+                .scaledToFill()
+                .overlay {
+                    if playsLoops, !reduceMotion, !lowPower, let clip = ArtLoop.clip(for: photo) {
+                        ArtLoop(url: clip)
+                    }
+                }
+                .frame(width: frame.width, height: frame.height)
+                .clipped()
+                .rotationEffect(.degrees(rotation))
+                .position(x: frame.midX, y: frame.midY)
+                .frame(width: size.width, height: size.height)
+                .mask {
+                    Image(asset, bundle: .module).resizable().frame(width: size.width, height: size.height)
+                }
+                .shadow(
+                    color: Color(hex: shadow?.color ?? 0).opacity(shadow?.opacity ?? 0),
+                    radius: shadow?.radius ?? 0, y: shadow?.y ?? 0
+                )
         case let .shape(asset, fill, shadow):
             Image(asset, bundle: .module)
                 .renderingMode(.template)
@@ -73,13 +126,25 @@ struct ArtCanvas: View {
                     color: Color(hex: shadow?.color ?? 0).opacity(shadow?.opacity ?? 0),
                     radius: shadow?.radius ?? 0, y: shadow?.y ?? 0
                 )
-        case let .text(content, style, color, center, rotation):
-            content.text
+        case let .text(content, style, color, center, rotation, width):
+            let label = content.text
                 .textStyle(style)
                 .foregroundStyle(color.color)
-                .fixedSize()
-                .rotationEffect(.degrees(rotation))
-                .position(center)
+                // Light captions sit on photos; a soft shadow keeps them readable on bright ones.
+                .shadow(color: .black.opacity(color == .textOnCoral ? 0.45 : 0), radius: 2, y: 1)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            if let width {
+                label
+                    .frame(maxWidth: width)
+                    .rotationEffect(.degrees(rotation))
+                    .position(center)
+            } else {
+                // A longer translation slides inward instead of running off the photo it is written on: light
+                // letters past the photo's edge vanish on the cream frames around it.
+                InsideArt(center: center, area: photo.flatMap { $0.contains(center) ? $0.insetBy(dx: 10, dy: 0) : nil }) { label.rotationEffect(.degrees(rotation)) }
+                    .frame(width: size.width, height: size.height)
+            }
         }
     }
 
@@ -87,7 +152,69 @@ struct ArtCanvas: View {
         switch fill {
         case let .token(token, opacity): AnyShapeStyle(token.color.opacity(opacity))
         case let .placeholder(hex): AnyShapeStyle(Color(hex: hex))
+        case .photo: AnyShapeStyle(Color.clear)
         case .brandGradient: AnyShapeStyle(LinearGradient(colors: [Color(hex: 0xF27650), Color(hex: 0xE2582F)], startPoint: .top, endPoint: .bottom))
         }
+    }
+}
+
+/// A muted clip looping over a photo frame's still, which shows until the first frame is ready. The clips have no
+/// sound track, so playing them leaves other apps' audio alone.
+private struct ArtLoop: View {
+    let url: URL
+    @State private var loop: Loop?
+
+    static func clip(for photo: String) -> URL? {
+        Bundle.module.url(forResource: photo.replacingOccurrences(of: "onboardingPhoto", with: "onboardingLoop"), withExtension: "mp4")
+    }
+
+    var body: some View {
+        // A clear base, so the view appears (and starts its clip) before there is a player to show.
+        ZStack {
+            Color.clear
+            if let loop { PlayerLayerView(player: loop.player) }
+        }
+        .onAppear { loop = Loop(url: url) }
+        .onDisappear {
+            loop?.player.pause()
+            loop = nil
+        }
+    }
+
+    @MainActor
+    final class Loop {
+        let player = AVQueuePlayer()
+        private let looper: AVPlayerLooper
+
+        init(url: URL) {
+            player.isMuted = true
+            player.preventsDisplaySleepDuringVideoPlayback = false
+            looper = AVPlayerLooper(player: player, templateItem: AVPlayerItem(url: url))
+            player.play()
+        }
+    }
+}
+
+/// Centres a caption on its point, moved just enough to stay inside `area` (its photo), or 20 pt inside the art
+/// without one; only a caption wider than that shrinks.
+private struct InsideArt: Layout {
+    let center: CGPoint
+    var area: CGRect?
+    let inset: CGFloat = 20
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache _: inout ()) -> CGSize {
+        proposal.replacingUnspecifiedDimensions()
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
+        guard let label = subviews.first else { return }
+        let lane = area.map { ($0.minX, $0.maxX) } ?? (inset, bounds.width - inset)
+        let size = label.sizeThatFits(ProposedViewSize(width: lane.1 - lane.0, height: nil))
+        let half = size.width / 2
+        let x = min(max(center.x, lane.0 + half), lane.1 - half)
+        label.place(
+            at: CGPoint(x: bounds.minX + x, y: bounds.minY + center.y), anchor: .center,
+            proposal: ProposedViewSize(size)
+        )
     }
 }

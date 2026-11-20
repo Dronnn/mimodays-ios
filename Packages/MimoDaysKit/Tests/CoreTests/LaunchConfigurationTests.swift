@@ -1,4 +1,5 @@
 import Core
+import Foundation
 import Testing
 
 struct LaunchConfigurationTests {
@@ -10,12 +11,21 @@ struct LaunchConfigurationTests {
     @Test func readsEveryFlag() {
         let configuration = LaunchConfiguration(arguments: [
             "MimoDays", "-ui-testing", "-skip-onboarding", "-fake-camera", "-seed", "populated", "-permissions", "denied",
-            "-surprise-tap", "expired",
+            "-surprise-tap", "expired", "-demo-footage", "/clips", "-open-url", "mimodays://map",
         ])
         #expect(configuration == LaunchConfiguration(
             isUITesting: true, skipsOnboarding: true, usesFakeCamera: true, seed: .populated, permissions: .denied,
-            surpriseTap: .expired
+            surpriseTap: .expired, demoFootage: URL(filePath: "/clips", directoryHint: .isDirectory),
+            openURL: URL(string: "mimodays://map")
         ))
+    }
+
+    @Test func footageAndLinkRoundTrip() {
+        let configuration = LaunchConfiguration(
+            isUITesting: true, demoFootage: URL(filePath: "/Users/me/clips", directoryHint: .isDirectory),
+            openURL: URL(string: "mimodays://capture?prompt=6F1C2B3A-0000-4000-8000-000000000001")
+        )
+        #expect(LaunchConfiguration(arguments: ["MimoDays"] + configuration.arguments) == configuration)
     }
 
     @Test(arguments: [["-seed"], ["-seed", "unknown"]])

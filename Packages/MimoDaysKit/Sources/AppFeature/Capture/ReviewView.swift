@@ -1,0 +1,521 @@
+import Core
+import DesignSystem
+import Persistence
+import SwiftUI
+
+/// C07 review, or C13d when a recording stopped early. The capture is the Memory Card's front on the canvas (U42):
+/// the selfie window can still be moved, the cameras swapped for a look, a video plays round and round; the card
+/// turns over only once saved. Save is the one primary action, everything else is optional.
+struct ReviewView: View {
+    @State var model: ReviewModel
+    let onRetake: () -> Void
+    let onSave: () async throws -> Void
+    /// Viewing only, as on a saved card.
+    @State private var swapped = false
+    @State private var controlsShown = true
+    @State private var isSaving = false
+    @State private var editsNote = false
+    @State private var confirmsRetake = false
+    /// C09 while it is open.
+    @State private var recording: VoiceRecording?
+    @State private var microphoneOff = false
+    @State private var choosesPlace = false
+    /// Place or Voice note is asking for its permission: one at a time, claimed at the tap.
+    @State private var opensTool = false
+    /// Off screen (left through a link while a permission was asked): nothing starts recording.
+    @State private var isShown = false
+    @State private var locationAllowed = false
+    @Environment(\.permissions) private var permissions
+    @State private var asker = PermissionAsker()
+    /// C13c, or the generic save failure.
+    @State private var saveError: SaveError?
+    @Environment(\.openURL) private var openURL
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var topInset: CGFloat = 0
+    private static let captionID = "review.caption"
+    @FocusState private var editsCaption: Bool
+
+    var body: some View {
+        // The keyboard covers the bottom instead of shrinking the card (Andrew, 2026-11-18).
+        KeyboardScroll(focusedID: editsCaption ? Self.captionID : nil) {
+            MediaThenPanel(aspectRatio: model.aspectRatio, topInset: topInset, chrome: chrome) {
+                media
+                Group {
+                    if let interruption = model.interruption {
+                        interruptedPanel(interruption)
+                    } else {
+                        panel
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+        }
+        .ignoresSafeArea(.container, edges: .top)
+        .background(ColorToken.canvas.color.ignoresSafeArea())
+        .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }) { topInset = CameraChrome.topInset($0) }
+        .task {
+            await model.load()
+            await model.startPlayback()
+        }
+        .task {
+            // Location is never asked for here: only after a tap on Place.
+            guard await permissions.status(of: .location).isUsable else { return }
+            locationAllowed = true
+            await model.locate()
+        }
+        .onAppear { isShown = true }
+        .onDisappear {
+            isShown = false
+            model.stopPlayback()
+        }
+        .fullScreenCover(isPresented: $editsNote) {
+            NoteEditorView(model: model)
+        }
+        .sheet(item: $recording) { recording in
+            VoiceRecordingSheet(recording: recording) { model.addVoice(at: $0.url, recordedAt: $0.startedAt) }
+        }
+        .sheet(isPresented: $choosesPlace) {
+            PlaceSheet(model: model, showsCurrent: locationAllowed)
+        }
+        .permissionExplainers(asker)
+        .sheet(isPresented: $microphoneOff) {
+            PermissionExplainerView(screen: .microphoneOff) {
+                openSettings()
+            } secondary: {
+                microphoneOff = false
+            }
+        }
+        .confirmationDialog(retakeTitle, isPresented: $confirmsRetake, titleVisibility: .visible) {
+            Button(role: .destructive) { discardAndRetake() } label: { Text("Retake", bundle: .module) }
+            Button(role: .cancel) {} label: { Text("Keep editing", bundle: .module) }
+        }
+        .alert(saveErrorTitle, isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            if case .lowStorage = saveError {
+                Button { openSettings() } label: { Text("Manage storage", bundle: .module) }
+            } else {
+                Button(role: .cancel) {} label: { Text("Not now", bundle: .module) }
+            }
+            Button { save() } label: { Text("Try again", bundle: .module) }
+                .keyboardShortcut(.defaultAction)
+        } message: {
+            saveErrorMessage
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("review")
+    }
+
+    // MARK: Media
+
+    /// Retake over the card; tapping the window swaps the cameras.
+    private var chrome: CGFloat {
+        Self.retakeRow + 12
+    }
+
+    private static let retakeRow: CGFloat = 52
+
+    /// The card front in the recorded shape, as large as the panel leaves room for, with Retake above it.
+    private var media: some View {
+        GeometryReader { proxy in
+            let slot = CGSize(
+                width: MemoryCardGeometry.slotWidth(screen: proxy.size.width),
+                height: max(0, proxy.size.height - topInset - chrome)
+            )
+            let card = MemoryCardGeometry.card(aspectRatio: model.aspectRatio, in: slot)
+            // Laid out on the full width, then drawn at the card's size: what is saved is what the card shows,
+            // whatever the keyboard or the panel leaves of the card.
+            let layout = MemoryCardGeometry.windowLayout(format: model.capture.format, screenWidth: proxy.size.width)
+            VStack(alignment: .leading, spacing: 0) {
+                RetakeButton(action: retake)
+                    .frame(height: Self.retakeRow)
+                MemoryCardFront(
+                    pictures: MemoryCardFront.Pictures(
+                        main: model.main, selfie: model.selfie, isVideo: model.video != nil,
+                        duration: model.video?.duration ?? 0, id: "review.media"
+                    ),
+                    playback: model.playback, size: card,
+                    window: model.hasSelfie && proxy.size.width > 0
+                        ? MemoryCardFront.Window(
+                            layout: layout, placement: model.window, rotation: Size.selfieWindowTilt.degrees, id: "review.selfieWindow",
+                            move: { model.window = $0 }, swap: { swap() }, halves: model.capture.isHalves
+                        )
+                        : nil,
+                    swapped: swapped, cornerOnRight: nil, controlsShown: $controlsShown, actions: nil
+                )
+                .background {
+                    MemoryCardOutline()
+                        .fill(ColorToken.mediaFrame.color)
+                        .shadow(color: ColorToken.textPrimary.color.opacity(0.16), radius: 9, y: 6)
+                }
+                .onChange(of: layout.windowFrame(model.window), initial: true) { model.windowFrame = $1 }
+            }
+            .padding(.top, topInset)
+            .frame(width: proxy.size.width, alignment: .top)
+        }
+    }
+
+    private func swap() {
+        withAnimation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.5)) { swapped.toggle() }
+    }
+
+    private func retake() {
+        guard !isSaving else { return }
+        if model.hasAnnotations {
+            confirmsRetake = true
+        } else {
+            discardAndRetake()
+        }
+    }
+
+    /// Copy approved by Andrew, 2026-11-13; a caption or a picked place alone asks too (Andrew, 2026-11-20).
+    private var retakeTitle: Text {
+        switch (model.note.isEmpty, model.voice == nil) {
+        case (false, false): Text("Retake and drop the notes?", bundle: .module)
+        case (true, false): Text("Retake and drop the voice note?", bundle: .module)
+        case (false, true): Text("Retake and drop the note?", bundle: .module)
+        case (true, true):
+            switch (model.hasCaption, model.hasChosenPlace) {
+            case (true, true): Text("Retake and drop the caption and place?", bundle: .module, comment: "Review (C07): confirmation before Retake throws away the caption written and the place picked")
+            case (false, true): Text("Retake and drop the place?", bundle: .module, comment: "Review (C07): confirmation before Retake throws away the place picked")
+            default: Text("Retake and drop the caption?", bundle: .module, comment: "Review (C07): confirmation before Retake throws away the caption written")
+            }
+        }
+    }
+
+    /// Our explainer and the system prompt the first time, then one fix for the city (Andrew, 2026-11-13).
+    private func choosePlace() {
+        guard !isSaving, !opensTool, !asker.isAsking else { return }
+        opensTool = true
+        Task {
+            let status = await asker.request(.location, using: permissions)
+            opensTool = false
+            locationAllowed = status.isUsable
+            // Saving started meanwhile: no sheet over it.
+            guard !isSaving else { return }
+            choosesPlace = true
+            if status.isUsable { await model.locate() }
+        }
+    }
+
+    /// Our explainer and the system prompt the first time; once it is off, the way to Settings.
+    private func recordVoice() {
+        guard !isSaving, !opensTool, !asker.isAsking else { return }
+        opensTool = true
+        Task {
+            let status = await asker.request(.microphone, using: permissions)
+            opensTool = false
+            // The microphone only records with its sheet up: not once Save started or something else opened.
+            guard isShown, !isSaving, !editsNote, !choosesPlace, recording == nil else { return }
+            guard status.isUsable else {
+                if status.needsSettings { microphoneOff = true }
+                return
+            }
+            model.playback?.pause()
+            model.stopVoice()
+            guard let recording = try? model.makeVoiceRecording(), recording.start() else { return }
+            self.recording = recording
+        }
+    }
+
+    private func discardAndRetake() {
+        model.discard()
+        onRetake()
+    }
+
+    private func save() {
+        guard !isSaving else { return }
+        isSaving = true
+        editsCaption = false
+        Task {
+            do {
+                try await onSave()
+            } catch {
+                saveError = error as? SaveError ?? .failed
+            }
+            isSaving = false
+        }
+    }
+
+    /// Place, Voice note (until there is one: then its card shows above), Note.
+    @ViewBuilder
+    private var chips: some View {
+        ReviewChip(icon: .glyphPin, title: placeTitle, action: choosePlace)
+            .accessibilityLabel(Text("Place", bundle: .module))
+            .accessibilityValue(model.place.map { $0.label.map { Text($0) } ?? Text("Current location", bundle: .module) } ?? Text("None", bundle: .module))
+            .accessibilityIdentifier("review.place")
+        if model.voice == nil {
+            ReviewChip(icon: .glyphMic, title: Text("Voice note", bundle: .module), action: recordVoice)
+                .accessibilityIdentifier("review.voiceNote")
+        }
+        ReviewChip(icon: .glyphNote, title: model.note.isEmpty ? Text("Note", bundle: .module) : Text(model.note), isFilled: !model.note.isEmpty) {
+            editsNote = true
+        }
+        .accessibilityLabel(Text("Note", bundle: .module))
+        .accessibilityValue(Text(model.note))
+        .accessibilityIdentifier("review.note")
+    }
+
+    /// The place's name; "Place" until there is one.
+    private var placeTitle: Text {
+        guard let place = model.place else { return Text("Place", bundle: .module) }
+        return place.label.map { Text($0) } ?? Text("Current location", bundle: .module)
+    }
+
+    // MARK: Save errors
+
+    private var saveErrorTitle: Text {
+        if case .lowStorage = saveError {
+            Text("Not enough space to save", bundle: .module)
+        } else {
+            Text("This moment didn't save", bundle: .module)
+        }
+    }
+
+    private var saveErrorMessage: Text {
+        if case let .lowStorage(shortfall) = saveError {
+            // Rounded up to 10 MB: "about 40 MB".
+            let rounded = (shortfall + 9_999_999) / 10_000_000 * 10_000_000
+            return Text("This moment is kept until you free up about \(rounded.formatted(.byteCount(style: .file).locale(AppLanguage.shared.locale))). Nothing is lost.", bundle: .module)
+        }
+        return Text("Nothing is lost. Try again in a moment.", bundle: .module)
+    }
+
+    /// There is no public link to iPhone Storage; Settings is one tap away from it (Andrew, 2026-11-13).
+    private func openSettings() {
+        if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+    }
+
+    // MARK: Panels
+
+    private var panel: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            CaptionField(text: $model.caption, isFocused: $editsCaption)
+                // What is typed while the moment saves would be dropped with Review: nothing changes until it fails.
+                .disabled(isSaving)
+                .id(Self.captionID)
+                .padding(.top, 20)
+            if let voice = model.voice {
+                VoiceNoteCard(model: model, voice: voice)
+                    // Its trash would take the file the save is copying.
+                    .disabled(isSaving)
+                    .padding(.top, 14)
+            }
+            // One row; under each other once large text no longer fits them side by side.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) { chips }
+                VStack(alignment: .leading, spacing: 0) { chips }
+            }
+            .disabled(isSaving)
+            .padding(.top, 14)
+            OriginLabel(origin: model.promptID == nil ? .manual : .randomPrompt, time: CaptureTimeLabel.text(model.capture.capturedAt))
+                .textStyle(.reviewMeta)
+                .foregroundStyle(ColorToken.textBody.color)
+                .padding(.leading, 2)
+                .padding(.top, 18)
+                .accessibilityIdentifier("review.time")
+            Button { save() } label: { Text("Save", bundle: .module) }
+                .buttonStyle(.primary)
+                .disabled(isSaving)
+                .padding(.horizontal, 4)
+                .padding(.top, 21)
+                .padding(.bottom, 50)
+                .accessibilityIdentifier("review.save")
+        }
+    }
+
+    /// C13d: what stopped the recording, Save N seconds, Record again.
+    private func interruptedPanel(_ interruption: CaptureInterruption) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .top, spacing: 10) {
+                Icon.glyphWarning.image
+                    .frame(width: 24, height: 24)
+                    .foregroundStyle(ColorToken.textLink.color)
+                    .accessibilityHidden(true)
+                interruptionText(interruption)
+                    .textStyle(.reviewNote)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.leading, 16)
+            .padding(.trailing, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 24)
+            .frame(minHeight: 88, alignment: .top)
+            .background(FieldBlob().fill(ColorToken.accentPeach.color))
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("review.interrupted")
+            .padding(.top, 20)
+            Button { save() } label: { Text("Save \(model.keptSeconds) seconds", bundle: .module) }
+                .buttonStyle(.primary)
+                .disabled(isSaving)
+                .padding(.horizontal, 4)
+                .padding(.top, 20)
+                .accessibilityIdentifier("review.save")
+            Button(action: retake) { Text("Record again", bundle: .module) }
+                .buttonStyle(.text)
+                .padding(.top, 14)
+                .padding(.bottom, 40)
+                .accessibilityIdentifier("review.recordAgain")
+        }
+    }
+
+    /// Copy approved by Andrew, 2026-11-13; the call version is the design's.
+    private func interruptionText(_ interruption: CaptureInterruption) -> Text {
+        let at = Duration.seconds(model.keptSeconds).formatted(.time(pattern: .minuteSecond).locale(AppLanguage.shared.locale))
+        return switch interruption {
+        case .anotherApp: Text("A call stopped the recording at \(at). The part before the call is kept.", bundle: .module)
+        case .background: Text("The recording stopped at \(at) when you left MimoDays. The part before is kept.", bundle: .module)
+        case .tooWarm: Text("This iPhone got too warm, so the recording stopped at \(at). The part before is kept.", bundle: .module)
+        case .lowStorage: Text("This iPhone ran out of space, so the recording stopped at \(at). The part before is kept.", bundle: .module)
+        case .other: Text("The recording stopped at \(at). The part before is kept.", bundle: .module)
+        }
+    }
+}
+
+// MARK: - Pieces
+
+/// The card from under the status bar, the panel right under it. The panel gets its height first; the card takes
+/// the rest, up to the height of a card as wide as the screen allows. Space left over (tall screens, the keyboard
+/// gone) stays below the panel.
+private struct MediaThenPanel: Layout {
+    let aspectRatio: CGFloat
+    let topInset: CGFloat
+    /// Above and below the card: Retake, Swap cameras.
+    let chrome: CGFloat
+
+    /// The screen's height, or more when the panel and the least of the media don't fit in it (the largest text).
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache _: inout ()) -> CGSize {
+        let size = proposal.replacingUnspecifiedDimensions()
+        guard subviews.count == 2 else { return size }
+        let panel = subviews[1].sizeThatFits(ProposedViewSize(width: size.width, height: nil)).height
+        return CGSize(width: size.width, height: max(size.height, topInset + chrome + leastCard(screen: size.width) + panel))
+    }
+
+    /// However large the text, the capture stays big enough to see what it is.
+    private func leastCard(screen: CGFloat) -> CGFloat {
+        min(MemoryCardGeometry.slotWidth(screen: screen) / aspectRatio, 96)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
+        guard subviews.count == 2 else { return }
+        let panel = subviews[1].sizeThatFits(ProposedViewSize(width: bounds.width, height: nil)).height
+        let card = MemoryCardGeometry.slotWidth(screen: bounds.width) / aspectRatio
+        let media = max(topInset + chrome + leastCard(screen: bounds.width), min(topInset + chrome + card, bounds.height - panel))
+        subviews[0].place(at: bounds.origin, proposal: ProposedViewSize(width: bounds.width, height: media))
+        subviews[1].place(at: CGPoint(x: bounds.minX, y: bounds.minY + media), proposal: ProposedViewSize(width: bounds.width, height: panel))
+    }
+}
+
+/// `content` laid out on the screen's height as if the keyboard were down, in a scroll that gains the keyboard's
+/// height below and brings `focusedID` above the keyboard when it comes up. The content is built by the caller, so
+/// what it reads keeps updating the caller (built in here, the Place sheet got a stale location answer).
+private struct KeyboardScroll<Content: View>: View {
+    var focusedID: String?
+    @ViewBuilder let content: Content
+    /// How much of the screen the keyboard covers; 0 when it is down (or a hardware keyboard keeps it away).
+    @State private var keyboardHeight: CGFloat = 0
+
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollViewReader { reader in
+                ScrollView {
+                    content.frame(width: proxy.size.width).frame(minHeight: proxy.size.height)
+                }
+                .contentMargins(.bottom, keyboardHeight, for: .scrollContent)
+                .scrollBounceBehavior(.basedOnSize)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: keyboardHeight) { _, height in
+                    guard let focusedID, height > 0 else { return }
+                    withAnimation { reader.scrollTo(focusedID, anchor: UnitPoint(x: 0.5, y: 0.35)) }
+                }
+            }
+        }
+        .ignoresSafeArea(.keyboard)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+            guard let frame = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                  let screen = (note.object as? UIScreen) ?? UIApplication.shared.connectedScenes.compactMap({ ($0 as? UIWindowScene)?.screen }).first
+            else { return }
+            keyboardHeight = max(0, screen.bounds.maxY - frame.minY)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardHeight = 0 }
+    }
+}
+
+/// "Add a few words (optional)": one line on a hand-cut cream field.
+private struct CaptionField: View {
+    @Binding var text: String
+    var isFocused: FocusState<Bool>.Binding
+
+    var body: some View {
+        TextField(text: $text) {
+            Text("Add a few words (optional)", bundle: .module)
+                .foregroundStyle(ColorToken.textTertiary.color)
+        }
+        .textStyle(.reviewField)
+        .foregroundStyle(ColorToken.textPrimary.color)
+        .tint(ColorToken.actionCoral.color)
+        .focused(isFocused)
+        .submitLabel(.done)
+        .onSubmit { isFocused.wrappedValue = false }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 12)
+        .frame(minHeight: 52)
+        .background(
+            FieldBlob()
+                .fill(ColorToken.surfaceCard.color)
+                .shadow(color: CameraPalette.chipText.opacity(0.08), radius: 2, y: 1)
+        )
+        .accessibilityLabel(Text("Caption", bundle: .module))
+        .accessibilityIdentifier("review.caption")
+    }
+}
+
+/// `Chip / Review`: glyph and label on a hand-cut chip; peach once something was added (it then shows its
+/// first words).
+private struct ReviewChip: View {
+    let icon: Icon
+    let title: Text
+    var isFilled = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                icon.image
+                    .frame(width: 18, height: 18)
+                title
+                    .textStyle(.reviewChip)
+                    .lineLimit(1)
+            }
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .padding(.leading, 11)
+            .padding(.trailing, 13)
+            .frame(minHeight: 34)
+            .frame(maxWidth: 200, alignment: .leading)
+            .fixedSize(horizontal: !isFilled, vertical: false)
+            .background(ReviewChipBlob().fill(isFilled ? ColorToken.accentPeach.color : ColorToken.surfaceChip.color))
+            .frame(minHeight: Size.minimumTapTarget)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// A peach capsule over the card, like the card's own buttons.
+private struct RetakeButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text("Retake", bundle: .module)
+                .textStyle(.cardButton)
+                .foregroundStyle(ColorToken.textPrimary.color)
+                .padding(.horizontal, 21)
+                .frame(minHeight: 36)
+                .background(ColorToken.accentPeach.color, in: Capsule())
+                .frame(minHeight: Size.minimumTapTarget)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("review.retake")
+    }
+}

@@ -44,9 +44,4 @@ struct TestDoublesTests {
         let location = FakeLocationProvider(location: nil)
         await #expect(throws: FakeServiceError.unavailable) { try await location.currentLocation() }
     }
-
-    @Test func captureEngineFallsBackToSingleCamera() async {
-        #expect(await FakeCaptureEngine(multiCam: false).capturePhoto().frontURL == nil)
-        #expect(await FakeCaptureEngine(multiCam: true).capturePhoto().frontURL != nil)
-    }
 }

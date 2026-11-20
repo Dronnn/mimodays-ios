@@ -72,8 +72,11 @@ public struct SurprisePlanner: Sendable {
             var weekStart = calendar.dateInterval(of: .weekOfYear, for: today)?.start ?? today
             while weekStart < horizonEnd {
                 guard let week = calendar.dateInterval(of: .weekOfYear, for: weekStart) else { break }
-                if !planned.contains(where: { week.contains($0) && $0 != week.end }) {
-                    result += drawWeek(week, count: count, rules, notBefore: earliestStart, using: &generator)
+                // A week keeps what it has (a surprise that already came, or the ones a replan left) and gets the rest
+                // of its count on other days: one surprise left over mustn't stand for the whole week.
+                let taken = planned.filter { week.contains($0) && $0 != week.end }
+                if taken.count < count {
+                    result += drawWeek(week, count: count, taken: taken, rules, notBefore: earliestStart, using: &generator)
                 }
                 weekStart = week.end
             }
@@ -84,7 +87,7 @@ public struct SurprisePlanner: Sendable {
     // MARK: Weeks
 
     private func drawWeek(
-        _ week: DateInterval, count: Int, _ rules: SurpriseRules, notBefore: Date,
+        _ week: DateInterval, count: Int, taken: [Date], _ rules: SurpriseRules, notBefore: Date,
         using generator: inout some RandomNumberGenerator
     ) -> [Date] {
         var enabledDays = 0
@@ -93,7 +96,8 @@ public struct SurprisePlanner: Sendable {
         while day < week.end {
             if isEnabled(day, rules) {
                 enabledDays += 1
-                if let window = window(on: day, rules, notBefore: notBefore) { candidates.append(window) }
+                if !taken.contains(where: { calendar.isDate($0, inSameDayAs: day) }),
+                   let window = window(on: day, rules, notBefore: notBefore) { candidates.append(window) }
             }
             guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
             day = next
@@ -103,7 +107,7 @@ public struct SurprisePlanner: Sendable {
         let share = candidates.count == enabledDays
             ? count
             : Int((Double(count * candidates.count) / Double(enabledDays)).rounded())
-        let picked = candidates.shuffled(using: &generator).prefix(min(share, candidates.count))
+        let picked = candidates.shuffled(using: &generator).prefix(min(share, count - taken.count, candidates.count))
         return picked.flatMap { slots(1, in: $0, using: &generator) }.sorted()
     }
 

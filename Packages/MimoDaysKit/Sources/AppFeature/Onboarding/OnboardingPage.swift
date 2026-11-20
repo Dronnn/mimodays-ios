@@ -14,7 +14,7 @@ enum OnboardingPage: Int, CaseIterable, Identifiable {
     var title: LocalizedStringResource {
         switch self {
         case .welcome: LocalizedStringResource("Your life, in little pieces.", bundle: .atURL(Bundle.module.bundleURL))
-        case .surprise: LocalizedStringResource("A little surprise, every day.", bundle: .atURL(Bundle.module.bundleURL))
+        case .surprise: LocalizedStringResource("A surprise comes. Capture it now.", bundle: .atURL(Bundle.module.bundleURL), comment: "Onboarding OB-02 title: the app's main idea")
         case .dualCamera: LocalizedStringResource("You and the world around you.", bundle: .atURL(Bundle.module.bundleURL))
         case .voice: LocalizedStringResource("Give your moment a voice.", bundle: .atURL(Bundle.module.bundleURL))
         case .movie: LocalizedStringResource("One day, it becomes a movie.", bundle: .atURL(Bundle.module.bundleURL))
@@ -31,8 +31,9 @@ enum OnboardingPage: Int, CaseIterable, Identifiable {
             )
         case .surprise:
             LocalizedStringResource(
-                "At a random moment, MimoDays may invite you to capture what is happening right now. Busy? Skip it. There are no streaks, scores, or missed-day penalties.",
-                bundle: .atURL(Bundle.module.bundleURL)
+                "That's the whole idea: at a random time, MimoDays sends a notification. Drop what you're doing and, wherever you are, capture what's around you right away, just as it is. Busy? Skip it. No streaks, no penalties.",
+                bundle: .atURL(Bundle.module.bundleURL),
+                comment: "Onboarding OB-02: the app's main idea; a notification comes, you stop and capture at once"
             )
         case .dualCamera:
             LocalizedStringResource(

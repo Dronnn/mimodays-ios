@@ -5,10 +5,13 @@ import SwiftUI
 public struct ExplainerArt: View {
     let glyph: Icon
     let blob: ColorToken
+    /// Plum; coral on a failure (F14).
+    let ink: ColorToken
 
-    public init(glyph: Icon, blob: ColorToken = .accentPeach) {
+    public init(glyph: Icon, blob: ColorToken = .accentPeach, ink: ColorToken = .textPrimary) {
         self.glyph = glyph
         self.blob = blob
+        self.ink = ink
     }
 
     public var body: some View {
@@ -18,8 +21,9 @@ public struct ExplainerArt: View {
             layer(.markTicks, .accentCoralMark)
             glyph.image
                 .resizable()
+                .scaledToFit()
                 .frame(width: 56, height: 56)
-                .foregroundStyle(ColorToken.textPrimary.color)
+                .foregroundStyle(ink.color)
                 .offset(x: 47, y: 44)
         }
         .frame(width: 150, height: 140)

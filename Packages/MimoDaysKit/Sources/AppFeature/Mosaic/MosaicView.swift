@@ -1,0 +1,310 @@
+@preconcurrency import AVFoundation
+import Core
+import DesignSystem
+import SwiftData
+import SwiftUI
+
+/// U13-U15: the home's other side. Every moment as a piece of a mosaic, month by month, newest first; favorites and
+/// videos take the larger pieces. A piece opens its Memory Card. Under ten moments a note says it grows (U14).
+struct MosaicView: View {
+    /// Its own tiles source, newest first whatever Memories is set to.
+    let model: MemoriesModel
+    /// The home's side facing the person: only then do the pieces move.
+    var isFacing = true
+    @State private var width: CGFloat = 0
+    @State private var isShown = false
+    @Environment(\.mosaicZoom) private var zoom
+    @Environment(\.tileMotion) private var motion
+
+    /// U16: pieces drift and videos loop on the side shown, not behind a Memory Card; the Mosaic's Motion setting,
+    /// Reduce Motion and Low Power Mode keep them still (H.9).
+    private var isLive: Bool { isFacing && isShown && motion?.isOn == true }
+
+    /// A month: yyyymm and its moments, newest first.
+    struct Month: Identifiable, Equatable {
+        let id: Int
+        let items: [MemoryItem]
+    }
+
+    /// U14's note shows for the first nine moments (Andrew, 2026-11-15).
+    static let growingUntil = 10
+
+    var body: some View {
+        ScrollView {
+            // Lazy, so only the months near the screen are built and load their thumbnails (E.5).
+            LazyVStack(alignment: .leading, spacing: 0) {
+                HomeHeader()
+                title
+                    .padding(.top, 13)
+                    .padding(.horizontal, 24)
+                ForEach(Array(months.enumerated()), id: \.element.id) { index, month in
+                    chapter(month, doodle: Self.doodles[index % Self.doodles.count])
+                        .padding(.top, 19)
+                }
+                if model.isLoaded, model.allIDs.count < Self.growingUntil {
+                    growingNote
+                        .padding(.top, 56)
+                        .padding(.horizontal, 20)
+                }
+            }
+            // On iPhone the wordmark sits up level with the status bar's bottom, as on Today.
+            .statusBarLift(13)
+            .padding(.bottom, 72)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .onGeometryChange(for: CGFloat.self, of: \.size.width) { width = $0 }
+        .scrollBounceBehavior(.basedOnSize)
+        .background(ColorToken.canvas.color.ignoresSafeArea())
+        .task { model.refresh() }
+        .onAppear { isShown = true }
+        .onDisappear { isShown = false }
+        .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
+        .accessibilityIdentifier("mosaic")
+    }
+
+    /// Month rows with their moments, newest first.
+    var months: [Month] {
+        var months: [Month] = []
+        for row in model.rows {
+            switch row {
+            case let .month(key, _): months.append(Month(id: key, items: []))
+            case let .day(_, items):
+                guard let last = months.popLast() else { continue }
+                months.append(Month(id: last.id, items: last.items + items))
+            }
+        }
+        return months
+    }
+
+    // MARK: Pieces
+
+    /// "Your mosaic", and how many moments since when.
+    private var title: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Your mosaic", bundle: .module)
+                .textStyle(.mosaicTitle)
+                .foregroundStyle(ColorToken.textPrimary.color)
+                .accessibilityAddTraits(.isHeader)
+            if model.isLoaded {
+                count
+                    .textStyle(.noteMeta)
+                    .foregroundStyle(ColorToken.textSecondary.color)
+            }
+        }
+    }
+
+    private var count: Text {
+        let count = model.allIDs.count
+        guard count >= Self.growingUntil, let first = months.last else {
+            return Text("\(count) moments so far", bundle: .module)
+        }
+        return Text("\(count) moments since \(Self.monthName(first.id, now: model.now))", bundle: .module)
+    }
+
+    /// "November", or "November 2025" from another year.
+    static func monthName(_ key: Int, now: Date) -> String {
+        let year = key / 100
+        var components = DateComponents(year: year, month: key % 100, day: 1)
+        components.calendar = Calendar.current
+        guard let date = components.date else { return "" }
+        let thisYear = Calendar.current.component(.year, from: now) == year
+        return date.formatted(thisYear ? .dateTime.month(.wide) : .dateTime.month(.wide).year().locale(AppLanguage.shared.locale))
+    }
+
+    /// U13: a hand-drawn mark by each month, in turn: the apricot star near the trailing edge, then the ticks just
+    /// after the name.
+    private static let doodles: [Doodle] = [
+        Doodle(icon: .markStarSolo, size: CGSize(width: 39.2, height: 40.4), alignment: .topTrailing, offset: CGSize(width: -19, height: -12)),
+        Doodle(icon: .markTicksA, size: CGSize(width: 26.7, height: 22.5), alignment: .topLeading, offset: CGSize(width: 220, height: -10)),
+    ]
+
+    struct Doodle {
+        let icon: Icon
+        let size: CGSize
+        let alignment: Alignment
+        let offset: CGSize
+    }
+
+    private func chapter(_ month: Month, doodle: Doodle) -> some View {
+        let layout = MosaicLayout.chapter(
+            month.items.map { MosaicLayout.Moment(id: $0.id, prefersLarge: $0.isFavorite || $0.mediaType == .video) },
+            width: width
+        )
+        let items = Dictionary(uniqueKeysWithValues: month.items.map { ($0.id, $0) })
+        return VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(Self.monthName(month.id, now: model.now))
+                    .textStyle(.mosaicChapter)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .accessibilityAddTraits(.isHeader)
+                Icon.markBrush.image
+                    .resizable()
+                    .frame(width: 196.3, height: 12.9)
+                    .foregroundStyle(ColorToken.actionCoral.color)
+                    .padding(.leading, -2)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, 26)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: doodle.alignment) {
+                doodle.icon.image
+                    .resizable()
+                    .frame(width: doodle.size.width, height: doodle.size.height)
+                    .foregroundStyle(ColorToken.accentApricot.color)
+                    .offset(doodle.offset)
+                    .accessibilityHidden(true)
+            }
+            ZStack(alignment: .topLeading) {
+                ForEach(layout.tiles, id: \.id) { tile in
+                    if let item = items[tile.id] {
+                        piece(item, tile)
+                    }
+                }
+            }
+            .frame(width: width, height: layout.height, alignment: .topLeading)
+            // The layout counts from the left edge; a mosaic reads the same either way.
+            .environment(\.layoutDirection, .leftToRight)
+            .padding(.top, 2)
+        }
+    }
+
+    private func piece(_ item: MemoryItem, _ tile: MosaicLayout.Tile) -> some View {
+        MomentTileLink(MemoriesRoute.moment(MomentPager(ids: model.allIDs, start: item.id, origin: .mosaic))) {
+            MosaicPiece(
+                item: item, detail: model.details[item.id], image: model.images[item.id], selfie: model.selfies[item.id],
+                isLive: isLive
+            )
+                .frame(width: tile.frame.width, height: tile.frame.height)
+                .modifier(ZoomSource(id: item.id, namespace: zoom))
+        }
+        .buttonStyle(.plain)
+        .rotationEffect(.degrees(tile.tilt))
+        .offset(x: tile.frame.minX, y: tile.frame.minY)
+        .task { await model.load(item.id) }
+        .accessibilityIdentifier("mosaic.piece")
+    }
+
+    /// U14: "Your mosaic grows with every moment".
+    private var growingNote: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Your mosaic grows with every moment", bundle: .module)
+                .textStyle(.mosaicNoteTitle)
+                .foregroundStyle(ColorToken.textPrimary.color)
+            Text("Each one finds its place here, month by month. Tap any piece to open it.", bundle: .module)
+                .textStyle(.pageIntro)
+                .foregroundStyle(ColorToken.textBody.color)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 24, style: .continuous).fill(ColorToken.surfaceCard.color))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("mosaic.growing")
+    }
+}
+
+/// `Mosaic / Photo`, `Mosaic / Video`: the main picture in a hand-cut frame (cream; plum in dark, U15) with a soft shadow, and the selfie in
+/// a small tilted window inset from the top corner where the moment has one; a video's length on a loop chip, a heart
+/// for a favorite.
+struct MosaicPiece: View {
+    let item: MemoryItem
+    let detail: TileDetail?
+    let image: UIImage?
+    var selfie: UIImage?
+    /// U16: photos drift (Ken Burns, 12 s), pictures move against the scroll, videos loop while on screen.
+    var isLive = false
+    @State private var isOnScreen = false
+    @State private var drifts = false
+
+    private var moves: Bool { isLive && isOnScreen }
+
+    var body: some View {
+        Color(hex: 0xC9B8AA)
+            .overlay { picture }
+            .clipShape(MemoryCardOutline())
+            .overlay { MemoryCardOutline().strokeBorder(ColorToken.mosaicFrame.color, lineWidth: 4) }
+            .background {
+                MemoryCardOutline()
+                    .fill(ColorToken.mosaicFrame.color)
+                    .shadow(color: ColorToken.textPrimary.color.opacity(0.14), radius: 4, y: 3)
+            }
+            .overlay(alignment: .topTrailing) {
+                if let selfie {
+                    GeometryReader { proxy in
+                        // U13: about 50 pt across on every piece, a little smaller on the narrowest.
+                        let width = min(50, proxy.size.width * 0.36)
+                        SelfieFrame { Image(uiImage: selfie).filling() }
+                            .frame(width: width)
+                            .padding(.top, 9)
+                            .padding(.trailing, 11)
+                            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topTrailing)
+                    }
+                    .allowsHitTesting(false)
+                }
+            }
+            .overlay(alignment: .bottomLeading) {
+                if let duration = detail?.duration {
+                    VideoBadge(duration: duration)
+                        .padding(10)
+                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if item.isFavorite {
+                    HeartShape()
+                        .fill(ColorToken.actionCoral.color)
+                        .frame(width: 16, height: 14)
+                        .padding(12)
+                }
+            }
+            .contentShape(MemoryCardOutline())
+            .onScrollVisibilityChange(threshold: 0.3) { visible in
+                isOnScreen = visible
+            }
+            .onChange(of: moves && item.mediaType == .photo, initial: true) { _, on in
+                withAnimation(on ? .easeInOut(duration: 12).repeatForever(autoreverses: true) : .easeOut(duration: 0.6)) { drifts = on }
+            }
+            .accessibilityElement()
+            .accessibilityLabel(label)
+            .accessibilityAddTraits(.isButton)
+    }
+
+    /// A little larger than the piece, so the drift and the parallax never show its edge.
+    private var picture: some View {
+        ZStack {
+            // Takes touches, which the filled picture doesn't: holding a video plays it.
+            Color.clear.contentShape(Rectangle())
+            if let image { Image(uiImage: image).filling() }
+        }
+        // H.9: the main stream plays; the selfie is drawn over the piece, a still.
+        .tileMotion(item.id, isVideo: item.mediaType == .video, still: nil)
+        .scaleEffect(drifts ? 1.14 : isLive ? 1.06 : 1, anchor: driftAnchor)
+        .modifier(MosaicParallax(isOn: isLive))
+    }
+
+    /// Each photo drifts towards its own corner, from its id.
+    private var driftAnchor: UnitPoint {
+        [.topLeading, .topTrailing, .bottomLeading, .bottomTrailing, .center][Int(item.id.uuid.0) % 5]
+    }
+
+    private var label: Text {
+        let time = Text(item.captured.instant, format: .dateTime.month(.wide).day().hour().minute())
+        let kind = item.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module)
+        return item.isFavorite
+            ? Text("\(kind) from \(time), favorite", bundle: .module)
+            : Text("\(kind) from \(time)", bundle: .module)
+    }
+}
+
+/// The piece a Memory Card grows out of (U40), where there is a namespace for it.
+private struct ZoomSource: ViewModifier {
+    let id: UUID
+    let namespace: Namespace.ID?
+
+    func body(content: Content) -> some View {
+        if let namespace {
+            content.matchedTransitionSource(id: id, in: namespace) { $0.clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)) }
+        } else {
+            content
+        }
+    }
+}

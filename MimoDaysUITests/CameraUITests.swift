@@ -1,0 +1,497 @@
+import Core
+import XCTest
+
+/// C04: the selfie window moves by touch and hold (sheet) or by dragging it to a corner.
+/// C06c: the microphone is explained the first time the camera is in Video, which is where it opens until the
+/// person picks Photo in Settings.
+final class CameraUITests: XCTestCase {
+    private var app: XCUIApplication!
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+    }
+
+    // A failure stops a test before its own `defer`, and a sideways simulator breaks every test after it.
+    override func tearDown() {
+        XCUIDevice.shared.orientation = .portrait
+        super.tearDown()
+    }
+
+    private var selfieWindow: XCUIElement {
+        app.descendants(matching: .any)["camera.selfieWindow"]
+    }
+
+    /// The camera, switched to Photo unless `inPhoto` is false (it opens in Video).
+    @MainActor
+    private func openCamera(permissions: PermissionStatus = .granted, inPhoto: Bool = true) {
+        app = XCUIApplication()
+        app.launchArguments = LaunchConfiguration(
+            isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: permissions
+        ).arguments
+        app.launch()
+        app.buttons["capture"].tap()
+        if permissions == .notDetermined {
+            // C06 camera explainer first, then C06c: the camera opens in Video, so the microphone is next.
+            app.buttons["permission.primary"].tap()
+            XCTAssertTrue(app.descendants(matching: .any)["permission.microphone"].waitForExistence(timeout: 5))
+            app.buttons["permission.primary"].tap()
+        }
+        XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
+        if inPhoto { app.buttons["camera.mode.photo"].tap() }
+    }
+
+    /// C.3/C.6: the screen stays upright while the camera turns its own controls with the phone, and 16:9 waits
+    /// for the phone on its side: the hint and the dimmed shutter, gone once it is sideways, back once upright.
+    @MainActor
+    func testTheCameraStaysUprightAndWaitsForTheRightHold() {
+        openCamera()
+        defer { XCUIDevice.shared.orientation = .portrait }
+        let shutter = app.buttons["camera.shutter"]
+        let hint = app.descendants(matching: .any)["camera.rotateHint"]
+        app.buttons["camera.format.landscape"].tap()
+        XCTAssertTrue(hint.waitForExistence(timeout: 3))
+        XCTAssertFalse(shutter.isEnabled)
+
+        XCUIDevice.shared.orientation = .landscapeLeft
+        XCTAssertTrue(hint.waitForNonExistence(timeout: 3))
+        XCTAssertTrue(shutter.isEnabled)
+        let window = app.windows.firstMatch.frame
+        XCTAssertGreaterThan(window.height, window.width, "the screen stays upright")
+        // The buttons are a column on the phone's top edge; Close is at the person's top left: the screen's top right.
+        let close = app.buttons["capture.close"].frame
+        XCTAssertGreaterThan(close.minX, window.midX)
+        XCTAssertLessThan(close.maxY, window.height * 0.15)
+
+        XCUIDevice.shared.orientation = .portrait
+        XCTAssertTrue(hint.waitForExistence(timeout: 3))
+        XCTAssertFalse(shutter.isEnabled)
+    }
+
+    /// The test matrix's capture-to-card cells: a 1:1 photo, then a 16:9 one taken with the phone sideways, each
+    /// saved and opened as a card of its own shape.
+    @MainActor
+    func testASquareAndASidewaysWideMomentOpenInTheirShapes() {
+        openCamera()
+        defer { XCUIDevice.shared.orientation = .portrait }
+        let shutter = app.buttons["camera.shutter"]
+        let save = app.buttons["review.save"]
+        let hero = app.descendants(matching: .any)["today.hero"]
+
+        app.buttons["camera.format.square"].tap()
+        shutter.tap()
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        XCTAssertTrue(hero.waitForExistence(timeout: 10))
+        sleep(1)
+        hero.tap()
+        var card = app.shown("viewer.media")?.frame ?? .zero
+        XCTAssertEqual(card.width / max(card.height, 1), 1, accuracy: 0.05, "a 1:1 card: \(card)")
+        app.buttons["viewer.back"].tap()
+
+        // The camera opens in Video again: Photo is only kept once picked in Settings.
+        app.buttons["capture"].tap()
+        app.buttons["camera.mode.photo"].tap()
+        app.buttons["camera.format.landscape"].tap()
+        XCUIDevice.shared.orientation = .landscapeLeft
+        let enabled = expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: shutter)
+        wait(for: [enabled], timeout: 5)
+        shutter.tap()
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        XCUIDevice.shared.orientation = .portrait
+        save.tap()
+        XCTAssertTrue(hero.waitForExistence(timeout: 10))
+        sleep(1)
+        hero.tap()
+        card = app.shown("viewer.media")?.frame ?? .zero
+        XCTAssertEqual(card.width / max(card.height, 1), 16.0 / 9, accuracy: 0.08, "a 16:9 card: \(card)")
+        XCTAssertNotNil(app.shown("viewer.selfieWindow"))
+    }
+
+    /// Flow 03 up to review: a photo to review and Retake back to the camera, then a video recorded, stopped
+    /// and reviewed, on the simulated engine.
+    @MainActor
+    func testTakesAPhotoThenRecordsAndStopsAVideo() {
+        openCamera()
+        let shutter = app.buttons["camera.shutter"]
+        shutter.tap()
+        let retake = app.buttons["review.retake"]
+        XCTAssertTrue(retake.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["review.selfieWindow"].exists)
+        XCTAssertTrue(app.buttons["review.save"].exists)
+        retake.tap()
+        XCTAssertTrue(shutter.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.descendants(matching: .any)["camera.notice"].exists)
+
+        app.buttons["camera.mode.video"].tap()
+        app.buttons["camera.length.30"].tap()
+        shutter.tap()
+        let stop = app.buttons["camera.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["camera.timer"].exists)
+        // While recording the top controls give way to the timer.
+        XCTAssertFalse(app.buttons["capture.close"].exists)
+        stop.tap()
+        // Review: the clip plays on tap; Save leaves the capture flow.
+        let media = app.descendants(matching: .any)["review.media"]
+        XCTAssertTrue(media.waitForExistence(timeout: 10))
+        media.tap()
+        app.buttons["review.save"].tap()
+        // C12: back on Today with the saved toast.
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["capture"].exists)
+    }
+
+    /// 9.17/9.18: review shows the selfie window as the camera recorded it, the same share of the frame however
+    /// much of the screen the panel (a voice note card, the keyboard) leaves the media, so the saved video is
+    /// composed the way it was recorded.
+    @MainActor
+    func testReviewKeepsTheRecordedSelfieWindowWhenTheMediaShrinks() {
+        openCamera()
+        app.buttons["camera.mode.video"].tap()
+        app.buttons["camera.length.30"].tap()
+        app.buttons["camera.shutter"].tap()
+        let stop = app.buttons["camera.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        stop.tap()
+        let media = app.descendants(matching: .any)["review.media"]
+        let window = app.descendants(matching: .any)["review.selfieWindow"]
+        XCTAssertTrue(window.waitForExistence(timeout: 10))
+        let share = { window.frame.width / media.frame.width }
+        let before = share()
+        // The 112 pt medium window on the 402 pt camera, measured around its tilt: about 0.30 of the frame.
+        XCTAssertEqual(before, 0.30, accuracy: 0.02)
+
+        // A voice note card makes the panel taller and the media smaller (the keyboard does the same on a device).
+        app.buttons["review.voiceNote"].tap()
+        let stopVoice = app.buttons["voice.stop"]
+        XCTAssertTrue(stopVoice.waitForExistence(timeout: 5))
+        sleep(1)
+        stopVoice.tap()
+        XCTAssertTrue(app.buttons["review.voice.play"].waitForExistence(timeout: 5))
+        sleep(1)
+        XCTAssertLessThan(media.frame.width, app.frame.width, "the panel squeezes the media: \(media.frame)")
+        XCTAssertEqual(share(), before, accuracy: 0.01)
+    }
+
+    /// 9.24/9.25: a saved two-camera video plays with its selfie window, which moves in the player as while
+    /// recording, and stays where it was put.
+    @MainActor
+    func testASavedVideoPlaysWithItsSelfieWindowWhichMovesInThePlayer() {
+        openCamera()
+        app.buttons["camera.mode.video"].tap()
+        app.buttons["camera.length.30"].tap()
+        app.buttons["camera.shutter"].tap()
+        let stop = app.buttons["camera.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        sleep(2)
+        stop.tap()
+        let save = app.buttons["review.save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        let hero = app.descendants(matching: .any)["today.hero"]
+        XCTAssertTrue(hero.waitForExistence(timeout: 10))
+        sleep(1)
+        hero.tap()
+
+        let window = app.descendants(matching: .any)["viewer.selfieWindow"]
+        XCTAssertTrue(window.waitForExistence(timeout: 10))
+        XCTAssertEqual(window.value as? String, "Top right, Medium")
+        // It plays by itself.
+        let play = app.buttons["viewer.play"]
+        let playing = expectation(for: NSPredicate(format: "label == 'Pause'"), evaluatedWith: play)
+        wait(for: [playing], timeout: 3)
+        attachScreenshot("player-recorded")
+        window.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.6)))
+        XCTAssertEqual(window.value as? String, "Bottom left, Medium")
+        sleep(1)
+        attachScreenshot("player-moved")
+
+        app.buttons["viewer.back"].tap()
+        XCTAssertTrue(hero.waitForExistence(timeout: 5))
+        hero.tap()
+        XCTAssertTrue(window.waitForExistence(timeout: 10))
+        XCTAssertEqual(window.value as? String, "Bottom left, Medium")
+    }
+
+    @MainActor
+    private func attachScreenshot(_ name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .original)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    /// The keyboard for the caption covers the bottom of Review instead of shrinking the card (Andrew, 2026-11-18);
+    /// the field scrolls above it and the rest stays reachable by scrolling.
+    @MainActor
+    func testTheKeyboardLeavesTheCardItsSize() throws {
+        openCamera()
+        app.buttons["camera.shutter"].tap()
+        let media = app.descendants(matching: .any)["review.media"].firstMatch
+        XCTAssertTrue(media.waitForExistence(timeout: 5))
+        let height = media.frame.height
+        let caption = app.textFields["review.caption"]
+        caption.tap()
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 5))
+        sleep(1)
+        // A simulator with a hardware keyboard keeps the on-screen one below the screen.
+        try XCTSkipIf(keyboard.frame.minY >= app.frame.maxY, "the on-screen keyboard is off (hardware keyboard)")
+        attachScreenshot("review with the keyboard")
+        XCTAssertEqual(media.frame.height, height, accuracy: 1, "the card changed its size")
+        XCTAssertLessThanOrEqual(caption.frame.maxY, keyboard.frame.minY, "the keyboard covers the caption field")
+        caption.typeText("Morning tea")
+        app.swipeUp()
+        XCTAssertTrue(app.buttons["review.save"].isHittable, "Save can't be reached")
+    }
+
+    /// C08: a note shows on its chip, Retake asks before dropping it, and Save keeps it.
+    @MainActor
+    func testANoteIsKeptAndRetakeAsksBeforeDroppingIt() {
+        openCamera()
+        app.buttons["camera.shutter"].tap()
+        let note = app.buttons["review.note"]
+        XCTAssertTrue(note.waitForExistence(timeout: 5))
+        note.tap()
+        let text = app.textViews["note.text"]
+        XCTAssertTrue(text.waitForExistence(timeout: 5))
+        text.typeText("Lena on her bike")
+        // The counter follows the typing a moment later on a busy simulator.
+        let counted = expectation(for: NSPredicate(format: "label == '16 of 500 characters'"), evaluatedWith: app.staticTexts["note.count"])
+        wait(for: [counted], timeout: 5)
+        app.buttons["note.done"].tap()
+        XCTAssertTrue(note.waitForExistence(timeout: 5))
+        XCTAssertEqual(note.value as? String, "Lena on her bike")
+
+        app.buttons["review.retake"].tap()
+        let confirmation = app.sheets["Retake and drop the note?"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        // iOS shows the dialog without its cancel button; a tap outside keeps editing.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
+        XCTAssertTrue(confirmation.waitForNonExistence(timeout: 5))
+        XCTAssertEqual(note.value as? String, "Lena on her bike")
+        app.buttons["review.save"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+    }
+
+    /// C09/C10: the microphone was explained when the camera opened in Video, so a Voice note records at once until
+    /// Stop, then shows as a card with its words that plays; Retake asks before dropping it, and Save keeps it.
+    @MainActor
+    func testAVoiceNoteIsRecordedPlayedAndKept() {
+        openCamera(permissions: .notDetermined)
+        app.buttons["camera.shutter"].tap()
+        let chip = app.buttons["review.voiceNote"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        chip.tap()
+        XCTAssertFalse(app.buttons["permission.primary"].exists)
+        let stop = app.buttons["voice.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        // Let it record a little over a second.
+        XCTAssertFalse(app.staticTexts["review.voice.transcript"].waitForExistence(timeout: 1.5))
+        stop.tap()
+
+        let play = app.buttons["review.voice.play"]
+        XCTAssertTrue(play.waitForExistence(timeout: 5))
+        XCTAssertFalse(chip.exists)
+        XCTAssertTrue(app.staticTexts["review.voice.transcript"].waitForExistence(timeout: 5))
+        play.tap()
+        XCTAssertEqual(play.label, "Pause voice note")
+
+        app.buttons["review.retake"].tap()
+        let confirmation = app.sheets["Retake and drop the voice note?"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
+        XCTAssertTrue(confirmation.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(play.exists)
+        app.buttons["review.save"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+    }
+
+    /// C10: the trash removes the voice note and the chip comes back.
+    @MainActor
+    func testRemovingTheVoiceNoteBringsTheChipBack() {
+        openCamera()
+        app.buttons["camera.shutter"].tap()
+        let chip = app.buttons["review.voiceNote"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        chip.tap()
+        let stop = app.buttons["voice.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["review.voice.transcript"].waitForExistence(timeout: 1))
+        stop.tap()
+        let remove = app.buttons["review.voice.remove"]
+        XCTAssertTrue(remove.waitForExistence(timeout: 5))
+        remove.tap()
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        // Nothing left to drop: Retake goes straight back to the camera.
+        app.buttons["review.retake"].tap()
+        XCTAssertTrue(app.buttons["camera.shutter"].waitForExistence(timeout: 5))
+    }
+
+    /// C11: location is asked for only at the first tap on Place, after our explainer, then the city fills in; a place nearby, a search
+    /// result or No place can replace it.
+    @MainActor
+    func testTheFirstPlaceTapAsksThenTheCityCanBeChanged() {
+        openCamera(permissions: .notDetermined)
+        app.buttons["camera.shutter"].tap()
+        let place = app.buttons["review.place"]
+        XCTAssertTrue(place.waitForExistence(timeout: 5))
+        XCTAssertEqual(place.value as? String, "None")
+
+        place.tap()
+        let explainerContinue = app.buttons["permission.primary"]
+        XCTAssertTrue(explainerContinue.waitForExistence(timeout: 5))
+        explainerContinue.tap()
+        let current = app.buttons["place.current"]
+        XCTAssertTrue(current.waitForExistence(timeout: 5))
+        // The city fills in by itself and is the chosen row.
+        XCTAssertTrue(waitFor("label CONTAINS 'Yerevan' AND isSelected == true", current))
+        let nearby = app.buttons.matching(identifier: "place.nearby").firstMatch
+        XCTAssertTrue(nearby.waitForExistence(timeout: 5))
+        nearby.tap()
+        XCTAssertTrue(waitFor("value == 'Cascade Complex'", place))
+
+        place.tap()
+        let search = app.textFields["place.search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("sevan")
+        let result = app.buttons.matching(identifier: "place.result").firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 5))
+        result.tap()
+        XCTAssertTrue(waitFor("value == 'Lake Sevan'", place))
+
+        place.tap()
+        let none = app.buttons["place.none"]
+        XCTAssertTrue(none.waitForExistence(timeout: 5))
+        none.tap()
+        XCTAssertTrue(waitFor("value == 'None'", place))
+        app.buttons["review.save"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+    }
+
+    private func waitFor(_ format: String, _ element: XCUIElement) -> Bool {
+        let expectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: format), object: element)
+        return XCTWaiter().wait(for: [expectation], timeout: 5) == .completed
+    }
+
+    /// C07: the selfie window still moves in review, and Retake leaves the camera's own corner as it was.
+    @MainActor
+    func testTheSelfieWindowMovesInReviewOnly() {
+        openCamera()
+        app.buttons["camera.shutter"].tap()
+        let window = app.descendants(matching: .any)["review.selfieWindow"]
+        XCTAssertTrue(window.waitForExistence(timeout: 5))
+        XCTAssertEqual(window.value as? String, "Top right, Medium")
+        window.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.5)))
+        XCTAssertEqual(window.value as? String, "Bottom left, Medium")
+        app.buttons["review.retake"].tap()
+        XCTAssertEqual(selfieWindow.value as? String, "Top right, Medium")
+    }
+
+    @MainActor
+    func testFlipAndHideTheSelfieWindow() {
+        openCamera()
+        app.buttons["camera.flip"].tap()
+        XCTAssertTrue(selfieWindow.exists)
+        let toggle = app.buttons["camera.selfie"]
+        XCTAssertEqual(toggle.value as? String, "On")
+        toggle.tap()
+        XCTAssertFalse(selfieWindow.waitForExistence(timeout: 1))
+        XCTAssertEqual(toggle.value as? String, "Off")
+        toggle.tap()
+        XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testTheCameraOpensInVideoExplainingTheMicrophoneThenRecordsSound() {
+        app = XCUIApplication()
+        app.launchArguments = LaunchConfiguration(
+            isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: .notDetermined
+        ).arguments
+        app.launch()
+        app.buttons["capture"].tap()
+        app.buttons["permission.primary"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["permission.microphone"].waitForExistence(timeout: 5))
+        let allow = app.buttons["permission.primary"]
+        allow.tap()
+        XCTAssertTrue(allow.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["camera.mode.video"].isSelected)
+        let sound = app.buttons["camera.sound"]
+        XCTAssertTrue(sound.waitForExistence(timeout: 5))
+        XCTAssertEqual(sound.value as? String, "On")
+    }
+
+    @MainActor
+    func testTouchAndHoldOpensTheSheetAndResetRestoresTheDefault() {
+        openCamera()
+        XCTAssertEqual(selfieWindow.value as? String, "Top right, Medium")
+        selfieWindow.press(forDuration: 1)
+        let bottomLeft = app.buttons["Bottom left"]
+        XCTAssertTrue(bottomLeft.waitForExistence(timeout: 5))
+        bottomLeft.tap()
+        app.buttons["Large"].tap()
+        XCTAssertEqual(selfieWindow.value as? String, "Bottom left, Large")
+        app.buttons["selfieWindow.reset"].tap()
+        XCTAssertEqual(selfieWindow.value as? String, "Top right, Medium")
+    }
+
+    @MainActor
+    func testDraggingSnapsToTheNearestCornerAndIsKept() {
+        openCamera()
+        let start = selfieWindow.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        start.press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.6)))
+        XCTAssertEqual(selfieWindow.value as? String, "Bottom left, Medium")
+        // Reopening the camera keeps the corner.
+        app.buttons["capture.close"].tap()
+        app.buttons["capture"].tap()
+        XCTAssertTrue(selfieWindow.waitForExistence(timeout: 5))
+        XCTAssertEqual(selfieWindow.value as? String, "Bottom left, Medium")
+    }
+
+    /// H.8/H.9 (Andrew, 2026-11-16): Halves from the ••• sheet films both cameras in halves, kept on the card with
+    /// its switch; holding the video lifts it playing, with motion on (the default) as with it off, and Open opens it.
+    @MainActor
+    func testHalvesFilmAndATileHeldStillOpens() {
+        openCamera()
+        app.buttons["camera.more"].tap()
+        let halves = app.descendants(matching: .any)["cameraSettings.arrangement"].buttons["Halves"]
+        XCTAssertTrue(halves.waitForExistence(timeout: 5))
+        halves.tap()
+        XCTAssertFalse(app.descendants(matching: .any)["cameraSettings.corner"].exists, "halves have no window corner")
+        app.buttons["cameraSettings.done"].tap()
+        XCTAssertFalse(selfieWindow.waitForExistence(timeout: 2), "no window over the halves")
+        attachScreenshot("camera-halves")
+
+        app.buttons["camera.mode.video"].tap()
+        app.buttons["camera.shutter"].tap()
+        let stop = app.buttons["camera.stop"]
+        XCTAssertTrue(stop.waitForExistence(timeout: 5))
+        sleep(2)
+        stop.tap()
+        let half = app.descendants(matching: .any)["review.selfieWindow"]
+        XCTAssertTrue(half.waitForExistence(timeout: 10))
+        XCTAssertEqual(half.label, "Selfie half")
+        attachScreenshot("review-halves")
+        app.buttons["review.save"].tap()
+
+        let hero = app.descendants(matching: .any)["today.hero"]
+        XCTAssertTrue(hero.waitForExistence(timeout: 10))
+        sleep(3)
+        attachScreenshot("hero-playing")
+        hero.press(forDuration: 1.5)
+        XCTAssertTrue(app.descendants(matching: .any)["tile.preview"].waitForExistence(timeout: 5), "held, it plays lifted")
+        sleep(1)
+        attachScreenshot("held")
+        XCTAssertFalse(app.buttons["viewer.favorite"].exists, "letting go after a hold doesn't open it")
+        XCTAssertTrue(app.buttons["Share"].exists && app.buttons["Favorite"].exists)
+        app.buttons["Open"].tap()
+        XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.descendants(matching: .any)["viewer.selfieWindow"].label, "Selfie half")
+        app.buttons["viewer.more"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["viewer.arrangement"].waitForExistence(timeout: 5))
+        attachScreenshot("viewer-menu")
+    }
+}

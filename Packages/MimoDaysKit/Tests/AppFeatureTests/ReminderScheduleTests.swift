@@ -88,4 +88,13 @@ struct ReminderScheduleTests {
         #expect(kept.earliestMinute == 9 * 60)
         #expect(kept.latestMinute == 18 * 60)
     }
+
+    @Test func weekdayNamesFollowTheAppsLanguageButTheWeekStaysTheIPhones() {
+        var iPhone = Calendar(identifier: .gregorian)
+        iPhone.locale = Locale(identifier: "en_US")
+        let german = iPhone.speaking(Locale(identifier: "de"))
+        #expect(german.standaloneWeekdaySymbols[1] == "Montag")
+        #expect(german.firstWeekday == 1)
+        #expect(german.orderedWeekdays == iPhone.orderedWeekdays)
+    }
 }

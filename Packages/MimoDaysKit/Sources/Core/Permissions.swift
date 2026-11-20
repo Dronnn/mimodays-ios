@@ -1,6 +1,7 @@
 import AVFoundation
 import CoreLocation
 import Photos
+import UIKit
 import UserNotifications
 
 /// Device permissions MimoDays asks for, each at the point of use (never all at launch).
@@ -77,6 +78,11 @@ private final class LocationAuthorization: NSObject, CLLocationManagerDelegate {
     override private init() {
         super.init()
         manager.delegate = self
+        // In the background Core Location shows no prompt and the answer never comes: the request gives up, as if
+        // the explainer had been closed, rather than holding every button that waits for it.
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { LocationAuthorization.shared.resumeWaiters() }
+        }
     }
 
     var status: PermissionStatus {
@@ -84,7 +90,8 @@ private final class LocationAuthorization: NSObject, CLLocationManagerDelegate {
     }
 
     func request() async {
-        guard manager.authorizationStatus == .notDetermined else { return }
+        guard manager.authorizationStatus == .notDetermined,
+              UIApplication.shared.applicationState != .background else { return }
         await withCheckedContinuation { continuation in
             waiters.append(continuation)
             manager.requestWhenInUseAuthorization()
@@ -95,10 +102,14 @@ private final class LocationAuthorization: NSObject, CLLocationManagerDelegate {
         // The manager was created on the main thread, so its callbacks arrive there.
         MainActor.assumeIsolated {
             guard manager.authorizationStatus != .notDetermined else { return }
-            let resumed = waiters
-            waiters.removeAll()
-            resumed.forEach { $0.resume() }
+            resumeWaiters()
         }
+    }
+
+    private func resumeWaiters() {
+        let resumed = waiters
+        waiters.removeAll()
+        resumed.forEach { $0.resume() }
     }
 }
 

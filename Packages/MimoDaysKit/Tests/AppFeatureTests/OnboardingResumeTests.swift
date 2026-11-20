@@ -4,6 +4,7 @@ import Foundation
 import Persistence
 import SwiftData
 import Testing
+import TestSupport
 
 /// Resuming after the app closes mid-onboarding (Andrew, 2026-11-13: same screen, results kept).
 @MainActor
@@ -52,6 +53,16 @@ struct OnboardingResumeTests {
         #expect(flow(store).step == .firstCapture)
     }
 
+    @Test func maybeLaterOnAReplayKeepsSurprisesOn() {
+        let store = InMemoryOnboardingStore(OnboardingRecord(isCompleted: true, step: 7, remindersEnabled: true))
+        let replay = flow(store)
+        replay.restart()
+        replay.finishIntro()
+        replay.remindLater()
+        #expect(store.record.remindersEnabled)
+        #expect(replay.step == .reminders(.later))
+    }
+
     @Test func aSavedFirstMomentCompletesOnboarding() {
         let store = InMemoryOnboardingStore(OnboardingRecord(step: 7))
         let first = flow(store)
@@ -73,7 +84,7 @@ struct OnboardingResumeTests {
     }
 
     @Test func swiftDataStoreRoundTrips() throws {
-        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let container = try TestStore.container()
         let store = SwiftDataOnboardingStore(context: container.mainContext)
         #expect(store.load() == OnboardingRecord())
 
@@ -93,5 +104,19 @@ struct OnboardingResumeTests {
         #expect(stored.weekdayMask == 0b111_0111)
         #expect(stored.latestMinute == 20 * 60)
         #expect(stored.isEnabled)
+    }
+
+    @Test func replayStartsOnTheFirstPageAndStaysFinished() {
+        let store = InMemoryOnboardingStore()
+        let first = flow(store)
+        first.page = .movie
+        first.finishIntro()
+        first.finish()
+        let replay = flow(store)
+        replay.restart()
+        #expect(replay.step == .intro)
+        #expect(replay.page == .welcome)
+        #expect(store.record.isCompleted)
+        #expect(flow(store).isCompleted)
     }
 }

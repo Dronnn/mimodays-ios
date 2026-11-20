@@ -40,7 +40,10 @@ final class OnboardingFlow {
     /// The camera is open for the first capture.
     var isCapturing = false
     private(set) var firstMoment: SavedMoment?
-    private var remindersEnabled = false
+    /// Surprises are on: the reminders choice, or on a replay the person's existing setting.
+    private(set) var remindersEnabled = false
+    /// Whether iOS lets the reminders through: O10 promises a surprise only then.
+    private(set) var remindersAllowed = false
     private(set) var isCompleted = false
 
     private let permissions: any PermissionService
@@ -69,19 +72,43 @@ final class OnboardingFlow {
     }
 
     func backToIntro() {
+        guard !isEnablingReminders else { return }
         step = .intro
     }
 
-    /// "Enable reminders": the system prompt, or its earlier answer.
-    func enableReminders() async {
+    /// From "Enable reminders" until iOS has answered: Back and Maybe later wait, so a late answer can't undo them.
+    private(set) var isEnablingReminders = false
+
+    /// "Enable reminders": our explainer and the system prompt (through `request`), or the earlier answer.
+    func enableReminders(request: ((Permission) async -> PermissionStatus)? = nil) async {
+        guard !isEnablingReminders else { return }
+        isEnablingReminders = true
+        defer { isEnablingReminders = false }
+        let status = if let request { await request(.notifications) } else { await permissions.request(.notifications) }
+        // Our explainer closed without Continue: nothing was asked, so the schedule stays as it was, to try again.
+        // Set only after the answer: a schedule edit saved while it waited mustn't store reminders as on.
+        if request != nil, status == .notDetermined { return }
         remindersEnabled = true
-        let status = await permissions.request(.notifications)
+        remindersAllowed = status.isUsable
         step = .reminders(status.isUsable ? .on : status.needsSettings ? .denied : .later)
         await remindersChanged()
     }
 
+    /// Back from iOS Settings on "Notifications are off": allowed there, the outcome says they are on.
+    func recheckReminders() async {
+        guard step == .reminders(.denied), await permissions.status(of: .notifications).isUsable,
+              // Continue tapped while the status was read: the flow has moved on.
+              step == .reminders(.denied) else { return }
+        remindersAllowed = true
+        step = .reminders(.on)
+        await remindersChanged()
+    }
+
+    /// "Maybe later". On a replay (Help › "Show the introduction again") the person's existing reminders setting
+    /// stays as it is.
     func remindLater() {
-        remindersEnabled = false
+        guard !isEnablingReminders else { return }
+        if !isCompleted { remindersEnabled = false }
         step = .reminders(.later)
     }
 
@@ -100,6 +127,17 @@ final class OnboardingFlow {
         isCapturing = false
         isCompleted = true
         step = .firstMomentSaved
+        // Relaunched after the reminders step, or allowed in Settings since.
+        Task { remindersAllowed = await permissions.status(of: .notifications).isUsable }
+    }
+
+    /// Help › "Show the introduction again": from the first page. A finished onboarding stays finished, so closing
+    /// the app on the way doesn't bring it back on the next launch.
+    func restart() {
+        firstMoment = nil
+        isCapturing = false
+        page = .welcome
+        step = .intro
     }
 
     func finish() {

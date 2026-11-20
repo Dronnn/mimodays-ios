@@ -61,11 +61,20 @@ struct RemindersResultView: View {
     }
 
     private var message: LocalizedStringResource {
-        isOn
-            ? schedule.summary(calendar: calendar, locale: locale)
-            : LocalizedStringResource(
-                "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in Settings.",
+        switch outcome {
+        case .on:
+            schedule.summary(calendar: calendar, locale: locale)
+        case .denied:
+            LocalizedStringResource(
+                "You can still capture moments whenever you like. To get surprises later, turn on notifications for MimoDays in iOS Settings.",
                 bundle: .atURL(Bundle.module.bundleURL)
             )
+        case .later:
+            // iOS hasn't asked yet, so MimoDays' own Settings can still turn them on.
+            LocalizedStringResource(
+                "You can still capture moments whenever you like. Turn on surprises any time in Settings › Surprises.",
+                bundle: .atURL(Bundle.module.bundleURL)
+            )
+        }
     }
 }

@@ -9,7 +9,7 @@ struct FirstCaptureView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                ArtCanvas(layers: Self.artLayers)
+                ArtCanvas(layers: Self.artLayers, playsLoops: true)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, Spacing.screenMargin)
                     .padding(.top, 50)
@@ -59,7 +59,7 @@ struct FirstCaptureView: View {
     /// The OB-03 dual-camera art with its own caption (`Onboarding / Art / Dual camera` in O09).
     nonisolated static var artLayers: [ArtLayer] {
         OnboardingPage.dualCamera.artLayers.map { layer in
-            guard case let .text(.localized(resource), style, color, _, rotation) = layer, resource.key == "the world around you" else {
+            guard case let .text(.localized(resource), style, color, _, rotation, _) = layer, resource.key == "the world around you" else {
                 return layer
             }
             return .text(
@@ -73,6 +73,8 @@ struct FirstCaptureView: View {
 /// O10: the first saved moment, then on to the app.
 struct FirstMomentView: View {
     let moment: SavedMoment
+    /// Surprises are on, so one may bring the person back.
+    let surprisesOn: Bool
     let viewMoments: () -> Void
     let done: () -> Void
     @Environment(\.calendar) private var calendar
@@ -97,11 +99,11 @@ struct FirstMomentView: View {
                     .accessibilityAddTraits(.isHeader)
                     .padding(.top, 36)
                     .padding(.horizontal, 18)
-                Text(LocalizedStringResource("It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.", bundle: .atURL(Bundle.module.bundleURL)))
+                Text(comeBack)
                     .textStyle(.body)
                     .foregroundStyle(ColorToken.textSecondary.color)
                     .padding(.top, 12)
-                    // 320 in the design; Penpot measures Nunito slightly wider, so 46 keeps its line breaks.
+                    // 320 in the design; Penpot measured the design's body face slightly wider, so 46 keeps its line breaks.
                     .padding(.horizontal, 46)
             }
             .multilineTextAlignment(.center)
@@ -126,6 +128,12 @@ struct FirstMomentView: View {
             .background(ColorToken.canvas.color.ignoresSafeArea(edges: .bottom))
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+    }
+
+    private var comeBack: LocalizedStringResource {
+        surprisesOn
+            ? LocalizedStringResource("It lives on this iPhone. Come back tomorrow, or whenever a surprise arrives.", bundle: .atURL(Bundle.module.bundleURL))
+            : LocalizedStringResource("It lives on this iPhone. Come back tomorrow, or whenever something feels worth keeping.", bundle: .atURL(Bundle.module.bundleURL))
     }
 
     /// "Today, 4:12 PM": the moment was saved a moment ago.

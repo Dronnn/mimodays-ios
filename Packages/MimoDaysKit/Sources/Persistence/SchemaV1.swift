@@ -12,7 +12,7 @@ public enum SchemaV1: VersionedSchema {
             Moment.self, MomentMedia.self, MomentVoiceNote.self, MomentLocation.self,
             SurpriseSchedule.self, SurprisePrompt.self,
             MomentCollection.self, CollectionMembership.self,
-            MovieProject.self, MovieClip.self, MovieAudioTrack.self,
+            MovieProject.self, MovieClip.self, MovieTextCard.self, MovieAudioTrack.self,
             ExportJob.self, BackupManifest.self, AppPreferences.self,
         ]
     }
@@ -37,6 +37,7 @@ public enum SchemaV1: VersionedSchema {
         public var tags: [String]
         public var isFavorite: Bool
         public var pipLayout: PiPLayout?
+        public var captureFormatRaw: String = CaptureFormat.portrait.rawValue
         public var createdAt: Date
         public var modifiedAt: Date
         /// Set while in Recently Deleted (kept 30 days).
@@ -80,6 +81,11 @@ public enum SchemaV1: VersionedSchema {
             get { MomentStatus(rawValue: statusRaw) ?? .needsRepair }
             set { statusRaw = newValue.rawValue }
         }
+
+        public var captureFormat: CaptureFormat {
+            get { CaptureFormat(rawValue: captureFormatRaw) ?? .portrait }
+            set { captureFormatRaw = newValue.rawValue }
+        }
     }
 
     @Model
@@ -96,6 +102,8 @@ public enum SchemaV1: VersionedSchema {
         /// EXIF orientation (1...8).
         public var orientation: Int
         public var hasAudio: Bool
+        /// Video streams: seconds this stream starts after the main one (negative: earlier). Nil for the main stream.
+        public var startOffset: Double?
         /// SHA-256, hex.
         public var checksum: String
         public var byteCount: Int64
@@ -103,7 +111,8 @@ public enum SchemaV1: VersionedSchema {
 
         public init(
             id: UUID = UUID(), role: MediaRole, relativePath: String, uniformType: String, pixelWidth: Int, pixelHeight: Int,
-            checksum: String, byteCount: Int64, orientation: Int = 1, codec: String? = nil, duration: Double? = nil, hasAudio: Bool = false
+            checksum: String, byteCount: Int64, orientation: Int = 1, codec: String? = nil, duration: Double? = nil, hasAudio: Bool = false,
+            startOffset: Double? = nil
         ) {
             self.id = id
             roleRaw = role.rawValue
@@ -115,6 +124,7 @@ public enum SchemaV1: VersionedSchema {
             self.pixelHeight = pixelHeight
             self.orientation = orientation
             self.hasAudio = hasAudio
+            self.startOffset = startOffset
             self.checksum = checksum
             self.byteCount = byteCount
         }
@@ -297,12 +307,28 @@ public enum SchemaV1: VersionedSchema {
         public var lengthRaw: String
         public var style: String?
         public var statusRaw: String
-        /// Rendered file, relative to the media store root.
-        public var renderedRelativePath: String?
+        /// Seconds, for `MovieLength.custom`.
+        public var customLength: Double?
+        public var fitRaw: String = MovieFit.fill.rawValue
+        /// F08: the day, and the place, on each clip.
+        public var showsDates: Bool = true
+        public var showsPlaces: Bool = true
+        /// F08: the movie's title over its first seconds.
+        public var showsTitle: Bool = true
+        /// F09: the clips' own sound, 0...1.
+        public var clipSoundLevel: Double = 0.7
+        /// F09: voice notes, 0...1.
+        public var voiceNoteLevel: Double = 1
+        /// Seed of the automatic pick, so the same source picks the same moments again.
+        public var selectionSeed: Int = 0
+        /// The latest rendered file; nil for a draft. Kept apart from the edit decisions above.
+        public var render: MovieRender?
         public var createdAt: Date
         public var updatedAt: Date
         @Relationship(deleteRule: .cascade, inverse: \MovieClip.project) public var clips: [MovieClip] = []
         @Relationship(deleteRule: .cascade, inverse: \MovieAudioTrack.project) public var audioTracks: [MovieAudioTrack] = []
+        /// U51; they share `position` with the clips.
+        @Relationship(deleteRule: .cascade, inverse: \MovieTextCard.project) public var textCards: [MovieTextCard] = []
 
         public init(
             id: UUID = UUID(), title: String, sourceRule: MovieSourceRule, aspectRatio: MovieAspectRatio,
@@ -333,6 +359,11 @@ public enum SchemaV1: VersionedSchema {
             set { statusRaw = newValue.rawValue }
         }
 
+        public var fit: MovieFit {
+            get { MovieFit(rawValue: fitRaw) ?? .fill }
+            set { fitRaw = newValue.rawValue }
+        }
+
         public var orderedClips: [MovieClip] { clips.sorted { $0.position < $1.position } }
     }
 
@@ -342,9 +373,19 @@ public enum SchemaV1: VersionedSchema {
         public var trimStart: Double?
         public var trimEnd: Double?
         public var crop: NormalizedRect?
-        public var pipLayoutOverride: PiPLayout?
+        /// nil keeps the selfie window where it was recorded.
+        public var selfiePlacementRaw: String?
+        public var transitionRaw: String = MovieTransition.cut.rawValue
         public var clipAudioRaw: String
         public var clipVolume: Double
+        /// F09: the moment's voice note plays over its clip; off for a new clip (see `init`).
+        public var includesVoiceNote: Bool = true
+        /// U52; nil uses the layout saved with the moment.
+        public var cameraLayoutRaw: String?
+        /// U52: where the window sits and how big it is; nil keeps the moment's. The camera layout picks what's in it.
+        public var pipFrame: PiPLayout?
+        /// U53: settings for the Atmosphere transition into this clip; nil uses the defaults.
+        public var atmosphere: MovieAtmosphere?
         public var project: MovieProject?
         public var moment: Moment?
 
@@ -354,11 +395,66 @@ public enum SchemaV1: VersionedSchema {
             self.position = position
             clipAudioRaw = ClipAudio.original.rawValue
             clipVolume = 1
+            // Voice notes are private: a new clip leaves its out until it's turned on in the editor (doc 01 §17).
+            // Set here rather than as the stored default, which the store's schema keeps.
+            includesVoiceNote = false
         }
 
         public var clipAudio: ClipAudio {
             get { ClipAudio(rawValue: clipAudioRaw) ?? .original }
             set { clipAudioRaw = newValue.rawValue }
+        }
+
+        public var selfiePlacement: MovieSelfiePlacement? {
+            get { selfiePlacementRaw.flatMap(MovieSelfiePlacement.init(rawValue:)) }
+            set { selfiePlacementRaw = newValue?.rawValue }
+        }
+
+        public var transition: MovieTransition {
+            get { MovieTransition(rawValue: transitionRaw) ?? .cut }
+            set { transitionRaw = newValue.rawValue }
+        }
+
+        public var cameraLayout: ClipCameraLayout? {
+            get { cameraLayoutRaw.flatMap(ClipCameraLayout.init(rawValue:)) }
+            set { cameraLayoutRaw = newValue?.rawValue }
+        }
+    }
+
+    /// U51: a card of text before the first clip or between clips.
+    @Model
+    public final class MovieTextCard {
+        @Attribute(.unique) public var id: UUID
+        /// Shared with the clips' `position`.
+        public var position: Int
+        public var text: String
+        public var lookRaw: String
+        /// Seconds on screen.
+        public var duration: Double
+        public var transitionRaw: String = MovieTransition.cut.rawValue
+        /// Settings for the Atmosphere transition into this card; nil uses the defaults.
+        public var atmosphere: MovieAtmosphere?
+        /// A moment's voice note that plays over the card.
+        public var voiceNoteID: UUID?
+        public var project: MovieProject?
+
+        public init(id: UUID = UUID(), project: MovieProject, position: Int, text: String, look: TextCardLook = .paper, duration: Double = 3) {
+            self.id = id
+            self.project = project
+            self.position = position
+            self.text = text
+            lookRaw = look.rawValue
+            self.duration = duration
+        }
+
+        public var look: TextCardLook {
+            get { TextCardLook(rawValue: lookRaw) ?? .paper }
+            set { lookRaw = newValue.rawValue }
+        }
+
+        public var transition: MovieTransition {
+            get { MovieTransition(rawValue: transitionRaw) ?? .cut }
+            set { transitionRaw = newValue.rawValue }
         }
     }
 
@@ -368,6 +464,8 @@ public enum SchemaV1: VersionedSchema {
         public var kindRaw: String
         /// The person's own audio file (no bundled music in v1), relative to the media store root.
         public var relativePath: String
+        /// The file's name as the person picked it ("Sunday song"), shown on F09.
+        public var name: String?
         public var startOffset: Double
         public var gain: Double
         public var gainEnvelope: [GainPoint]

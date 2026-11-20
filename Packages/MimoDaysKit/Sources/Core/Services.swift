@@ -38,6 +38,14 @@ public protocol NotificationScheduler: Sendable {
     func pending() async -> [SurpriseNotification]
     func schedule(_ notification: SurpriseNotification) async throws
     func cancel(ids: [String]) async
+    /// Every notification of the app, waiting or already shown (S08 Delete all data).
+    func removeAll() async
+}
+
+public extension NotificationScheduler {
+    func removeAll() async {
+        await cancel(ids: await pending().map(\.id))
+    }
 }
 
 // MARK: Location (7.4)
@@ -87,22 +95,4 @@ public enum PurchaseOutcome: Equatable, Sendable {
 public protocol TipStore: Sendable {
     func products() async throws -> [TipProduct]
     func purchase(productID: String) async throws -> PurchaseOutcome
-}
-
-// MARK: Camera (6.1)
-
-public struct CapturedPhoto: Equatable, Sendable {
-    public var backURL: URL
-    /// Nil on devices without multi-camera support.
-    public var frontURL: URL?
-
-    public init(backURL: URL, frontURL: URL?) {
-        self.backURL = backURL
-        self.frontURL = frontURL
-    }
-}
-
-public protocol CaptureEngine: Sendable {
-    func supportsMultiCam() async -> Bool
-    func capturePhoto() async throws -> CapturedPhoto
 }

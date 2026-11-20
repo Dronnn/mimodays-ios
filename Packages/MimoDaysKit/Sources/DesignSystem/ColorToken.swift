@@ -22,6 +22,8 @@ public enum ColorToken: String, CaseIterable, Sendable {
     /// Row details, e.g. the time in a settings row.
     case textTertiary
     case textLink
+    /// Words on a destructive button (`Button / Destructive`): darker than the link, readable on peach.
+    case textDestructive
     case textOnCoral
     case actionCoral
     case actionCoralGradientStart
@@ -33,6 +35,8 @@ public enum ColorToken: String, CaseIterable, Sendable {
     case indicatorInactive
     /// PiP / selfie frame; stays light in dark mode.
     case mediaFrame
+    /// U13/U15: a Mosaic piece's frame; cream, dark plum in dark mode.
+    case mosaicFrame
     /// 45 % scrim behind text on photos.
     case mediaScrim
 

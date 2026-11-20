@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// `Button / Primary`: hand-cut coral shape, Fraunces label, soft coral shadow. Full width, 54 pt tall.
+/// `Button / Primary`: hand-cut coral shape, heading-face label, soft coral shadow. Full width, 54 pt tall.
 public struct PrimaryButtonStyle: ButtonStyle {
     public init() {}
 
@@ -22,7 +22,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
     }
 }
 
-/// `Button / Text`: coral Nunito label, 44 pt tall hit area.
+/// `Button / Text`: coral body-face label, 44 pt tall hit area.
 public struct TextButtonStyle: ButtonStyle {
     public init() {}
 
@@ -35,6 +35,28 @@ public struct TextButtonStyle: ButtonStyle {
             .opacity(configuration.isPressed ? 0.6 : 1)
             .contentShape(Rectangle())
     }
+}
+
+/// `Button / Destructive`: dark coral words on the hand-cut peach shape, 52 pt tall (M07, M15, S08).
+public struct DestructiveButtonStyle: ButtonStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textStyle(.rowTitle)
+            .foregroundStyle(ColorToken.textDestructive.color)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 52)
+            .background { ColorToken.accentPeach.color.mask { Icon.shapeButton.image.resizable() } }
+            .opacity(configuration.isPressed ? 0.7 : 1)
+            .contentShape(Rectangle())
+    }
+}
+
+public extension ButtonStyle where Self == DestructiveButtonStyle {
+    static var destructive: DestructiveButtonStyle { DestructiveButtonStyle() }
 }
 
 public extension ButtonStyle where Self == PrimaryButtonStyle {

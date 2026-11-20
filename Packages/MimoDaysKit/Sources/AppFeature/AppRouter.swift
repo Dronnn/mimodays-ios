@@ -2,6 +2,8 @@ import Core
 import DesignSystem
 import Foundation
 import Observation
+import Persistence
+import SwiftUI
 
 public enum MainTab: String, CaseIterable, Hashable, Sendable {
     case today
@@ -34,6 +36,24 @@ public enum Route: Equatable, Sendable {
     case settings
     /// Opens the camera. `promptID` is set when answering a surprise.
     case capture(promptID: UUID?)
+    /// Starts a movie (F02) on Movies, from a source chosen elsewhere when there is one (a place, a selection).
+    case newMovie(MovieSourceRule?)
+}
+
+/// A screen pushed on Movies (F06, F11, F15).
+enum MovieRoute: Hashable {
+    /// F06-F09.
+    case editor(UUID)
+    /// F15.
+    case movie(UUID)
+    /// F11-F14.
+    case export(UUID)
+}
+
+/// A movie wizard to show, maybe with its source already chosen.
+public struct NewMovieRequest: Equatable, Identifiable, Sendable {
+    public var id = UUID()
+    public var source: MovieSourceRule?
 }
 
 /// What the camera was opened for.
@@ -52,23 +72,49 @@ public struct CaptureRequest: Equatable, Identifiable, Sendable {
 public final class AppRouter {
     public var selectedTab: MainTab
     public var isSettingsPresented = false
-    public var capture: CaptureRequest?
+    /// The camera, then Review. A route that comes while it's up waits until it closes (Andrew, 2026-11-19): a Review
+    /// left behind would go on saving and writing while its draft opened again.
+    public var capture: CaptureRequest? {
+        didSet {
+            guard capture == nil, let held else { return }
+            self.held = nil
+            open(held)
+        }
+    }
+    /// A route waiting for the camera to close; a later one takes its place.
+    var held: Route?
+    public var newMovie: NewMovieRequest?
+    /// What's pushed on Movies.
+    var moviesPath: [MovieRoute] = []
+    /// What's pushed on Today (the camera's last capture opens there).
+    var todayPath = NavigationPath()
 
     public init(selectedTab: MainTab = .today) {
         self.selectedTab = selectedTab
     }
 
     public func open(_ route: Route) {
+        // Another camera over the open one would start over its capture; it stays as it is.
+        if capture != nil {
+            if case .capture = route { return }
+            held = route
+            return
+        }
         switch route {
         case let .tab(tab):
             dismissAll()
             selectedTab = tab
         case .settings:
-            capture = nil
             isSettingsPresented = true
+        case let .newMovie(source):
+            dismissAll()
+            selectedTab = .movies
+            moviesPath = []
+            newMovie = NewMovieRequest(source: source)
         case let .capture(promptID):
             // A surprise wins over whatever is on screen; Capture lives on Today.
             isSettingsPresented = false
+            newMovie = nil
             selectedTab = .today
             capture = CaptureRequest(promptID: promptID)
         }
@@ -77,6 +123,7 @@ public final class AppRouter {
     public func dismissAll() {
         isSettingsPresented = false
         capture = nil
+        newMovie = nil
     }
 
     // MARK: Parsing

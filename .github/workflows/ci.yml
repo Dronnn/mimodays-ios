@@ -18,16 +18,23 @@ jobs:
   app:
     name: App (unit + UI)
     runs-on: xcode-27
-    timeout-minutes: 40
+    # The UI suite alone takes 40+ minutes on hosted runners (20-150 s a test).
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode 27.2
         run: sudo xcode-select -s /Applications/Xcode_27.2.app
       - name: Unit tests
+        env:
+          # Read by the StoreKit test-session purchases, which never finish on hosted runners (unsigned app).
+          TEST_RUNNER_MIMODAYS_CI: "1"
         run: >
           xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan Unit
           -destination "$DESTINATION" -resultBundlePath results/Unit.xcresult CODE_SIGNING_ALLOWED=NO
       - name: UI tests
+        env:
+          # Read by tests that drive Files' own picker, which stalls on hosted runners.
+          TEST_RUNNER_MIMODAYS_CI: "1"
         run: >
           xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan UI
           -destination "$DESTINATION" -resultBundlePath results/UI.xcresult CODE_SIGNING_ALLOWED=NO
@@ -42,7 +49,7 @@ jobs:
   package:
     name: MimoDaysKit (unit, integration, snapshots)
     runs-on: xcode-27
-    timeout-minutes: 30
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: Packages/MimoDaysKit
@@ -50,10 +57,31 @@ jobs:
       - uses: actions/checkout@v4
       - name: Select Xcode 27.2
         run: sudo xcode-select -s /Applications/Xcode_27.2.app
+      # A run that stalls is sampled after 30 minutes, then stopped, so the stacks get uploaded. A slow runner
+      # takes about 20 minutes for the whole run.
       - name: Package tests
-        run: >
-          xcodebuild test -scheme MimoDaysKit-Package
-          -destination "$DESTINATION" -resultBundlePath results/Package.xcresult
+        run: |
+          mkdir -p results/samples
+          xcodebuild test -scheme MimoDaysKit-Package \
+            -destination "$DESTINATION" -resultBundlePath results/Package.xcresult \
+            -skip-testing:AppFeatureTests/ArchivePerformanceTests &
+          tests=$!
+          (
+            sleep 1800
+            kill -0 "$tests" 2>/dev/null || exit 0
+            echo "::warning::Package tests still running after 30 minutes; sampling and stopping them"
+            for pid in $(pgrep -f 'xctest|MimoDaysKit'); do
+              sample "$pid" 5 -file "results/samples/sample-$pid.txt" >/dev/null 2>&1 || true
+            done
+            kill "$tests"
+          ) &
+          wait "$tests"
+      # Timed on their own: run beside the movie exports, they time the runner's load, not the code.
+      - name: Performance tests
+        run: |
+          xcodebuild test -scheme MimoDaysKit-Package \
+            -destination "$DESTINATION" -resultBundlePath results/Performance.xcresult \
+            -only-testing:AppFeatureTests/ArchivePerformanceTests
       - name: Upload results and snapshot diffs
         if: failure()
         uses: actions/upload-artifact@v4

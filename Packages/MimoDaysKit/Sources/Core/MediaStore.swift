@@ -59,6 +59,16 @@ public struct MediaStore: Sendable {
         return try describe(relativePath)
     }
 
+    /// Moves `source` (on the same volume, e.g. a file just unpacked from a backup) into `area` under a new name.
+    public func store(moving source: URL, in area: Area, fileExtension: String? = nil) throws -> StoredFile {
+        let relativePath = newRelativePath(area, fileExtension ?? source.pathExtension)
+        let destination = url(forUnchecked: relativePath)
+        try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try protect(source)
+        try FileManager.default.moveItem(at: source, to: destination)
+        return try describe(relativePath)
+    }
+
     /// Writes `data` into `area` atomically.
     public func store(_ data: Data, in area: Area, fileExtension: String) throws -> StoredFile {
         let relativePath = newRelativePath(area, fileExtension)
@@ -94,13 +104,80 @@ public struct MediaStore: Sendable {
         try FileManager.default.removeItem(at: url)
     }
 
-    /// Files in originals and derived that no record points to, e.g. after an interrupted save.
-    /// Leftover staging files are always orphans.
+    /// Files in originals and derived that no record points to, e.g. after an interrupted save (leftover staging
+    /// files among them). A file a record points to is never one, whatever its name.
     public func orphans(referenced: Set<String>) throws -> [String] {
         try [Area.originals, .derived].flatMap { try relativePaths(in: $0) }
-            .filter { !referenced.contains($0) || ($0 as NSString).lastPathComponent.hasSuffix(".partial") }
+            .filter { !referenced.contains($0) }
             .sorted()
     }
+
+    /// Every stored file goes, unpacked restores left by a stopped app too; the empty areas stay (S08 Delete all data).
+    /// Tries every file even when one won't go, then throws the first failure.
+    public func removeAll() throws {
+        try remove(Area.allCases)
+    }
+
+    /// At launch: what a Delete All left behind goes on. The cache and unpacked restores here; originals and derived
+    /// are the orphan sweep's, which keeps a moment taken since. True when there was one and it's now done.
+    @discardableResult
+    public func finishPendingErase() -> Bool {
+        guard isErasePending else { return false }
+        return (try? remove([.cache])) != nil
+    }
+
+    /// A Delete All isn't done yet.
+    public var isErasePending: Bool { FileManager.default.fileExists(atPath: root.appending(path: Self.erasePending).path) }
+
+    /// When the Delete All that isn't done yet began: what was made later isn't its to remove.
+    public var erasePendingSince: Date? {
+        (try? FileManager.default.attributesOfItem(atPath: root.appending(path: Self.erasePending).path))?[.creationDate] as? Date
+    }
+
+    /// Delete All has begun: until it's done, every launch empties the cache (a quit mid-way included). Kept as it
+    /// is when already there, so it keeps the first attempt's time.
+    public func markErasePending() {
+        guard !isErasePending else { return }
+        FileManager.default.createFile(atPath: root.appending(path: Self.erasePending).path, contents: nil)
+    }
+
+    /// The erase didn't happen after all (its records stayed).
+    public func clearErasePending() {
+        try? FileManager.default.removeItem(at: root.appending(path: Self.erasePending))
+    }
+
+    private func remove(_ areas: [Area]) throws {
+        markErasePending()
+        var failure: (any Error)?
+        func attempt(_ work: () throws -> Void) {
+            do { try work() } catch { failure = failure ?? error }
+        }
+        for area in areas {
+            let folder = root.appendingPathComponent(area.rawValue, isDirectory: true)
+            attempt {
+                for item in try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil) {
+                    attempt { try FileManager.default.removeItem(at: item) }
+                }
+            }
+        }
+        attempt { try removeStaging() }
+        // Left in place on a failure: tried again at every launch until it's done (the cache isn't in the orphan sweep).
+        if let failure { throw failure }
+        try? FileManager.default.removeItem(at: root.appending(path: Self.erasePending))
+    }
+
+    private static let erasePending = ".erase-pending"
+
+    /// Folders a restore unpacks into next to the areas (`.restore-…`); one left by an app that was stopped
+    /// mid-restore holds private media nothing points to.
+    public func removeStaging() throws {
+        let items = try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil, options: [])
+        for item in items where item.lastPathComponent.hasPrefix(Self.stagingPrefix) {
+            try FileManager.default.removeItem(at: item)
+        }
+    }
+
+    public static let stagingPrefix = ".restore-"
 
     public func clearCache() throws {
         let cache = root.appendingPathComponent(Area.cache.rawValue, isDirectory: true)

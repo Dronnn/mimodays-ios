@@ -1,0 +1,390 @@
+@testable import AppFeature
+@testable import Core
+import Foundation
+import QuartzCore
+import Testing
+
+@MainActor
+struct CameraModelMicrophoneTests {
+    private func videoCamera(engine: SimulatedCaptureEngine, allowed: Bool) async -> CameraModel {
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { allowed ? .granted : .denied }, onCapture: { _ in }
+        )
+        await model.start()
+        return model
+    }
+
+    private func eventually(_ condition: () async -> Bool) async -> Bool {
+        for _ in 0..<50 {
+            if await condition() { return true }
+            try? await Task.sleep(for: .milliseconds(20))
+        }
+        return false
+    }
+
+    @Test func aRetakenCameraStillHearsInterruptions() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: true)
+        await model.stop() // Review opens
+        await model.start() // Retake
+        await engine.simulateInterruption(.anotherApp)
+        #expect(await eventually { await MainActor.run { model.interruption == .anotherApp } })
+        await engine.simulateInterruptionEnded()
+        #expect(await eventually { await MainActor.run { model.interruption == nil } })
+    }
+
+    /// An error stopped the camera and nothing says it ended: back in the app, it starts again and the shutter works.
+    @Test func comingBackRestartsACameraAnErrorStopped() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: true)
+        await engine.simulateInterruption(.other)
+        #expect(await eventually { await MainActor.run { model.interruption == .other } })
+        await model.recover()
+        #expect(await eventually { await MainActor.run { model.interruption == nil && model.canCapture } })
+    }
+
+    @Test func aCallEndingWhileReviewShowsFreesTheShutter() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: true)
+        await engine.simulateInterruption(.anotherApp)
+        #expect(await eventually { await MainActor.run { model.interruption == .anotherApp } })
+        await model.stop() // Review opens
+        await engine.simulateInterruptionEnded()
+        await model.start() // Retake
+        #expect(await eventually { await MainActor.run { model.interruption == nil } })
+    }
+
+    @Test func videoWithPermissionAndSoundUsesTheMicrophone() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: true)
+        #expect(model.microphoneOn)
+        #expect(await engine.hasMicrophone)
+    }
+
+    @Test func noPermissionNoMicrophone() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: false)
+        #expect(!model.microphoneOn)
+        #expect(!(await engine.hasMicrophone))
+    }
+
+    /// "Record sound" off in the ••• sheet turns the microphone off.
+    @Test func turningSoundOffInSettingsStopsTheMicrophone() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: true)
+        model.settings.recordsSound = false
+        #expect(await eventually { await !engine.hasMicrophone })
+    }
+
+    @Test func photoModeNeverUsesTheMicrophone() async {
+        let engine = SimulatedCaptureEngine()
+        let model = await videoCamera(engine: engine, allowed: true)
+        model.mode = .photo
+        #expect(await eventually { await !engine.hasMicrophone })
+    }
+}
+
+@MainActor
+struct CameraModelInterruptionTests {
+    @Test func aCallDuringRecordingHandsOverThePartBeforeIt() async throws {
+        let engine = SimulatedCaptureEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.videoLength = .long
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        async let recording: Void = model.shutter()
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+        await engine.simulateInterruption(.anotherApp)
+        await recording
+        guard case let .video(video) = try #require(results.first).media else { Issue.record("not a video"); return }
+        #expect(video.interruption == .anotherApp)
+        results.first?.discardFiles()
+
+        // The shutter waits for the camera to come back.
+        for _ in 0..<50 where model.interruption == nil { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(model.interruption == .anotherApp)
+        #expect(!model.canCapture)
+        await engine.simulateInterruptionEnded()
+        for _ in 0..<50 where model.interruption != nil { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(model.canCapture)
+    }
+
+    /// Closed while a photo is being taken: the photo goes, and no review opens for it.
+    @Test func aPhotoFinishingAfterCloseIsThrownAway() async throws {
+        let engine = HeldPhotoEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .photo
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        async let shot: Void = model.shutter()
+        while await !engine.isHolding { try await Task.sleep(for: .milliseconds(10)) }
+        model.close()
+        await engine.release()
+        await shot
+        #expect(results.isEmpty)
+    }
+
+    /// What the screen showed at the shutter is the photo's: a format or selfie change during the flash is for the next.
+    @Test func changesWhileThePhotoFinishesAreForTheNextOne() async throws {
+        let engine = HeldPhotoEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .photo
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        let format = model.format
+        async let shot: Void = model.shutter()
+        while await !engine.isHolding { try await Task.sleep(for: .milliseconds(10)) }
+        model.setFormat(format == .square ? .portrait : .square)
+        model.toggleSelfie()
+        await engine.release()
+        await shot
+        let result = try #require(results.first)
+        #expect(result.format == format)
+        #expect(result.selfieURL != nil)
+    }
+
+    /// The simulated camera, with a photo that comes only once released and a stop that doesn't cut it short.
+    private actor HeldPhotoEngine: CaptureEngine {
+        private let base = SimulatedCaptureEngine()
+        private var held: CheckedContinuation<Void, Never>?
+        var isHolding: Bool { held != nil }
+        func release() { held?.resume(); held = nil }
+
+        func start() async throws -> CameraSetup { try await base.start() }
+        func stop() async {}
+        func backLenses() async -> [BackLens] { await base.backLenses() }
+        func setBackLens(_ lens: BackLens) async throws { try await base.setBackLens(lens) }
+        func flip() async throws -> CameraSetup { try await base.flip() }
+        func setMicrophone(_ enabled: Bool) async throws { try await base.setMicrophone(enabled) }
+        func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto {
+            await withCheckedContinuation { held = $0 }
+            return try await base.capturePhoto(flash: flash, silent: silent)
+        }
+        func record(limit: Duration?) async throws -> CapturedVideo { try await base.record(limit: limit) }
+        func stopRecording() async { await base.stopRecording() }
+        func setTorch(_ mode: FlashMode) async { await base.setTorch(mode) }
+        func setCaptureHold(_ hold: DeviceHold) async { await base.setCaptureHold(hold) }
+        @MainActor func previewLayer(for _: CameraPosition) -> CALayer? { nil }
+        @MainActor func setPreviewHold(_: DeviceHold) {}
+        nonisolated var events: AsyncStream<CaptureEvent> { base.events }
+    }
+
+    /// Stop tapped while the recording is still starting (here, the torch) ends it: it doesn't run to its limit.
+    @Test func aStopWhileTheRecordingStartsIsKept() async throws {
+        let engine = SimulatedCaptureEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.videoLength = .long
+        settings.flash = .on
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        async let recording: Void = model.shutter()
+        while !model.isRecording { await Task.yield() }
+        await model.shutter()
+        await recording
+        #expect(results.isEmpty && !model.isRecording)
+        #expect(await !engine.isRecording)
+    }
+
+    /// 9.19: the flash button lights the rear camera while a video records, also when pressed mid-recording.
+    @Test func flashLightsTheRearCameraWhileRecording() async throws {
+        let engine = SimulatedCaptureEngine()
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.videoLength = .long
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { $0.discardFiles() }
+        )
+        await model.start()
+        model.settings.flash = .on
+        async let recording: Void = model.shutter()
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+        model.settings.flash = .off
+        model.nextFlash()
+        try await Task.sleep(for: .milliseconds(100))
+        await engine.stopRecording()
+        await recording
+        #expect(await engine.torchChanges == [.on, .off, .auto, .off])
+    }
+
+    /// Sound off records no sound, also right after it was on (Andrew, 2026-11-16); sound on records it.
+    @Test func eachRecordingTakesTheSoundSettingAtTheShutter() async throws {
+        let engine = SimulatedCaptureEngine()
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.videoLength = .long
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .granted }, onCapture: { $0.discardFiles() }
+        )
+        await model.start()
+        for sound in [false, true, false] {
+            model.toggleSound()
+            #expect(model.microphoneOn == sound)
+            async let recording: Void = model.shutter()
+            while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+            #expect(await engine.hasMicrophone == sound)
+            await engine.stopRecording()
+            await recording
+        }
+    }
+
+    /// The ••• sheet's rear lens reaches the camera when it opens and when it changes (Andrew, 2026-11-16).
+    @Test func theChosenBackLensFilms() async throws {
+        let engine = SimulatedCaptureEngine(lenses: [.ultraWide, .wide, .telephoto])
+        var settings = CameraSettings()
+        settings.backLens = .ultraWide
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { $0.discardFiles() }
+        )
+        await model.start()
+        #expect(model.lenses == [.ultraWide, .wide, .telephoto])
+        #expect(await engine.backLens == .ultraWide)
+        model.settings.backLens = .telephoto
+        for _ in 0..<50 where await engine.backLens != .telephoto { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(await engine.backLens == .telephoto)
+    }
+
+    /// The flash button goes off, auto, on and round again, and the camera remembers it (Andrew, 2026-11-16).
+    @Test func flashButtonGoesRoundItsThreeModes() {
+        let store = InMemoryCameraSettingsStore()
+        let model = CameraModel(
+            engine: SimulatedCaptureEngine(), store: store, isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { $0.discardFiles() }
+        )
+        var seen = [model.settings.flash]
+        for _ in 0..<3 {
+            model.nextFlash()
+            seen.append(model.settings.flash)
+        }
+        #expect(seen == [.off, .auto, .on, .off])
+        model.nextFlash()
+        #expect(store.load().flash == .auto)
+    }
+}
+
+@MainActor
+struct CameraNoticeTests {
+    private func camera(
+        engine: any CaptureEngine = SimulatedCaptureEngine(), mode: CameraSettings.Mode = .video,
+        sound: Bool = true, microphone: PermissionStatus = .granted
+    ) async -> CameraModel {
+        var settings = CameraSettings()
+        settings.opensIn = mode
+        settings.recordsSound = sound
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { microphone }, onCapture: { $0.discardFiles() }
+        )
+        await model.start()
+        return model
+    }
+
+    @Test func aDeniedMicrophoneIsExplainedOnlyWhenItMatters() async {
+        #expect(await camera(microphone: .denied).notice == .microphoneOff)
+        #expect(await camera(microphone: .restricted).notice == .microphoneOff)
+        #expect(await camera(sound: false, microphone: .denied).notice == nil)
+        #expect(await camera(mode: .photo, microphone: .denied).notice == nil)
+        #expect(await camera(microphone: .notDetermined).notice == nil)
+    }
+
+    @Test func noRoomToRecordIsExplained() async {
+        let model = await camera(engine: SimulatedCaptureEngine(freeBytes: 100_000_000))
+        await model.shutter()
+        #expect(model.notice == .lowStorage)
+        #expect(model.phase == .ready)
+    }
+
+    @Test func aCameraThatCannotStartIsExplained() async {
+        let model = await camera(engine: AVCaptureEngine())
+        #expect(model.notice == .unavailable)
+        #expect(!model.canCapture)
+    }
+
+    @Test func interruptionsOutrankTheMicrophone() async throws {
+        let engine = SimulatedCaptureEngine()
+        let model = await camera(engine: engine, microphone: .denied)
+        await engine.simulateInterruption(.tooWarm)
+        for _ in 0..<50 where model.interruption == nil { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(model.notice == .interrupted(.tooWarm))
+    }
+}
+
+struct MediaCheckTests {
+    private func file(_ ext: String, _ bytes: [UInt8] = Array("not media".utf8)) throws -> URL {
+        let url = try CaptureFiles.temporaryURL(ext)
+        try Data(bytes).write(to: url)
+        return url
+    }
+
+    private func goodPhoto() async throws -> CapturedPhoto {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        return try await engine.capturePhoto(flash: .off, silent: true)
+    }
+
+    @Test func anUnreadableMainPhotoIsRejectedAndDeleted() async throws {
+        let good = try await goodPhoto()
+        let broken = CapturedPhoto(mainURL: try file("jpg"), mainPosition: .back, selfieURL: good.selfieURL)
+        #expect(MediaCheck.checked(broken) == nil)
+        #expect(!FileManager.default.fileExists(atPath: broken.mainURL.path))
+        #expect(!FileManager.default.fileExists(atPath: try #require(good.selfieURL).path))
+        try? FileManager.default.removeItem(at: good.mainURL)
+    }
+
+    @Test func anUnreadableSelfieIsDroppedAndTheMomentKept() async throws {
+        let good = try await goodPhoto()
+        let broken = try file("jpg")
+        let photo = try #require(MediaCheck.checked(CapturedPhoto(mainURL: good.mainURL, mainPosition: .back, selfieURL: broken)))
+        #expect(photo.selfieURL == nil)
+        #expect(!FileManager.default.fileExists(atPath: broken.path))
+        [good.mainURL, good.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
+    }
+
+    /// A photo cut off part-way (its size still reads) isn't a moment.
+    @Test func aCutOffPhotoIsRejected() async throws {
+        let good = try await goodPhoto()
+        let data = try Data(contentsOf: good.mainURL)
+        let cut = try file("jpg", Array(data.prefix(data.count / 2)))
+        #expect(!MediaCheck.isReadableImage(cut))
+        #expect(MediaCheck.isReadableImage(good.mainURL))
+        [cut, good.mainURL, good.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
+    }
+
+    @Test func anEmptyVideoIsRejected() async throws {
+        let empty = CapturedVideo(mainURL: try file("mov", []), mainPosition: .back, selfieURL: nil, duration: 0, selfieOffset: 0, hasAudio: false)
+        #expect(await MediaCheck.checked(empty) == nil)
+        #expect(!FileManager.default.fileExists(atPath: empty.mainURL.path))
+    }
+
+    @Test func aRecordedVideoPasses() async throws {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let video = try await engine.record(limit: .seconds(1))
+        let checked = try #require(await MediaCheck.checked(video))
+        #expect(checked == video)
+        [video.mainURL, video.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
+    }
+}

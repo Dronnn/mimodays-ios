@@ -11,7 +11,7 @@ struct OnboardingIntroView: View {
             header
             TabView(selection: $page) {
                 ForEach(OnboardingPage.allCases) { page in
-                    OnboardingPageView(page: page) { advance(from: page) }
+                    OnboardingPageView(page: page, isCurrent: page == self.page) { advance(from: page) }
                         .tag(page)
                 }
             }
@@ -27,7 +27,7 @@ struct OnboardingIntroView: View {
             if page.canSkip {
                 Button(action: onFinish) {
                     Text("Skip", bundle: .module)
-                        .textStyle(TextStyle(.nunito, size: 17, weight: 700, relativeTo: .body))
+                        .textStyle(TextStyle(.body, size: 17, weight: 700, relativeTo: .body))
                         .foregroundStyle(ColorToken.textLink.color)
                         .frame(minWidth: Size.minimumTapTarget, minHeight: Size.minimumTapTarget, alignment: .trailing)
                 }
@@ -37,7 +37,7 @@ struct OnboardingIntroView: View {
         .frame(minHeight: Size.minimumTapTarget)
         .padding(.leading, 24)
         .padding(.trailing, Spacing.screenMargin)
-        .padding(.top, -10)
+        .statusBarLift(10, compactOnly: false)
     }
 
     private func advance(from current: OnboardingPage) {
@@ -52,12 +52,21 @@ struct OnboardingIntroView: View {
 /// One page: art, headline, body; the button stays at the bottom.
 struct OnboardingPageView: View {
     let page: OnboardingPage
+    /// The page in view plays its clips; the pages beside it keep their stills.
+    var isCurrent = true
     let action: () -> Void
+    /// What the page shows above the button.
+    @State private var visibleHeight: CGFloat = 0
+
+    /// Room the headline and body take under the art at the default text size.
+    private static let textRoom: CGFloat = 216
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                ArtCanvas(layers: page.artLayers)
+                ArtCanvas(layers: page.artLayers, playsLoops: isCurrent)
+                    // A short screen (iPhone Duo's outer display) draws the art smaller, so the words fit under it.
+                    .frame(maxHeight: visibleHeight > 0 ? max(200, visibleHeight - Self.textRoom) : nil)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, Spacing.screenMargin)
                     .padding(.top, 16)
@@ -77,6 +86,7 @@ struct OnboardingPageView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollBounceBehavior(.basedOnSize)
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.height - $0.safeAreaInsets.bottom }) { visibleHeight = $0 }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Button(action: action) { Text(page.primaryAction) }
                 .buttonStyle(.primary)

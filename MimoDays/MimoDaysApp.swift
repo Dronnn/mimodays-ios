@@ -5,19 +5,28 @@ import UIKit
 
 @main
 struct MimoDaysApp: App {
-    private let dependencies: AppDependencies
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    private let configuration = LaunchConfiguration()
+    /// Nil when the store can't be opened: the launch offers a way back instead of crashing.
+    private let dependencies: AppDependencies?
 
     init() {
-        let configuration = LaunchConfiguration()
         if configuration.isUITesting {
             UIView.setAnimationsEnabled(false)
         }
-        dependencies = AppDependencies(configuration: configuration)
+        dependencies = try? AppDependencies(configuration: configuration)
     }
 
     var body: some Scene {
         WindowGroup {
-            RootView(dependencies: dependencies)
+            AppLaunchView(configuration: configuration, opened: dependencies)
         }
+    }
+}
+
+/// Reports the orientations the app allows right now: upright only while capturing (C.3).
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_: UIApplication, supportedInterfaceOrientationsFor _: UIWindow?) -> UIInterfaceOrientationMask {
+        OrientationLock.mask
     }
 }

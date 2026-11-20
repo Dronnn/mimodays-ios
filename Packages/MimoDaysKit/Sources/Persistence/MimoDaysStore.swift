@@ -2,7 +2,7 @@ import Core
 import Foundation
 import SwiftData
 
-// Current model names. When SchemaV2 lands, point these at it and add a stage to the migration plan.
+// Current model names. Until 1.0 ships, V1 changes in place; after that, a new version points these at it and adds a stage.
 public typealias Moment = SchemaV1.Moment
 public typealias MomentMedia = SchemaV1.MomentMedia
 public typealias MomentVoiceNote = SchemaV1.MomentVoiceNote
@@ -13,12 +13,13 @@ public typealias MomentCollection = SchemaV1.MomentCollection
 public typealias CollectionMembership = SchemaV1.CollectionMembership
 public typealias MovieProject = SchemaV1.MovieProject
 public typealias MovieClip = SchemaV1.MovieClip
+public typealias MovieTextCard = SchemaV1.MovieTextCard
 public typealias MovieAudioTrack = SchemaV1.MovieAudioTrack
 public typealias ExportJob = SchemaV1.ExportJob
 public typealias BackupManifest = SchemaV1.BackupManifest
 public typealias AppPreferences = SchemaV1.AppPreferences
 
-/// Every schema version in order. Each new version adds a migration stage; versions are never edited once shipped.
+/// Every schema version in order. Each new version adds a migration stage; versions are never edited once shipped (none has yet).
 public enum MimoDaysMigrationPlan: SchemaMigrationPlan {
     public static var schemas: [any VersionedSchema.Type] { [SchemaV1.self] }
     public static var stages: [MigrationStage] { [] }

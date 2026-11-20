@@ -18,7 +18,7 @@ struct SurpriseCoordinatorTests {
         }
     }
 
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let notifications = FakeNotificationScheduler()
     private let device = DeviceCalendar("Europe/Berlin")
     private let clock: TestDateProvider
@@ -184,14 +184,42 @@ struct SurpriseCoordinatorTests {
         let prompt = try #require(try prompts().first)
         clock.set(prompt.plannedAt.addingTimeInterval(14 * 60))
         #expect(coordinator.open(promptID: prompt.id))
+        let moment = shot(at: clock.now())
         // Reviewing takes a while; the window closes before the save.
         clock.advance(by: 5 * 60)
         await coordinator.refresh()
         #expect(prompt.outcome == .expired)
-        let moment = UUID()
         coordinator.captured(promptID: prompt.id, momentID: moment)
         #expect(prompt.outcome == .captured)
         #expect(prompt.capturedMomentID == moment)
+    }
+
+    /// The camera opened in time but the shutter pressed after the window: a plain capture (Help › Surprises).
+    @Test func aShotAfterTheWindowDoesntAnswerThePrompt() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let prompt = try #require(try prompts().first)
+        clock.set(prompt.plannedAt.addingTimeInterval(14 * 60))
+        #expect(coordinator.open(promptID: prompt.id))
+        #expect(coordinator.expiry(of: prompt.id) == prompt.expiresAt)
+        clock.set(prompt.expiresAt.addingTimeInterval(5 * 60))
+        coordinator.captured(promptID: prompt.id, momentID: shot(at: clock.now()))
+        #expect(prompt.outcome != .captured)
+    }
+
+    @Test func aLaterSurpriseDoesntOpenEarly() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let prompt = try #require(try prompts().first)
+        #expect(clock.now() < prompt.plannedAt)
+        #expect(!coordinator.open(promptID: prompt.id))
+        #expect(prompt.outcome == .pending && prompt.openedAt == nil)
+    }
+
+    private func shot(at date: Date) -> UUID {
+        let moment = Moment(captured: CaptureTime(instant: date, timeZone: device.calendar.timeZone), origin: .randomPrompt, mediaType: .photo, createdAt: date)
+        context.insert(moment)
+        return moment.id
     }
 
     @Test func aPromptThatWasNeverOpenedIsNotAnswered() async throws {
@@ -276,6 +304,17 @@ struct SurpriseCoordinatorTests {
         #expect(await notifications.pending().count == 14)
     }
 
+    @Test func aWeekChosenAfterAnIndefinitePauseEndsInAWeek() async throws {
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        await coordinator.pause(.indefinitely)
+        await coordinator.pause(.week)
+        #expect(!schedule.isPausedIndefinitely)
+        #expect(schedule.pausedUntil == date("2026-11-18 00:00"))
+        await coordinator.pause(.indefinitely)
+        #expect(schedule.isPausedIndefinitely && schedule.pausedUntil == nil)
+    }
+
     @Test func resumingEarlyPlansTodayAgain() async throws {
         let coordinator = coordinator()
         await coordinator.refresh()
@@ -294,6 +333,61 @@ struct SurpriseCoordinatorTests {
     }
 
     // MARK: Changes
+
+    @Test func sendingOneNowArrivesInSecondsAndStaysThroughAReplan() async throws {
+        clock.set(date("2026-11-11 23:30")) // outside the hours
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        #expect(await coordinator.sendNow())
+        let now = try #require(try prompts(.pending).first)
+        #expect(now.plannedAt == date("2026-11-11 23:30").addingTimeInterval(10))
+        #expect(now.expiresAt == now.plannedAt.addingTimeInterval(15 * 60))
+        await coordinator.settingsChanged()
+        #expect(try prompts(.pending).first?.id == now.id)
+        let pending = await notifications.pending()
+        #expect(pending.first?.id == now.id.uuidString)
+        #expect(pending.first?.fireDate == now.plannedAt)
+        clock.set(now.plannedAt.addingTimeInterval(5))
+        #expect(coordinator.open(promptID: now.id))
+    }
+
+    /// A pause stops even the surprise due in a few seconds: nothing more comes once the person said so.
+    @Test func aPauseStopsASurpriseDueWithinTheMinute() async throws {
+        clock.set(date("2026-11-11 23:30"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        #expect(await coordinator.sendNow())
+        let soon = try #require(try prompts(.pending).first)
+        await coordinator.pause(.today)
+        #expect(soon.outcome == .cancelled)
+        #expect(await !notifications.pending().contains { $0.id == soon.notificationRequestID })
+    }
+
+    @Test func aSecondTapSendsNoSecondSurprise() async throws {
+        clock.set(date("2026-11-11 23:30"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        #expect(await coordinator.sendNow())
+        #expect(await coordinator.sendNow())
+        let soon = clock.now().addingTimeInterval(SurpriseCoordinator.sendNowDelay)
+        #expect(try prompts(.pending).count { $0.plannedAt <= soon } == 1)
+    }
+
+    /// iOS turned the request down: Settings doesn't say it's on its way, and Today doesn't wait for it.
+    @Test func aSendIOSRefusesIsNotReportedAsSent() async throws {
+        clock.set(date("2026-11-11 23:30"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        await notifications.setScheduleError(.unavailable)
+        #expect(await !coordinator.sendNow())
+        let soon = clock.now().addingTimeInterval(SurpriseCoordinator.sendNowDelay)
+        #expect(try prompts(.pending).count { $0.plannedAt <= soon } == 0)
+    }
+
+    @Test func sendingOneNowNeedsNotifications() async throws {
+        #expect(await coordinator(.denied).sendNow() == false)
+        #expect(try prompts().isEmpty)
+    }
 
     @Test func newSettingsReplaceTheFuturePlan() async throws {
         let coordinator = coordinator()
@@ -352,7 +446,7 @@ struct SurpriseCoordinatorTests {
 @MainActor
 struct OnboardingSurprisesTests {
     typealias DeviceCalendar = SurpriseCoordinatorTests.DeviceCalendar
-    private let container = try! MimoDaysStore.makeContainer(inMemory: true)
+    private let container = try! TestStore.container()
     private let notifications = FakeNotificationScheduler()
 
     private func flow(answer: PermissionStatus) -> OnboardingFlow {

@@ -1,0 +1,68 @@
+import Core
+import Foundation
+import Persistence
+import SwiftData
+
+/// S09: how Memories opens and sorts, whether Today shows On this day, and which time zone decides a moment's day.
+struct MemoriesSettings: Codable, Equatable, Sendable {
+    enum Mode: String, Codable, CaseIterable, Sendable {
+        case timeline
+        case calendar
+
+        var memoriesMode: MemoriesMode { self == .timeline ? .timeline : .calendar }
+    }
+
+    /// Which day a moment belongs to.
+    enum Days: String, Codable, CaseIterable, Sendable {
+        /// Where it was taken: 11 PM in New York stays on that day, wherever you are now.
+        case whereTaken
+        /// The iPhone's time zone now.
+        case thisIPhone
+    }
+
+    var opensIn = Mode.timeline
+    var newestFirst = true
+    var onThisDayOnToday = true
+    var days = Days.whereTaken
+
+    init() {}
+
+    /// Settings saved by an earlier version lack the newer keys; those keep their defaults.
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        opensIn = try container.decodeIfPresent(Mode.self, forKey: .opensIn) ?? opensIn
+        newestFirst = try container.decodeIfPresent(Bool.self, forKey: .newestFirst) ?? newestFirst
+        onThisDayOnToday = try container.decodeIfPresent(Bool.self, forKey: .onThisDayOnToday) ?? onThisDayOnToday
+        days = try container.decodeIfPresent(Days.self, forKey: .days) ?? days
+    }
+}
+
+/// The S09 settings for the whole app.
+typealias MemoriesPreferences = DevicePreference<MemoriesSettings>
+
+extension DevicePreference<MemoriesSettings> {
+    static func memories(_ defaults: UserDefaults?) -> MemoriesPreferences {
+        MemoriesPreferences(key: "memoriesSettings", defaults: defaults, initial: MemoriesSettings())
+    }
+}
+
+/// Each moment's stored day (`localDay`, which Memories, the calendar, On this day and movies all go by) for
+/// the S09 time zone choice.
+enum MomentDays {
+    /// Rewrites the days that differ; returns how many did. `deviceZone` is the iPhone's zone now.
+    @MainActor
+    @discardableResult
+    static func relabel(_ context: ModelContext, days: MemoriesSettings.Days, deviceZone: TimeZone = .current) throws -> Int {
+        var changed = 0
+        for moment in try context.fetch(FetchDescriptor<Moment>()) {
+            let zone = days == .thisIPhone ? deviceZone : TimeZone(identifier: moment.timeZoneID) ?? .gmt
+            let day = LocalDay(moment.capturedAt, in: zone).key
+            if moment.localDay != day {
+                moment.localDay = day
+                changed += 1
+            }
+        }
+        if changed > 0 { try context.save() }
+        return changed
+    }
+}

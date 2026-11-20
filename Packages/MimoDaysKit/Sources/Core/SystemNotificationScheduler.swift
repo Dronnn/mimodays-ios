@@ -36,6 +36,13 @@ public struct SystemNotificationScheduler: NotificationScheduler {
     public func cancel(ids: [String]) async {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
     }
+
+    /// Surprises, the backup reminder, "Your movie is ready", and those already in Notification Center.
+    public func removeAll() async {
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+        center.removeAllDeliveredNotifications()
+    }
 }
 
 /// Keeps requests in memory instead of handing them to iOS: UI tests, which must not leave

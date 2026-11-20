@@ -1,0 +1,129 @@
+import CoreGraphics
+import Persistence
+
+/// Where the selfie window goes in the preview (C01, C04). Values from the 402 pt design: the top corners sit
+/// 49.1 pt below the safe area, the bottom ones 125 pt above the preview's bottom edge (clear of the 10/30/60 s
+/// picker), 8.7 pt from the left edge and 23.3 pt from the right one. Size changes keep the corner's edges.
+/// Corners are physical: the same in right-to-left languages, as the saved moment is composed.
+struct SelfieWindowLayout {
+    typealias Corner = CameraSettings.SelfieWindow.Corner
+    typealias Scale = CameraSettings.SelfieWindow.Scale
+
+    /// The medium frame; the window adds a 6 pt gap and a 4 pt handle below it.
+    static let frame = CGSize(width: 112, height: 150)
+    static let handleSpace: CGFloat = 10
+
+    let preview: CGSize
+    let topInset: CGFloat
+    /// The "A little surprise" chip's corner (top left, top right in right-to-left languages) and bottom edge:
+    /// a window in that corner starts below it.
+    var chip: (corner: Corner, bottom: CGFloat)?
+    /// Space under the bottom corners: the camera keeps clear of the 10/30/60 s picker; review has nothing there.
+    var bottomMargin: CGFloat = 125
+    /// Space over the top corners, below the top inset. Inside a 1:1 or 16:9 frame the window keeps 17 pt from its edges (U02).
+    var topMargin: CGFloat = 49.1
+    /// Space beside the left and right corners. Held sideways, the side with the buttons keeps clear of them (U04).
+    var leftMargin: CGFloat = 8.7
+    var rightMargin: CGFloat = 23.3
+    /// Held sideways the window lies on its side: 150 x 112 at the medium size (U04).
+    var sideways = false
+
+    static func frameSize(_ scale: Scale) -> CGSize {
+        CGSize(width: frame.width * scale.factor, height: frame.height * scale.factor)
+    }
+
+    /// Frame plus handle.
+    static func windowSize(_ scale: Scale) -> CGSize {
+        let frame = frameSize(scale)
+        return CGSize(width: frame.width, height: frame.height + handleSpace)
+    }
+
+    /// The frame at `scale` in this layout: upright, or on its side.
+    func frameSize(_ scale: Scale) -> CGSize {
+        let size = Self.frameSize(scale)
+        return sideways ? CGSize(width: size.height, height: size.width) : size
+    }
+
+    func windowSize(_ scale: Scale) -> CGSize {
+        let frame = frameSize(scale)
+        return CGSize(width: frame.width, height: frame.height + Self.handleSpace)
+    }
+
+    /// Centre of the whole window (frame and handle).
+    func center(_ corner: Corner, _ scale: Scale) -> CGPoint {
+        let size = windowSize(scale)
+        let x = corner.isLeft ? leftMargin + size.width / 2 : preview.width - rightMargin - size.width / 2
+        var top = topInset + topMargin
+        if let chip, chip.corner == corner { top = max(top, chip.bottom + 12) }
+        let y = corner.isTop ? top + size.height / 2 : preview.height - bottomMargin - size.height / 2
+        return CGPoint(x: x, y: y)
+    }
+
+    /// Centre of the frame alone, where the C04 targets are drawn.
+    func frameCenter(_ corner: Corner, _ scale: Scale) -> CGPoint {
+        let center = center(corner, scale)
+        return CGPoint(x: center.x, y: center.y - Self.handleSpace / 2)
+    }
+
+    /// The frame (without the handle) where the window sits, for composing the photo.
+    func windowFrame(_ placement: CameraSettings.SelfieWindow) -> SelfieWindowFrame {
+        let center = frameCenter(placement.corner, placement.scale)
+        let size = frameSize(placement.scale)
+        let frame = CGRect(x: center.x - size.width / 2, y: center.y - size.height / 2, width: size.width, height: size.height)
+        return SelfieWindowFrame(frame: frame, preview: preview)
+    }
+
+    /// The corner a window centred at `point` snaps to.
+    func nearest(to point: CGPoint, _ scale: Scale) -> Corner {
+        Corner.allCases.min { distance(center($0, scale), point) < distance(center($1, scale), point) } ?? .topRight
+    }
+
+    private func distance(_ a: CGPoint, _ b: CGPoint) -> CGFloat {
+        hypot(a.x - b.x, a.y - b.y)
+    }
+}
+
+extension SelfieWindowLayout {
+    /// The camera's layout on media of `aspectRatio` shown at the full `width`. Review and the player lay the
+    /// window out here and draw it scaled to the size the media is shown at, so it is the recorded window
+    /// wherever it shows, and what is saved does not depend on how big the media happens to be on screen.
+    static func media(width: CGFloat, aspectRatio: CGFloat, topInset: CGFloat) -> SelfieWindowLayout {
+        SelfieWindowLayout(preview: CGSize(width: width, height: width / max(aspectRatio, 0.01)), topInset: topInset)
+    }
+
+    /// The camera's layout for a moment of `format` (C.5): 9:16 as above; 1:1 inside its frame (U02); 16:9 sideways
+    /// on the frame the phone held sideways shows, `width` being its short side (U04).
+    static func media(width: CGFloat, format: CaptureFormat, topInset: CGFloat) -> SelfieWindowLayout {
+        switch format {
+        case .portrait: media(width: width, aspectRatio: format.aspectRatio, topInset: topInset)
+        case .square: insideFrame(CGSize(width: width, height: width))
+        case .landscape: sideways(preview: CGSize(width: width * format.aspectRatio, height: width))
+        }
+    }
+
+    /// Inside a 1:1 or 16:9 frame on the upright camera: 17 pt from its top and bottom edges (U02).
+    static func insideFrame(_ size: CGSize) -> SelfieWindowLayout {
+        SelfieWindowLayout(preview: size, topInset: 0, bottomMargin: 17, topMargin: 17)
+    }
+
+    /// The phone held sideways (U04): on its side, clear of the buttons' column and of the pickers' row.
+    static func sideways(preview: CGSize, columnOnRight: Bool = false, chip: (corner: Corner, bottom: CGFloat)? = nil) -> SelfieWindowLayout {
+        let column = CameraChrome.sidewaysColumnSpace
+        return SelfieWindowLayout(
+            preview: preview, topInset: 0, chip: chip, bottomMargin: 60, topMargin: 17,
+            leftMargin: columnOnRight ? 8.7 : column, rightMargin: columnOnRight ? column : 23.3, sideways: true
+        )
+    }
+
+    /// The corner and size closest to a saved window. Moments saved before 9.17, with odd layouts, land in
+    /// the nearest corner at the nearest size.
+    func placement(nearest layout: PiPLayout) -> CameraSettings.SelfieWindow {
+        let short = layout.scale * min(preview.width, preview.height)
+        let scale = Scale.allCases.min {
+            abs(Self.frameSize($0).width - short) < abs(Self.frameSize($1).width - short)
+        } ?? .medium
+        // The saved centre is the frame's; the layout's corners are the whole window's (frame and handle).
+        let center = CGPoint(x: layout.centerX * preview.width, y: layout.centerY * preview.height + Self.handleSpace / 2)
+        return CameraSettings.SelfieWindow(corner: nearest(to: center, scale), scale: scale)
+    }
+}

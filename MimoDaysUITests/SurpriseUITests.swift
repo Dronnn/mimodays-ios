@@ -21,17 +21,35 @@ final class SurpriseUITests: XCTestCase {
     func testTapInTimeOpensTheSurpriseCamera() {
         let app = launch(tap: .inTime)
         XCTAssertTrue(app.otherElements["camera"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["camera.surprise"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["camera.surprise"].exists)
         // Not now: closing is safe and lands on Today.
         app.buttons["capture.close"].tap()
         XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.tabBars.firstMatch.buttons.element(boundBy: 0).isSelected)
     }
 
+    /// 7.7: from the notification a photo is kept in two taps, shutter and Save, with nothing in between (after
+    /// picking Photo: the camera opens in Video).
+    @MainActor
+    func testASurpriseIsKeptInTwoTaps() {
+        let app = launch(tap: .inTime)
+        let shutter = app.buttons["camera.shutter"]
+        XCTAssertTrue(shutter.waitForExistence(timeout: 5))
+        app.buttons["camera.mode.photo"].tap()
+        shutter.tap()
+        let save = app.buttons["review.save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        // 7.6: review marks it as a surprise.
+        XCTAssertTrue(app.descendants(matching: .any)["review.time"].label.hasPrefix("Surprise moment"))
+        save.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["capture"].exists)
+    }
+
     @MainActor
     func testTapAfterExpiryOpensAPlainCamera() {
         let app = launch(tap: .expired)
         XCTAssertTrue(app.otherElements["camera"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["camera.surprise"].exists)
+        XCTAssertFalse(app.descendants(matching: .any)["camera.surprise"].exists)
     }
 }

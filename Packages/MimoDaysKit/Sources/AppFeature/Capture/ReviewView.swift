@@ -166,12 +166,18 @@ struct ReviewView: View {
         }
     }
 
-    /// Copy approved by Andrew, 2026-11-13.
+    /// Copy approved by Andrew, 2026-11-13; a caption or a picked place alone asks too (Andrew, 2026-11-20).
     private var retakeTitle: Text {
         switch (model.note.isEmpty, model.voice == nil) {
         case (false, false): Text("Retake and drop the notes?", bundle: .module)
         case (true, false): Text("Retake and drop the voice note?", bundle: .module)
-        default: Text("Retake and drop the note?", bundle: .module)
+        case (false, true): Text("Retake and drop the note?", bundle: .module)
+        case (true, true):
+            switch (model.hasCaption, model.hasChosenPlace) {
+            case (true, true): Text("Retake and drop the caption and place?", bundle: .module, comment: "Review (C07): confirmation before Retake throws away the caption written and the place picked")
+            case (false, true): Text("Retake and drop the place?", bundle: .module, comment: "Review (C07): confirmation before Retake throws away the place picked")
+            default: Text("Retake and drop the caption?", bundle: .module, comment: "Review (C07): confirmation before Retake throws away the caption written")
+            }
         }
     }
 

@@ -152,4 +152,18 @@ struct ReviewDraftTests {
         #expect(review.hasAnnotations)
         #expect(review.momentDraft.note == review.note)
     }
+
+    /// Retake asks before dropping a caption or a picked place too (Andrew, 2026-11-20); spaces and "No place" don't.
+    @Test func aCaptionOrAPickedPlaceCountsAsSomethingToKeep() async throws {
+        let review = ReviewModel(capture: try await capture())
+        defer { review.discard() }
+        review.caption = "  "
+        review.choose(nil)
+        #expect(!review.hasAnnotations)
+        review.caption = "Sunday"
+        #expect(review.hasAnnotations && review.hasCaption && !review.hasChosenPlace)
+        review.caption = ""
+        review.choose(ReviewPlace(label: "Yerevan", latitude: 40.18, longitude: 44.51, precision: .city, source: .manual))
+        #expect(review.hasAnnotations && review.hasChosenPlace)
+    }
 }

@@ -121,8 +121,12 @@ final class ReviewModel {
         }
     }
 
-    /// Something Retake would throw away besides the capture.
-    var hasAnnotations: Bool { !note.isEmpty || voice != nil }
+    /// Something Retake would throw away besides the capture: a place counts once it was picked, not the city found
+    /// by itself.
+    var hasAnnotations: Bool { !note.isEmpty || voice != nil || hasCaption || hasChosenPlace }
+
+    var hasCaption: Bool { !caption.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    var hasChosenPlace: Bool { placeWasChosen && place != nil }
 
     /// Retaken or saved: the draft file belongs to the next capture now, and a lookup still finishing for this one
     /// mustn't write over it.

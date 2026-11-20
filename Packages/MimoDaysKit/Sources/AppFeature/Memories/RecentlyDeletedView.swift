@@ -177,9 +177,12 @@ final class RecentlyDeletedModel {
 
     func daysLeft(_ item: DeletedItem) -> Int { DeletionStore.daysLeft(deletedAt: item.deletedAt, now: now) }
 
-    /// The ones recovered: not what went past its 30 days meanwhile.
+    /// The ones recovered: not what went past its 30 days meanwhile. Nil when saving failed and nothing changed.
     @discardableResult
-    func recover(_ ids: Set<UUID>) -> Set<UUID> { (try? store.recover(ids)) ?? [] }
+    func recover(_ ids: Set<UUID>) -> Set<UUID>? { try? store.recover(ids) }
+
+    /// The next moment here whose 30 days run out.
+    var nextExpiry: Date? { items.map { DeletionStore.expiry(deletedAt: $0.deletedAt) }.min() }
     func deleteForever(_ ids: Set<UUID>) { try? store.deleteForever(ids) }
 }
 
@@ -283,6 +286,12 @@ struct RecentlyDeletedView: View {
             }
         }
         .task { model.refresh() }
+        // Left open: a moment leaves the grid as its 30 days run out.
+        .task(id: model.nextExpiry) {
+            guard let next = model.nextExpiry else { return }
+            try? await Task.sleep(for: .seconds(max(next.timeIntervalSince(model.now), 0) + 1))
+            if !Task.isCancelled { model.refresh() }
+        }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
         .confirmationDialog(
             Text("Delete \(deleting?.count ?? 0) moments for good?", bundle: .module),
@@ -397,7 +406,9 @@ struct DeletedMomentView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 20)
                     Button {
-                        if model.recover([id]).contains(id) { dismiss() } else { expired = true }
+                        // Not saved (a full disk): it stays here, as it is.
+                        guard let recovered = model.recover([id]) else { return }
+                        if recovered.contains(id) { dismiss() } else { expired = true }
                     } label: { Text("Recover", bundle: .module) }
                     .buttonStyle(.primary)
                     .padding(.horizontal, 20)

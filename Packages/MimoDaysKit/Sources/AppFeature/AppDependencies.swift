@@ -49,6 +49,11 @@ public final class AppDependencies {
     /// Throws when the store or the media folder can't be opened: the launch shows a way back instead of a crash.
     public init(configuration: LaunchConfiguration = LaunchConfiguration()) throws {
         if configuration.isUITesting, configuration.breaksStore { throw BrokenStoreForTesting() }
+        // A setting aside cut short ends first: a new store must never open next to the old media, whose files the
+        // orphan sweep below would take.
+        if !configuration.isUITesting {
+            try Self.finishSettingAside(store: Self.storeURL, media: Self.mediaRoot(configuration), into: URL.applicationSupportDirectory)
+        }
         // UI tests start from an empty store on every launch.
         modelContainer = try MimoDaysStore.makeContainer(inMemory: configuration.isUITesting)
         // UI tests can start every permission in a fixed state instead of hitting system prompts.
@@ -198,16 +203,38 @@ public final class AppDependencies {
     /// nothing on disk to move.
     public static func setAside(_ configuration: LaunchConfiguration, now: Date = .now) throws {
         guard !configuration.isUITesting else { return }
-        let store = ModelConfiguration(schema: MimoDaysStore.schema).url
-        try setAside(store: store, media: mediaRoot(configuration), into: URL.applicationSupportDirectory, now: now)
+        try setAside(store: storeURL, media: mediaRoot(configuration), into: URL.applicationSupportDirectory, now: now)
     }
 
-    /// The store's files (the store, its -shm and -wal, its support folder) and the media folder, moved together.
+    private static var storeURL: URL { ModelConfiguration(schema: MimoDaysStore.schema).url }
+    /// In a Set aside folder while its moves aren't all done.
+    private static let settingAsideMarker = ".moving"
+
+    /// The store's files (the store, its -shm and -wal, its support folder) and the media folder, moved together: the
+    /// marker stays until both are, so a launch after the app was ended in between finishes the job.
     static func setAside(store: URL, media: URL, into root: URL, now: Date) throws {
         let files = FileManager.default
         let stamp = now.formatted(.iso8601.year().month().day().dateSeparator(.dash).time(includingFractionalSeconds: false).timeSeparator(.omitted))
         let folder = root.appending(path: "Set aside", directoryHint: .isDirectory).appending(path: stamp, directoryHint: .isDirectory)
         try files.createDirectory(at: folder, withIntermediateDirectories: true)
+        let marker = folder.appending(path: settingAsideMarker)
+        try Data().write(to: marker)
+        try move(store: store, media: media, into: folder)
+        try files.removeItem(at: marker)
+    }
+
+    /// What a setting aside cut short left in place moves into its folder.
+    static func finishSettingAside(store: URL, media: URL, into root: URL) throws {
+        let files = FileManager.default
+        let folders = (try? files.contentsOfDirectory(at: root.appending(path: "Set aside", directoryHint: .isDirectory), includingPropertiesForKeys: nil)) ?? []
+        for folder in folders where files.fileExists(atPath: folder.appending(path: settingAsideMarker).path(percentEncoded: false)) {
+            try move(store: store, media: media, into: folder)
+            try files.removeItem(at: folder.appending(path: settingAsideMarker))
+        }
+    }
+
+    private static func move(store: URL, media: URL, into folder: URL) throws {
+        let files = FileManager.default
         let directory = store.deletingLastPathComponent()
         let name = store.lastPathComponent
         for url in (try? files.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)) ?? []

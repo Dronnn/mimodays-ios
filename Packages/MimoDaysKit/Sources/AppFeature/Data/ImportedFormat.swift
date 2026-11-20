@@ -31,7 +31,7 @@ enum ImportedFormats {
     static func repairOnce(context: ModelContext, defaults: UserDefaults) {
         guard !defaults.bool(forKey: repairedKey) else { return }
         let imported = MomentOrigin.imported.rawValue
-        let moments = (try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.originRaw == imported }))) ?? []
+        guard let moments = try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.originRaw == imported })) else { return }
         moments.forEach { $0.fitImportedFormat() }
         guard (try? context.save()) != nil else { return }
         defaults.set(true, forKey: repairedKey)

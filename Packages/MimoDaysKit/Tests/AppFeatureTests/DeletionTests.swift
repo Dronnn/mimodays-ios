@@ -165,7 +165,7 @@ struct DeletionTests {
         let late = RecentlyDeletedModel(library: library, clock: TestDateProvider(now.addingTimeInterval(30 * Self.day + 1)))
         late.refresh()
         #expect(late.items.isEmpty)
-        #expect(late.recover([id]).isEmpty)
+        #expect(late.recover([id]) == [])
         #expect(try moment(id)?.deletedAt != nil)
     }
 }

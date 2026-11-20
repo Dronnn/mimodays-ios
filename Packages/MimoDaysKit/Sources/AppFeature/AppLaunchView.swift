@@ -32,6 +32,7 @@ public struct AppLaunchView: View {
                 }
         } else {
             StoreRecoveryView(stillFails: stillFails, tryAgain: tryAgain, restore: { choosingBackup = true })
+                .appLanguage()
                 .fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.data]) { result in
                     if case let .success(url) = result { restore(from: url) }
                 }
@@ -47,7 +48,13 @@ public struct AppLaunchView: View {
     private func restore(from url: URL) {
         do {
             try AppDependencies.setAside(configuration)
-            reopened = try AppDependencies(configuration: configuration)
+            let dependencies = try AppDependencies(configuration: configuration)
+            // Someone who had moments has been through onboarding; the new library doesn't know it yet.
+            let onboarding = SwiftDataOnboardingStore(context: dependencies.modelContainer.mainContext)
+            var record = onboarding.load()
+            record.isCompleted = true
+            onboarding.save(record)
+            reopened = dependencies
             restoring = url
         } catch {
             stillFails = true

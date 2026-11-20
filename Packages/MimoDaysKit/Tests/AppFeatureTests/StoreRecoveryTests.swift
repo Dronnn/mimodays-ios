@@ -33,5 +33,26 @@ struct StoreRecoveryTests {
         #expect(FileManager.default.fileExists(atPath: support.appending(path: "other.plist").path(percentEncoded: false)))
         #expect(!FileManager.default.fileExists(atPath: store.path(percentEncoded: false)))
         #expect(!FileManager.default.fileExists(atPath: media.path(percentEncoded: false)))
+        #expect(!moved.contains(".moving"))
+    }
+
+    /// Ended after the store moved but before the media: the next launch moves the media too, before a new store
+    /// opens next to it.
+    @Test func aSettingAsideCutShortIsFinishedAtLaunch() throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: "SetAside-\(UUID().uuidString)", directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let media = root.appending(path: "Media", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: media, withIntermediateDirectories: true)
+        try Data("photo".utf8).write(to: media.appending(path: "a.heic"))
+        let folder = root.appending(path: "Set aside/2026-11-20T091200", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try Data("db".utf8).write(to: folder.appending(path: "default.store"))
+        try Data().write(to: folder.appending(path: ".moving"))
+
+        try AppDependencies.finishSettingAside(store: root.appending(path: "default.store"), media: media, into: root)
+
+        #expect(FileManager.default.fileExists(atPath: folder.appending(path: "Media/a.heic").path(percentEncoded: false)))
+        #expect(!FileManager.default.fileExists(atPath: media.path(percentEncoded: false)))
+        #expect(!FileManager.default.fileExists(atPath: folder.appending(path: ".moving").path(percentEncoded: false)))
     }
 }

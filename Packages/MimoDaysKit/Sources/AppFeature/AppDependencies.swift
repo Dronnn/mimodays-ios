@@ -17,6 +17,7 @@ public final class AppDependencies {
     let camera: CameraServices
     let momentSaver: MomentSaver
     let thumbnails = ThumbnailPipeline()
+    var library: MediaLibrary { MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails) }
     let memoriesPreferences: MemoriesPreferences
     let moviePreferences: MoviePreferences
     let privacyPreferences: PrivacyPreferences
@@ -45,13 +46,11 @@ public final class AppDependencies {
         simulated ? .simulated : VoiceServices(makeRecorder: { AVVoiceRecorder() }, transcriber: OnDeviceTranscriber())
     }
 
-    public init(configuration: LaunchConfiguration = LaunchConfiguration()) {
-        do {
-            // UI tests start from an empty store on every launch.
-            modelContainer = try MimoDaysStore.makeContainer(inMemory: configuration.isUITesting)
-        } catch {
-            fatalError("MimoDays can't open its store: \(error)")
-        }
+    /// Throws when the store or the media folder can't be opened: the launch shows a way back instead of a crash.
+    public init(configuration: LaunchConfiguration = LaunchConfiguration()) throws {
+        if configuration.isUITesting, configuration.breaksStore { throw BrokenStoreForTesting() }
+        // UI tests start from an empty store on every launch.
+        modelContainer = try MimoDaysStore.makeContainer(inMemory: configuration.isUITesting)
         // UI tests can start every permission in a fixed state instead of hitting system prompts.
         if configuration.isUITesting, let status = configuration.permissions {
             permissions = PresetPermissionService(status: status)
@@ -96,11 +95,7 @@ public final class AppDependencies {
             voice: Self.voice(simulated: simulatedCamera),
             places: Self.places(configuration, context: modelContainer.mainContext, privacy: privacyPreferences)
         )
-        do {
-            momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))
-        } catch {
-            fatalError("MimoDays can't open its media folder: \(error)")
-        }
+        momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))
         // Before any screen: what a Delete All couldn't remove, and files a save or a deletion left behind when iOS
         // ended the app mid-way.
         // The capture in review goes too when it's older than the erase, which may have been cut short before it; one
@@ -195,6 +190,34 @@ public final class AppDependencies {
     }
 
     /// Application Support/Media, out of the user's Files view. UI tests use a fresh temporary folder.
+    private struct BrokenStoreForTesting: Error {}
+
+    /// Before a restore into a new library, when the store can't be opened: its files and the media folder move to
+    /// Application Support/Set aside/<date and time>, nothing deleted, so the launch starts empty. UI tests keep
+    /// nothing on disk to move.
+    public static func setAside(_ configuration: LaunchConfiguration, now: Date = .now) throws {
+        guard !configuration.isUITesting else { return }
+        let store = ModelConfiguration(schema: MimoDaysStore.schema).url
+        try setAside(store: store, media: mediaRoot(configuration), into: URL.applicationSupportDirectory, now: now)
+    }
+
+    /// The store's files (the store, its -shm and -wal, its support folder) and the media folder, moved together.
+    static func setAside(store: URL, media: URL, into root: URL, now: Date) throws {
+        let files = FileManager.default
+        let stamp = now.formatted(.iso8601.year().month().day().dateSeparator(.dash).time(includingFractionalSeconds: false).timeSeparator(.omitted))
+        let folder = root.appending(path: "Set aside", directoryHint: .isDirectory).appending(path: stamp, directoryHint: .isDirectory)
+        try files.createDirectory(at: folder, withIntermediateDirectories: true)
+        let directory = store.deletingLastPathComponent()
+        let name = store.lastPathComponent
+        for url in (try? files.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)) ?? []
+        where url.lastPathComponent == name || url.lastPathComponent.hasPrefix(name + "-") || url.lastPathComponent.hasPrefix("." + name) {
+            try files.moveItem(at: url, to: folder.appending(path: url.lastPathComponent))
+        }
+        if files.fileExists(atPath: media.path(percentEncoded: false)) {
+            try files.moveItem(at: media, to: folder.appending(path: media.lastPathComponent, directoryHint: .isDirectory))
+        }
+    }
+
     private static func mediaRoot(_ configuration: LaunchConfiguration) -> URL {
         if configuration.isUITesting {
             return FileManager.default.temporaryDirectory.appending(path: "UITestMedia-\(UUID().uuidString)", directoryHint: .isDirectory)

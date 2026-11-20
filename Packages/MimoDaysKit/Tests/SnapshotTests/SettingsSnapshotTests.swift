@@ -112,6 +112,11 @@ struct SettingsSnapshotTests {
         assertScreenSnapshots(of: AppLockView(biometry: .faceID) {}, variants: variants)
     }
 
+    /// The library couldn't be opened at launch, after one Try again (Andrew, 2026-11-20).
+    @Test func storeRecovery() {
+        assertScreenSnapshots(of: StoreRecoveryView(stillFails: true, tryAgain: {}, restore: {}), variants: variants)
+    }
+
     /// S04.
     @Test func appearance() {
         var settings = AppearanceSettings()

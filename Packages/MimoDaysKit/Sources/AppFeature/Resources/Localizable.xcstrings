@@ -79589,6 +79589,144 @@
         }
       }
     },
+    "Nothing has been deleted. Try again, or restore from a backup: what's here now is kept apart on this device." : {
+      "comment" : "Launch: message under the title when the library can't be opened",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يُحذف شيء. حاول مرة أخرى أو استعد من نسخة احتياطية: ما هو موجود الآن سيُحفظ بشكل منفصل على هذا الجهاز."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нічога не выдалена. Паспрабуй зноў або аднаві з рэзервовай копіі: усё, што ёсць зараз, захаваецца на прыладзе асобна."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wurde nichts gelöscht. Versuch es noch einmal oder stell aus einem Backup wieder her: Was jetzt da ist, bleibt separat auf diesem Gerät."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing has been deleted. Try again, or restore from a backup: what's here now is kept apart on this device."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha eliminado nada. Inténtalo de nuevo o restaura desde una copia de seguridad: lo que hay ahora se guarda aparte en este dispositivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien n’a été supprimé. Réessaie ou restaure une sauvegarde : ce qui est là maintenant est conservé à part sur cet appareil."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "שום דבר לא נמחק. נסה שוב או שחזר מגיבוי: מה שיש כאן עכשיו יישמר בנפרד במכשיר הזה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ոչինչ չի ջնջվել։ Փորձիր նորից կամ վերականգնիր պահուստային պատճենից. այն, ինչ հիմա կա, առանձին կպահվի այս սարքում։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è stato eliminato nulla. Riprova o ripristina da un backup: ciò che c’è ora resta a parte su questo dispositivo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "何も削除されていません。もう一度試すか、バックアップから復元してください。今あるデータはこのデバイスに別に保管されます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "არაფერი წაშლილა. სცადე ხელახლა ან აღადგინე სარეზერვო ასლიდან: რაც ახლა აქ არის, ცალკე შეინახება ამ მოწყობილობაზე."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ештеңе жойылған жоқ. Қайта көр немесе сақтық көшірмеден қалпына келтір: қазір бар нәрсе осы құрылғыда бөлек сақталады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제된 것은 없어요. 다시 시도하거나 백업에서 복원하세요. 지금 있는 데이터는 이 기기에 따로 보관돼요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is niets verwijderd. Probeer het opnieuw of zet een back-up terug: wat er nu is, blijft apart bewaard op dit apparaat."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nic nie zostało usunięte. Spróbuj ponownie lub przywróć z kopii zapasowej: to, co jest teraz, zostanie osobno na tym urządzeniu."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada foi apagado. Tente de novo ou restaure de um backup: o que está aqui agora fica guardado à parte neste dispositivo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ничего не удалено. Попробуй снова или восстанови из резервной копии: всё, что есть сейчас, сохранится на устройстве отдельно."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inget har raderats. Försök igen eller återställ från en säkerhetskopia: det som finns nu sparas separat på den här enheten."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiçbir şey silinmedi. Yeniden dene ya da bir yedekten geri yükle: şu anda burada olanlar bu cihazda ayrı olarak saklanır."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нічого не видалено. Спробуй ще раз або віднови з резервної копії: усе, що є зараз, збережеться на пристрої окремо."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有删除任何内容。请重试，或从备份恢复：现在的内容会单独保留在这台设备上。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有刪除任何內容。請再試一次，或從備份回復：現在的內容會另外保留在這台裝置上。"
+          }
+        }
+      }
+    },
     "Nothing here is changed or removed" : {
       "comment" : "Restore (E07): detail of Add what's missing",
       "extractionState" : "manual",
@@ -126736,6 +126874,144 @@
         }
       }
     },
+    "They still can't be opened." : {
+      "comment" : "Launch: shown after Try again (or setting the library aside) failed again",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يزال تعذّر فتحها."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Усё яшчэ не атрымліваецца адкрыць."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie lassen sich immer noch nicht öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They still can't be opened."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguen sin poder abrirse."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ils ne s’ouvrent toujours pas."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "עדיין לא ניתן לפתוח אותם."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Դեռ չի հաջողվում բացել։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non si riescono ancora ad aprire."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだ開けません。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ჯერ კიდევ ვერ იხსნება."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Әлі де ашылмай тұр."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 열 수 없어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ze kunnen nog steeds niet worden geopend."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nadal nie da się ich otworzyć."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ainda não foi possível abri-los."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всё ещё не получается открыть."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De kan fortfarande inte öppnas."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hâlâ açılamıyor."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Досі не вдається відкрити."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仍然无法打开。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仍然無法打開。"
+          }
+        }
+      }
+    },
     "This backup was made by a newer MimoDays. Update the app, then restore it." : {
       "comment" : "Restore: newer backup, message",
       "extractionState" : "manual",
@@ -151843,6 +152119,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "瞬間會連同筆記、語音筆記、地點、選集和短片計畫案一起回來。設定不包含在內，需要重新設定。"
+          }
+        }
+      }
+    },
+    "Your moments couldn't be opened" : {
+      "comment" : "Launch: title when the library can't be opened (a damaged store); the app shows this instead of crashing",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر فتح لحظاتك"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не атрымалася адкрыць твае моманты"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Momente konnten nicht geöffnet werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your moments couldn't be opened"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron abrir tus momentos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d’ouvrir tes moments"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לא הצלחנו לפתוח את הרגעים שלך"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Չհաջողվեց բացել քո պահերը"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è stato possibile aprire i tuoi momenti"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モーメントを開けませんでした"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შენი მომენტების გახსნა ვერ მოხერხდა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сәттеріңді ашу мүмкін болмады"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "순간들을 열 수 없어요"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je momenten konden niet worden geopend"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się otworzyć twoich chwil"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível abrir seus momentos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получилось открыть твои моменты"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dina ögonblick kunde inte öppnas"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anların açılamadı"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося відкрити твої моменти"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法打开你的瞬间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法打開你的瞬間"
           }
         }
       }

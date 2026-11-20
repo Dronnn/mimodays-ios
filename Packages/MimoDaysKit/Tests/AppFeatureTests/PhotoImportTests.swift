@@ -136,6 +136,8 @@ struct PhotoImportTests {
         #expect(moment.origin == .imported)
         #expect(moment.mediaType == .photo)
         #expect(moment.pipLayout == nil)
+        // 64x48: a wide photo keeps its shape (Andrew, 2026-11-20).
+        #expect(moment.captureFormat == .landscape)
         // 18:42:05 at +04:00 is 14:42:05 UTC.
         #expect(moment.capturedAt == Date(timeIntervalSince1970: 1_794_408_125))
         #expect(TimeZone(identifier: moment.timeZoneID)?.secondsFromGMT() == 4 * 3600)

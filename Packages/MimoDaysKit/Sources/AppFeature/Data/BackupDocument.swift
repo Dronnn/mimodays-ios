@@ -263,6 +263,8 @@ extension BackupDocument.MomentRecord {
                 startOffset: $0.startOffset
             )
         }
+        // A backup from before imports kept their shape.
+        moment.fitImportedFormat()
         moment.voiceNotes = voiceNotes.map {
             MomentVoiceNote(id: $0.id, relativePath: paths[$0.path] ?? $0.path, duration: $0.duration, recordedAt: $0.recordedAt, transcript: $0.transcript)
         }

@@ -109,6 +109,7 @@ struct MomentSaver {
             }
             context.insert(moment)
             moment.media = media
+            moment.fitImportedFormat()
             if let voiceNote { moment.voiceNotes = [voiceNote] }
             if let place = draft.place {
                 moment.location = MomentLocation(

@@ -60612,6 +60612,144 @@
         }
       }
     },
+    "Its 30 days are up: this moment is already deleted." : {
+      "comment" : "Recently deleted (M16b): Recover tapped after the moment's 30 days ran out",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "انتهت مدة الثلاثين يومًا، وقد حُذفت هذه اللحظة بالفعل."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тэрмін захоўвання скончыўся, гэты момант ужо выдалены."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die 30 Tage sind vorbei: Dieser Moment ist schon gelöscht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its 30 days are up: this moment is already deleted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasaron sus 30 días: este momento ya se eliminó."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ses 30 jours sont passés : ce moment est déjà supprimé."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 הימים עברו: הרגע הזה כבר נמחק."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 օրն անցել է. այս պահն արդեն ջնջված է։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I 30 giorni sono passati: questo momento è già stato eliminato."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30日が過ぎたため、このモーメントはすでに削除されています。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 დღე გავიდა: ეს მომენტი უკვე წაშლილია."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сақтау мерзімі бітті, бұл сәт жойылып кеткен."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30일이 지나 이 순간은 이미 삭제되었어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De 30 dagen zijn voorbij: dit moment is al verwijderd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minęło 30 dni: ta chwila jest już usunięta."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os 30 dias acabaram: este momento já foi apagado."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Срок хранения истёк, этот момент уже удалён."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De 30 dagarna har gått: det här ögonblicket är redan raderat."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 gün doldu: bu an zaten silindi."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Термін зберігання минув, цей момент уже видалено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 天已过，这个瞬间已被删除。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 天已過，此瞬間已被刪除。"
+          }
+        }
+      }
+    },
     "Its moments stay in Memories." : {
       "comment" : "Collection (M12): delete confirmation message.",
       "extractionState" : "manual",

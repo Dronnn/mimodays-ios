@@ -151,9 +151,13 @@ final class RecentlyDeletedModel {
     var now: Date { clock.now() }
     var store: DeletionStore { DeletionStore(context: library.context, store: library.store, now: { [clock] in clock.now() }) }
 
+    /// Past its 30 days a moment isn't shown any more, though the purge may not have run yet.
     func refresh() {
         let descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.deletedAt != nil }, sortBy: [SortDescriptor(\.deletedAt, order: .reverse)])
-        items = ((try? library.context.fetch(descriptor)) ?? []).map {
+        let now = now
+        items = ((try? library.context.fetch(descriptor)) ?? []).filter {
+            $0.deletedAt.map { DeletionStore.expiry(deletedAt: $0) > now } ?? false
+        }.map {
             DeletedItem(
                 item: MemoryItem(
                     id: $0.id, localDay: $0.localDay, capturedAt: $0.capturedAt, timeZoneID: $0.timeZoneID,
@@ -173,7 +177,9 @@ final class RecentlyDeletedModel {
 
     func daysLeft(_ item: DeletedItem) -> Int { DeletionStore.daysLeft(deletedAt: item.deletedAt, now: now) }
 
-    func recover(_ ids: Set<UUID>) { try? store.recover(ids) }
+    /// The ones recovered: not what went past its 30 days meanwhile.
+    @discardableResult
+    func recover(_ ids: Set<UUID>) -> Set<UUID> { (try? store.recover(ids)) ?? [] }
     func deleteForever(_ ids: Set<UUID>) { try? store.deleteForever(ids) }
 }
 
@@ -354,6 +360,8 @@ struct DeletedMomentView: View {
     let id: UUID
     @Environment(\.dismiss) private var dismiss
     @State private var confirmsDelete = false
+    /// Recover came too late: its 30 days were up.
+    @State private var expired = false
 
     var body: some View {
         ScrollView {
@@ -389,8 +397,7 @@ struct DeletedMomentView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 20)
                     Button {
-                        model.recover([id])
-                        dismiss()
+                        if model.recover([id]).contains(id) { dismiss() } else { expired = true }
                     } label: { Text("Recover", bundle: .module) }
                     .buttonStyle(.primary)
                     .padding(.horizontal, 20)
@@ -411,7 +418,22 @@ struct DeletedMomentView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
-        .task { model.refresh() }
+        .task {
+            model.refresh()
+            // Gone meanwhile: past its 30 days, purged or recovered elsewhere.
+            if !model.items.contains(where: { $0.id == id }) { dismiss() }
+        }
+        // Left open: it closes itself once its 30 days are up (Andrew, 2026-11-20).
+        .task(id: model.items.first(where: { $0.id == id })?.deletedAt) {
+            guard let deletedAt = model.items.first(where: { $0.id == id })?.deletedAt else { return }
+            let left = DeletionStore.expiry(deletedAt: deletedAt).timeIntervalSince(model.now)
+            if left > 0 { try? await Task.sleep(for: .seconds(left)) }
+            guard !Task.isCancelled, !expired else { return }
+            dismiss()
+        }
+        .alert(Text("Its 30 days are up: this moment is already deleted.", bundle: .module, comment: "Recently deleted (M16b): Recover tapped after the moment's 30 days ran out"), isPresented: $expired) {
+            Button { dismiss() } label: { Text("OK", bundle: .module) }
+        }
         .confirmationDialog(Text("Delete this moment for good?", bundle: .module), isPresented: $confirmsDelete, titleVisibility: .visible) {
             Button(role: .destructive) {
                 model.deleteForever([id])

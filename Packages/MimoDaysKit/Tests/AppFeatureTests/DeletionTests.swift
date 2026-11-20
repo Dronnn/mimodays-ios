@@ -149,7 +149,23 @@ struct DeletionTests {
     @Test func aMomentPastItsThirtyDaysIsNotRecovered() async throws {
         let id = try await save()
         try deletion(at: .now).moveToRecentlyDeleted([id])
-        try deletion(at: .now.addingTimeInterval(31 * 86_400)).recover([id])
+        #expect(try deletion(at: .now.addingTimeInterval(31 * 86_400)).recover([id]).isEmpty)
+        #expect(try moment(id)?.deletedAt != nil)
+    }
+
+    /// Recently deleted left open across the deadline: the moment isn't listed any more and Recover says so
+    /// (Andrew, 2026-11-20).
+    @Test func pastItsThirtyDaysAMomentIsNotListedNorRecovered() async throws {
+        let id = try await save()
+        let now = Date(timeIntervalSince1970: 1_794_000_000)
+        try deletion(at: now).moveToRecentlyDeleted([id])
+        let open = RecentlyDeletedModel(library: library, clock: TestDateProvider(now.addingTimeInterval(29 * Self.day)))
+        open.refresh()
+        #expect(open.items.map(\.id) == [id])
+        let late = RecentlyDeletedModel(library: library, clock: TestDateProvider(now.addingTimeInterval(30 * Self.day + 1)))
+        late.refresh()
+        #expect(late.items.isEmpty)
+        #expect(late.recover([id]).isEmpty)
         #expect(try moment(id)?.deletedAt != nil)
     }
 }

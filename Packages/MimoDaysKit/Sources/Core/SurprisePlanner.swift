@@ -58,12 +58,14 @@ public struct SurprisePlanner: Sendable {
             while day < horizonEnd {
                 // A day keeps what it has (a surprise that already came) and gets the rest of its count after it.
                 let taken = planned.filter { calendar.isDate($0, inSameDayAs: day) }
-                let notBefore = taken.max().map { max(earliestStart, $0.addingTimeInterval(TimeInterval(minimumSeparation * 60))) }
+                // The whole window's real length: on a DST change it isn't the clock-time difference.
+                let dayGap = gap(count, minutes: window(on: day, rules, notBefore: day)?.minutes ?? 0)
+                let notBefore = taken.max().map { max(earliestStart, $0.addingTimeInterval(TimeInterval(dayGap * 60))) }
                 if isEnabled(day, rules), taken.count < count,
                    let window = window(on: day, rules, notBefore: notBefore ?? earliestStart) {
-                    // A day that is already under way gets only as many surprises as fit with the full gap.
-                    let fitting = window.isPartial ? 1 + window.minutes / minimumSeparation : count
-                    result += slots(min(count - taken.count, fitting), in: window, using: &generator)
+                    // A day that is already under way gets only as many surprises as fit with the day's gap.
+                    let fitting = window.isPartial ? 1 + window.minutes / max(dayGap, 1) : count
+                    result += slots(min(count - taken.count, fitting), in: window, gap: dayGap, using: &generator)
                 }
                 guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
                 day = next
@@ -111,7 +113,7 @@ public struct SurprisePlanner: Sendable {
             ? count
             : Int((Double(count * candidates.count) / Double(enabledDays)).rounded())
         let picked = candidates.shuffled(using: &generator).prefix(min(share, count - taken.count, candidates.count))
-        return picked.flatMap { slots(1, in: $0, using: &generator) }.sorted()
+        return picked.flatMap { slots(1, in: $0, gap: 0, using: &generator) }.sorted()
     }
 
     // MARK: Days
@@ -147,10 +149,19 @@ public struct SurprisePlanner: Sendable {
         return Date(timeIntervalSinceReferenceDate: (seconds / 60).rounded(.up) * 60)
     }
 
-    /// `count` random minutes in the window, at least `minimumSeparation` apart (less if the window is too short).
-    private func slots(_ count: Int, in window: Window, using generator: inout some RandomNumberGenerator) -> [Date] {
+    /// The gap between a day's surprises, from its whole window: the full `minimumSeparation` when they fit,
+    /// else an even share that leaves room for chance.
+    private func gap(_ count: Int, minutes: Int) -> Int {
+        guard count > 1 else { return minimumSeparation }
+        return minutes >= minimumSeparation * (count - 1) ? minimumSeparation : minutes / count
+    }
+
+    /// `count` random minutes in the window, `preferred` minutes apart, or less when that doesn't fit what is left of it.
+    private func slots(
+        _ count: Int, in window: Window, gap preferred: Int, using generator: inout some RandomNumberGenerator
+    ) -> [Date] {
         guard count > 0 else { return [] }
-        let gap = count > 1 ? min(minimumSeparation, window.minutes / (count - 1)) : 0
+        let gap = count > 1 ? min(preferred, window.minutes / (count - 1)) : 0
         let free = window.minutes - (count - 1) * gap
         let offsets = (0..<count).map { _ in Int.random(in: 0...free, using: &generator) }.sorted()
         return offsets.enumerated().map { index, offset in

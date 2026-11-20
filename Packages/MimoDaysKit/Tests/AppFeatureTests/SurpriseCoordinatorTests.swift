@@ -429,6 +429,24 @@ struct SurpriseCoordinatorTests {
         #expect(await notifications.pending().map(\.id) == before.map(\.uuidString))
     }
 
+    /// A narrow window keeps its count through a replan: the top-up uses the day's gap, not the full two hours.
+    @Test func aReplanInANarrowWindowKeepsTheCount() async throws {
+        schedule.frequency = .threeADay
+        schedule.earliestMinute = 8 * 60
+        schedule.latestMinute = 9 * 60
+        clock.set(date("2026-11-11 07:00"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let first = try #require(try prompts(.pending).first)
+        clock.set(first.plannedAt.addingTimeInterval(60))
+        schedule.expiryMinutes = 30
+        await coordinator.settingsChanged()
+        let day = try prompts().filter { $0.outcome != .cancelled && device.calendar.isDate($0.plannedAt, inSameDayAs: first.plannedAt) }
+        #expect(day.count == 3)
+        let later = try prompts(.pending).filter { !device.calendar.isDate($0.plannedAt, inSameDayAs: first.plannedAt) }
+        #expect(Set(later.map { minute(of: $0.plannedAt) }).count > 3) // still random, not the same three times
+    }
+
     @Test func newSettingsReplaceTheFuturePlan() async throws {
         let coordinator = coordinator()
         await coordinator.refresh()

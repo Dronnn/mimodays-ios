@@ -113669,7 +113669,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deinen Film vertonen?"
+            "value" : "Deinen Film einsprechen?"
           }
         },
         "en" : {
@@ -121673,7 +121673,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Mikrofon nimmt nur auf, während du deinen Film vertonst. Deine Stimme bleibt auf deinem Gerät."
+            "value" : "Das Mikrofon nimmt nur auf, während du deinen Film einsprichst. Deine Stimme bleibt auf deinem Gerät."
           }
         },
         "en" : {
@@ -135193,7 +135193,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erlaube in den iOS-Einstellungen den Mikrofonzugriff, um deinen Film zu vertonen. Musik hinzufügen kannst du trotzdem."
+            "value" : "Erlaube in den iOS-Einstellungen den Mikrofonzugriff, um deinen Film einzusprechen. Musik hinzufügen kannst du trotzdem."
           }
         },
         "en" : {

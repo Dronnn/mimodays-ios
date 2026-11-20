@@ -150,9 +150,8 @@ struct MovieEditorView: View {
         }
         .onDisappear {
             isShown = false
-            // The microphone's explainer covers the editor without leaving it, and so does a take's sheet, full screen
-            // on a landscape iPhone: the sheet ends its take itself.
-            if !previewing, asker.screen == nil, voiceover == nil { model.close() }
+            // The microphone's explainer covers the editor without leaving it.
+            if !previewing, asker.screen == nil { model.close() }
         }
     }
 
@@ -979,7 +978,14 @@ struct LevelSlider: View {
                         changing(false)
                     }
             )
-            // A drag cancelled (a call coming in) never ends: the change is kept all the same.
+            // A drag cancelled (a call coming in) or cut short (another tool picked) never ends: the change is kept
+            // all the same.
+            .onDisappear {
+                if dragging {
+                    dragging = false
+                    changing(false)
+                }
+            }
             .onChange(of: pressed) { _, pressed in
                 if !pressed, dragging {
                     dragging = false

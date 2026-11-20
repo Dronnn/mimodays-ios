@@ -10,7 +10,10 @@ public struct SystemNotificationScheduler: NotificationScheduler {
         let requests = await UNUserNotificationCenter.current().pendingNotificationRequests()
         return requests.compactMap { request in
             guard let date = (request.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate() else { return nil }
-            return SurpriseNotification(id: request.identifier, fireDate: date, title: request.content.title, body: request.content.body)
+            return SurpriseNotification(
+                id: request.identifier, promptID: request.content.userInfo[SurpriseNotification.promptIDKey] as? String,
+                fireDate: date, title: request.content.title, body: request.content.body
+            )
         }
         .sorted { $0.fireDate < $1.fireDate }
     }
@@ -20,7 +23,7 @@ public struct SystemNotificationScheduler: NotificationScheduler {
         content.title = notification.title
         content.body = notification.body
         content.sound = .default
-        content.userInfo = [SurpriseNotification.promptIDKey: notification.id]
+        content.userInfo = [SurpriseNotification.promptIDKey: notification.promptID]
         // Components carry the time zone, so the request fires at this exact instant; the coordinator
         // re-plans when the device's time zone changes.
         var calendar = Calendar(identifier: .gregorian)

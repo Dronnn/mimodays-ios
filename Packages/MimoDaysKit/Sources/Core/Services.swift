@@ -20,14 +20,17 @@ public struct SurpriseNotification: Equatable, Identifiable, Sendable {
     /// Key in the notification's `userInfo` holding the prompt's UUID string.
     public static let promptIDKey = "promptID"
 
-    /// The prompt's UUID string, also the notification request identifier.
+    /// The notification request identifier.
     public var id: String
+    /// The prompt's UUID string, what a tap opens.
+    public var promptID: String
     public var fireDate: Date
     public var title: String
     public var body: String
 
-    public init(id: String, fireDate: Date, title: String = "", body: String = "") {
+    public init(id: String, promptID: String? = nil, fireDate: Date, title: String = "", body: String = "") {
         self.id = id
+        self.promptID = promptID ?? id
         self.fireDate = fireDate
         self.title = title
         self.body = body

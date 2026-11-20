@@ -56,11 +56,14 @@ public struct SurprisePlanner: Sendable {
             var result: [Date] = []
             var day = today
             while day < horizonEnd {
-                if isEnabled(day, rules), !planned.contains(where: { calendar.isDate($0, inSameDayAs: day) }),
-                   let window = window(on: day, rules, notBefore: earliestStart) {
+                // A day keeps what it has (a surprise that already came) and gets the rest of its count after it.
+                let taken = planned.filter { calendar.isDate($0, inSameDayAs: day) }
+                let notBefore = taken.max().map { max(earliestStart, $0.addingTimeInterval(TimeInterval(minimumSeparation * 60))) }
+                if isEnabled(day, rules), taken.count < count,
+                   let window = window(on: day, rules, notBefore: notBefore ?? earliestStart) {
                     // A day that is already under way gets only as many surprises as fit with the full gap.
                     let fitting = window.isPartial ? 1 + window.minutes / minimumSeparation : count
-                    result += slots(min(count, fitting), in: window, using: &generator)
+                    result += slots(min(count - taken.count, fitting), in: window, using: &generator)
                 }
                 guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
                 day = next

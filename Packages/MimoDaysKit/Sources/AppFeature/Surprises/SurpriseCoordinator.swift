@@ -103,6 +103,8 @@ final class SurpriseCoordinator {
 
     /// How far ahead "Send a surprise now" plans its surprise: time to leave the app and see it arrive.
     static let sendNowDelay: TimeInterval = 10
+    /// Marks a sent-now prompt's request: it is extra and doesn't take the place of the day's (or week's) own.
+    static let sendNowPrefix = "now-"
 
     /// "Send a surprise now" (S02): one surprise in a few seconds, whatever the hours and days, so a person (and App
     /// Review) can see how surprises work. It is a prompt like any other: its notification opens the camera, and
@@ -129,12 +131,12 @@ final class SurpriseCoordinator {
             let minutes = self.fetchSchedule()?.expiryMinutes ?? SurpriseSchedule().expiryMinutes
             self.context.insert(SurprisePrompt(
                 id: id, plannedAt: time, expiresAt: time.addingTimeInterval(TimeInterval(minutes * 60)),
-                notificationRequestID: id.uuidString
+                notificationRequestID: Self.sendNowPrefix + id.uuidString
             ))
             self.save()
             await self.syncNotifications(now: now)
             // iOS turned it down: nothing is on its way, so Settings doesn't say so and Today doesn't wait for it.
-            guard await self.notifications.pending().contains(where: { $0.id == id.uuidString }) else {
+            guard await self.notifications.pending().contains(where: { $0.promptID == id.uuidString }) else {
                 self.fetchPrompt(id)?.outcome = .cancelled
                 self.save()
                 return
@@ -237,7 +239,9 @@ final class SurpriseCoordinator {
             if replan || upcoming.contains(where: { !fits($0.plannedAt, rules, calendar, notBefore: notBefore) }) {
                 upcoming.forEach { $0.outcome = .cancelled }
             }
-            let planned = prompts.filter { $0.outcome != .cancelled }.map(\.plannedAt)
+            let planned = prompts
+                .filter { $0.outcome != .cancelled && !$0.notificationRequestID.hasPrefix(Self.sendNowPrefix) }
+                .map(\.plannedAt)
             let times = SurprisePlanner(calendar: calendar).draw(rules, now: notBefore, planned: planned, using: &generator)
             for time in times {
                 let id = UUID()
@@ -256,7 +260,7 @@ final class SurpriseCoordinator {
 
     /// Schedules the next pending prompts that iOS doesn't have yet and removes every request without one.
     private func syncNotifications(now: Date) async {
-        let wanted = fetchUpcomingPending(now: now).map { (id: $0.notificationRequestID, fireDate: $0.plannedAt) }
+        let wanted = fetchUpcomingPending(now: now).map { (id: $0.notificationRequestID, promptID: $0.id.uuidString, fireDate: $0.plannedAt) }
         let scheduled = await notifications.pending()
         let wantedIDs = Set(wanted.map(\.id))
         let stale = scheduled.map(\.id).filter { !wantedIDs.contains($0) }
@@ -265,7 +269,7 @@ final class SurpriseCoordinator {
         let fireDates = Dictionary(scheduled.map { ($0.id, $0.fireDate) }, uniquingKeysWith: { first, _ in first })
         for prompt in wanted where fireDates[prompt.id] != prompt.fireDate {
             let notification = SurpriseNotification(
-                id: prompt.id, fireDate: prompt.fireDate,
+                id: prompt.id, promptID: prompt.promptID, fireDate: prompt.fireDate,
                 title: String(appLocalized: Self.title), body: String(appLocalized: Self.bodies.randomElement(using: &generator)!)
             )
             do {

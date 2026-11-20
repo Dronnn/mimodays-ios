@@ -345,7 +345,8 @@ struct SurpriseCoordinatorTests {
         await coordinator.settingsChanged()
         #expect(try prompts(.pending).first?.id == now.id)
         let pending = await notifications.pending()
-        #expect(pending.first?.id == now.id.uuidString)
+        #expect(pending.first?.id == SurpriseCoordinator.sendNowPrefix + now.id.uuidString)
+        #expect(pending.first?.promptID == now.id.uuidString)
         #expect(pending.first?.fireDate == now.plannedAt)
         clock.set(now.plannedAt.addingTimeInterval(5))
         #expect(coordinator.open(promptID: now.id))
@@ -387,6 +388,33 @@ struct SurpriseCoordinatorTests {
     @Test func sendingOneNowNeedsNotifications() async throws {
         #expect(await coordinator(.denied).sendNow() == false)
         #expect(try prompts().isEmpty)
+    }
+
+    /// "Send a surprise now" is extra: a replan later that day (a new language, new settings) still plans the day's own.
+    @Test func aSurpriseSentNowDoesntTakeTheDaysPlace() async throws {
+        clock.set(date("2026-11-11 10:00"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        #expect(await coordinator.sendNow())
+        clock.set(date("2026-11-11 10:05"))
+        await coordinator.settingsChanged()
+        let today = try prompts(.pending).filter { device.calendar.isDate($0.plannedAt, inSameDayAs: date("2026-11-11 10:00")) }
+        #expect(today.contains { $0.plannedAt > date("2026-11-11 10:05") })
+    }
+
+    /// A replan keeps what already came today and plans the rest of the day's count.
+    @Test func aReplanTopsUpADayThatHadOneAlready() async throws {
+        schedule.frequency = .threeADay
+        clock.set(date("2026-11-11 07:00"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let first = try #require(try prompts(.pending).first)
+        clock.set(first.expiresAt.addingTimeInterval(60))
+        await coordinator.settingsChanged()
+        let day = try prompts().filter { $0.outcome != .cancelled && device.calendar.isDate($0.plannedAt, inSameDayAs: first.plannedAt) }
+        #expect(day.count > 1)
+        let times = day.map(\.plannedAt).sorted()
+        #expect(zip(times, times.dropFirst()).allSatisfy { $1.timeIntervalSince($0) >= 120 * 60 })
     }
 
     @Test func newSettingsReplaceTheFuturePlan() async throws {

@@ -130,8 +130,8 @@ public struct RootView: View {
             guard onboarding == nil, let route = AppRouter.route(from: url) else { return }
             open(route)
         }
-        // Planned surprises carry their words: drawn again in the language just chosen.
-        .onChange(of: AppLanguage.shared.code) { Task { await surprises.settingsChanged() } }
+        // Planned surprises carry their words: scheduled again in the language just chosen.
+        .onChange(of: AppLanguage.shared.code) { Task { await surprises.languageChanged() } }
         // S09: Memories follows a change at once.
         .onChange(of: memoriesPreferences.value.opensIn) { _, mode in memories.mode = mode.memoriesMode }
         .onChange(of: memoriesPreferences.value.newestFirst) { _, newestFirst in

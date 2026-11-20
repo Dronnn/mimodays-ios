@@ -417,6 +417,18 @@ struct SurpriseCoordinatorTests {
         #expect(zip(times, times.dropFirst()).allSatisfy { $1.timeIntervalSince($0) >= 120 * 60 })
     }
 
+    /// Another language rewords what iOS has and keeps the plan: late in the day a redraw would find no time left.
+    @Test func aNewLanguageKeepsThePlan() async throws {
+        clock.set(date("2026-11-11 21:50"))
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let before = try prompts(.pending).map(\.id)
+        await coordinator.languageChanged()
+        #expect(try prompts(.pending).map(\.id) == before)
+        #expect(try prompts(.cancelled).isEmpty)
+        #expect(await notifications.pending().map(\.id) == before.map(\.uuidString))
+    }
+
     @Test func newSettingsReplaceTheFuturePlan() async throws {
         let coordinator = coordinator()
         await coordinator.refresh()

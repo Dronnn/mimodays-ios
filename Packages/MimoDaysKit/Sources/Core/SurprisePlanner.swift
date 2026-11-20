@@ -150,7 +150,7 @@ public struct SurprisePlanner: Sendable {
     /// `count` random minutes in the window, at least `minimumSeparation` apart (less if the window is too short).
     private func slots(_ count: Int, in window: Window, using generator: inout some RandomNumberGenerator) -> [Date] {
         guard count > 0 else { return [] }
-        let gap = count > 1 ? min(minimumSeparation, window.minutes / count) : 0
+        let gap = count > 1 ? min(minimumSeparation, window.minutes / (count - 1)) : 0
         let free = window.minutes - (count - 1) * gap
         let offsets = (0..<count).map { _ in Int.random(in: 0...free, using: &generator) }.sorted()
         return offsets.enumerated().map { index, offset in

@@ -50,6 +50,11 @@ final class SurpriseCoordinator {
         await serially { await self.performRefresh(replan: false) }
     }
 
+    /// Another app language: the plan stays, the requests iOS has are given the new words.
+    func languageChanged() async {
+        await serially { await self.performRefresh(replan: false, rewords: true) }
+    }
+
     /// After the person changes their surprise settings: the future plan is dropped and drawn again.
     func settingsChanged() async {
         await serially { await self.performRefresh(replan: true) }
@@ -115,7 +120,8 @@ final class SurpriseCoordinator {
             guard await self.permissions.status(of: .notifications).isUsable else { return }
             let now = self.clock.now()
             // A second tap while the first is still on its way sends no second one; on its way means iOS has it.
-            let soon = now.addingTimeInterval(Self.sendNowDelay)
+            // On a whole second: iOS fires on one, and a tap right away mustn't find the prompt not yet due.
+            let soon = Date(timeIntervalSinceReferenceDate: now.addingTimeInterval(Self.sendNowDelay).timeIntervalSinceReferenceDate.rounded(.up))
             let scheduled = Set(await self.notifications.pending().map(\.id))
             let dueSoon = self.fetchUpcomingPending(now: now).filter { $0.plannedAt <= soon }
             if dueSoon.contains(where: { scheduled.contains($0.notificationRequestID) }) {
@@ -215,7 +221,7 @@ final class SurpriseCoordinator {
     }
 
     /// `stopsAll`: the person paused, so even a surprise due within the minute goes.
-    private func performRefresh(replan: Bool, stopsAll: Bool = false) async {
+    private func performRefresh(replan: Bool, stopsAll: Bool = false, rewords: Bool = false) async {
         let status = await permissions.status(of: .notifications)
         let now = clock.now()
         let schedule = fetchSchedule()
@@ -255,11 +261,12 @@ final class SurpriseCoordinator {
             upcoming.forEach { $0.outcome = .cancelled }
         }
         save()
-        await syncNotifications(now: now)
+        await syncNotifications(now: now, rewords: rewords)
     }
 
     /// Schedules the next pending prompts that iOS doesn't have yet and removes every request without one.
-    private func syncNotifications(now: Date) async {
+    /// `rewords`: every request is scheduled again, in the app's current language.
+    private func syncNotifications(now: Date, rewords: Bool = false) async {
         let wanted = fetchUpcomingPending(now: now).map { (id: $0.notificationRequestID, promptID: $0.id.uuidString, fireDate: $0.plannedAt) }
         let scheduled = await notifications.pending()
         let wantedIDs = Set(wanted.map(\.id))
@@ -267,7 +274,9 @@ final class SurpriseCoordinator {
         if !stale.isEmpty { await notifications.cancel(ids: stale) }
 
         let fireDates = Dictionary(scheduled.map { ($0.id, $0.fireDate) }, uniquingKeysWith: { first, _ in first })
-        for prompt in wanted where fireDates[prompt.id] != prompt.fireDate {
+        // Not one due within the minute: it may be on its way already, and a replacement would come too late.
+        let reworded = now.addingTimeInterval(60)
+        for prompt in wanted where (rewords && prompt.fireDate > reworded) || fireDates[prompt.id] != prompt.fireDate {
             let notification = SurpriseNotification(
                 id: prompt.id, promptID: prompt.promptID, fireDate: prompt.fireDate,
                 title: String(appLocalized: Self.title), body: String(appLocalized: Self.bodies.randomElement(using: &generator)!)

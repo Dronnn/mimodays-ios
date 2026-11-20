@@ -53,11 +53,13 @@ struct MovieExportView: View {
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
-        .task { if let id = coverID { await tiles.load(id) } }
+        .task(id: coverID) { if let id = coverID { await tiles.load(id) } }
     }
 
-    /// The first moment, as on Movies and the movie's page: a text card that opens the movie has no picture.
-    private var coverID: UUID? { MovieStore.liveClips(of: model.project).first?.moment?.id }
+    /// The movie's first moment, past any text card (it has no picture), and of the ones the render kept.
+    private var coverID: UUID? {
+        model.plan.clips.first { if case .card = $0.media { false } else { true } }?.momentID
+    }
     private var cover: UIImage? { coverID.flatMap { tiles.images[$0] } }
 }
 

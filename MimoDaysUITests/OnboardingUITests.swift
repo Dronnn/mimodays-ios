@@ -111,7 +111,16 @@ final class OnboardingUITests: XCTestCase {
     /// WCAG in light mode by design, approved by Andrew on 2026-11-13 (design tokens doc, "kept as designed").
     @MainActor
     private func audit() throws {
-        try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast))
+        // A busy CI machine can run out of the audit's own time ("Audit failed to complete in time"); that is the
+        // machine, not the screen, so it gets one more go, as in AccessibilityUITests.
+        for attempt in 1...2 {
+            do {
+                try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast))
+                return
+            } catch where attempt == 1 && "\(error)".localizedCaseInsensitiveContains("in time") {
+                continue
+            }
+        }
     }
 
     /// Accessibility audit on every onboarding screen.

@@ -73,6 +73,9 @@ final class TodayModel {
     /// This calendar month, newest first.
     private(set) var month: [MomentSummary] = []
     private(set) var count = 0
+    /// P8.5: today, yyyymmdd, and whether it has no moment yet (Find moments in Photos).
+    private(set) var todayKey = 0
+    private(set) var isTodayEmpty = false
     private(set) var onThisDay: OnThisDay?
     private(set) var surprise = SurpriseStatus.onItsWay
     /// When the ribbon may change by itself; Today refreshes then.
@@ -153,6 +156,9 @@ final class TodayModel {
         let today = LocalDay(now, in: calendar.timeZone)
         latest = fetch(Self.alive, sort: [SortDescriptor(\.capturedAt, order: .reverse)], limit: 1).first.map(MomentSummary.init)
         count = (try? context.fetchCount(FetchDescriptor<Moment>(predicate: Self.alive))) ?? 0
+        let key = today.key
+        todayKey = key
+        isTodayEmpty = (try? context.fetchCount(FetchDescriptor<Moment>(predicate: #Predicate { $0.deletedAt == nil && $0.localDay == key }))) == 0
 
         let first = today.year * 10_000 + today.month * 100
         let last = first + 99

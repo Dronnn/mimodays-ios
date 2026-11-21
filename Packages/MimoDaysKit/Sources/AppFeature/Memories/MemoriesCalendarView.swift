@@ -8,6 +8,8 @@ struct MemoriesCalendarView: View {
     @Bindable var model: MemoriesModel
     @Environment(\.calendar) private var calendar
     @Environment(\.locale) private var locale
+    /// P8.5: the empty day Find moments in Photos is open for.
+    @State private var photosDay: Int?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -16,6 +18,7 @@ struct MemoriesCalendarView: View {
             case .year: year
             }
         }
+        .photoDaySuggestions(day: $photosDay)
         .contentShape(Rectangle())
         // Like Photos: pinch closed for the whole year, open for a month. The month title does the same with a tap.
         .simultaneousGesture(MagnifyGesture().onEnded { value in
@@ -169,6 +172,12 @@ struct MemoriesCalendarView: View {
             } else {
                 label
                     .frame(maxWidth: .infinity, minHeight: Size.minimumTapTarget, alignment: .leading)
+                // EE01: an empty day that has been, its photos in Photos.
+                if day <= model.today {
+                    PhotosSuggestionsLink { photosDay = day }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityIdentifier("calendar.photosSuggestions")
+                }
             }
         }
     }

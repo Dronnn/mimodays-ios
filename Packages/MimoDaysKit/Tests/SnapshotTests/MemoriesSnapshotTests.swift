@@ -141,6 +141,16 @@ struct MemoriesSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
+    /// P8.5 EE01: an empty day that has been offers its photos in Photos.
+    @Test func calendarEmptyDay() async throws {
+        try await populate()
+        let model = await memories()
+        model.mode = .calendar
+        model.show(month: 202608)
+        model.selectedDay = 20260812
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, rightToLeft: true)])
+    }
+
     /// M03: 2026 in dots.
     @Test func calendarYear() async throws {
         try await populate()

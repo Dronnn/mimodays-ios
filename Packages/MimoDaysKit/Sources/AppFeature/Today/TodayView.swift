@@ -26,6 +26,8 @@ struct TodayView: View {
     @State private var asker = PermissionAsker()
     @Environment(\.permissions) private var permissions
     @State private var heroHalves: CaptureFormat?
+    /// P8.5: the day Find moments in Photos is open for.
+    @State private var photosDay: Int?
 
     var body: some View {
         ScrollView {
@@ -38,6 +40,7 @@ struct TodayView: View {
         .scrollBounceBehavior(.basedOnSize)
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .permissionExplainers(asker)
+        .photoDaySuggestions(day: $photosDay)
         .toolbar(.hidden, for: .navigationBar)
         .navigationTitle(Text("Today", bundle: .module))
         .memoriesDestinations(thisYear: Calendar.current.component(.year, from: model.now))
@@ -210,6 +213,7 @@ struct TodayView: View {
                 .padding(.top, 17)
                 addMoment
                     .padding(.top, 2)
+                photosSuggestions
             } else {
                 Button(action: capture) {
                     HStack(spacing: 10) {
@@ -223,7 +227,17 @@ struct TodayView: View {
                 .padding(.top, 20)
                 addMoment
                     .padding(.top, 10)
+                photosSuggestions
             }
+        }
+    }
+
+    /// EE01: on a day with no moment yet, the day's photos in Photos.
+    @ViewBuilder
+    private var photosSuggestions: some View {
+        if model.isTodayEmpty {
+            PhotosSuggestionsLink { photosDay = model.todayKey }
+                .accessibilityIdentifier("today.photosSuggestions")
         }
     }
 

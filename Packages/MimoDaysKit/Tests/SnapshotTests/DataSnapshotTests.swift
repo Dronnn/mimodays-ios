@@ -192,4 +192,54 @@ struct DataSnapshotTests {
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
         ] + SnapshotVariant.languages)
     }
+
+    // MARK: P8.5 From this day
+
+    private func photoDay(_ library: FakeDaySnapshotLibrary, picked: Set<String> = []) async -> some View {
+        let model = PhotoDayModel(day: 20261121, library: library)
+        await model.start()
+        model.picked = picked
+        return PhotoDaySheet(model: model, close: {}, review: {}, browse: {})
+    }
+
+    /// EE02: two of nine picked.
+    @Test func photoSuggestionsSelected() async {
+        let view = await photoDay(FakeDaySnapshotLibrary(assets: 9), picked: ["asset-1", "asset-4"])
+        assertScreenSnapshots(of: view, variants: variants + [SnapshotVariant(.iPhone, .light, rightToLeft: true)] + SnapshotVariant.languages)
+    }
+
+    /// EE03.
+    @Test func photoSuggestionsExplainer() async {
+        assertScreenSnapshots(of: await photoDay(FakeDaySnapshotLibrary(status: .notDetermined)), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// EE04.
+    @Test func photoSuggestionsDenied() async {
+        assertScreenSnapshots(of: await photoDay(FakeDaySnapshotLibrary(status: .denied)), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .light, .accessibilityExtraExtraExtraLarge)])
+    }
+
+    @Test func photoSuggestionsEmpty() async {
+        assertScreenSnapshots(of: await photoDay(FakeDaySnapshotLibrary(status: .limited)), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+}
+
+/// Photos for one day in snapshots: plain tiles, a Live Photo and a video among them.
+private struct FakeDaySnapshotLibrary: PhotoDayLibrary {
+    var status: PhotoDayAccess = .full
+    var assets = 0
+
+    func access() -> PhotoDayAccess { status }
+    func requestAccess() async -> PhotoDayAccess { status }
+
+    func assets(on day: Int) async throws -> [PhotoDayAsset] {
+        (0..<assets).map {
+            PhotoDayAsset(
+                id: "asset-\($0)", createdAt: Date(timeIntervalSince1970: 1_795_250_000 - Double($0) * 3_600),
+                isVideo: $0 == 3, isLivePhoto: [1, 6].contains($0), duration: $0 == 3 ? 10 : 0
+            )
+        }
+    }
+
+    func thumbnail(_ id: String) async -> UIImage? { nil }
+    func file(_ id: String) async throws -> PickedFile? { nil }
 }

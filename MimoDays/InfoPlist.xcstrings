@@ -716,6 +716,144 @@
           }
         }
       }
+    },
+    "NSPhotoLibraryUsageDescription" : {
+      "comment" : "System prompt for reading Photos: Find moments in Photos for a chosen day",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays looks at the photos and videos taken on a day you choose, so you can pick some to keep. Nothing is copied until you import it."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ينظر MimoDays إلى الصور ومقاطع الفيديو الملتقطة في يوم تختاره، لتنتقي منها ما تحتفظ به. لا يُنسخ شيء حتى تستورده."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays глядзіць на фота і відэа, знятыя ў дзень, які ты выбераш, каб ты мог нешта пакінуць. Нічога не капіюецца, пакуль ты не імпартуеш."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays sieht sich die Fotos und Videos eines Tages an, den du auswählst, damit du einige behalten kannst. Nichts wird kopiert, bis du es importierst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays mira las fotos y vídeos tomados el día que elijas, para que escojas los que quieres conservar. No se copia nada hasta que lo importes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays regarde les photos et vidéos prises le jour que tu choisis, pour que tu gardes celles que tu veux. Rien n’est copié avant que tu l’importes."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays מסתכל על התמונות והסרטונים מיום שבחרת, כדי שתוכל לבחור מה לשמור. שום דבר לא מועתק עד שתייבא אותו."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ը նայում է քո ընտրած օրվա լուսանկարներին և տեսանյութերին, որ դու ընտրես պահելիքները։ Ոչինչ չի պատճենվում, մինչև չներմուծես։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays guarda le foto e i video scattati nel giorno che scegli, così puoi tenerne alcuni. Non viene copiato nulla finché non lo importi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysは、選んだ日に撮った写真と動画を表示し、残したいものを選べるようにします。読み込むまで何もコピーしません。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays უყურებს შენ მიერ არჩეულ დღეს გადაღებულ ფოტოებსა და ვიდეოებს, რომ შეინახო ზოგიერთი. არაფერი კოპირდება, სანამ არ შემოიტან."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays сен таңдаған күні түсірілген фото мен бейнелерді қарайды, солардың кейбірін сақтай аласың. Импорттамайынша ештеңе көшірілмейді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays는 선택한 날에 찍은 사진과 동영상을 보여 주어 남길 것을 고를 수 있게 합니다. 가져오기 전에는 아무것도 복사하지 않아요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays bekijkt de foto’s en video’s van een dag die jij kiest, zodat je er een paar kunt bewaren. Er wordt niets gekopieerd tot je het importeert."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays przegląda zdjęcia i filmy z wybranego przez ciebie dnia, żebyś mógł zachować niektóre. Nic nie jest kopiowane, dopóki tego nie zaimportujesz."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O MimoDays olha as fotos e vídeos do dia que você escolher, para você guardar alguns. Nada é copiado até você importar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays смотрит фото и видео, снятые в выбранный тобой день, чтобы ты мог что-то сохранить. Ничего не копируется, пока ты не импортируешь."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays tittar på bilder och videor från en dag du väljer, så att du kan behålla några. Inget kopieras förrän du importerar det."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays, seçtiğin günde çekilen fotoğraf ve videolara bakar, böylece bazılarını saklayabilirsin. İçe aktarana kadar hiçbir şey kopyalanmaz."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays дивиться фото й відео, зняті в обраний тобою день, щоб ти міг щось зберегти. Нічого не копіюється, доки ти не імпортуєш."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 会查看你所选日期拍摄的照片和视频，方便你挑选保留。在你导入之前，不会复制任何内容。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 會查看你所選日期拍攝的照片和影片，方便你挑選保留。在你匯入之前，不會拷貝任何內容。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

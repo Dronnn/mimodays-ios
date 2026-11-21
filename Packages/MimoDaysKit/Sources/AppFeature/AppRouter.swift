@@ -78,22 +78,24 @@ public final class AppRouter {
     public var isSettingsPresented = false
     /// The camera, then Review. A route that comes while it's up waits until it closes (Andrew, 2026-11-19): a Review
     /// left behind would go on saving and writing while its draft opened again.
-    public var capture: CaptureRequest? {
-        didSet {
-            guard capture == nil else { return }
-            // A surprise tapped meanwhile comes first, if it can still be answered (P2.0).
-            if let surprise = heldSurprise {
-                heldSurprise = nil
-                if isAnswerable(surprise) {
-                    held = nil
-                    open(.capture(promptID: surprise))
-                    return
-                }
+    public var capture: CaptureRequest?
+
+    /// The camera's cover is gone: what came while it was up opens now. Not before: a cover still on its way out
+    /// would take the new one with it.
+    public func captureDismissed() {
+        guard capture == nil else { return }
+        // A surprise tapped meanwhile comes first, if it can still be answered (P2.0).
+        if let surprise = heldSurprise {
+            heldSurprise = nil
+            if isAnswerable(surprise) {
+                held = nil
+                open(.capture(promptID: surprise))
+                return
             }
-            guard let held else { return }
-            self.held = nil
-            open(held)
         }
+        guard let held else { return }
+        self.held = nil
+        open(held)
     }
     /// A route waiting for the camera to close; a later one takes its place.
     var held: Route?

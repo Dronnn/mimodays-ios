@@ -187,7 +187,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                 if let factor = Self.stop(of: lens, on: device) { self.zoom(device, to: factor, smoothly: true) }
                 return
             }
-            guard lens != self.backLens else { return }
+            // The lens's own camera chosen again: back to its own view from wherever a pinch left it.
+            guard lens != self.backLens else {
+                if let device = self.cameras[.back]?.input.device { self.zoom(device, to: 1, smoothly: true) }
+                return
+            }
             self.backLens = lens
             guard let setup = self.setup, self.recording == nil, setup.positions.contains(.back) else { return }
             // Another lens costs the hardware differently: the setup is worked out again.
@@ -509,7 +513,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         frameRateCap = 30
         usesVirtualBack = true
         guard let multiCam = session as? AVCaptureMultiCamSession else {
-            try configure(.single(.back), formatWidth: nil)
+            try configureSingleBack(formatWidth: nil)
             return .single(.back)
         }
         // The virtual rear camera with the front one; then the lens's own camera with it, at the same tiers; then one
@@ -519,15 +523,19 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             usesVirtualBack = virtual
             if let found = try negotiateDual(multiCam) { return found }
         }
+        try configureSingleBack(formatWidth: maxFormatWidth)
+        return .single(.back)
+    }
+
+    /// The rear camera alone: the virtual one, else the lens's own camera when the virtual one can't run here.
+    private func configureSingleBack(formatWidth: Int32?) throws {
         usesVirtualBack = true
         do {
-            try configure(.single(.back), formatWidth: maxFormatWidth)
+            try configure(.single(.back), formatWidth: formatWidth)
         } catch where backDevice(backLens, paired: false)?.isVirtualDevice == true {
-            // The virtual camera can't run here: the lens's own camera can.
             usesVirtualBack = false
-            try configure(.single(.back), formatWidth: maxFormatWidth)
+            try configure(.single(.back), formatWidth: formatWidth)
         }
-        return .single(.back)
     }
 
     private func negotiateDual(_ multiCam: AVCaptureMultiCamSession) throws -> CameraSetup? {

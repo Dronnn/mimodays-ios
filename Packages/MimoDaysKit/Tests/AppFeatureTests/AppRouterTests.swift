@@ -30,6 +30,9 @@ struct AppRouterTests {
         router.open(.capture(promptID: UUID()))
         #expect(router.capture == shown && !router.isSettingsPresented && router.selectedTab == .today)
         router.capture = nil
+        // Only once the cover is gone: one still closing would take the next with it.
+        #expect(!router.isSettingsPresented)
+        router.captureDismissed()
         #expect(router.isSettingsPresented && router.held == nil)
     }
 
@@ -110,6 +113,8 @@ struct AppRouterTests {
         router.heldSurprise = id
         router.open(.settings)
         router.capture = nil
+        #expect(router.capture == nil)
+        router.captureDismissed()
         #expect(router.capture?.promptID == (answerable ? id : nil))
         #expect(router.isSettingsPresented == !answerable)
     }

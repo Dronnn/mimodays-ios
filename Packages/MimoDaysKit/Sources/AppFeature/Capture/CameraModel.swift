@@ -240,7 +240,8 @@ final class CameraModel {
         if events == nil { listenForEvents(engine.events) }
         isClosed = false
         do {
-            try? await engine.setBackLens(settings.backLens)
+            // The saved lens is for the first start only: Retake keeps the framing the shot was taken with.
+            if setup == nil { try? await engine.setBackLens(settings.backLens) }
             // A setup change reported while starting (heat dropped the selfie camera) is newer than what start saw.
             let changes = setupChanges
             let started = try await engine.start()
@@ -303,10 +304,12 @@ final class CameraModel {
         showsSingleCameraNote = false
         if setup == .dual {
             isSwapped.toggle()
-            // The lock's mark goes with the swap, so the lock goes too: no camera stays held without a sign of it.
-            if let mark = focusMark, mark.result.locks {
-                _ = await engine.focus(at: CGPoint(x: 0.5, y: 0.5), on: mark.position, lock: false)
+            // The lock's mark goes with the swap, so every lock goes too: no camera stays held without a sign of it,
+            // also one whose mark a tap on the other camera replaced.
+            for position in lockedPositions {
+                _ = await engine.focus(at: CGPoint(x: 0.5, y: 0.5), on: position, lock: false)
             }
+            lockedPositions = []
         } else if let flipped = try? await engine.flip() {
             setup = flipped
             await refreshZoom()
@@ -529,12 +532,16 @@ final class CameraModel {
     /// A tap focuses and exposes there; a long press locks both (P1.6). `layerPoint` is where the mark goes.
     func focus(at point: CGPoint, layerPoint: CGPoint, on position: CameraPosition, lock: Bool) async {
         let result = await engine.focus(at: point, on: position, lock: lock)
+        if result.locks { lockedPositions.insert(position) } else { lockedPositions.remove(position) }
         guard result.focuses || result.exposes else {
             focusMark = nil
             return
         }
         focusMark = FocusMark(position: position, point: layerPoint, result: result)
     }
+
+    /// The cameras a long press holds; the mark shows only the last one.
+    private var lockedPositions: Set<CameraPosition> = []
 
     /// The mark fades after a tap; a lock keeps its label.
     func focusMarkFaded(_ mark: FocusMark) {

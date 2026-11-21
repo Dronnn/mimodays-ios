@@ -525,6 +525,16 @@ struct CameraZoomFocusTests {
         #expect(await engine.zoomFactors[.front] == 2)
     }
 
+    /// Retake opens the camera where the shot was framed: the saved lens is only for the first start.
+    @Test func aRetakeKeepsThePinchedZoom() async throws {
+        let (model, engine) = await camera()
+        model.pinch(2, on: .back, ended: true)
+        try await settle(engine, .back, at: 4)
+        await model.stop()
+        await model.start()
+        #expect(await engine.zoomFactors[.back] == 4)
+    }
+
     /// Pinched away from the chosen lens, choosing it again in ••• goes back to it.
     @Test func choosingTheSameLensAfterAPinchGoesBackToIt() async throws {
         let (model, engine) = await camera()
@@ -543,6 +553,17 @@ struct CameraZoomFocusTests {
         await model.flip()
         #expect(model.focusMark == nil)
         #expect(await engine.focusTaps.last.map { $0.position == .back && !$0.lock } == true)
+    }
+
+    /// A lock on the rear camera, then a tap on the front one: the swap still lets the rear go, though the mark moved.
+    @Test func aSwapReleasesEveryLock() async throws {
+        let (model, engine) = await camera()
+        await model.focus(at: CGPoint(x: 0.2, y: 0.2), layerPoint: .zero, on: .back, lock: true)
+        await model.focus(at: CGPoint(x: 0.6, y: 0.6), layerPoint: .zero, on: .front, lock: false)
+        await model.flip()
+        let afterSwap = await engine.focusTaps.dropFirst(2)
+        #expect(afterSwap.contains { $0.position == .back && !$0.lock })
+        #expect(!afterSwap.contains { $0.position == .front })
     }
 
     @Test func aTapFocusesThereAndTheMarkFades() async throws {

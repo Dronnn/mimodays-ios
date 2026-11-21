@@ -198,6 +198,9 @@ public struct RootView: View {
 
     private func startOver() {
         router.isSettingsPresented = false
+        // Nothing waits for the camera to close: everything is gone.
+        router.held = nil
+        router.heldSurprise = nil
         router.capture = nil
         router.newMovie = nil
         router.moviesPath = []
@@ -349,7 +352,7 @@ public struct RootView: View {
         .sheet(isPresented: $router.isSettingsPresented) {
             SettingsScreen(surprises: surprises)
         }
-        .fullScreenCover(item: $router.capture) { request in
+        .fullScreenCover(item: $router.capture, onDismiss: router.captureDismissed) { request in
             CaptureFlowView(request: request, lastCapture: lastCapture, promptExpiry: request.promptID.flatMap(surprises.expiry)) { saved in
                 if let promptID = saved.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
                 showsSavedToast = true

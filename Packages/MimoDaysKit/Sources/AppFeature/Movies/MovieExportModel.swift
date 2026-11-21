@@ -47,6 +47,8 @@ final class MovieExportModel {
     private(set) var runsInBackground = false
     /// iOS turned it down: "Keep MimoDays open to finish this export."
     private(set) var foregroundOnly = false
+    /// P8.13: the export's `ExportJob` row, so a relaunch knows one was cut short.
+    private(set) var job: ExportJob?
     private let logger = Logger(subsystem: "MimoDays", category: "Movies")
 
     /// Starts with the quality and place set in Settings (S06); a movie made before keeps its own quality.
@@ -94,6 +96,46 @@ final class MovieExportModel {
     /// F11's "You can leave MimoDays while the movie is being made."
     var canLeave: Bool { continuation?.isAvailable == true }
 
+    /// Waiting for iOS or rendering: another export has to wait, and nothing may take its files.
+    var isBusy: Bool {
+        switch phase {
+        case .waiting, .rendering: true
+        default: false
+        }
+    }
+
+    /// Notes where the export is; a new start begins a new row.
+    private func record(_ state: ExportState) {
+        let context = library.context
+        if job == nil || job?.state.isOver == true {
+            let row = ExportJob(kind: .movie, sourceIDs: [project.id], destination: .files, createdAt: clock.now())
+            context.insert(row)
+            job = row
+        }
+        guard let job else { return }
+        job.state = state
+        if state == .finished { job.progress = 1 }
+        if state.isOver { job.finishedAt = clock.now() }
+        try? context.save()
+    }
+
+    /// Jobs a quit or a crash cut short (doc: P8.13): stopped, never finished without their file.
+    static func reconcileJobs(in context: ModelContext, now: Date) {
+        let movie = ExportKind.movie.rawValue
+        let queued = ExportState.queued.rawValue
+        let running = ExportState.running.rawValue
+        let open = (try? context.fetch(FetchDescriptor<ExportJob>(
+            predicate: #Predicate { $0.kindRaw == movie && ($0.stateRaw == queued || $0.stateRaw == running) }
+        ))) ?? []
+        guard !open.isEmpty else { return }
+        for job in open {
+            job.state = .failed
+            job.errorMessage = "interrupted"
+            job.finishedAt = now
+        }
+        try? context.save()
+    }
+
     func start() {
         // Two taps before the options make way: one render, or Cancel would stop only the second.
         if case .rendering = phase { return }
@@ -107,6 +149,7 @@ final class MovieExportModel {
         foregroundOnly = false
         if let continuation, continuation.isAvailable {
             phase = .waiting
+            record(.queued)
             let accepted = continuation.submit(title: String(appLocalized: "Exporting a movie", bundle: .module)) { [weak self] task in
                 guard let self else { return task.finish(success: false) }
                 runContinued(task)
@@ -130,6 +173,7 @@ final class MovieExportModel {
             stoppedByIOS()
         }
         phase = .rendering(progress: 0, remaining: nil)
+        record(.running)
         let started = clock.now()
         task = Task { [weak self] in
             guard let self else { return }
@@ -141,12 +185,14 @@ final class MovieExportModel {
                 }
                 try store.attach(render, to: project)
                 phase = .ready(render)
+                record(.finished)
                 handed.finish(success: true)
                 notifyIfAway()
             } catch {
                 guard !Task.isCancelled, !(error is CancellationError) else { return }
                 logger.error("Exporting the movie failed: \(error.localizedDescription, privacy: .public)")
                 phase = .failed(.other)
+                record(.failed)
                 handed.finish(success: false)
             }
             if continued === handed { continued = nil }
@@ -160,10 +206,12 @@ final class MovieExportModel {
         continued?.finish(success: false)
         continued = nil
         phase = .failed(.other)
+        record(.failed)
     }
 
     private func runInForeground() {
         phase = .rendering(progress: 0, remaining: nil)
+        record(.running)
         let started = clock.now()
         task = Task { [weak self] in
             guard let self else { return }
@@ -182,20 +230,24 @@ final class MovieExportModel {
                 }
                 try store.attach(render, to: project)
                 phase = .ready(render)
+                record(.finished)
                 notifyIfAway()
             } catch {
                 // A cancel has already said where to go: back to the options, or F14 when time ran out.
                 guard !Task.isCancelled, !(error is CancellationError) else { return }
                 logger.error("Exporting the movie failed: \(error.localizedDescription, privacy: .public)")
                 phase = .failed(.other)
+                record(.failed)
             }
         }
     }
 
     func cancel() {
+        let wasBusy = isBusy
         task?.cancel()
         task = nil
         phase = .options
+        if wasBusy { record(.cancelled) }
         continued?.finish(success: false)
         continued = nil
         runsInBackground = false
@@ -208,6 +260,7 @@ final class MovieExportModel {
         task?.cancel()
         task = nil
         phase = .failed(.other)
+        record(.failed)
         endBackgroundTask()
     }
 
@@ -260,6 +313,7 @@ final class MovieExportModel {
         let remaining = fraction > 0.05 ? elapsed / fraction * (1 - fraction) : nil
         phase = .rendering(progress: fraction, remaining: remaining)
         continued?.report(fraction)
+        job?.progress = fraction
     }
 
     static func preset(_ resolution: MovieResolution) -> String {

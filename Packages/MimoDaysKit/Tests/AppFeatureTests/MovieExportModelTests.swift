@@ -290,4 +290,53 @@ struct MovieExportModelTests {
         #expect(project.render == nil)
         #expect(project.orderedClips.count == 4)
     }
+
+    private func jobs() throws -> [ExportJob] {
+        try context.fetch(FetchDescriptor<ExportJob>(sortBy: [SortDescriptor(\.createdAt)]))
+    }
+
+    /// Each export leaves one row: queued, running, then how it ended; a relaunch closes the ones cut short.
+    @Test func eachExportIsRecorded() async throws {
+        let project = try await project(photos: 2)
+        let continuation = FakeContinuation()
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }, continuation: continuation)
+        model.resolution = .p720
+        model.start()
+        #expect(try jobs().map(\.state) == [.queued])
+        #expect(try jobs().first?.sourceIDs == [project.id] && jobs().first?.kind == .movie)
+        continuation.runNext()
+        #expect(try jobs().map(\.state) == [.running])
+        await model.waitForRender()
+        #expect(try jobs().map(\.state) == [.finished])
+        model.start()
+        model.cancel()
+        #expect(try jobs().map(\.state) == [.finished, .cancelled])
+
+        // Quit while one waited: the next launch says it stopped, and never that it finished.
+        model.start()
+        #expect(try jobs().last?.state == .queued)
+        MovieExportModel.reconcileJobs(in: context, now: clock.now())
+        #expect(try jobs().map(\.state) == [.finished, .cancelled, .failed])
+        #expect(try jobs().last?.finishedAt != nil)
+    }
+
+    /// One export at a time: the same movie reopens its export; another one waits until it's done.
+    @Test func oneExportAtATime() async throws {
+        let first = try await project(photos: 2)
+        let second = try await project(photos: 2)
+        let continuation = FakeContinuation()
+        let center = MovieExportCenter()
+        let make = { (project: MovieProject) in
+            { MovieExportModel(project: project, library: self.library, clock: self.clock, freeSpace: { nil }, continuation: continuation) }
+        }
+        let model = try #require(center.model(for: first, make: make(first)))
+        model.start()
+        #expect(center.isExporting)
+        #expect(center.model(for: first, make: make(first)) === model)
+        #expect(center.model(for: second, make: make(second)) == nil)
+        model.cancel()
+        #expect(!center.isExporting)
+        let next = try #require(center.model(for: second, make: make(second)))
+        #expect(next !== model && next.project.id == second.id)
+    }
 }

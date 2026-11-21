@@ -1,5 +1,7 @@
 import BackgroundTasks
 import Foundation
+import Observation
+import Persistence
 
 /// P8.13: a movie export iOS keeps running after MimoDays is left, with the system's progress and Cancel
 /// (iOS 26 continued processing). Without it, the export runs while MimoDays is open, as before.
@@ -78,4 +80,30 @@ final class SystemContinuedExport: ContinuedExportScheduler {
             task.setTaskCompleted(success: success)
         }
     }
+}
+
+extension ExportState {
+    var isOver: Bool { self == .finished || self == .failed || self == .cancelled }
+}
+
+/// P8.13: one movie export at a time, kept while its screen is closed (Back to Movies) so it can be reopened.
+@MainActor
+@Observable
+final class MovieExportCenter {
+    private(set) var active: MovieExportModel?
+
+    /// The export screen's model for `project`: the one under way for it, or a new one. Nil while another movie is
+    /// exporting: Movies offers View export for that one instead.
+    func model(for project: MovieProject, make: () -> MovieExportModel) -> MovieExportModel? {
+        if let active, active.isBusy {
+            return active.project.id == project.id ? active : nil
+        }
+        if let active, active.project.id == project.id { return active }
+        let model = make()
+        active = model
+        return model
+    }
+
+    /// Delete all, Replace everything and deleting the movie wait for this: its files are in use.
+    var isExporting: Bool { active?.isBusy == true }
 }

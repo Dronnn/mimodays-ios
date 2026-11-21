@@ -112,6 +112,7 @@ public final class AppDependencies {
         momentSaver.store.finishPendingErase()
         OrphanFiles.remove(context: modelContainer.mainContext, store: momentSaver.store)
         OrphanFiles.removeScratch()
+        MovieExportModel.reconcileJobs(in: modelContainer.mainContext, now: Date())
         if !configuration.isUITesting { ImportedFormats.repairOnce(context: modelContainer.mainContext, defaults: .standard) }
         camera.drafts.removeLeftovers()
         appLock = AppLock(settings: { privacyPreferences.value })

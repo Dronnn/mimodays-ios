@@ -85,6 +85,8 @@ public struct RootView: View {
                 OnboardingView(flow: onboarding) { tab in
                     router.selectedTab = tab
                     self.onboarding = nil
+                    // A camera shortcut that came during onboarding (P8.1).
+                    openHeldRoute()
                 }
             } else {
                 tabs
@@ -115,6 +117,8 @@ public struct RootView: View {
         // Launch and every return to the app (notification permission may have changed in Settings).
         .onAppear {
             notificationTaps.listen(openSurprise)
+            // P8.1: held until the launch is back and App Lock is open.
+            openCameraShortcut()
             guard !appLock.isLocked else { return }
             resumeLaunch()
             openHeldRoute()
@@ -157,6 +161,7 @@ public struct RootView: View {
             // The iPhone may be in another zone now.
             if memoriesPreferences.value.days == .thisIPhone { relabelDays(.thisIPhone) }
         }
+        .onReceive(NotificationCenter.default.publisher(for: CameraShortcut.requested)) { _ in openCameraShortcut() }
         // Midnight, a clock change or a new time zone: hours follow the device.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
             refreshSurprises()
@@ -244,6 +249,11 @@ public struct RootView: View {
         }
     }
 
+    /// P8.1: Siri, Shortcuts, the Action button or a control asked for the camera.
+    private func openCameraShortcut() {
+        if CameraShortcut.take() { open(CameraShortcut.route) }
+    }
+
     private func openHeldRoute() {
         // Not before the launch's review is back, which would then close what this opened.
         guard resumedLaunch, let heldRoute else { return }
@@ -267,6 +277,11 @@ public struct RootView: View {
         }
         if let onboarding, case let .capture(promptID?) = route {
             onboarding.openSurprise(promptID)
+            return
+        }
+        // A camera shortcut waits for onboarding to finish (P8.1); its own first capture is part of it.
+        if onboarding != nil, route == CameraShortcut.route {
+            heldRoute = route
             return
         }
         if case let .capture(promptID?) = route {

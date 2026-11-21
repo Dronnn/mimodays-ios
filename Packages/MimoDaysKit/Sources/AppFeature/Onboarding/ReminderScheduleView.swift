@@ -125,6 +125,11 @@ struct WeekdayPicker: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text(verbatim: calendar.speaking(locale).standaloneWeekdaySymbols[day - 1]))
+                // P4.2: the letter shown, then the day's name.
+                .accessibilityInputLabels([
+                    Text(verbatim: calendar.speaking(locale).veryShortStandaloneWeekdaySymbols[day - 1]),
+                    Text(verbatim: calendar.speaking(locale).standaloneWeekdaySymbols[day - 1]),
+                ])
                 .accessibilityAddTraits(isOn ? .isSelected : [])
             }
         }

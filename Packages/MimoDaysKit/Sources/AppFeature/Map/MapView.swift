@@ -633,6 +633,8 @@ struct RecentPlacesPanel: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Map marker: \(PlaceName.text(place)) · \(Text("\(place.moments.count) moments", bundle: .module))", bundle: .module))
+        // P4.2: Voice Control by the name shown.
+        .accessibilityInputLabels([PlaceName.text(place)])
         .accessibilityAddTraits(.isButton)
     }
 

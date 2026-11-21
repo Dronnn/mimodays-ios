@@ -413,6 +413,7 @@ struct VoicePill: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text("Voice note · \(length)", bundle: .module))
+        .accessibilityInputLabels([Text("Voice note", bundle: .module)])
         .accessibilityValue(isPlaying ? Text(Duration.seconds(model.voiceTime.rounded()), format: .time(pattern: .minuteSecond)) : Text(verbatim: ""))
         .accessibilityHint(Text(isPlaying ? "Stops it" : "Plays it", bundle: .module))
         .accessibilityIdentifier("viewer.voice")

@@ -133,6 +133,11 @@ struct MemoriesCalendarView: View {
         .disabled(isFuture)
         .environment(\.layoutDirection, .leftToRight)
         .accessibilityLabel(Text("Calendar day: \(Text(MemoriesView.dayDate(key), format: Date.FormatStyle(timeZone: .gmt).weekday(.wide).month(.wide).day())) · \(count(items.count))", bundle: .module))
+        // P4.2: Voice Control by the number shown, or the date.
+        .accessibilityInputLabels([
+            Text(key % 100, format: .number),
+            Text(MemoriesView.dayDate(key), format: Date.FormatStyle(timeZone: .gmt).month(.wide).day()),
+        ])
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityIdentifier("calendar.day.\(key % 100)")
     }
@@ -218,6 +223,10 @@ struct MemoriesCalendarView: View {
         .buttonStyle(.plain)
         .disabled(isFuture || key < model.earliestMonth)
         .accessibilityLabel(Text("Calendar month: \(Text(MemoriesView.monthDate(key), format: Date.FormatStyle(timeZone: .gmt).month(.wide))) · \(Text("\(withMoments) days with moments", bundle: .module))", bundle: .module))
+        .accessibilityInputLabels([
+            Text(MemoriesView.monthDate(key), format: Date.FormatStyle(timeZone: .gmt).month(.abbreviated)),
+            Text(MemoriesView.monthDate(key), format: Date.FormatStyle(timeZone: .gmt).month(.wide)),
+        ])
         .accessibilityIdentifier("calendar.month.\(key % 100)")
     }
 

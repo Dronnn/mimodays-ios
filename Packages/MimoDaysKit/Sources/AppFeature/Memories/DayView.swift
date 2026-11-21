@@ -15,6 +15,8 @@ final class DayModel {
     private(set) var moments: [MomentSummary] = []
     /// P8.3: the whole day hidden from memories.
     private(set) var isHidden = false
+    /// The moments an automatic movie of the day takes: hidden ones stay out (P8.3).
+    private(set) var movieMoments = 0
     /// A hide or show of the day that couldn't be saved, for "Try again".
     private(set) var failedVisibility: Bool?
     private(set) var images: [String: UIImage] = [:]
@@ -50,9 +52,12 @@ final class DayModel {
             predicate: #Predicate { $0.deletedAt == nil && $0.localDay == day },
             sortBy: [SortDescriptor(\.capturedAt)]
         )
-        isHidden = MemoryVisibility(context: context).isDayHidden(day)
+        let visibility = MemoryVisibility(context: context)
+        isHidden = visibility.isDayHidden(day)
         do {
-            moments = try context.fetch(descriptor).map(MomentSummary.init)
+            let fetched = try context.fetch(descriptor)
+            moments = fetched.map(MomentSummary.init)
+            movieMoments = visibility.visible(fetched).count
         } catch {
             logger.error("Reading the day failed: \(error.localizedDescription, privacy: .public)")
         }
@@ -75,9 +80,10 @@ final class DayModel {
         }
     }
 
+    /// After the alert's own dismissal, which clears the failure: a second one brings a fresh alert.
     func retryVisibility() {
         guard let hidden = failedVisibility else { return }
-        setHidden(hidden)
+        Task { self.setHidden(hidden) }
     }
 
     func dismissVisibilityFailure() {
@@ -199,7 +205,7 @@ struct DayView: View {
                 } icon: { Icon.glyphArchive.image }
             }
             .accessibilityIdentifier("day.hideFromMemories")
-            if model.moments.count >= MovieSelection.minimumMoments {
+            if model.movieMoments >= MovieSelection.minimumMoments {
                 Button {
                     let date = MemoriesView.dayDate(model.day)
                     router?.open(.newMovie(MovieSourceRule(kind: .dateRange, start: date, end: date)))

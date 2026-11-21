@@ -215,7 +215,7 @@ struct MomentViewer: View {
                     Button { collecting = CollectingMoment(id: moment.id, selection: Set(moment.collections.map(\.id))) } label: {
                         Label { Text("Add to collection", bundle: .module) } icon: { Icon.glyphCollection.image }
                     }
-                    NavigationLink(value: MemoriesRoute.day(LocalDay(moment.captured.instant, in: moment.captured.timeZone).key)) {
+                    NavigationLink(value: MemoriesRoute.day(moment.localDay)) {
                         Label { Text("Show the whole day", bundle: .module) } icon: { Icon.glyphClock.image }
                     }
                     // P8.3: hidden with its day, showing it again is the day's choice (Show the whole day).

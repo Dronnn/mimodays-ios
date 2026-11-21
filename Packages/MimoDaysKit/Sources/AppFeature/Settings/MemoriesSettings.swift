@@ -66,8 +66,14 @@ enum MomentDays {
         }
         // P8.3: a hidden day goes where its moments went, in the same save.
         if changed > 0 {
-            try MemoryVisibility.remapHiddenDays(context, oldDays: oldDays)
-            try context.save()
+            do {
+                try MemoryVisibility.remapHiddenDays(context, oldDays: oldDays)
+                try context.save()
+            } catch {
+                // All of it or none: new days left unsaved would go out with the next save, without their hidden days.
+                context.rollback()
+                throw error
+            }
         }
         return changed
     }

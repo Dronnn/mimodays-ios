@@ -72,6 +72,8 @@ struct ViewerMoment: Equatable, Identifiable {
 
     var id: UUID
     var captured: CaptureTime
+    /// The day it's kept under, as Settings › Memories › Days labels it: its day page and hidden day are this one.
+    var localDay: Int
     var origin: MomentOrigin
     var mediaType: MediaType
     /// The shape it was recorded in: the Memory Card takes it (U20).
@@ -107,6 +109,7 @@ struct ViewerMoment: Equatable, Identifiable {
         let summary = MomentSummary(moment)
         id = moment.id
         captured = summary.captured
+        localDay = moment.localDay
         origin = moment.origin
         mediaType = moment.mediaType
         format = moment.captureFormat
@@ -245,9 +248,10 @@ final class MomentViewerModel {
         }
     }
 
+    /// After the alert's own dismissal, which clears the failure: a second one brings a fresh alert.
     func retryVisibility() {
         guard let failed = failedVisibility else { return }
-        setHidden(failed.hidden, failed.id)
+        Task { self.setHidden(failed.hidden, failed.id) }
     }
 
     func dismissVisibilityFailure() {

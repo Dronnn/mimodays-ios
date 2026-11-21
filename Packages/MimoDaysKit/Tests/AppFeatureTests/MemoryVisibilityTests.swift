@@ -45,6 +45,22 @@ struct MemoryVisibilityTests {
         #expect(!MemoryVisibility(context: context).isHidden(moment))
     }
 
+    /// A day whose moments are hidden offers no movie of itself: an automatic movie would leave them all out.
+    @Test func aHiddenDayOffersNoMovie() async throws {
+        let store = try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "Visibility-\(UUID().uuidString)"))
+        let moments = (0..<MovieSelection.minimumMoments).map { insert(Self.lateInNewYork.addingTimeInterval(Double(-$0 * 60)), zone: "America/New_York") }
+        try context.save()
+        let day = DayModel(day: 2026_11_11, context: context, store: store, thumbnails: ThumbnailPipeline())
+        await day.refresh()
+        #expect(day.movieMoments == moments.count)
+        try MemoryVisibility.setHidden(true, moments[0], in: context)
+        await day.refresh()
+        #expect(day.movieMoments == moments.count - 1)
+        day.setHidden(true)
+        await day.refresh()
+        #expect(day.movieMoments == 0 && day.moments.count == moments.count)
+    }
+
     /// The Memory Card's ••• (BB01): at once, and the card knows whether its day is hidden too.
     @Test func aMomentIsHiddenFromItsCard() async throws {
         let store = try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "Visibility-\(UUID().uuidString)"))

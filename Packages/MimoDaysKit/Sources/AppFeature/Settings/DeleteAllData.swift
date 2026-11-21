@@ -57,6 +57,7 @@ struct AppEraser {
             try deleteAll(SurprisePrompt.self)
             try deleteAll(SurpriseSchedule.self)
             try deleteAll(Moment.self)
+            try deleteAll(HiddenDay.self)
             try deleteAll(BackupManifest.self)
             try deleteAll(AppPreferences.self)
             try context.save()

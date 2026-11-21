@@ -243,11 +243,14 @@ struct DeleteAllTests {
             memories.reset()
         }
         eraser.temporaryDirectory = temporary
+        context.insert(HiddenDay(localDay: 2026_11_11))
+        try context.save()
         #expect(eraser.counts() == AppEraser.Counts(moments: 1, collections: 1, movies: 1))
         try await eraser.eraseEverything()
 
         #expect(eraser.counts() == AppEraser.Counts())
         #expect(try context.fetchCount(FetchDescriptor<MomentLocation>()) == 0)
+        #expect(try context.fetchCount(FetchDescriptor<HiddenDay>()) == 0)
         #expect(!store.fileExists(file.relativePath))
         #expect(try store.usage().values.reduce(0, +) == 0)
         #expect(!FileManager.default.fileExists(atPath: drafts.root.path))

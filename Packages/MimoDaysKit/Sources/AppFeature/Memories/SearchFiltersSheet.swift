@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Persistence
 import SwiftUI
 
 /// M08b: the kind, a span of days, voice note, written note and favourites. Changes apply as they're made;
@@ -10,6 +11,8 @@ struct SearchFiltersSheet: View {
     @Environment(\.calendar) private var calendar
     /// The From or To row whose calendar is open.
     @State private var picking: Bound?
+    @State private var picksTags = false
+    @State private var picksMoods = false
 
     private enum Bound {
         case from
@@ -44,6 +47,8 @@ struct SearchFiltersSheet: View {
                     toggleRow(Text("Has a written note", bundle: .module), isOn: $model.filters.hasWrittenNote, id: "filters.note")
                     toggleRow(Text("Favorites only", bundle: .module), isOn: $model.filters.favoritesOnly, id: "filters.favorites")
                     collectionRow
+                    choiceRow(Text("Tags", bundle: .module), value: tagsValue, id: "filters.tags") { picksTags = true }
+                    choiceRow(Text("Mood", bundle: .module), value: moodsValue, id: "filters.mood") { picksMoods = true }
                 }
                 .padding(.top, 12)
             }
@@ -51,6 +56,19 @@ struct SearchFiltersSheet: View {
             .padding(.top, 24)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) { buttons }
+        .sheet(isPresented: $picksTags) {
+            ChoiceListSheet(
+                title: Text("Tags", bundle: .module), choices: model.tagChoices.map { (Tags.key($0), Text(verbatim: "#" + $0)) },
+                empty: Text("No tags yet. Add them to a moment in Review or Edit moment.", bundle: .module, comment: "Search filters (P8.4 CC07): no moment has a tag"),
+                selection: $model.filters.tags
+            )
+        }
+        .sheet(isPresented: $picksMoods) {
+            ChoiceListSheet(
+                title: Text("Mood", bundle: .module), choices: Mood.allCases.map { ($0, $0.label) }, empty: Text(verbatim: ""),
+                selection: $model.filters.moods
+            )
+        }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(28)
@@ -202,6 +220,47 @@ struct SearchFiltersSheet: View {
         .accessibilityIdentifier("filters.collection")
     }
 
+    // MARK: Tags and mood (P8.4, P8.10 CC07)
+
+    /// "Any", or the picked ones in the list's order.
+    private var tagsValue: Text {
+        let picked = model.tagChoices.filter { model.filters.tags.contains(Tags.key($0)) }
+        return picked.isEmpty ? Text("Any", bundle: .module) : Text(verbatim: TagList.text(picked))
+    }
+
+    private var moodsValue: Text {
+        let picked = Mood.allCases.filter(model.filters.moods.contains)
+        guard let first = picked.first else { return Text("Any", bundle: .module) }
+        return picked.dropFirst().reduce(first.label) { $0 + Text(verbatim: ", ") + $1.label }
+    }
+
+    private func choiceRow(_ title: Text, value: Text, id: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                title
+                    .textStyle(.rowTitle)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                Spacer(minLength: 8)
+                value
+                    .textStyle(.rowValue)
+                    .foregroundStyle(ColorToken.textTertiary.color)
+                    .lineLimit(1)
+                Icon.glyphChevron.image
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .flipsForRightToLeftLayoutDirection(true)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, 16)
+            .frame(minHeight: 52)
+            .overlay(alignment: .top) { ColorToken.separator.color.frame(height: 1).padding(.leading, 16) }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(id)
+    }
+
     // MARK: Switches
 
     private func toggleRow(_ title: Text, isOn: Binding<Bool>, id: String, isLast: Bool = false) -> some View {
@@ -217,5 +276,92 @@ struct SearchFiltersSheet: View {
             if !isLast { ColorToken.separator.color.frame(height: 1).padding(.leading, 16) }
         }
         .accessibilityIdentifier(id)
+    }
+}
+
+/// Any number of choices, ticked or not; each tap applies at once, like the other filters (CC07).
+struct ChoiceListSheet<ID: Hashable>: View {
+    let title: Text
+    let choices: [(ID, Text)]
+    /// Said when there is nothing to choose.
+    let empty: Text
+    @Binding var selection: Set<ID>
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            TitleBar {
+                EmptyView()
+            } title: {
+                title
+                    .textStyle(.editorTitle)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .accessibilityAddTraits(.isHeader)
+            } trailing: {
+                Button { dismiss() } label: {
+                    Text("Done", bundle: .module)
+                        .textStyle(.editorDone)
+                        .foregroundStyle(ColorToken.textLink.color)
+                        .padding(.horizontal, 16)
+                        .frame(minHeight: Size.minimumTapTarget)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("sheet.done")
+            }
+            .padding(.top, 8)
+            ScrollView {
+                if choices.isEmpty {
+                    empty
+                        .textStyle(.rowCaption)
+                        .foregroundStyle(ColorToken.textSecondary.color)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 12)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(Array(choices.enumerated()), id: \.offset) { index, choice in
+                            row(choice.0, choice.1, isLast: index == choices.count - 1)
+                        }
+                    }
+                    .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        .presentationCornerRadius(28)
+        .presentationBackground(ColorToken.surfaceSheet.color)
+    }
+
+    private func row(_ id: ID, _ label: Text, isLast: Bool) -> some View {
+        let isOn = selection.contains(id)
+        return Button {
+            if isOn { selection.remove(id) } else { selection.insert(id) }
+        } label: {
+            HStack {
+                label
+                    .textStyle(.rowTitle)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                if isOn {
+                    Icon.glyphCheck.image
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(ColorToken.textLink.color)
+                        .accessibilityHidden(true)
+                }
+            }
+            .padding(.horizontal, 16)
+            .frame(minHeight: 48)
+            .overlay(alignment: .bottom) {
+                if !isLast { ColorToken.separator.color.frame(height: 1).padding(.leading, 16) }
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isOn ? .isSelected : [])
     }
 }

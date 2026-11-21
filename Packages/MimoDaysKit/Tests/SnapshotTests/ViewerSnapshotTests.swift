@@ -173,6 +173,19 @@ struct ViewerSnapshotTests {
         assertScreenSnapshots(of: try await hiddenPage(id), variants: [SnapshotVariant(.iPhone, .light)], testName: "backHiddenWithItsDay")
     }
 
+    /// §V8 CC06: the tags and the mood under the note.
+    @Test func backWithTagsAndMood() async throws {
+        let id = try await save(video: false)
+        let context = container.mainContext
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first)
+        moment.tags = ["bike", "lena"]
+        moment.mood = .joyful
+        try context.save()
+        assertScreenSnapshots(of: try await hiddenPage(id), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .light, rightToLeft: true),
+        ])
+    }
+
     private func hiddenPage(_ id: UUID) async throws -> some View {
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)
@@ -253,5 +266,16 @@ struct ViewerSnapshotTests {
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
             SnapshotVariant(.iPhone, .light, rightToLeft: true),
         ])
+    }
+
+    /// §V8 CC05: the Tags and Mood rows filled in.
+    @Test func editWithTagsAndMood() async throws {
+        let id = try await save(video: false)
+        let model = try #require(EditMomentModel(id: id, library: library, voice: .simulated, places: .simulated))
+        await model.loadThumbnail()
+        model.caption = "First snow"
+        model.tags = ["bike", "lena"]
+        model.mood = .joyful
+        assertScreenSnapshots(of: EditMomentView(model: model), variants: [SnapshotVariant(.iPhone, .light)] + SnapshotVariant.languages)
     }
 }

@@ -18,6 +18,8 @@ struct EditMomentView: View {
     @State private var choosesVoice = false
     @State private var choosesPlace = false
     @State private var choosesCollections = false
+    @State private var editsTags = false
+    @State private var choosesMood = false
     @State private var recording: VoiceRecording?
     @State private var microphoneOff = false
     @State private var saveFailed = false
@@ -86,6 +88,12 @@ struct EditMomentView: View {
         }
         .sheet(isPresented: $choosesCollections) {
             CollectionPickerSheet(library: model.library, selection: $model.collectionIDs)
+        }
+        .sheet(isPresented: $editsTags) {
+            TagEditorSheet(tags: $model.tags, recent: Tags.recent(in: model.library.context))
+        }
+        .sheet(isPresented: $choosesMood) {
+            MoodPickerSheet(mood: $model.mood)
         }
         .permissionExplainers(asker)
         .sheet(isPresented: $microphoneOff) {
@@ -224,6 +232,17 @@ struct EditMomentView: View {
             } action: {
                 choosesPlace = true
             }
+            // CC05: after Place.
+            row(mark: "#", title: Text("Tags", bundle: .module), id: "edit.tags") {
+                if model.tags.isEmpty { Text("None", bundle: .module) } else { Text(verbatim: TagList.text(model.tags)) }
+            } action: {
+                editsTags = true
+            }
+            row(mark: model.mood?.emoji ?? "🙂", title: Text("Mood", bundle: .module), id: "edit.mood") {
+                model.mood?.name ?? Text("None", bundle: .module)
+            } action: {
+                choosesMood = true
+            }
             row(icon: .glyphCollection, title: Text("Collections", bundle: .module), id: "edit.collections") {
                 collectionNames
             } action: {
@@ -266,11 +285,11 @@ struct EditMomentView: View {
 
     /// A 64 pt row: peach disc with a glyph, the title, its value and a chevron.
     private func row(
-        icon: Icon, title: Text, id: String, @ViewBuilder value: () -> some View, action: @escaping () -> Void
+        icon: Icon? = nil, mark: String? = nil, title: Text, id: String, @ViewBuilder value: () -> some View, action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                disc(icon)
+                if let icon { disc(icon) } else { markDisc(mark ?? "") }
                 title
                     .textStyle(.rowTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
@@ -297,6 +316,16 @@ struct EditMomentView: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier(id)
+    }
+
+    /// A disc with a character in the glyph's place: "#", a mood's emoji.
+    private func markDisc(_ mark: String) -> some View {
+        Text(verbatim: mark)
+            .textStyle(.rowTitle)
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .frame(width: 36, height: 36)
+            .background(ColorToken.accentPeach.color, in: Circle())
+            .accessibilityHidden(true)
     }
 
     private func disc(_ icon: Icon) -> some View {

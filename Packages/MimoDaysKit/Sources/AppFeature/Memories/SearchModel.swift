@@ -116,6 +116,12 @@ final class SearchModel {
 
     private(set) var collections: [CollectionChoice] = []
 
+    /// M08b's Tags row (CC07): every tag once, as the most recent moment spells it, most recent first.
+    var tagChoices: [String] {
+        var seen: Set<String> = []
+        return entries.flatMap(\.tags).filter { seen.insert(Tags.key($0)).inserted }
+    }
+
     /// Something to look for: words or a filter.
     var isSearching: Bool { !Self.words(query).isEmpty || !filters.isEmpty }
 

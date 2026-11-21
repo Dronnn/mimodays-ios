@@ -20,6 +20,9 @@ struct ReviewView: View {
     @State private var recording: VoiceRecording?
     @State private var microphoneOff = false
     @State private var choosesPlace = false
+    @State private var editsTags = false
+    @State private var choosesMood = false
+    @Environment(\.mediaLibrary) private var library
     /// Place or Voice note is asking for its permission: one at a time, claimed at the tap.
     @State private var opensTool = false
     /// Off screen (left through a link while a permission was asked): nothing starts recording.
@@ -76,6 +79,12 @@ struct ReviewView: View {
         }
         .sheet(isPresented: $choosesPlace) {
             PlaceSheet(model: model, showsCurrent: locationAllowed)
+        }
+        .sheet(isPresented: $editsTags) {
+            TagEditorSheet(tags: $model.tags, recent: library.map { Tags.recent(in: $0.context) } ?? [])
+        }
+        .sheet(isPresented: $choosesMood) {
+            MoodPickerSheet(mood: $model.mood)
         }
         .permissionExplainers(asker)
         .sheet(isPresented: $microphoneOff) {
@@ -235,7 +244,8 @@ struct ReviewView: View {
         }
     }
 
-    /// Place, Voice note (until there is one: then its card shows above), Note.
+    /// Place, Voice note (until there is one: then its card shows above), Note, then Tags (each tag once there are
+    /// some) and Mood (CC01, CC02).
     @ViewBuilder
     private var chips: some View {
         ReviewChip(icon: .glyphPin, title: placeTitle, action: choosePlace)
@@ -252,6 +262,23 @@ struct ReviewView: View {
         .accessibilityLabel(Text("Note", bundle: .module))
         .accessibilityValue(Text(model.note))
         .accessibilityIdentifier("review.note")
+        if model.tags.isEmpty {
+            ReviewChip(mark: "#", title: Text("Tags", bundle: .module)) { editsTags = true }
+                .accessibilityIdentifier("review.tags")
+        } else {
+            ForEach(model.tags, id: \.self) { tag in
+                ReviewChip(title: Text(verbatim: "#" + tag), isFilled: true) { editsTags = true }
+                    .accessibilityLabel(Text("Tags", bundle: .module))
+                    .accessibilityValue(Text(verbatim: TagList.text(model.tags)))
+            }
+            .accessibilityIdentifier("review.tags")
+        }
+        ReviewChip(mark: model.mood?.emoji ?? "🙂", title: model.mood?.name ?? Text("Mood", bundle: .module), isFilled: model.mood != nil) {
+            choosesMood = true
+        }
+        .accessibilityLabel(Text("Mood", bundle: .module))
+        .accessibilityValue(model.mood?.name ?? Text("None", bundle: .module))
+        .accessibilityIdentifier("review.mood")
     }
 
     /// The place's name; "Place" until there is one.
@@ -299,11 +326,8 @@ struct ReviewView: View {
                     .disabled(isSaving)
                     .padding(.top, 14)
             }
-            // One row; under each other once large text no longer fits them side by side.
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 8) { chips }
-                VStack(alignment: .leading, spacing: 0) { chips }
-            }
+            // Rows that wrap, as many as the chips take.
+            ChipFlow(spacing: 8, lineSpacing: 2) { chips }
             .disabled(isSaving)
             .padding(.top, 14)
             OriginLabel(origin: model.promptID == nil ? .manual : .randomPrompt, time: CaptureTimeLabel.text(model.capture.capturedAt))
@@ -472,7 +496,9 @@ private struct CaptionField: View {
 /// `Chip / Review`: glyph and label on a hand-cut chip; peach once something was added (it then shows its
 /// first words).
 private struct ReviewChip: View {
-    let icon: Icon
+    var icon: Icon?
+    /// A character in the glyph's place: "#", a mood's emoji.
+    var mark: String?
     let title: Text
     var isFilled = false
     let action: () -> Void
@@ -480,8 +506,15 @@ private struct ReviewChip: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 5) {
-                icon.image
-                    .frame(width: 18, height: 18)
+                if let icon {
+                    icon.image
+                        .frame(width: 18, height: 18)
+                } else if let mark {
+                    Text(verbatim: mark)
+                        .textStyle(.reviewChip)
+                        .frame(minWidth: 18)
+                        .accessibilityHidden(true)
+                }
                 title
                     .textStyle(.reviewChip)
                     .lineLimit(1)

@@ -42,6 +42,23 @@ struct MemoryCardBack: View {
                 }
                 words
                     .padding(.top, 26)
+                // CC06: the tags, then the mood, only when set.
+                if !moment.tags.isEmpty || moment.mood != nil {
+                    ChipFlow {
+                        ForEach(moment.tags, id: \.self) { TagChip(tag: $0) }
+                        if let mood = moment.mood {
+                            Text("Mood: \(mood.label)", bundle: .module, comment: "Memory Card back (P8.10 CC06): the mood after it, Mood: 😄 Joyful")
+                                .textStyle(.reviewChip)
+                                .foregroundStyle(ColorToken.textPrimary.color)
+                                .padding(.horizontal, 11)
+                                .frame(minHeight: 32)
+                                .background(ReviewChipBlob().fill(ColorToken.surfaceChip.color))
+                        }
+                    }
+                    .padding(.top, 16)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier("card.tagsAndMood")
+                }
                 // U31: "+ Record a voice note" right under "+ Write a note".
                 voice
                     .padding(.top, moment.voice == nil && !hasWords ? 0 : 20)

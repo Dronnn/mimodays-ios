@@ -53,6 +53,8 @@ struct SearchSnapshotTests {
                 place: place.map { ReviewPlace(label: $0, latitude: 37.8, longitude: -122.2, precision: .city, source: .gps) }
             )
             draft.note = note
+            // P8.4: tags that don't match "lake", for the Tags filter.
+            if date == Self.date(2026, 10, 18) { draft.tags = ["bike", "lena"] }
             if let transcript {
                 let url = root.appending(path: "\(UUID().uuidString).m4a")
                 try SimulatedVoiceRecorder.writeTone(to: url, seconds: 1)
@@ -97,6 +99,15 @@ struct SearchSnapshotTests {
         assertScreenSnapshots(of: screen(try await model(query: "snow tahoe", filters: SearchFilters(kind: .videos))), variants: [
             SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
         ])
+    }
+
+    /// §V8 CC07: Tags and Mood picked.
+    @Test func filtersWithTagsAndMood() async throws {
+        let model = try await model(query: "lake", filters: SearchFilters(moods: [.joyful, .calm], tags: [Tags.key("bike")]))
+        assertScreenSnapshots(
+            of: SearchFiltersSheet(model: model).background(ColorToken.surfaceSheet.color.ignoresSafeArea()),
+            variants: [SnapshotVariant(.iPhone, .light)] + SnapshotVariant.languages
+        )
     }
 
     /// M08b, on its own.

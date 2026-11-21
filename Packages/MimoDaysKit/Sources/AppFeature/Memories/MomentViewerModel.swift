@@ -82,6 +82,9 @@ struct ViewerMoment: Equatable, Identifiable {
     var title: String?
     var note: String?
     var isFavorite: Bool
+    /// P8.4, P8.10: shown on the card's back.
+    var tags: [String] = []
+    var mood: Mood?
     /// P8.3: hidden from memories on its own, and hidden because its whole day is.
     var isHidden: Bool
     var isHiddenWithDay = false
@@ -110,6 +113,8 @@ struct ViewerMoment: Equatable, Identifiable {
         id = moment.id
         captured = summary.captured
         localDay = moment.localDay
+        tags = moment.tags
+        mood = moment.mood
         origin = moment.origin
         mediaType = moment.mediaType
         format = moment.captureFormat

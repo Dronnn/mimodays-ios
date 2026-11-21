@@ -102,6 +102,36 @@ struct ReviewSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
+    /// §V8 CC02: tags and a mood chosen, each tag its own chip.
+    @Test func photoWithTagsAndMood() async throws {
+        let model = try await review()
+        defer { model.discard() }
+        await model.locate()
+        model.tags = ["bike", "lena"]
+        model.mood = .joyful
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)] + SnapshotVariant.languages)
+    }
+
+    /// §V8 CC03: two tags, one typed, the ones used before suggested.
+    @Test func tagSheet() {
+        var tags = ["bike", "lena"]
+        let binding = Binding { tags } set: { tags = $0 }
+        assertScreenSnapshots(
+            of: TagEditorSheet(tags: binding, recent: ["lake", "lena", "lake tahoe", "lakeside picnic"]),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)] + SnapshotVariant.languages
+        )
+    }
+
+    /// §V8 CC04.
+    @Test func moodSheet() {
+        var mood: Mood? = .joyful
+        let binding = Binding { mood } set: { mood = $0 }
+        assertScreenSnapshots(
+            of: MoodPickerSheet(mood: binding),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)] + SnapshotVariant.languages
+        )
+    }
+
     /// C08 with the keyboard's space left out (the keyboard doesn't render in snapshots).
     @Test func noteEditor() async throws {
         let model = try await review()

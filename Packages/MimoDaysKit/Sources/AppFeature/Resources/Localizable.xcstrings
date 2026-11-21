@@ -54816,6 +54816,144 @@
         }
       }
     },
+    "Each day with moments gives one second: its first surprise, or else its earliest moment. Tap Change on a day to pick another." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each day with moments gives one second: its first surprise, or else its earliest moment. Tap Change on a day to pick another."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كل يوم فيه لحظات يعطي ثانية واحدة: أول مفاجأة فيه، وإلا فأقدم لحظة. اضغط «تغيير» عند يوم لاختيار غيرها."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожны дзень з момантамі дае адну секунду: свой першы сюрпрыз ці самы ранні момант. Націсні «Змяніць» каля дня, каб выбраць іншы."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeder Tag mit Momenten gibt eine Sekunde: seine erste Überraschung oder sonst seinen frühesten Moment. Tippe bei einem Tag auf „Ändern“, um einen anderen zu wählen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada día con momentos da un segundo: su primera sorpresa o, si no, su momento más temprano. Toca Cambiar en un día para elegir otro."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque jour avec des moments donne une seconde : sa première surprise, sinon son moment le plus tôt. Touche Changer sur un jour pour en choisir un autre."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כל יום עם רגעים נותן שנייה אחת: ההפתעה הראשונה שלו, ואם אין, הרגע המוקדם ביותר. מקישים „לשנות” ליד יום כדי לבחור אחר."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Պահեր ունեցող յուրաքանչյուր օր տալիս է մեկ վայրկյան՝ իր առաջին անակնկալը, այլապես ամենավաղ պահը։ Հպիր «Փոխել» օրվա մոտ՝ ուրիշն ընտրելու համար։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ogni giorno con momenti dà un secondo: la sua prima sorpresa, altrimenti il suo momento più presto. Tocca Cambia su un giorno per sceglierne un altro."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モーメントのある日はそれぞれ1秒になります。その日最初のサプライズ、なければ一番早いモーメントです。別のものにするには、その日の「変更」をタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ყოველი დღე მომენტებით ერთ წამს იძლევა: მის პირველ სიურპრიზს, თუ არა და ყველაზე ადრეულ მომენტს. სხვის ასარჩევად დღესთან შეეხე „შეცვლას“."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сәттері бар әр күн бір секунд береді: оның алғашқы тосын сыйы, болмаса ең ерте сәті. Басқасын таңдау үшін күннің жанындағы «Өзгерту» түймесін түрт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "순간이 있는 날마다 1초가 됩니다. 그날의 첫 서프라이즈, 없으면 가장 이른 순간이에요. 다른 순간을 고르려면 그날의 변경을 탭하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elke dag met momenten geeft één seconde: de eerste verrassing, anders het vroegste moment. Tik bij een dag op Wijzig om een ander te kiezen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Każdy dzień z chwilami daje jedną sekundę: swoją pierwszą niespodziankę, a jeśli jej nie ma, najwcześniejszą chwilę. Stuknij Zmień przy dniu, by wybrać inną."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada dia com momentos dá um segundo: a primeira surpresa ou, se não houver, o momento mais cedo. Toque em Trocar em um dia para escolher outro."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каждый день с моментами даёт одну секунду: его первый сюрприз или самый ранний момент. Нажми «Сменить» у дня, чтобы выбрать другой."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varje dag med ögonblick ger en sekund: dagens första överraskning, annars dess tidigaste ögonblick. Tryck på Ändra vid en dag för att välja ett annat."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anı olan her gün bir saniye verir: ilk sürprizi, yoksa en erken anı. Başka birini seçmek için bir günde Değiştir’e dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожен день із моментами дає одну секунду: його перший сюрприз або найраніший момент. Торкнися «Змінити» біля дня, щоб вибрати інший."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每个有瞬间的日子贡献一秒：当天的第一个惊喜，没有则是最早的瞬间。轻点某天的“更改”可换成别的。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每個有瞬間的日子貢獻一秒：當天的第一個驚喜，沒有則是最早的瞬間。點一下某天的「更換」可換成別的。"
+          }
+        }
+      }
+    },
     "Each moment as its own files, named by the date and time it was taken." : {
       "comment" : "Export (E02): what 'Separate files' makes",
       "extractionState" : "manual",
@@ -67951,6 +68089,420 @@
         }
       }
     },
+    "In Movies, tap New movie, then One second per day, and pick a month or a year." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Movies, tap New movie, then One second per day, and pick a month or a year."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في «الأفلام» اضغط «فيلم جديد» ثم «ثانية واحدة في اليوم»، واختر شهرًا أو سنة."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Фільмах націсні «Новы фільм», потым «Адна секунда ў дзень» і выберы месяц ці год."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe in Filme auf „Neuer Film“, dann auf „Eine Sekunde pro Tag“, und wähle einen Monat oder ein Jahr."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Películas, toca Nueva película, luego Un segundo al día, y elige un mes o un año."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Films, touche Nouveau film, puis Une seconde par jour, et choisis un mois ou une année."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בסרטים מקישים על „סרט חדש”, ואז „שנייה אחת ביום”, ובוחרים חודש או שנה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Ֆիլմեր»-ում հպիր «Նոր ֆիլմ», ապա «Մեկ վայրկյան օրական», և ընտրիր ամիս կամ տարի։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Film, tocca Nuovo film, poi Un secondo al giorno, e scegli un mese o un anno."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「ムービー」で「新規ムービー」、「1日1秒」をタップし、月または年を選びます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„ფილმებში“ შეეხე „ახალ ფილმს“, შემდეგ „დღეში ერთ წამს“ და აირჩიე თვე ან წელი."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Фильмдер» бөлімінде «Жаңа фильм», сосын «Күніне бір секунд» түймесін түртіп, ай не жыл таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무비에서 새 무비, 하루 1초를 탭하고 한 달이나 한 해를 고르세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tik in Films op Nieuwe film, dan op Eén seconde per dag, en kies een maand of een jaar."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W Filmach stuknij Nowy film, potem Jedna sekunda dziennie, i wybierz miesiąc lub rok."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em Filmes, toque em Novo filme, depois em Um segundo por dia, e escolha um mês ou um ano."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В Фильмах нажми «Новый фильм», затем «Одна секунда в день» и выбери месяц или год."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I Filmer trycker du på Ny film, sedan En sekund om dagen, och väljer en månad eller ett år."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filmler’de Yeni film’e, sonra Günde bir saniye’ye dokun ve bir ay ya da yıl seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Фільмах торкнися «Новий фільм», потім «Одна секунда на день» і вибери місяць чи рік."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在“影片”中轻点“新建影片”，再轻点“每天一秒”，然后选择一个月或一年。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「短片」中點一下「新增短片」，再點一下「每天一秒」，然後選擇一個月或一年。"
+          }
+        }
+      }
+    },
+    "In Search, tap Filters, then Tags or Mood, to narrow the results." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Search, tap Filters, then Tags or Mood, to narrow the results."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في «بحث»، اضغط «عوامل التصفية» ثم «الوسوم» أو «المزاج» لتضييق النتائج."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Пошуку націсні «Фільтры», потым «Тэгі» ці «Настрой», каб звузіць вынікі."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe in der Suche auf „Filter“ und dann auf „Tags“ oder „Stimmung“, um die Ergebnisse einzugrenzen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Buscar, toca Filtros y luego Etiquetas o Ánimo para acotar los resultados."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Rechercher, touche Filtres, puis Tags ou Humeur, pour affiner les résultats."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בחיפוש מקישים על „מסננים” ואז על „תגיות” או „מצב רוח” כדי לצמצם את התוצאות."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Որոնումում հպիր «Ֆիլտրեր», ապա «Պիտակներ» կամ «Տրամադրություն»՝ արդյունքները նեղացնելու համար։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Cerca, tocca Filtri, poi Tag o Umore, per restringere i risultati."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「検索」で「フィルタ」をタップし、「タグ」または「気分」で結果を絞り込めます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ძიებაში შეეხე „ფილტრებს“, შემდეგ „თეგებს“ ან „განწყობას“, რომ შედეგები დაავიწროო."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Іздеуде «Сүзгілер», сосын «Тегтер» не «Көңіл-күй» түймесін түртіп, нәтижелерді тарылт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "검색에서 필터를 탭한 다음 태그나 기분을 탭해 결과를 좁히세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tik in Zoek op Filters en dan op Tags of Stemming om de resultaten te verfijnen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W Szukaj stuknij Filtry, a potem Tagi lub Nastrój, by zawęzić wyniki."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em Buscar, toque em Filtros e depois em Tags ou Humor para refinar os resultados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В Поиске нажми «Фильтры», затем «Теги» или «Настроение», чтобы сузить результаты."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I Sök trycker du på Filter och sedan Taggar eller Humör för att smalna av resultaten."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ara’da Filtreler’e, ardından Etiketler ya da Ruh hali’ne dokunarak sonuçları daralt."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Пошуку торкнися «Фільтри», потім «Теги» чи «Настрій», щоб звузити результати."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在“搜索”中轻点“筛选”，再轻点“标签”或“心情”来缩小结果。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「搜尋」中點一下「篩選條件」，再點一下「標籤」或「心情」來縮小結果。"
+          }
+        }
+      }
+    },
+    "In Settings › Surprises, turn on Fallback reminder and choose a time." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Settings › Surprises, turn on Fallback reminder and choose a time."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في الإعدادات › المفاجآت، شغّل «تذكير احتياطي» واختر وقتًا."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Налады › Сюрпрызы ўключы «Запасное напамінанне» і выберы час."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schalte unter Einstellungen › Überraschungen „Ersatz-Erinnerung“ ein und wähle eine Uhrzeit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Ajustes › Sorpresas, activa Recordatorio de respaldo y elige una hora."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Réglages › Surprises, active Rappel de secours et choisis une heure."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בהגדרות › הפתעות מפעילים „תזכורת גיבוי” ובוחרים שעה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Կարգավորումներ › Անակնկալներ բաժնում միացրու «Պահուստային հիշեցում» և ընտրիր ժամ։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Impostazioni › Sorprese, attiva Promemoria di riserva e scegli un orario."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「設定」›「サプライズ」で「予備のリマインダー」をオンにして時刻を選びます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "პარამეტრები › სიურპრიზებში ჩართე „სარეზერვო შეხსენება“ და აირჩიე დრო."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Параметрлер › Тосын сыйлар бөлімінде «Қосалқы еске салғыш» қосып, уақыт таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정 › 서프라이즈에서 대체 알림을 켜고 시간을 고르세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zet in Instellingen › Verrassingen Reserveherinnering aan en kies een tijd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W Ustawienia › Niespodzianki włącz Zapasowe przypomnienie i wybierz godzinę."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em Ajustes › Surpresas, ative Lembrete reserva e escolha um horário."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В Настройки › Сюрпризы включи «Запасное напоминание» и выбери время."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I Inställningar › Överraskningar slår du på Reservpåminnelse och väljer en tid."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarlar › Sürprizler’de Yedek hatırlatıcı’yı aç ve bir saat seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Налаштування › Сюрпризи увімкни «Запасне нагадування» й вибери час."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在“设置”›“惊喜”中打开“备用提醒”并选择时间。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「設定」›「驚喜」中開啟「備用提醒」並選擇時間。"
+          }
+        }
+      }
+    },
     "In progress" : {
       "comment" : "VoiceOver value of the step under way",
       "extractionState" : "manual",
@@ -73519,6 +74071,144 @@
         }
       }
     },
+    "Live Photos keep their motion: on the card, tap Play Live Photo." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photos keep their motion: on the card, tap Play Live Photo."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحتفظ الصور الحية بحركتها: على البطاقة اضغط «تشغيل الصورة الحية»."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photos захоўваюць рух: на картцы націсні «Прайграць Live Photo»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photos behalten ihre Bewegung: Tippe auf der Karte auf „Live Photo abspielen“."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las Live Photos conservan su movimiento: en la tarjeta, toca Reproducir Live Photo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les Live Photos gardent leur mouvement : sur la carte, touche Lire la Live Photo."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photos שומרות על התנועה: בכרטיס מקישים על „הפעלת Live Photo”."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photo-ները պահում են շարժումը․ քարտի վրա հպիր «Նվագարկել Live Photo-ն»։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le Live Photo mantengono il movimento: sulla scheda, tocca Riproduci Live Photo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photosは動きも残ります。カードで「Live Photosを再生」をタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photo-ები მოძრაობას ინარჩუნებს: ბარათზე შეეხე „Live Photo-ს დაკვრას“."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photo қозғалысын сақтайды: карточкада «Live Photo ойнату» түймесін түрт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photo는 움직임도 그대로 남아요. 카드에서 Live Photo 재생을 탭하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photos houden hun beweging: tik op de kaart op Live Photo afspelen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photo zachowują ruch: na karcie stuknij Odtwórz Live Photo."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As Live Photos mantêm o movimento: no cartão, toque em Reproduzir Live Photo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photos сохраняют движение: на карточке нажми «Воспроизвести Live Photo»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photos behåller sin rörelse: tryck på Spela upp Live Photo på kortet."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photo’lar hareketini korur: kartta Live Photo’yu oynat’a dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Photos зберігають рух: на картці торкнися «Відтворити Live Photo»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "实况照片会保留动态效果：在卡片上轻点“播放实况照片”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原況照片會保留動態：在卡片上點一下「播放原況照片」。"
+          }
+        }
+      }
+    },
     "Loading motion…" : {
       "comment" : "P8.6 EE05: Try again is asking Photos for the motion",
       "extractionState" : "manual",
@@ -78787,6 +79477,144 @@
         }
       }
     },
+    "MimoDays looks only at that date, and only after you allow Photos access. Browse Photos opens the system picker for any date, with no access needed." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays looks only at that date, and only after you allow Photos access. Browse Photos opens the system picker for any date, with no access needed."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا ينظر MimoDays إلا إلى ذلك التاريخ، وفقط بعد أن تسمح بالوصول إلى الصور. «تصفّح الصور» يفتح منتقي النظام لأي تاريخ دون إذن."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays глядзіць толькі на гэтую дату і толькі пасля таго, як ты дазволіш доступ да Фота. «Праглядзець Фота» адкрывае сістэмны выбар за любую дату, без доступу."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays sieht nur dieses Datum an und erst, wenn du den Zugriff auf Fotos erlaubst. „Fotos durchsuchen“ öffnet die Auswahl des Systems für jedes Datum, ganz ohne Zugriff."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays solo mira esa fecha, y solo después de que permitas el acceso a Fotos. Explorar Fotos abre el selector del sistema para cualquier fecha, sin acceso."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays ne regarde que cette date, et seulement après que tu as autorisé l’accès à Photos. Parcourir Photos ouvre le sélecteur du système pour n’importe quelle date, sans accès."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays מסתכל רק על התאריך הזה, ורק אחרי שמאשרים גישה לתמונות. „עיון בתמונות” פותח את בורר המערכת לכל תאריך, בלי גישה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ը նայում է միայն այդ ամսաթվին և միայն այն բանից հետո, երբ թույլ տաս Լուսանկարների հասանելիությունը։ «Դիտել Լուսանկարները»-ն բացում է համակարգային ընտրիչը ցանկացած ամսաթվի համար՝ առանց հասանելիության։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays guarda solo quella data, e solo dopo che hai consentito l’accesso a Foto. Sfoglia Foto apre il selettore di sistema per qualsiasi data, senza accesso."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysが見るのはその日付だけで、写真へのアクセスを許可したあとだけです。「写真をブラウズ」は、アクセス許可なしでどの日付でもシステムのピッカーを開きます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays მხოლოდ იმ თარიღს უყურებს და მხოლოდ მას შემდეგ, რაც ფოტოებზე წვდომას დაუშვებ. „ფოტოების დათვალიერება“ ხსნის სისტემურ ამომრჩევს ნებისმიერი თარიღისთვის, წვდომის გარეშე."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays тек сол күнді және тек Фотосуреттерге рұқсат бергеннен кейін қарайды. «Фотосуреттерді шолу» кез келген күнге жүйелік таңдауды рұқсатсыз ашады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays는 그 날짜만, 그리고 사진 접근을 허용한 뒤에만 봅니다. 사진 둘러보기는 접근 권한 없이 어느 날짜든 시스템 선택기를 열어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays kijkt alleen naar die datum, en pas nadat je toegang tot Foto’s geeft. ‘Foto’s bekijken’ opent de kiezer van het systeem voor elke datum, zonder toegang."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays patrzy tylko na tę datę i dopiero gdy zezwolisz na dostęp do Zdjęć. Przeglądaj Zdjęcia otwiera systemowy wybór dla dowolnej daty, bez dostępu."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O MimoDays olha só aquela data, e só depois que você permitir o acesso ao Fotos. Explorar Fotos abre o seletor do sistema para qualquer data, sem acesso."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays смотрит только на эту дату и только после того, как ты разрешишь доступ к Фото. «Открыть Фото» открывает системный выбор за любую дату, без доступа."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays tittar bara på det datumet, och först när du tillåter åtkomst till Bilder. Bläddra i Bilder öppnar systemets väljare för vilket datum som helst, utan åtkomst."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays yalnızca o tarihe ve yalnızca Fotoğraflar erişimine izin verdikten sonra bakar. Fotoğraflar’a göz at, her tarih için sistem seçicisini erişim gerekmeden açar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays дивиться лише на цю дату й лише після того, як ти дозволиш доступ до Фото. «Переглянути Фото» відкриває системний вибір за будь-яку дату, без доступу."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 只看那个日期，而且只在你允许访问“照片”之后。“浏览照片”会为任意日期打开系统选择器，无需访问权限。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 只看那個日期，而且只在你允許取用「照片」之後。「瀏覽照片」會為任何日期打開系統挑選器，不需要取用權限。"
+          }
+        }
+      }
+    },
     "MimoDays only adds what you save. It can't see the rest of your library." : {
       "comment" : "Explainer message before the system Photos (add only) prompt",
       "extractionState" : "manual",
@@ -79611,6 +80439,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "瞬間會在 30 天後永久刪除，且不會顯示在 App 的其他地方。"
+          }
+        }
+      }
+    },
+    "Moments from Photos" : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments from Photos"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لحظات من الصور"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моманты з Фота"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momente aus Fotos"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momentos desde Fotos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments depuis Photos"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "רגעים מהתמונות"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Պահեր Լուսանկարներից"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momenti da Foto"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真からのモーメント"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მომენტები ფოტოებიდან"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фотосуреттерден сәттер"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진에서 가져온 순간"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momenten uit Foto’s"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chwile ze Zdjęć"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momentos do Fotos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моменты из Фото"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ögonblick från Bilder"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotoğraflar’dan anlar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моменти з Фото"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "来自照片的瞬间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "來自照片的瞬間"
           }
         }
       }
@@ -94332,6 +95298,420 @@
         }
       }
     },
+    "On Today, tap Add a moment, then Write a moment." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Today, tap Add a moment, then Write a moment."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في «اليوم» اضغط «أضف لحظة» ثم «اكتب لحظة»."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На экране Сёння націсні «Дадаць момант», потым «Напісаць момант»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe in Heute auf „Moment hinzufügen“ und dann auf „Moment schreiben“."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Hoy, toca Añadir un momento y luego Escribir un momento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Aujourd’hui, touche Ajouter un moment, puis Écrire un moment."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ב„היום” מקישים על „הוספת רגע” ואז „כתיבת רגע”."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Այսօր»-ում հպիր «Ավելացնել պահ», ապա «Գրել պահ»։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Oggi, tocca Aggiungi un momento, poi Scrivi un momento."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「今日」で「モーメントを追加」、続いて「モーメントを書く」をタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„დღეს“-ში შეეხე „მომენტის დამატებას“, შემდეგ „მომენტის დაწერას“."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Бүгін» экранында «Сәт қосу», сосын «Сәт жазу» түймесін түрт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘에서 순간 추가, 그다음 순간 쓰기를 탭하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tik in Vandaag op Moment toevoegen en dan op Moment schrijven."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W Dziś stuknij Dodaj chwilę, a potem Napisz chwilę."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em Hoje, toque em Adicionar um momento e depois em Escrever um momento."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На экране Сегодня нажми «Добавить момент», затем «Написать момент»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "På Idag trycker du på Lägg till ett ögonblick och sedan Skriv ett ögonblick."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugün’de An ekle’ye, sonra Bir an yaz’a dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На екрані Сьогодні торкнися «Додати момент», потім «Написати момент»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在“今天”中轻点“添加瞬间”，再轻点“写一个瞬间”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「今天」中點一下「新增瞬間」，再點一下「寫一個瞬間」。"
+          }
+        }
+      }
+    },
+    "On a day with no moments, Today and the calendar show Find moments in Photos. Pick photos and videos taken that day, tap Review, then Import." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On a day with no moments, Today and the calendar show Find moments in Photos. Pick photos and videos taken that day, tap Review, then Import."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في يوم بلا لحظات، يعرض «اليوم» والتقويم «ابحث عن لحظات في الصور». اختر صورًا ومقاطع فيديو من ذلك اليوم، واضغط «مراجعة» ثم «استيراد»."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У дзень без момантаў Сёння і каляндар паказваюць «Знайсці моманты ў Фота». Выберы фота і відэа, знятыя ў той дзень, націсні «Праглядзець», потым «Імпарт»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An einem Tag ohne Momente zeigen Heute und der Kalender „Momente in Fotos finden“. Wähle Fotos und Videos von diesem Tag, tippe auf „Prüfen“ und dann auf „Import“."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En un día sin momentos, Hoy y el calendario muestran Buscar momentos en Fotos. Elige fotos y vídeos de ese día, toca Revisar y luego Importar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un jour sans moments, Aujourd’hui et le calendrier affichent Trouver des moments dans Photos. Choisis des photos et vidéos de ce jour, touche Vérifier, puis Importer."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ביום בלי רגעים, „היום” ולוח השנה מציגים „חיפוש רגעים בתמונות”. בוחרים תמונות וסרטונים מאותו יום, מקישים „סקירה” ואז „ייבוא”."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Առանց պահերի օրը «Այսօր»-ը և օրացույցը ցույց են տալիս «Գտնել պահեր Լուսանկարներում»։ Ընտրիր այդ օրվա լուսանկարներն ու տեսանյութերը, հպիր «Դիտել», ապա «Ներմուծում»։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In un giorno senza momenti, Oggi e il calendario mostrano Trova momenti in Foto. Scegli foto e video di quel giorno, tocca Rivedi, poi Importa."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モーメントがない日は、「今日」とカレンダーに「写真でモーメントを探す」が表示されます。その日に撮った写真と動画を選び、「確認」、続いて「読み込み」をタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დღეს, როცა მომენტები არ არის, „დღეს“ და კალენდარი აჩვენებს „მომენტების პოვნა ფოტოებში“. აირჩიე იმ დღის ფოტოები და ვიდეოები, შეეხე „ნახვას“, შემდეგ „იმპორტს“."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сәт жоқ күні «Бүгін» мен күнтізбе «Фотосуреттерден сәттерді табу» дегенді көрсетеді. Сол күні түсірілген фото мен бейнелерді таңда, «қарау», сосын «Импорттау» түймесін түрт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "순간이 없는 날에는 오늘과 캘린더에 사진에서 순간 찾기가 보여요. 그날 찍은 사진과 동영상을 골라 검토, 그다음 가져오기를 탭하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op een dag zonder momenten tonen Vandaag en de kalender ‘Momenten zoeken in Foto’s’. Kies foto’s en video’s van die dag, tik op Bekijken en dan op Importeer."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W dzień bez chwil Dziś i kalendarz pokazują Znajdź chwile w Zdjęciach. Wybierz zdjęcia i filmy z tego dnia, stuknij Przejrzyj, a potem Import."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em um dia sem momentos, Hoje e o calendário mostram Encontrar momentos no Fotos. Escolha fotos e vídeos daquele dia, toque em Revisar e depois em Importar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В день без моментов Сегодня и календарь показывают «Найти моменты в Фото». Выбери фото и видео, снятые в тот день, нажми «Просмотреть», затем «Импорт»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En dag utan ögonblick visar Idag och kalendern Hitta ögonblick i Bilder. Välj bilder och videor från den dagen, tryck på Granska och sedan Importera."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anı olmayan bir günde Bugün ve takvim Fotoğraflar’da an bul seçeneğini gösterir. O gün çekilen fotoğraf ve videoları seç, İncele’ye, sonra İçe aktar’a dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У день без моментів Сьогодні й календар показують «Знайти моменти у Фото». Вибери фото й відео, зняті того дня, торкнися «Переглянути», потім «Імпорт»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有瞬间的日子，“今天”和日历会显示“在‘照片’中查找瞬间”。选择那天拍的照片和视频，轻点“查看”，再轻点“导入”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有瞬間的日子，「今天」和行事曆會顯示「在『照片』中尋找瞬間」。選擇那天拍的照片和影片，點一下「查看」，再點一下「匯入」。"
+          }
+        }
+      }
+    },
+    "On days with no surprise planned, MimoDays reminds you at that time. It stays off unless you turn it on." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On days with no surprise planned, MimoDays reminds you at that time. It stays off unless you turn it on."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في الأيام التي لا مفاجأة فيها، يذكّرك MimoDays في ذلك الوقت. يبقى متوقفًا حتى تشغّله."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У дні без запланаванага сюрпрызу MimoDays нагадае ў гэты час. Пакуль ты яго не ўключыш, яно выключана."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An Tagen ohne geplante Überraschung erinnert dich MimoDays zu dieser Zeit. Sie bleibt aus, bis du sie einschaltest."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los días sin sorpresa prevista, MimoDays te avisa a esa hora. Sigue desactivado hasta que lo actives."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les jours sans surprise prévue, MimoDays te le rappelle à cette heure. Il reste désactivé tant que tu ne l’actives pas."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בימים בלי הפתעה מתוכננת, MimoDays מזכיר בשעה הזאת. היא כבויה עד שמפעילים אותה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Առանց պլանավորված անակնկալի օրերին MimoDays-ը քեզ կհիշեցնի այդ ժամին։ Այն անջատված է, մինչև չմիացնես։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nei giorni senza sorpresa prevista, MimoDays te lo ricorda a quell’ora. Resta spento finché non lo attivi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サプライズの予定がない日は、MimoDaysがその時刻にお知らせします。オンにするまでオフのままです。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დღეებში, როცა სიურპრიზი დაგეგმილი არ არის, MimoDays ამ დროს შეგახსენებს. გამორთულია, სანამ არ ჩართავ."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тосын сый жоспарланбаған күндері MimoDays сол уақытта еске салады. Сен қоспайынша ол өшірулі тұрады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "예정된 서프라이즈가 없는 날에는 MimoDays가 그 시간에 알려 드려요. 켜기 전까지는 꺼져 있어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op dagen zonder geplande verrassing herinnert MimoDays je op dat moment. Hij blijft uit tot je hem aanzet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W dni bez zaplanowanej niespodzianki MimoDays przypomni ci o tej godzinie. Pozostaje wyłączone, dopóki go nie włączysz."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nos dias sem surpresa planejada, o MimoDays lembra você nesse horário. Fica desligado até você ativar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В дни без запланированного сюрприза MimoDays напомнит в это время. Пока ты его не включишь, оно выключено."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagar utan planerad överraskning påminner MimoDays dig vid den tiden. Den är av tills du slår på den."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planlanmış sürpriz olmayan günlerde MimoDays sana o saatte hatırlatır. Sen açana kadar kapalı kalır."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У дні без запланованого сюрпризу MimoDays нагадає в цей час. Доки ти його не ввімкнеш, воно вимкнене."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在没有安排惊喜的日子，MimoDays 会在这个时间提醒你。你打开之前它一直是关闭的。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在沒有安排驚喜的日子，MimoDays 會在這個時間提醒你。你開啟之前它一直是關閉的。"
+          }
+        }
+      }
+    },
     "On iPhones that can use both cameras at once, MimoDays captures what's in front of you and your face in a small window, in the same photo or video." : {
       "comment" : "Help & about (S07): Selfie window help",
       "extractionState" : "manual",
@@ -94880,6 +96260,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示時間"
+          }
+        }
+      }
+    },
+    "On the back of the card, Then & Now shows both side by side. With several repeats, choose the one to compare." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On the back of the card, Then & Now shows both side by side. With several repeats, choose the one to compare."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "على ظهر البطاقة يعرض «الآن وقبل» الاثنتين جنبًا إلى جنب. إذا تعددت التكرارات، اختر ما تقارن به."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На адвароце карткі «Тады і цяпер» паказвае абодва побач. Калі паўтораў некалькі, выберы, з якім параўнаць."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf der Rückseite der Karte zeigt „Damals & Heute“ beide nebeneinander. Bei mehreren Wiederholungen wählst du die zum Vergleichen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En el reverso de la tarjeta, Antes y ahora muestra ambos juntos. Si hay varias repeticiones, elige con cuál comparar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Au dos de la carte, Avant et maintenant les montre côte à côte. S’il y a plusieurs reprises, choisis celle à comparer."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בגב הכרטיס, „אז ועכשיו” מציג את שניהם זה לצד זה. כשיש כמה חזרות, בוחרים את זו להשוואה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Քարտի հետևի կողմում «Այն ժամանակ և հիմա»-ն ցույց է տալիս երկուսը կողք կողքի։ Մի քանի կրկնության դեպքում ընտրիր, որի հետ համեմատել։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sul retro della scheda, Allora e ora li mostra uno accanto all’altro. Con più ripetizioni, scegli quella da confrontare."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カードの裏の「あの時と今」で両方を並べて見られます。繰り返しが複数あるときは、比べるものを選べます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ბარათის უკანა მხარეს „მაშინ და ახლა“ ორივეს გვერდიგვერდ აჩვენებს. რამდენიმე გამეორებისას აირჩიე, რომელს შეადარო."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Карточканың артында «Сонда және қазір» екеуін қатар көрсетеді. Қайталау бірнешеу болса, қайсысымен салыстыратыныңды таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "카드 뒷면의 그때와 지금에서 둘을 나란히 볼 수 있어요. 반복이 여러 개면 비교할 것을 고르세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op de achterkant van de kaart toont Toen & nu ze naast elkaar. Bij meerdere herhalingen kies je welke je vergelijkt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na odwrocie karty Wtedy i teraz pokazuje oba obok siebie. Przy kilku powtórzeniach wybierz, z którym porównać."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No verso do cartão, Antes e agora mostra os dois lado a lado. Com várias repetições, escolha qual comparar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На обороте карточки «Тогда и сейчас» показывает оба рядом. Если повторов несколько, выбери, с каким сравнить."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "På kortets baksida visar Då och nu båda sida vid sida. Finns flera upprepningar väljer du vilken du jämför med."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kartın arka yüzünde O zaman ve şimdi ikisini yan yana gösterir. Birden çok tekrar varsa karşılaştırılacak olanı seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На звороті картки «Тоді й зараз» показує обидва поруч. Якщо повторів кілька, вибери, з яким порівняти."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在卡片背面，“那时与现在”会把两者并排显示。有多次重拍时，选择要比较的那一次。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在卡片背面，「那時與現在」會把兩者並排顯示。有多次重拍時，選擇要比較的那一次。"
           }
         }
       }
@@ -98286,6 +99804,144 @@
         }
       }
     },
+    "Only you set the mood. MimoDays never guesses it." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only you set the mood. MimoDays never guesses it."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنت وحدك من يحدد المزاج. MimoDays لا يخمّنه أبدًا."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настрой ставіш толькі ты. MimoDays ніколі яго не адгадвае."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Stimmung legst nur du fest. MimoDays errät sie nie."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo tú eliges el ánimo. MimoDays nunca lo adivina."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toi seul choisis l’humeur. MimoDays ne la devine jamais."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מצב הרוח נקבע רק על ידך. MimoDays אף פעם לא מנחש אותו."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Տրամադրությունը նշում ես միայն դու։ MimoDays-ը երբեք չի գուշակում այն։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’umore lo scegli solo tu. MimoDays non lo indovina mai."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "気分を決めるのはあなただけ。MimoDaysが推測することはありません。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "განწყობას მხოლოდ შენ ირჩევ. MimoDays მას არასოდეს გამოიცნობს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Көңіл-күйді тек сен белгілейсің. MimoDays оны ешқашан болжамайды."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기분은 당신만 정할 수 있어요. MimoDays는 절대 추측하지 않아요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alleen jij kiest de stemming. MimoDays raadt hem nooit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastrój ustawiasz tylko ty. MimoDays nigdy go nie zgaduje."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só você define o humor. O MimoDays nunca adivinha."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроение ставишь только ты. MimoDays никогда его не угадывает."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bara du väljer humöret. MimoDays gissar det aldrig."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruh halini yalnızca sen belirlersin. MimoDays onu asla tahmin etmez."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настрій ставиш лише ти. MimoDays ніколи його не вгадує."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心情只由你来定。MimoDays 从不猜测。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心情只由你決定。MimoDays 從不猜測。"
+          }
+        }
+      }
+    },
     "Open" : {
       "comment" : "Surprise ribbon action (T03): opens the camera to answer the surprise.",
       "extractionState" : "manual",
@@ -98696,6 +100352,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打開一個瞬間，點一下 •••，然後點一下「從回憶中隱藏」。"
+          }
+        }
+      }
+    },
+    "Open an old moment, tap •••, then Capture this again, and take the same picture today." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open an old moment, tap •••, then Capture this again, and take the same picture today."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح لحظة قديمة، واضغط ••• ثم «التقطها مجددًا»، والتقط الصورة نفسها اليوم."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Адкрый стары момант, націсні •••, потым «Зняць зноў» і зрабі той самы кадр сёння."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne einen alten Moment, tippe auf •••, dann auf „Noch einmal aufnehmen“, und nimm heute dasselbe Bild auf."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre un momento antiguo, toca ••• y luego Capturar de nuevo, y haz la misma foto hoy."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre un ancien moment, touche •••, puis Capturer à nouveau, et prends la même photo aujourd’hui."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "פותחים רגע ישן, מקישים על ••• ואז „לצלם שוב”, ומצלמים היום את אותה תמונה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Բացիր հին պահը, հպիր •••, ապա «Նորից նկարել», և այսօր արա նույն կադրը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri un vecchio momento, tocca •••, poi Cattura di nuovo, e scatta la stessa foto oggi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昔のモーメントを開いて•••、「もう一度撮る」をタップし、今日同じ写真を撮ります。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "გახსენი ძველი მომენტი, შეეხე •••-ს, შემდეგ „ხელახლა გადაღებას“ და დღეს იგივე კადრი გადაიღე."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ескі сәтті аш, ••• түймесін, сосын «Қайта түсіру» түймесін түртіп, бүгін дәл сол кадрды түсір."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "예전 순간을 열고 •••, 다시 담기를 탭한 뒤 오늘 같은 사진을 찍으세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open een oud moment, tik op ••• en dan op Opnieuw vastleggen, en maak vandaag dezelfde foto."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz starą chwilę, stuknij •••, potem Uchwyć ponownie i zrób to samo zdjęcie dziś."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abra um momento antigo, toque em ••• e depois em Capturar de novo, e tire a mesma foto hoje."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открой старый момент, нажми •••, затем «Снять снова» и сделай тот же кадр сегодня."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppna ett gammalt ögonblick, tryck på ••• och sedan Fånga igen, och ta samma bild idag."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eski bir anı aç, •••’ye, sonra Yeniden yakala’ya dokun ve bugün aynı kareyi çek."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрий старий момент, торкнися •••, потім «Зняти знову» і зроби той самий кадр сьогодні."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开一个旧瞬间，轻点 •••，再轻点“再拍一次”，今天拍下同样的画面。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開一個舊瞬間，點一下 •••，再點一下「再拍一次」，今天拍下同樣的畫面。"
           }
         }
       }
@@ -101874,140 +103668,140 @@
         }
       }
     },
-    "Photos: only to save what you export. Importing uses the system picker and needs no access." : {
-      "comment" : "Help & about (S07): Permissions help",
+    "Photos: to save what you export and, if you allow it, to find moments from a day you choose. Importing through the system picker needs no access." : {
+      "comment" : "Help & about (P8.15)",
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos: to save what you export and, if you allow it, to find moments from a day you choose. Importing through the system picker needs no access."
+          }
+        },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الصور: فقط لحفظ ما يتم تصديره. الاستيراد يستخدم منتقي النظام ولا يحتاج إلى أي إذن."
+            "value" : "الصور: لحفظ ما تصدّره، ولإيجاد لحظات من يوم تختاره إن سمحت بذلك. الاستيراد عبر منتقي النظام لا يحتاج إلى إذن."
           }
         },
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фота: толькі каб захоўваць тое, што ты экспартуеш. Для імпарту выкарыстоўваецца сістэмнае акно выбару, доступ для яго не патрэбны."
+            "value" : "Фота: каб захоўваць тое, што ты экспартуеш, і, калі дазволіш, знаходзіць моманты з выбранага дня. Імпарт праз сістэмны выбар не патрабуе доступу."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos: nur um zu speichern, was du exportierst. Der Import nutzt die Systemauswahl und braucht keinen Zugriff."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Photos: only to save what you export. Importing uses the system picker and needs no access."
+            "value" : "Fotos: um zu sichern, was du exportierst, und, wenn du es erlaubst, Momente eines gewählten Tages zu finden. Der Import über die Auswahl des Systems braucht keinen Zugriff."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos: solo para guardar lo que exportas. Para importar se usa el selector del sistema, que no necesita acceso."
+            "value" : "Fotos: para guardar lo que exportas y, si lo permites, encontrar momentos de un día que elijas. Importar con el selector del sistema no necesita acceso."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Photos : uniquement pour enregistrer ce que tu exportes. L’importation utilise le sélecteur du système et ne demande aucun accès."
+            "value" : "Photos : pour enregistrer ce que tu exportes et, si tu l’autorises, trouver les moments d’un jour que tu choisis. L’import par le sélecteur du système ne demande aucun accès."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "תמונות: רק לשמירת תוצרים של ייצוא. הייבוא משתמש בבורר של המערכת ולא דורש גישה."
+            "value" : "תמונות: כדי לשמור את מה שמייצאים, ואם מאשרים, למצוא רגעים מיום שבוחרים. ייבוא דרך בורר המערכת לא צריך גישה."
           }
         },
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Լուսանկարներ՝ միայն արտահանածդ պահպանելու համար։ Ներմուծումն օգտագործում է համակարգային ընտրիչը և մուտք չի պահանջում։"
+            "value" : "Լուսանկարներ՝ պահելու այն, ինչ արտահանում ես, և, եթե թույլ տաս, գտնելու քո ընտրած օրվա պահերը։ Համակարգային ընտրիչով ներմուծումը հասանելիություն չի պահանջում։"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Foto: solo per salvare ciò che esporti. L'importazione usa il selettore di sistema e non richiede alcun accesso."
+            "value" : "Foto: per salvare ciò che esporti e, se lo consenti, trovare i momenti di un giorno che scegli. Importare con il selettore di sistema non richiede accesso."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真：書き出したものの保存にのみ使用します。読み込みにはシステムの選択画面を使うため、アクセス許可は不要です。"
+            "value" : "写真：書き出したものを保存するため、そして許可すれば選んだ日のモーメントを探すため。システムのピッカーからの読み込みにはアクセス許可は不要です。"
           }
         },
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ფოტოები: მხოლოდ იმის შესანახად, რასაც აექსპორტებ. იმპორტი სისტემურ ამომრჩევს იყენებს და წვდომა არ სჭირდება."
+            "value" : "ფოტოები: შენ მიერ ექსპორტირებულის შესანახად და, თუ დაუშვებ, არჩეული დღის მომენტების საპოვნელად. სისტემური ამომრჩევით იმპორტს წვდომა არ სჭირდება."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фотосуреттер: тек экспортталғанды сақтау үшін. Импорттау жүйелік таңдау терезесін пайдаланады және рұқсатты қажет етпейді."
+            "value" : "Фотосуреттер: экспорттағаныңды сақтау үшін және рұқсат берсең, өзің таңдаған күннің сәттерін табу үшін. Жүйелік таңдау арқылы импорттауға рұқсат керек емес."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사진: 내보낸 항목을 저장할 때만 사용해요. 가져오기는 시스템 선택기를 사용하므로 접근 권한이 필요 없어요."
+            "value" : "사진: 내보낸 항목을 저장하고, 허용하면 선택한 날의 순간을 찾기 위해 사용합니다. 시스템 선택기로 가져오기는 접근 권한이 필요 없어요."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Foto's: alleen om te bewaren wat je exporteert. Importeren gebruikt de kiezer van het systeem en heeft geen toegang nodig."
+            "value" : "Foto’s: om te bewaren wat je exporteert en, als je het toestaat, momenten van een gekozen dag te vinden. Importeren via de kiezer van het systeem heeft geen toegang nodig."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zdjęcia: tylko do zapisywania tego, co eksportujesz. Import korzysta z systemowego wyboru zdjęć i nie wymaga dostępu."
+            "value" : "Zdjęcia: by zapisywać to, co eksportujesz, i, jeśli pozwolisz, znajdować chwile z wybranego dnia. Import przez systemowy wybór nie wymaga dostępu."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos: só para salvar o que você exporta. A importação usa o seletor do sistema e não precisa de acesso."
+            "value" : "Fotos: para salvar o que você exporta e, se você permitir, encontrar momentos de um dia que escolher. Importar pelo seletor do sistema não precisa de acesso."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фото: только чтобы сохранять то, что ты экспортируешь. Для импорта используется системное окно выбора, доступ ему не нужен."
+            "value" : "Фото: чтобы сохранять то, что ты экспортируешь, и, если разрешишь, находить моменты из выбранного дня. Импорт через системный выбор не требует доступа."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bilder: bara för att spara det du exporterar. Import använder systemets väljare och kräver ingen åtkomst."
+            "value" : "Bilder: för att spara det du exporterar och, om du tillåter det, hitta ögonblick från en dag du väljer. Import via systemets väljare kräver ingen åtkomst."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotoğraflar: yalnızca dışa aktardıklarını kaydetmek için. İçe aktarma, sistemin seçicisini kullanır ve erişim izni gerektirmez."
+            "value" : "Fotoğraflar: dışa aktardıklarını kaydetmek ve izin verirsen seçtiğin bir günün anlarını bulmak için. Sistem seçicisiyle içe aktarma erişim gerektirmez."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фотографії: лише щоб зберігати те, що ти експортуєш. Для імпорту використовується системний вибір, доступ не потрібен."
+            "value" : "Фото: щоб зберігати те, що ти експортуєш, і, якщо дозволиш, знаходити моменти з обраного дня. Імпорт через системний вибір не потребує доступу."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "照片：仅用于存储导出的内容。导入使用系统选择器，无需访问权限。"
+            "value" : "照片：用来保存你导出的内容；如果你允许，还会用来查找你所选日期的瞬间。通过系统选择器导入无需访问权限。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "照片：僅用於儲存匯出的內容。匯入時使用系統選取器，不需要取用權限。"
+            "value" : "照片：用來儲存你輸出的內容；如果你允許，也會用來尋找你所選日期的瞬間。透過系統挑選器匯入不需要取用權限。"
           }
         }
       }
@@ -132691,6 +134485,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "標籤"
+          }
+        }
+      }
+    },
+    "Tags and mood" : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags and mood"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوسوم والمزاج"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тэгі і настрой"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags und Stimmung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiquetas y ánimo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags et humeur"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "תגיות ומצב רוח"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Պիտակներ և տրամադրություն"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag e umore"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグと気分"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "თეგები და განწყობა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тегтер және көңіл-күй"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태그와 기분"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags en stemming"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagi i nastrój"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags e humor"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Теги и настроение"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taggar och humör"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiketler ve ruh hali"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Теги й настрій"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标签和心情"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標籤和心情"
           }
         }
       }
@@ -165318,6 +167250,144 @@
         }
       }
     },
+    "When you save or edit a moment, tap Tags to add words to search for later, up to 10, and Mood to pick how it felt." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you save or edit a moment, tap Tags to add words to search for later, up to 10, and Mood to pick how it felt."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عند حفظ لحظة أو تحريرها، اضغط «الوسوم» لإضافة كلمات تبحث بها لاحقًا (حتى 10)، و«المزاج» لتحديد شعورك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Калі захоўваеш ці мяняеш момант, націсні «Тэгі», каб дадаць словы для пошуку (да 10), і «Настрой», каб адзначыць, якім ён быў."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du einen Moment sicherst oder bearbeitest, tippe auf „Tags“, um Wörter für die Suche hinzuzufügen (bis zu 10), und auf „Stimmung“, um festzuhalten, wie er sich angefühlt hat."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando guardas o editas un momento, toca Etiquetas para añadir palabras que buscar después (hasta 10), y Ánimo para marcar cómo se sintió."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand tu enregistres ou modifies un moment, touche Tags pour ajouter des mots à rechercher plus tard (jusqu’à 10), et Humeur pour noter ce que tu as ressenti."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כששומרים או עורכים רגע, מקישים על „תגיות” כדי להוסיף מילים לחיפוש מאוחר יותר (עד 10), ועל „מצב רוח” כדי לסמן איך זה הרגיש."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Պահը պահելիս կամ խմբագրելիս հպիր «Պիտակներ»՝ որոնման համար բառեր ավելացնելու (մինչև 10), և «Տրամադրություն»՝ նշելու, թե ինչպես էր։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando salvi o modifichi un momento, tocca Tag per aggiungere parole da cercare in seguito (fino a 10), e Umore per segnare come ti sei sentito."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モーメントを保存または編集するとき、「タグ」をタップすると後で検索する言葉を追加でき（最大10個）、「気分」でそのときの気持ちを選べます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მომენტის შენახვისას ან რედაქტირებისას შეეხე „თეგებს“, რომ დაამატო სიტყვები მოგვიანებით საძიებლად (10-მდე), და „განწყობას“, რომ მონიშნო, როგორი იყო."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сәтті сақтағанда не өңдегенде, кейін іздейтін сөздерді қосу үшін «Тегтер» (10-ға дейін), қалай болғанын белгілеу үшін «Көңіл-күй» түймесін түрт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "순간을 저장하거나 편집할 때 태그를 탭해 나중에 검색할 단어를 추가하고(최대 10개), 기분을 탭해 어땠는지 고르세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je een moment bewaart of wijzigt, tik je op Tags om woorden toe te voegen om later op te zoeken (tot 10), en op Stemming om aan te geven hoe het voelde."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gdy zapisujesz lub edytujesz chwilę, stuknij Tagi, by dodać słowa do późniejszego wyszukiwania (do 10), i Nastrój, by zaznaczyć, jak było."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao salvar ou editar um momento, toque em Tags para adicionar palavras para buscar depois (até 10), e em Humor para marcar como foi."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Когда сохраняешь или меняешь момент, нажми «Теги», чтобы добавить слова для поиска (до 10), и «Настроение», чтобы отметить, каким он был."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "När du sparar eller redigerar ett ögonblick trycker du på Taggar för att lägga till ord att söka på senare (upp till 10), och på Humör för att visa hur det kändes."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir anı kaydederken ya da düzenlerken, sonra aramak için sözcük eklemek üzere Etiketler’e (en fazla 10), nasıl hissettirdiğini seçmek için Ruh hali’ne dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Коли зберігаєш чи змінюєш момент, торкнися «Теги», щоб додати слова для пошуку (до 10), і «Настрій», щоб позначити, яким він був."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存或编辑瞬间时，轻点“标签”添加以后要搜索的词（最多 10 个），轻点“心情”记下当时的感受。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存或編輯瞬間時，點一下「標籤」加入日後要搜尋的字詞（最多 10 個），點一下「心情」記下當時的感受。"
+          }
+        }
+      }
+    },
     "Which collection?" : {
       "comment" : "New movie: question on the list of collections",
       "extractionState" : "manual",
@@ -167150,6 +169220,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "寫一個瞬間"
+          }
+        }
+      }
+    },
+    "Write what you want to remember, and add a place, tags and mood if you like. It becomes a paper card among your photos and videos." : {
+      "comment" : "Help & about (P8.15)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write what you want to remember, and add a place, tags and mood if you like. It becomes a paper card among your photos and videos."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتب ما تريد تذكّره، وأضف مكانًا ووسومًا ومزاجًا إن شئت. تصبح بطاقة ورقية بين صورك ومقاطع الفيديو."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Напішы, што хочаш запомніць, і, калі хочаш, дадай месца, тэгі і настрой. Атрымаецца папяровая картка сярод тваіх фота і відэа."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib auf, woran du dich erinnern willst, und füge, wenn du magst, einen Ort, Tags und eine Stimmung hinzu. Daraus wird eine Papierkarte zwischen deinen Fotos und Videos."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe lo que quieres recordar y, si quieres, añade un lugar, etiquetas y ánimo. Se convierte en una tarjeta de papel entre tus fotos y vídeos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écris ce dont tu veux te souvenir et, si tu veux, ajoute un lieu, des tags et une humeur. Ça devient une carte en papier parmi tes photos et vidéos."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כותבים מה רוצים לזכור, ואם רוצים מוסיפים מקום, תגיות ומצב רוח. זה הופך לכרטיס נייר בין התמונות והסרטונים."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Գրիր այն, ինչ ուզում ես հիշել, և, եթե ուզում ես, ավելացրու վայր, պիտակներ և տրամադրություն։ Այն դառնում է թղթե քարտ քո լուսանկարների և տեսանյութերի մեջ։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrivi ciò che vuoi ricordare e, se vuoi, aggiungi un luogo, tag e umore. Diventa una scheda di carta tra le tue foto e i tuoi video."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "残したいことを書き、必要なら場所、タグ、気分を加えます。写真や動画に並ぶ紙のカードになります。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დაწერე, რისი დამახსოვრებაც გინდა, და სურვილისამებრ დაამატე ადგილი, თეგები და განწყობა. ის ქაღალდის ბარათად იქცევა შენს ფოტოებსა და ვიდეოებს შორის."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Есте сақтағың келгенді жаз, қаласаң орын, тегтер мен көңіл-күй қос. Ол фото мен бейнелеріңнің арасында қағаз карточкаға айналады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기억하고 싶은 것을 쓰고, 원하면 장소, 태그, 기분을 더하세요. 사진과 동영상 사이에 종이 카드로 남아요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijf op wat je wilt onthouden en voeg als je wilt een plek, tags en stemming toe. Het wordt een papieren kaart tussen je foto’s en video’s."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Napisz, co chcesz zapamiętać, i jeśli chcesz, dodaj miejsce, tagi i nastrój. Powstanie papierowa karta wśród twoich zdjęć i filmów."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escreva o que quer lembrar e, se quiser, adicione um lugar, tags e humor. Vira um cartão de papel entre suas fotos e vídeos."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Напиши, что хочешь запомнить, и, если хочешь, добавь место, теги и настроение. Получится бумажная карточка среди твоих фото и видео."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv det du vill minnas och lägg till en plats, taggar och humör om du vill. Det blir ett papperskort bland dina bilder och videor."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hatırlamak istediğini yaz; istersen bir yer, etiketler ve ruh hali ekle. Fotoğraf ve videoların arasında kâğıttan bir kart olur."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Напиши, що хочеш запам’ятати, і, якщо хочеш, додай місце, теги й настрій. Вийде паперова картка серед твоїх фото й відео."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写下你想记住的事；愿意的话，加上地点、标签和心情。它会成为照片和视频之间的一张纸卡。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "寫下你想記住的事；願意的話，加上地點、標籤和心情。它會成為照片和影片之間的一張紙卡。"
           }
         }
       }

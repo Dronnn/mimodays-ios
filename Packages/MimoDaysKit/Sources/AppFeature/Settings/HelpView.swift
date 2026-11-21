@@ -20,6 +20,12 @@ enum HelpArticle: String, CaseIterable, Hashable {
     case cameraShortcut
     case hideFromMemories
     case remindLater
+    case tagsAndMood
+    case momentsFromPhotos
+    case thenNow
+    case oneSecond
+    case writeMoment
+    case fallbackReminder
 
     var title: Text {
         switch self {
@@ -30,6 +36,12 @@ enum HelpArticle: String, CaseIterable, Hashable {
         case .cameraShortcut: Text("Open the camera quickly", bundle: .module)
         case .hideFromMemories: Text("Hide from memories", bundle: .module)
         case .remindLater: Text("Remind me later", bundle: .module)
+        case .tagsAndMood: Text("Tags and mood", bundle: .module)
+        case .momentsFromPhotos: Text("Moments from Photos", bundle: .module)
+        case .thenNow: Text("Then & Now", bundle: .module)
+        case .oneSecond: Text("One second per day", bundle: .module)
+        case .writeMoment: Text("Write a moment", bundle: .module)
+        case .fallbackReminder: Text("Fallback reminder", bundle: .module)
         }
     }
 
@@ -50,7 +62,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
             Text("Camera and microphone: for photos, videos and voice notes.", bundle: .module),
             Text("Location, if you allow it: to save where a moment happened and to show where you are on the map.", bundle: .module),
             Text("Notifications, if you allow them: for surprises, and to tell you when a movie is ready or a backup is due.", bundle: .module),
-            Text("Photos: only to save what you export. Importing uses the system picker and needs no access.", bundle: .module),
+            Text("Photos: to save what you export and, if you allow it, to find moments from a day you choose. Importing through the system picker needs no access.", bundle: .module),
             Text("Face ID, if you turn on App Lock.", bundle: .module),
             Text("You can change any of them in iOS Settings.", bundle: .module),
         ]
@@ -78,6 +90,33 @@ enum HelpArticle: String, CaseIterable, Hashable {
         case .remindLater: [
             Text("When a surprise arrives at a bad time, touch and hold its notification, then tap Remind me later.", bundle: .module),
             Text("The same surprise comes back once, later today, inside your surprise hours.", bundle: .module),
+        ]
+        // P8.15: the rest of 1.0.7, the names as the screens show them.
+        case .tagsAndMood: [
+            Text("When you save or edit a moment, tap Tags to add words to search for later, up to 10, and Mood to pick how it felt.", bundle: .module),
+            Text("In Search, tap Filters, then Tags or Mood, to narrow the results.", bundle: .module),
+            Text("Only you set the mood. MimoDays never guesses it.", bundle: .module),
+        ]
+        case .momentsFromPhotos: [
+            Text("On a day with no moments, Today and the calendar show Find moments in Photos. Pick photos and videos taken that day, tap Review, then Import.", bundle: .module),
+            Text("MimoDays looks only at that date, and only after you allow Photos access. Browse Photos opens the system picker for any date, with no access needed.", bundle: .module),
+            Text("Live Photos keep their motion: on the card, tap Play Live Photo.", bundle: .module),
+        ]
+        case .thenNow: [
+            Text("Open an old moment, tap •••, then Capture this again, and take the same picture today.", bundle: .module),
+            Text("On the back of the card, Then & Now shows both side by side. With several repeats, choose the one to compare.", bundle: .module),
+        ]
+        case .oneSecond: [
+            Text("In Movies, tap New movie, then One second per day, and pick a month or a year.", bundle: .module),
+            Text("Each day with moments gives one second: its first surprise, or else its earliest moment. Tap Change on a day to pick another.", bundle: .module),
+        ]
+        case .writeMoment: [
+            Text("On Today, tap Add a moment, then Write a moment.", bundle: .module),
+            Text("Write what you want to remember, and add a place, tags and mood if you like. It becomes a paper card among your photos and videos.", bundle: .module),
+        ]
+        case .fallbackReminder: [
+            Text("In Settings › Surprises, turn on Fallback reminder and choose a time.", bundle: .module),
+            Text("On days with no surprise planned, MimoDays reminds you at that time. It stays off unless you turn it on.", bundle: .module),
         ]
         }
     }

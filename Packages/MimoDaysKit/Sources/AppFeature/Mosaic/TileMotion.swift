@@ -459,7 +459,9 @@ extension MediaLibrary {
             let (main, duration) = try await Self.picture(of: mainURL)
             var selfie: AVPlayerItem?
             if withSelfie, let path = video.selfiePath, let selfieURL = try? store.url(for: path) {
-                selfie = AVPlayerItem(asset: try await VideoComposer.selfieStream(selfieURL, offset: video.timing.selfieOffset, mainDuration: duration))
+                // A selfie that can't be placed leaves the tile its main picture.
+                selfie = (try? await VideoComposer.selfieStream(selfieURL, offset: video.timing.selfieOffset, mainDuration: duration))
+                    .map { AVPlayerItem(asset: $0) }
             }
             return (video, AVPlayerItem(asset: main), selfie)
         } catch {

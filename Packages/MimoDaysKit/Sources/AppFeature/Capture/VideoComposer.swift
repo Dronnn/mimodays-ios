@@ -39,7 +39,9 @@ enum VideoComposer {
         let composition = AVMutableComposition()
         let main = AVURLAsset(url: mainURL)
         guard let mainVideo = try await main.loadTracks(withMediaType: .video).first else { throw Failure.noVideo }
-        let range = CMTimeRange(start: .zero, duration: try await main.load(.duration))
+        // From the main picture's first frame: a video track that starts a little into its file would leave the
+        // compositor a first instant with no main frame.
+        let range = try await mediaRange(of: mainVideo)
         guard let mainTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             throw Failure.compositionFailed
         }
@@ -60,8 +62,8 @@ enum VideoComposer {
               let selfieTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             throw Failure.noVideo
         }
-        let selfieRange = try await selfieVideo.load(.timeRange)
-        if let (source, start) = placement(selfie: selfieRange.duration, offset: timing.selfieOffset, main: range.duration) {
+        let selfieRange = try await mediaRange(of: selfieVideo)
+        if let (source, start) = placement(selfie: selfieRange, offset: timing.selfieOffset, main: range) {
             try selfieTrack.insertTimeRange(source, of: selfieVideo, at: start)
         }
 
@@ -74,7 +76,7 @@ enum VideoComposer {
             SelfieWindowArt(window: timing.window ?? SelfieWindowFrame(frame: .zero, preview: mainSize), canvas: mainSize)
         }
         let instruction = SelfieWindowInstruction(
-            timeRange: range, mainTrackID: mainTrack.trackID, selfieTrackID: selfieTrack.trackID,
+            timeRange: CMTimeRange(start: .zero, duration: range.duration), mainTrackID: mainTrack.trackID, selfieTrackID: selfieTrack.trackID,
             mainOrientation: .init(mainTransform), selfieOrientation: .init(try await selfieVideo.load(.preferredTransform)),
             art: art
         )
@@ -95,20 +97,30 @@ enum VideoComposer {
               let track = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             throw Failure.noVideo
         }
-        let range = try await video.load(.timeRange)
-        guard let (source, start) = placement(selfie: range.duration, offset: offset, main: mainDuration) else { throw Failure.noVideo }
+        let range = try await mediaRange(of: video)
+        let main = CMTimeRange(start: .zero, duration: mainDuration)
+        guard let (source, start) = placement(selfie: range, offset: offset, main: main) else { throw Failure.noVideo }
         try track.insertTimeRange(source, of: video, at: start)
         track.preferredTransform = try await video.load(.preferredTransform)
         return composition
     }
 
+    /// Where a track's pictures really are in its file: from its first non-empty edit, which `timeRange` doesn't
+    /// tell when the file opens with an empty one.
+    static func mediaRange(of track: AVAssetTrack) async throws -> CMTimeRange {
+        let (range, segments) = try await track.load(.timeRange, .segments)
+        guard let first = segments.first(where: { !$0.isEmpty }) else { return range }
+        return CMTimeRange(start: first.timeMapping.target.start, end: range.end)
+    }
+
     /// Which part of the selfie stream goes where on the main timeline: a later start is inserted later,
-    /// an earlier one is trimmed; nothing runs past the main stream.
-    static func placement(selfie: CMTime, offset: TimeInterval, main: CMTime) -> (source: CMTimeRange, at: CMTime)? {
-        let shift = CMTime(seconds: offset, preferredTimescale: 600)
-        let sourceStart = shift < .zero ? CMTimeMultiply(shift, multiplier: -1) : .zero
-        let at = shift < .zero ? .zero : shift
-        let length = CMTimeMinimum(CMTimeSubtract(selfie, sourceStart), CMTimeSubtract(main, at))
+    /// an earlier one is trimmed; nothing runs past the main stream. `selfie` and `main` are the video tracks'
+    /// ranges in their files; the offset is between the two files' starts, and the timeline begins at `main.start`.
+    static func placement(selfie: CMTimeRange, offset: TimeInterval, main: CMTimeRange) -> (source: CMTimeRange, at: CMTime)? {
+        let shift = CMTimeSubtract(CMTime(seconds: offset, preferredTimescale: 600), main.start)
+        let sourceStart = CMTimeMaximum(selfie.start, CMTimeMultiply(shift, multiplier: -1))
+        let at = CMTimeAdd(sourceStart, shift)
+        let length = CMTimeMinimum(CMTimeSubtract(selfie.end, sourceStart), CMTimeSubtract(main.duration, at))
         guard length > .zero else { return nil }
         return (CMTimeRange(start: sourceStart, duration: length), at)
     }

@@ -58,7 +58,8 @@ final class ViewerVideoPlayer {
         hasSelfie = selfieItem != nil
         await Self.ready(item)
         if let selfieItem { await Self.ready(selfieItem) }
-        if item.status == .readyToPlay { duration = max(duration, item.duration.seconds.isFinite ? item.duration.seconds : 0) }
+        // The file's own length: a moment saved before 1.0.7 with its streams swapped kept the other stream's.
+        if item.status == .readyToPlay, item.duration.seconds.isFinite, item.duration.seconds > 0 { duration = item.duration.seconds }
         timeObserver = main.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 20), queue: .main) { [weak self] time in
             MainActor.assumeIsolated { self?.time = time.seconds }
         }

@@ -23,6 +23,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private var backLens = BackLens.wide
     private var recording: RecordingDelegate?
     private var pressure: [CameraPosition: CapturePressurePolicy.Level] = [:]
+    /// The angles last asked for: connections made later (a lens change, a flip) start at them, not at portrait.
+    private let previewAngle = Mutex<CGFloat>(90)
+    private let captureAngle = Mutex<CGFloat>(90)
+    /// The frame rate the current setup needed to fit the system pressure budget; pressure relief stays below it.
+    private var frameRateCap = 30
     private var pressureObservations: [CameraPosition: NSKeyValueObservation] = [:]
     /// Between `start()` and `stop()`: the session should be running.
     private var isActive = false
@@ -205,6 +210,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             guard let setup = self.setup else { throw CaptureError.notRunning }
             guard case let .single(position) = setup, self.recording == nil else { return setup }
             let flipped = CameraSetup.single(position.other)
+            self.frameRateCap = 30
             self.session.beginConfiguration()
             defer { self.session.commitConfiguration() }
             self.removeCamera(position)
@@ -281,15 +287,20 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     @MainActor
     public func setPreviewHold(_ hold: DeviceHold) {
         let angle = Self.rotationAngle(hold)
-        for preview in previews.values {
-            if let connection = preview.connection, connection.isVideoRotationAngleSupported(angle) {
-                connection.videoRotationAngle = angle
+        // Under the lock, so a connection made on the session queue at the same time can't apply an older angle after this.
+        previewAngle.withLock { stored in
+            stored = angle
+            for preview in previews.values {
+                if let connection = preview.connection, connection.isVideoRotationAngleSupported(angle) {
+                    connection.videoRotationAngle = angle
+                }
             }
         }
     }
 
     public func setCaptureHold(_ hold: DeviceHold) async {
         let angle = Self.rotationAngle(hold)
+        captureAngle.withLock { $0 = angle }
         try? await onQueue {
             for camera in self.cameras.values {
                 for connection in [camera.photo.connection(with: .video), camera.movie.connection(with: .video)].compactMap(\.self)
@@ -431,6 +442,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     /// Both cameras at the largest formats the hardware budget allows, then a lower frame rate if the
     /// system pressure cost is too high; the rear camera alone when nothing fits.
     private func configureWithinBudget() throws -> CameraSetup {
+        frameRateCap = 30
         guard let multiCam = session as? AVCaptureMultiCamSession else {
             try configure(.single(.back), formatWidth: nil)
             return .single(.back)
@@ -438,11 +450,16 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         for width in CapturePressurePolicy.dualFormatWidths where width <= maxFormatWidth {
             // A selfie camera that can't be added (busy, broken) leaves the rear camera alone, not no camera.
             guard (try? configure(.dual, formatWidth: width)) != nil else { break }
-            if multiCam.hardwareCost <= 1 {
-                for frameRate in [30, 24, 15] where multiCam.systemPressureCost > 1 {
-                    setFrameRate(frameRate)
+            for frameRate in [30, 24, 15] {
+                // The session prices a camera at its format's top rate unless the input caps it; both costs count,
+                // and both cameras must take the rate.
+                session.beginConfiguration()
+                for camera in cameras.values { camera.input.videoMinFrameDurationOverride = CMTime(value: 1, timescale: CMTimeScale(frameRate)) }
+                session.commitConfiguration()
+                if setFrameRate(frameRate), multiCam.hardwareCost <= 1, multiCam.systemPressureCost <= 1 {
+                    frameRateCap = frameRate
+                    return .dual
                 }
-                if multiCam.systemPressureCost <= 1 { return .dual }
             }
             removeAllCameras()
         }
@@ -468,17 +485,24 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         session.commitConfiguration()
     }
 
-    private func setFrameRate(_ frameRate: Int) {
+    /// Whether every camera took the rate; one that can't keeps its own.
+    @discardableResult
+    private func setFrameRate(_ frameRate: Int) -> Bool {
+        var all = true
         for camera in cameras.values {
             let device = camera.input.device
             let supported = device.activeFormat.videoSupportedFrameRateRanges.contains {
                 $0.minFrameRate <= Double(frameRate) && Double(frameRate) <= $0.maxFrameRate
             }
-            guard supported, (try? device.lockForConfiguration()) != nil else { continue }
+            guard supported, (try? device.lockForConfiguration()) != nil else {
+                all = false
+                continue
+            }
             device.activeVideoMinFrameDuration = CMTime(value: 1, timescale: CMTimeScale(frameRate))
             device.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: CMTimeScale(frameRate))
             device.unlockForConfiguration()
         }
+        return all
     }
 
     /// Heat or load on a camera: lower the frame rate, and drop the selfie camera when it gets critical.
@@ -492,14 +516,19 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         guard let setup else { return }
         let response = CapturePressurePolicy.response(
             to: pressure.values.max() ?? .nominal, lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled,
-            setup: setup, isRecording: recording != nil
+            setup: setup, isRecording: recording != nil, frameRateCap: frameRateCap
         )
         setFrameRate(response.frameRate)
         guard response.dropsSelfie else { return }
         session.beginConfiguration()
         removeCamera(.front)
+        // One camera has no shared budget to stay under: back to the full rate once the heat passes.
+        cameras[.back]?.input.videoMinFrameDurationOverride = .invalid
         session.commitConfiguration()
+        frameRateCap = 30
         self.setup = .single(.back)
+        // The rear camera was slowed for the front one's heat: its own pressure sets its rate now.
+        applyPressure()
         eventSink.yield(.setupChanged(.single(.back)))
     }
 
@@ -544,7 +573,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         pressureObservations[position] = device.observe(\.systemPressureState, options: [.initial, .new]) { [weak self] device, _ in
             guard let engine = self else { return }
             let level = CapturePressurePolicy.Level(device.systemPressureState.level)
-            engine.queue.async { engine.pressureChanged(level, on: position) }
+            // A camera removed since (the selfie dropped for heat) no longer has a say.
+            engine.queue.async {
+                guard engine.cameras[position]?.input.device === device else { return }
+                engine.pressureChanged(level, on: position)
+            }
         }
     }
 
@@ -552,7 +585,10 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private func connect(_ connection: AVCaptureConnection, _ position: CameraPosition) throws {
         guard session.canAddConnection(connection) else { throw CaptureError.configurationFailed }
         session.addConnection(connection)
-        if connection.isVideoRotationAngleSupported(90) { connection.videoRotationAngle = 90 }
+        func rotate(_ angle: CGFloat) {
+            if connection.isVideoRotationAngleSupported(angle) { connection.videoRotationAngle = angle }
+        }
+        if connection.videoPreviewLayer == nil { captureAngle.withLock { rotate($0) } } else { previewAngle.withLock { rotate($0) } }
         if position == .front, connection.isVideoMirroringSupported {
             connection.automaticallyAdjustsVideoMirroring = false
             connection.isVideoMirrored = true
@@ -685,7 +721,10 @@ private final class PhotoDelegate: NSObject, AVCapturePhotoCaptureDelegate, Send
 private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDelegate, Sendable {
     private struct Stream {
         var position: CameraPosition
+        /// Host time of the start callback; also says the stream has begun.
         var started: TimeInterval?
+        /// Its first frame on the session clock (iOS 18.2 and later).
+        var firstFrame: TimeInterval?
         var result: (url: URL, duration: TimeInterval)?
         var finished = false
         var failed = false
@@ -728,12 +767,25 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
         stopRequested.withLock { $0 = true }
     }
 
+    /// iOS 18.0-18.1: the callback's time stands in for the first frame's.
     func fileOutput(_ output: AVCaptureFileOutput, didStartRecordingTo _: URL, from _: [AVCaptureConnection]) {
+        didStart(output, firstFrame: nil)
+    }
+
+    /// iOS 18.2 and later call only this one: the first frame's time on the session clock, which both cameras share,
+    /// so a late callback under load doesn't shift the selfie.
+    @available(iOS 18.2, *)
+    func fileOutput(_ output: AVCaptureFileOutput, didStartRecordingTo _: URL, startPTS: CMTime, from _: [AVCaptureConnection]) {
+        didStart(output, firstFrame: startPTS.isNumeric ? startPTS.seconds : nil)
+    }
+
+    private func didStart(_ output: AVCaptureFileOutput, firstFrame: TimeInterval?) {
         if stopRequested.withLock({ $0 }) { output.stopRecording() }
         let now = CACurrentMediaTime()
         let isFirst = streams.withLock { streams in
             let first = !streams.values.contains { $0.started != nil }
             streams[ObjectIdentifier(output)]?.started = now
+            streams[ObjectIdentifier(output)]?.firstFrame = firstFrame
             return first
         }
         if isFirst { started() }
@@ -773,7 +825,12 @@ private final class RecordingDelegate: NSObject, AVCaptureFileOutputRecordingDel
         }
         let selfie = ordered.count > 1 ? ordered[1] : nil
         var offset: TimeInterval = 0
-        if let mainStart = main.started, let selfieStart = selfie?.started { offset = selfieStart - mainStart }
+        // First frames when both streams have one, else both callback times: never one clock against the other.
+        if let mainStart = main.firstFrame, let selfieStart = selfie?.firstFrame {
+            offset = selfieStart - mainStart
+        } else if let mainStart = main.started, let selfieStart = selfie?.started {
+            offset = selfieStart - mainStart
+        }
         return .success(CapturedVideo(
             mainURL: mainResult.url, mainPosition: main.position, selfieURL: selfie?.result?.url,
             duration: mainResult.duration, selfieOffset: offset, hasAudio: hasAudio,

@@ -108,6 +108,11 @@ struct CapturePressurePolicyTests {
         #expect(!Policy.response(to: .critical, setup: .single(.front), isRecording: false).dropsSelfie)
     }
 
+    @Test func reliefNeverRaisesTheFrameRateAboveTheBudget() {
+        #expect(Policy.response(to: .nominal, setup: .dual, isRecording: false, frameRateCap: 24).frameRate == 24)
+        #expect(Policy.response(to: .critical, setup: .dual, isRecording: false, frameRateCap: 24).frameRate == 15)
+    }
+
     @Test func dualFormatsStepDown() {
         #expect(Policy.dualFormatWidths == Policy.dualFormatWidths.sorted(by: >))
     }

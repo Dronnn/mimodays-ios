@@ -27,6 +27,8 @@ enum MediaCheck {
         }
         if video.hasAudio { await logSoundStart(video.mainURL) }
         var video = video
+        // After a swap the main file is the other camera's: its own length, not the one the engine reported.
+        if let duration = try? await AVURLAsset(url: video.mainURL).load(.duration).seconds, duration > 0 { video.duration = duration }
         if let selfie = video.selfieURL, !(await isPlayableVideo(selfie)) {
             remove([selfie])
             video.selfieURL = nil

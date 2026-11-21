@@ -117,6 +117,55 @@ struct CameraModelInterruptionTests {
         #expect(model.canCapture)
     }
 
+    /// Swapped before recording: the front camera's file is the main one, the rear's the selfie, the offset turned round.
+    @Test func aSwappedRecordingPutsTheFrontStreamFirst() async throws {
+        let engine = OffsetVideoEngine()
+        var results: [CaptureResult] = []
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { results.append($0) }
+        )
+        await model.start()
+        await model.flip()
+        #expect(model.isSwapped)
+        await model.shutter()
+        guard case let .video(video) = try #require(results.first).media else { Issue.record("not a video"); return }
+        let recorded = try #require(await engine.recorded)
+        #expect(video.mainPosition == .front)
+        #expect(video.mainURL == recorded.selfieURL)
+        #expect(video.selfieURL == recorded.mainURL)
+        #expect(video.selfieOffset == -0.3)
+        results.first?.discardFiles()
+    }
+
+    /// The simulated recording with the selfie starting 0.3 s after the main stream.
+    private actor OffsetVideoEngine: CaptureEngine {
+        private let base = SimulatedCaptureEngine()
+        private(set) var recorded: CapturedVideo?
+
+        func start() async throws -> CameraSetup { try await base.start() }
+        func stop() async {}
+        func backLenses() async -> [BackLens] { await base.backLenses() }
+        func setBackLens(_ lens: BackLens) async throws { try await base.setBackLens(lens) }
+        func flip() async throws -> CameraSetup { try await base.flip() }
+        func setMicrophone(_ enabled: Bool) async throws { try await base.setMicrophone(enabled) }
+        func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto { try await base.capturePhoto(flash: flash, silent: silent) }
+        func record(limit _: Duration?) async throws -> CapturedVideo {
+            var video = try await base.record(limit: .milliseconds(600))
+            video.selfieOffset = 0.3
+            recorded = video
+            return video
+        }
+        func stopRecording() async { await base.stopRecording() }
+        func setTorch(_ mode: FlashMode) async { await base.setTorch(mode) }
+        func setCaptureHold(_ hold: DeviceHold) async { await base.setCaptureHold(hold) }
+        @MainActor func previewLayer(for _: CameraPosition) -> CALayer? { nil }
+        @MainActor func setPreviewHold(_: DeviceHold) {}
+        nonisolated var events: AsyncStream<CaptureEvent> { base.events }
+    }
+
     /// Closed while a photo is being taken: the photo goes, and no review opens for it.
     @Test func aPhotoFinishingAfterCloseIsThrownAway() async throws {
         let engine = HeldPhotoEngine()
@@ -384,7 +433,22 @@ struct MediaCheckTests {
         _ = await engine.start()
         let video = try await engine.record(limit: .seconds(1))
         let checked = try #require(await MediaCheck.checked(video))
-        #expect(checked == video)
+        var expected = video
+        expected.duration = checked.duration
+        #expect(checked == expected)
+        #expect(abs(checked.duration - video.duration) < 0.2)
+        [video.mainURL, video.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
+    }
+
+    /// After a swap the main file is the selfie camera's, which can be shorter: the moment takes that file's length.
+    @Test func aSwappedVideoTakesItsMainFilesLength() async throws {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        var video = try await engine.record(limit: .seconds(1))
+        let actual = video.duration
+        video.duration = actual + 5
+        let checked = try #require(await MediaCheck.checked(video))
+        #expect(abs(checked.duration - actual) < 0.2)
         [video.mainURL, video.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
     }
 }

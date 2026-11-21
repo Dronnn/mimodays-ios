@@ -142,13 +142,18 @@ public enum CapturePressurePolicy {
         public var dropsSelfie: Bool
     }
 
-    /// Low Power Mode counts as at least serious pressure: a lower frame rate saves battery.
-    public static func response(to level: Level, lowPower: Bool = false, setup: CameraSetup, isRecording: Bool) -> Response {
-        switch lowPower ? max(level, .serious) : level {
+    /// Low Power Mode counts as at least serious pressure: a lower frame rate saves battery. `frameRateCap` is the
+    /// rate the setup was configured at to fit the budget: relief never raises the frame rate above it.
+    public static func response(
+        to level: Level, lowPower: Bool = false, setup: CameraSetup, isRecording: Bool, frameRateCap: Int = 30
+    ) -> Response {
+        var response = switch lowPower ? max(level, .serious) : level {
         case .nominal, .fair: Response(frameRate: 30, dropsSelfie: false)
         case .serious: Response(frameRate: 24, dropsSelfie: false)
         case .critical, .shutdown: Response(frameRate: 15, dropsSelfie: setup == .dual && !isRecording)
         }
+        response.frameRate = min(response.frameRate, frameRateCap)
+        return response
     }
 
     /// Format widths tried for each camera of a dual setup, largest first, before keeping one camera.

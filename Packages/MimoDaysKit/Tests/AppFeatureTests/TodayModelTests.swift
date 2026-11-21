@@ -201,6 +201,17 @@ struct TodayModelTests {
         #expect(today.onThisDay?.cover.id == cover)
     }
 
+    /// P8.3: a hidden day doesn't come back on Today; the next earlier year does.
+    @Test func onThisDaySkipsAHiddenDay() async throws {
+        let cover = try await save(at: Self.date(2023, 11, 11))
+        try await save(at: Self.date(2024, 11, 11, 19))
+        try MemoryVisibility.setDayHidden(true, 2024_11_11, in: context)
+        let today = model()
+        await today.refresh()
+        #expect(today.onThisDay?.yearsAgo == 3)
+        #expect(today.onThisDay?.cover.id == cover)
+    }
+
     @Test func captureFromTodayAnswersAReadySurprise() async throws {
         let now = clock.now()
         let prompt = SurprisePrompt(plannedAt: now.addingTimeInterval(-180), expiresAt: now.addingTimeInterval(720), notificationRequestID: "ready")

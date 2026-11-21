@@ -119,14 +119,18 @@ final class MoviesModel {
         return MovieSuggestion(month: month, candidates: candidates, days: Set(candidates.map(\.day)).count, seconds: seconds)
     }
 
-    /// Alive moments on these local days, ready for MovieSelection.
-    static func candidates(in context: ModelContext, from first: Int, through last: Int) throws -> [MovieSelection.Candidate] {
+    /// Alive moments on these local days, ready for MovieSelection. An automatic pick leaves out moments hidden from
+    /// memories (P8.3); choosing by hand offers them too.
+    static func candidates(
+        in context: ModelContext, from first: Int, through last: Int, includingHidden: Bool = false
+    ) throws -> [MovieSelection.Candidate] {
         var descriptor = FetchDescriptor<Moment>(
             predicate: #Predicate { $0.deletedAt == nil && $0.localDay >= first && $0.localDay <= last },
             sortBy: [SortDescriptor(\.capturedAt)]
         )
         descriptor.relationshipKeyPathsForPrefetching = [\.media]
-        return try context.fetch(descriptor).map { moment in
+        let moments = try context.fetch(descriptor)
+        return (includingHidden ? moments : MemoryVisibility(context: context).visible(moments)).map { moment in
             MovieSelection.Candidate(
                 id: moment.id, capturedAt: moment.capturedAt, day: moment.localDay,
                 videoDuration: moment.mediaType == .video ? (moment.media.compactMap(\.duration).max() ?? MovieSelection.photoSeconds) : nil

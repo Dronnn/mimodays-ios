@@ -203,8 +203,10 @@ final class TodayModel {
             #Predicate { $0.deletedAt == nil && keys.contains($0.localDay) },
             sort: [SortDescriptor(\.localDay, order: .reverse), SortDescriptor(\.capturedAt, order: .reverse)], limit: nil
         )
-        guard let cover = moments.first else { return nil }
-        let sameYear = moments.filter { $0.localDay == cover.localDay }
+        // P8.3: hidden moments and days don't come back here.
+        let shown = MemoryVisibility(context: context).visible(moments)
+        guard let cover = shown.first else { return nil }
+        let sameYear = shown.filter { $0.localDay == cover.localDay }
         return OnThisDay(yearsAgo: today.year - cover.localDay / 10_000, count: sameYear.count, cover: MomentSummary(cover))
     }
 

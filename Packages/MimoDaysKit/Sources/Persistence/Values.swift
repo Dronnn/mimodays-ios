@@ -335,3 +335,30 @@ public enum AppearancePreference: String, Codable, CaseIterable, Sendable {
     case light
     case dark
 }
+
+/// P8.10: a private mark on a moment, set only by the person. Stored by its stable code, never by its name.
+public enum Mood: String, CaseIterable, Codable, Sendable {
+    case joyful
+    case calm
+    case okay
+    case low
+    case heavy
+
+    public var emoji: String {
+        switch self {
+        case .joyful: "😄"
+        case .calm: "😌"
+        case .okay: "🙂"
+        case .low: "😕"
+        case .heavy: "😞"
+        }
+    }
+}
+
+public extension Moment {
+    /// An unknown code (from a newer version's backup) reads as no mood.
+    var mood: Mood? {
+        get { moodRaw.flatMap(Mood.init(rawValue:)) }
+        set { moodRaw = newValue?.rawValue }
+    }
+}

@@ -2,31 +2,33 @@ import Core
 import Foundation
 import SwiftData
 
-// Current model names. Until 1.0 ships, V1 changes in place; after that, a new version points these at it and adds a stage.
-public typealias Moment = SchemaV1.Moment
-public typealias MomentMedia = SchemaV1.MomentMedia
-public typealias MomentVoiceNote = SchemaV1.MomentVoiceNote
-public typealias MomentLocation = SchemaV1.MomentLocation
-public typealias SurpriseSchedule = SchemaV1.SurpriseSchedule
-public typealias SurprisePrompt = SchemaV1.SurprisePrompt
-public typealias MomentCollection = SchemaV1.MomentCollection
-public typealias CollectionMembership = SchemaV1.CollectionMembership
-public typealias MovieProject = SchemaV1.MovieProject
-public typealias MovieClip = SchemaV1.MovieClip
-public typealias MovieTextCard = SchemaV1.MovieTextCard
-public typealias MovieAudioTrack = SchemaV1.MovieAudioTrack
-public typealias ExportJob = SchemaV1.ExportJob
-public typealias BackupManifest = SchemaV1.BackupManifest
-public typealias AppPreferences = SchemaV1.AppPreferences
+// Current model names: the newest schema. A shipped version is never edited; a new one copies it and adds a stage.
+public typealias Moment = SchemaV2.Moment
+public typealias MomentMedia = SchemaV2.MomentMedia
+public typealias MomentVoiceNote = SchemaV2.MomentVoiceNote
+public typealias MomentLocation = SchemaV2.MomentLocation
+public typealias SurpriseSchedule = SchemaV2.SurpriseSchedule
+public typealias SurprisePrompt = SchemaV2.SurprisePrompt
+public typealias MomentCollection = SchemaV2.MomentCollection
+public typealias CollectionMembership = SchemaV2.CollectionMembership
+public typealias MovieProject = SchemaV2.MovieProject
+public typealias MovieClip = SchemaV2.MovieClip
+public typealias MovieTextCard = SchemaV2.MovieTextCard
+public typealias MovieAudioTrack = SchemaV2.MovieAudioTrack
+public typealias ExportJob = SchemaV2.ExportJob
+public typealias BackupManifest = SchemaV2.BackupManifest
+public typealias AppPreferences = SchemaV2.AppPreferences
+public typealias HiddenDay = SchemaV2.HiddenDay
 
-/// Every schema version in order. Each new version adds a migration stage; versions are never edited once shipped (none has yet).
+/// Every schema version in order. Each new version adds a migration stage; versions are never edited once shipped.
 public enum MimoDaysMigrationPlan: SchemaMigrationPlan {
-    public static var schemas: [any VersionedSchema.Type] { [SchemaV1.self] }
-    public static var stages: [MigrationStage] { [] }
+    public static var schemas: [any VersionedSchema.Type] { [SchemaV1.self, SchemaV2.self] }
+    /// 1.0.5 → 1.0.7: new optional fields and `HiddenDay`; nothing to convert.
+    public static var stages: [MigrationStage] { [.lightweight(fromVersion: SchemaV1.self, toVersion: SchemaV2.self)] }
 }
 
 public enum MimoDaysStore {
-    public static var schema: Schema { Schema(versionedSchema: SchemaV1.self) }
+    public static var schema: Schema { Schema(versionedSchema: SchemaV2.self) }
 
     /// The app's container. `url` nil uses the default store location; tests pass `inMemory: true`.
     public static func makeContainer(inMemory: Bool = false, url: URL? = nil) throws -> ModelContainer {
@@ -43,7 +45,7 @@ public enum MimoDaysStore {
 }
 
 
-public extension SchemaV1.Moment {
+public extension Moment {
     /// Creates a moment whose day and time zone come from one capture time, so they can't disagree.
     convenience init(captured: CaptureTime, origin: MomentOrigin, mediaType: MediaType, promptID: UUID? = nil, createdAt: Date) {
         self.init(

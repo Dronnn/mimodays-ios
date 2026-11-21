@@ -14,10 +14,67 @@ struct PersistenceTests {
         Moment(capturedAt: Date(timeIntervalSince1970: 1_794_412_920), timeZoneID: "America/Los_Angeles", localDay: day, origin: origin, mediaType: type)
     }
 
-    @Test func schemaHoldsEveryEntityOfVersionOne() {
+    @Test func schemaHoldsEveryEntityOfBothVersions() {
         #expect(SchemaV1.models.count == 15)
         #expect(SchemaV1.versionIdentifier == Schema.Version(1, 0, 0))
-        #expect(MimoDaysMigrationPlan.schemas.count == 1)
+        #expect(SchemaV2.models.count == 16)
+        #expect(SchemaV2.versionIdentifier == Schema.Version(2, 0, 0))
+        #expect(MimoDaysMigrationPlan.schemas.count == 2)
+        #expect(MimoDaysMigrationPlan.stages.count == 1)
+    }
+
+    /// A 1.0.5 store on disk opens in 1.0.7 with everything kept: no moment hidden, no repeat link, no mood.
+    @Test func aVersionOneStoreOnDiskMovesToVersionTwo() throws {
+        let folder = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let url = folder.appending(path: "MimoDays.store")
+        let id = UUID()
+        do {
+            let schema = Schema(versionedSchema: SchemaV1.self)
+            let old = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: url))
+            let context = ModelContext(old)
+            let moment = SchemaV1.Moment(
+                id: id, capturedAt: Date(timeIntervalSince1970: 1_794_412_920), timeZoneID: "Europe/Berlin", localDay: 2026_11_11,
+                origin: .randomPrompt, mediaType: .video
+            )
+            moment.tags = ["lake"]
+            moment.note = "Lena rode all the way"
+            context.insert(moment)
+            moment.media.append(SchemaV1.MomentMedia(role: .rearSource, relativePath: "originals/a.mov", uniformType: "com.apple.quicktime-movie", pixelWidth: 1080, pixelHeight: 1920, checksum: "abc", byteCount: 1))
+            context.insert(SchemaV1.SurpriseSchedule())
+            try context.save()
+        }
+        let context = ModelContext(try MimoDaysStore.makeContainer(url: url))
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>()).first)
+        #expect(moment.id == id)
+        #expect(moment.tags == ["lake"] && moment.note == "Lena rode all the way")
+        #expect(moment.media.map(\.relativePath) == ["originals/a.mov"])
+        #expect(!moment.isHiddenFromMemories)
+        #expect(moment.repeatOfMomentID == nil)
+        #expect(moment.mood == nil)
+        #expect(try context.fetchCount(FetchDescriptor<SurpriseSchedule>()) == 1)
+        #expect(try context.fetchCount(FetchDescriptor<HiddenDay>()) == 0)
+    }
+
+    @Test func aMoodIsKeptByItsCodeAndAnUnknownCodeReadsAsNone() throws {
+        let context = try makeContext()
+        let moment = makeMoment()
+        context.insert(moment)
+        moment.mood = .calm
+        #expect(moment.moodRaw == "calm")
+        moment.moodRaw = "ecstatic"
+        #expect(moment.mood == nil)
+        #expect(Mood.allCases.map(\.rawValue) == ["joyful", "calm", "okay", "low", "heavy"])
+    }
+
+    @Test func aDayIsHiddenOnce() throws {
+        let context = try makeContext()
+        context.insert(HiddenDay(localDay: 2026_11_11))
+        try context.save()
+        context.insert(HiddenDay(localDay: 2026_11_11))
+        try context.save()
+        #expect(try context.fetchCount(FetchDescriptor<HiddenDay>()) == 1)
     }
 
     @Test func deletingMomentRemovesItsMediaVoiceAndPlace() throws {

@@ -50,6 +50,9 @@ struct BackupService {
         document.collections = ((try? context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)]))) ?? [])
             .map(BackupDocument.CollectionRecord.init)
         document.movies = projects().map { BackupDocument.MovieRecord($0, includesRender: includesRenders) }
+        let hiddenDays = ((try? context.fetch(FetchDescriptor<HiddenDay>())) ?? []).map(\.localDay).sorted()
+        document.hiddenDays = hiddenDays.isEmpty ? nil : hiddenDays
+        document.formatVersion = document.neededVersion
         let paths = document.moments.flatMap(\.paths) + document.movies.flatMap(\.paths)
         var seen: Set<String> = []
         let files = paths.compactMap { path -> (path: String, url: URL)? in
@@ -222,6 +225,14 @@ struct BackupService {
             throw error
         }
 
+        // P8.3: replacing restores every hidden day; adding brings one only for a day that had no moments here, so
+        // a choice made on this iPhone stays.
+        let daysHere = replacing ? [] : Set(((try? context.fetch(FetchDescriptor<Moment>())) ?? []).map(\.localDay))
+        let rulesHere = replacing ? [] : Set(((try? context.fetch(FetchDescriptor<HiddenDay>())) ?? []).map(\.localDay))
+        for day in Set(document.hiddenDays ?? []) where !daysHere.contains(day) && !rulesHere.contains(day) {
+            context.insert(HiddenDay(localDay: day))
+        }
+
         var wanted = 0
         var restored = 0
         var damagedFiles = 0
@@ -357,8 +368,10 @@ struct BackupService {
         let collections = try context.fetch(FetchDescriptor<MomentCollection>())
         let paths = moments.flatMap { $0.media.map(\.relativePath) + $0.voiceNotes.map(\.relativePath) }
             + projects.flatMap { $0.audioTracks.map(\.relativePath) + ($0.render.map { [$0.relativePath] } ?? []) }
+        let hiddenDays = try context.fetch(FetchDescriptor<HiddenDay>())
         for project in projects { context.delete(project) }
         for collection in collections { context.delete(collection) }
+        for day in hiddenDays { context.delete(day) }
         for moment in moments { context.delete(moment) }
         return (Set(paths), kept)
     }

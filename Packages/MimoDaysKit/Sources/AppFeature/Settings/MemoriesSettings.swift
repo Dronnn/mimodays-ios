@@ -54,15 +54,21 @@ enum MomentDays {
     @discardableResult
     static func relabel(_ context: ModelContext, days: MemoriesSettings.Days, deviceZone: TimeZone = .current) throws -> Int {
         var changed = 0
+        var oldDays: [UUID: Int] = [:]
         for moment in try context.fetch(FetchDescriptor<Moment>()) {
             let zone = days == .thisIPhone ? deviceZone : TimeZone(identifier: moment.timeZoneID) ?? .gmt
             let day = LocalDay(moment.capturedAt, in: zone).key
             if moment.localDay != day {
+                oldDays[moment.id] = moment.localDay
                 moment.localDay = day
                 changed += 1
             }
         }
-        if changed > 0 { try context.save() }
+        // P8.3: a hidden day goes where its moments went, in the same save.
+        if changed > 0 {
+            try MemoryVisibility.remapHiddenDays(context, oldDays: oldDays)
+            try context.save()
+        }
         return changed
     }
 }

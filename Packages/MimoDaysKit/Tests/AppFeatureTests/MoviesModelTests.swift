@@ -216,6 +216,29 @@ struct MoviesModelTests {
         #expect(model.title == "Oakland")
     }
 
+    /// P8.3: hidden moments and days are left out of periods, collections and places, and their counts;
+    /// choosing by hand still offers them.
+    @Test func anAutomaticPickLeavesHiddenMomentsOut() async throws {
+        let ids = try await save([20261001, 20261002, 20261003, 20261004, 20261005, 20261006, 20261007])
+        let first = ids[0]
+        try MemoryVisibility.setHidden(true, try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == first })).first!, in: context)
+        try MemoryVisibility.setDayHidden(true, 20261002, in: context)
+        let model = wizard()
+        #expect(model.count(of: .lastMonth) == 5)
+        #expect(model.loadCandidates())
+        #expect(Set(model.candidates.map(\.id)) == Set(ids.dropFirst(2)))
+        let place = wizard(MovieSourceRule(kind: .place, momentIDs: ids))
+        #expect(place.loadCandidates())
+        #expect(place.candidates.count == 5)
+        let byHand = wizard()
+        byHand.source = .moments
+        #expect(byHand.loadCandidates())
+        #expect(byHand.candidates.count == 7)
+        let chosen = wizard(MovieSourceRule(kind: .selection, momentIDs: ids))
+        #expect(chosen.loadCandidates())
+        #expect(chosen.candidates.count == 7)
+    }
+
     @Test func choosingMomentsByHandStartsWithNone() async throws {
         try await save([20260101, 20260202, 20260303, 20260404, 20260505, 20261010])
         let model = wizard()

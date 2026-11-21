@@ -104,10 +104,7 @@ final class NewMovieModel {
     /// Moments a period holds (F02's details).
     func count(of source: Source) -> Int {
         guard let days = days(of: source) else { return 0 }
-        let first = days.lowerBound, last = days.upperBound
-        return (try? library.context.fetchCount(FetchDescriptor<Moment>(
-            predicate: #Predicate { $0.deletedAt == nil && $0.localDay >= first && $0.localDay <= last }
-        ))) ?? 0
+        return (try? MoviesModel.candidates(in: library.context, from: days.lowerBound, through: days.upperBound).count) ?? 0
     }
 
     /// F03's error: the end is before the start.
@@ -128,10 +125,11 @@ final class NewMovieModel {
 
     func loadChoices() {
         do {
+            let visibility = MemoryVisibility(context: library.context)
             let all = try library.context.fetch(FetchDescriptor<MomentCollection>(sortBy: [SortDescriptor(\.sortOrder)]))
             collections = all.map { collection in
                 // Each moment once, as the wizard takes them.
-                Choice(id: collection.id, title: collection.title, count: Set(collection.orderedMoments.filter { $0.deletedAt == nil }.map(\.id)).count)
+                Choice(id: collection.id, title: collection.title, count: Set(visibility.visible(collection.orderedMoments.filter { $0.deletedAt == nil }).map(\.id)).count)
             }
         } catch {
             logger.error("Reading collections failed: \(error.localizedDescription, privacy: .public)")
@@ -168,13 +166,18 @@ final class NewMovieModel {
             return try MoviesModel.candidates(in: library.context, from: days.lowerBound, through: days.upperBound)
         case let .collection(id):
             let collection = try library.context.fetch(FetchDescriptor<MomentCollection>(predicate: #Predicate { $0.id == id })).first
-            return Self.candidates(collection?.orderedMoments ?? [])
-        case .place, .moments:
-            if presetIDs.isEmpty, source == .moments {
+            return Self.candidates(MemoryVisibility(context: library.context).visible(collection?.orderedMoments ?? []))
+        case .place:
+            let ids = placeIDs
+            let moments = try library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { ids.contains($0.id) }))
+            return Self.candidates(MemoryVisibility(context: library.context).visible(moments))
+        case .moments:
+            // Chosen by hand, so hidden moments count too (P8.3).
+            if presetIDs.isEmpty {
                 // Choose moments from everything: none picked until tapped (F05).
-                return try MoviesModel.candidates(in: library.context, from: 0, through: 99_999_999)
+                return try MoviesModel.candidates(in: library.context, from: 0, through: 99_999_999, includingHidden: true)
             }
-            let ids = source == .moments ? presetIDs : placeIDs
+            let ids = presetIDs
             return Self.candidates(try library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { ids.contains($0.id) })))
         }
     }

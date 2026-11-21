@@ -46,7 +46,7 @@ final class OnThisDayModel {
             sortBy: [SortDescriptor(\.localDay, order: .reverse), SortDescriptor(\.capturedAt)]
         )
         do {
-            let moments = try library.context.fetch(descriptor)
+            let moments = MemoryVisibility(context: library.context).visible(try library.context.fetch(descriptor))
             years = Dictionary(grouping: moments) { $0.localDay / 10_000 }
                 .map { OnThisDayYear(year: $0.key, yearsAgo: year - $0.key, moments: $0.value.map(MomentSummary.init)) }
                 .sorted { $0.year > $1.year }

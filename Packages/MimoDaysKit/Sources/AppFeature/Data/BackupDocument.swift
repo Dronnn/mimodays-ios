@@ -10,7 +10,10 @@ import Persistence
 struct BackupDocument: Codable, Equatable {
     static let format = "MimoDays backup"
     /// Raise when a reader of this version couldn't restore the new layout.
-    static let currentVersion = 1
+    static let currentVersion = 2
+    /// 1.0.5 reads version 1. A backup with nothing hidden, no mood and no Then & Now stays at 1 so it still restores
+    /// there; with any of them it is 2, which 1.0.5 refuses rather than bring hidden moments back into memories.
+    static let firstVersion = 1
     static let manifestPath = "manifest.json"
     static let mediaFolder = "media"
 
@@ -18,12 +21,21 @@ struct BackupDocument: Codable, Equatable {
     var formatVersion = Self.currentVersion
     var archiveID = UUID()
     var createdAt: Date
-    var schemaVersion = SchemaV1.versionIdentifier.description
+    var schemaVersion = SchemaV2.versionIdentifier.description
     /// Store-relative path -> checksum and size.
     var files: [String: FileEntry] = [:]
     var moments: [MomentRecord] = []
     var collections: [CollectionRecord] = []
     var movies: [MovieRecord] = []
+    /// P8.3: days hidden from memories (`Moment.localDay` keys). Missing in version 1.
+    var hiddenDays: [Int]?
+
+    /// The lowest version that can restore everything in it.
+    var neededVersion: Int {
+        let usesNewFields = !(hiddenDays ?? []).isEmpty
+            || moments.contains { $0.isHiddenFromMemories == true || $0.repeatOf != nil || $0.mood != nil }
+        return usesNewFields ? Self.currentVersion : Self.firstVersion
+    }
 
     struct FileEntry: Codable, Equatable {
         var sha256: String
@@ -51,6 +63,10 @@ struct BackupDocument: Codable, Equatable {
         var media: [MediaRecord]
         var voiceNotes: [VoiceNoteRecord]
         var location: LocationRecord?
+        /// Version 2 (P8.3, P8.8, P8.10); missing when unset.
+        var isHiddenFromMemories: Bool?
+        var repeatOf: UUID?
+        var mood: String?
 
         /// Every file the moment needs.
         var paths: [String] { media.map(\.path) + voiceNotes.map(\.path) }
@@ -221,6 +237,9 @@ extension BackupDocument.MomentRecord {
         isFavorite = moment.isFavorite
         pipLayout = moment.pipLayout
         captureFormat = moment.captureFormatRaw
+        isHiddenFromMemories = moment.isHiddenFromMemories ? true : nil
+        repeatOf = moment.repeatOfMomentID
+        mood = moment.moodRaw
         createdAt = moment.createdAt
         modifiedAt = moment.modifiedAt
         media = moment.media.sorted { $0.roleRaw < $1.roleRaw }.map {
@@ -254,6 +273,9 @@ extension BackupDocument.MomentRecord {
         moment.isFavorite = isFavorite
         moment.pipLayout = pipLayout
         moment.captureFormatRaw = captureFormat ?? CaptureFormat.portrait.rawValue
+        moment.isHiddenFromMemories = isHiddenFromMemories ?? false
+        moment.repeatOfMomentID = repeatOf
+        moment.moodRaw = mood
         moment.modifiedAt = modifiedAt
         moment.media = media.map {
             MomentMedia(

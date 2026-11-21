@@ -237,6 +237,58 @@ struct BackupTests {
         #expect(newFiles.allSatisfy { FileManager.default.fileExists(atPath: (try? other.store.url(for: $0).path) ?? "/") })
     }
 
+    private func hiddenDays(_ library: MediaLibrary) throws -> [Int] {
+        try library.context.fetch(FetchDescriptor<HiddenDay>()).map(\.localDay).sorted()
+    }
+
+    /// P8.3, P8.8, P8.10 on 1.0.5: a backup using none of them stays version 1, so 1.0.5 can still restore it.
+    @Test func aBackupWithNothingNewStaysVersionOne() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let (_, document) = try backUp(phone)
+        #expect(document.formatVersion == 1 && document.hiddenDays == nil)
+    }
+
+    /// Hidden moments and days, moods and Then & Now links come back; the backup is version 2.
+    @Test func hidingMoodsAndRepeatsComeBack() async throws {
+        let phone = try library()
+        let ids = try await fill(phone)
+        let moments = try phone.context.fetch(FetchDescriptor<Moment>())
+        let byID = Dictionary(uniqueKeysWithValues: moments.map { ($0.id, $0) })
+        byID[ids[0]]?.isHiddenFromMemories = true
+        byID[ids[1]]?.mood = .calm
+        byID[ids[2]]?.repeatOfMomentID = ids[0]
+        try MemoryVisibility.setDayHidden(true, 2026_11_13, in: phone.context)
+        try MemoryVisibility.setDayHidden(true, 2025_01_01, in: phone.context)
+        let (url, document) = try backUp(phone)
+        #expect(document.formatVersion == 2 && document.hiddenDays == [2025_01_01, 2026_11_13])
+
+        let empty = try library()
+        _ = try restore(url, into: empty)
+        let back = Dictionary(uniqueKeysWithValues: try empty.context.fetch(FetchDescriptor<Moment>()).map { ($0.id, $0) })
+        #expect(back[ids[0]]?.isHiddenFromMemories == true && back[ids[1]]?.isHiddenFromMemories == false)
+        #expect(back[ids[1]]?.mood == .calm && back[ids[0]]?.mood == nil)
+        #expect(back[ids[2]]?.repeatOfMomentID == ids[0])
+        #expect(try hiddenDays(empty) == [2025_01_01, 2026_11_13])
+        #expect(records(empty) == records(phone))
+    }
+
+    /// Adding brings a hidden day only for a day new to this iPhone; replacing brings back every one as backed up.
+    @Test func addingKeepsThisIPhonesChoiceForItsOwnDays() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        try MemoryVisibility.setDayHidden(true, 2026_11_13, in: phone.context)
+        try MemoryVisibility.setDayHidden(true, 2025_01_01, in: phone.context)
+        let (url, _) = try backUp(phone)
+        let other = try library()
+        _ = try await fill(other)
+        try MemoryVisibility.setDayHidden(true, 2026_11_12, in: other.context)
+        _ = try restore(url, into: other)
+        #expect(try hiddenDays(other) == [2025_01_01, 2026_11_12])
+        _ = try restore(url, into: other, mode: .replaceEverything)
+        #expect(try hiddenDays(other) == [2025_01_01, 2026_11_13])
+    }
+
     /// A backup none of whose moments can come in whole can't replace the library: that would leave nothing.
     @Test func aBackupWithNothingWholeCantReplaceTheLibrary() async throws {
         let phone = try library()

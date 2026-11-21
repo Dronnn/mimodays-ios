@@ -65,6 +65,19 @@ struct OnThisDayTests {
         #expect(model.image(model.years.first?.moments.first?.mainPath) != nil)
     }
 
+    /// P8.3: a hidden moment and a hidden day stay out; the rest of that year stays.
+    @Test func hiddenMomentsAndDaysStayOut() async throws {
+        let kept = try await save(at: Self.date(2025, 11, 11, 8))
+        let id = try await save(at: Self.date(2025, 11, 11, 19))
+        _ = try await save(at: Self.date(2023, 11, 11, 9))
+        try MemoryVisibility.setHidden(true, try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first!, in: context)
+        try MemoryVisibility.setDayHidden(true, 2023_11_11, in: context)
+        let model = model()
+        await model.refresh()
+        #expect(model.years.map(\.year) == [2025])
+        #expect(model.ids == [kept])
+    }
+
     @Test func nothingEarlierIsEmptyOnceLoaded() async throws {
         _ = try await save(at: Self.date(2026, 11, 11, 10))
         let model = model()

@@ -67,6 +67,8 @@ struct SettingsModelTests {
         #expect(model.fallbackOutsideHours)
         model.reminders.setLatest(23 * 60 + 30)
         #expect(!model.fallbackOutsideHours)
+        // The replan reads the store: it ends before the test's store goes.
+        await model.replanning?.value
     }
 
     /// KK05: iOS turned it down: the row says so, and Try again schedules it once it can.

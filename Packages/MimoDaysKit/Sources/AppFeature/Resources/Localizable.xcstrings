@@ -37543,6 +37543,144 @@
         }
       }
     },
+    "Change days" : {
+      "comment" : "P8.3: confirms the Time zones change in Settings › Memories",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change days"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير الأيام"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змяніць дні"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tage ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar los días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer les jours"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "שינוי הימים"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Փոխել օրերը"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia i giorni"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付を変更"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დღეების შეცვლა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Күндерді өзгерту"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "날짜 변경"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagen wijzigen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmień dni"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mudar os dias"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить дни"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändra dagar"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Günleri değiştir"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінити дні"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更改日期"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更改日期"
+          }
+        }
+      }
+    },
     "Changed by you · %@" : {
       "comment" : "P8.9 HH04: the day's moment was picked by hand; %@ is its time",
       "extractionState" : "manual",
@@ -64496,6 +64634,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "隱藏"
+          }
+        }
+      }
+    },
+    "Hidden days will cover more" : {
+      "comment" : "P8.3: Settings › Memories › Time zones; the new days would put more moments under a hidden day",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden days will cover more"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ستغطي الأيام المخفية المزيد"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Схаваныя дні ахопяць больш"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeblendete Tage umfassen dann mehr"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los días ocultos abarcarán más"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les jours masqués couvriront plus"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ימים מוסתרים יכסו יותר"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Թաքցված օրերը ավելին կընդգրկեն"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I giorni nascosti includeranno di più"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非表示の日に含まれる範囲が広がります"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დამალული დღეები მეტს მოიცავს"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жасырылған күндер көбірек қамтиды"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "숨긴 날이 더 많은 순간을 포함합니다"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verborgen dagen gaan meer omvatten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryte dni obejmą więcej"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os dias ocultos vão abranger mais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрытые дни охватят больше"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dolda dagar kommer att omfatta mer"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gizlenen günler daha fazlasını kapsayacak"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приховані дні охоплять більше"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏的日期将涵盖更多"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱藏的日期將涵蓋更多"
           }
         }
       }
@@ -166460,6 +166736,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "冬天"
+          }
+        }
+      }
+    },
+    "With this choice %@ fall on a day you hid, so they leave On this day, widgets and automatic movies too. They stay in the archive." : {
+      "comment" : "P8.3: %@ is a count (3 moments)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With this choice %@ fall on a day you hid, so they leave On this day, widgets and automatic movies too. They stay in the archive."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مع هذا الاختيار، تقع %@ في يوم أخفيته، فتغيب أيضًا عن «في مثل هذا اليوم» والأدوات والأفلام التلقائية. وتبقى في الأرشيف."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пры гэтым выбары %@ трапяць на дзень, які ты схаваў, таму знікнуць і з «У гэты дзень», віджэтаў і аўтаматычных фільмаў. У архіве яны застануцца."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit dieser Wahl fallen %@ auf einen Tag, den du ausgeblendet hast. Sie verschwinden dann auch aus „An diesem Tag“, Widgets und automatischen Filmen. Im Archiv bleiben sie."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con esta opción, %@ caen en un día que ocultaste, así que también salen de «Un día como hoy», los widgets y las películas automáticas. Se quedan en el archivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec ce choix, %@ tombent sur un jour que tu as masqué : ils quittent aussi « Ce jour-là », les widgets et les films automatiques. Ils restent dans l’archive."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בבחירה הזאת %@ נופלים על יום שהסתרת, ולכן יוצאים גם מ„ביום הזה”, מהווידג׳טים ומהסרטים האוטומטיים. הם נשארים בארכיון."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Այս ընտրությամբ %@ ընկնում են քո թաքցրած օրվա վրա, ուստի դուրս են գալիս նաև «Այս օրը»-ից, վիջեթներից և ավտոմատ ֆիլմերից։ Արխիվում դրանք մնում են։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con questa scelta %@ cadono in un giorno che hai nascosto, quindi escono anche da «In questo giorno», dai widget e dai film automatici. Restano nell’archivio."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この選択では、%@が非表示にした日に入るため、「この日」、ウィジェット、自動ムービーにも出なくなります。アーカイブには残ります。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ამ არჩევანით %@ ხვდება შენ მიერ დამალულ დღეზე, ამიტომ ისინი „ამ დღეს“, ვიჯეტებიდან და ავტომატური ფილმებიდანაც გაქრება. არქივში დარჩება."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бұл таңдауда %@ сен жасырған күнге түседі, сондықтан «Осы күні», виджеттер мен автоматты фильмдерден де шығады. Мұрағатта қалады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 선택으로 %@이 숨긴 날에 속하게 되어 ‘이날’, 위젯, 자동 영화에서도 빠집니다. 보관함에는 남아 있어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Met deze keuze vallen %@ op een dag die je hebt verborgen, dus verdwijnen ze ook uit ‘Op deze dag’, widgets en automatische films. In het archief blijven ze."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przy tym wyborze %@ trafią na dzień, który ukryłeś, więc znikną też z „Tego dnia”, widżetów i automatycznych filmów. W archiwum zostaną."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Com essa escolha, %@ caem em um dia que você ocultou e saem também de “Neste dia”, dos widgets e dos filmes automáticos. Continuam no arquivo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При таком выборе %@ попадут на день, который ты скрыл, поэтому уйдут и из «В этот день», виджетов и автоматических фильмов. В архиве они останутся."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Med det här valet hamnar %@ på en dag du har dolt, så de försvinner också från ”Den här dagen”, widgetar och automatiska filmer. De finns kvar i arkivet."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu seçimle %@ gizlediğin bir güne düşer, bu yüzden “Bu gün”, widget’lar ve otomatik filmlerden de çıkar. Arşivde kalırlar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "За такого вибору %@ потраплять на день, який ти приховав, тож зникнуть і з «Цього дня», віджетів та автоматичних фільмів. В архіві вони залишаться."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这样选择后，%@会落在你隐藏的日期上，因此也不会出现在“那年今日”、小组件和自动影片中。它们仍保留在归档里。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這樣選擇後，%@會落在你隱藏的日期上，因此也不會出現在「當年今日」、小工具和自動影片中。它們仍保留在封存裡。"
           }
         }
       }

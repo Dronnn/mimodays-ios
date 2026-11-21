@@ -123,4 +123,31 @@ struct MemoryVisibilityTests {
         #expect(try hiddenDays() == [2026_11_12])
         #expect(MemoryVisibility(context: context).isHidden(late))
     }
+
+    /// Settings › Memories asks first when a hidden day would land on a day with moments that were shown.
+    @Test func aDaysChangeThatSpreadsAHiddenDayIsCountedFirst() throws {
+        let late = insert(Self.lateInNewYork, zone: "America/New_York")
+        let next = insert(Self.lateInNewYork.addingTimeInterval(3600), zone: "Asia/Tbilisi")
+        try context.save()
+        #expect(late.localDay == 2026_11_11 && next.localDay == 2026_11_12)
+        let tbilisi = try #require(TimeZone(identifier: "Asia/Tbilisi"))
+        #expect(try MomentDays.newlyHidden(context, days: .thisIPhone, deviceZone: tbilisi) == 0)
+        try MemoryVisibility.setDayHidden(true, 2026_11_11, in: context)
+        #expect(try MomentDays.newlyHidden(context, days: .thisIPhone, deviceZone: tbilisi) == 1)
+        // Hidden on its own already: nothing new to tell.
+        try MemoryVisibility.setHidden(true, next, in: context)
+        #expect(try MomentDays.newlyHidden(context, days: .thisIPhone, deviceZone: tbilisi) == 0)
+        try MemoryVisibility.setHidden(false, next, in: context)
+        // The count is what the change does.
+        try MomentDays.relabel(context, days: .thisIPhone, deviceZone: tbilisi)
+        #expect(MemoryVisibility(context: context).isHidden(next))
+        #expect(try MomentDays.newlyHidden(context, days: .thisIPhone, deviceZone: tbilisi) == 0)
+    }
+
+    @Test func remappedHiddenDays() {
+        #expect(MemoryVisibility.remapped([], [(1, 2)]).isEmpty)
+        #expect(MemoryVisibility.remapped([1], [(1, 2)]) == [2])
+        #expect(MemoryVisibility.remapped([1], [(1, 2), (1, 1)]) == [1, 2])
+        #expect(MemoryVisibility.remapped([1, 5], [(1, 2), (3, 4)]) == [2, 5])
+    }
 }

@@ -62,21 +62,28 @@ struct MemoryVisibility {
         let rules = try context.fetch(FetchDescriptor<HiddenDay>())
         guard !rules.isEmpty else { return }
         let hidden = Set(rules.map(\.localDay))
+        let moves = try context.fetch(FetchDescriptor<Moment>()).map { (from: oldDays[$0.id] ?? $0.localDay, to: $0.localDay) }
+        let wanted = remapped(hidden, moves)
+        for rule in rules where !wanted.contains(rule.localDay) { context.delete(rule) }
+        for day in wanted.subtracting(hidden) { context.insert(HiddenDay(localDay: day)) }
+    }
+
+    /// The hidden days after every moment goes from its old day to its new one: a hidden day goes to every day its
+    /// moments now fall on, and keeps its rule while one of its own moments is still on it, or when none left it.
+    static func remapped(_ hidden: Set<Int>, _ moves: [(from: Int, to: Int)]) -> Set<Int> {
+        guard !hidden.isEmpty else { return [] }
         var stayed: Set<Int> = []
         var leftDays: Set<Int> = []
         var movedTo: Set<Int> = []
-        for moment in try context.fetch(FetchDescriptor<Moment>()) {
-            guard let old = oldDays[moment.id] else {
-                stayed.insert(moment.localDay)
+        for move in moves {
+            guard move.from != move.to else {
+                stayed.insert(move.to)
                 continue
             }
-            guard hidden.contains(old) else { continue }
-            leftDays.insert(old)
-            movedTo.insert(moment.localDay)
+            guard hidden.contains(move.from) else { continue }
+            leftDays.insert(move.from)
+            movedTo.insert(move.to)
         }
-        // A day keeps its rule while one of its own moments is still on it, or when none left it.
-        let wanted = movedTo.union(hidden.filter { stayed.contains($0) || !leftDays.contains($0) })
-        for rule in rules where !wanted.contains(rule.localDay) { context.delete(rule) }
-        for day in wanted.subtracting(hidden) { context.insert(HiddenDay(localDay: day)) }
+        return movedTo.union(hidden.filter { stayed.contains($0) || !leftDays.contains($0) })
     }
 }

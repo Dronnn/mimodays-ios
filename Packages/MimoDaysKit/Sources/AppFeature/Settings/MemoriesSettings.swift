@@ -77,4 +77,21 @@ enum MomentDays {
         }
         return changed
     }
+
+    /// P8.3: how many moments the change would newly put under a hidden day (they'd leave On this day, widgets and
+    /// automatic movies), told before the change. Moments hidden by now, or deleted, don't count.
+    @MainActor
+    static func newlyHidden(_ context: ModelContext, days: MemoriesSettings.Days, deviceZone: TimeZone = .current) throws -> Int {
+        let hidden = Set(try context.fetch(FetchDescriptor<HiddenDay>()).map(\.localDay))
+        guard !hidden.isEmpty else { return 0 }
+        let moments = try context.fetch(FetchDescriptor<Moment>())
+        let moves = moments.map { moment in
+            let zone = days == .thisIPhone ? deviceZone : TimeZone(identifier: moment.timeZoneID) ?? .gmt
+            return (from: moment.localDay, to: LocalDay(moment.capturedAt, in: zone).key)
+        }
+        let after = MemoryVisibility.remapped(hidden, moves)
+        return zip(moments, moves).filter { moment, move in
+            moment.deletedAt == nil && !moment.isHiddenFromMemories && !hidden.contains(move.from) && after.contains(move.to)
+        }.count
+    }
 }

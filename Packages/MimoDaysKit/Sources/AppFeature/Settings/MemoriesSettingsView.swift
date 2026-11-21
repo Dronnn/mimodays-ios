@@ -1,14 +1,24 @@
 import DesignSystem
+import OSLog
 import SwiftUI
 
 /// S09 with the app's preferences.
 struct MemoriesSettingsScreen: View {
     @Environment(MemoriesPreferences.self) private var preferences: MemoriesPreferences?
+    @Environment(\.mediaLibrary) private var library
 
     var body: some View {
         if let preferences {
             @Bindable var preferences = preferences
-            MemoriesSettingsView(settings: $preferences.value)
+            MemoriesSettingsView(settings: $preferences.value) { days in
+                guard let library else { return 0 }
+                do {
+                    return try MomentDays.newlyHidden(library.context, days: days)
+                } catch {
+                    Logger(subsystem: "MimoDays", category: "Settings").error("Counting hidden days' moments failed: \(error.localizedDescription, privacy: .public)")
+                    return 0
+                }
+            }
         }
     }
 }
@@ -16,6 +26,9 @@ struct MemoriesSettingsScreen: View {
 /// S09: how Memories opens and sorts, On this day on Today, and which time zone decides a moment's day.
 struct MemoriesSettingsView: View {
     @Binding var settings: MemoriesSettings
+    /// P8.3: moments the choice would newly put under a hidden day; asked about first.
+    var newlyHidden: (MemoriesSettings.Days) -> Int = { _ in 0 }
+    @State private var pending: (days: MemoriesSettings.Days, count: Int)?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -61,6 +74,16 @@ struct MemoriesSettingsView: View {
             }
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .alert(
+            Text("Hidden days will cover more", bundle: .module),
+            isPresented: Binding { pending != nil } set: { if !$0 { pending = nil } },
+            presenting: pending
+        ) { pending in
+            Button { settings.days = pending.days } label: { Text("Change days", bundle: .module) }
+            Button(role: .cancel) {} label: { Text("Cancel", bundle: .module) }
+        } message: { pending in
+            Text("With this choice \(Text("\(pending.count) moments", bundle: .module)) fall on a day you hid, so they leave On this day, widgets and automatic movies too. They stay in the archive.", bundle: .module)
+        }
     }
 
     private func sectionLabel(_ text: Text) -> some View {
@@ -73,7 +96,9 @@ struct MemoriesSettingsView: View {
     private func choice(_ title: Text, _ days: MemoriesSettings.Days, id: String) -> some View {
         let isSelected = settings.days == days
         return Button {
-            settings.days = days
+            guard !isSelected else { return }
+            let count = newlyHidden(days)
+            if count > 0 { pending = (days, count) } else { settings.days = days }
         } label: {
             HStack(spacing: 8) {
                 title.textStyle(.rowTitle)

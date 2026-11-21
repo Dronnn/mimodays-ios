@@ -176,9 +176,9 @@ private struct LayoutGlyph: View {
             case .window, .swapped:
                 let (back, front) = layout == .window ? (main, selfie) : (selfie, main)
                 RoundedRectangle(cornerRadius: 4, style: .continuous).fill(back)
-                RoundedRectangle(cornerRadius: 2, style: .continuous)
+                SelfieWindowShape()
                     .fill(front)
-                    .overlay(RoundedRectangle(cornerRadius: 2, style: .continuous).strokeBorder(.white, lineWidth: 1.2))
+                    .overlay(SelfieWindowShape().stroke(.white, lineWidth: 1.2))
                     .frame(width: window.width, height: window.height)
                     .rotationEffect(.degrees(-5.4))
                     .position(x: size.width - window.width / 2 - 2, y: window.height / 2 + 3)

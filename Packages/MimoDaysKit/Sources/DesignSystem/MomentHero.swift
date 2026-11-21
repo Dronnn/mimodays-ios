@@ -222,9 +222,7 @@ private struct PersonGlyph: Shape {
 /// medium window and scale with the width, so any size is the same window.
 public enum SelfieWindowStyle {
     public static let size = CGSize(width: 112, height: 150)
-    public static let cornerRadius: CGFloat = 22
     public static let border: CGFloat = 4
-    public static let innerCornerRadius: CGFloat = 18
     public static let shadowOpacity = 0.22
     /// Blur radius as Core Graphics takes it; SwiftUI's shadow radius is half of it.
     public static let shadowBlur: CGFloat = 14
@@ -256,7 +254,7 @@ public struct SelfieFrame<Content: View>: View {
     public var body: some View {
         GeometryReader { proxy in
             let k = proxy.size.width / SelfieWindowStyle.size.width
-            RoundedRectangle(cornerRadius: SelfieWindowStyle.cornerRadius * k, style: .continuous)
+            SelfieWindowShape()
                 .fill(SelfieWindowStyle.frameColor)
                 .shadow(
                     color: .black.opacity(SelfieWindowStyle.shadowOpacity),
@@ -266,7 +264,7 @@ public struct SelfieFrame<Content: View>: View {
                     // The colour takes the opening's size; the picture fills it and is cut to it.
                     placeholder
                         .overlay { content }
-                        .clipShape(RoundedRectangle(cornerRadius: SelfieWindowStyle.innerCornerRadius * k, style: .continuous))
+                        .clipShape(SelfieWindowShape())
                         .padding(SelfieWindowStyle.border * k)
                 }
         }

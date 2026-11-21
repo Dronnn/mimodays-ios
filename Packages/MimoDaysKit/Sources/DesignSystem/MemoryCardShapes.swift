@@ -276,3 +276,13 @@ public struct MemoryCardBrushUnderline: Shape {
         return path
     }
 }
+
+/// The selfie window's hand-cut edge everywhere (P8.16): upright it is the card's selfie blob, on its side the
+/// sideways camera window's; the window's tilt is applied by whoever draws it.
+public struct SelfieWindowShape: Shape {
+    public init() {}
+
+    public func path(in rect: CGRect) -> Path {
+        rect.width > rect.height ? LandscapeSelfieBlob().path(in: rect) : CardSelfieBlob().path(in: rect)
+    }
+}

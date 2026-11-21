@@ -32,7 +32,8 @@ struct PhotoComposerTests {
         let pixels = try rgba(composed)
         #expect(pixels(10, 10).isClose(to: (200, 40, 40)))
         #expect(pixels(Int(rect.midX), Int(rect.midY)).isClose(to: (40, 40, 200)))
-        #expect(pixels(Int(rect.midX), Int(rect.minY + 2 * scale)).isClose(to: (0xFB, 0xF6, 0xEF)))
+        // The hand-cut edge sits about 1.4 pt in from the rect at the top's middle; the opening starts past the 4 pt border.
+        #expect(pixels(Int(rect.midX), Int(rect.minY + 3 * scale)).isClose(to: (0xFB, 0xF6, 0xEF)))
     }
 
     @MainActor

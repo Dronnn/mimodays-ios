@@ -426,13 +426,13 @@ struct HeroVideo: View {
     }
 }
 
-/// The selfie window's outline where the composed picture has it: rounded and tilted.
+/// The selfie window's outline where the composed picture has it: hand-cut and tilted.
 private struct WindowShape: View {
     let rect: CGRect
 
     var body: some View {
         let style = SelfieWindowStyle.self
-        RoundedRectangle(cornerRadius: style.cornerRadius * min(rect.width, rect.height) / style.size.width, style: .continuous)
+        SelfieWindowShape()
             .frame(width: rect.width, height: rect.height)
             .rotationEffect(style.tilt)
             .position(x: rect.midX, y: rect.midY)

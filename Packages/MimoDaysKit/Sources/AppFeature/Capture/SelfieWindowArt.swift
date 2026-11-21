@@ -3,7 +3,7 @@ import DesignSystem
 import UIKit
 
 /// The signature selfie window for one canvas (a photo or a video's render size), drawn once and reused for
-/// every frame: shadow + cream frame, and the opening the selfie shows through, both already tilted.
+/// every frame: shadow + cream frame, and the opening the selfie shows through, both hand-cut and already tilted.
 /// The same window as `SelfieFrame` on screen: every metric comes from `SelfieWindowStyle`.
 struct SelfieWindowArt: @unchecked Sendable {
     /// Shadow and cream frame on a clear canvas.
@@ -42,14 +42,14 @@ struct SelfieWindowArt: @unchecked Sendable {
                 red: CGFloat(style.frameHex >> 16 & 0xFF) / 255, green: CGFloat(style.frameHex >> 8 & 0xFF) / 255,
                 blue: CGFloat(style.frameHex & 0xFF) / 255, alpha: 1
             ).setFill()
-            UIBezierPath(roundedRect: outer, cornerRadius: style.cornerRadius * scale).fill()
+            UIBezierPath(cgPath: SelfieWindowShape().path(in: outer).cgPath).fill()
         }
         let openingImage = renderer.image { context in
             let cg = context.cgContext
             cg.translateBy(x: rect.midX, y: rect.midY)
             cg.rotate(by: tilt)
             UIColor.white.setFill()
-            UIBezierPath(roundedRect: inner, cornerRadius: style.innerCornerRadius * scale).fill()
+            UIBezierPath(cgPath: SelfieWindowShape().path(in: inner).cgPath).fill()
         }
         frame = frameImage.cgImage.map { CIImage(cgImage: $0) } ?? CIImage.empty()
         opening = openingImage.cgImage.map { CIImage(cgImage: $0) } ?? CIImage.empty()

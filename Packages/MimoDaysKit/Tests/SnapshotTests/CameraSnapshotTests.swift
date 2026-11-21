@@ -146,6 +146,20 @@ struct CameraSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
+    /// P1.4: the label after a tap, on the next lens (2×).
+    @Test func zoomedIn() async {
+        let model = await camera()
+        model.nextZoomStop()
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, rightToLeft: true)])
+    }
+
+    /// P1.6: a long press on the picture: the hand-cut mark with AE/AF Lock above it.
+    @Test func focusLocked() async {
+        let model = await camera()
+        await model.focus(at: CGPoint(x: 0.5, y: 0.4), layerPoint: CGPoint(x: 200, y: 330), on: .back, lock: true)
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
     @Test func selfieWindowHidden() async {
         let model = await camera()
         model.toggleSelfie()

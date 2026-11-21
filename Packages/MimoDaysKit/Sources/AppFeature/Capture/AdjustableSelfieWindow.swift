@@ -144,11 +144,11 @@ struct SelfieTarget: View {
         let frame = size
         Group {
             if isSelected {
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
+                SelfieWindowShape()
                     .stroke(CameraPalette.coral, lineWidth: 2.5)
                     .frame(width: frame.width + 8, height: frame.height + 8)
             } else {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                SelfieWindowShape()
                     .stroke(CameraPalette.cream.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [10, 10]))
                     .frame(width: frame.width, height: frame.height)
             }

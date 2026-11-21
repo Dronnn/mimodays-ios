@@ -125,6 +125,25 @@ struct TodaySnapshotTests {
         assertScreenSnapshots(of: view, variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
     }
 
+    /// P8.7: after "Remind me later" - coming back, no time left, couldn't be set.
+    @Test func ribbonsAfterRemindMeLater() {
+        let now = clock.now()
+        let statuses: [SurpriseStatus] = [.later, .retryFailed(.noTime), .retryFailed(.failed)]
+        let view = VStack(spacing: 14) {
+            ForEach(Array(statuses.enumerated()), id: \.offset) { _, status in
+                SurpriseRibbon(status: status, now: now) {}
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(ColorToken.canvas.color)
+        assertScreenSnapshots(
+            of: view,
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
+                + SnapshotVariant.languages
+        )
+    }
+
     /// T06 with the rest of the scroll: this month, On this day, the movie card.
     @Test func onThisDay() async throws {
         try await populate()

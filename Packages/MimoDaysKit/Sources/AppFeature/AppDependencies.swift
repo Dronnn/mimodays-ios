@@ -74,7 +74,10 @@ public final class AppDependencies {
         // UI tests keep notification requests in memory so nothing is left on the simulator.
         let notifications: any NotificationScheduler = configuration.isUITesting
             ? InMemoryNotificationScheduler() : SystemNotificationScheduler()
-        surprises = SurpriseCoordinator(context: modelContainer.mainContext, notifications: notifications, permissions: permissions)
+        surprises = SurpriseCoordinator(
+            context: modelContainer.mainContext, notifications: notifications, permissions: permissions,
+            defaults: configuration.isUITesting ? nil : .standard
+        )
         // The simulator has no cameras; UI tests can ask for the simulated one on devices too.
         #if targetEnvironment(simulator)
         let simulatedCamera = true
@@ -137,6 +140,8 @@ public final class AppDependencies {
             temporaryDirectory: FileManager.default.temporaryDirectory
         )
         UNUserNotificationCenter.current().delegate = notificationTaps
+        notificationTaps.remindLater = { [surprises] in await surprises.remindLater(promptID: $0) }
+        SurpriseNotificationHandler.registerActions()
         if configuration.isUITesting, let tap = configuration.surpriseTap {
             simulate(tap)
         }

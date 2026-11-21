@@ -302,7 +302,7 @@ struct TodayView: View {
                 Task {
                     if await !model.turnOn(request: { await asker.request($0, using: permissions) }), let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                 }
-            case .onItsWay, .passed: break
+            case .onItsWay, .passed, .later, .retryFailed: break
             }
         }
         .padding(.horizontal, isWide ? 0 : 18)

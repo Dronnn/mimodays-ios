@@ -27,13 +27,16 @@ public struct SurpriseNotification: Equatable, Identifiable, Sendable {
     public var fireDate: Date
     public var title: String
     public var body: String
+    /// The notification's actions (P8.7 "Remind me later"); nil for none.
+    public var categoryID: String?
 
-    public init(id: String, promptID: String? = nil, fireDate: Date, title: String = "", body: String = "") {
+    public init(id: String, promptID: String? = nil, fireDate: Date, title: String = "", body: String = "", categoryID: String? = nil) {
         self.id = id
         self.promptID = promptID ?? id
         self.fireDate = fireDate
         self.title = title
         self.body = body
+        self.categoryID = categoryID
     }
 }
 

@@ -7,6 +7,17 @@ import UserNotifications
 final class SurpriseNotificationHandler: NSObject, UNUserNotificationCenterDelegate {
     private var waiting: UUID?
     private var onOpen: ((UUID) -> Void)?
+    /// P8.7: "Remind me later" pressed on a surprise; set at launch, as it runs with the app in the background.
+    var remindLater: ((UUID) async -> Void)?
+
+    /// The surprise's "Remind me later", in the app's language; registered at launch and when the language changes.
+    static func registerActions() {
+        let action = UNNotificationAction(
+            identifier: SurpriseCoordinator.remindLaterAction, title: String(appLocalized: SurpriseCoordinator.remindLaterTitle), options: []
+        )
+        let category = UNNotificationCategory(identifier: SurpriseCoordinator.remindLaterCategory, actions: [action], intentIdentifiers: [])
+        UNUserNotificationCenter.current().setNotificationCategories([category])
+    }
 
     func listen(_ handler: @escaping (UUID) -> Void) {
         onOpen = handler
@@ -29,14 +40,20 @@ final class SurpriseNotificationHandler: NSObject, UNUserNotificationCenterDeleg
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping @Sendable () -> Void
     ) {
-        let promptID: UUID? = if response.actionIdentifier == UNNotificationDefaultActionIdentifier,
-                                 case let .capture(id?) = AppRouter.route(fromNotification: response.notification.request.content.userInfo) {
+        let promptID: UUID? = if case let .capture(id?) = AppRouter.route(fromNotification: response.notification.request.content.userInfo) {
             id
         } else {
             nil
         }
+        let action = response.actionIdentifier
         Task { @MainActor in
-            if let promptID { deliver(promptID) }
+            if let promptID {
+                if action == UNNotificationDefaultActionIdentifier {
+                    deliver(promptID)
+                } else if action == SurpriseCoordinator.remindLaterAction {
+                    await remindLater?(promptID)
+                }
+            }
             completionHandler()
         }
     }

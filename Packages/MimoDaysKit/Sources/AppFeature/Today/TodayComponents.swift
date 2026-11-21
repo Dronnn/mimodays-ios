@@ -17,12 +17,17 @@ struct SurpriseRibbon: View {
                 .frame(width: 16, height: 16.5)
                 .foregroundStyle(ColorToken.accentApricot.color)
                 .accessibilityHidden(true)
-            Text(message)
-                .textStyle(status == .passed ? .handSmall : .hand)
-                .foregroundStyle(ColorToken.textPrimary.color)
-                .fixedSize(horizontal: false, vertical: true)
-                // The words fill the row up to the action, which never wraps.
-                .frame(maxWidth: isWide ? .infinity : nil, alignment: .leading)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(message)
+                    .textStyle(isLong ? .handSmall : .hand)
+                if let detail {
+                    Text(detail).textStyle(.handSmall)
+                }
+            }
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .fixedSize(horizontal: false, vertical: true)
+            // The words fill the row up to the action, which never wraps.
+            .frame(maxWidth: isWide ? .infinity : nil, alignment: .leading)
             if let actionTitle {
                 Button(action: action) {
                     Text(actionTitle)
@@ -50,7 +55,20 @@ struct SurpriseRibbon: View {
         .accessibilityIdentifier("today.ribbon")
     }
 
-    private var isWide: Bool { actionTitle != nil || status == .passed }
+    private var isWide: Bool { actionTitle != nil || isLong || detail != nil }
+
+    /// A whole sentence rather than a few words: smaller, across the width.
+    private var isLong: Bool {
+        switch status {
+        case .passed, .retryFailed: true
+        default: false
+        }
+    }
+
+    /// P8.7: under "A little later".
+    private var detail: LocalizedStringResource? {
+        status == .later ? resource("Your surprise will be back today.") : nil
+    }
 
     private var message: LocalizedStringResource {
         switch status {
@@ -60,6 +78,9 @@ struct SurpriseRibbon: View {
         case .paused(nil): resource("Surprises are paused")
         case let .paused(until?): pausedUntil(until)
         case .off: resource("Turn on little surprises")
+        case .later: resource("A little later")
+        case .retryFailed(.noTime): resource("No time left for another surprise today.")
+        case .retryFailed(.failed): resource("Couldn't set the reminder.")
         }
     }
 
@@ -68,7 +89,7 @@ struct SurpriseRibbon: View {
         case .ready: resource("Open")
         case .paused: resource("Resume")
         case .off: resource("Turn on")
-        case .onItsWay, .passed: nil
+        case .onItsWay, .passed, .later, .retryFailed: nil
         }
     }
 

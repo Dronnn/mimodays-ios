@@ -26,6 +26,9 @@ final class SurpriseCoordinator {
     private let deviceCalendar: () -> Calendar
     private var generator: any RandomNumberGenerator
     private var running: Task<Void, Never>?
+    /// Where a failed "Remind me later" is kept for Today until the day changes; in memory when nil (UI tests).
+    private let defaults: UserDefaults?
+    private var retryNoteInMemory: [String: Any]?
     private let logger = Logger(subsystem: "MimoDays", category: "Surprises")
 
     init(
@@ -34,8 +37,10 @@ final class SurpriseCoordinator {
         permissions: any PermissionService,
         clock: any DateProvider = SystemDateProvider(),
         calendar: @escaping () -> Calendar = { Calendar.current },
-        generator: any RandomNumberGenerator = SystemRandomNumberGenerator()
+        generator: any RandomNumberGenerator = SystemRandomNumberGenerator(),
+        defaults: UserDefaults? = .standard
     ) {
+        self.defaults = defaults
         self.context = context
         self.notifications = notifications
         self.permissions = permissions
@@ -205,7 +210,7 @@ final class SurpriseCoordinator {
         let prompts = fetchRecentPrompts(now: now, calendar: calendar)
         let status = SurpriseStatus(
             schedule: schedule, prompts: prompts, notificationsAllowed: notifications.isUsable,
-            latestCapture: latestCapture, now: now, calendar: calendar
+            latestCapture: latestCapture, now: now, calendar: calendar, retryFailure: retryFailure(now: now, calendar: calendar)
         )
         let pending = prompts.filter { $0.outcome == .pending }
         let changes = pending.map(\.expiresAt) + pending.map(\.plannedAt) + [schedule?.pausedUntil].compactMap(\.self)
@@ -247,6 +252,109 @@ final class SurpriseCoordinator {
         prompt.outcome = .captured
         prompt.capturedMomentID = momentID
         save()
+    }
+
+    // MARK: Remind me later (P8.7)
+
+    /// The notification category with the "Remind me later" action, and the action.
+    nonisolated static let remindLaterCategory = "surprise"
+    nonisolated static let remindLaterAction = "remindLater"
+    nonisolated static let remindLaterTitle = LocalizedStringResource("Remind me later", bundle: .atURL(Bundle.module.bundleURL))
+    /// Marks a surprise that is coming back; it comes back once.
+    nonisolated static let retryPrefix = "retry-"
+    static let retryDelay: TimeInterval = 30 * 60
+    static let retryNearest: TimeInterval = 5 * 60
+    private static let retryNoteKey = "surpriseRetryNote"
+
+    enum RetryFailure: String, Equatable {
+        /// No time left today in the hours, the pause or before the next surprise.
+        case noTime
+        /// iOS didn't take the notification.
+        case failed
+    }
+
+    enum RetryResult: Equatable {
+        case later(Date)
+        case failed(RetryFailure)
+        /// Not a live ordinary surprise any more (answered, expired, already retried, a stale or repeated press).
+        case ignored
+    }
+
+    /// Only planned surprises; not "Send a surprise now", onboarding's or one already coming back.
+    static func isOrdinary(_ requestID: String) -> Bool {
+        ![sendNowPrefix, firstPrefix, retryPrefix].contains { requestID.hasPrefix($0) }
+    }
+
+    /// The same surprise (its reservation for the day and its id) comes back 30 minutes on, sooner late in the day,
+    /// with a fresh window; never tomorrow. Runs from the notification without opening the app.
+    @discardableResult
+    func remindLater(promptID: UUID) async -> RetryResult {
+        var result = RetryResult.ignored
+        await serially { result = await self.performRemindLater(promptID) }
+        return result
+    }
+
+    private func performRemindLater(_ promptID: UUID) async -> RetryResult {
+        let now = clock.now()
+        guard let prompt = fetchPrompt(promptID), prompt.outcome == .pending, Self.isOrdinary(prompt.notificationRequestID),
+              prompt.plannedAt <= now, now < prompt.expiresAt,
+              let schedule = fetchSchedule(), schedule.isEnabled,
+              await permissions.status(of: .notifications).isUsable else { return .ignored }
+        let calendar = calendar(for: schedule)
+        let window = TimeInterval(schedule.expiryMinutes * 60)
+        guard let time = retryTime(now: now, window: window, schedule: schedule, calendar: calendar, prompt: prompt) else {
+            noteRetryFailure(.noTime, now: now)
+            return .failed(.noTime)
+        }
+        let original = (prompt.plannedAt, prompt.expiresAt, prompt.notificationRequestID)
+        prompt.plannedAt = time
+        prompt.expiresAt = time.addingTimeInterval(window)
+        prompt.notificationRequestID = Self.retryPrefix + prompt.id.uuidString
+        save()
+        await syncNotifications(now: now)
+        guard await notifications.pending().contains(where: { $0.id == prompt.notificationRequestID }) else {
+            // The surprise stays as it came, still open.
+            (prompt.plannedAt, prompt.expiresAt, prompt.notificationRequestID) = original
+            save()
+            noteRetryFailure(.failed, now: now)
+            return .failed(.failed)
+        }
+        noteRetryFailure(nil, now: now)
+        return .later(time)
+    }
+
+    /// Half an hour on, or the latest time at least 5 minutes away whose whole window fits in today's hours and
+    /// before the next surprise; nil when there's none, or surprises are paused.
+    private func retryTime(now: Date, window: TimeInterval, schedule: SurpriseSchedule, calendar: Calendar, prompt: SurprisePrompt) -> Date? {
+        guard !schedule.isPausedIndefinitely, (schedule.pausedUntil ?? .distantPast) <= now else { return nil }
+        let day = calendar.startOfDay(for: now)
+        guard let close = calendar.date(byAdding: .minute, value: schedule.latestMinute, to: day),
+              let tomorrow = calendar.date(byAdding: .day, value: 1, to: day) else { return nil }
+        var latest = min(now.addingTimeInterval(Self.retryDelay), close.addingTimeInterval(-window), tomorrow.addingTimeInterval(-window))
+        if let next = fetchUpcomingPending(now: now).first(where: { $0.id != prompt.id }) {
+            latest = min(latest, next.plannedAt.addingTimeInterval(-window))
+        }
+        // On a whole second: iOS fires on one.
+        latest = Date(timeIntervalSinceReferenceDate: latest.timeIntervalSinceReferenceDate.rounded(.down))
+        guard latest >= now.addingTimeInterval(Self.retryNearest), fits(latest, schedule.rules, calendar, notBefore: now) else { return nil }
+        return latest
+    }
+
+    private func noteRetryFailure(_ failure: RetryFailure?, now: Date) {
+        let note: [String: Any]? = failure.map { ["kind": $0.rawValue, "at": now.timeIntervalSinceReferenceDate] }
+        if let defaults {
+            defaults.set(note, forKey: Self.retryNoteKey)
+        } else {
+            retryNoteInMemory = note
+        }
+    }
+
+    /// Today's failed "Remind me later", if any.
+    private func retryFailure(now: Date, calendar: Calendar) -> RetryFailure? {
+        let note = defaults.map { $0.dictionary(forKey: Self.retryNoteKey) } ?? retryNoteInMemory
+        guard let kind = (note?["kind"] as? String).flatMap(RetryFailure.init(rawValue:)), let at = note?["at"] as? Double,
+              calendar.isDate(Date(timeIntervalSinceReferenceDate: at), inSameDayAs: now) else { return nil }
+        return kind
     }
 
     // MARK: Refresh
@@ -315,19 +423,26 @@ final class SurpriseCoordinator {
         let remindersOn = fetchSchedule()?.isEnabled == true
         let wanted = fetchUpcomingPending(now: now)
             .filter { remindersOn || !$0.notificationRequestID.hasPrefix(Self.firstPrefix) }
-            .map { (id: $0.notificationRequestID, promptID: $0.id.uuidString, fireDate: $0.plannedAt) }
+            .map {
+                (id: $0.notificationRequestID, promptID: $0.id.uuidString, fireDate: $0.plannedAt,
+                 category: Self.isOrdinary($0.notificationRequestID) ? Self.remindLaterCategory : nil)
+            }
         let scheduled = await notifications.pending()
         let wantedIDs = Set(wanted.map(\.id))
         let stale = scheduled.map(\.id).filter { !wantedIDs.contains($0) }
         if !stale.isEmpty { await notifications.cancel(ids: stale) }
 
         let fireDates = Dictionary(scheduled.map { ($0.id, $0.fireDate) }, uniquingKeysWith: { first, _ in first })
+        // Requests from before "Remind me later" get its action.
+        let categories = Dictionary(scheduled.map { ($0.id, $0.categoryID) }, uniquingKeysWith: { first, _ in first })
         // Not one due within the minute: it may be on its way already, and a replacement would come too late.
         let reworded = now.addingTimeInterval(60)
-        for prompt in wanted where (rewords && prompt.fireDate > reworded) || fireDates[prompt.id] != prompt.fireDate {
+        for prompt in wanted where (rewords && prompt.fireDate > reworded) || fireDates[prompt.id] != prompt.fireDate
+            || categories[prompt.id].map({ $0 != prompt.category }) == true {
             let notification = SurpriseNotification(
                 id: prompt.id, promptID: prompt.promptID, fireDate: prompt.fireDate,
-                title: String(appLocalized: Self.title), body: String(appLocalized: Self.bodies.randomElement(using: &generator)!)
+                title: String(appLocalized: Self.title), body: String(appLocalized: Self.bodies.randomElement(using: &generator)!),
+                categoryID: prompt.category
             )
             do {
                 try await notifications.schedule(notification)
@@ -432,13 +547,25 @@ enum SurpriseStatus: Equatable {
     case paused(until: Date?)
     /// T07: notifications aren't allowed, or surprises were never turned on.
     case off
+    /// P8.7: "Remind me later" was pressed; the surprise comes back today.
+    case later
+    /// P8.7: "Remind me later" couldn't bring it back; said until the day changes.
+    case retryFailed(SurpriseCoordinator.RetryFailure)
 
     init(
         schedule: SurpriseSchedule?, prompts: [SurprisePrompt], notificationsAllowed: Bool, latestCapture: Date?,
-        now: Date, calendar: Calendar
+        now: Date, calendar: Calendar, retryFailure: SurpriseCoordinator.RetryFailure? = nil
     ) {
         if let ready = prompts.first(where: { $0.outcome == .pending && $0.plannedAt <= now && now < $0.expiresAt }) {
             self = .ready(promptID: ready.id)
+            return
+        }
+        if prompts.contains(where: { $0.outcome == .pending && $0.plannedAt > now && $0.notificationRequestID.hasPrefix(SurpriseCoordinator.retryPrefix) }) {
+            self = .later
+            return
+        }
+        if let retryFailure {
+            self = .retryFailed(retryFailure)
             return
         }
         guard let schedule, schedule.isEnabled, notificationsAllowed else {

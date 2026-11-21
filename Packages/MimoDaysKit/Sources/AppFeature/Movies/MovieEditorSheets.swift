@@ -7,6 +7,8 @@ import SwiftUI
 /// `Navigation / Editor bar` on the editor's sheets: Cancel, the title, Done.
 struct SheetBar: View {
     let title: Text
+    /// Done can be used (P8.9 HH02: not while the period has no days).
+    var canFinish = true
     var done: (() -> Void)?
     @Environment(\.dismiss) private var dismiss
 
@@ -41,6 +43,8 @@ struct SheetBar: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .disabled(!canFinish)
+                .opacity(canFinish ? 1 : 0.4)
                 .accessibilityIdentifier("sheet.done")
             }
         }

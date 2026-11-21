@@ -16,6 +16,39 @@ final class NewMovieModel {
         case collection(UUID)
         case place(String)
         case moments
+        /// P8.9 HH01: one second for each day of a month or a year.
+        case oneSecond
+    }
+
+    /// HH02: the month (yyyymm) or the year a One second per day movie covers.
+    enum OneSecondPeriod: Hashable {
+        case month(Int)
+        case year(Int)
+
+        var days: ClosedRange<Int> {
+            switch self {
+            case let .month(month): OneSecondPerDay.days(ofMonth: month)
+            case let .year(year): OneSecondPerDay.days(ofYear: year)
+            }
+        }
+
+        /// "October 2026", "2026".
+        @MainActor var name: String {
+            switch self {
+            case let .month(month): MoviesModel.monthTitle(month)
+            case let .year(year): String(year)
+            }
+        }
+
+        /// The month or year before (-1) or after (1).
+        func shifted(by offset: Int) -> OneSecondPeriod {
+            switch self {
+            case let .month(month):
+                let index = (month / 100) * 12 + (month % 100 - 1) + offset
+                return .month((index / 12) * 100 + index % 12 + 1)
+            case let .year(year): return .year(year + offset)
+            }
+        }
     }
 
     /// One of F02's rows, with how many moments it holds.
@@ -58,6 +91,12 @@ final class NewMovieModel {
     private var builtID: UUID?
     private(set) var collections: [Choice] = []
     private(set) var places: [MapPlace] = []
+    /// HH02; the last full month until another is chosen.
+    var oneSecondPeriod: OneSecondPeriod = .month(0)
+    /// HH04: the period's days, each with its moment.
+    private(set) var oneSecondDays: [OneSecondPerDay.Day] = []
+    /// HH05: the days whose moment was changed by hand.
+    private(set) var changedDays: Set<Int> = []
     let tiles: MemoriesModel
     private let defaults: MovieDefaults
     private let library: MediaLibrary
@@ -78,6 +117,7 @@ final class NewMovieModel {
         self.calendar = calendar
         self.seed = seed
         tiles = MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails, clock: clock, calendar: calendar)
+        oneSecondPeriod = .month(lastMonth)
         if let rule { apply(rule) }
     }
 
@@ -97,6 +137,7 @@ final class NewMovieModel {
         case .thisYear: thisYear * 10_000 + 101...thisYear * 10_000 + 1231
         case .lastYear: (thisYear - 1) * 10_000 + 101...(thisYear - 1) * 10_000 + 1231
         case .dates: from.flatMap { from in to.map { from...max(from, $0) } }
+        case .oneSecond: oneSecondPeriod.days
         case .collection, .place, .moments: nil
         }
     }
@@ -139,8 +180,55 @@ final class NewMovieModel {
         places = map.places
     }
 
+    // MARK: One second per day (HH01-HH05)
+
+    /// The days of a period with a moment to show; throws when the archive can't be read ("Try again").
+    func oneSecondDays(of period: OneSecondPeriod) throws -> [OneSecondPerDay.Day] {
+        try MoviesModel.oneSecondDays(in: library.context, store: library.store, days: period.days)
+    }
+
+    /// Reads the chosen period's days and their moments, keeping the picks made by hand that still fit.
+    private func loadOneSecond() throws {
+        var days = try oneSecondDays(of: oneSecondPeriod)
+        let kept = Set(oneSecondDays.filter { changedDays.contains($0.day) }.map(\.picked) + presetIDs)
+        changedDays = []
+        for index in days.indices {
+            guard let pick = days[index].choices.first(where: kept.contains), pick != days[index].picked else { continue }
+            days[index].picked = pick
+            changedDays.insert(days[index].day)
+        }
+        oneSecondDays = days
+        let ids = days.flatMap(\.choices)
+        let moments = try library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { ids.contains($0.id) }))
+        items = moments.sorted { $0.capturedAt < $1.capturedAt }.map {
+            MemoryItem(
+                id: $0.id, localDay: $0.localDay, capturedAt: $0.capturedAt, timeZoneID: $0.timeZoneID,
+                mediaType: $0.mediaType, origin: $0.origin, isFavorite: $0.isFavorite
+            )
+        }
+    }
+
+    /// HH05: another of the day's moments takes its second.
+    func choose(_ id: UUID, forDay day: Int) {
+        guard let index = oneSecondDays.firstIndex(where: { $0.day == day }), oneSecondDays[index].choices.contains(id) else { return }
+        oneSecondDays[index].picked = id
+        if id == oneSecondDays[index].choices.first { changedDays.remove(day) } else { changedDays.insert(day) }
+    }
+
+    /// The movie's length: a second a day.
+    var oneSecondLength: Double { Double(oneSecondDays.count) * OneSecondPerDay.seconds }
+
     /// Reads the source's moments; false when there are too few for a movie (F16).
     func loadCandidates() -> Bool {
+        if source == .oneSecond {
+            // One day is enough here (HH06).
+            do { try loadOneSecond() } catch {
+                logger.error("Reading the days failed: \(error.localizedDescription, privacy: .public)")
+                oneSecondDays = []
+            }
+            candidates = []
+            return !oneSecondDays.isEmpty
+        }
         do {
             candidates = try readCandidates()
             let ids = candidates.map(\.id)
@@ -161,6 +249,7 @@ final class NewMovieModel {
 
     private func readCandidates() throws -> [MovieSelection.Candidate] {
         switch source {
+        case .oneSecond: return []
         case .lastMonth, .thisYear, .lastYear, .dates:
             guard let days = days(of: source) else { return [] }
             return try MoviesModel.candidates(in: library.context, from: days.lowerBound, through: days.upperBound)
@@ -220,6 +309,7 @@ final class NewMovieModel {
 
     /// The automatic pick for the chosen length; choosing moments by hand starts with none.
     func pickAutomatically() {
+        guard source != .oneSecond else { return }
         let inputs = PickInputs(source: source, target: target, candidates: candidates.map(\.id))
         guard inputs != pickedFor else { return }
         pickedFor = inputs
@@ -234,13 +324,20 @@ final class NewMovieModel {
         if picked.contains(id) { picked.remove(id) } else { picked.insert(id) }
     }
 
-    var canBuild: Bool { picked.count >= MovieSelection.minimumMoments }
+    var canBuild: Bool { source == .oneSecond ? !oneSecondDays.isEmpty : picked.count >= MovieSelection.minimumMoments }
 
     /// The draft, its moments in the order they happened.
     func build() -> UUID? {
         guard builtID == nil else { return nil }
         let ordered = candidates.filter { picked.contains($0.id) }.map(\.id)
         do {
+            if source == .oneSecond {
+                let project = try MovieStore(context: library.context, store: library.store, now: { [clock] in clock.now() }).createOneSecond(
+                    title: title, period: oneSecondPeriod.days, days: oneSecondDays, aspectRatio: aspectRatio, fit: fit, defaults: defaults
+                )
+                builtID = project.id
+                return project.id
+            }
             let project = try MovieStore(context: library.context, store: library.store, now: { [clock] in clock.now() }).create(
                 title: title, source: rule, length: length, aspectRatio: aspectRatio, fit: fit, momentIDs: ordered,
                 seed: Int(truncatingIfNeeded: seed), defaults: defaults
@@ -269,6 +366,8 @@ final class NewMovieModel {
             return Self.span(first, last)
         case let .collection(id): return collections.first { $0.id == id }?.title ?? String(appLocalized: "New movie", bundle: .module)
         case .place: return placeName ?? String(appLocalized: "Unnamed place", bundle: .module)
+        case .oneSecond:
+            return String(appLocalized: "\(oneSecondPeriod.name), one second a day", bundle: .module, comment: "P8.9: a One second per day movie's first title; the month or the year")
         }
     }
 
@@ -284,6 +383,7 @@ final class NewMovieModel {
         case .collection: String(appLocalized: "This collection has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet")
         case .place: String(appLocalized: "This place has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet")
         case .moments: String(appLocalized: "Your choice has \(count) moments.", bundle: .module, comment: "New movie (F16): why there's no movie yet; the moments picked one by one")
+        case .oneSecond: String(appLocalized: "No moments to use in this period", bundle: .module)
         }
     }
 
@@ -296,6 +396,7 @@ final class NewMovieModel {
         case let .collection(id): collections.first { $0.id == id }?.title ?? String(appLocalized: "Movie period: this collection", bundle: .module)
         case .place: placeName ?? String(appLocalized: "Movie period: this place", bundle: .module)
         case .dates, .moments: String(appLocalized: "Movie period: these dates", bundle: .module)
+        case .oneSecond: oneSecondPeriod.name
         }
     }
 
@@ -316,6 +417,12 @@ final class NewMovieModel {
         case let .collection(id): return MovieSourceRule(kind: .collection, collectionID: id)
         case .place: return MovieSourceRule(kind: .place, momentIDs: placeIDs)
         case .moments: return MovieSourceRule(kind: .selection, momentIDs: Array(picked))
+        case .oneSecond:
+            let days = oneSecondPeriod.days
+            return MovieSourceRule(
+                kind: .oneSecondPerDay, start: MemoriesView.dayDate(days.lowerBound), end: MemoriesView.dayDate(days.upperBound),
+                momentIDs: oneSecondDays.map(\.picked)
+            )
         }
     }
 
@@ -332,9 +439,16 @@ final class NewMovieModel {
             source = .place(rule.momentIDs.first?.uuidString ?? "")
             placeIDs = rule.momentIDs
             placeName = placeLabel(of: rule.momentIDs)
-        case .selection, .onThisDay, .oneSecondPerDay:
+        case .selection, .onThisDay:
             source = .moments
             presetIDs = rule.momentIDs
+        case .oneSecondPerDay:
+            source = .oneSecond
+            // The picks it was made with come back when its days are read.
+            presetIDs = rule.momentIDs
+            if let start = rule.start.map({ LocalDay($0, in: .gmt).key }), let end = rule.end.map({ LocalDay($0, in: .gmt).key }) {
+                oneSecondPeriod = start % 10_000 == 101 && end % 10_000 == 1231 ? .year(start / 10_000) : .month(start / 100)
+            }
         }
     }
 

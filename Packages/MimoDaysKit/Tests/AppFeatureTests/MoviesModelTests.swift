@@ -321,4 +321,60 @@ struct MoviesModelTests {
         #expect(project.orderedClips[0].moment?.id == other && project.orderedClips[0].trimEnd == 1)
         #expect(project.sourceRule.momentIDs == [other, ids[0]])
     }
+
+    /// HH02: the last full month at first; months and years step back and forth across the year's end.
+    @Test func oneSecondPeriods() {
+        let model = wizard()
+        #expect(model.oneSecondPeriod == .month(202610))
+        #expect(NewMovieModel.OneSecondPeriod.month(202601).shifted(by: -1) == .month(202512))
+        #expect(NewMovieModel.OneSecondPeriod.month(202612).shifted(by: 1) == .month(202701))
+        #expect(NewMovieModel.OneSecondPeriod.year(2026).shifted(by: -1) == .year(2025))
+        #expect(NewMovieModel.OneSecondPeriod.month(202602).days == 20260201...20260228)
+    }
+
+    /// HH04-HH06: one day is enough; a day changed by hand keeps its pick and Build makes a second a day.
+    @Test func oneSecondWizardBuildsADraft() async throws {
+        let ids = try await save([20261003, 20261003, 20261010])
+        let model = wizard()
+        model.source = .oneSecond
+        #expect(model.loadCandidates())
+        #expect(model.oneSecondDays.map(\.day) == [20261003, 20261010])
+        #expect(model.oneSecondLength == 2)
+        let day = try #require(model.oneSecondDays.first)
+        let other = try #require(day.choices.first { $0 != day.picked })
+        model.choose(other, forDay: day.day)
+        #expect(model.changedDays == [20261003])
+        // Back and Next again: the hand-made pick stays.
+        #expect(model.loadCandidates())
+        #expect(model.oneSecondDays.first?.picked == other)
+        let id = try #require(model.build())
+        let project = try #require(try context.fetch(FetchDescriptor<MovieProject>(predicate: #Predicate { $0.id == id })).first)
+        #expect(project.sourceRule.kind == .oneSecondPerDay)
+        #expect(project.orderedClips.compactMap(\.moment?.id) == [other, ids[2]])
+        #expect(project.title == "October 2026, one second a day")
+    }
+
+    /// A period with no moments: nothing to build.
+    @Test func oneSecondWithoutMoments() throws {
+        let model = wizard()
+        model.source = .oneSecond
+        model.oneSecondPeriod = .year(2020)
+        #expect(!model.loadCandidates())
+        #expect(!model.canBuild)
+        #expect(try model.oneSecondDays(of: .year(2020)).isEmpty)
+    }
+
+    /// Opened from a One second per day movie: its year and picks come back.
+    @Test func oneSecondRuleComesBack() async throws {
+        let ids = try await save([20250303, 20250303])
+        let days = try MoviesModel.oneSecondDays(in: context, store: store, days: OneSecondPerDay.days(ofYear: 2025))
+        let other = try #require(days.first?.choices.first { $0 != days.first?.picked })
+        let rule = MovieSourceRule(
+            kind: .oneSecondPerDay, start: MemoriesView.dayDate(20250101), end: MemoriesView.dayDate(20251231), momentIDs: [other]
+        )
+        let model = wizard(rule)
+        #expect(model.source == .oneSecond && model.oneSecondPeriod == .year(2025))
+        #expect(model.loadCandidates())
+        #expect(model.oneSecondDays.first?.picked == other && Set(ids).contains(other))
+    }
 }

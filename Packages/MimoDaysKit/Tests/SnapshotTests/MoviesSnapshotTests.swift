@@ -145,4 +145,43 @@ struct MoviesSnapshotTests {
         for item in model.items { await model.tiles.load(item.id) }
         assertScreenSnapshots(of: page(MomentsStep(model: model) {}), variants: variants)
     }
+
+    /// HH01: One second per day chosen, October 2026.
+    @Test func sourceOneSecond() async throws {
+        try await save([20261003, 20261010, 20261010, 20261020])
+        let model = wizard()
+        model.source = .oneSecond
+        assertScreenSnapshots(of: page(SourceStep(model: model, path: .constant([]), close: {})), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
+    /// HH02.
+    @Test func oneSecondPeriod() async throws {
+        try await save([20261003, 20261010, 20261010, 20261020])
+        let model = wizard()
+        assertScreenSnapshots(of: OneSecondPeriodSheet(model: model) {}, variants: variants + [SnapshotVariant(.iPhone, .light, rightToLeft: true)] + SnapshotVariant.languages)
+        model.oneSecondPeriod = .month(202009)
+        assertScreenSnapshots(of: OneSecondPeriodSheet(model: model) {}, variants: [SnapshotVariant(.iPhone, .light)], testName: "oneSecondPeriodEmpty")
+    }
+
+    /// HH03: the length is the days'.
+    @Test func oneSecondShape() async throws {
+        try await save([20261003, 20261010, 20261010, 20261020])
+        let model = wizard()
+        model.source = .oneSecond
+        _ = model.loadCandidates()
+        assertScreenSnapshots(of: page(LengthStep(model: model, path: .constant([]))), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// HH04, one day changed by hand; HH05 for a day with two moments.
+    @Test func oneSecondDays() async throws {
+        try await save([20261003, 20261010, 20261010, 20261020], videos: [3])
+        let model = wizard()
+        model.source = .oneSecond
+        _ = model.loadCandidates()
+        let day = try #require(model.oneSecondDays.first { $0.choices.count > 1 })
+        model.choose(day.choices[1], forDay: day.day)
+        for item in model.items { await model.tiles.load(item.id) }
+        assertScreenSnapshots(of: page(MomentsStep(model: model) {}), variants: variants + SnapshotVariant.languages)
+        assertScreenSnapshots(of: OneSecondDaySheet(model: model, day: try #require(model.oneSecondDays.first { $0.day == day.day })), variants: [SnapshotVariant(.iPhone, .light)], testName: "oneSecondChange")
+    }
 }

@@ -261,6 +261,10 @@ struct SourceStep: View {
     @State private var tooFew: Bool
     /// F16's Catch a moment now: the camera over the wizard, which waits underneath as it was.
     @State private var capturing: CaptureRequest?
+    /// HH02: the month or year for One second per day.
+    @State private var picksPeriod = false
+    /// "October 2026 · 27 days · 27 s" once chosen.
+    @State private var oneSecondDays: Int?
 
     init(model: NewMovieModel, path: Binding<[NewMovieStep]>, close: @escaping () -> Void, tooFew: Bool = false) {
         self.model = model
@@ -291,8 +295,18 @@ struct SourceStep: View {
                     .accessibilityIdentifier("newMovie.next")
             }
         }
-        .task { model.loadChoices() }
+        .task {
+            model.loadChoices()
+            if model.source == .oneSecond { countOneSecond() }
+        }
         .fullScreenCover(item: $capturing, onDismiss: recount) { CaptureFlowView(request: $0) }
+        .sheet(isPresented: $picksPeriod) {
+            OneSecondPeriodSheet(model: model) {
+                model.source = .oneSecond
+                countOneSecond()
+            }
+            .presentationDetents([.medium, .large])
+        }
     }
 
     /// Back from the camera: the counts include a new moment, and F16 goes once the source has enough.
@@ -316,6 +330,15 @@ struct SourceStep: View {
                 )
             }
             .accessibilityIdentifier("newMovie.source.dates")
+            // HH01: after Dates.
+            Button { picksPeriod = true } label: {
+                WizardRow(
+                    title: Text("One second per day", bundle: .module),
+                    detail: oneSecondDetail,
+                    isChosen: model.source == .oneSecond, opens: model.source != .oneSecond
+                )
+            }
+            .accessibilityIdentifier("newMovie.oneSecondPerDay")
             Button { path.append(.collections) } label: {
                 WizardRow(title: Text("A collection", bundle: .module), detail: chosenCollection, isChosen: isCollection, opens: !isCollection)
             }
@@ -338,6 +361,18 @@ struct SourceStep: View {
             WizardRow(title: title, detail: Text("\(name) · \(count)", bundle: .module), isChosen: model.source == source)
         }
         .accessibilityIdentifier("newMovie.source.\(source)")
+    }
+
+    /// "October 2026 · 27 days · 27 s", or what it is before one is chosen.
+    private var oneSecondDetail: Text {
+        guard model.source == .oneSecond, let days = oneSecondDays else { return Text("A month or a year", bundle: .module) }
+        let seconds = Duration.seconds(Double(days) * OneSecondPerDay.seconds)
+            .formatted(.units(allowed: [.minutes, .seconds], width: .narrow).locale(AppLanguage.shared.locale))
+        return Text("\(model.oneSecondPeriod.name) · \(Text("\(days) days", bundle: .module)) · \(seconds)", bundle: .module)
+    }
+
+    private func countOneSecond() {
+        oneSecondDays = try? model.oneSecondDays(of: model.oneSecondPeriod).count
     }
 
     private var isCollection: Bool { if case .collection = model.source { true } else { false } }
@@ -740,8 +775,14 @@ struct LengthStep: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                WizardHeader(step: 2, question: Text("How long, what shape?", bundle: .module))
+                WizardHeader(step: 2, question: model.source == .oneSecond ? Text("What shape?", bundle: .module) : Text("How long, what shape?", bundle: .module))
                 section(Text("Length", bundle: .module)).padding(.top, 20)
+                if model.source == .oneSecond {
+                    // HH03: set by the days.
+                    OneSecondLengthCard(model: model)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 6)
+                } else {
                 // A Grid, not a LazyVGrid: both cards in a row take the taller one's height.
                 Grid(horizontalSpacing: 16, verticalSpacing: 8) {
                     ForEach([[MovieLength.quick, .short], [.full, .custom]], id: \.self) { row in
@@ -768,6 +809,7 @@ struct LengthStep: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
                     .accessibilityIdentifier("newMovie.customMinutes")
+                }
                 }
                 section(Text("Shape", bundle: .module)).padding(.top, 24)
                 HStack(spacing: 8) {
@@ -922,6 +964,16 @@ struct MomentsStep: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 WizardHeader(step: 3, question: Text("Which moments?", bundle: .module))
+                if model.source == .oneSecond {
+                    // HH04.
+                    Text("\(Text("\(model.oneSecondDays.count) days", bundle: .module)), one second each. Tap a day to change its moment.", bundle: .module)
+                        .textStyle(.pageIntro)
+                        .foregroundStyle(ColorToken.textSecondary.color)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 10)
+                    OneSecondDaysList(model: model).padding(.top, 14)
+                } else {
                 intro
                     .textStyle(.pageIntro)
                     .foregroundStyle(ColorToken.textSecondary.color)
@@ -949,6 +1001,7 @@ struct MomentsStep: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 14)
+                }
             }
             .padding(.bottom, 24)
             .frame(maxWidth: 640)
@@ -958,7 +1011,7 @@ struct MomentsStep: View {
             Button(action: build) { Text("Build the movie", bundle: .module) }
                 .buttonStyle(WizardButtonStyle())
                 .disabled(!model.canBuild)
-                .accessibilityIdentifier("newMovie.build")
+                .accessibilityIdentifier(model.source == .oneSecond ? "oneSecond.make" : "newMovie.build")
         }
     }
 

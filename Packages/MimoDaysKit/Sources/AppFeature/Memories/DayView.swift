@@ -271,7 +271,11 @@ struct DayView: View {
     private func picture(_ moment: MomentSummary) -> some View {
         Color(hex: 0x9C8573)
             .overlay {
-                if let image = model.image(moment.picturePath) { Image(uiImage: image).filling() }
+                if moment.mediaType == .text {
+                    PaperTileFace(excerpt: moment.excerpt, glyphSize: 20, isLarge: true)
+                } else if let image = model.image(moment.picturePath) {
+                    Image(uiImage: image).filling()
+                }
             }
             .aspectRatio(370 / 250, contentMode: .fit)
             .clipShape(DayCardBlob())
@@ -305,7 +309,7 @@ struct DayView: View {
 
     /// "Video, voice note".
     private func pictureLabel(_ moment: MomentSummary) -> Text {
-        let kind = moment.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module)
+        let kind = MemoryTile.kind(moment.mediaType)
         return moment.hasVoiceNote ? kind + Text(verbatim: ", ") + Text("Description has voice note", bundle: .module) : kind
     }
 

@@ -220,7 +220,10 @@ struct MosaicPiece: View {
 
     var body: some View {
         Color(hex: 0xC9B8AA)
-            .overlay { picture }
+            .overlay {
+                // II06: a written moment is paper with its first words.
+                if item.mediaType == .text { PaperTileFace(excerpt: detail?.excerpt, glyphSize: 18) } else { picture }
+            }
             .clipShape(MemoryCardOutline())
             .overlay { MemoryCardOutline().strokeBorder(ColorToken.mosaicFrame.color, lineWidth: 4) }
             .background {
@@ -288,7 +291,7 @@ struct MosaicPiece: View {
 
     private var label: Text {
         let time = Text(item.captured.instant, format: .dateTime.month(.wide).day().hour().minute())
-        let kind = item.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module)
+        let kind = MemoryTile.kind(item.mediaType)
         return item.isFavorite
             ? Text("\(kind) from \(time), favorite", bundle: .module)
             : Text("\(kind) from \(time)", bundle: .module)

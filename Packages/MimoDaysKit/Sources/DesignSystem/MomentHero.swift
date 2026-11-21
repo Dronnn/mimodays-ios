@@ -17,16 +17,19 @@ public struct MomentHero: View {
     let caption: Text
     let place: Text?
     let tag: Text?
+    /// A moment written on paper: no scrim, the caption in ink.
+    let isPaper: Bool
     @Environment(\.colorSchemeContrast) private var contrast
     /// The app's reading direction: the picture is laid out left to right, the caption's words read as they do.
     @Environment(\.layoutDirection) private var readingDirection
 
-    public init(photo: HeroMedia, selfie: HeroMedia?, caption: Text, place: Text? = nil, tag: Text? = nil) {
+    public init(photo: HeroMedia, selfie: HeroMedia?, caption: Text, place: Text? = nil, tag: Text? = nil, isPaper: Bool = false) {
         self.photo = photo
         self.selfie = selfie
         self.caption = caption
         self.place = place
         self.tag = tag
+        self.isPaper = isPaper
     }
 
     public var body: some View {
@@ -42,21 +45,23 @@ public struct MomentHero: View {
                 Self.fill(photo, placeholder: 0x9C8573)
                     .frame(width: proxy.size.width, height: proxy.size.height)
                     .overlay(alignment: .bottom) {
-                        LinearGradient(
-                            stops: [
-                                .init(color: Self.scrim.opacity(0), location: 0),
-                                .init(color: Self.scrim.opacity(0.18 * scrim), location: 0.45),
-                                .init(color: Self.scrim.opacity(0.54 * scrim), location: 1),
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .frame(height: proxy.size.height * 0.6)
+                        if !isPaper {
+                            LinearGradient(
+                                stops: [
+                                    .init(color: Self.scrim.opacity(0), location: 0),
+                                    .init(color: Self.scrim.opacity(0.18 * scrim), location: 0.45),
+                                    .init(color: Self.scrim.opacity(0.54 * scrim), location: 1),
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .frame(height: proxy.size.height * 0.6)
+                        }
                     }
                     .clipShape(HeroBlob())
                 captionBlock
                     .environment(\.layoutDirection, readingDirection)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(isPaper ? ColorToken.textSecondary.color : .white)
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     .padding(.leading, 22 * scale)
                     .padding(.bottom, 42 * scale)

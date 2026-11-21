@@ -617,7 +617,11 @@ struct RecentPlacesPanel: View {
         VStack(alignment: .leading, spacing: 8) {
             Color(hex: 0xC9B8AA)
                 .overlay {
-                    if let id = place.moments.first?.id, let image = model.images[id] { Image(uiImage: image).filling() }
+                    if place.moments.first?.item.mediaType == .text {
+                        PaperTileFace()
+                    } else if let id = place.moments.first?.id, let image = model.images[id] {
+                        Image(uiImage: image).filling()
+                    }
                 }
                 .frame(width: width, height: 66)
                 .clipShape(Self.photoShapes[index % Self.photoShapes.count])
@@ -979,7 +983,13 @@ struct PlacePreview: View {
 
     private func preview(_ moment: MapMoment, index: Int) -> some View {
         Color(hex: 0xC9B8AA)
-            .overlay { if let image = model.images[moment.id] { Image(uiImage: image).filling() } }
+            .overlay {
+                if moment.item.mediaType == .text {
+                    PaperTileFace()
+                } else if let image = model.images[moment.id] {
+                    Image(uiImage: image).filling()
+                }
+            }
             .aspectRatio(86 / 108, contentMode: .fit)
             .clipShape(Self.previewShapes[index])
             .overlay(alignment: .bottom) {
@@ -990,6 +1000,6 @@ struct PlacePreview: View {
             .environment(\.layoutDirection, .leftToRight)
             .task { await model.load(moment.id) }
             .accessibilityElement()
-            .accessibilityLabel(moment.item.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module))
+            .accessibilityLabel(MemoryTile.kind(moment.item.mediaType))
     }
 }

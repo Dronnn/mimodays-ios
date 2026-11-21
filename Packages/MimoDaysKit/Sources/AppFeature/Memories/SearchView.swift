@@ -213,7 +213,12 @@ struct SearchResults: View {
         HStack(alignment: .top, spacing: 16) {
             Color(hex: 0xC9B8AA)
                 .overlay {
-                    if let image = model.images[hit.id] { Image(uiImage: image).filling() }
+                    // P8.11: the words are beside it already; the paper and its "T" say it's written.
+                    if hit.entry.item.mediaType == .text {
+                        PaperTileFace(glyphSize: 18)
+                    } else if let image = model.images[hit.id] {
+                        Image(uiImage: image).filling()
+                    }
                 }
                 .frame(width: 76, height: 72)
                 .tileMotion(hit.id, isVideo: hit.entry.item.mediaType == .video, still: model.images[hit.id])

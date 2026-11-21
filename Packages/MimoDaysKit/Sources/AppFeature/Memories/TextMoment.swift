@@ -20,6 +20,8 @@ enum TextMoment {
     static let bodyLimit = 500
     /// What a tile or a movie's paper card shows; the full body stays on the Memory Card.
     static let excerptLimit = 140
+    /// What a small tile has room for.
+    static let tileExcerptLimit = 60
 
     /// Trimmed at both ends and cut to `limit` characters (whole characters, never half an emoji).
     static func cleaned(_ text: String, limit: Int) -> String {

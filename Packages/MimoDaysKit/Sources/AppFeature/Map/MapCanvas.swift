@@ -8,6 +8,8 @@ struct MapMarker: View {
     let image: UIImage?
     let count: Int
     let isSelected: Bool
+    /// P8.11: the newest moment is written: paper and its "T".
+    var isPaper = false
 
     var body: some View {
         ZStack {
@@ -21,7 +23,13 @@ struct MapMarker: View {
                 .frame(width: 56, height: 56)
                 .shadow(color: Color(hex: 0x4B2938).opacity(isSelected ? 0 : 0.18), radius: 4, y: 2)
             Color(hex: 0xB9A89A)
-                .overlay { if let image { Image(uiImage: image).filling() } }
+                .overlay {
+                    if isPaper {
+                        PaperTileFace(glyphSize: 14).padding(-4)
+                    } else if let image {
+                        Image(uiImage: image).filling()
+                    }
+                }
                 .frame(width: 46, height: 46)
                 .clipShape(MapPinPhotoBlob())
         }
@@ -49,6 +57,7 @@ final class PlaceAnnotation: NSObject, MKAnnotation {
     let coordinate: CLLocationCoordinate2D
     let count: Int
     let coverID: UUID
+    let coverIsText: Bool
     let latest: Date
     let title: String?
 
@@ -57,6 +66,7 @@ final class PlaceAnnotation: NSObject, MKAnnotation {
         coordinate = place.coordinate
         count = place.moments.count
         coverID = place.moments.first?.id ?? UUID()
+        coverIsText = place.moments.first?.item.mediaType == .text
         latest = place.moments.first?.item.capturedAt ?? .distantPast
         title = place.label
     }
@@ -83,8 +93,8 @@ final class MarkerView: MKAnnotationView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    func show(image: UIImage?, count: Int, label: String, isSelected: Bool, typefaces: Typefaces) {
-        host.rootView = AnyView(MapMarker(image: image, count: count, isSelected: isSelected).environment(\.typefaces, typefaces))
+    func show(image: UIImage?, isPaper: Bool, count: Int, label: String, isSelected: Bool, typefaces: Typefaces) {
+        host.rootView = AnyView(MapMarker(image: image, count: count, isSelected: isSelected, isPaper: isPaper).environment(\.typefaces, typefaces))
         accessibilityLabel = label
     }
 }
@@ -242,7 +252,7 @@ struct MapCanvas: UIViewRepresentable {
             if parent.images[cover.coverID] == nil { parent.onLoad(cover.coverID) }
             let name = members.count == 1 ? (cover.title ?? String(appLocalized: "Unnamed place", bundle: .module)) : String(appLocalized: "\(members.count) places", bundle: .module)
             view.show(
-                image: parent.images[cover.coverID], count: count,
+                image: parent.images[cover.coverID], isPaper: cover.coverIsText, count: count,
                 label: String(appLocalized: "Map marker: \(name) · \(String(appLocalized: "\(count) moments", bundle: .module))", bundle: .module),
                 isSelected: members.count == 1 && parent.selection == cover.id, typefaces: parent.typefaces
             )

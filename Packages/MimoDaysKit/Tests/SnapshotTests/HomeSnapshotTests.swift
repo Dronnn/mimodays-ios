@@ -102,6 +102,16 @@ struct HomeSnapshotTests {
         ])
     }
 
+    /// P8.11 II06: a written moment among the pieces, paper with its first words.
+    @Test func mosaicWithAWrittenMoment() async throws {
+        try await populate(8, video: true)
+        let saver = MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil })
+        let written = try saver.saveText(TextMomentDraft(capturedAt: CaptureTime(instant: Self.date(2026, 11, 10, 9), timeZone: .gmt), body: "Blanket fort, three chapters, rain."))
+        written.id = UUID(uuidString: "00000000-0000-4000-8000-000000000099")!
+        try container.mainContext.save()
+        assertScreenSnapshots(of: await home(.mosaic), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
+    }
+
     /// U14: the first few moments, and the note that it grows.
     @Test func mosaicFirstFew() async throws {
         try await populate(3, video: true)

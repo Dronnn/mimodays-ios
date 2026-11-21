@@ -227,7 +227,8 @@ final class CollectionModel {
             ($0.id, TileDetail(
                 thumbnailPath: $0.media.first { $0.role == .thumbnail }?.relativePath,
                 duration: $0.mediaType == .video ? $0.media.compactMap(\.duration).max() : nil,
-                hasVoiceNote: !$0.voiceNotes.isEmpty
+                hasVoiceNote: !$0.voiceNotes.isEmpty,
+                excerpt: $0.mediaType == .text ? TextMoment.excerpt($0.note ?? "", limit: TextMoment.tileExcerptLimit) : nil
             ))
         })
         let path = CollectionsModel.summary(collection).coverPath

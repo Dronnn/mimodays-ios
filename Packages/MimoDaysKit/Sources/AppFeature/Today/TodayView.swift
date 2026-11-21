@@ -263,7 +263,8 @@ struct TodayView: View {
                     selfie: latest.windowPath.map { heroSelfie($0) },
                     caption: model.timeText(latest.captured),
                     place: latest.place.map { Text($0) },
-                    tag: latest.origin == .randomPrompt ? Text("surprise", bundle: .module) : nil
+                    tag: latest.origin == .randomPrompt ? Text("surprise", bundle: .module) : nil,
+                    isPaper: latest.mediaType == .text
                 )
                 // H.9: held, the whole hero lifts; its video plays inside it, under the frame and caption.
                 .tileMotion(
@@ -373,7 +374,8 @@ struct TodayView: View {
                     MomentTileLink(MemoriesRoute.moment(pager(from: moment.id))) {
                         StripTile(
                             image: model.image(moment.thumbnailPath, TodayModel.tilePixels), style: style,
-                            id: moment.id, isVideo: moment.mediaType == .video
+                            id: moment.id, isVideo: moment.mediaType == .video,
+                            paper: moment.mediaType == .text ? .some(moment.excerpt) : nil
                         )
                     }
                     .buttonStyle(.plain)
@@ -397,7 +399,13 @@ struct TodayView: View {
                     let image = model.image(moment.thumbnailPath, TodayModel.tilePixels)
                     Color(hex: 0xC9B8AA)
                         .aspectRatio(1, contentMode: .fit)
-                        .overlay { if let image { Image(uiImage: image).filling() } }
+                        .overlay {
+                            if moment.mediaType == .text {
+                                PaperTileFace(excerpt: moment.excerpt.map { String($0.prefix(TextMoment.tileExcerptLimit)) })
+                            } else if let image {
+                                Image(uiImage: image).filling()
+                            }
+                        }
                         .tileMotion(moment.id, isVideo: moment.mediaType == .video, still: image)
                         .clipShape(StripTile.shape(moment.captured.instant))
                         .background(StripTile.shadow(StripTile.shape(moment.captured.instant)))
@@ -490,6 +498,10 @@ struct TodayView: View {
 
     /// H.9: a video's main stream plays in the hero; its selfie window stays a still.
     private func heroPicture(_ latest: MomentSummary) -> HeroMedia {
+        // II06: the latest moment written in words is paper with them.
+        if latest.mediaType == .text {
+            return .view(AnyView(PaperHero(title: latest.title, excerpt: latest.excerpt)))
+        }
         guard latest.mediaType == .video, let image = model.image(latest.picturePath, TodayModel.heroPixels) else {
             return media(latest.picturePath, TodayModel.heroPixels)
         }
@@ -536,8 +548,9 @@ struct TodayView: View {
 
     /// "Photo, Today, 2:37 PM, Yerevan, with selfie" (A07).
     private func describe(_ moment: MomentSummary, withSelfie: Bool) -> Text {
-        var text = moment.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module)
+        var text = MemoryTile.kind(moment.mediaType)
         text = text + Text(verbatim: ", ") + model.timeText(moment.captured)
+        if let excerpt = moment.excerpt { text = text + Text(verbatim: ", ") + Text(excerpt) }
         if let place = moment.place { text = text + Text(verbatim: ", ") + Text(place) }
         if moment.origin == .randomPrompt { text = text + Text(verbatim: ", ") + Text("surprise", bundle: .module) }
         if withSelfie { text = text + Text(verbatim: ", ") + Text("with selfie", bundle: .module) }

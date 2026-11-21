@@ -105,7 +105,7 @@ private struct PlaceContent: View {
     private var strip: some View {
         Map(initialPosition: .region(MKCoordinateRegion(center: place.coordinate, latitudinalMeters: 1200, longitudinalMeters: 1200)), interactionModes: []) {
             Annotation("", coordinate: place.coordinate) {
-                MapMarker(image: image, count: place.moments.count, isSelected: false)
+                MapMarker(image: image, count: place.moments.count, isSelected: false, isPaper: place.moments.first?.item.mediaType == .text)
             }
             .annotationTitles(.hidden)
         }

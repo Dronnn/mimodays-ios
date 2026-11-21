@@ -161,7 +161,11 @@ struct OnThisDayView: View {
         VStack(alignment: .leading, spacing: 6) {
             Color(hex: 0x9C8573)
                 .overlay {
-                    if let image = model.image(moment.picturePath) { Image(uiImage: image).filling() }
+                    if moment.mediaType == .text {
+                        PaperTileFace(excerpt: moment.excerpt, glyphSize: 20, isLarge: true)
+                    } else if let image = model.image(moment.picturePath) {
+                        Image(uiImage: image).filling()
+                    }
                 }
                 .aspectRatio(370 / 210, contentMode: .fit)
                 .clipShape(DayCardBlob())
@@ -175,7 +179,7 @@ struct OnThisDayView: View {
                 }
                 .environment(\.layoutDirection, .leftToRight)
                 .accessibilityElement()
-                .accessibilityLabel(moment.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module))
+                .accessibilityLabel(MemoryTile.kind(moment.mediaType))
                 .accessibilityAddTraits(.isImage)
                 .padding(.horizontal, 16)
             if let caption = moment.title ?? moment.place {

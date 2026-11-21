@@ -90,6 +90,21 @@ struct MemoriesSnapshotTests {
         assertScreenSnapshots(of: screen(await memories()))
     }
 
+    /// P8.11 II06: written moments are paper tiles in the timeline and paper cards on their day.
+    @Test func writtenMoments() async throws {
+        try await populate()
+        let saver = MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil })
+        _ = try saver.saveText(TextMomentDraft(capturedAt: CaptureTime(instant: Self.date(2026, 11, 11, 7), timeZone: .gmt), caption: "Rain day", body: "Blanket fort, three chapters, rain. She fell asleep before the dragon came back."))
+        let model = await memories()
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
+        let day = model.dayModel(20261111)
+        await day.refresh()
+        assertScreenSnapshots(
+            of: NavigationStack { DayView(model: day, thisYear: 2026) }.environment(AppRouter()),
+            variants: [SnapshotVariant(.iPhone, .light)], testName: "writtenMomentsDay"
+        )
+    }
+
     @Test func timelineOnDuo() async throws {
         try await populate()
         assertScreenSnapshots(of: screen(await memories()).onDuo(), variants: SnapshotVariant.duo)

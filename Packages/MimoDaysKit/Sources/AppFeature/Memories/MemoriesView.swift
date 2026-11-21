@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Persistence
 import SwiftData
 import SwiftUI
 
@@ -481,7 +482,11 @@ struct MemoryTile: View {
         Color(hex: 0xC9B8AA)
             .aspectRatio(1, contentMode: .fit)
             .overlay {
-                if let image { Image(uiImage: image).filling() }
+                if item.mediaType == .text {
+                    PaperTileFace(excerpt: detail?.excerpt)
+                } else if let image {
+                    Image(uiImage: image).filling()
+                }
             }
             .tileMotion(item.id, isVideo: item.mediaType == .video, still: image)
             .clipShape(StripTile.shape(item.capturedAt))
@@ -519,12 +524,23 @@ struct MemoryTile: View {
             .accessibilityIdentifier("memories.tile")
     }
 
+    /// The first word of a tile's VoiceOver description.
+    static func kind(_ type: MediaType) -> Text {
+        switch type {
+        case .video: Text("Video", bundle: .module)
+        case .text: Text("Written moment", bundle: .module)
+        default: Text("Photo", bundle: .module)
+        }
+    }
+
     /// "Video, 6:42 PM, surprise, favorite, voice note".
     private var label: Text {
         var clock = Date.FormatStyle(date: .omitted, time: .shortened)
         clock.timeZone = item.captured.timeZone
-        var text = item.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module)
+        var text = MemoryTile.kind(item.mediaType)
         text = text + Text(verbatim: ", ") + Text(item.capturedAt, format: clock)
+        // P8.11: the words are read too.
+        if let excerpt = detail?.excerpt { text = text + Text(verbatim: ", ") + Text(excerpt) }
         if item.origin == .randomPrompt { text = text + Text(verbatim: ", ") + Text("surprise", bundle: .module) }
         if item.isFavorite { text = text + Text(verbatim: ", ") + Text("Description is favorite", bundle: .module) }
         if detail?.hasVoiceNote == true { text = text + Text(verbatim: ", ") + Text("Description has voice note", bundle: .module) }

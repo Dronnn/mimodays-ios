@@ -94,6 +94,22 @@ struct TodaySnapshotTests {
         assertScreenSnapshots(of: screen(await today()).onDuo(), variants: SnapshotVariant.duo)
     }
 
+    /// P8.11 II06: the latest moment and one in the strip written in words: paper with them.
+    @Test func withWrittenMoments() async throws {
+        try await populate()
+        let saver = MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil })
+        var strip = TextMomentDraft(capturedAt: CaptureTime(instant: Self.date(2026, 11, 9, 20), timeZone: .gmt), body: "Blanket fort, three chapters, rain.")
+        strip.caption = ""
+        _ = try saver.saveText(strip)
+        var latest = TextMomentDraft(
+            capturedAt: CaptureTime(instant: Self.date(2026, 11, 11, 15, 10), timeZone: .gmt), caption: "Rain day",
+            body: "Lena and I built a blanket fort and read three chapters with a flashlight. She fell asleep before the dragon came back."
+        )
+        latest.place = ReviewPlace(label: "Yerevan, Armenia", latitude: 40.18, longitude: 44.51, precision: .city, source: .gps)
+        _ = try saver.saveText(latest)
+        assertScreenSnapshots(of: screen(await today()), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)])
+    }
+
     /// The standard set plus X01, iPad landscape in two columns.
     private static let variants = SnapshotVariant.standard + [SnapshotVariant(.iPadLandscape, .light), SnapshotVariant(.iPadLandscape, .dark)]
 

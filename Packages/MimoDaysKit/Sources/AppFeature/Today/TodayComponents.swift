@@ -145,11 +145,17 @@ struct StripTile: View {
     /// H.9: a video tile plays.
     var id: UUID?
     var isVideo = false
+    /// P8.11: a written moment's words on paper instead of a picture.
+    var paper: String??
 
     var body: some View {
         Color(hex: 0xC9B8AA)
             .overlay {
-                if let image { Image(uiImage: image).filling() }
+                if let paper {
+                    PaperTileFace(excerpt: paper.map { String($0.prefix(TextMoment.tileExcerptLimit)) })
+                } else if let image {
+                    Image(uiImage: image).filling()
+                }
             }
             .frame(width: style.size.width, height: style.size.height)
             .tileMotion(id ?? UUID(), isVideo: isVideo && id != nil, still: image)

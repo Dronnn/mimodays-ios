@@ -10,8 +10,35 @@ struct InteractivePreview: View {
     let model: CameraModel
     let position: CameraPosition
     var activeArea: CGRect?
+    @State private var size = CGSize.zero
 
     var body: some View {
+        preview
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { size = $0 }
+            // P4.3: what a tap, a long press and a pinch do, by name for Voice Control and VoiceOver.
+            .accessibilityElement(children: .ignore)
+            // In halves two pictures show at once: each says which camera it is.
+            .accessibilityLabel(position == .back
+                ? Text("Back camera", bundle: .module)
+                : Text("Front camera", bundle: .module, comment: "Camera (P4.3): the selfie camera's live picture, for Voice Control and VoiceOver"))
+            .accessibilityAction(named: Text("Focus in the middle", bundle: .module, comment: "Camera (P4.3): what a tap on the picture does, there in the middle")) {
+                focusInTheMiddle(lock: false)
+            }
+            .accessibilityAction(named: Text("Lock focus and exposure", bundle: .module, comment: "Camera (P4.3): what a long press on the picture does, there in the middle")) {
+                focusInTheMiddle(lock: true)
+            }
+            .accessibilityZoomAction { action in
+                model.pinch(action.direction == .zoomIn ? 1.5 : 1 / 1.5, on: position, ended: true)
+            }
+            .accessibilityIdentifier("camera.picture")
+    }
+
+    private func focusInTheMiddle(lock: Bool) {
+        let area = activeArea ?? CGRect(origin: .zero, size: size)
+        Task { await model.focus(at: CGPoint(x: 0.5, y: 0.5), layerPoint: CGPoint(x: area.midX, y: area.midY), on: position, lock: lock) }
+    }
+
+    private var preview: some View {
         CameraPreview(engine: model.engine, position: position, gestures: CameraPreview.Gestures(
             activeArea: activeArea,
             tap: { point, layerPoint in Task { await model.focus(at: point, layerPoint: layerPoint, on: position, lock: false) } },

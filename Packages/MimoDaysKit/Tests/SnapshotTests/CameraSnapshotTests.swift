@@ -58,6 +58,13 @@ struct CameraSnapshotTests {
         assertScreenSnapshots(of: screen(await camera(surprise: true)), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
+    /// P8.8 GG02: taking a moment again, its date in the chip.
+    @Test func thenNow() async {
+        let model = await camera()
+        model.repeating = CaptureTime(instant: Date(timeIntervalSince1970: 1_762_872_120), timeZone: .gmt)
+        assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, rightToLeft: true)] + SnapshotVariant.languages)
+    }
+
     @Test func videoIdle() async {
         assertScreenSnapshots(of: screen(await camera(mode: .video), last: true), variants: [SnapshotVariant(.iPhone, .light)])
     }

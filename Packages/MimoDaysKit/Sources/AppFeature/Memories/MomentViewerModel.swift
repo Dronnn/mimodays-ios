@@ -70,6 +70,8 @@ struct ViewerMoment: Equatable, Identifiable {
         var aspectRatio: CGFloat { pixelSize.height > 0 ? pixelSize.width / pixelSize.height : 3.0 / 4.0 }
     }
 
+    /// P8.8: how many times this moment, or the one it repeats, was taken again; 0 when never.
+    var thenNowRepeats = 0
     var id: UUID
     var captured: CaptureTime
     /// The day it's kept under, as Settings › Memories › Days labels it: its day page and hidden day are this one.
@@ -206,6 +208,7 @@ final class MomentViewerModel {
         }
         var viewed = ViewerMoment(moment)
         viewed.isHiddenWithDay = MemoryVisibility(context: library.context).isDayHidden(moment.localDay)
+        viewed.thenNowRepeats = ThenNow.comparison(for: moment, in: library.context)?.repeats.count ?? 0
         moments[id] = viewed
         // The selfie as big as the main picture: swapped, it fills the card (U23).
         for (path, size) in [(viewed.mainPath, Self.photoPixels), (viewed.selfiePath, Self.photoPixels)] {

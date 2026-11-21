@@ -237,6 +237,55 @@ struct ViewerSnapshotTests {
         ])
     }
 
+    /// P8.8: the moment saved with `save`, taken again a year on (Nov 21, 2026) and, with `twice`, once more.
+    private func saveThenNow(twice: Bool = false) async throws -> (then: UUID, now: UUID) {
+        let then = try await save(video: false)
+        let context = container.mainContext
+        let first = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == then })).first)
+        first.capturedAt = Date(timeIntervalSince1970: 1_762_886_520)
+        var now = then
+        for offset: Double in twice ? [0, 4 * 86_400] : [4 * 86_400] {
+            let id = try await save(video: false, note: "")
+            let moment = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first)
+            moment.capturedAt = Date(timeIntervalSince1970: 1_794_422_520 + offset)
+            moment.repeatOfMomentID = then
+            now = id
+        }
+        try context.save()
+        return (then, now)
+    }
+
+    private func thenNow(_ id: UUID) async -> some View {
+        let model = ThenNowModel(library: library, momentID: id)
+        await model.refresh()
+        return NavigationStack { ThenNowView(model: model) }
+    }
+
+    /// GG05: the card back links to Then & Now.
+    @Test func backWithThenNow() async throws {
+        let ids = try await saveThenNow(twice: true)
+        assertScreenSnapshots(of: try await hiddenPage(ids.then), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+    }
+
+    /// GG04: Then and the newest Now, the repeats' dates to choose from; stacked at large type, side by side on iPad.
+    @Test func thenNowComparison() async throws {
+        let ids = try await saveThenNow(twice: true)
+        assertScreenSnapshots(of: await thenNow(ids.then), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+            SnapshotVariant(.iPad, .light), SnapshotVariant(.iPhone, .light, rightToLeft: true),
+        ] + SnapshotVariant.languages)
+    }
+
+    /// GG04: Then is in Recently Deleted; Now still opens.
+    @Test func thenNowWithThenGone() async throws {
+        let ids = try await saveThenNow()
+        let context = container.mainContext
+        let then = ids.then
+        try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == then })).first).deletedAt = .now
+        try context.save()
+        assertScreenSnapshots(of: await thenNow(ids.now), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
     private func hiddenPage(_ id: UUID) async throws -> some View {
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)

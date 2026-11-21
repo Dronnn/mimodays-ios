@@ -319,6 +319,8 @@ enum MemoriesRoute: Hashable {
     case deletedMoment(UUID)
     /// M14.
     case onThisDay
+    /// P8.8 GG04: a moment taken then and again.
+    case thenNow(UUID)
 }
 
 extension View {
@@ -333,6 +335,7 @@ extension View {
             case .recentlyDeleted: RecentlyDeletedScreen()
             case let .deletedMoment(id): DeletedMomentScreen(id: id)
             case .onThisDay: OnThisDayScreen()
+            case let .thenNow(id): ThenNowScreen(momentID: id)
             }
         }
     }

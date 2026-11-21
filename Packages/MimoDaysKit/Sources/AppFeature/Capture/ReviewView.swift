@@ -23,6 +23,8 @@ struct ReviewView: View {
     @State private var editsTags = false
     @State private var choosesMood = false
     @Environment(\.mediaLibrary) private var library
+    /// GG03: when the moment captured again was taken; read once.
+    @State private var repeating: CaptureTime?
     /// Place or Voice note is asking for its permission: one at a time, claimed at the tap.
     @State private var opensTool = false
     /// Off screen (left through a link while a permission was asked): nothing starts recording.
@@ -330,12 +332,20 @@ struct ReviewView: View {
             ChipFlow(spacing: 8, lineSpacing: 2) { chips }
             .disabled(isSaving)
             .padding(.top, 14)
-            OriginLabel(origin: model.promptID == nil ? .manual : .randomPrompt, time: CaptureTimeLabel.text(model.capture.capturedAt))
-                .textStyle(.reviewMeta)
-                .foregroundStyle(ColorToken.textBody.color)
-                .padding(.leading, 2)
-                .padding(.top, 18)
-                .accessibilityIdentifier("review.time")
+            Group {
+                // GG03: which moment this captures again.
+                if let repeating {
+                    Text("Repeating a moment from \(ThenNow.dateText(repeating))", bundle: .module)
+                } else {
+                    OriginLabel(origin: model.promptID == nil ? .manual : .randomPrompt, time: CaptureTimeLabel.text(model.capture.capturedAt))
+                }
+            }
+            .textStyle(.reviewMeta)
+            .foregroundStyle(ColorToken.textBody.color)
+            .padding(.leading, 2)
+            .padding(.top, 18)
+            .accessibilityIdentifier("review.time")
+            .task(id: model.repeatOf) { repeating = library.flatMap { ThenNow.capturedTime(of: model.repeatOf, in: $0.context) } }
             Button { save() } label: { Text("Save", bundle: .module) }
                 .buttonStyle(.primary)
                 .disabled(isSaving)

@@ -163,7 +163,7 @@ struct CameraView: View {
         return ZStack {
             // U03/U06: while the phone is held the wrong way the hint has the preview to itself.
             if let selfie = model.selfiePosition, !model.needsRotation, !model.showsHalves {
-                let chipBottom = model.isSurprise ? chipHeight.map { chrome.surpriseChip.minY + $0 } : nil
+                let chipBottom = model.isSurprise || model.repeating != nil ? chipHeight.map { chrome.surpriseChip.minY + $0 } : nil
                 AdjustableSelfieWindow(
                     placement: $model.settings.selfieWindow, showsSheet: $adjustsSelfie,
                     layout: chrome.selfieWindow(in: windowArea, insideShape: insideShape, chipBottom: chipBottom),
@@ -190,6 +190,10 @@ struct CameraView: View {
                 buttons(turn, chrome, direction)
                 if model.isSurprise {
                     SurpriseChip()
+                        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { chipHeight = $0 }
+                        .turned(chrome.surpriseChip, turn, alignment: chrome.leading(.top), direction: direction)
+                } else if let repeating = model.repeating {
+                    SurpriseChip(title: Text("Then & Now · \(ThenNow.dateText(repeating))", bundle: .module), id: "camera.thenNow")
                         .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { chipHeight = $0 }
                         .turned(chrome.surpriseChip, turn, alignment: chrome.leading(.top), direction: direction)
                 }
@@ -553,15 +557,18 @@ private struct DurationPicker: View {
     }
 }
 
-/// C01s: mint hand-cut chip with a coral star.
+/// C01s: mint hand-cut chip with a coral star; P8.8 GG02 says which moment is captured again in it.
 private struct SurpriseChip: View {
+    var title = Text("A little surprise", bundle: .module)
+    var id = "camera.surprise"
+
     var body: some View {
         HStack(spacing: 8) {
             Icon.markStarSmall.image
                 .resizable()
                 .frame(width: 16, height: 16)
                 .foregroundStyle(CameraPalette.star)
-            Text("A little surprise", bundle: .module)
+            title
                 .textStyle(.hand)
                 .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 .foregroundStyle(CameraPalette.chipText)
@@ -571,7 +578,7 @@ private struct SurpriseChip: View {
         .frame(minHeight: 34)
         .background(ChipBlob().fill(CameraPalette.chip))
         .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("camera.surprise")
+        .accessibilityIdentifier(id)
     }
 }
 

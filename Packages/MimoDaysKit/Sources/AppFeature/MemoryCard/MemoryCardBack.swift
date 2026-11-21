@@ -76,6 +76,23 @@ struct MemoryCardBack: View {
                     collections
                         .padding(.top, 18)
                 }
+                // GG05: the moments taken then and again, after the collections.
+                if moment.thenNowRepeats > 0 {
+                    NavigationLink(value: MemoriesRoute.thenNow(moment.id)) {
+                        HStack(spacing: 6) {
+                            Icon.glyphClock.image.resizable().frame(width: 16, height: 16).accessibilityHidden(true)
+                            Text("Then & Now · \(moment.thenNowRepeats) repeats", bundle: .module)
+                        }
+                        .textStyle(.cardBackSmall)
+                        .foregroundStyle(ColorToken.textPrimary.color)
+                        .padding(.horizontal, 11)
+                        .frame(minHeight: 32)
+                        .background(ReviewChipBlob().fill(ColorToken.surfaceChip.color))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 12)
+                    .accessibilityIdentifier("viewer.thenNow")
+                }
                 Spacer(minLength: 20)
                 // No picture to show small, and no blank window (II05).
                 if moment.mediaType != .text { livePreview }

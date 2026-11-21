@@ -128,6 +128,8 @@ final class CameraModel {
     }
 
     let isSurprise: Bool
+    /// P8.8 GG02: capturing again the moment taken then.
+    var repeating: CaptureTime?
     let engine: any CaptureEngine
     private let orientation: any OrientationSensor
     private var holds: Task<Void, Never>?

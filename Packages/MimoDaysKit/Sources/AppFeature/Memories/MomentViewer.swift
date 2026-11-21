@@ -44,6 +44,7 @@ struct MomentViewer: View {
     @Bindable var model: MomentViewerModel
     @Environment(\.camera) private var camera
     @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
+    @Environment(AppRouter.self) private var router: AppRouter?
     /// M07 while it is open.
     @State private var editing: EditMomentModel?
     /// M15 while it is open, for this moment.
@@ -233,6 +234,13 @@ struct MomentViewer: View {
                             } icon: { Icon.glyphArchive.image }
                         }
                         .accessibilityIdentifier("viewer.hideFromMemories")
+                    }
+                    // P8.8 GG01: the camera, to take it again; photos and videos.
+                    if moment.mediaType != .text {
+                        Button { router?.open(.captureAgain(moment.id)) } label: {
+                            Label { Text("Capture this again", bundle: .module) } icon: { Icon.glyphCamera.image }
+                        }
+                        .accessibilityIdentifier("viewer.captureAgain")
                     }
                     if moment.selfiePath != nil, moment.format != .square,
                        let layout = moment.video?.layout ?? moment.photo?.layout {

@@ -33,6 +33,7 @@ public struct RootView: View {
     @Namespace private var mosaicZoom
     /// C12 toast after a save.
     @State private var showsSavedToast = false
+    @State private var savedKind = SavedToast.Kind.today
     /// Off on iPhone Duo's outer display, where the status bar sits on the side.
     @State private var statusBarOnTop = true
     /// The launch route and a draft left by iOS have been opened (once, after App Lock if it's on).
@@ -358,6 +359,7 @@ public struct RootView: View {
         .fullScreenCover(item: $router.capture, onDismiss: router.captureDismissed) { request in
             CaptureFlowView(request: request, lastCapture: lastCapture, promptExpiry: request.promptID.flatMap(surprises.expiry)) { saved in
                 if let promptID = saved.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
+                savedKind = saved.thenNow
                 showsSavedToast = true
             }
         }
@@ -365,16 +367,17 @@ public struct RootView: View {
             WriteMomentView(model: WriteMomentModel(
                 draft: camera.writing.load(), now: CaptureTime(instant: .now, timeZone: .current), drafts: camera.writing, places: camera.places
             )) { _ in
+                savedKind = .today
                 showsSavedToast = true
             }
         }
         .overlay(alignment: .bottom) {
             if showsSavedToast {
-                SavedToast()
+                SavedToast(kind: savedKind)
                     .padding(.bottom, 100)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .task {
-                        AccessibilityNotification.Announcement(String(appLocalized: "Saved to today", bundle: .module)).post()
+                        AccessibilityNotification.Announcement(savedKind.announcement).post()
                         try? await Task.sleep(for: .seconds(2.5))
                         withAnimation { showsSavedToast = false }
                     }
@@ -474,7 +477,11 @@ struct CaptureFlowView: View {
         let moment = try await saver.save(review.momentDraft)
         review.stopPlayback()
         review.clearDraft()
-        onSaved(SavedCapture(momentID: moment.id, promptID: review.promptID, main: review.main, selfie: review.selfie, capturedAt: moment.capturedAt))
+        let thenNow: SavedToast.Kind = review.repeatOf == nil ? .today : moment.repeatOfMomentID == nil ? .originalGone : .thenNow
+        onSaved(SavedCapture(
+            momentID: moment.id, promptID: review.promptID, main: review.main, selfie: review.selfie, capturedAt: moment.capturedAt,
+            thenNow: thenNow
+        ))
         dismiss()
     }
 
@@ -513,6 +520,7 @@ struct CaptureFlowView: View {
                     )
                 }
             )
+            camera?.repeating = saver.flatMap { ThenNow.capturedTime(of: request.repeatOf, in: $0.context) }
         }
     }
 }
@@ -524,4 +532,5 @@ struct SavedCapture {
     var main: UIImage?
     var selfie: UIImage?
     var capturedAt: Date
+    var thenNow = SavedToast.Kind.today
 }

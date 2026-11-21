@@ -112,6 +112,31 @@ struct ReviewSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)] + SnapshotVariant.languages)
     }
 
+    /// P8.8 GG03: Review says which moment this takes again.
+    @Test func repeating() async throws {
+        let container = try TestStore.container()
+        let root = FileManager.default.temporaryDirectory.appending(path: "ReviewRepeat-\(UUID().uuidString)")
+        let library = MediaLibrary(context: container.mainContext, store: try MediaStore(root: root), thumbnails: ThumbnailPipeline())
+        let then = Moment(
+            captured: CaptureTime(instant: Date(timeIntervalSince1970: 1_762_872_120), timeZoneID: "GMT"), origin: .manual, mediaType: .photo, createdAt: .now
+        )
+        container.mainContext.insert(then)
+        try container.mainContext.save()
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let model = ReviewModel(
+            capture: CaptureResult(media: .photo(try await engine.capturePhoto(flash: .off, silent: true)), window: .init(), capturedAt: time),
+            repeatOf: then.id
+        )
+        await model.load()
+        defer { model.discard() }
+        assertScreenSnapshots(
+            of: screen(model).environment(\.mediaLibrary, library),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
+        )
+        withExtendedLifetime(container) {}
+    }
+
     /// §V8 CC03: two tags, one typed, the ones used before suggested.
     @Test func tagSheet() {
         var tags = ["bike", "lena"]

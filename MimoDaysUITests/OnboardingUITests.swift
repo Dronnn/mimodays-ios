@@ -75,6 +75,23 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(app.buttons["firstCapture.capture"].waitForExistence(timeout: 5))
     }
 
+    /// P2.4, W03: notifications off, so the first surprise shows at the top of onboarding a few seconds after the
+    /// reminders step; Open brings its camera (here the camera-off explainer), and closing it returns to the page.
+    @MainActor
+    func testWithoutNotificationsTheFirstSurpriseShowsInTheApp() {
+        launch(permissions: .denied)
+        tap("onboarding.skip")
+        tap("reminders.enable")
+        XCTAssertTrue(app.buttons["reminders.openSettings"].waitForExistence(timeout: 5))
+        let ribbon = app.descendants(matching: .any)["onboarding.surprise"]
+        XCTAssertTrue(ribbon.waitForExistence(timeout: 20))
+        // Open sits at the ribbon's trailing end.
+        ribbon.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+        XCTAssertTrue(app.descendants(matching: .any)["permission.cameraOff"].waitForExistence(timeout: 5))
+        tap("permission.secondary")
+        XCTAssertTrue(app.buttons["reminders.openSettings"].waitForExistence(timeout: 5))
+    }
+
     @MainActor
     func testFirstCaptureOpensTheCameraExplainerAndCloses() {
         launch()

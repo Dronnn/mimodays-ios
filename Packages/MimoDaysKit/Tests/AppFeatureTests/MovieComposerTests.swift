@@ -133,6 +133,39 @@ struct MovieComposerTests {
         #expect(MoviePlan(project, store: store).clips.map(\.momentID) == Array(ids.dropFirst()))
     }
 
+    /// P8.6: a Live Photo plays its motion, without a window; with the motion gone, its still.
+    @Test func aLivePhotoPlaysItsMotion() async throws {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let clip = try await engine.record(limit: .seconds(1))
+        if let selfie = clip.selfieURL { try? FileManager.default.removeItem(at: selfie) }
+        let still = try await engine.capturePhoto(flash: .off, silent: true)
+        if let selfie = still.selfieURL { try? FileManager.default.removeItem(at: selfie) }
+        let saver = MomentSaver(context: context, store: store, clock: TestDateProvider(), freeBytes: { nil })
+        let moment = try await saver.save(MomentDraft(
+            capture: CaptureResult(
+                media: .photo(CapturedPhoto(mainURL: still.mainURL, mainPosition: .back, selfieURL: nil, motionURL: clip.mainURL)),
+                window: nil, capturedAt: CaptureTime(instant: now, timeZone: .gmt)
+            ),
+            caption: "", window: nil, promptID: nil, origin: .imported
+        ))
+        let motion = try #require(moment.livePhotoMotion)
+        #expect(moment.movieVideoDuration == motion.duration)
+        let project = try project([moment.id])
+        let plan = MoviePlan(project, store: store)
+        let planned = try #require(plan.clips.first)
+        #expect(planned.mainURL == (try store.url(for: motion.relativePath)))
+        #expect(planned.selfieURL == nil && planned.window == nil)
+        #expect(planned.duration > 0.9 && planned.duration < 1.2)
+        if case .video = planned.media {} else { Issue.record("the motion plays as video") }
+        let composed = try await MovieComposer.compose(plan, renderSize: portrait)
+        #expect(abs(composed.asset.duration.seconds - plan.duration) < 0.01)
+
+        try store.remove(motion.relativePath)
+        let fallback = try #require(MoviePlan(project, store: store).clips.first)
+        #expect(fallback.media == .photo && fallback.duration == MovieSelection.photoSeconds)
+    }
+
     // MARK: Composition
 
     @Test func theMoviePlaysEveryClipInTurnAtItsShape() async throws {

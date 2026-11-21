@@ -32,11 +32,14 @@ public struct CapturedPhoto: Codable, Equatable, Sendable {
     public var mainPosition: CameraPosition
     /// The front camera's frame on dual captures.
     public var selfieURL: URL?
+    /// P8.6: an imported Live Photo's paired motion.
+    public var motionURL: URL?
 
-    public init(mainURL: URL, mainPosition: CameraPosition, selfieURL: URL?) {
+    public init(mainURL: URL, mainPosition: CameraPosition, selfieURL: URL?, motionURL: URL? = nil) {
         self.mainURL = mainURL
         self.mainPosition = mainPosition
         self.selfieURL = selfieURL
+        self.motionURL = motionURL
     }
 }
 

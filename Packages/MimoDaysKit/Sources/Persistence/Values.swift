@@ -28,6 +28,8 @@ public enum MediaRole: String, Codable, CaseIterable, Sendable {
     case composedPreview
     case thumbnail
     case audioSource
+    /// P8.6: an imported Live Photo's paired motion, next to its still (the main source). Needs backup version 2.
+    case livePhotoMotion
 }
 
 public enum LocationPrecision: String, Codable, CaseIterable, Sendable {

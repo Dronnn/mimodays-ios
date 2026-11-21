@@ -35,6 +35,7 @@ struct BackupDocument: Codable, Equatable {
         let usesNewFields = !(hiddenDays ?? []).isEmpty
             || moments.contains { $0.isHiddenFromMemories == true || $0.repeatOf != nil || $0.mood != nil }
             || movies.contains { $0.sourceRule.kind == .oneSecondPerDay }
+            || moments.contains { $0.media.contains { $0.role == MediaRole.livePhotoMotion.rawValue } }
         return usesNewFields ? Self.currentVersion : Self.firstVersion
     }
 

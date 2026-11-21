@@ -133,7 +133,7 @@ final class MoviesModel {
         return (includingHidden ? moments : MemoryVisibility(context: context).visible(moments)).map { moment in
             MovieSelection.Candidate(
                 id: moment.id, capturedAt: moment.capturedAt, day: moment.localDay,
-                videoDuration: moment.mediaType == .video ? (moment.media.compactMap(\.duration).max() ?? MovieSelection.photoSeconds) : nil
+                videoDuration: moment.movieVideoDuration
             )
         }
     }

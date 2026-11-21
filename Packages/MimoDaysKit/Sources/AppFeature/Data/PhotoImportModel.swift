@@ -26,6 +26,9 @@ final class PhotoImportModel: Identifiable {
         let checksum: String
         let duration: TimeInterval?
         let hasAudio: Bool
+        /// P8.6: a Live Photo's motion, checked to play; nil for a Live Photo whose motion didn't come or won't play.
+        var motionURL: URL?
+        var isLivePhoto = false
     }
 
     enum Phase: Equatable {
@@ -44,6 +47,10 @@ final class PhotoImportModel: Identifiable {
     var skipped: Set<Int> = []
     /// Picked items that couldn't be loaded (an iCloud download that failed) or read: Import then says some didn't come in.
     private(set) var unreadable = 0
+    /// P8.6: Live Photos whose motion couldn't be loaded, waiting for Import as still or Skip; Import leaves them out.
+    var motionFailed: Set<Int> = []
+    /// P8.6: picked Live Photos whose still is already here without motion: "Keep motion" adds it to that moment.
+    var motionToAttach: [Int: UUID] = [:]
 
     /// Every copy the picker handed over, read or not yet, so closing mid-load leaves none behind.
     private var received: [URL] = []
@@ -59,26 +66,70 @@ final class PhotoImportModel: Identifiable {
         self.lookup = lookup
     }
 
-    /// What "Import N" brings in, oldest first.
-    var new: [Picked] { picked.filter { !skipped.contains($0.id) }.sorted { $0.capturedAt.instant < $1.capturedAt.instant } }
+    /// What "Import N" brings in, oldest first: not what's here already, nor a Live Photo still waiting on its motion.
+    var new: [Picked] {
+        picked.filter { !skipped.contains($0.id) && !motionFailed.contains($0.id) }.sorted { $0.capturedAt.instant < $1.capturedAt.instant }
+    }
 
     var count: Int { picked.count }
     var videos: Int { picked.count { $0.isVideo } }
+    var livePhotos: Int { picked.count(where: \.isLivePhoto) }
 
-    /// Reads files handed over by the picker (or tests): date, zone, place, checksum, a thumbnail.
+    /// "Import as still": the Live Photo comes in as a photo.
+    func importAsStill(_ id: Int) {
+        motionFailed.remove(id)
+    }
+
+    /// "Skip": the Live Photo stays out.
+    func skip(_ id: Int) {
+        motionFailed.remove(id)
+        skipped.insert(id)
+    }
+
+    /// "Keep motion": the motion joins the moment that has this still; no second moment.
+    func attachMotion(_ id: Int) async -> Bool {
+        guard let momentID = motionToAttach[id], let motion = picked.first(where: { $0.id == id })?.motionURL,
+              let moment = try? library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == momentID })).first
+        else { return false }
+        do {
+            try await saver.attachMotion(motion, to: moment)
+        } catch {
+            Self.logger.error("Keeping a Live Photo's motion failed: \(String(describing: error), privacy: .public)")
+            return false
+        }
+        motionToAttach[id] = nil
+        try? FileManager.default.removeItem(at: motion)
+        return true
+    }
+
+    /// Reads files handed over by tests: date, zone, place, checksum, a thumbnail.
     func load(_ files: [(url: URL, isVideo: Bool)]) async {
-        let existing = existingChecksums()
-        var seen = existing
+        await load(files.map { PickedFile(url: $0.url, isVideo: $0.isVideo) })
+    }
+
+    /// Reads files handed over by the picker: date, zone, place, checksum, a thumbnail.
+    func load(_ files: [PickedFile]) async {
+        let existing = existingStills()
+        var seen = Set(existing.keys)
         var picked: [Picked] = []
         var skipped: Set<Int> = []
-        received += files.map(\.url).filter { !received.contains($0) }
+        var motionFailed: Set<Int> = []
+        var motionToAttach: [Int: UUID] = [:]
+        received += files.flatMap { [$0.url, $0.motionURL].compactMap(\.self) }.filter { !received.contains($0) }
         for (index, file) in files.enumerated() {
             guard !Task.isCancelled else { return }
-            guard let item = await Task.detached(priority: .userInitiated, operation: { await Self.read(file.url, isVideo: file.isVideo, id: index) }).value else {
+            guard let item = await Task.detached(priority: .userInitiated, operation: { await Self.read(file, id: index) }).value else {
                 unreadable += 1
                 continue
             }
-            if !seen.insert(item.checksum).inserted { skipped.insert(item.id) }
+            if !seen.insert(item.checksum).inserted {
+                skipped.insert(item.id)
+                if item.motionURL != nil, let here = existing[item.checksum], !here.hasMotion, !motionToAttach.values.contains(here.id) {
+                    motionToAttach[item.id] = here.id
+                }
+            } else if item.isLivePhoto, item.motionURL == nil {
+                motionFailed.insert(item.id)
+            }
             picked.append(item)
             phase = .loading(Double(index + 1) / Double(files.count))
             thumbnails[item.id] = await ReviewModel.still(item.url, maxPixelSize: 300, at: 0)
@@ -86,6 +137,8 @@ final class PhotoImportModel: Identifiable {
         guard !Task.isCancelled else { return }
         self.picked = picked
         self.skipped = skipped
+        self.motionFailed = motionFailed
+        self.motionToAttach = motionToAttach
         phase = picked.isEmpty ? .failed : .ready
     }
 
@@ -96,7 +149,7 @@ final class PhotoImportModel: Identifiable {
 
     /// Loads what the picker returned, then reads it.
     func load(_ items: [some PhotoPickerItemLoading]) async {
-        var files: [(url: URL, isVideo: Bool)] = []
+        var files: [PickedFile] = []
         for (index, item) in items.enumerated() {
             let file = Task.isCancelled ? nil : try? await item.loadFile()
             if let file { received.append(file.url) }
@@ -106,11 +159,12 @@ final class PhotoImportModel: Identifiable {
                 received = []
                 return
             }
+            if let motion = file?.motionURL { received.append(motion) }
             guard let file else {
                 unreadable += 1
                 continue
             }
-            files.append((file.url, file.isVideo))
+            files.append(file)
             phase = .loading(Double(index + 1) / Double(items.count) / 2)
         }
         await load(files)
@@ -137,7 +191,7 @@ final class PhotoImportModel: Identifiable {
                 ? .video(CapturedVideo(
                     mainURL: item.url, mainPosition: .back, selfieURL: nil, duration: item.duration ?? 0, selfieOffset: 0, hasAudio: item.hasAudio
                 ))
-                : .photo(CapturedPhoto(mainURL: item.url, mainPosition: .back, selfieURL: nil))
+                : .photo(CapturedPhoto(mainURL: item.url, mainPosition: .back, selfieURL: nil, motionURL: item.motionURL))
             do {
                 _ = try await saver.save(MomentDraft(
                     capture: CaptureResult(media: media, window: nil, capturedAt: item.capturedAt), caption: "", window: nil, promptID: nil,
@@ -157,16 +211,36 @@ final class PhotoImportModel: Identifiable {
     func discard() {
         loading?.cancel()
         loading = nil
-        (received + picked.map(\.url)).forEach { try? FileManager.default.removeItem(at: $0) }
+        (received + picked.flatMap { [$0.url, $0.motionURL].compactMap(\.self) }).forEach { try? FileManager.default.removeItem(at: $0) }
         received = []
     }
 
-    private func existingChecksums() -> Set<String> {
+    /// The checksums of the camera files here, each with its moment and whether that one has a Live Photo's motion.
+    private func existingStills() -> [String: (id: UUID, hasMotion: Bool)] {
         let media = (try? library.context.fetch(FetchDescriptor<MomentMedia>())) ?? []
-        return Set(media.filter { $0.moment?.deletedAt == nil && ($0.role == .rearSource || $0.role == .frontSource) }.map(\.checksum))
+        var stills: [String: (id: UUID, hasMotion: Bool)] = [:]
+        for file in media where file.role == .rearSource || file.role == .frontSource {
+            guard let moment = file.moment, moment.deletedAt == nil else { continue }
+            stills[file.checksum] = (moment.id, moment.livePhotoMotion != nil)
+        }
+        return stills
     }
 
     // MARK: Reading
+
+    /// A picked file read; a Live Photo's motion is kept only if it plays.
+    nonisolated static func read(_ file: PickedFile, id: Int) async -> Picked? {
+        guard var item = await read(file.url, isVideo: file.isVideo, id: id) else { return nil }
+        item.isLivePhoto = file.isLivePhoto || file.motionURL != nil
+        if let motion = file.motionURL, await plays(motion) { item.motionURL = motion }
+        return item
+    }
+
+    nonisolated static func plays(_ url: URL) async -> Bool {
+        let asset = AVURLAsset(url: url)
+        guard let duration = try? await asset.load(.duration).seconds, duration > 0 else { return false }
+        return !((try? await asset.loadTracks(withMediaType: .video)) ?? []).isEmpty
+    }
 
     nonisolated static func read(_ url: URL, isVideo: Bool, id: Int) async -> Picked? {
         guard let checksum = try? MediaStore.sha256(of: url) else { return nil }
@@ -264,16 +338,24 @@ protocol PhotoPickerItemLoading: Sendable {
 struct PickedFile: Transferable {
     let url: URL
     let isVideo: Bool
+    /// P8.6: a Live Photo's paired motion.
+    var motionURL: URL?
+    /// A Live Photo, with or without its motion: without it, E05 asks before importing the still alone.
+    var isLivePhoto = false
 
     static var transferRepresentation: some TransferRepresentation {
         FileRepresentation(importedContentType: .movie) { received in PickedFile(url: try copy(received.file), isVideo: true) }
         FileRepresentation(importedContentType: .image) { received in PickedFile(url: try copy(received.file), isVideo: false) }
     }
 
-    private static func copy(_ file: URL) throws -> URL {
+    static func target(extension pathExtension: String) throws -> URL {
         let folder = FileManager.default.temporaryDirectory.appending(path: "Import", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        let target = folder.appending(path: "\(UUID().uuidString).\(file.pathExtension.isEmpty ? "dat" : file.pathExtension)")
+        return folder.appending(path: "\(UUID().uuidString).\(pathExtension.isEmpty ? "dat" : pathExtension)")
+    }
+
+    static func copy(_ file: URL) throws -> URL {
+        let target = try target(extension: file.pathExtension)
         try FileManager.default.copyItem(at: file, to: target)
         return target
     }

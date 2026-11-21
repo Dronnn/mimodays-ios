@@ -121,13 +121,22 @@ struct MoviePlan: Sendable, Equatable {
     @MainActor
     private static func clip(_ clip: MovieClip, _ moment: Moment, showsDates: Bool, showsPlaces: Bool, store: MediaStore) -> Clip? {
         let summary = MomentSummary(moment)
-        guard let mainPath = summary.mainPath, let mainURL = try? store.url(for: mainPath) else { return nil }
-        let selfieURL = summary.selfiePath.flatMap { try? store.url(for: $0) }
+        guard var mainPath = summary.mainPath, var mainURL = try? store.url(for: mainPath) else { return nil }
+        var selfieURL = summary.selfiePath.flatMap { try? store.url(for: $0) }
+        // P8.6: a Live Photo plays its motion, on its own; the still when the motion is gone.
+        let motion = moment.mediaType == .photo ? moment.livePhotoMotion.flatMap { media in
+            (try? store.url(for: media.relativePath)).flatMap { FileManager.default.fileExists(atPath: $0.path) ? (media, $0) : nil }
+        } : nil
+        if let motion {
+            mainPath = motion.0.relativePath
+            mainURL = motion.1
+            selfieURL = nil
+        }
         let media: Clip.Media
         let duration: Double
-        if moment.mediaType == .video {
+        if moment.mediaType == .video || motion != nil {
             let main = moment.media.first { $0.relativePath == mainPath }
-            let selfie = moment.media.first { $0.relativePath == summary.selfiePath }
+            let selfie = motion == nil ? moment.media.first { $0.relativePath == summary.selfiePath } : nil
             let length = main?.duration ?? MovieSelection.longestVideoSeconds
             let start = min(max(clip.trimStart ?? 0, 0), max(length - 0.1, 0))
             let end = min(clip.trimEnd ?? start + MovieSelection.longestVideoSeconds, length)
@@ -153,7 +162,7 @@ struct MoviePlan: Sendable, Equatable {
             voiceURL: voice, soundOn: clip.clipAudio != .muted, volume: clip.clipVolume,
             pictureSize: moment.media.first { $0.relativePath == mainPath }.map { media in
                 // Photos keep their EXIF turn: 5-8 lie on their side.
-                (5...8).contains(media.orientation) && moment.mediaType == .photo
+                (5...8).contains(media.orientation) && moment.mediaType == .photo && motion == nil
                     ? CGSize(width: media.pixelHeight, height: media.pixelWidth) : CGSize(width: media.pixelWidth, height: media.pixelHeight)
             }
         )

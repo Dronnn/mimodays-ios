@@ -56,7 +56,7 @@ struct MomentSaver {
 
     func save(_ draft: MomentDraft) async throws -> Moment {
         let capture = draft.capture
-        try checkSpace(for: [capture.mainURL, capture.selfieURL, draft.voice?.url].compactMap(\.self))
+        try checkSpace(for: [capture.mainURL, capture.selfieURL, capture.motionURL, draft.voice?.url].compactMap(\.self))
         var written: [String] = []
         var composedPhoto: URL?
         do {
@@ -76,6 +76,10 @@ struct MomentSaver {
                 let selfie = try await stored(selfieURL, role: role(capture.mainPosition.other), isVideo: !isPhoto, written: &written)
                 if case let .video(video) = capture.media { selfie.startOffset = video.selfieOffset }
                 media.append(selfie)
+            }
+            // A Live Photo's motion must play, or the save fails: it is never dropped quietly.
+            if let motionURL = capture.motionURL {
+                media.append(try await stored(motionURL, role: .livePhotoMotion, isVideo: true, written: &written))
             }
             if let composedPhoto {
                 media.append(try await stored(composedPhoto, role: .composedPreview, isVideo: false, area: .derived, written: &written))
@@ -138,6 +142,24 @@ struct MomentSaver {
             Logger(subsystem: "MimoDays", category: "Save").error("Saving a moment failed: \(String(describing: error), privacy: .public)")
             written.forEach { try? store.remove($0) }
             if let composedPhoto { try? FileManager.default.removeItem(at: composedPhoto) }
+            throw error as? SaveError ?? .failed
+        }
+    }
+
+    /// P8.6 "Keep motion": a Live Photo's motion joins the moment that already has its still. Nothing changes if it
+    /// doesn't play or can't be kept; the picked file stays for the caller to remove.
+    func attachMotion(_ url: URL, to moment: Moment) async throws {
+        guard moment.livePhotoMotion == nil else { return }
+        try checkSpace(for: [url])
+        var written: [String] = []
+        do {
+            let media = try await stored(url, role: .livePhotoMotion, isVideo: true, written: &written)
+            moment.media.append(media)
+            moment.modifiedAt = clock.now()
+            try context.save()
+        } catch {
+            context.rollback()
+            written.forEach { try? store.remove($0) }
             throw error as? SaveError ?? .failed
         }
     }

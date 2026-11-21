@@ -190,7 +190,7 @@ final class NewMovieModel {
             .map { moment in
                 MovieSelection.Candidate(
                     id: moment.id, capturedAt: moment.capturedAt, day: moment.localDay,
-                    videoDuration: moment.mediaType == .video ? (moment.media.compactMap(\.duration).max() ?? MovieSelection.photoSeconds) : nil
+                    videoDuration: moment.movieVideoDuration
                 )
             }
     }

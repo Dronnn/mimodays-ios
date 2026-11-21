@@ -38,9 +38,14 @@ struct CaptureResult: Codable, Equatable, Sendable {
         }
     }
 
+    /// P8.6: an imported Live Photo's motion.
+    var motionURL: URL? {
+        if case let .photo(photo) = media { photo.motionURL } else { nil }
+    }
+
     /// Removes the temporary files of a capture nobody keeps.
     func discardFiles() {
-        [mainURL, selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
+        [mainURL, selfieURL, motionURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
     }
 }
 

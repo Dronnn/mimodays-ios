@@ -47,6 +47,40 @@ struct MovieStore {
         return project
     }
 
+    /// P8.9: one clip a day in day order, each one second, cut to the next; the rule keeps the period and the picks.
+    func createOneSecond(
+        title: String, period: ClosedRange<Int>, days: [OneSecondPerDay.Day], aspectRatio: MovieAspectRatio, fit: MovieFit,
+        defaults: MovieDefaults = MovieDefaults()
+    ) throws -> MovieProject {
+        let ids = days.sorted { $0.day < $1.day }.map(\.picked)
+        let rule = MovieSourceRule(
+            kind: .oneSecondPerDay, start: MemoriesView.dayDate(period.lowerBound), end: MemoriesView.dayDate(period.upperBound), momentIDs: ids
+        )
+        let project = try create(title: title, source: rule, length: .full, aspectRatio: aspectRatio, fit: fit, momentIDs: ids, defaults: defaults)
+        for clip in project.orderedClips { Self.makeOneSecond(clip) }
+        try save()
+        return project
+    }
+
+    /// "Change moment" on a day: another moment of that day takes the clip's place, still one second.
+    func changeMoment(of clip: MovieClip, to momentID: UUID) throws {
+        guard let moment = try moments([momentID])[momentID], let project = clip.project else { return }
+        let old = clip.moment?.id
+        clip.moment = moment
+        Self.makeOneSecond(clip)
+        var rule = project.sourceRule
+        rule.momentIDs = rule.momentIDs.map { $0 == old ? momentID : $0 }
+        project.sourceRule = rule
+        try save()
+    }
+
+    private static func makeOneSecond(_ clip: MovieClip) {
+        clip.trimStart = 0
+        clip.trimEnd = OneSecondPerDay.seconds
+        // One second is too short for a fade.
+        clip.transition = .cut
+    }
+
     /// A new draft with the same moments and edits; the render stays with the original.
     @discardableResult
     func duplicate(_ project: MovieProject) throws -> MovieProject {

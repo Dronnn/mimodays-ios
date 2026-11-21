@@ -300,4 +300,25 @@ struct MoviesModelTests {
         #expect(days.map(\.day) == [20261102])
         #expect(days.first?.picked == ids[1] && days.first?.choices == [ids[1], ids[0]])
     }
+
+    /// P8.9: one clip a day in order, a second each with cuts; Change moment swaps a day's clip and keeps it a second.
+    @Test func aOneSecondMovieHasASecondADay() async throws {
+        let ids = try await save([20261103, 20261102, 20261102])
+        let days = try MoviesModel.oneSecondDays(in: context, store: store, days: OneSecondPerDay.days(ofMonth: 202611))
+        let store = MovieStore(context: context, store: self.store, now: { Date(timeIntervalSince1970: 0) })
+        let project = try store.createOneSecond(
+            title: "November 2026", period: OneSecondPerDay.days(ofMonth: 202611), days: days, aspectRatio: .portrait9x16, fit: .fill
+        )
+        #expect(project.sourceRule.kind == .oneSecondPerDay)
+        #expect(project.orderedClips.compactMap(\.moment?.localDay) == [20261102, 20261103])
+        #expect(project.orderedClips.allSatisfy { $0.trimStart == 0 && $0.trimEnd == 1 && $0.transition == .cut })
+        let plan = MoviePlan(project, store: self.store)
+        #expect(plan.clips.map(\.duration) == [1, 1])
+        let firstDay = try #require(days.first)
+        let other = try #require(firstDay.choices.first { $0 != firstDay.picked })
+        #expect(Set([ids[1], ids[2]]) == Set(firstDay.choices))
+        try store.changeMoment(of: project.orderedClips[0], to: other)
+        #expect(project.orderedClips[0].moment?.id == other && project.orderedClips[0].trimEnd == 1)
+        #expect(project.sourceRule.momentIDs == [other, ids[0]])
+    }
 }

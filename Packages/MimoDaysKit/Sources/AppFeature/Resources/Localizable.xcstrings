@@ -24237,6 +24237,144 @@
         }
       }
     },
+    "Action button (iPhone 15 Pro and later): Settings › Action Button › Shortcut › Open MimoDays Camera." : {
+      "comment" : "Help › Open the camera quickly (P8.1): assigning the shortcut to the Action button, as iOS names the steps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action button (iPhone 15 Pro and later): Settings › Action Button › Shortcut › Open MimoDays Camera."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "زر الإجراء (iPhone 15 Pro والأحدث): الإعدادات › زر الإجراء › اختصار › فتح كاميرا MimoDays."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка дзеяння (iPhone 15 Pro і навейшыя): Налады › Кнопка дзеяння › Хуткая каманда › Адкрыць камеру MimoDays."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktionstaste (iPhone 15 Pro und neuer): Einstellungen › Aktionstaste › Kurzbefehl › MimoDays-Kamera öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Botón de acción (iPhone 15 Pro y posteriores): Ajustes › Botón de acción › Atajo › Abrir cámara de MimoDays."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bouton Action (iPhone 15 Pro et modèles ultérieurs) : Réglages › Bouton Action › Raccourci › Ouvrir l’appareil photo MimoDays."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כפתור הפעולה (iPhone 15 Pro ואילך): הגדרות › כפתור הפעולה › קיצור › פתיחת המצלמה של MimoDays."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Գործողության կոճակ (iPhone 15 Pro և ավելի նոր)․ Կարգավորումներ › Գործողության կոճակ › Արագ հրաման › Բացել MimoDays-ի տեսախցիկը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasto Azione (iPhone 15 Pro e modelli successivi): Impostazioni › Tasto Azione › Comando rapido › Apri fotocamera MimoDays."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクションボタン（iPhone 15 Pro以降）：設定 › アクションボタン › ショートカット › MimoDaysカメラを開く。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მოქმედების ღილაკი (iPhone 15 Pro და უფრო ახალი): პარამეტრები › მოქმედების ღილაკი › სწრაფი ბრძანება › MimoDays-ის კამერის გახსნა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Әрекет түймесі (iPhone 15 Pro және жаңарақ): Параметрлер › Әрекет түймесі › Жылдам пәрмен › MimoDays камерасын ашу."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동작 버튼(iPhone 15 Pro 이상): 설정 › 동작 버튼 › 단축어 › MimoDays 카메라 열기."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actieknop (iPhone 15 Pro en nieuwer): Instellingen › Actieknop › Opdracht › Open MimoDays-camera."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przycisk czynności (iPhone 15 Pro i nowsze): Ustawienia › Przycisk czynności › Skrót › Otwórz aparat MimoDays."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Botão de Ação (iPhone 15 Pro e posteriores): Ajustes › Botão de Ação › Atalho › Abrir câmera do MimoDays."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка действия (iPhone 15 Pro и новее): Настройки › Кнопка действия › Быстрая команда › Открыть камеру MimoDays."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Åtgärdsknappen (iPhone 15 Pro och senare): Inställningar › Åtgärdsknapp › Genväg › Öppna MimoDays-kameran."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eylem düğmesi (iPhone 15 Pro ve sonrası): Ayarlar › Eylem Düğmesi › Kestirme › MimoDays Kamerasını Aç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка дії (iPhone 15 Pro і новіші): Параметри › Кнопка дії › Швидка команда › Відкрити камеру MimoDays."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "操作按钮（iPhone 15 Pro 及后续机型）：设置 › 操作按钮 › 快捷指令 › 打开 MimoDays 相机。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動作按鈕（iPhone 15 Pro 及後續機型）：設定 › 動作按鈕 › 捷徑 › 打開 MimoDays 相機。"
+          }
+        }
+      }
+    },
     "Add" : {
       "comment" : "Edit moment: value of the Voice note row when the moment has none.",
       "extractionState" : "manual",
@@ -24821,6 +24959,144 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Add MimoDays Camera once, then open the camera with one press, without looking for the app." : {
+      "comment" : "Help › Open the camera quickly (P8.1): what it is for",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add MimoDays Camera once, then open the camera with one press, without looking for the app."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أضف كاميرا MimoDays مرة واحدة، ثم افتح الكاميرا بضغطة واحدة دون البحث عن التطبيق."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дадайце камеру MimoDays адзін раз і адкрывайце камеру адным націскам, не шукаючы праграму."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge die MimoDays-Kamera einmal hinzu und öffne die Kamera dann mit einem Druck, ohne die App zu suchen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade Cámara MimoDays una vez y abre la cámara con una sola pulsación, sin buscar la app."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez Appareil photo MimoDays une fois, puis ouvrez l’appareil photo d’une seule pression, sans chercher l’app."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "הוסיפו את מצלמת MimoDays פעם אחת, ואז פתחו את המצלמה בלחיצה אחת, בלי לחפש את האפליקציה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Մեկ անգամ ավելացրեք MimoDays տեսախցիկը, և բացեք տեսախցիկը մեկ սեղմումով՝ առանց հավելվածը փնտրելու։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi Fotocamera MimoDays una volta, poi apri la fotocamera con un solo tocco, senza cercare l’app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysカメラを一度追加すれば、アプリを探さずにワンタッチでカメラを開けます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ერთხელ დაამატეთ MimoDays კამერა და გახსენით კამერა ერთი დაჭერით, აპის ძებნის გარეშე."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays камерасын бір рет қосыңыз, сосын қолданбаны іздемей, камераны бір басумен ашыңыз."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 카메라를 한 번 추가하면 앱을 찾지 않고 한 번에 카메라를 열 수 있습니다."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voeg MimoDays-camera één keer toe en open de camera daarna met één druk, zonder de app te zoeken."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj Aparat MimoDays raz, a potem otwieraj aparat jednym naciśnięciem, bez szukania aplikacji."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicione a Câmera MimoDays uma vez e abra a câmera com um toque, sem procurar o app."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте камеру MimoDays один раз и открывайте камеру одним нажатием, не ища приложение."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lägg till MimoDays-kamera en gång och öppna sedan kameran med ett tryck, utan att leta efter appen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays Kamera’yı bir kez ekleyin, sonra uygulamayı aramadan kamerayı tek dokunuşla açın."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додайте камеру MimoDays один раз і відкривайте камеру одним натисканням, не шукаючи застосунок."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加一次 MimoDays 相机，之后一按即可打开相机，无需寻找 App。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加入一次 MimoDays 相機，之後一按即可打開相機，不必尋找 App。"
           }
         }
       }
@@ -39093,6 +39369,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "繼續"
+          }
+        }
+      }
+    },
+    "Control Center: swipe down from the top right, tap +, Add a Control, MimoDays Camera." : {
+      "comment" : "Help › Open the camera quickly (P8.1): adding the control in Control Center, as iOS names the steps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control Center: swipe down from the top right, tap +, Add a Control, MimoDays Camera."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مركز التحكم: اسحب لأسفل من أعلى اليمين، واضغط على +، ثم إضافة عنصر تحكم، ثم كاميرا MimoDays."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пункт кіравання: правядзіце ўніз ад правага верхняга кута, націсніце +, «Дадаць элемент кіравання», камера MimoDays."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrollzentrum: Streiche oben rechts nach unten, tippe auf +, „Steuerelement hinzufügen“, MimoDays-Kamera."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro de control: desliza hacia abajo desde la esquina superior derecha, toca +, Añadir un control, Cámara MimoDays."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centre de contrôle : balayez vers le bas depuis le coin supérieur droit, touchez +, Ajouter une commande, Appareil photo MimoDays."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מרכז הבקרה: החליקו למטה מהפינה הימנית העליונה, הקישו על +, ”הוספת פקד“, מצלמת MimoDays."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Կառավարման կենտրոն․ սահեցրեք ներքև վերին աջ անկյունից, հպեք +, «Ավելացնել կառավարում», MimoDays տեսախցիկ։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro di Controllo: scorri in basso dall’angolo in alto a destra, tocca +, Aggiungi un controllo, Fotocamera MimoDays."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントロールセンター：右上から下にスワイプし、＋、「コントロールを追加」、「MimoDaysカメラ」の順にタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მართვის ცენტრი: ზედა მარჯვენა კუთხიდან ჩამოასრიალეთ, შეეხეთ +-ს, „მართვის ელემენტის დამატება“, MimoDays კამერა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Басқару орталығы: жоғарғы оң жақтан төмен сырғытып, + түймесін, «Басқару элементін қосу», MimoDays камерасы дегенді түртіңіз."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제어 센터: 오른쪽 상단에서 아래로 쓸어내리고 +, 제어 항목 추가, MimoDays 카메라를 차례로 탭하십시오."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedieningspaneel: veeg rechtsboven omlaag, tik op +, Voeg een regelaar toe, MimoDays-camera."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centrum sterowania: przesuń w dół od prawego górnego rogu, stuknij +, Dodaj element sterowania, Aparat MimoDays."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Central de Controle: deslize para baixo a partir do canto superior direito, toque em +, Adicionar um Controle, Câmera MimoDays."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пункт управления: смахните вниз от правого верхнего угла, коснитесь +, «Добавить элемент управления», камера MimoDays."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrollcenter: svep nedåt från det övre högra hörnet, tryck på +, Lägg till en reglage, MimoDays-kamera."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denetim Merkezi: sağ üstten aşağı kaydırın, + simgesine, Denetim Ekle’ye, MimoDays Kamera’ya dokunun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пункт керування: проведіть униз від правого верхнього кута, торкніться +, «Додати елемент керування», камера MimoDays."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "控制中心：从右上角向下轻扫，轻点 +、“添加控制”，然后选择 MimoDays 相机。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "控制中心：從右上角向下滑動，點一下 +、「加入控制項目」，然後選擇 MimoDays 相機。"
           }
         }
       }
@@ -60637,6 +61051,144 @@
         }
       }
     },
+    "If the iPhone or App Lock is locked, Face ID comes first." : {
+      "comment" : "Help › Open the camera quickly (P8.1): unlocking comes before the camera",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If the iPhone or App Lock is locked, Face ID comes first."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذا كان iPhone أو قفل التطبيق مقفلًا، فسيأتي Face ID أولًا."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Калі iPhone або блакіроўка праграмы заблакіраваныя, спачатку будзе Face ID."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ist das iPhone oder die App-Sperre gesperrt, kommt zuerst Face ID."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si el iPhone o el bloqueo de la app están activos, primero aparece Face ID."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si l’iPhone ou le verrouillage de l’app est actif, Face ID vient d’abord."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אם ה־iPhone או נעילת האפליקציה נעולים, Face ID יופיע קודם."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Եթե iPhone-ը կամ հավելվածի կողպումը կողպված են, նախ կլինի Face ID-ն։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se l’iPhone o il blocco app sono bloccati, prima arriva Face ID."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneまたはアプリロックがロックされている場合は、先にFace IDが求められます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "თუ iPhone ან აპის ჩაკეტვა ჩაკეტილია, ჯერ Face ID მოგთხოვთ."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone немесе қолданба құлпы құлыпталған болса, алдымен Face ID сұралады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone이나 앱 잠금이 잠겨 있으면 먼저 Face ID가 나타납니다."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als de iPhone of de app-vergrendeling vergrendeld is, komt Face ID eerst."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli iPhone lub blokada aplikacji są zablokowane, najpierw pojawi się Face ID."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se o iPhone ou o Bloqueio do App estiver bloqueado, o Face ID vem primeiro."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если iPhone или блокировка приложения заблокированы, сначала будет Face ID."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om iPhone eller applåset är låst kommer Face ID först."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone veya Uygulama Kilidi kilitliyse önce Face ID gelir."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Якщо iPhone або блокування застосунку заблоковані, спершу буде Face ID."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果 iPhone 或 App 锁已锁定，会先进行面容 ID 验证。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果 iPhone 或 App 鎖定已鎖定，會先進行 Face ID 驗證。"
+          }
+        }
+      }
+    },
     "Import" : {
       "comment" : "Import from Photos page (E05) title",
       "extractionState" : "manual",
@@ -66615,6 +67167,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "位置：允許後，可儲存瞬間發生的地點，並在地圖上顯示目前所在位置。"
+          }
+        }
+      }
+    },
+    "Lock Screen: touch and hold the Lock Screen, tap Customize, Lock Screen, tap a button at the bottom, then MimoDays Camera." : {
+      "comment" : "Help › Open the camera quickly (P8.1): putting the control on the Lock Screen, as iOS names the steps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock Screen: touch and hold the Lock Screen, tap Customize, Lock Screen, tap a button at the bottom, then MimoDays Camera."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "شاشة القفل: المس شاشة القفل مطولًا، واضغط على تخصيص، ثم شاشة القفل، ثم زرًا في الأسفل، ثم كاميرا MimoDays."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экран блакіроўкі: дакраніцеся да экрана блакіроўкі і ўтрымлівайце, націсніце «Наладзіць», «Экран блакіроўкі», кнопку ўнізе, затым камеру MimoDays."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperrbildschirm: Lege den Finger auf den Sperrbildschirm, tippe auf „Anpassen“, „Sperrbildschirm“, auf eine Taste unten und dann auf MimoDays-Kamera."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pantalla bloqueada: mantén pulsada la pantalla bloqueada, toca Personalizar, Pantalla bloqueada, un botón de la parte inferior y luego Cámara MimoDays."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écran verrouillé : maintenez le doigt sur l’écran verrouillé, touchez Personnaliser, Écran verrouillé, un bouton en bas, puis Appareil photo MimoDays."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מסך הנעילה: געו ממושכות במסך הנעילה, הקישו על ”התאמה אישית“, ”מסך הנעילה“, על כפתור בתחתית, ואז על מצלמת MimoDays."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Կողպէկրան․ հպեք և պահեք կողպէկրանը, հպեք «Հարմարեցնել», «Կողպէկրան», ներքևի կոճակներից մեկին, ապա MimoDays տեսախցիկ։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schermata di blocco: tieni premuta la schermata di blocco, tocca Personalizza, Schermata di blocco, un pulsante in basso, poi Fotocamera MimoDays."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロック画面：ロック画面を長押しし、「カスタマイズ」、「ロック画面」、下部のボタン、「MimoDaysカメラ」の順にタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ჩაკეტილი ეკრანი: ხანგრძლივად შეეხეთ ჩაკეტილ ეკრანს, შეეხეთ „მორგებას“, „ჩაკეტილ ეკრანს“, ქვედა ღილაკს და შემდეგ MimoDays კამერას."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Құлыптау экраны: құлыптау экранын басып тұрып, «Баптау», «Құлыптау экраны», төмендегі түймені, сосын MimoDays камерасын түртіңіз."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠금 화면: 잠금 화면을 길게 터치하고 사용자화, 잠금 화면, 하단의 버튼, MimoDays 카메라를 차례로 탭하십시오."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegangsscherm: houd het toegangsscherm ingedrukt, tik op Pas aan, Toegangsscherm, een knop onderaan en dan MimoDays-camera."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ekran blokady: dotknij i przytrzymaj ekran blokady, stuknij Dostosuj, Ekran blokady, przycisk na dole, a potem Aparat MimoDays."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tela Bloqueada: toque e mantenha pressionada a Tela Bloqueada, toque em Personalizar, Tela Bloqueada, em um botão na parte inferior e depois em Câmera MimoDays."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экран блокировки: коснитесь экрана блокировки и удерживайте, нажмите «Настроить», «Экран блокировки», кнопку внизу, затем камеру MimoDays."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Låsskärm: håll fingret på låsskärmen, tryck på Anpassa, Låsskärm, en knapp längst ned och sedan MimoDays-kamera."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kilitli Ekran: Kilitli Ekran’a dokunup basılı tutun, Özelleştir’e, Kilitli Ekran’a, alttaki bir düğmeye ve sonra MimoDays Kamera’ya dokunun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Замкнений екран: торкніться й утримуйте замкнений екран, натисніть «Налаштувати», «Замкнений екран», кнопку внизу, а потім камеру MimoDays."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "锁定屏幕：按住锁定屏幕，轻点“自定”、“锁定屏幕”、底部的一个按钮，然后选择 MimoDays 相机。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鎖定畫面：按住鎖定畫面，點一下「自訂」、「鎖定畫面」、底部的一個按鈕，然後選擇 MimoDays 相機。"
           }
         }
       }
@@ -88898,6 +89588,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開啟 iOS「設定」"
+          }
+        }
+      }
+    },
+    "Open the camera quickly" : {
+      "comment" : "Help › Open the camera quickly (P8.1): the topic's title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the camera quickly"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فتح الكاميرا بسرعة"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хутка адкрыць камеру"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamera schnell öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la cámara rápidamente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l’appareil photo rapidement"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "פתיחה מהירה של המצלמה"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Արագ բացել տեսախցիկը"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri subito la fotocamera"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カメラをすばやく開く"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "კამერის სწრაფად გახსნა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камераны жылдам ашу"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "카메라 빠르게 열기"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera snel openen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szybkie otwieranie aparatu"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir a câmera rapidamente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Быстро открыть камеру"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppna kameran snabbt"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamerayı hızlıca aç"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Швидко відкрити камеру"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快速打开相机"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快速打開相機"
           }
         }
       }
@@ -111679,6 +112507,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "短篇"
+          }
+        }
+      }
+    },
+    "Shortcuts & Siri: say “Open MimoDays Camera”, or add it in the Shortcuts app." : {
+      "comment" : "Help › Open the camera quickly (P8.1): Siri and the Shortcuts app; the quoted words are the intent's title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcuts & Siri: say “Open MimoDays Camera”, or add it in the Shortcuts app."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الاختصارات وSiri: قل ”فتح كاميرا MimoDays“، أو أضفه في تطبيق الاختصارات."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хуткія каманды і Siri: скажыце «Адкрыць камеру MimoDays» або дадайце яе ў праграме «Хуткія каманды»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle & Siri: Sag „MimoDays-Kamera öffnen“ oder füge es in der Kurzbefehle-App hinzu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajos y Siri: di «Abrir cámara de MimoDays» o añádelo en la app Atajos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourcis et Siri : dites « Ouvrir l’appareil photo MimoDays », ou ajoutez-le dans l’app Raccourcis."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "קיצורים ו־Siri: אמרו ”פתיחת המצלמה של MimoDays“, או הוסיפו אותו באפליקציית ”קיצורים“."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Արագ հրամաններ և Siri․ ասեք «Բացել MimoDays-ի տեսախցիկը» կամ ավելացրեք այն «Արագ հրամաններ» հավելվածում։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comandi rapidi e Siri: di’ «Apri fotocamera MimoDays» o aggiungilo nell’app Comandi Rapidi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ショートカットとSiri：「MimoDaysカメラを開く」と話しかけるか、ショートカットAppで追加します。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "სწრაფი ბრძანებები და Siri: თქვით „MimoDays-ის კამერის გახსნა“ ან დაამატეთ Shortcuts აპში."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жылдам пәрмендер және Siri: «MimoDays камерасын ашу» деп айтыңыз немесе оны Shortcuts қолданбасында қосыңыз."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단축어 및 Siri: “MimoDays 카메라 열기”라고 말하거나 단축어 앱에서 추가하십시오."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opdrachten en Siri: zeg ‘Open MimoDays-camera’, of voeg het toe in de Opdrachten-app."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skróty i Siri: powiedz „Otwórz aparat MimoDays” albo dodaj to w aplikacji Skróty."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atalhos e Siri: diga “Abrir câmera do MimoDays” ou adicione no app Atalhos."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Быстрые команды и Siri: скажите «Открыть камеру MimoDays» или добавьте её в приложении «Команды»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genvägar och Siri: säg ”Öppna MimoDays-kameran” eller lägg till den i appen Genvägar."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kestirmeler ve Siri: “MimoDays Kamerasını Aç” deyin ya da Kestirmeler uygulamasında ekleyin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Швидкі команди і Siri: скажіть «Відкрити камеру MimoDays» або додайте її в застосунку «Команди»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快捷指令与 Siri：说“打开 MimoDays 相机”，或在“快捷指令” App 中添加。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "捷徑與 Siri：說「打開 MimoDays 相機」，或在「捷徑」App 中加入。"
           }
         }
       }

@@ -17,6 +17,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
     case selfieWindow
     case permissions
     case newIPhone
+    case cameraShortcut
 
     var title: Text {
         switch self {
@@ -24,6 +25,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
         case .selfieWindow: Text("The selfie window", bundle: .module)
         case .permissions: Text("Permissions", bundle: .module)
         case .newIPhone: Text("Moving to a new iPhone", bundle: .module)
+        case .cameraShortcut: Text("Open the camera quickly", bundle: .module)
         }
     }
 
@@ -52,6 +54,15 @@ enum HelpArticle: String, CaseIterable, Hashable {
             Text("On this iPhone, open Settings › Backup and make a backup. Save it to iCloud Drive, another place in Files, or a computer.", bundle: .module),
             Text("On the new iPhone, install MimoDays and, after the introduction, open Settings › Backup, tap Restore from a backup and choose that file.", bundle: .module),
             Text("Your moments come back with their notes, voice notes, places, collections and movie projects. Settings aren't included; set them again.", bundle: .module),
+        ]
+        // P8.1: the steps as iOS names them.
+        case .cameraShortcut: [
+            Text("Add MimoDays Camera once, then open the camera with one press, without looking for the app.", bundle: .module),
+            Text("Shortcuts & Siri: say “Open MimoDays Camera”, or add it in the Shortcuts app.", bundle: .module),
+            Text("Control Center: swipe down from the top right, tap +, Add a Control, MimoDays Camera.", bundle: .module),
+            Text("Lock Screen: touch and hold the Lock Screen, tap Customize, Lock Screen, tap a button at the bottom, then MimoDays Camera.", bundle: .module),
+            Text("Action button (iPhone 15 Pro and later): Settings › Action Button › Shortcut › Open MimoDays Camera.", bundle: .module),
+            Text("If the iPhone or App Lock is locked, Face ID comes first.", bundle: .module),
         ]
         }
     }

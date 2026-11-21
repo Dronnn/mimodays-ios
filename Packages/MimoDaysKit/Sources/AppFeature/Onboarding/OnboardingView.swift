@@ -36,13 +36,28 @@ struct OnboardingView: View {
             }
         }
         .animation(.default, value: flow.step)
+        // W03: the first surprise in the app when its notification can't come (P2.4).
+        .overlay(alignment: .top) {
+            if let promptID = flow.inAppSurprise, !flow.isCapturing {
+                SurpriseRibbon(status: .ready(promptID: promptID), now: Date()) { flow.openSurprise(promptID) }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .accessibilityIdentifier("onboarding.surprise")
+            }
+        }
+        .animation(.snappy, value: flow.inAppSurprise)
+        .task(id: flow.isCapturing) {
+            guard !flow.isCapturing else { return }
+            await flow.watchFirstSurprise()
+        }
         .permissionExplainers(asker)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await flow.recheckReminders() } }
         }
-        .fullScreenCover(isPresented: $flow.isCapturing) {
-            CaptureFlowView(request: CaptureRequest()) { saved in
-                flow.firstMomentSaved(SavedMoment(
+        .fullScreenCover(item: $flow.capture) { request in
+            CaptureFlowView(request: request, promptExpiry: request.promptID.flatMap(flow.expiry)) { saved in
+                flow.saved(saved, moment: SavedMoment(
                     photo: saved.main.map { .image(Image(uiImage: $0)) } ?? .placeholder,
                     selfie: saved.selfie.map { .image(Image(uiImage: $0)) },
                     capturedAt: saved.capturedAt

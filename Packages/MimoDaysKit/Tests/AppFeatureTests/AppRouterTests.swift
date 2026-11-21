@@ -99,4 +99,18 @@ struct AppRouterTests {
         let titles = MainTab.allCases.map { String(localized: $0.title) }
         #expect(titles == ["Today", "Memories", "Map", "Movies"])
     }
+
+    /// P2.0: a surprise tapped while the camera is up opens when it closes, if it can still be answered.
+    @Test(arguments: [true, false])
+    func aSurpriseDuringACaptureWaitsForIt(answerable: Bool) {
+        let router = AppRouter()
+        router.isAnswerable = { _ in answerable }
+        router.open(.capture(promptID: nil))
+        let id = UUID()
+        router.heldSurprise = id
+        router.open(.settings)
+        router.capture = nil
+        #expect(router.capture?.promptID == (answerable ? id : nil))
+        #expect(router.isSettingsPresented == !answerable)
+    }
 }

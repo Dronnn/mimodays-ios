@@ -417,6 +417,73 @@ struct SurpriseCoordinatorTests {
         #expect(zip(times, times.dropFirst()).allSatisfy { $1.timeIntervalSince($0) >= 120 * 60 })
     }
 
+    // MARK: The first surprise (P2)
+
+    /// P2.1-P2.3: seconds after the reminders step, counted for its day: once a day, nothing else comes today.
+    @Test func theFirstSurpriseComesInSecondsAndIsTheDaysOne() async throws {
+        clock.set(date("2026-11-11 10:00"))
+        let coordinator = coordinator()
+        #expect(await coordinator.remindersChosen(firstSurprise: true))
+        let first = try #require(coordinator.firstSurprise())
+        #expect(first.plannedAt == date("2026-11-11 10:00").addingTimeInterval(SurpriseCoordinator.sendNowDelay))
+        #expect(first.expiresAt == first.plannedAt.addingTimeInterval(15 * 60))
+        let today = try prompts(.pending).filter { device.calendar.isDate($0.plannedAt, inSameDayAs: first.plannedAt) }
+        #expect(today.map(\.id) == [first.promptID])
+        #expect(await notifications.pending().contains { $0.id == SurpriseCoordinator.firstPrefix + first.promptID.uuidString })
+        #expect(try prompts(.pending).count == 14)
+        // Settings saved again later keep it and still count it.
+        await coordinator.settingsChanged()
+        #expect(coordinator.firstSurprise() == first)
+        #expect(try prompts(.pending).filter { device.calendar.isDate($0.plannedAt, inSameDayAs: first.plannedAt) }.count == 1)
+    }
+
+    @Test func thereIsOnlyEverOneFirstSurprise() async throws {
+        clock.set(date("2026-11-11 10:00"))
+        let coordinator = coordinator()
+        _ = await coordinator.remindersChosen(firstSurprise: true)
+        let first = coordinator.firstSurprise()
+        _ = await coordinator.remindersChosen(firstSurprise: true)
+        #expect(coordinator.firstSurprise() == first)
+        #expect(try prompts().count { $0.notificationRequestID.hasPrefix(SurpriseCoordinator.firstPrefix) } == 1)
+        _ = await coordinator.remindersChosen(firstSurprise: false)
+        #expect(coordinator.firstSurprise() == first)
+    }
+
+    /// P2.4: "Maybe later" (surprises off) or notifications off: the first surprise stays, for the app to show.
+    @Test(arguments: [PermissionStatus.denied, .notDetermined])
+    func withoutNotificationsTheFirstSurpriseStaysInTheApp(permission: PermissionStatus) async throws {
+        clock.set(date("2026-11-11 10:00"))
+        schedule.isEnabled = false
+        let coordinator = coordinator(permission)
+        #expect(await !coordinator.remindersChosen(firstSurprise: true))
+        await coordinator.refresh()
+        let first = try #require(coordinator.firstSurprise())
+        #expect(try prompts(.pending).map(\.id) == [first.promptID])
+        clock.set(first.plannedAt.addingTimeInterval(1))
+        #expect(coordinator.open(promptID: first.promptID))
+    }
+
+    @Test func aFirstSurpriseIOSRefusesIsShownInTheApp() async throws {
+        clock.set(date("2026-11-11 10:00"))
+        await notifications.setScheduleError(.unavailable)
+        let coordinator = coordinator()
+        #expect(await !coordinator.remindersChosen(firstSurprise: true))
+        #expect(coordinator.firstSurprise() != nil)
+    }
+
+    /// Relaunched between the reminders step and the surprise: it's still there, and gone once it expires.
+    @Test func theFirstSurpriseOutlivesARelaunchUntilItExpires() async throws {
+        clock.set(date("2026-11-11 10:00"))
+        _ = await coordinator().remindersChosen(firstSurprise: true)
+        let relaunched = coordinator(seed: 2)
+        await relaunched.refresh()
+        let first = try #require(relaunched.firstSurprise())
+        clock.set(first.expiresAt)
+        #expect(relaunched.firstSurprise() == nil)
+        clock.set(first.plannedAt.addingTimeInterval(5))
+        #expect(relaunched.open(promptID: first.promptID))
+    }
+
     /// Another language rewords what iOS has and keeps the plan: late in the day a redraw would find no time left.
     @Test func aNewLanguageKeepsThePlan() async throws {
         clock.set(date("2026-11-11 21:50"))
@@ -515,28 +582,33 @@ struct OnboardingSurprisesTests {
             generator: SeededRandomNumberGenerator(seed: 1)
         )
         let flow = OnboardingFlow(
-            permissions: permissions, store: SwiftDataOnboardingStore(context: container.mainContext)
-        ) { await surprises.settingsChanged() }
+            permissions: permissions, store: SwiftDataOnboardingStore(context: container.mainContext),
+            surprises: OnboardingSurprises(surprises)
+        )
         flow.finishIntro()
         return flow
     }
 
     private var prompts: [SurprisePrompt] { (try? container.mainContext.fetch(FetchDescriptor<SurprisePrompt>())) ?? [] }
 
+    /// The plan and the first surprise, which takes one of its day's places.
     @Test func enablingRemindersPlansTheFirstSurprises() async {
         let flow = flow(answer: .granted)
         flow.schedule.frequency = .twiceADay
         await flow.enableReminders()
         #expect(prompts.count == 28)
         #expect(await notifications.pending().count == 28)
+        #expect(prompts.count { $0.notificationRequestID.hasPrefix(SurpriseCoordinator.firstPrefix) } == 1)
     }
 
-    @Test func deniedOrLaterPlansNothing() async {
+    /// Denied or "Maybe later": no plan, only the first surprise, shown in the app.
+    @Test func deniedOrLaterPlansOnlyTheFirstSurprise() async {
         await flow(answer: .denied).enableReminders()
-        #expect(prompts.isEmpty)
+        #expect(prompts.count == 1)
         flow(answer: .granted).remindLater()
-        #expect(prompts.isEmpty)
-        #expect(await notifications.pending().isEmpty)
+        for _ in 0..<50 { await Task.yield() }
+        #expect(prompts.count == 1)
+        #expect(prompts.allSatisfy { $0.notificationRequestID.hasPrefix(SurpriseCoordinator.firstPrefix) })
     }
 }
 

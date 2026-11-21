@@ -1,4 +1,5 @@
 @testable import AppFeature
+import Core
 import SwiftUI
 import Testing
 import TestSupport
@@ -26,6 +27,17 @@ struct ReminderSetupSnapshotTests {
         assertScreenSnapshots(
             of: RemindersResultView(outcome: outcome, schedule: ReminderSchedule(), next: {}, openSettings: {}),
             testName: "\(outcome)"
+        )
+    }
+
+    /// W03 (P2.4): no reminders, and the first surprise shows in the app at the top.
+    @Test func firstSurpriseInTheApp() {
+        let flow = OnboardingFlow(permissions: PresetPermissionService(status: .denied), store: InMemoryOnboardingStore())
+        flow.step = .reminders(.denied)
+        flow.inAppSurprise = UUID()
+        assertScreenSnapshots(
+            of: OnboardingView(flow: flow) { _ in },
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .light, rightToLeft: true)]
         )
     }
 }

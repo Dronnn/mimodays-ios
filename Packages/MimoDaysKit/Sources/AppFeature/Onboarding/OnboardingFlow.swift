@@ -30,6 +30,31 @@ enum RemindersOutcome: Equatable, CaseIterable {
     case later
 }
 
+/// What onboarding needs from the surprises (P2): the plan and the first surprise after the reminders step, and
+/// that surprise's camera. `SurpriseCoordinator` gives them in the app; tests give their own.
+@MainActor
+struct OnboardingSurprises {
+    /// The reminders step chose; true when iOS has the first surprise's notification.
+    var remindersChosen: (_ firstSurprise: Bool) async -> Bool = { _ in false }
+    var first: () -> SurpriseCoordinator.FirstSurprise? = { nil }
+    /// A surprise opened in time; false when it can't be answered any more.
+    var open: (UUID) -> Bool = { _ in false }
+    var expiry: (UUID) -> Date? = { _ in nil }
+    var captured: (_ promptID: UUID, _ momentID: UUID) -> Void = { _, _ in }
+}
+
+extension OnboardingSurprises {
+    init(_ coordinator: SurpriseCoordinator) {
+        self.init(
+            remindersChosen: { await coordinator.remindersChosen(firstSurprise: $0) },
+            first: { coordinator.firstSurprise() },
+            open: { coordinator.open(promptID: $0) },
+            expiry: { coordinator.expiry(of: $0) },
+            captured: { coordinator.captured(promptID: $0, momentID: $1) }
+        )
+    }
+}
+
 /// Onboarding's state machine. Every change is saved, so a later launch resumes on the same screen.
 @MainActor
 @Observable
@@ -37,8 +62,22 @@ final class OnboardingFlow {
     var step: OnboardingStep = .intro { didSet { save() } }
     var page: OnboardingPage = .welcome { didSet { save() } }
     var schedule = ReminderSchedule() { didSet { save() } }
-    /// The camera is open for the first capture.
-    var isCapturing = false
+    /// The camera: the first capture, or a surprise over whatever page is showing (P2.0).
+    var capture: CaptureRequest? {
+        didSet {
+            // A surprise tapped while the camera was up opens once it closes, if still in time.
+            guard capture == nil, let held = heldSurprise else { return }
+            heldSurprise = nil
+            openSurprise(held)
+        }
+    }
+
+    var isCapturing: Bool { capture != nil }
+    private var heldSurprise: UUID?
+    /// W03: the first surprise shown in the app, when its notification can't come (P2.4).
+    var inAppSurprise: UUID?
+    /// iOS took the first surprise's notification in this run.
+    private var surpriseNotified = false
     private(set) var firstMoment: SavedMoment?
     /// Surprises are on: the reminders choice, or on a replay the person's existing setting.
     private(set) var remindersEnabled = false
@@ -48,13 +87,12 @@ final class OnboardingFlow {
 
     private let permissions: any PermissionService
     private let store: any OnboardingStore
-    /// Runs once the reminders choice is saved, so surprises are planned (or dropped) right away.
-    private let remindersChanged: @MainActor () async -> Void
+    private let surprises: OnboardingSurprises
 
-    init(permissions: any PermissionService, store: any OnboardingStore, remindersChanged: @escaping @MainActor () async -> Void = {}) {
+    init(permissions: any PermissionService, store: any OnboardingStore, surprises: OnboardingSurprises = OnboardingSurprises()) {
         self.permissions = permissions
         self.store = store
-        self.remindersChanged = remindersChanged
+        self.surprises = surprises
         let record = store.load()
         schedule = record.schedule
         remindersEnabled = record.remindersEnabled
@@ -91,7 +129,14 @@ final class OnboardingFlow {
         remindersEnabled = true
         remindersAllowed = status.isUsable
         step = .reminders(status.isUsable ? .on : status.needsSettings ? .denied : .later)
-        await remindersChanged()
+        await remindersChosen()
+    }
+
+    /// Surprises planned (or dropped) right away; the first time through, the first surprise comes in a few seconds,
+    /// whatever was chosen (P2.1, P2.4). A replay keeps the person's surprises as they are.
+    private func remindersChosen() async {
+        let notified = await surprises.remindersChosen(!isCompleted)
+        surpriseNotified = surpriseNotified || notified
     }
 
     /// Back from iOS Settings on "Notifications are off": allowed there, the outcome says they are on.
@@ -101,7 +146,7 @@ final class OnboardingFlow {
               step == .reminders(.denied) else { return }
         remindersAllowed = true
         step = .reminders(.on)
-        await remindersChanged()
+        _ = await surprises.remindersChosen(false)
     }
 
     /// "Maybe later". On a replay (Help › "Show the introduction again") the person's existing reminders setting
@@ -110,6 +155,8 @@ final class OnboardingFlow {
         guard !isEnablingReminders else { return }
         if !isCompleted { remindersEnabled = false }
         step = .reminders(.later)
+        // "Maybe later" changes no settings on a replay, so there is nothing to plan then.
+        if !isCompleted { Task { await remindersChosen() } }
     }
 
     func finishReminders() {
@@ -118,13 +165,62 @@ final class OnboardingFlow {
 
     /// "Capture my first moment": the camera, with its own explainer if access isn't granted yet.
     func startFirstCapture() {
-        isCapturing = true
+        capture = CaptureRequest()
+    }
+
+    /// A draft iOS closed the app on: back in its camera, a surprise's as a surprise.
+    func resumeCapture(promptID: UUID?) {
+        guard promptID != nil || step == .firstCapture else { return }
+        capture = CaptureRequest(promptID: promptID)
+    }
+
+    // MARK: The first surprise (P2)
+
+    /// A surprise's notification tapped, or W03's Open: its camera over this page at once; while a camera is up it
+    /// waits for it to close (P2.0). Too late, nothing opens: the person goes on with onboarding.
+    func openSurprise(_ promptID: UUID) {
+        guard capture == nil else {
+            heldSurprise = promptID
+            return
+        }
+        guard surprises.open(promptID) else { return }
+        inAppSurprise = nil
+        capture = CaptureRequest(promptID: promptID)
+    }
+
+    func expiry(of promptID: UUID) -> Date? { surprises.expiry(promptID) }
+
+    /// A save from the camera: a surprise answers its prompt and onboarding goes on where it was (W04); the first
+    /// capture shows its moment (O10).
+    func saved(_ saved: SavedCapture, moment: SavedMoment) {
+        if let promptID = saved.promptID {
+            surprises.captured(promptID, saved.momentID)
+            capture = nil
+        } else {
+            firstMomentSaved(moment)
+        }
+    }
+
+    /// Keeps W03's ribbon in step with the first surprise until it's caught or gone: shown while it can be answered,
+    /// unless iOS brought its notification.
+    func watchFirstSurprise(now: () -> Date = Date.init) async {
+        while !Task.isCancelled, let first = surprises.first() {
+            let wait = first.plannedAt.timeIntervalSince(now())
+            if wait > 0 {
+                try? await Task.sleep(for: .seconds(wait))
+                continue
+            }
+            let allowed = await permissions.status(of: .notifications).isUsable
+            inAppSurprise = allowed && surpriseNotified ? nil : first.promptID
+            try? await Task.sleep(for: .seconds(max(first.expiresAt.timeIntervalSince(now()), 1)))
+        }
+        inAppSurprise = nil
     }
 
     /// The first moment exists, so onboarding is done even if the app closes on O10.
     func firstMomentSaved(_ moment: SavedMoment) {
         firstMoment = moment
-        isCapturing = false
+        capture = nil
         isCompleted = true
         step = .firstMomentSaved
         // Relaunched after the reminders step, or allowed in Settings since.
@@ -135,7 +231,7 @@ final class OnboardingFlow {
     /// the app on the way doesn't bring it back on the next launch.
     func restart() {
         firstMoment = nil
-        isCapturing = false
+        capture = nil
         page = .welcome
         step = .intro
     }

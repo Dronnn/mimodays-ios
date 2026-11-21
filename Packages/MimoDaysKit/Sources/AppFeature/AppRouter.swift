@@ -76,13 +76,27 @@ public final class AppRouter {
     /// left behind would go on saving and writing while its draft opened again.
     public var capture: CaptureRequest? {
         didSet {
-            guard capture == nil, let held else { return }
+            guard capture == nil else { return }
+            // A surprise tapped meanwhile comes first, if it can still be answered (P2.0).
+            if let surprise = heldSurprise {
+                heldSurprise = nil
+                if isAnswerable(surprise) {
+                    held = nil
+                    open(.capture(promptID: surprise))
+                    return
+                }
+            }
+            guard let held else { return }
             self.held = nil
             open(held)
         }
     }
     /// A route waiting for the camera to close; a later one takes its place.
     var held: Route?
+    /// A surprise tapped while the camera was up; the latest one wins.
+    var heldSurprise: UUID?
+    /// Opens a held surprise's prompt; false when it can't be answered any more (expired, caught, gone).
+    var isAnswerable: (UUID) -> Bool = { _ in false }
     public var newMovie: NewMovieRequest?
     /// What's pushed on Movies.
     var moviesPath: [MovieRoute] = []

@@ -44,6 +44,7 @@ public struct RootView: View {
 
     public init(router: AppRouter = AppRouter(), dependencies: AppDependencies) {
         _router = State(initialValue: router)
+        router.isAnswerable = { [surprises = dependencies.surprises] in surprises.open(promptID: $0) }
         permissions = dependencies.permissions
         launchRoute = dependencies.launchRoute
         let surprises = dependencies.surprises
@@ -168,7 +169,7 @@ public struct RootView: View {
     }
 
     private static func onboardingFlow(context: ModelContext, permissions: any PermissionService, surprises: SurpriseCoordinator) -> OnboardingFlow {
-        OnboardingFlow(permissions: permissions, store: SwiftDataOnboardingStore(context: context)) { await surprises.settingsChanged() }
+        OnboardingFlow(permissions: permissions, store: SwiftDataOnboardingStore(context: context), surprises: OnboardingSurprises(surprises))
     }
 
     /// S08: everything is gone, so MimoDays starts again from onboarding with nothing open.
@@ -178,7 +179,7 @@ public struct RootView: View {
         resumedLaunch = true
         if let draft = camera.drafts.load() {
             if let onboarding {
-                if onboarding.step == .firstCapture { onboarding.startFirstCapture() }
+                onboarding.resumeCapture(promptID: draft.promptID)
             } else {
                 router.open(.capture(promptID: draft.promptID))
             }
@@ -228,12 +229,14 @@ public struct RootView: View {
         }
     }
 
-    /// In time it's "A little surprise"; too late it's a plain capture, never backdated (doc 01).
-    /// Not during onboarding: the camera would open only once it ends, long after. The surprise stays unopened, and
-    /// Today offers it while it's still in time.
+    /// In time it's "A little surprise"; too late it's a plain capture, never backdated (doc 01). During onboarding
+    /// its camera opens over the page, which comes back when it closes (P2.0).
     private func openSurprise(_ promptID: UUID) {
-        guard onboarding == nil else { return }
-        open(.capture(promptID: promptID))
+        if let onboarding {
+            onboarding.openSurprise(promptID)
+        } else {
+            open(.capture(promptID: promptID))
+        }
     }
 
     private func openHeldRoute() {
@@ -244,10 +247,13 @@ public struct RootView: View {
     }
 
     /// Behind App Lock nothing opens (a recovered Review would play under the lock screen): it waits for the unlock,
-    /// and a surprise is checked then. With the camera or Review up, a surprise is left for Today to offer while it's
-    /// in time (and a link waits in the router).
+    /// and a surprise is checked then. With the camera or Review up, a surprise waits for them to close and opens then
+    /// if still in time (P2.0); a plain camera is dropped, and a link waits in the router.
     private func open(_ route: Route) {
-        if router.capture != nil, case .capture = route { return }
+        if router.capture != nil, case let .capture(promptID) = route {
+            if let promptID { router.heldSurprise = promptID }
+            return
+        }
         // Before the launch's review is back (a tap iOS kept for the app as it opens), it waits for it.
         guard resumedLaunch, !appLock.isLockedOrDue else {
             heldRoute = route

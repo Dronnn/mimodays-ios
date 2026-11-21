@@ -89,8 +89,149 @@ struct OnboardingFlowTests {
         let flow = OnboardingFlow(permissions: PresetPermissionService(status: .notDetermined), store: InMemoryOnboardingStore())
         flow.step = .firstCapture
         flow.startFirstCapture()
-        flow.isCapturing = false
+        flow.capture = nil
         #expect(flow.step == .firstCapture)
         #expect(flow.firstMoment == nil)
+    }
+
+    // MARK: The first surprise (P2)
+
+    /// Records what the flow asks of the surprises; `answerable` is what `open` says.
+    @MainActor
+    final class Surprises {
+        var chosen: [Bool] = []
+        var opened: [UUID] = []
+        var captured: [(UUID, UUID)] = []
+        var answerable = true
+        var notified = true
+        var first: SurpriseCoordinator.FirstSurprise?
+
+        var hooks: OnboardingSurprises {
+            OnboardingSurprises(
+                remindersChosen: { self.chosen.append($0); return self.notified },
+                first: { self.first },
+                open: { self.opened.append($0); return self.answerable },
+                expiry: { _ in nil },
+                captured: { self.captured.append(($0, $1)) }
+            )
+        }
+    }
+
+    private func flow(_ surprises: Surprises, answer: PermissionStatus = .granted, completed: Bool = false) -> OnboardingFlow {
+        let store = InMemoryOnboardingStore()
+        if completed { store.save(OnboardingRecord(isCompleted: true, step: 0, schedule: ReminderSchedule(), remindersEnabled: true)) }
+        return OnboardingFlow(
+            permissions: PresetPermissionService(status: answer, requestResult: answer), store: store, surprises: surprises.hooks
+        )
+    }
+
+    /// P2.1: whatever the reminders answer, the first surprise is asked for once; a replay asks for none.
+    @Test(arguments: [PermissionStatus.granted, .denied, .notDetermined])
+    func theRemindersStepAsksForTheFirstSurprise(answer: PermissionStatus) async {
+        let surprises = Surprises()
+        let flow = flow(surprises, answer: answer)
+        flow.finishIntro()
+        await flow.enableReminders()
+        #expect(surprises.chosen == [true])
+    }
+
+    @Test func maybeLaterAsksForTheFirstSurpriseToo() async {
+        let surprises = Surprises()
+        let flow = flow(surprises)
+        flow.finishIntro()
+        flow.remindLater()
+        for _ in 0..<50 where surprises.chosen.isEmpty { await Task.yield() }
+        #expect(surprises.chosen == [true])
+    }
+
+    @Test func aReplayBringsNoFirstSurprise() async {
+        let surprises = Surprises()
+        let flow = flow(surprises, completed: true)
+        flow.restart()
+        flow.finishIntro()
+        await flow.enableReminders()
+        #expect(surprises.chosen == [false])
+        flow.remindLater()
+        await Task.yield()
+        #expect(surprises.chosen == [false])
+    }
+
+    /// P2.0, P2.3: a tap opens the surprise camera over the page; closing it brings the page back.
+    @Test func aSurpriseOpensItsCameraOverTheCurrentPage() {
+        let surprises = Surprises()
+        let flow = flow(surprises)
+        flow.step = .reminders(.on)
+        let id = UUID()
+        flow.openSurprise(id)
+        #expect(flow.capture?.promptID == id)
+        flow.capture = nil
+        #expect(flow.step == .reminders(.on))
+    }
+
+    @Test func aSurpriseTooLateOpensNothing() {
+        let surprises = Surprises()
+        surprises.answerable = false
+        let flow = flow(surprises)
+        flow.openSurprise(UUID())
+        #expect(flow.capture == nil)
+    }
+
+    /// P2.0: a tap while the first-capture camera is up waits for it to close, then opens if still in time.
+    @Test func aSurpriseDuringACaptureWaitsForIt() {
+        let surprises = Surprises()
+        let flow = flow(surprises)
+        flow.step = .firstCapture
+        flow.startFirstCapture()
+        let id = UUID()
+        flow.openSurprise(id)
+        #expect(flow.capture?.promptID == nil)
+        #expect(surprises.opened.isEmpty)
+        flow.capture = nil
+        #expect(flow.capture?.promptID == id)
+    }
+
+    @Test func aWaitingSurpriseThatExpiredOpensNothing() {
+        let surprises = Surprises()
+        let flow = flow(surprises)
+        flow.startFirstCapture()
+        flow.openSurprise(UUID())
+        surprises.answerable = false
+        flow.capture = nil
+        #expect(flow.capture == nil)
+    }
+
+    /// O3, W04: the surprise's moment answers it and onboarding goes on where it was; the first capture shows O10.
+    @Test func aSavedSurpriseAnswersItAndOnboardingGoesOn() {
+        let surprises = Surprises()
+        let flow = flow(surprises)
+        flow.step = .firstCapture
+        let id = UUID()
+        flow.openSurprise(id)
+        let moment = UUID()
+        flow.saved(SavedCapture(momentID: moment, promptID: id, capturedAt: Date()), moment: SavedMoment(photo: .placeholder, capturedAt: Date()))
+        #expect(surprises.captured.map(\.0) == [id])
+        #expect(surprises.captured.map(\.1) == [moment])
+        #expect(flow.capture == nil)
+        #expect(flow.step == .firstCapture)
+        #expect(!flow.isCompleted)
+    }
+
+    /// P2.4: W03's ribbon while the first surprise can be answered and its notification didn't come.
+    @Test(arguments: [(PermissionStatus.denied, true, true), (.granted, false, true), (.granted, true, false)])
+    func theRibbonShowsWhenNoNotificationCame(status: PermissionStatus, notified: Bool, shows: Bool) async {
+        let surprises = Surprises()
+        surprises.notified = notified
+        let id = UUID()
+        surprises.first = SurpriseCoordinator.FirstSurprise(promptID: id, plannedAt: Date(timeIntervalSince1970: 0), expiresAt: Date().addingTimeInterval(60))
+        let flow = flow(surprises, answer: status)
+        flow.finishIntro()
+        await flow.enableReminders()
+        let watch = Task { await flow.watchFirstSurprise() }
+        for _ in 0..<100 where flow.inAppSurprise == nil && shows { await Task.yield() }
+        for _ in 0..<20 { await Task.yield() }
+        #expect((flow.inAppSurprise == id) == shows)
+        flow.openSurprise(id)
+        #expect(flow.inAppSurprise == nil)
+        watch.cancel()
     }
 }

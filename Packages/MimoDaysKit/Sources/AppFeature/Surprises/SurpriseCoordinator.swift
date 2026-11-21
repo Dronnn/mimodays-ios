@@ -152,6 +152,47 @@ final class SurpriseCoordinator {
         return sent
     }
 
+    // MARK: The first surprise (P2)
+
+    /// Marks the onboarding surprise's request (the prompt id stays a UUID). Unlike a sent-now one it counts for its day.
+    static let firstPrefix = "first-"
+
+    struct FirstSurprise: Equatable {
+        let promptID: UUID
+        let plannedAt: Date
+        let expiresAt: Date
+    }
+
+    /// Onboarding's reminders step chose (on, off or later): the plan follows the choice, and with `firstSurprise` the
+    /// first surprise comes a few seconds later, created and counted in the same step as the plan drawn around it
+    /// (P2.1, P2.2). Only one ever. True when iOS has its notification; otherwise onboarding shows it in the app (P2.4).
+    func remindersChosen(firstSurprise: Bool) async -> Bool {
+        var notified = false
+        await serially {
+            let now = self.clock.now()
+            if firstSurprise, self.fetchFirstPrompt() == nil {
+                let id = UUID()
+                let time = Date(timeIntervalSinceReferenceDate: now.addingTimeInterval(Self.sendNowDelay).timeIntervalSinceReferenceDate.rounded(.up))
+                let minutes = self.fetchSchedule()?.expiryMinutes ?? SurpriseSchedule().expiryMinutes
+                self.context.insert(SurprisePrompt(
+                    id: id, plannedAt: time, expiresAt: time.addingTimeInterval(TimeInterval(minutes * 60)),
+                    notificationRequestID: Self.firstPrefix + id.uuidString
+                ))
+            }
+            await self.performRefresh(replan: true)
+            guard firstSurprise, let first = self.fetchFirstPrompt(), first.outcome == .pending,
+                  await self.permissions.status(of: .notifications).isUsable else { return }
+            notified = await self.notifications.pending().contains { $0.id == first.notificationRequestID }
+        }
+        return notified
+    }
+
+    /// The first surprise while it is still to come or can be answered; nil once it's caught, expired or gone.
+    func firstSurprise() -> FirstSurprise? {
+        guard let prompt = fetchFirstPrompt(), prompt.outcome == .pending, clock.now() < prompt.expiresAt else { return nil }
+        return FirstSurprise(promptID: prompt.id, plannedAt: prompt.plannedAt, expiresAt: prompt.expiresAt)
+    }
+
     // MARK: Today
 
     /// What Today's ribbon says (T02-T07), and when that may change on its own (a prompt fires or expires,
@@ -236,7 +277,10 @@ final class SurpriseCoordinator {
         // plans one seconds ahead, outside the hours and days.
         // Not when the person paused or turned surprises off: then nothing more comes, however soon it was due.
         let settled = stopsAll || schedule?.isEnabled != true ? now : now.addingTimeInterval(60)
-        let upcoming = prompts.filter { $0.outcome == .pending && $0.plannedAt > settled }
+        // The first surprise stays with "Maybe later" and notifications off too: onboarding shows it in the app.
+        let upcoming = prompts.filter {
+            $0.outcome == .pending && $0.plannedAt > settled && (stopsAll || !$0.notificationRequestID.hasPrefix(Self.firstPrefix))
+        }
 
         if let schedule, schedule.isEnabled, !schedule.isPausedIndefinitely, status.isUsable {
             let rules = schedule.rules
@@ -333,6 +377,13 @@ final class SurpriseCoordinator {
 
     private func fetchPrompt(_ id: UUID) -> SurprisePrompt? {
         var descriptor = FetchDescriptor<SurprisePrompt>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return fetch(descriptor).first
+    }
+
+    private func fetchFirstPrompt() -> SurprisePrompt? {
+        let prefix = Self.firstPrefix
+        var descriptor = FetchDescriptor<SurprisePrompt>(predicate: #Predicate { $0.notificationRequestID.starts(with: prefix) })
         descriptor.fetchLimit = 1
         return fetch(descriptor).first
     }

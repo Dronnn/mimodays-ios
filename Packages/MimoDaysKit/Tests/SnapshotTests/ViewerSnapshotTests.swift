@@ -128,6 +128,57 @@ struct ViewerSnapshotTests {
             .background(ColorToken.canvas.color)
     }
 
+    /// P8.11: a written moment, Sat, Nov 21, 2026, 2:37 PM in Yerevan.
+    private func saveText(body: String = Self.textBody) throws -> UUID {
+        var draft = TextMomentDraft(
+            capturedAt: CaptureTime(instant: Date(timeIntervalSince1970: 1_795_257_420), timeZone: TimeZone(identifier: "Asia/Yerevan")!),
+            caption: "Rain day", body: body
+        )
+        draft.place = ReviewPlace(label: "Yerevan, Armenia", latitude: 40.18, longitude: 44.51, precision: .city, source: .gps)
+        draft.tags = ["lena"]
+        draft.mood = .calm
+        return try MomentSaver(context: container.mainContext, store: store, clock: clock, freeBytes: { nil }).saveText(draft).id
+    }
+
+    private static let textBody = "Lena and I built a blanket fort and read three chapters with a flashlight. She fell asleep before the dragon came back. I stayed a little longer just to listen to the rain."
+
+    private func textPage(angle: Double, body: String = Self.textBody) async throws -> some View {
+        let id = try saveText(body: body)
+        let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await model.load(id)
+        let moment = try #require(model.moments[id])
+        return MemoryCardPage(model: model, moment: moment, isCurrent: false, screenWidth: 402, angle: angle, edit: {}, step: { _ in })
+            .frame(width: 359)
+            .padding(.top, 108)
+            .padding(.bottom, 84)
+            .frame(maxWidth: .infinity)
+            .background(ColorToken.canvas.color)
+    }
+
+    /// II04: the paper front.
+    @Test func memoryCardTextFront() async throws {
+        assertScreenSnapshots(of: try await textPage(angle: 0), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+            SnapshotVariant(.iPhone, .light, rightToLeft: true),
+        ])
+    }
+
+    /// II05: the whole text on the back, no picture and no window; the longest text scrolls.
+    @Test func memoryCardTextBack() async throws {
+        assertScreenSnapshots(of: try await textPage(angle: 180), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, rightToLeft: true),
+        ])
+        let longest = String(String(repeating: Self.textBody + " ", count: 3).prefix(500))
+        assertScreenSnapshots(of: try await textPage(angle: 180, body: longest), variants: [SnapshotVariant(.iPhone, .light)], testName: "memoryCardTextBackLongest")
+    }
+
+    /// Edit moment for a written moment: no picture, no voice note.
+    @Test func editText() async throws {
+        let id = try saveText()
+        let model = try #require(EditMomentModel(id: id, library: library, voice: .simulated, places: .simulated))
+        assertScreenSnapshots(of: EditMomentView(model: model), variants: [SnapshotVariant(.iPhone, .light)])
+    }
+
     /// A photo with nothing added: no caption, note, place or voice note.
     private func saveBare() async throws -> UUID {
         let engine = SimulatedCaptureEngine()

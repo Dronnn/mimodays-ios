@@ -40,6 +40,13 @@ struct TextMomentTests {
         #expect(!excerpt.dropLast().hasSuffix(" "))
     }
 
+    /// Share text: the caption over the words, nothing more.
+    @Test func sharedTextIsTheCaptionAndTheWords() {
+        #expect(TextMoment.shareText(title: "Rain day", body: "Blanket fort.\nThree chapters.") == "Rain day\n\nBlanket fort.\nThree chapters.")
+        #expect(TextMoment.shareText(title: nil, body: "Only words") == "Only words")
+        #expect(TextMoment.shareText(title: " ", body: "Words") == "Words")
+    }
+
     /// Body in the note, caption in the title, a manual moment with no media and nothing in the store.
     @Test func itSavesWithoutAnyFile() throws {
         var draft = draft("  We found the old bakery again.\n", caption: " Bakery ")

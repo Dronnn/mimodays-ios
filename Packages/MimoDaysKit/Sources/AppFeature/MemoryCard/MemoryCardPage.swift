@@ -117,15 +117,21 @@ struct MemoryCardPage: View {
     private func twoSided(_ card: CGSize) -> some View {
         let showsBack = flip.showsBack
         return ZStack {
-            MemoryCardFront(
-                pictures: MemoryCardFront.Pictures(
-                    main: model.image(moment.mainPath), selfie: model.image(moment.selfiePath),
-                    isVideo: moment.mediaType == .video, duration: moment.video?.timing.duration ?? 0
-                ),
-                playback: playback, size: card, window: window,
-                swapped: swapped, cornerOnRight: cornerOnRight, controlsShown: $controlsShown,
-                actions: cardActions
-            )
+            Group {
+                if moment.mediaType == .text {
+                    PaperCardFront(moment: moment, size: card, cornerOnRight: cornerOnRight, actions: cardActions)
+                } else {
+                    MemoryCardFront(
+                        pictures: MemoryCardFront.Pictures(
+                            main: model.image(moment.mainPath), selfie: model.image(moment.selfiePath),
+                            isVideo: moment.mediaType == .video, duration: moment.video?.timing.duration ?? 0
+                        ),
+                        playback: playback, size: card, window: window,
+                        swapped: swapped, cornerOnRight: cornerOnRight, controlsShown: $controlsShown,
+                        actions: cardActions
+                    )
+                }
+            }
             .modifier(CardFace(angle: reduceMotion ? (showsBack ? 180 : 0) : flip.angle, isBack: false))
             .allowsHitTesting(!showsBack)
             .accessibilityHidden(showsBack)
@@ -143,7 +149,7 @@ struct MemoryCardPage: View {
         .background {
             MemoryCardOutline()
                 .scale(x: showsBack && !reduceMotion ? -1 : 1)
-                .fill((showsBack ? ColorToken.surfaceCard : .mediaFrame).color)
+                .fill((showsBack || moment.mediaType == .text ? ColorToken.surfaceCard : .mediaFrame).color)
                 .shadow(color: Color(hex: 0x2A1B21).opacity(0.16), radius: 9, y: 6)
         }
         .modifier(CardTurn(angle: reduceMotion ? 0 : flip.angle, cornerOnRight: cornerOnRight))

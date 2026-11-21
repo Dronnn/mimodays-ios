@@ -31,6 +31,11 @@ enum TextMoment {
         !cleaned(draft.body, limit: bodyLimit).isEmpty
     }
 
+    /// Share text: the caption over the words, nothing else (no place, tags or mood).
+    static func shareText(title: String?, body: String?) -> String {
+        [title, body].compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }.joined(separator: "\n\n")
+    }
+
     /// The start of the body on one line, with "…" when there is more.
     static func excerpt(_ body: String, limit: Int = excerptLimit) -> String {
         let flat = body.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }.joined(separator: " ")

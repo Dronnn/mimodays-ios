@@ -40,8 +40,16 @@ struct MemoryCardBack: View {
                         .padding(.top, 10)
                         .accessibilityIdentifier("card.hiddenState")
                 }
+                if moment.mediaType == .text, let title = moment.title {
+                    // II05: the caption over the words.
+                    Text(title)
+                        .textStyle(.dayCaption)
+                        .foregroundStyle(ColorToken.textPrimary.color)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 26)
+                }
                 words
-                    .padding(.top, 26)
+                    .padding(.top, moment.mediaType == .text && moment.title != nil ? 18 : 26)
                 // CC06: the tags, then the mood, only when set.
                 if !moment.tags.isEmpty || moment.mood != nil {
                     ChipFlow {
@@ -59,15 +67,18 @@ struct MemoryCardBack: View {
                     .accessibilityElement(children: .combine)
                     .accessibilityIdentifier("card.tagsAndMood")
                 }
-                // U31: "+ Record a voice note" right under "+ Write a note".
-                voice
-                    .padding(.top, moment.voice == nil && !hasWords ? 0 : 20)
+                // U31: "+ Record a voice note" right under "+ Write a note". A written moment is words only (II05).
+                if moment.mediaType != .text {
+                    voice
+                        .padding(.top, moment.voice == nil && !hasWords ? 0 : 20)
+                }
                 if !moment.collections.isEmpty {
                     collections
                         .padding(.top, 18)
                 }
                 Spacer(minLength: 20)
-                livePreview
+                // No picture to show small, and no blank window (II05).
+                if moment.mediaType != .text { livePreview }
             }
             .padding(.horizontal, 26)
             .padding(.top, 30)
@@ -114,7 +125,7 @@ struct MemoryCardBack: View {
 
     /// The note; the caption only when there is no note (Andrew, 2026-11-16: U30 has one text, and a caption alone
     /// is never lost).
-    private var noteText: String? { moment.note ?? moment.title }
+    private var noteText: String? { moment.mediaType == .text ? moment.note : moment.note ?? moment.title }
 
     private var hasWords: Bool { noteText != nil }
 

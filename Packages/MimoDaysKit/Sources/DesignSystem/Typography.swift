@@ -135,6 +135,10 @@ public struct TextStyle: Equatable, Sendable {
     public static let dayTime = TextStyle(.body, size: 13, weight: 700, relativeTo: .footnote)
     /// A moment's caption on a day (M04).
     public static let dayCaption = TextStyle(.hand, size: 20, relativeTo: .body)
+    /// P8.11 II04: a written moment's words on the paper front.
+    public static let paperExcerpt = TextStyle(.hand, size: 24, lineHeight: 1.3, relativeTo: .title3)
+    /// P8.11 II06: a written moment's words on a tile.
+    public static let paperTile = TextStyle(.hand, size: 15, lineHeight: 1.2, relativeTo: .subheadline, maximumScale: 1.35)
     /// The place and the date line under a moment in the viewer (M05).
     public static let viewerPlace = TextStyle(.body, size: 14, weight: 700, relativeTo: .footnote)
     public static let viewerMeta = TextStyle(.body, size: 14, weight: 500, relativeTo: .footnote)

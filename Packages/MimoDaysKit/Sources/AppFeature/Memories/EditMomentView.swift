@@ -129,10 +129,10 @@ struct EditMomentView: View {
             Button(action: save) {
                 Text("Save", bundle: .module)
                     .textStyle(.editorDone)
-                    .foregroundStyle(ColorToken.textLink.color)
+                    .foregroundStyle(model.canSave ? ColorToken.textLink.color : ColorToken.textLink.color.opacity(0.4))
                     .frame(minHeight: Size.minimumTapTarget)
             }
-            .disabled(model.isSaving)
+            .disabled(model.isSaving || !model.canSave)
             .accessibilityIdentifier("edit.save")
         }
         .buttonStyle(.plain)
@@ -144,30 +144,35 @@ struct EditMomentView: View {
     /// The picture and when it was taken, which stay as they are.
     private var header: some View {
         HStack(alignment: .top, spacing: 18) {
-            NoteThumbnailBlob()
-                .fill(CameraPalette.thumbnailPlaceholder)
-                .overlay {
-                    if let thumbnail = model.thumbnail {
-                        Image(uiImage: thumbnail).filling().clipShape(NoteThumbnailBlob())
+            // P8.11: a written moment has no picture, only its time.
+            if model.mediaType != .text {
+                NoteThumbnailBlob()
+                    .fill(CameraPalette.thumbnailPlaceholder)
+                    .overlay {
+                        if let thumbnail = model.thumbnail {
+                            Image(uiImage: thumbnail).filling().clipShape(NoteThumbnailBlob())
+                        }
                     }
-                }
-                .frame(width: 94, height: 118)
-                .accessibilityHidden(true)
+                    .frame(width: 94, height: 118)
+                    .accessibilityHidden(true)
+            }
             VStack(alignment: .leading, spacing: 6) {
                 MomentViewer.time(model.captured, date: true)
                     .textStyle(.noteMeta)
                     .foregroundStyle(ColorToken.textBody.color)
-                Group {
-                    if model.mediaType == .video {
-                        Text("The video and its time can't be changed.", bundle: .module)
-                    } else {
-                        Text("The photo and its time can't be changed.", bundle: .module)
+                if model.mediaType != .text {
+                    Group {
+                        if model.mediaType == .video {
+                            Text("The video and its time can't be changed.", bundle: .module)
+                        } else {
+                            Text("The photo and its time can't be changed.", bundle: .module)
+                        }
                     }
+                    .textStyle(.rowCaption)
+                    .foregroundStyle(ColorToken.textTertiary.color)
                 }
-                .textStyle(.rowCaption)
-                .foregroundStyle(ColorToken.textTertiary.color)
             }
-            .padding(.top, 8)
+            .padding(.top, model.mediaType == .text ? 0 : 8)
             .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .combine)
@@ -192,8 +197,14 @@ struct EditMomentView: View {
 
     private var noteField: some View {
         TextField(text: $model.note, axis: .vertical) {
-            Text("Add a note", bundle: .module)
-                .foregroundStyle(ColorToken.textTertiary.color)
+            Group {
+                if model.mediaType == .text {
+                    Text("Write what you want to remember…", bundle: .module)
+                } else {
+                    Text("Add a note", bundle: .module)
+                }
+            }
+            .foregroundStyle(ColorToken.textTertiary.color)
         }
         .lineLimit(2...12)
         .textStyle(.noteBody)
@@ -211,17 +222,19 @@ struct EditMomentView: View {
 
     private var rows: some View {
         VStack(spacing: 0) {
-            row(icon: .glyphMic, title: Text("Voice note", bundle: .module), id: "edit.voice") {
-                if let voice = model.voice {
-                    // While it plays: the time left.
-                    let seconds = model.isPlayingVoice ? max(voice.duration - model.voiceTime, 0).rounded(.up) : voice.duration.rounded()
-                    Text(Duration.seconds(seconds), format: .time(pattern: .minuteSecond))
-                        .monospacedDigit()
-                } else {
-                    Text("Add", bundle: .module)
+            if model.mediaType != .text {
+                row(icon: .glyphMic, title: Text("Voice note", bundle: .module), id: "edit.voice") {
+                    if let voice = model.voice {
+                        // While it plays: the time left.
+                        let seconds = model.isPlayingVoice ? max(voice.duration - model.voiceTime, 0).rounded(.up) : voice.duration.rounded()
+                        Text(Duration.seconds(seconds), format: .time(pattern: .minuteSecond))
+                            .monospacedDigit()
+                    } else {
+                        Text("Add", bundle: .module)
+                    }
+                } action: {
+                    model.voice == nil ? recordVoice() : (choosesVoice = true)
                 }
-            } action: {
-                model.voice == nil ? recordVoice() : (choosesVoice = true)
             }
             row(icon: .glyphPin, title: Text("Place", bundle: .module), id: "edit.place") {
                 if let label = model.place?.label {

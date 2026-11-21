@@ -103,6 +103,11 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
             || tags != originalTags || mood != originalMood
     }
 
+    /// P8.11: a written moment keeps words in its body.
+    var canSave: Bool {
+        mediaType != .text || !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     func loadThumbnail() async {
         guard thumbnail == nil, let path = thumbnailPath, let url = try? library.store.url(for: path),
               let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: 400) else { return }
@@ -243,6 +248,7 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     /// save is already running or the changes were discarded while this one waited: nothing was written by it.
     func save() async throws {
         guard !isSaving, !isDiscarded else { throw CancellationError() }
+        guard canSave else { throw SaveError.failed }
         isSaving = true
         defer { isSaving = false }
         await transcription?.value

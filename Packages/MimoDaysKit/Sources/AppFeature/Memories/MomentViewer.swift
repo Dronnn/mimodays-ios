@@ -52,6 +52,8 @@ struct MomentViewer: View {
     @State private var collecting: CollectingMoment?
     /// E01, from Share.
     @State private var exporting: MomentExportModel?
+    /// P8.11: Share text, a written moment's words.
+    @State private var sharingText: SharedText?
     /// The status bar's height and the screen's width: the selfie window is laid out from them, as on the camera.
     @State private var screenWidth: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
@@ -112,6 +114,7 @@ struct MomentViewer: View {
             .onDisappear { model.setCollections(self.collecting?.selection ?? collecting.selection, for: collecting.id) }
         }
         .sheet(item: $exporting) { MomentExportSheet(model: $0) }
+        .sheet(item: $sharingText) { ShareSheet(items: [$0.text]).presentationDetents([.medium, .large]) }
         .alert(
             Text("Couldn't change what you see in memories", bundle: .module),
             isPresented: Binding(get: { model.failedVisibility != nil }, set: { if !$0 { model.dismissVisibilityFailure() } })
@@ -268,13 +271,20 @@ struct MomentViewer: View {
         let tint = ColorToken.textPrimary.color
         return HStack {
             // E01: as seen or as the camera's files, with what the moment has.
-            Button { exporting = MomentExportModel(ids: [moment.id], library: model.library, exactPlace: moviePreferences?.value.exactPlaceInFiles ?? false) } label: {
+            // P8.11: a written moment shares its words as plain text; no image is made.
+            Button {
+                if moment.mediaType == .text {
+                    sharingText = SharedText(text: TextMoment.shareText(title: moment.title, body: moment.note))
+                } else {
+                    exporting = MomentExportModel(ids: [moment.id], library: model.library, exactPlace: moviePreferences?.value.exactPlaceInFiles ?? false)
+                }
+            } label: {
                 Icon.glyphShare.image.resizable().frame(width: 24, height: 24).foregroundStyle(tint)
                     .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(Text("Share", bundle: .module))
+            .accessibilityLabel(moment.mediaType == .text ? Text("Share text", bundle: .module) : Text("Share", bundle: .module))
             .accessibilityIdentifier("viewer.share")
             .frame(maxWidth: .infinity)
             Button { model.toggleFavorite(moment.id) } label: {
@@ -424,6 +434,12 @@ struct VoicePill: View {
 struct CollectingMoment: Identifiable {
     let id: UUID
     var selection: Set<UUID>
+}
+
+/// P8.11: words for the share sheet.
+struct SharedText: Identifiable {
+    let id = UUID()
+    let text: String
 }
 
 /// The system share sheet for files. Its Save Image / Save Video would raise the Photos prompt without our

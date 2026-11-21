@@ -59808,6 +59808,144 @@
         }
       }
     },
+    "Hidden moments stay in your archive, Search and Map. They just don't come back in On this day or automatic movies." : {
+      "comment" : "Help & about › Hide from memories (P8.15): what hiding does",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden moments stay in your archive, Search and Map. They just don't come back in On this day or automatic movies."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تبقى اللحظات المخفية في أرشيفك وفي البحث والخريطة، لكنها لا تعود في في مثل هذا اليوم ولا في الأفلام التلقائية."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Схаваныя моманты застаюцца ў архіве, Пошуку і на Карце. Яны проста не вяртаюцца ў «У гэты дзень» і ў аўтаматычных фільмах."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeblendete Momente bleiben in deinem Archiv, in der Suche und auf der Karte. Sie kommen nur nicht mehr in An diesem Tag oder in automatischen Filmen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los momentos ocultos siguen en tu archivo, en Buscar y en Mapa. Solo dejan de aparecer en Un día como hoy y en las películas automáticas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les moments masqués restent dans vos archives, dans Rechercher et sur la Carte. Ils ne reviennent simplement plus dans Ce jour-là ni dans les films automatiques."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "רגעים מוסתרים נשארים בארכיון, בחיפוש ובמפה. הם פשוט לא חוזרים ב״ביום הזה״ ובסרטים האוטומטיים."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Թաքցված պահերը մնում են ձեր արխիվում, Որոնումում և Քարտեզում։ Պարզապես դրանք այլևս չեն հայտնվում «Այս օրը» բաժնում և ավտոմատ ֆիլմերում։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I momenti nascosti restano nel tuo archivio, in Cerca e nella Mappa. Semplicemente non tornano più in In questo giorno né nei film automatici."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隠したモーメントはアーカイブ、検索、地図に残ります。「この日の思い出」と自動ムービーに出てこなくなるだけです。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დამალული მომენტები რჩება თქვენს არქივში, ძიებასა და რუკაზე. უბრალოდ, ისინი აღარ ჩნდება „ამ დღეს“-ში და ავტომატურ ფილმებში."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жасырылған сәттер мұрағатта, Іздеуде және Картада қалады. Олар тек «Осы күні» бөлімінде және автоматты фильмдерде көрінбейді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "숨긴 순간은 보관함, 검색, 지도에 그대로 남아 있어요. 이날의 추억과 자동 영화에만 다시 나오지 않아요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verborgen momenten blijven in je archief, in Zoek en op de Kaart. Ze komen alleen niet meer terug in Op deze dag of in automatische films."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryte chwile zostają w archiwum, w Szukaj i na Mapie. Po prostu nie wracają w Tego dnia ani w automatycznych filmach."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os momentos ocultos continuam no seu arquivo, em Buscar e no Mapa. Eles só deixam de voltar em Neste dia e nos filmes automáticos."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрытые моменты остаются в архиве, Поиске и на Карте. Они просто не возвращаются в «В этот день» и в автоматических фильмах."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dolda ögonblick finns kvar i ditt arkiv, i Sök och på Kartan. De kommer bara inte tillbaka i Den här dagen eller i automatiska filmer."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gizlenen anlar arşivinde, Ara’da ve Harita’da kalır. Yalnızca Tarihte bugün’de ve otomatik filmlerde yeniden çıkmazlar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приховані моменти залишаються в архіві, Пошуку й на Мапі. Вони просто не повертаються в «Цього дня» та в автоматичних фільмах."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏的瞬间仍保留在你的存档、搜索和地图中，只是不会再出现在“历史上的今天”和自动影片里。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱藏的瞬間仍保留在你的封存、搜尋和地圖中，只是不會再出現在「那年今日」和自動影片裡。"
+          }
+        }
+      }
+    },
     "Hidden with this day" : {
       "comment" : "Memory Card back (P8.3): the moment is hidden because its whole day is",
       "extractionState" : "manual",
@@ -90140,6 +90278,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開啟「最近刪除」"
+          }
+        }
+      }
+    },
+    "Open a moment, tap •••, then Hide from memories." : {
+      "comment" : "Help & about › Hide from memories (P8.15): how to hide one moment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open a moment, tap •••, then Hide from memories."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح لحظة، واضغط •••، ثم إخفاء من الذكريات."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Адкрыйце момант, націсніце •••, потым Схаваць з успамінаў."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne einen Moment, tippe auf ••• und dann auf In Erinnerungen ausblenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre un momento, toca ••• y luego Ocultar en recuerdos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez un moment, touchez •••, puis Masquer des souvenirs."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "פתחו רגע, הקישו על ••• ואז על להסתיר מהזיכרונות."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Բացեք պահը, հպեք •••, ապա՝ Թաքցնել հիշողություններից։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri un momento, tocca ••• e poi Nascondi dai ricordi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モーメントを開いて•••をタップし、「思い出に表示しない」をタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "გახსენით მომენტი, შეეხეთ •••-ს, შემდეგ — მოგონებებიდან დამალვა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сәтті ашып, ••• түймесін, содан кейін Естеліктерден жасыру түймесін басыңыз."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "순간을 열고 •••을 탭한 다음 추억에서 숨기기를 탭하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open een moment, tik op ••• en dan op Verbergen in herinneringen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz chwilę, stuknij ••• i wybierz Ukryj we wspomnieniach."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abra um momento, toque em ••• e depois em Ocultar das memórias."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Откройте момент, нажмите •••, затем Скрыть из воспоминаний."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppna ett ögonblick, tryck på ••• och sedan på Dölj i minnen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir anı aç, ••• simgesine, sonra Anılardan gizle’ye dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрийте момент, натисніть •••, потім Приховати зі спогадів."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开一个瞬间，轻点 •••，然后轻点“从回忆中隐藏”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開一個瞬間，點一下 •••，然後點一下「從回憶中隱藏」。"
           }
         }
       }
@@ -128141,6 +128417,144 @@
         }
       }
     },
+    "The same surprise comes back once, later today, inside your surprise hours." : {
+      "comment" : "Help & about › Remind me later (P8.15): what happens",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The same surprise comes back once, later today, inside your surprise hours."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعود المفاجأة نفسها مرة واحدة، في وقت لاحق اليوم، ضمن ساعات مفاجآتك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Той самы сюрпрыз вернецца адзін раз, пазней сёння, у межах вашых гадзін сюрпрызаў."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieselbe Überraschung kommt einmal wieder, später am Tag, innerhalb deiner Überraschungszeiten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La misma sorpresa vuelve una vez, más tarde hoy, dentro de tu horario de sorpresas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La même surprise revient une fois, plus tard dans la journée, dans vos heures de surprises."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אותה הפתעה חוזרת פעם אחת, מאוחר יותר היום, בתוך שעות ההפתעות שלכם."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Նույն անակնկալը կվերադառնա մեկ անգամ՝ այսօր ավելի ուշ, ձեր անակնկալների ժամերի սահմաններում։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La stessa sorpresa torna una volta, più tardi oggi, entro le tue ore delle sorprese."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同じサプライズが今日のうちにもう一度だけ、サプライズの時間帯の中で届きます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "იგივე სიურპრიზი ერთხელ დაბრუნდება, დღესვე მოგვიანებით, თქვენი სიურპრიზების საათებში."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сол тосынсый бүгін кейінірек, тосынсый уақытының ішінде бір рет қайта келеді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "같은 서프라이즈가 오늘 서프라이즈 시간 안에서 나중에 한 번 다시 와요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dezelfde verrassing komt één keer terug, later vandaag, binnen je verrassingsuren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta sama niespodzianka wróci raz, później dzisiaj, w godzinach niespodzianek."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A mesma surpresa volta uma vez, mais tarde hoje, dentro do seu horário de surpresas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тот же сюрприз вернётся один раз, позже сегодня, в пределах ваших часов сюрпризов."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Samma överraskning kommer tillbaka en gång, senare i dag, inom dina överraskningstider."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aynı sürpriz bugün daha sonra, sürpriz saatlerin içinde bir kez geri gelir."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Той самий сюрприз повернеться один раз, пізніше сьогодні, у межах ваших годин сюрпризів."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同一个惊喜会在今天稍后、你的惊喜时段内再来一次。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同一個驚喜會在今天稍後、你的驚喜時段內再來一次。"
+          }
+        }
+      }
+    },
     "The selfie window" : {
       "comment" : "Help & about (S07): help page title",
       "extractionState" : "manual",
@@ -140281,6 +140695,144 @@
         }
       }
     },
+    "To hide a whole day, open the day, tap •••, then Hide this day from memories." : {
+      "comment" : "Help & about › Hide from memories (P8.15): how to hide a day",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To hide a whole day, open the day, tap •••, then Hide this day from memories."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لإخفاء يوم كامل، افتح اليوم، واضغط •••، ثم إخفاء هذا اليوم من الذكريات."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каб схаваць увесь дзень, адкрыйце дзень, націсніце •••, потым Схаваць гэты дзень з успамінаў."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um einen ganzen Tag auszublenden, öffne den Tag, tippe auf ••• und dann auf Diesen Tag in Erinnerungen ausblenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para ocultar un día entero, abre el día, toca ••• y luego Ocultar este día en recuerdos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour masquer une journée entière, ouvrez le jour, touchez •••, puis Masquer ce jour des souvenirs."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כדי להסתיר יום שלם, פתחו את היום, הקישו על ••• ואז על להסתיר את היום הזה מהזיכרונות."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ամբողջ օրը թաքցնելու համար բացեք օրը, հպեք •••, ապա՝ Թաքցնել այս օրը հիշողություններից։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per nascondere un giorno intero, apri il giorno, tocca ••• e poi Nascondi questo giorno dai ricordi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1日まるごと隠すには、その日を開いて•••をタップし、「この日を思い出に表示しない」をタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მთელი დღის დასამალად გახსენით დღე, შეეხეთ •••-ს, შემდეგ — ამ დღის მოგონებებიდან დამალვა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бүкіл күнді жасыру үшін күнді ашып, ••• түймесін, содан кейін Бұл күнді естеліктерден жасыру түймесін басыңыз."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "하루 전체를 숨기려면 그 날을 열고 •••을 탭한 다음 이 날을 추억에서 숨기기를 탭하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om een hele dag te verbergen, open je de dag, tik je op ••• en dan op Deze dag verbergen in herinneringen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby ukryć cały dzień, otwórz go, stuknij ••• i wybierz Ukryj ten dzień we wspomnieniach."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para ocultar um dia inteiro, abra o dia, toque em ••• e depois em Ocultar este dia das memórias."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы скрыть весь день, откройте день, нажмите •••, затем Скрыть этот день из воспоминаний."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om du vill dölja en hel dag öppnar du dagen, trycker på ••• och sedan på Dölj den här dagen i minnen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bütün bir günü gizlemek için günü aç, ••• simgesine, sonra Bu günü anılardan gizle’ye dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Щоб приховати весь день, відкрийте день, натисніть •••, потім Приховати цей день зі спогадів."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要隐藏一整天，请打开这一天，轻点 •••，然后轻点“从回忆中隐藏这一天”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要隱藏一整天，請打開這一天，點一下 •••，然後點一下「從回憶中隱藏這一天」。"
+          }
+        }
+      }
+    },
     "To record voice notes, allow microphone access in iOS Settings. You can still write a note." : {
       "comment" : "Microphone off screen: message under the title",
       "extractionState" : "manual",
@@ -140415,6 +140967,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "若要錄製語音筆記，請在 iOS「設定」中允許取用麥克風。仍然可以寫下文字筆記。"
+          }
+        }
+      }
+    },
+    "To show them again, use the same menu." : {
+      "comment" : "Help & about › Hide from memories (P8.15): how to undo it",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To show them again, use the same menu."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لإظهارها مرة أخرى، استخدم القائمة نفسها."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каб зноў паказаць іх, скарыстайцеся тым самым меню."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um sie wieder zu zeigen, nutze dasselbe Menü."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para volver a mostrarlos, usa el mismo menú."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour les afficher à nouveau, utilisez le même menu."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כדי להציג אותם שוב, השתמשו באותו תפריט."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Դրանք կրկին ցույց տալու համար օգտագործեք նույն ընտրացանկը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per mostrarli di nuovo, usa lo stesso menu."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もう一度表示するには、同じメニューを使います。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მათ კვლავ საჩვენებლად იგივე მენიუ გამოიყენეთ."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оларды қайта көрсету үшін сол мәзірді пайдаланыңыз."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 보이게 하려면 같은 메뉴를 사용하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gebruik hetzelfde menu om ze weer te tonen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby znów je pokazać, użyj tego samego menu."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para mostrá-los de novo, use o mesmo menu."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы снова показать их, воспользуйтесь тем же меню."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Använd samma meny för att visa dem igen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeniden göstermek için aynı menüyü kullan."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Щоб знову показати їх, скористайтеся тим самим меню."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要重新显示，请使用同一个菜单。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要重新顯示，請使用同一個選單。"
           }
         }
       }
@@ -151916,6 +152606,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天無論是什麼模樣，都值得記錄。"
+          }
+        }
+      }
+    },
+    "When a surprise arrives at a bad time, touch and hold its notification, then tap Remind me later." : {
+      "comment" : "Help & about › Remind me later (P8.15): where the action is",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When a surprise arrives at a bad time, touch and hold its notification, then tap Remind me later."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذا وصلت مفاجأة في وقت غير مناسب، المس إشعارها مطولًا، ثم اضغط ذكّرني لاحقًا."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Калі сюрпрыз прыйшоў не ў час, націсніце і ўтрымлівайце яго апавяшчэнне, потым націсніце Нагадаць пазней."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommt eine Überraschung ungelegen, lege den Finger auf ihre Mitteilung und tippe auf Später erinnern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si una sorpresa llega en mal momento, mantén pulsada su notificación y toca Recordármelo más tarde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si une surprise arrive au mauvais moment, touchez sa notification de manière prolongée, puis Me le rappeler plus tard."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אם הפתעה מגיעה בזמן לא נוח, געו בהתראה שלה והחזיקו, ואז הקישו על להזכיר לי מאוחר יותר."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Եթե անակնկալը եկել է անհարմար պահին, հպեք և պահեք դրա ծանուցումը, ապա հպեք Հիշեցնել ավելի ուշ։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se una sorpresa arriva nel momento sbagliato, tieni premuta la sua notifica e tocca Ricordamelo più tardi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サプライズが都合の悪いときに届いたら、通知を長押しして「あとで通知」をタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "თუ სიურპრიზი მოუხერხებელ დროს მოვიდა, შეეხეთ და გეჭიროთ მის შეტყობინებაზე, შემდეგ — მოგვიანებით შემახსენე."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тосынсый ыңғайсыз уақытта келсе, оның хабарландыруын басып тұрыңыз да, Кейінірек еске салу түймесін басыңыз."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서프라이즈가 곤란한 때에 오면 알림을 길게 누른 다음 나중에 알림을 탭하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Komt een verrassing op een slecht moment, houd dan de melding ingedrukt en tik op Herinner me later."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli niespodzianka przyjdzie w złym momencie, przytrzymaj jej powiadomienie i stuknij Przypomnij później."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se uma surpresa chegar numa hora ruim, toque e segure a notificação e depois toque em Lembrar mais tarde."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если сюрприз пришёл не вовремя, нажмите и удерживайте его уведомление, затем нажмите Напомнить позже."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om en överraskning kommer vid fel tillfälle trycker du länge på notisen och sedan på Påminn mig senare."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir sürpriz uygunsuz bir anda gelirse bildirimine dokunup basılı tut, sonra Daha sonra hatırlat’a dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Якщо сюрприз прийшов не вчасно, натисніть і утримуйте його сповіщення, потім натисніть Нагадати пізніше."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果惊喜来得不是时候，请按住它的通知，然后轻点“稍后提醒我”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果驚喜來得不是時候，請按住它的通知，然後點一下「稍後提醒我」。"
           }
         }
       }

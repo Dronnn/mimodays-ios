@@ -27,7 +27,7 @@ struct SearchFiltersSheet: View {
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .accessibilityAddTraits(.isHeader)
                     .padding(.horizontal, 4)
-                SegmentedControl(selection: $model.filters.kind, options: [.all, .photos, .videos]) { kind in
+                SegmentedControl(selection: $model.filters.kind, options: [.all, .photos, .videos, .text]) { kind in
                     switch kind {
                     case .all: Text("All", bundle: .module)
                     case .photos: Text("Photos", bundle: .module)
@@ -81,7 +81,9 @@ struct SearchFiltersSheet: View {
                 Text("Reset", bundle: .module)
             }
             .buttonStyle(SoftButtonStyle())
-            .frame(maxWidth: 120)
+            // 120 pt as drawn; a longer word or larger text widens it instead of breaking the word.
+            .frame(minWidth: 120)
+            .fixedSize(horizontal: true, vertical: false)
             .disabled(model.filters == SearchFilters(place: model.filters.place))
             .accessibilityIdentifier("filters.reset")
             Button { dismiss() } label: {

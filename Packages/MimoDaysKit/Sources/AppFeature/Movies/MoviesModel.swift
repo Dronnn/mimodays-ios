@@ -150,7 +150,7 @@ final class MoviesModel {
             let main = moment.media.first { $0.role == .rearSource || $0.role == .frontSource }
             return OneSecondPerDay.Candidate(
                 id: moment.id, capturedAt: moment.capturedAt, day: moment.localDay, isSurprise: moment.origin == .randomPrompt,
-                isPlayable: main.map { store.fileExists($0.relativePath) } ?? false
+                isPlayable: moment.mediaType == .text ? !(moment.note ?? "").isEmpty : main.map { store.fileExists($0.relativePath) } ?? false
             )
         })
     }

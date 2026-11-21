@@ -11,6 +11,8 @@ public enum MomentOrigin: String, Codable, CaseIterable, Sendable {
 public enum MediaType: String, Codable, CaseIterable, Sendable {
     case photo
     case video
+    /// P8.11: words only, the body in `note` and the caption in `title`; no media. Needs backup version 2.
+    case text
 }
 
 public enum MomentStatus: String, Codable, CaseIterable, Sendable {

@@ -273,6 +273,27 @@ struct BackupTests {
         #expect(records(empty) == records(phone))
     }
 
+    /// P8.11: a written moment comes back with its words and no files; the backup is version 2. Without words it's no moment.
+    @Test func aWrittenMomentComesBack() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let saver = MomentSaver(context: phone.context, store: phone.store, clock: clock, freeBytes: { nil })
+        let written = try saver.saveText(TextMomentDraft(capturedAt: CaptureTime(instant: clock.now().addingTimeInterval(10 * 86_400), timeZone: .gmt), caption: "Rain", body: "Rain all day"))
+        let (url, document) = try backUp(phone)
+        #expect(document.formatVersion == 2)
+        let record = try #require(document.moments.first { $0.id == written.id })
+        #expect(record.hasContent && record.paths.isEmpty)
+        var blank = record
+        blank.note = "  "
+        #expect(!blank.hasContent)
+
+        let empty = try library()
+        _ = try restore(url, into: empty)
+        let back = try #require(try empty.context.fetch(FetchDescriptor<Moment>()).first { $0.id == written.id })
+        #expect(back.mediaType == .text && back.note == "Rain all day" && back.title == "Rain" && back.media.isEmpty)
+        #expect(records(empty) == records(phone))
+    }
+
     /// Adding brings a hidden day only for a day new to this iPhone; replacing brings back every one as backed up.
     @Test func addingKeepsThisIPhonesChoiceForItsOwnDays() async throws {
         let phone = try library()

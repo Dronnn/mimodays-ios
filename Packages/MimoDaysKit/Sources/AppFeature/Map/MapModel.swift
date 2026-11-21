@@ -193,6 +193,7 @@ final class MapModel {
         case .all: break
         case .photos: guard moment.item.mediaType == .photo else { return false }
         case .videos: guard moment.item.mediaType == .video else { return false }
+        case .text: guard moment.item.mediaType == .text else { return false }
         }
         if let from = filters.from, moment.item.localDay < from { return false }
         if let to = filters.to, moment.item.localDay > to { return false }

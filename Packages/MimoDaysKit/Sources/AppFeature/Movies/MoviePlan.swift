@@ -121,6 +121,17 @@ struct MoviePlan: Sendable, Equatable {
     @MainActor
     private static func clip(_ clip: MovieClip, _ moment: Moment, showsDates: Bool, showsPlaces: Bool, store: MediaStore) -> Clip? {
         let summary = MomentSummary(moment)
+        let caption = captionLine(summary, showsDates: showsDates, showsPlaces: showsPlaces)
+        // P8.11: a written moment is a paper card with the start of its words, timed like a photo.
+        if moment.mediaType == .text {
+            return Clip(
+                momentID: moment.id, media: .card(text: TextMoment.excerpt(moment.note ?? ""), look: .paper), mainURL: nil, selfieURL: nil,
+                window: nil, placement: nil, layout: nil,
+                duration: min(max(clip.trimEnd ?? MovieSelection.photoSeconds, MoviePlan.shortestPhoto), MoviePlan.longestPhoto),
+                transition: clip.transition, atmosphere: clip.atmosphere, caption: caption,
+                voiceURL: clip.includesVoiceNote ? moment.voiceNotes.first.flatMap { try? store.url(for: $0.relativePath) } : nil, soundOn: false
+            )
+        }
         guard var mainPath = summary.mainPath, var mainURL = try? store.url(for: mainPath) else { return nil }
         var selfieURL = summary.selfiePath.flatMap { try? store.url(for: $0) }
         // P8.6: a Live Photo plays its motion, on its own; the still when the motion is gone.
@@ -147,18 +158,13 @@ struct MoviePlan: Sendable, Equatable {
             // A photo's trim is how long it shows (F06's Trim).
             duration = min(max(clip.trimEnd ?? MovieSelection.photoSeconds, MoviePlan.shortestPhoto), MoviePlan.longestPhoto)
         }
-        var parts: [String] = []
-        if showsDates, let zone = TimeZone(identifier: summary.captured.timeZoneID) {
-            parts.append(summary.captured.instant.formatted(Date.FormatStyle(timeZone: zone).weekday(.abbreviated).month(.abbreviated).day().locale(AppLanguage.shared.locale)))
-        }
-        if showsPlaces, let place = summary.place { parts.append(place) }
         let voice = clip.includesVoiceNote ? moment.voiceNotes.first.flatMap { try? store.url(for: $0.relativePath) } : nil
         return Clip(
             momentID: moment.id, media: media, mainURL: mainURL, selfieURL: selfieURL,
             window: selfieURL == nil ? nil : clip.pipFrame ?? moment.pipLayout, placement: clip.selfiePlacement,
             // H.8: a moment kept in halves stays in halves until the clip picks otherwise.
             layout: selfieURL == nil ? nil : clip.cameraLayout ?? (summary.isHalves ? .sideBySide : nil), duration: duration, transition: clip.transition,
-            atmosphere: clip.atmosphere, caption: parts.isEmpty ? nil : parts.joined(separator: " · "),
+            atmosphere: clip.atmosphere, caption: caption,
             voiceURL: voice, soundOn: clip.clipAudio != .muted, volume: clip.clipVolume,
             pictureSize: moment.media.first { $0.relativePath == mainPath }.map { media in
                 // Photos keep their EXIF turn: 5-8 lie on their side.
@@ -166,6 +172,17 @@ struct MoviePlan: Sendable, Equatable {
                     ? CGSize(width: media.pixelHeight, height: media.pixelWidth) : CGSize(width: media.pixelWidth, height: media.pixelHeight)
             }
         )
+    }
+
+    /// The date and place line under a clip, as the movie's options say.
+    @MainActor
+    private static func captionLine(_ summary: MomentSummary, showsDates: Bool, showsPlaces: Bool) -> String? {
+        var parts: [String] = []
+        if showsDates, let zone = TimeZone(identifier: summary.captured.timeZoneID) {
+            parts.append(summary.captured.instant.formatted(Date.FormatStyle(timeZone: zone).weekday(.abbreviated).month(.abbreviated).day().locale(AppLanguage.shared.locale)))
+        }
+        if showsPlaces, let place = summary.place { parts.append(place) }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     /// U51: the card for as long as it's set to show, with the voice comment picked for it.

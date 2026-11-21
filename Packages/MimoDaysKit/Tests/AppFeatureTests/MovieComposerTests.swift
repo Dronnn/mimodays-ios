@@ -133,6 +133,22 @@ struct MovieComposerTests {
         #expect(MoviePlan(project, store: store).clips.map(\.momentID) == Array(ids.dropFirst()))
     }
 
+    /// P8.11: a written moment plays as a paper card with the start of its words and the date line.
+    @Test func aWrittenMomentIsAPaperCard() async throws {
+        let ids = try await save(1)
+        let saver = MomentSaver(context: context, store: store, clock: TestDateProvider(), freeBytes: { nil })
+        let written = try saver.saveText(TextMomentDraft(capturedAt: CaptureTime(instant: now, timeZone: .gmt), body: "Rain all day\nand tea"))
+        let project = try project(ids + [written.id])
+        project.showsPlaces = false
+        let plan = MoviePlan(project, store: store)
+        let card = try #require(plan.clips.last)
+        #expect(card.momentID == written.id)
+        #expect(card.media == .card(text: "Rain all day and tea", look: .paper))
+        #expect(card.caption == "Wed, Nov 11" && card.duration == MovieSelection.photoSeconds && !card.soundOn)
+        let composed = try await MovieComposer.compose(plan, renderSize: portrait)
+        #expect(abs(composed.asset.duration.seconds - plan.duration) < 0.01)
+    }
+
     /// P8.6: a Live Photo plays its motion, without a window; with the motion gone, its still.
     @Test func aLivePhotoPlaysItsMotion() async throws {
         let engine = SimulatedCaptureEngine()

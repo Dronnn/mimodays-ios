@@ -29,6 +29,7 @@ struct SearchFiltersSheet: View {
                     case .all: Text("All", bundle: .module)
                     case .photos: Text("Photos", bundle: .module)
                     case .videos: Text("Videos", bundle: .module)
+                    case .text: Text("Text", bundle: .module)
                     }
                 }
                 .padding(.top, 16)

@@ -125,7 +125,7 @@ struct BackupService {
             return record.members.contains { !members.contains($0.momentID) && here.contains($0.momentID) }
         }
         // A record with no picture is no moment: it isn't counted, so Add doesn't offer it.
-        let moments = document.moments.filter(\.hasPicture)
+        let moments = document.moments.filter(\.hasContent)
         return Summary(
             createdAt: document.createdAt, moments: moments.count, collections: document.collections.count,
             projects: document.movies.count, alreadyHere: moments.count { here.contains($0.id) }, isClean: check.damaged.isEmpty,
@@ -137,7 +137,7 @@ struct BackupService {
     func files(for check: BackupArchive.Check, mode: Mode) -> Set<String> {
         let here = mode == .addMissing ? existingMomentIDs() : []
         let projectsHere = mode == .addMissing ? existingProjectIDs() : []
-        let moments = check.document.moments.filter { $0.hasPicture && !here.contains($0.id) }.flatMap(\.paths)
+        let moments = check.document.moments.filter { $0.hasContent && !here.contains($0.id) }.flatMap(\.paths)
         let projects = check.document.movies.filter { !projectsHere.contains($0.id) }.flatMap(\.paths)
         return Set(moments + projects).subtracting(check.damaged)
     }
@@ -167,7 +167,7 @@ struct BackupService {
         // iPhone's than none.
         let here = replacing
             ? existingMomentIDs().intersection(
-                document.moments.filter { !$0.hasPicture || $0.paths.contains(where: check.damaged.contains) }.map(\.id)
+                document.moments.filter { !$0.hasContent || $0.paths.contains(where: check.damaged.contains) }.map(\.id)
             )
             : existingMomentIDs()
         let projectsHere = replacing ? [] : existingProjectIDs()
@@ -201,7 +201,7 @@ struct BackupService {
         // Files first: nothing in the library changes until every file that should come in is here, so a
         // replacement that can't bring one in leaves the library untouched (no records to roll back).
         // A moment comes in whole or not at all: none of its files move unless all of them were unpacked.
-        for record in document.moments where record.hasPicture && !here.contains(record.id) && !record.paths.contains(where: check.damaged.contains) {
+        for record in document.moments where record.hasContent && !here.contains(record.id) && !record.paths.contains(where: check.damaged.contains) {
             if record.paths.allSatisfy({ unpacked[$0] != nil }) {
                 for path in record.paths { _ = move(path) }
             } else {
@@ -239,7 +239,7 @@ struct BackupService {
         var skipped: [Date] = []
         var moments: [UUID: Moment] = [:]
         // A record with no picture is no moment: not counted, not brought in.
-        for record in document.moments where record.hasPicture && !here.contains(record.id) {
+        for record in document.moments where record.hasContent && !here.contains(record.id) {
             wanted += 1
             let damaged = record.paths.filter { check.damaged.contains($0) }
             damagedFiles += damaged.count
@@ -350,7 +350,7 @@ struct BackupService {
         context.insert(manifest)
         try? context.save()
         return Outcome(
-            restored: restored, wanted: wanted, damagedFiles: damagedFiles, alreadyHere: document.moments.count(where: \.hasPicture) - wanted, skipped: skipped.sorted()
+            restored: restored, wanted: wanted, damagedFiles: damagedFiles, alreadyHere: document.moments.count(where: \.hasContent) - wanted, skipped: skipped.sorted()
         )
     }
 

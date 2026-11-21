@@ -36,6 +36,7 @@ struct BackupDocument: Codable, Equatable {
             || moments.contains { $0.isHiddenFromMemories == true || $0.repeatOf != nil || $0.mood != nil }
             || movies.contains { $0.sourceRule.kind == .oneSecondPerDay }
             || moments.contains { $0.media.contains { $0.role == MediaRole.livePhotoMotion.rawValue } }
+            || moments.contains { $0.mediaType == MediaType.text.rawValue }
         return usesNewFields ? Self.currentVersion : Self.firstVersion
     }
 
@@ -72,10 +73,11 @@ struct BackupDocument: Codable, Equatable {
 
         /// Every file the moment needs.
         var paths: [String] { media.map(\.path) + voiceNotes.map(\.path) }
-        /// Something to show: at least one camera file. A record without one (a damaged or hand-made manifest) is no
-        /// moment to restore.
-        var hasPicture: Bool {
-            media.contains { $0.role == MediaRole.rearSource.rawValue || $0.role == MediaRole.frontSource.rawValue }
+        /// Something to show: at least one camera file, or a written moment's words (P8.11). A record without either
+        /// (a damaged or hand-made manifest) is no moment to restore.
+        var hasContent: Bool {
+            if mediaType == MediaType.text.rawValue { return !(note ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            return media.contains { $0.role == MediaRole.rearSource.rawValue || $0.role == MediaRole.frontSource.rawValue }
         }
 
         /// Without the files that are gone from this iPhone, so a restore brings back the rest of the moment

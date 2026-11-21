@@ -63,6 +63,7 @@ struct MapFiltersSheet: View {
                     case .all: Text("Photos & videos", bundle: .module)
                     case .photos: Text("Photos", bundle: .module)
                     case .videos: Text("Videos", bundle: .module)
+                    case .text: Text("Text", bundle: .module)
                     }
                 }
                 .padding(.top, 20)

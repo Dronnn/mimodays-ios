@@ -12,6 +12,8 @@ struct SearchFilters: Equatable {
         case all
         case photos
         case videos
+        /// P8.11: written moments.
+        case text
     }
 
     var kind = Kind.all
@@ -222,6 +224,7 @@ final class SearchModel {
         case .all: break
         case .photos: if entry.item.mediaType != .photo { return false }
         case .videos: if entry.item.mediaType != .video { return false }
+        case .text: if entry.item.mediaType != .text { return false }
         }
         if let from = filters.from, entry.item.localDay < from { return false }
         if let to = filters.to, entry.item.localDay > to { return false }

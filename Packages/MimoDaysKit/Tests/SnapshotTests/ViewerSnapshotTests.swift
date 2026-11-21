@@ -161,6 +161,30 @@ struct ViewerSnapshotTests {
         ])
     }
 
+    /// P8.3 (BB02): the back says the moment is hidden from memories, or hidden with its day.
+    @Test func backHidden() async throws {
+        let id = try await save(video: false)
+        let context = container.mainContext
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first)
+        try MemoryVisibility.setHidden(true, moment, in: context)
+        assertScreenSnapshots(of: try await hiddenPage(id), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)])
+        try MemoryVisibility.setHidden(false, moment, in: context)
+        try MemoryVisibility.setDayHidden(true, moment.localDay, in: context)
+        assertScreenSnapshots(of: try await hiddenPage(id), variants: [SnapshotVariant(.iPhone, .light)], testName: "backHiddenWithItsDay")
+    }
+
+    private func hiddenPage(_ id: UUID) async throws -> some View {
+        let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await model.load(id)
+        let moment = try #require(model.moments[id])
+        return MemoryCardPage(model: model, moment: moment, isCurrent: false, screenWidth: 402, angle: 180, edit: {}, step: { _ in })
+            .frame(width: 359)
+            .padding(.top, 108)
+            .padding(.bottom, 84)
+            .frame(maxWidth: .infinity)
+            .background(ColorToken.canvas.color)
+    }
+
     /// U31: the back with only the basics, "+" links to add the rest.
     @Test func backBasics() async throws {
         assertScreenSnapshots(of: try await page(video: false, angle: 180, bare: true), variants: [SnapshotVariant(.iPhone, .light)])

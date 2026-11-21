@@ -147,6 +147,19 @@ struct MemoriesSnapshotTests {
         )
     }
 
+    /// P8.3 (BB05): the day stays in the archive and says it's hidden from memories.
+    @Test func dayHidden() async throws {
+        _ = try await save(at: Self.date(2026, 11, 11, 8, 5), place: "Yerevan", caption: "Breakfast chaos, as usual")
+        _ = try await save(at: Self.date(2026, 11, 11, 18, 42), place: "Yerevan")
+        let model = await memories().dayModel(20261111)
+        model.setHidden(true)
+        await model.refresh()
+        assertScreenSnapshots(
+            of: NavigationStack { DayView(model: model, thisYear: 2026) }.environment(AppRouter()),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
+        )
+    }
+
     /// M10: every favourite, newest first. Only one in `populate()`, so a few more get a heart.
     @Test func favorites() async throws {
         try await populate()

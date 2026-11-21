@@ -80,6 +80,9 @@ struct ViewerMoment: Equatable, Identifiable {
     var title: String?
     var note: String?
     var isFavorite: Bool
+    /// P8.3: hidden from memories on its own, and hidden because its whole day is.
+    var isHidden: Bool
+    var isHiddenWithDay = false
     var mainPath: String?
     var selfiePath: String?
     /// The single picture made for sharing (photos).
@@ -111,6 +114,7 @@ struct ViewerMoment: Equatable, Identifiable {
         title = moment.title
         note = moment.note.flatMap { $0.isEmpty ? nil : $0 }
         isFavorite = moment.isFavorite
+        isHidden = moment.isHiddenFromMemories
         mainPath = summary.mainPath
         selfiePath = summary.selfiePath
         composedPath = moment.media.first { $0.role == .composedPreview }?.relativePath
@@ -192,7 +196,8 @@ final class MomentViewerModel {
             moments[id] = nil
             return
         }
-        let viewed = ViewerMoment(moment)
+        var viewed = ViewerMoment(moment)
+        viewed.isHiddenWithDay = MemoryVisibility(context: library.context).isDayHidden(moment.localDay)
         moments[id] = viewed
         // The selfie as big as the main picture: swapped, it fills the card (U23).
         for (path, size) in [(viewed.mainPath, Self.photoPixels), (viewed.selfiePath, Self.photoPixels)] {
@@ -221,6 +226,32 @@ final class MomentViewerModel {
         } catch {
             logger.error("Saving the favourite failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    /// P8.3: a hide or show that couldn't be saved, for "Try again".
+    private(set) var failedVisibility: (id: UUID, hidden: Bool)?
+
+    /// Hide from memories, or Show in memories: at once, no question (BB01).
+    func setHidden(_ hidden: Bool, _ id: UUID) {
+        guard let moment = fetch(id) else { return }
+        failedVisibility = nil
+        do {
+            try MemoryVisibility.setHidden(hidden, moment, in: library.context)
+            moments[id]?.isHidden = hidden
+        } catch {
+            library.context.rollback()
+            failedVisibility = (id, hidden)
+            logger.error("Hiding the moment failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func retryVisibility() {
+        guard let failed = failedVisibility else { return }
+        setHidden(failed.hidden, failed.id)
+    }
+
+    func dismissVisibilityFailure() {
+        failedVisibility = nil
     }
 
     /// Movie drafts that use the moment (M15's note).

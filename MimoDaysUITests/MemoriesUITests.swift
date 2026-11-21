@@ -338,6 +338,41 @@ final class MemoriesUITests: XCTestCase {
         XCTAssertTrue(app.buttons["viewer.favorite"].waitForExistence(timeout: 10))
     }
 
+    /// P8.3 (BB01, BB03-BB05): a moment is hidden from its card's •••, at once; a day from its own •••, after a
+    /// question; each then says so and offers to show it again.
+    @MainActor
+    func testHidingAMomentAndADayFromMemories() {
+        launch(.populated)
+        let tile = app.descendants(matching: .any).matching(identifier: "memories.tile").firstMatch
+        XCTAssertTrue(tile.waitForExistence(timeout: 20))
+        tile.tap()
+        let more = app.buttons["viewer.more"]
+        XCTAssertTrue(more.waitForExistence(timeout: 10))
+        more.tap()
+        let hide = app.buttons["viewer.hideFromMemories"]
+        XCTAssertTrue(hide.waitForExistence(timeout: 5))
+        XCTAssertEqual(hide.label, "Hide from memories")
+        hide.tap()
+        more.tap()
+        XCTAssertTrue(hide.waitForExistence(timeout: 5))
+        XCTAssertEqual(hide.label, "Show in memories")
+        app.buttons["Show the whole day"].tap()
+
+        let options = app.buttons["day.options"]
+        XCTAssertTrue(options.waitForExistence(timeout: 10))
+        options.tap()
+        let hideDay = app.buttons["day.hideFromMemories"]
+        XCTAssertTrue(hideDay.waitForExistence(timeout: 5))
+        hideDay.tap()
+        let confirm = app.alerts.buttons["Hide day"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        confirm.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["day.hiddenState"].waitForExistence(timeout: 5))
+        options.tap()
+        XCTAssertTrue(hideDay.waitForExistence(timeout: 5))
+        XCTAssertEqual(hideDay.label, "Show this day in memories")
+    }
+
     /// Flow 03 (doc 02): find an old moment by its place, edit it, see the change in the viewer.
     @MainActor
     func testFlow03FindAndEditAnOldMemory() {

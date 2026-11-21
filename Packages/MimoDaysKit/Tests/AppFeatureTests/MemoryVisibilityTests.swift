@@ -1,5 +1,5 @@
 @testable import AppFeature
-import Core
+@testable import Core
 import Foundation
 import Persistence
 import SwiftData
@@ -26,6 +26,39 @@ struct MemoryVisibilityTests {
 
     private func hiddenDays() throws -> [Int] {
         try context.fetch(FetchDescriptor<HiddenDay>()).map(\.localDay).sorted()
+    }
+
+    /// The day's ••• (BB03-BB05): hidden and shown again; the day's moments follow.
+    @Test func aDayIsHiddenAndShownFromItsMenu() async throws {
+        let store = try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "Visibility-\(UUID().uuidString)"))
+        let moment = insert(Self.lateInNewYork, zone: "America/New_York")
+        try context.save()
+        let day = DayModel(day: 2026_11_11, context: context, store: store, thumbnails: ThumbnailPipeline())
+        await day.refresh()
+        #expect(!day.isHidden)
+        day.setHidden(true)
+        #expect(day.isHidden && day.failedVisibility == nil)
+        #expect(MemoryVisibility(context: context).isHiddenWithItsDay(moment))
+        day.setHidden(false)
+        await day.refresh()
+        #expect(!day.isHidden)
+        #expect(!MemoryVisibility(context: context).isHidden(moment))
+    }
+
+    /// The Memory Card's ••• (BB01): at once, and the card knows whether its day is hidden too.
+    @Test func aMomentIsHiddenFromItsCard() async throws {
+        let store = try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "Visibility-\(UUID().uuidString)"))
+        let moment = insert(Self.lateInNewYork, zone: "America/New_York")
+        try context.save()
+        let library = MediaLibrary(context: context, store: store, thumbnails: ThumbnailPipeline())
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [moment.id], start: moment.id), library: library)
+        await viewer.load(moment.id)
+        viewer.setHidden(true, moment.id)
+        #expect(viewer.moments[moment.id]?.isHidden == true && moment.isHiddenFromMemories)
+        try MemoryVisibility.setDayHidden(true, moment.localDay, in: context)
+        let again = MomentViewerModel(pager: MomentPager(ids: [moment.id], start: moment.id), library: library)
+        await again.load(moment.id)
+        #expect(again.moments[moment.id]?.isHiddenWithDay == true)
     }
 
     @Test func aMomentAddedToAHiddenDayIsHiddenWithIt() throws {

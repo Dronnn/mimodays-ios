@@ -35,6 +35,11 @@ struct MemoryCardBack: View {
                 }
                 details
                     .padding(.top, 10)
+                if moment.isHidden || moment.isHiddenWithDay {
+                    HiddenFromMemoriesChip(withItsDay: moment.isHiddenWithDay)
+                        .padding(.top, 10)
+                        .accessibilityIdentifier("card.hiddenState")
+                }
                 words
                     .padding(.top, 26)
                 // U31: "+ Record a voice note" right under "+ Write a note".

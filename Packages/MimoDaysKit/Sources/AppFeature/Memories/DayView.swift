@@ -13,6 +13,10 @@ import SwiftUI
 final class DayModel {
     let day: Int
     private(set) var moments: [MomentSummary] = []
+    /// P8.3: the whole day hidden from memories.
+    private(set) var isHidden = false
+    /// A hide or show of the day that couldn't be saved, for "Try again".
+    private(set) var failedVisibility: Bool?
     private(set) var images: [String: UIImage] = [:]
 
     static let photoPixels = 1000
@@ -46,6 +50,7 @@ final class DayModel {
             predicate: #Predicate { $0.deletedAt == nil && $0.localDay == day },
             sortBy: [SortDescriptor(\.capturedAt)]
         )
+        isHidden = MemoryVisibility(context: context).isDayHidden(day)
         do {
             moments = try context.fetch(descriptor).map(MomentSummary.init)
         } catch {
@@ -55,6 +60,28 @@ final class DayModel {
             await load(moment.picturePath, Self.photoPixels)
             await load(moment.windowPath, Self.selfiePixels)
         }
+    }
+
+    /// Hide this day from memories (after BB04's confirmation), or Show this day in memories.
+    func setHidden(_ hidden: Bool) {
+        failedVisibility = nil
+        do {
+            try MemoryVisibility.setDayHidden(hidden, day, in: context)
+            isHidden = hidden
+        } catch {
+            context.rollback()
+            failedVisibility = hidden
+            logger.error("Hiding the day failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func retryVisibility() {
+        guard let hidden = failedVisibility else { return }
+        setHidden(hidden)
+    }
+
+    func dismissVisibilityFailure() {
+        failedVisibility = nil
     }
 
     func image(_ path: String?) -> UIImage? {
@@ -95,6 +122,9 @@ struct DayView: View {
     let model: DayModel
     /// The title leaves the year out within this one.
     let thisYear: Int
+    @Environment(AppRouter.self) private var router: AppRouter?
+    /// BB04: "Hide this day from memories?".
+    @State private var confirmsHiding = false
 
     var body: some View {
         ScrollView {
@@ -102,6 +132,12 @@ struct DayView: View {
                 summary
                     .padding(.horizontal, 16)
                     .padding(.top, 10)
+                if model.isHidden {
+                    HiddenFromMemoriesChip()
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                        .accessibilityIdentifier("day.hiddenState")
+                }
                 ForEach(model.moments) { moment in
                     MomentTileLink(MemoriesRoute.moment(MomentPager(ids: model.moments.map(\.id), start: moment.id))) {
                         card(moment)
@@ -127,11 +163,61 @@ struct DayView: View {
                     .foregroundStyle(ColorToken.textPrimary.color)
                     .accessibilityAddTraits(.isHeader)
             }
+            ToolbarItem(placement: .topBarTrailing) { options }
+        }
+        .alert(Text("Hide this day from memories?", bundle: .module), isPresented: $confirmsHiding) {
+            Button(role: .cancel) {} label: { Text("Cancel", bundle: .module) }
+            Button { model.setHidden(true) } label: { Text("Hide day", bundle: .module) }
+        } message: {
+            Text("Your moments stay in the archive.", bundle: .module)
+        }
+        .alert(
+            Text("Couldn't change what you see in memories", bundle: .module),
+            isPresented: Binding(get: { model.failedVisibility != nil }, set: { if !$0 { model.dismissVisibilityFailure() } })
+        ) {
+            Button { model.retryVisibility() } label: { Text("Try again", bundle: .module) }
+            Button(role: .cancel) { model.dismissVisibilityFailure() } label: { Text("Dismiss", bundle: .module) }
         }
         .task { await model.refresh() }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
             Task { await model.refresh() }
         }
+    }
+
+    /// BB03: the day's ••• menu. Hiding asks first; showing again is at once.
+    private var options: some View {
+        Menu {
+            Button {
+                if model.isHidden { model.setHidden(false) } else { confirmsHiding = true }
+            } label: {
+                Label {
+                    if model.isHidden {
+                        Text("Show this day in memories", bundle: .module, comment: "Day ••• (P8.3)")
+                    } else {
+                        Text("Hide this day from memories", bundle: .module, comment: "Day ••• (P8.3): every moment of the day, also ones added later")
+                    }
+                } icon: { Icon.glyphArchive.image }
+            }
+            .accessibilityIdentifier("day.hideFromMemories")
+            if model.moments.count >= MovieSelection.minimumMoments {
+                Button {
+                    let date = MemoriesView.dayDate(model.day)
+                    router?.open(.newMovie(MovieSourceRule(kind: .dateRange, start: date, end: date)))
+                } label: {
+                    Label { Text("Make a movie of this day", bundle: .module) } icon: { Icon.glyphFilm.image }
+                }
+                .accessibilityIdentifier("day.movie")
+            }
+        } label: {
+            Icon.glyphMore.image
+                .resizable()
+                .frame(width: 24, height: 24)
+                .foregroundStyle(ColorToken.textPrimary.color)
+                .frame(width: Size.minimumTapTarget, height: Size.minimumTapTarget)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel(Text("Day options", bundle: .module))
+        .accessibilityIdentifier("day.options")
     }
 
     /// "Wed, Nov 11", with the year when it isn't this one.

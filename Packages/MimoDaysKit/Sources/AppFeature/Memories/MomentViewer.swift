@@ -112,6 +112,13 @@ struct MomentViewer: View {
             .onDisappear { model.setCollections(self.collecting?.selection ?? collecting.selection, for: collecting.id) }
         }
         .sheet(item: $exporting) { MomentExportSheet(model: $0) }
+        .alert(
+            Text("Couldn't change what you see in memories", bundle: .module),
+            isPresented: Binding(get: { model.failedVisibility != nil }, set: { if !$0 { model.dismissVisibilityFailure() } })
+        ) {
+            Button { model.retryVisibility() } label: { Text("Try again", bundle: .module) }
+            Button(role: .cancel) { model.dismissVisibilityFailure() } label: { Text("Dismiss", bundle: .module) }
+        }
         .onChange(of: model.ids.isEmpty) { _, isEmpty in if isEmpty { dismiss() } }
         .onChange(of: model.current) { model.stopVoice() }
         .onDisappear { model.stopVoice() }
@@ -210,6 +217,19 @@ struct MomentViewer: View {
                     }
                     NavigationLink(value: MemoriesRoute.day(LocalDay(moment.captured.instant, in: moment.captured.timeZone).key)) {
                         Label { Text("Show the whole day", bundle: .module) } icon: { Icon.glyphClock.image }
+                    }
+                    // P8.3: hidden with its day, showing it again is the day's choice (Show the whole day).
+                    if !moment.isHiddenWithDay {
+                        Button { model.setHidden(!moment.isHidden, moment.id) } label: {
+                            Label {
+                                if moment.isHidden {
+                                    Text("Show in memories", bundle: .module, comment: "Memory Card ••• (P8.3): back into On this day, widgets and automatic movies")
+                                } else {
+                                    Text("Hide from memories", bundle: .module, comment: "Memory Card ••• (P8.3): out of On this day, widgets and automatic movies; stays in the archive")
+                                }
+                            } icon: { Icon.glyphArchive.image }
+                        }
+                        .accessibilityIdentifier("viewer.hideFromMemories")
                     }
                     if moment.selfiePath != nil, moment.format != .square,
                        let layout = moment.video?.layout ?? moment.photo?.layout {

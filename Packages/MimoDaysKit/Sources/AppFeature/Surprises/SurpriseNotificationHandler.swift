@@ -27,6 +27,12 @@ final class SurpriseNotificationHandler: NSObject, UNUserNotificationCenterDeleg
         }
     }
 
+    /// A tap on a notification that isn't a surprise: the fallback reminder (P8.14) opens the plain camera, through
+    /// App Lock and onboarding like a camera shortcut.
+    static func opened(requestID: String) {
+        if requestID.hasPrefix(SurpriseCoordinator.fallbackPrefix) { CameraShortcut.request() }
+    }
+
     /// A tap on the surprise for `promptID`.
     func deliver(_ promptID: UUID) {
         if let onOpen { onOpen(promptID) } else { waiting = promptID }
@@ -46,6 +52,7 @@ final class SurpriseNotificationHandler: NSObject, UNUserNotificationCenterDeleg
             nil
         }
         let action = response.actionIdentifier
+        let requestID = response.notification.request.identifier
         Task { @MainActor in
             if let promptID {
                 if action == UNNotificationDefaultActionIdentifier {
@@ -53,6 +60,8 @@ final class SurpriseNotificationHandler: NSObject, UNUserNotificationCenterDeleg
                 } else if action == SurpriseCoordinator.remindLaterAction {
                     await remindLater?(promptID)
                 }
+            } else if action == UNNotificationDefaultActionIdentifier {
+                Self.opened(requestID: requestID)
             }
             completionHandler()
         }

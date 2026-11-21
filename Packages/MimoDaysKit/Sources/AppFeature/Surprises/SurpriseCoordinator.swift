@@ -29,6 +29,7 @@ final class SurpriseCoordinator {
     /// Where a failed "Remind me later" is kept for Today until the day changes; in memory when nil (UI tests).
     private let defaults: UserDefaults?
     private var retryNoteInMemory: [String: Any]?
+    private var fallbackInMemory: FallbackReminder?
     private let logger = Logger(subsystem: "MimoDays", category: "Surprises")
 
     init(
@@ -421,12 +422,15 @@ final class SurpriseCoordinator {
     private func syncNotifications(now: Date, rewords: Bool = false) async {
         // The first surprise after "Maybe later" (or with surprises switched off since) shows in the app only.
         let remindersOn = fetchSchedule()?.isEnabled == true
-        let wanted = fetchUpcomingPending(now: now)
+        var wanted = fetchUpcomingPending(now: now)
             .filter { remindersOn || !$0.notificationRequestID.hasPrefix(Self.firstPrefix) }
             .map {
                 (id: $0.notificationRequestID, promptID: $0.id.uuidString, fireDate: $0.plannedAt,
                  category: Self.isOrdinary($0.notificationRequestID) ? Self.remindLaterCategory : nil)
             }
+        let fallbacks = await fallbackTimes(now: now)
+        wanted += fallbacks.map { (id: $0.id, promptID: $0.id, fireDate: $0.date, category: nil) }
+        var fallbackFailed = false
         let scheduled = await notifications.pending()
         let wantedIDs = Set(wanted.map(\.id))
         let stale = scheduled.map(\.id).filter { !wantedIDs.contains($0) }
@@ -439,16 +443,77 @@ final class SurpriseCoordinator {
         let reworded = now.addingTimeInterval(60)
         for prompt in wanted where (rewords && prompt.fireDate > reworded) || fireDates[prompt.id] != prompt.fireDate
             || categories[prompt.id].map({ $0 != prompt.category }) == true {
+            let isFallback = prompt.id.hasPrefix(Self.fallbackPrefix)
             let notification = SurpriseNotification(
                 id: prompt.id, promptID: prompt.promptID, fireDate: prompt.fireDate,
-                title: String(appLocalized: Self.title), body: String(appLocalized: Self.bodies.randomElement(using: &generator)!),
+                title: String(appLocalized: isFallback ? Self.fallbackTitle : Self.title),
+                body: String(appLocalized: isFallback ? Self.fallbackBody : Self.bodies.randomElement(using: &generator)!),
                 categoryID: prompt.category
             )
             do {
                 try await notifications.schedule(notification)
             } catch {
+                if isFallback { fallbackFailed = true }
                 logger.error("Scheduling a surprise failed: \(error.localizedDescription, privacy: .public)")
             }
+        }
+        self.fallbackFailed = fallbackFailed
+    }
+
+    // MARK: Fallback reminder (P8.14)
+
+    nonisolated static let fallbackPrefix = "fallback-"
+    nonisolated static let fallbackTitle = LocalizedStringResource("A moment for today", bundle: .atURL(Bundle.module.bundleURL))
+    nonisolated static let fallbackBody = LocalizedStringResource(
+        "If you'd like, take a moment to remember today.", bundle: .atURL(Bundle.module.bundleURL)
+    )
+    private static let fallbackKey = "surpriseFallback"
+
+    /// Device-local and off at first; a backup never brings it.
+    var fallback: FallbackReminder {
+        if let defaults {
+            return defaults.data(forKey: Self.fallbackKey).flatMap { try? JSONDecoder().decode(FallbackReminder.self, from: $0) } ?? FallbackReminder()
+        }
+        return fallbackInMemory ?? FallbackReminder()
+    }
+
+    /// The last scheduling of the reminders failed: Settings offers Try again (a refresh).
+    private(set) var fallbackFailed = false
+
+    func setFallback(_ value: FallbackReminder) async {
+        if let defaults {
+            defaults.set(try? JSONEncoder().encode(value), forKey: Self.fallbackKey)
+        } else {
+            fallbackInMemory = value
+        }
+        await serially { await self.performRefresh(replan: false) }
+    }
+
+    /// One reminder at the chosen time on each enabled, unpaused day of the plan with no surprise of its own (a
+    /// surprise coming back later still holds its day); none while surprises are off or the time is outside the hours.
+    private func fallbackTimes(now: Date) async -> [(id: String, date: Date)] {
+        let fallback = fallback
+        guard fallback.isOn, let minute = fallback.minute, let schedule = fetchSchedule(), schedule.isEnabled,
+              !schedule.isPausedIndefinitely, (schedule.earliestMinute...schedule.latestMinute).contains(minute),
+              await permissions.status(of: .notifications).isUsable else { return [] }
+        let calendar = calendar(for: schedule)
+        let today = calendar.startOfDay(for: now)
+        let nowPrefix = Self.sendNowPrefix
+        let cancelled = PromptOutcome.cancelled.rawValue
+        let busy = Set(fetch(FetchDescriptor<SurprisePrompt>(predicate: #Predicate { $0.plannedAt >= today && $0.outcomeRaw != cancelled }))
+            .filter { !$0.notificationRequestID.hasPrefix(nowPrefix) }
+            .map { calendar.startOfDay(for: $0.plannedAt) })
+        return (0..<SurprisePlanner(calendar: calendar).horizonDays).compactMap { offset in
+            guard let day = calendar.date(byAdding: .day, value: offset, to: today), !busy.contains(day),
+                  schedule.weekdayMask & (1 << (calendar.component(.weekday, from: day) - 1)) != 0,
+                  (schedule.pausedUntil ?? .distantPast) <= day,
+                  let time = calendar.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: day),
+                  // A time the clock skips that day (DST) is skipped, not moved.
+                  calendar.dateComponents([.hour, .minute], from: time) == DateComponents(hour: minute / 60, minute: minute % 60),
+                  time > now else { return nil }
+            let parts = calendar.dateComponents([.year, .month, .day], from: day)
+            let key = parts.year! * 10_000 + parts.month! * 100 + parts.day!
+            return (Self.fallbackPrefix + String(key), time)
         }
     }
 
@@ -588,6 +653,18 @@ enum SurpriseStatus: Equatable {
             return
         }
         self = .onItsWay
+    }
+}
+
+/// P8.14: a reminder at a fixed time on days with no surprise planned.
+struct FallbackReminder: Codable, Equatable {
+    var isOn = false
+    /// Minutes after midnight, in the surprises' time; nil until chosen.
+    var minute: Int?
+
+    /// 8:00 PM when the hours allow it, else the nearest time inside them.
+    static func defaultMinute(earliest: Int, latest: Int) -> Int {
+        min(max(20 * 60, earliest), latest)
     }
 }
 

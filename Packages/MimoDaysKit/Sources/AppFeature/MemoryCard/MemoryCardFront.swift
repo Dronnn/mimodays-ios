@@ -146,7 +146,7 @@ struct MemoryCardFront: View {
         let offset = inWindow ? drag ?? .zero : .zero
         let rect = Self.between(bounds, window?.offsetBy(dx: offset.width, dy: offset.height) ?? bounds, share)
         // The card's outline, or the window's own hand-cut frame with its 4 pt cream edge inside it.
-        let shape = share > 0.5 ? AnyShape(CardSelfieBlob()) : AnyShape(MemoryCardOutline())
+        let shape = share > 0.5 ? AnyShape(SelfieWindowShape()) : AnyShape(MemoryCardOutline())
         return content(stream)
             .frame(width: rect.width, height: rect.height)
             .clipShape(shape)

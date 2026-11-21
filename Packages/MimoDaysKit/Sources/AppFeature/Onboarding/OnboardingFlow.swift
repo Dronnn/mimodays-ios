@@ -63,14 +63,18 @@ final class OnboardingFlow {
     var page: OnboardingPage = .welcome { didSet { save() } }
     var schedule = ReminderSchedule() { didSet { save() } }
     /// The camera: the first capture, or a surprise over whatever page is showing (P2.0).
-    var capture: CaptureRequest? {
-        didSet {
-            // A surprise tapped while the camera was up opens once it closes, if still in time.
-            guard capture == nil, let held = heldSurprise else { return }
-            heldSurprise = nil
-            openSurprise(held)
-        }
+    var capture: CaptureRequest?
+
+    /// The camera's cover is gone: a surprise tapped while it was up opens now, if still in time. Not before: a
+    /// cover still on its way out would take the new one with it.
+    func captureDismissed() {
+        guard capture == nil, let held = heldSurprise else { return }
+        heldSurprise = nil
+        openSurprise(held)
     }
+
+    /// Planning the first surprise finished: W03's watcher looks again (the prompt may be new).
+    private(set) var surprisesPlanned = 0
 
     var isCapturing: Bool { capture != nil }
     private var heldSurprise: UUID?
@@ -137,6 +141,7 @@ final class OnboardingFlow {
     private func remindersChosen() async {
         let notified = await surprises.remindersChosen(!isCompleted)
         surpriseNotified = surpriseNotified || notified
+        surprisesPlanned += 1
     }
 
     /// Back from iOS Settings on "Notifications are off": allowed there, the outcome says they are on.
@@ -179,6 +184,8 @@ final class OnboardingFlow {
     /// A surprise's notification tapped, or W03's Open: its camera over this page at once; while a camera is up it
     /// waits for it to close (P2.0). Too late, nothing opens: the person goes on with onboarding.
     func openSurprise(_ promptID: UUID) {
+        // Its own camera is up already (opened from W03, then the notification tapped): nothing more to open.
+        guard capture?.promptID != promptID else { return }
         guard capture == nil else {
             heldSurprise = promptID
             return
@@ -192,9 +199,10 @@ final class OnboardingFlow {
 
     /// A save from the camera: a surprise answers its prompt and onboarding goes on where it was (W04); the first
     /// capture shows its moment (O10).
+    /// A surprise's camera stays a surprise's when the shot came too late to count: onboarding goes on where it was.
     func saved(_ saved: SavedCapture, moment: SavedMoment) {
-        if let promptID = saved.promptID {
-            surprises.captured(promptID, saved.momentID)
+        if capture?.promptID != nil {
+            if let promptID = saved.promptID { surprises.captured(promptID, saved.momentID) }
             capture = nil
         } else {
             firstMomentSaved(moment)
@@ -203,8 +211,9 @@ final class OnboardingFlow {
 
     /// Keeps W03's ribbon in step with the first surprise until it's caught or gone: shown while it can be answered,
     /// unless iOS brought its notification.
+    /// Not once onboarding is done: Today shows it then, and a replay from Help brings no first surprise.
     func watchFirstSurprise(now: () -> Date = Date.init) async {
-        while !Task.isCancelled, let first = surprises.first() {
+        while !Task.isCancelled, !isCompleted, let first = surprises.first() {
             let wait = first.plannedAt.timeIntervalSince(now())
             if wait > 0 {
                 try? await Task.sleep(for: .seconds(wait))

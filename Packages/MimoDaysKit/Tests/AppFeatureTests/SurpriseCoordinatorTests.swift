@@ -450,7 +450,8 @@ struct SurpriseCoordinatorTests {
     }
 
     /// P2.4: "Maybe later" (surprises off) or notifications off: the first surprise stays, for the app to show.
-    @Test(arguments: [PermissionStatus.denied, .notDetermined])
+    /// With notifications allowed but surprises off, iOS doesn't bring it either.
+    @Test(arguments: [PermissionStatus.denied, .notDetermined, .granted])
     func withoutNotificationsTheFirstSurpriseStaysInTheApp(permission: PermissionStatus) async throws {
         clock.set(date("2026-11-11 10:00"))
         schedule.isEnabled = false
@@ -459,6 +460,7 @@ struct SurpriseCoordinatorTests {
         await coordinator.refresh()
         let first = try #require(coordinator.firstSurprise())
         #expect(try prompts(.pending).map(\.id) == [first.promptID])
+        #expect(await notifications.pending().isEmpty)
         clock.set(first.plannedAt.addingTimeInterval(1))
         #expect(coordinator.open(promptID: first.promptID))
     }

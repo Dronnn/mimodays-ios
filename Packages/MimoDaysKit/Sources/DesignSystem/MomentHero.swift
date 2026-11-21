@@ -239,21 +239,25 @@ public enum SelfieWindowStyle {
 }
 
 /// The selfie window: a cream frame with the picture clipped inside it, never over it. Takes the window's
-/// shape at the width it is given; `tilted` false when the caller tilts it together with something else.
+/// shape at the width it is given; `tilted` false when the caller tilts it together with something else; `landscape`
+/// lays it on its side (16:9 moments), in the landscape hand-cut frame.
 public struct SelfieFrame<Content: View>: View {
     let placeholder: Color
     let tilted: Bool
+    let landscape: Bool
     let content: Content
 
-    public init(placeholder: Color = Color(hex: 0xB9A89A), tilted: Bool = true, @ViewBuilder content: () -> Content) {
+    public init(placeholder: Color = Color(hex: 0xB9A89A), tilted: Bool = true, landscape: Bool = false, @ViewBuilder content: () -> Content) {
         self.placeholder = placeholder
         self.tilted = tilted
+        self.landscape = landscape
         self.content = content()
     }
 
     public var body: some View {
+        let aspect = SelfieWindowStyle.size.width / SelfieWindowStyle.size.height
         GeometryReader { proxy in
-            let k = proxy.size.width / SelfieWindowStyle.size.width
+            let k = min(proxy.size.width, proxy.size.height) / SelfieWindowStyle.size.width
             SelfieWindowShape()
                 .fill(SelfieWindowStyle.frameColor)
                 .shadow(
@@ -268,7 +272,7 @@ public struct SelfieFrame<Content: View>: View {
                         .padding(SelfieWindowStyle.border * k)
                 }
         }
-        .aspectRatio(SelfieWindowStyle.size.width / SelfieWindowStyle.size.height, contentMode: .fit)
+        .aspectRatio(landscape ? 1 / aspect : aspect, contentMode: .fit)
         .rotationEffect(tilted ? SelfieWindowStyle.tilt : .zero)
     }
 }

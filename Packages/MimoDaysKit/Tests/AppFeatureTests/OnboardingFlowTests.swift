@@ -187,6 +187,9 @@ struct OnboardingFlowTests {
         #expect(flow.capture?.promptID == nil)
         #expect(surprises.opened.isEmpty)
         flow.capture = nil
+        // Not while the old cover is still on its way out.
+        #expect(flow.capture == nil)
+        flow.captureDismissed()
         #expect(flow.capture?.promptID == id)
     }
 
@@ -197,7 +200,48 @@ struct OnboardingFlowTests {
         flow.openSurprise(UUID())
         surprises.answerable = false
         flow.capture = nil
+        flow.captureDismissed()
         #expect(flow.capture == nil)
+    }
+
+    /// The notification of the surprise whose camera is up, tapped: nothing waits to open it again after.
+    @Test func theOpenSurpriseTappedAgainOpensNothingMore() {
+        let surprises = Surprises()
+        let flow = flow(surprises)
+        let id = UUID()
+        flow.openSurprise(id)
+        flow.openSurprise(id)
+        flow.capture = nil
+        flow.captureDismissed()
+        #expect(flow.capture == nil)
+        #expect(surprises.opened == [id])
+    }
+
+    /// A surprise's shot saved too late to count is a plain moment: onboarding goes on where it was, not finished.
+    @Test func aLateSurpriseShotDoesntFinishOnboarding() {
+        let surprises = Surprises()
+        let flow = flow(surprises)
+        flow.step = .reminders(.on)
+        flow.openSurprise(UUID())
+        flow.saved(SavedCapture(momentID: UUID(), promptID: nil, capturedAt: Date()), moment: SavedMoment(photo: .placeholder, capturedAt: Date()))
+        #expect(surprises.captured.isEmpty)
+        #expect(flow.capture == nil)
+        #expect(flow.step == .reminders(.on))
+        #expect(!flow.isCompleted)
+    }
+
+    /// W03 looks again once the reminders step planned (the prompt may be new); a finished onboarding (a replay) shows none.
+    @Test func theRibbonWatchRestartsAfterPlanningAndStopsOnceDone() async {
+        let surprises = Surprises()
+        surprises.first = SurpriseCoordinator.FirstSurprise(promptID: UUID(), plannedAt: Date(timeIntervalSince1970: 0), expiresAt: Date().addingTimeInterval(60))
+        let flow = flow(surprises, answer: .denied)
+        flow.finishIntro()
+        #expect(flow.surprisesPlanned == 0)
+        await flow.enableReminders()
+        #expect(flow.surprisesPlanned == 1)
+        flow.finish()
+        await flow.watchFirstSurprise()
+        #expect(flow.inAppSurprise == nil)
     }
 
     /// O3, W04: the surprise's moment answers it and onboarding goes on where it was; the first capture shows O10.

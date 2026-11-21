@@ -98,14 +98,13 @@ struct SelfieWindowView<Content: View>: View {
     }
 
     private func upright(_ frame: CGSize) -> some View {
-        let frameTurn: Angle = sideways ? .degrees(90) : .zero
+        // On its side the window is drawn wide, in the landscape hand-cut frame the saved moment has.
+        let size = sideways ? CGSize(width: frame.height, height: frame.width) : frame
         return VStack(spacing: 6) {
-            SelfieFrame(placeholder: CameraPalette.selfiePlaceholder, tilted: false) {
-                TurnedPicture(angle: -(frameTurn + turn), content: content)
+            SelfieFrame(placeholder: CameraPalette.selfiePlaceholder, tilted: false, landscape: sideways) {
+                TurnedPicture(angle: -turn, content: content)
             }
-            .frame(width: frame.width, height: frame.height)
-            .rotationEffect(frameTurn)
-            .frame(width: sideways ? frame.height : frame.width, height: sideways ? frame.width : frame.height)
+            .frame(width: size.width, height: size.height)
             Capsule()
                 .fill(CameraPalette.cream.opacity(0.9))
                 .frame(width: 24, height: 4)

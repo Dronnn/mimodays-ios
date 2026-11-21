@@ -351,8 +351,8 @@ struct MovieEditorView: View {
             let scale = stage.width / canvas.width
             let picture = MovieComposer.pictureRect(source: plan.pictureSize ?? canvas, canvas: canvas, fit: model.project.fit)
             if let rect = movingWindow ?? MovieComposer.windowRect(window: plan.window, placement: plan.placement, picture: picture, canvas: canvas) {
-                RoundedRectangle(cornerRadius: 12 * scale * 3, style: .continuous)
-                    .strokeBorder(ColorToken.actionCoral.color, style: StrokeStyle(lineWidth: 2, dash: [7, 5]))
+                SelfieWindowShape()
+                    .stroke(ColorToken.actionCoral.color, style: StrokeStyle(lineWidth: 2, dash: [7, 5]))
                     .frame(width: rect.width * scale, height: rect.height * scale)
                     .rotationEffect(.degrees(-5.4))
                     .contentShape(Rectangle())

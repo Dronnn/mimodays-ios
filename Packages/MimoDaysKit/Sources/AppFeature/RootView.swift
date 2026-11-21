@@ -233,6 +233,11 @@ public struct RootView: View {
     /// its camera opens over the page, which comes back when it closes (P2.0).
     private func openSurprise(_ promptID: UUID) {
         if let onboarding {
+            // A tap iOS kept for the app as it opens waits for the launch's draft, which comes back first.
+            guard resumedLaunch else {
+                heldRoute = .capture(promptID: promptID)
+                return
+            }
             onboarding.openSurprise(promptID)
         } else {
             open(.capture(promptID: promptID))
@@ -251,12 +256,17 @@ public struct RootView: View {
     /// if still in time (P2.0); a plain camera is dropped, and a link waits in the router.
     private func open(_ route: Route) {
         if router.capture != nil, case let .capture(promptID) = route {
-            if let promptID { router.heldSurprise = promptID }
+            // Its own camera is up already: nothing more to open.
+            if let promptID, router.capture?.promptID != promptID { router.heldSurprise = promptID }
             return
         }
         // Before the launch's review is back (a tap iOS kept for the app as it opens), it waits for it.
         guard resumedLaunch, !appLock.isLockedOrDue else {
             heldRoute = route
+            return
+        }
+        if let onboarding, case let .capture(promptID?) = route {
+            onboarding.openSurprise(promptID)
             return
         }
         if case let .capture(promptID?) = route {

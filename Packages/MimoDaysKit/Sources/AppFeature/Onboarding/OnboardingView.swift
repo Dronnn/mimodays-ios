@@ -47,7 +47,7 @@ struct OnboardingView: View {
             }
         }
         .animation(.snappy, value: flow.inAppSurprise)
-        .task(id: flow.isCapturing) {
+        .task(id: [flow.isCapturing ? 1 : 0, flow.surprisesPlanned]) {
             guard !flow.isCapturing else { return }
             await flow.watchFirstSurprise()
         }
@@ -55,7 +55,7 @@ struct OnboardingView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await flow.recheckReminders() } }
         }
-        .fullScreenCover(item: $flow.capture) { request in
+        .fullScreenCover(item: $flow.capture, onDismiss: flow.captureDismissed) { request in
             CaptureFlowView(request: request, promptExpiry: request.promptID.flatMap(flow.expiry)) { saved in
                 flow.saved(saved, moment: SavedMoment(
                     photo: saved.main.map { .image(Image(uiImage: $0)) } ?? .placeholder,

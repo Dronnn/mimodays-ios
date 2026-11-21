@@ -311,7 +311,11 @@ final class SurpriseCoordinator {
     /// Schedules the next pending prompts that iOS doesn't have yet and removes every request without one.
     /// `rewords`: every request is scheduled again, in the app's current language.
     private func syncNotifications(now: Date, rewords: Bool = false) async {
-        let wanted = fetchUpcomingPending(now: now).map { (id: $0.notificationRequestID, promptID: $0.id.uuidString, fireDate: $0.plannedAt) }
+        // The first surprise after "Maybe later" (or with surprises switched off since) shows in the app only.
+        let remindersOn = fetchSchedule()?.isEnabled == true
+        let wanted = fetchUpcomingPending(now: now)
+            .filter { remindersOn || !$0.notificationRequestID.hasPrefix(Self.firstPrefix) }
+            .map { (id: $0.notificationRequestID, promptID: $0.id.uuidString, fireDate: $0.plannedAt) }
         let scheduled = await notifications.pending()
         let wantedIDs = Set(wanted.map(\.id))
         let stale = scheduled.map(\.id).filter { !wantedIDs.contains($0) }

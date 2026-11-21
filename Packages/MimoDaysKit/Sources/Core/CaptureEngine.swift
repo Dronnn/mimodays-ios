@@ -174,6 +174,60 @@ public enum BackLens: String, Codable, CaseIterable, Sendable {
     case telephoto
 }
 
+/// How far a camera zooms and where its lenses are (P1). `factor` is the device's own zoom; people read
+/// `factor * shownMultiplier` (0.5×, 1×, 2× on a phone whose zoom starts at the ultra wide lens).
+public struct CameraZoom: Equatable, Sendable {
+    /// One per lens, in order, as device factors; a camera with one lens has `[1]`.
+    public var stops: [Double]
+    /// The rear lens each stop is, where the camera knows (a virtual camera); empty otherwise.
+    public var lenses: [BackLens]
+    public var minFactor: Double
+    public var maxFactor: Double
+    public var shownMultiplier: Double
+    public var factor: Double
+
+    public init(stops: [Double], lenses: [BackLens] = [], minFactor: Double, maxFactor: Double, shownMultiplier: Double, factor: Double) {
+        self.stops = stops
+        self.lenses = lenses
+        self.minFactor = minFactor
+        self.maxFactor = maxFactor
+        self.shownMultiplier = shownMultiplier
+        self.factor = factor
+    }
+
+    /// Never past what people are told the camera reaches.
+    public static let maxShown: Double = 10
+
+    public func clamped(_ factor: Double) -> Double { min(max(factor, minFactor), maxFactor) }
+
+    public var shown: Double { factor * shownMultiplier }
+
+    /// The stop a tap on the zoom label goes to: the next one up, round to the first after the last (P1.4).
+    public var nextStop: Double {
+        stops.first { $0 > factor + 0.05 } ?? stops.first ?? 1
+    }
+
+    /// The stop the zoom is at, if it's at one.
+    public var currentStop: Double? {
+        stops.first { abs($0 - factor) < 0.05 }
+    }
+}
+
+/// What a tap on the picture did (P1.6): the camera may focus, set its exposure there, or both, and keep them.
+public struct FocusResult: Equatable, Sendable {
+    public var focuses: Bool
+    public var exposes: Bool
+    public var locks: Bool
+
+    public init(focuses: Bool, exposes: Bool, locks: Bool) {
+        self.focuses = focuses
+        self.exposes = exposes
+        self.locks = locks
+    }
+
+    public static let none = FocusResult(focuses: false, exposes: false, locks: false)
+}
+
 /// The camera, behind a protocol so the UI can run on a simulated engine (simulator, UI tests).
 public protocol CaptureEngine: AnyObject, Sendable {
     /// Configures and starts the session: dual when the device supports it, otherwise the rear camera.
@@ -206,6 +260,18 @@ public protocol CaptureEngine: AnyObject, Sendable {
     /// A new stream for each camera start; the one before ends. A listener cancelled while Review shows (which ends
     /// its stream) doesn't leave a retaken camera deaf to calls and heat.
     var events: AsyncStream<CaptureEvent> { get }
+    /// The camera's zoom now; nil when that camera isn't in the setup.
+    func zoom(on position: CameraPosition) async -> CameraZoom?
+    /// Zooms that camera, clamped to its range; `smoothly` ramps there (a tap on the label), otherwise at once (a pinch).
+    func setZoom(_ factor: Double, on position: CameraPosition, smoothly: Bool) async
+    /// Focus and exposure at `point` (0...1 in the camera's own frame, as the preview layer converts it); `lock` keeps them.
+    func focus(at point: CGPoint, on position: CameraPosition, lock: Bool) async -> FocusResult
+}
+
+public extension CaptureEngine {
+    func zoom(on _: CameraPosition) async -> CameraZoom? { nil }
+    func setZoom(_: Double, on _: CameraPosition, smoothly _: Bool) async {}
+    func focus(at _: CGPoint, on _: CameraPosition, lock _: Bool) async -> FocusResult { .none }
 }
 
 /// Where capture writes its files until a moment is saved.

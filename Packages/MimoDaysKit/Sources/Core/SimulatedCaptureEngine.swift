@@ -87,6 +87,42 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
     public func setBackLens(_ lens: BackLens) {
         backLens = lenses.contains(lens) ? lens : .wide
+        // Like a virtual camera: the lens is a zoom stop.
+        if let index = lenses.firstIndex(of: backLens) { zoomFactors[.back] = backStops[index] }
+    }
+
+    // MARK: Zoom and focus, like a phone whose virtual rear camera starts at its ultra wide lens
+
+    /// Each camera's zoom now (tests).
+    public private(set) var zoomFactors: [CameraPosition: Double] = [:]
+    /// Every focus tap, in order (tests).
+    public private(set) var focusTaps: [(position: CameraPosition, point: CGPoint, lock: Bool)] = []
+
+    private var backStops: [Double] { lenses.indices.map { pow(2, Double($0)) } }
+    private var backMultiplier: Double { lenses.first == .ultraWide ? 0.5 : 1 }
+
+    public func zoom(on position: CameraPosition) -> CameraZoom? {
+        guard let setup, setup.positions.contains(position) else { return nil }
+        let back = position == .back
+        let stops = back ? backStops : [1]
+        let multiplier = back ? backMultiplier : 1
+        let fallback = back ? lenses.firstIndex(of: backLens).map { backStops[$0] } ?? 1 : 1
+        return CameraZoom(
+            stops: stops, lenses: back ? lenses : [], minFactor: 1, maxFactor: CameraZoom.maxShown / multiplier,
+            shownMultiplier: multiplier, factor: zoomFactors[position] ?? fallback
+        )
+    }
+
+    public func setZoom(_ factor: Double, on position: CameraPosition, smoothly _: Bool) {
+        guard let zoom = zoom(on: position) else { return }
+        zoomFactors[position] = zoom.clamped(factor)
+    }
+
+    /// The rear camera focuses and exposes; the front one only exposes, as on most phones.
+    public func focus(at point: CGPoint, on position: CameraPosition, lock: Bool) -> FocusResult {
+        guard let setup, setup.positions.contains(position) else { return .none }
+        focusTaps.append((position, point, lock))
+        return FocusResult(focuses: position == .back, exposes: true, locks: lock)
     }
 
     public func setMicrophone(_ enabled: Bool) {

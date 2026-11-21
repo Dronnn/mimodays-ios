@@ -146,6 +146,11 @@ struct CameraChrome {
         CGRect(x: 0, y: size.height - 46, width: size.width, height: 30)
     }
 
+    /// P1.4 zoom label, centred over the pickers (or the lock chip while recording).
+    func zoomLabel(above picker: CGRect) -> CGRect {
+        CGRect(x: 0, y: picker.minY - 50, width: size.width, height: 44)
+    }
+
     /// C05/C13 note cards, standing on the format picker.
     func note(above picker: CGRect, gap: CGFloat) -> CGRect {
         let top = sideways ? 24 : topInset + 40

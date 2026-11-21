@@ -96,6 +96,10 @@ final class CameraModel {
     private(set) var lenses: [BackLens] = []
     /// Dual setups: the front camera is the big one (↻).
     private(set) var isSwapped = false
+    /// Each camera's zoom as last read; the label shows the big camera's (P1.3, P1.4).
+    private(set) var zooms: [CameraPosition: CameraZoom] = [:]
+    /// The last tap on a picture: where, on which camera, and what it did (P1.6). A lock stays until the next tap.
+    private(set) var focusMark: FocusMark?
     /// A call, the background or heat has the camera; nothing can be captured until it's back.
     private(set) var interruption: CaptureInterruption?
     /// C05 note, shown until the person flips or captures.
@@ -110,7 +114,10 @@ final class CameraModel {
             if settings.recordsSound != oldValue.recordsSound { Task { await refreshMicrophone() } }
             if isRecording, settings.flash != oldValue.flash { setTorch(settings.flash) }
             if settings.backLens != oldValue.backLens, phase != .starting {
-                Task { [engine, lens = settings.backLens] in try? await engine.setBackLens(lens) }
+                Task { [engine, lens = settings.backLens] in
+                    try? await engine.setBackLens(lens)
+                    await self.refreshZoom()
+                }
             }
         }
     }
@@ -239,6 +246,7 @@ final class CameraModel {
             }
             if setupChanges == changes { setup = started }
             lenses = await engine.backLenses()
+            await refreshZoom()
             showsSingleCameraNote = setup != .dual
             phase = .ready
             await refreshMicrophone()
@@ -279,7 +287,9 @@ final class CameraModel {
             isSwapped.toggle()
         } else if let flipped = try? await engine.flip() {
             setup = flipped
+            await refreshZoom()
         }
+        focusMark = nil
     }
 
     func toggleSelfie() {
@@ -442,6 +452,74 @@ final class CameraModel {
         return video
     }
 
+    // MARK: Zoom and focus (P1)
+
+    /// The big camera's zoom, for the label.
+    var mainZoom: CameraZoom? { zooms[mainPosition] }
+
+    func refreshZoom() async {
+        var read: [CameraPosition: CameraZoom] = [:]
+        for position in setup?.positions ?? [] {
+            read[position] = await engine.zoom(on: position)
+        }
+        zooms = read
+    }
+
+    /// The zoom a pinch started from.
+    private var pinchStart: [CameraPosition: Double] = [:]
+    /// The latest zoom asked for; one task hands them to the camera in order, skipping ones already passed.
+    private var zoomTarget: (position: CameraPosition, factor: Double, smoothly: Bool)?
+    private var zoomTask: Task<Void, Never>?
+
+    /// A pinch on a picture zooms that camera, from where it was when the pinch began.
+    func pinch(_ scale: Double, on position: CameraPosition, ended: Bool) {
+        guard let zoom = zooms[position] else { return }
+        let start = pinchStart[position] ?? zoom.factor
+        pinchStart[position] = ended ? nil : start
+        setZoom(zoom.clamped(start * scale), on: position, smoothly: false)
+    }
+
+    /// The label: the big camera goes to its next lens, or back to the first (P1.4). On a rear lens the ••• sheet
+    /// follows, so the camera opens there next time.
+    func nextZoomStop() {
+        let position = mainPosition
+        guard let zoom = zooms[position] else { return }
+        let stop = zoom.nextStop
+        if position == .back, let index = zoom.stops.firstIndex(of: stop), index < zoom.lenses.count, settings.backLens != zoom.lenses[index] {
+            settings.backLens = zoom.lenses[index]
+        }
+        setZoom(stop, on: position, smoothly: true)
+    }
+
+    private func setZoom(_ factor: Double, on position: CameraPosition, smoothly: Bool) {
+        zooms[position]?.factor = factor
+        zoomTarget = (position, factor, smoothly)
+        guard zoomTask == nil else { return }
+        zoomTask = Task { [weak self] in
+            while let self, let target = self.zoomTarget {
+                self.zoomTarget = nil
+                await self.engine.setZoom(target.factor, on: target.position, smoothly: target.smoothly)
+            }
+            self?.zoomTask = nil
+        }
+    }
+
+    /// A tap focuses and exposes there; a long press locks both (P1.6). `layerPoint` is where the mark goes.
+    func focus(at point: CGPoint, layerPoint: CGPoint, on position: CameraPosition, lock: Bool) async {
+        let result = await engine.focus(at: point, on: position, lock: lock)
+        guard result.focuses || result.exposes else {
+            focusMark = nil
+            return
+        }
+        focusMark = FocusMark(position: position, point: layerPoint, result: result)
+    }
+
+    /// The mark fades after a tap; a lock keeps its label.
+    func focusMarkFaded(_ mark: FocusMark) {
+        guard focusMark == mark, !mark.result.locks else { return }
+        focusMark = nil
+    }
+
     // MARK: Engine
 
     /// The microphone runs only in video mode, with permission and "Record sound" on. Also called after the
@@ -471,6 +549,8 @@ final class CameraModel {
                     self.setup = setup
                     setupChanges += 1
                     if setup != .dual { isSwapped = false }
+                    focusMark = nil
+                    Task { await self.refreshZoom() }
                 case let .interrupted(reason):
                     interruption = reason
                 case .resumed:
@@ -484,4 +564,12 @@ final class CameraModel {
             }
         }
     }
+}
+
+/// Where a tap on a picture focused (P1.6). Each tap is a new mark.
+struct FocusMark: Equatable {
+    let id = UUID()
+    let position: CameraPosition
+    let point: CGPoint
+    let result: FocusResult
 }

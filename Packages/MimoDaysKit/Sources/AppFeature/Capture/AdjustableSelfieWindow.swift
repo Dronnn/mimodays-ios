@@ -1,7 +1,8 @@
 import DesignSystem
 import SwiftUI
 
-/// The selfie window at its corner, moved by dragging (snaps to the nearest corner) or by touch and hold (C04 sheet).
+/// The selfie window at its corner, moved by dragging (snaps to the nearest corner) or by touch and hold (C04 sheet);
+/// a pinch makes it a size bigger or smaller (P1.7).
 /// While it is dragged or the sheet is open, the four corners show as targets with the one it will land on in coral.
 /// Shared by the camera and review (C07). Corners are physical, so the layer is always laid out left to right.
 struct AdjustableSelfieWindow<Content: View>: View {
@@ -14,6 +15,7 @@ struct AdjustableSelfieWindow<Content: View>: View {
     let id: String
     @ViewBuilder let content: () -> Content
     @GestureState(resetTransaction: Transaction(animation: .snappy)) private var drag: CGSize?
+    @GestureState(resetTransaction: Transaction(animation: .snappy)) private var pinch: CGFloat = 1
 
     private typealias Corner = CameraSettings.SelfieWindow.Corner
 
@@ -30,8 +32,10 @@ struct AdjustableSelfieWindow<Content: View>: View {
                 }
             }
             SelfieWindowView(scale: placement.scale, showsHandle: isEnabled, sideways: layout.sideways, turn: turn, content: content)
+                .scaleEffect(min(max(pinch, 0.8), 1.25))
                 .position(center)
                 .gesture(gesture, isEnabled: isEnabled)
+                .simultaneousGesture(resize, isEnabled: isEnabled)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("Selfie window", bundle: .module))
                 .accessibilityValue(Text(placement.accessibilityValue))
@@ -41,6 +45,14 @@ struct AdjustableSelfieWindow<Content: View>: View {
                 .accessibilityIdentifier(id)
         }
         .environment(\.layoutDirection, .leftToRight)
+    }
+
+    private var resize: some Gesture {
+        MagnifyGesture()
+            .updating($pinch) { value, state, _ in state = value.magnification }
+            .onEnded { value in
+                withAnimation(.snappy) { placement.scale = placement.scale.after(pinch: value.magnification) }
+            }
     }
 
     private var gesture: some Gesture {
@@ -143,5 +155,16 @@ struct SelfieTarget: View {
         }
         .rotationEffect(Size.selfieWindowTilt)
         .accessibilityHidden(true)
+    }
+}
+
+extension CameraSettings.SelfieWindow.Scale {
+    /// One size up for a pinch out, one down for a pinch in; a small one changes nothing.
+    func after(pinch magnification: CGFloat) -> Self {
+        let all = Self.allCases
+        guard let index = all.firstIndex(of: self) else { return self }
+        if magnification > 1.15 { return all[min(index + 1, all.count - 1)] }
+        if magnification < 0.87 { return all[max(index - 1, 0)] }
+        return self
     }
 }

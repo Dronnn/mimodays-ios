@@ -127,7 +127,7 @@ struct CameraView: View {
                 if let selfie = model.selfiePosition, model.showsHalves, !model.needsRotation {
                     halves(turn, shape: shape, selfie: selfie)
                 } else {
-                    CameraPreview(engine: model.engine, position: model.mainPosition)
+                    InteractivePreview(model: model, position: model.mainPosition, activeArea: fills ? nil : turn.rect(shape))
                         .accessibilityHidden(true)
                 }
                 if !fills {
@@ -149,7 +149,7 @@ struct CameraView: View {
         return ZStack(alignment: .topLeading) {
             ForEach([(model.mainPosition, first), (selfie, second)], id: \.0) { position, half in
                 let rect = turn.rect(half.offsetBy(dx: shape.minX, dy: shape.minY))
-                CameraPreview(engine: model.engine, position: position)
+                InteractivePreview(model: model, position: position)
                     .frame(width: rect.width, height: rect.height)
                     .clipped()
                     .position(x: rect.midX, y: rect.midY)
@@ -185,6 +185,7 @@ struct CameraView: View {
                 FormatLockedChip(format: model.format)
                     .rotationEffect(spin(turn))
                     .turned(chrome.lockChip, turn, direction: direction)
+                zoomLabel(turn, chrome.zoomLabel(above: chrome.lockChip), direction, spins: true)
             } else {
                 buttons(turn, chrome, direction)
                 if model.isSurprise {
@@ -235,13 +236,17 @@ struct CameraView: View {
         let sideways = turn.hold.isLandscape
         let withDuration = model.notice == nil && !model.showsSingleCameraNote && model.mode == .video
         let picker = chrome.formatPicker(withDuration: withDuration)
+        let zoom = chrome.zoomLabel(above: picker)
+        // The notes stand on the zoom label when it shows.
+        let base = showsZoomLabel ? zoom : picker
         if let notice = model.notice {
             CameraNote(notice)
-                .turned(chrome.note(above: picker, gap: model.mode == .video ? 17 : 20), turn, alignment: .bottom, direction: direction)
+                .turned(chrome.note(above: base, gap: model.mode == .video ? 17 : 20), turn, alignment: .bottom, direction: direction)
         } else if model.showsSingleCameraNote {
             CameraNote(icon: .glyphInfo, text: Text("This iPhone can use one camera at a time. Tap ↻ to switch between you and the world.", bundle: .module), id: "camera.singleNote")
-                .turned(chrome.note(above: picker, gap: 20), turn, alignment: .bottom, direction: direction)
+                .turned(chrome.note(above: base, gap: 20), turn, alignment: .bottom, direction: direction)
         }
+        zoomLabel(turn, zoom, direction, spins: false)
         FormatPicker(selection: model.format) { format in
             withAnimation(.easeInOut(duration: 0.3)) { model.setFormat(format) }
         }
@@ -249,6 +254,17 @@ struct CameraView: View {
         if withDuration {
             DurationPicker(selection: $model.settings.videoLength)
                 .turned(chrome.durationPicker, turn, alignment: Alignment(horizontal: sideways ? chrome.physical(right: false) : .center, vertical: .center), direction: direction)
+        }
+    }
+
+    private var showsZoomLabel: Bool { model.mainZoom != nil && !model.needsRotation }
+
+    @ViewBuilder
+    private func zoomLabel(_ turn: CameraTurn, _ box: CGRect, _ direction: LayoutDirection, spins: Bool) -> some View {
+        if showsZoomLabel, let zoom = model.mainZoom {
+            ZoomLabel(zoom: zoom) { model.nextZoomStop() }
+                .rotationEffect(spins ? spin(turn) : .zero)
+                .turned(box, turn, direction: direction)
         }
     }
 
@@ -622,20 +638,27 @@ private struct CameraNote: View {
     }
 }
 
-/// Hosts an engine's preview layer.
+/// Hosts an engine's preview layer; with `gestures`, it takes taps, long presses and pinches (P1).
 struct CameraPreview: UIViewRepresentable {
     let engine: any CaptureEngine
     let position: CameraPosition
+    var gestures: Gestures?
 
     func makeUIView(context _: Context) -> PreviewView { PreviewView() }
 
     func updateUIView(_ view: PreviewView, context _: Context) {
         view.host(engine, position)
+        view.gestures = gestures
     }
 
     final class PreviewView: UIView {
         private var hosted: CALayer?
         private var hostedPosition: CameraPosition?
+        var previewLayer: CALayer? { hosted }
+        var gestures: Gestures? {
+            didSet { if (gestures == nil) != (oldValue == nil) { installGestures() } }
+        }
+        private var recognizers: [UIGestureRecognizer] = []
 
         func host(_ engine: any CaptureEngine, _ position: CameraPosition) {
             guard position != hostedPosition else { return }
@@ -654,6 +677,45 @@ struct CameraPreview: UIViewRepresentable {
             CATransaction.setDisableActions(true)
             hosted?.frame = bounds
             CATransaction.commit()
+        }
+
+        private func installGestures() {
+            recognizers.forEach(removeGestureRecognizer)
+            recognizers = []
+            guard gestures != nil else { return }
+            let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
+            let press = UILongPressGestureRecognizer(target: self, action: #selector(pressed))
+            press.minimumPressDuration = 0.6
+            let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinched))
+            tap.require(toFail: press)
+            [tap, press, pinch].forEach(addGestureRecognizer)
+            recognizers = [tap, press, pinch]
+        }
+
+        /// Only inside the format's frame, where the picture is.
+        override func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
+            guard recognizers.contains(recognizer) else { return super.gestureRecognizerShouldBegin(recognizer) }
+            guard let area = gestures?.activeArea else { return gestures != nil }
+            return area.contains(recognizer.location(in: self))
+        }
+
+        @objc private func tapped(_ recognizer: UITapGestureRecognizer) {
+            let point = recognizer.location(in: self)
+            gestures?.tap(devicePoint(point), point)
+        }
+
+        @objc private func pressed(_ recognizer: UILongPressGestureRecognizer) {
+            guard recognizer.state == .began else { return }
+            let point = recognizer.location(in: self)
+            gestures?.press(devicePoint(point), point)
+        }
+
+        @objc private func pinched(_ recognizer: UIPinchGestureRecognizer) {
+            switch recognizer.state {
+            case .changed: gestures?.pinch(Double(recognizer.scale), false)
+            case .ended, .cancelled, .failed: gestures?.pinch(Double(recognizer.scale), true)
+            default: break
+            }
         }
     }
 }

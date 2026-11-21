@@ -21,6 +21,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private var cameras: [CameraPosition: Camera] = [:]
     private var microphone: AVCaptureDeviceInput?
     private var backLens = BackLens.wide
+    /// The rear camera may be the phone's virtual camera, which changes lens by itself as it zooms (P1.1). Off for the
+    /// tier that tries the lens's own camera instead.
+    private var usesVirtualBack = true
+    /// Cameras whose focus and exposure the person locked: a new scene doesn't undo them.
+    private var focusLocked: Set<CameraPosition> = []
+    private var subjectObservers: [CameraPosition: any NSObjectProtocol] = [:]
+    /// Where a zoom ramp is heading, so the label reads the stop, not a point on the way.
+    private var rampTargets: [ObjectIdentifier: Double] = [:]
     private var recording: RecordingDelegate?
     private var pressure: [CameraPosition: CapturePressurePolicy.Level] = [:]
     /// The angles last asked for: connections made later (a lens change, a flip) start at them, not at portrait.
@@ -162,13 +170,22 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     }
 
     public func backLenses() async -> [BackLens] {
-        (try? await onQueue { BackLens.allCases.filter { self.backDevice($0) != nil } }) ?? [.wide]
+        (try? await onQueue {
+            if let device = self.cameras[.back]?.input.device, device.isVirtualDevice { return Self.lenses(of: device) }
+            let paired = self.setup == .dual
+            return BackLens.allCases.filter { self.physicalBackDevice($0, paired: paired) != nil }
+        }) ?? [.wide]
     }
 
     public func setBackLens(_ lens: BackLens) async throws {
         try await onQueue {
             guard lens != self.backLens else { return }
             self.backLens = lens
+            // A virtual camera has the lens already: it zooms to it, no new session (P1.2).
+            if let device = self.cameras[.back]?.input.device, device.isVirtualDevice {
+                if let factor = Self.stop(of: lens, on: device) { self.zoom(device, to: factor, smoothly: true) }
+                return
+            }
             guard let setup = self.setup, self.recording == nil, setup.positions.contains(.back) else { return }
             // Another lens costs the hardware differently: the setup is worked out again.
             self.removeAllCameras()
@@ -191,18 +208,60 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
     }
 
-    /// The rear lens's device, if the phone has it and, with two cameras, it pairs with the front one.
-    private func backDevice(_ lens: BackLens) -> AVCaptureDevice? {
-        let type: AVCaptureDevice.DeviceType = switch lens {
+    /// The phone's virtual rear cameras, the most lenses first.
+    private static let virtualBackTypes: [AVCaptureDevice.DeviceType] = [.builtInTripleCamera, .builtInDualWideCamera, .builtInDualCamera]
+
+    private static func lensType(_ lens: BackLens) -> AVCaptureDevice.DeviceType {
+        switch lens {
         case .ultraWide: .builtInUltraWideCamera
         case .wide: .builtInWideAngleCamera
         case .telephoto: .builtInTelephotoCamera
         }
-        guard let device = AVCaptureDevice.default(type, for: .video, position: .back) else { return nil }
-        guard isMultiCam, let front = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else { return device }
-        let discovery = AVCaptureDevice.DiscoverySession(deviceTypes: [type, .builtInWideAngleCamera], mediaType: .video, position: .unspecified)
-        let pairs = discovery.supportedMultiCamDeviceSets.contains { $0.contains(device) && $0.contains(front) }
-        return pairs ? device : nil
+    }
+
+    /// With two cameras, a rear device counts only in a multi-camera set with the front one (P1.1).
+    private func pairs(_ device: AVCaptureDevice, paired: Bool) -> Bool {
+        guard paired, isMultiCam else { return true }
+        guard let front = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else { return false }
+        let discovery = AVCaptureDevice.DiscoverySession(deviceTypes: [device.deviceType, .builtInWideAngleCamera], mediaType: .video, position: .unspecified)
+        return discovery.supportedMultiCamDeviceSets.contains { $0.contains(device) && $0.contains(front) }
+    }
+
+    private func physicalBackDevice(_ lens: BackLens, paired: Bool) -> AVCaptureDevice? {
+        AVCaptureDevice.default(Self.lensType(lens), for: .video, position: .back).flatMap { pairs($0, paired: paired) ? $0 : nil }
+    }
+
+    /// The rear camera: the virtual one when this tier allows it and it pairs, else the chosen lens's own.
+    private func backDevice(_ lens: BackLens, paired: Bool) -> AVCaptureDevice? {
+        if usesVirtualBack, let virtual = Self.virtualBackTypes.lazy
+            .compactMap({ AVCaptureDevice.default($0, for: .video, position: .back) })
+            .first(where: { self.pairs($0, paired: paired) }) {
+            return virtual
+        }
+        return physicalBackDevice(lens, paired: paired)
+    }
+
+    /// A virtual camera's lenses in zoom order.
+    private static func lenses(of device: AVCaptureDevice) -> [BackLens] {
+        device.constituentDevices.compactMap { constituent in
+            switch constituent.deviceType {
+            case .builtInUltraWideCamera: .ultraWide
+            case .builtInWideAngleCamera: .wide
+            case .builtInTelephotoCamera: .telephoto
+            default: nil
+            }
+        }
+    }
+
+    /// The device zoom factors of a camera's lenses: 1, then where a virtual camera switches to each next lens.
+    private static func stops(of device: AVCaptureDevice) -> [Double] {
+        guard device.isVirtualDevice else { return [1] }
+        return [1] + device.virtualDeviceSwitchOverVideoZoomFactors.map { Double(truncating: $0) }
+    }
+
+    private static func stop(of lens: BackLens, on device: AVCaptureDevice) -> Double? {
+        let stops = stops(of: device)
+        return lenses(of: device).firstIndex(of: lens).flatMap { $0 < stops.count ? stops[$0] : nil }
     }
 
     public func flip() async throws -> CameraSetup {
@@ -217,11 +276,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             // The new camera is the first one while it's added: it may take the plain microphone.
             self.setup = flipped
             do {
-                try self.addCamera(position.other, formatWidth: self.maxFormatWidth)
+                try self.addCamera(position.other, formatWidth: self.maxFormatWidth, paired: false)
             } catch {
                 self.setup = setup
                 // Not even the old one back: no setup, so the shutter says the camera isn't there instead of waiting.
-                if (try? self.addCamera(position, formatWidth: self.maxFormatWidth)) == nil { self.setup = nil }
+                if (try? self.addCamera(position, formatWidth: self.maxFormatWidth, paired: false)) == nil { self.setup = nil }
                 throw error
             }
             return flipped
@@ -402,6 +461,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                 ) { result in
                     self.queue.async {
                         self.recording = nil
+                        self.setSmoothAutoFocus(false)
                         // Pressure that rose while recording can drop the selfie camera now.
                         self.applyPressure()
                         // The session tells why it was interrupted; the movie output only that it was.
@@ -413,6 +473,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     }
                 }
                 self.recording = delegate
+                self.setSmoothAutoFocus(true)
                 let maximum = limit.map { CMTime(seconds: TimeInterval($0.components.seconds), preferredTimescale: 600) } ?? .invalid
                 for (position, movie) in outputs {
                     movie.maxRecordedDuration = maximum
@@ -443,13 +504,26 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     /// system pressure cost is too high; the rear camera alone when nothing fits.
     private func configureWithinBudget() throws -> CameraSetup {
         frameRateCap = 30
+        usesVirtualBack = true
         guard let multiCam = session as? AVCaptureMultiCamSession else {
             try configure(.single(.back), formatWidth: nil)
             return .single(.back)
         }
+        // The virtual rear camera with the front one; then the lens's own camera with it, at the same tiers; then one
+        // camera (P1.1). A pair that can't be added at one size (busy, over budget) tries the next size down.
+        let hasVirtualPair = backDevice(backLens, paired: true)?.isVirtualDevice == true
+        for virtual in hasVirtualPair ? [true, false] : [false] {
+            usesVirtualBack = virtual
+            if let found = try negotiateDual(multiCam) { return found }
+        }
+        usesVirtualBack = true
+        try configure(.single(.back), formatWidth: maxFormatWidth)
+        return .single(.back)
+    }
+
+    private func negotiateDual(_ multiCam: AVCaptureMultiCamSession) throws -> CameraSetup? {
         for width in CapturePressurePolicy.dualFormatWidths where width <= maxFormatWidth {
-            // A selfie camera that can't be added (busy, broken) leaves the rear camera alone, not no camera.
-            guard (try? configure(.dual, formatWidth: width)) != nil else { break }
+            guard (try? configure(.dual, formatWidth: width)) != nil else { continue }
             for frameRate in [30, 24, 15] {
                 // The session prices a camera at its format's top rate unless the input caps it; both costs count,
                 // and both cameras must take the rate.
@@ -463,8 +537,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             }
             removeAllCameras()
         }
-        try configure(.single(.back), formatWidth: maxFormatWidth)
-        return .single(.back)
+        return nil
     }
 
     private func configure(_ setup: CameraSetup, formatWidth: Int32?) throws {
@@ -472,7 +545,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         defer { session.commitConfiguration() }
         if !isMultiCam { session.sessionPreset = maxFormatWidth < 1920 ? .hd1280x720 : .high }
         do {
-            for position in setup.positions { try addCamera(position, formatWidth: formatWidth) }
+            // Both cameras record at one size: the views swap, and Halves shows them side by side (P1.0a).
+            let shared = setup == .dual ? formatWidth.flatMap(sharedDimensions) : nil
+            for position in setup.positions {
+                try addCamera(position, formatWidth: formatWidth, paired: setup == .dual, dimensions: shared)
+            }
         } catch {
             removeAllCameras()
             throw error
@@ -532,13 +609,15 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         eventSink.yield(.setupChanged(.single(.back)))
     }
 
-    private func addCamera(_ position: CameraPosition, formatWidth: Int32?) throws {
+    private func device(for position: CameraPosition, paired: Bool) -> AVCaptureDevice? {
         let avPosition: AVCaptureDevice.Position = position == .back ? .back : .front
-        let chosen = position == .back ? backDevice(backLens) : nil
-        guard let device = chosen ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: avPosition) else {
-            throw CaptureError.cameraUnavailable
-        }
-        if isMultiCam, let formatWidth { try selectMultiCamFormat(device, maxWidth: formatWidth) }
+        let chosen = position == .back ? backDevice(backLens, paired: paired) : nil
+        return chosen ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: avPosition)
+    }
+
+    private func addCamera(_ position: CameraPosition, formatWidth: Int32?, paired: Bool, dimensions: CMVideoDimensions? = nil) throws {
+        guard let device = device(for: position, paired: paired) else { throw CaptureError.cameraUnavailable }
+        if isMultiCam, let formatWidth { try selectMultiCamFormat(device, maxWidth: formatWidth, dimensions: dimensions) }
         let input = try deviceInput(device)
         guard session.canAddInput(input) else { throw CaptureError.configurationFailed }
         session.addInputWithNoConnections(input)
@@ -570,6 +649,10 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
         if let largest = device.activeFormat.supportedMaxPhotoDimensions.last { photo.maxPhotoDimensions = largest }
         cameras[position] = Camera(input: input, photo: photo, movie: movie)
+        prepareFocus(device, position)
+        if position == .back, let factor = Self.stop(of: backLens, on: device) ?? Self.stop(of: .wide, on: device) {
+            zoom(device, to: factor, smoothly: false)
+        }
         pressureObservations[position] = device.observe(\.systemPressureState, options: [.initial, .new]) { [weak self] device, _ in
             guard let engine = self else { return }
             let level = CapturePressurePolicy.Level(device.systemPressureState.level)
@@ -615,23 +698,153 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private func removeCamera(_ position: CameraPosition) {
         pressureObservations[position] = nil
         pressure[position] = nil
+        focusLocked.remove(position)
+        subjectObservers.removeValue(forKey: position).map(NotificationCenter.default.removeObserver)
         guard let camera = cameras.removeValue(forKey: position) else { return }
         session.removeInput(camera.input)
         session.removeOutput(camera.photo)
         session.removeOutput(camera.movie)
     }
 
-    /// The largest multi-camera format up to `maxWidth` pixels wide, so two cameras fit the hardware budget.
-    private func selectMultiCamFormat(_ device: AVCaptureDevice, maxWidth: Int32) throws {
+    /// The largest multi-camera format up to `maxWidth` pixels wide, so two cameras fit the hardware budget; with
+    /// `dimensions`, one of exactly that size when the camera has it.
+    private func selectMultiCamFormat(_ device: AVCaptureDevice, maxWidth: Int32, dimensions: CMVideoDimensions? = nil) throws {
         let formats = device.formats.filter(\.isMultiCamSupported)
-        func width(_ format: AVCaptureDevice.Format) -> Int32 { CMVideoFormatDescriptionGetDimensions(format.formatDescription).width }
-        guard let format = formats.filter({ width($0) <= maxWidth }).max(by: { width($0) < width($1) })
-            ?? formats.min(by: { width($0) < width($1) }) else {
+        if let dimensions, let format = formats.first(where: { Self.same(Self.size($0), dimensions) }) {
+            try device.lockForConfiguration()
+            device.activeFormat = format
+            device.unlockForConfiguration()
+            return
+        }
+        guard let format = Self.largest(formats, upTo: maxWidth) ?? formats.min(by: { Self.size($0).width < Self.size($1).width }) else {
             throw CaptureError.configurationFailed
         }
         try device.lockForConfiguration()
         device.activeFormat = format
         device.unlockForConfiguration()
+    }
+
+    private static func size(_ format: AVCaptureDevice.Format) -> CMVideoDimensions {
+        CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+    }
+
+    private static func same(_ a: CMVideoDimensions, _ b: CMVideoDimensions) -> Bool { a.width == b.width && a.height == b.height }
+
+    /// The widest format up to `maxWidth`; of equal widths the first listed, as before (P1.0a keeps today's choice).
+    private static func largest(_ formats: [AVCaptureDevice.Format], upTo maxWidth: Int32) -> AVCaptureDevice.Format? {
+        formats.filter { size($0).width <= maxWidth }.max { size($0).width < size($1).width }
+    }
+
+    /// The size both cameras of a pair record at: the rear camera's usual choice when the front one has it, else the
+    /// biggest size both have up to `maxWidth`; nil leaves each to its own (P1.0a).
+    private func sharedDimensions(_ maxWidth: Int32) -> CMVideoDimensions? {
+        guard let back = device(for: .back, paired: true), let front = device(for: .front, paired: true) else { return nil }
+        let backFormats = back.formats.filter(\.isMultiCamSupported)
+        let frontSizes = front.formats.filter(\.isMultiCamSupported).map(Self.size)
+        func frontHas(_ size: CMVideoDimensions) -> Bool { frontSizes.contains { Self.same($0, size) } }
+        if let usual = Self.largest(backFormats, upTo: maxWidth).map(Self.size), frontHas(usual) { return usual }
+        return backFormats.map(Self.size)
+            .filter { $0.width <= maxWidth && frontHas($0) }
+            .max { Int($0.width) * Int($0.height) < Int($1.width) * Int($1.height) }
+    }
+
+    // MARK: Focus and zoom (on `queue`)
+
+    /// Continuous focus and exposure from the middle, and a new look when the scene changes (P1.5).
+    private func prepareFocus(_ device: AVCaptureDevice, _ position: CameraPosition) {
+        resetFocus(device)
+        subjectObservers.removeValue(forKey: position).map(NotificationCenter.default.removeObserver)
+        subjectObservers[position] = NotificationCenter.default.addObserver(
+            forName: AVCaptureDevice.subjectAreaDidChangeNotification, object: device, queue: nil
+        ) { [weak self] _ in
+            guard let engine = self else { return }
+            engine.queue.async {
+                guard engine.cameras[position]?.input.device === device, !engine.focusLocked.contains(position) else { return }
+                engine.resetFocus(device)
+            }
+        }
+    }
+
+    /// While recording, focus moves slowly instead of hunting in the clip (P1.5); photos keep the quick one.
+    private func setSmoothAutoFocus(_ on: Bool) {
+        for camera in cameras.values {
+            let device = camera.input.device
+            guard device.isSmoothAutoFocusSupported, (try? device.lockForConfiguration()) != nil else { continue }
+            device.isSmoothAutoFocusEnabled = on
+            device.unlockForConfiguration()
+        }
+    }
+
+    private func resetFocus(_ device: AVCaptureDevice) {
+        guard (try? device.lockForConfiguration()) != nil else { return }
+        defer { device.unlockForConfiguration() }
+        let middle = CGPoint(x: 0.5, y: 0.5)
+        if device.isFocusPointOfInterestSupported { device.focusPointOfInterest = middle }
+        if device.isFocusModeSupported(.continuousAutoFocus) { device.focusMode = .continuousAutoFocus }
+        if device.isExposurePointOfInterestSupported { device.exposurePointOfInterest = middle }
+        if device.isExposureModeSupported(.continuousAutoExposure) { device.exposureMode = .continuousAutoExposure }
+        device.isSubjectAreaChangeMonitoringEnabled = true
+    }
+
+    public func focus(at point: CGPoint, on position: CameraPosition, lock: Bool) async -> FocusResult {
+        (try? await onQueue { () -> FocusResult in
+            guard let device = self.cameras[position]?.input.device, (try? device.lockForConfiguration()) != nil else { return .none }
+            defer { device.unlockForConfiguration() }
+            // A lock focuses and exposes once, then holds; a tap keeps following from the new point until the scene changes.
+            let focusMode: AVCaptureDevice.FocusMode = lock ? .autoFocus : .continuousAutoFocus
+            let exposureMode: AVCaptureDevice.ExposureMode = lock ? .autoExpose : .continuousAutoExposure
+            let focuses = device.isFocusPointOfInterestSupported && device.isFocusModeSupported(focusMode)
+            let exposes = device.isExposurePointOfInterestSupported && device.isExposureModeSupported(exposureMode)
+            if focuses {
+                device.focusPointOfInterest = point
+                device.focusMode = focusMode
+            }
+            if exposes {
+                device.exposurePointOfInterest = point
+                device.exposureMode = exposureMode
+            }
+            let locks = lock && (focuses || exposes)
+            if locks { self.focusLocked.insert(position) } else { self.focusLocked.remove(position) }
+            return FocusResult(focuses: focuses, exposes: exposes, locks: locks)
+        }) ?? .none
+    }
+
+    public func zoom(on position: CameraPosition) async -> CameraZoom? {
+        try? await onQueue { () -> CameraZoom? in
+            guard let device = self.cameras[position]?.input.device else { return nil }
+            let multiplier = Double(device.displayVideoZoomFactorMultiplier)
+            let minFactor = Double(device.minAvailableVideoZoomFactor)
+            let maxFactor = max(minFactor, min(Double(device.maxAvailableVideoZoomFactor), CameraZoom.maxShown / max(multiplier, 0.01)))
+            let stops = Self.stops(of: device)
+            return CameraZoom(
+                stops: stops.filter { $0 >= minFactor && $0 <= maxFactor },
+                lenses: device.isVirtualDevice ? Self.lenses(of: device) : [],
+                minFactor: minFactor, maxFactor: maxFactor, shownMultiplier: multiplier,
+                factor: device.isRampingVideoZoom ? self.rampTargets[ObjectIdentifier(device)] ?? Double(device.videoZoomFactor) : Double(device.videoZoomFactor)
+            )
+        }
+    }
+
+    public func setZoom(_ factor: Double, on position: CameraPosition, smoothly: Bool) async {
+        _ = try? await onQueue {
+            guard let device = self.cameras[position]?.input.device else { return }
+            self.zoom(device, to: factor, smoothly: smoothly)
+        }
+    }
+
+    private func zoom(_ device: AVCaptureDevice, to factor: Double, smoothly: Bool) {
+        let minFactor = device.minAvailableVideoZoomFactor
+        let maxFactor = max(minFactor, min(device.maxAvailableVideoZoomFactor, CGFloat(CameraZoom.maxShown) / max(device.displayVideoZoomFactorMultiplier, 0.01)))
+        let clamped = min(max(CGFloat(factor), minFactor), maxFactor)
+        guard (try? device.lockForConfiguration()) != nil else { return }
+        defer { device.unlockForConfiguration() }
+        rampTargets[ObjectIdentifier(device)] = Double(clamped)
+        if smoothly {
+            device.ramp(toVideoZoomFactor: clamped, withRate: 8)
+        } else {
+            device.cancelVideoZoomRamp()
+            device.videoZoomFactor = clamped
+        }
     }
 
     /// Only once allowed: an input made before would raise the system prompt itself, without our explainer.

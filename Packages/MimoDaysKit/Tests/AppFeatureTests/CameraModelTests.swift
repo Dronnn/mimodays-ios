@@ -452,3 +452,108 @@ struct MediaCheckTests {
         [video.mainURL, video.selfieURL].compactMap(\.self).forEach { try? FileManager.default.removeItem(at: $0) }
     }
 }
+
+/// P1: zoom stops, pinch and tap to focus on the simulated camera (a rear camera at 0.5×, 1×, 2×).
+@MainActor
+struct CameraZoomFocusTests {
+    private func camera(lenses: [BackLens] = [.ultraWide, .wide, .telephoto]) async -> (CameraModel, SimulatedCaptureEngine) {
+        let engine = SimulatedCaptureEngine(lenses: lenses)
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { _ in }
+        )
+        await model.start()
+        return (model, engine)
+    }
+
+    private func settle(_ engine: SimulatedCaptureEngine, _ position: CameraPosition, at factor: Double) async throws {
+        for _ in 0..<50 where await engine.zoomFactors[position] != factor { try await Task.sleep(for: .milliseconds(10)) }
+    }
+
+    @Test func theCameraOpensAtTheChosenLens() async throws {
+        let (model, _) = await camera()
+        let zoom = try #require(model.mainZoom)
+        #expect(zoom.stops == [1, 2, 4])
+        #expect(zoom.shown == 1)
+        #expect(ZoomLabel.text(zoom.shown).hasPrefix("1"))
+    }
+
+    @Test func theLabelStepsThroughTheLensesAndRoundAgain() async throws {
+        let (model, engine) = await camera()
+        model.nextZoomStop()
+        #expect(model.mainZoom?.shown == 2)
+        #expect(model.settings.backLens == .telephoto)
+        try await settle(engine, .back, at: 4)
+        model.nextZoomStop()
+        #expect(model.mainZoom?.shown == 0.5)
+        #expect(model.settings.backLens == .ultraWide)
+        try await settle(engine, .back, at: 1)
+        #expect(await engine.zoomFactors[.back] == 1)
+    }
+
+    @Test func aPinchZoomsFromWhereItBeganAndStopsAtTheEnds() async throws {
+        let (model, engine) = await camera()
+        model.pinch(1.5, on: .back, ended: false)
+        model.pinch(2, on: .back, ended: true)
+        #expect(model.mainZoom?.factor == 4)
+        try await settle(engine, .back, at: 4)
+        model.pinch(100, on: .back, ended: true)
+        #expect(model.mainZoom?.shown == CameraZoom.maxShown)
+        model.pinch(0.01, on: .back, ended: true)
+        #expect(model.mainZoom?.factor == 1)
+        try await settle(engine, .back, at: 1)
+    }
+
+    /// Swapped, the label and a pinch are the front camera's; the rear keeps its own zoom.
+    @Test func frontAndRearZoomStayApart() async throws {
+        let (model, engine) = await camera()
+        await model.flip()
+        #expect(model.mainZoom?.stops == [1])
+        model.pinch(2, on: .front, ended: true)
+        try await settle(engine, .front, at: 2)
+        #expect(model.zooms[.back]?.shown == 1)
+    }
+
+    @Test func aTapFocusesThereAndTheMarkFades() async throws {
+        let (model, engine) = await camera()
+        await model.focus(at: CGPoint(x: 0.2, y: 0.3), layerPoint: CGPoint(x: 40, y: 90), on: .back, lock: false)
+        let mark = try #require(model.focusMark)
+        #expect(mark.point == CGPoint(x: 40, y: 90))
+        #expect(mark.result == FocusResult(focuses: true, exposes: true, locks: false))
+        #expect(await engine.focusTaps.last?.point == CGPoint(x: 0.2, y: 0.3))
+        model.focusMarkFaded(mark)
+        #expect(model.focusMark == nil)
+    }
+
+    @Test func aLongPressLocksAndTheLockStaysUntilTheNextTap() async throws {
+        let (model, engine) = await camera()
+        await model.focus(at: CGPoint(x: 0.5, y: 0.5), layerPoint: .zero, on: .front, lock: true)
+        let mark = try #require(model.focusMark)
+        #expect(mark.result == FocusResult(focuses: false, exposes: true, locks: true))
+        model.focusMarkFaded(mark)
+        #expect(model.focusMark == mark)
+        await model.focus(at: CGPoint(x: 0.1, y: 0.1), layerPoint: .zero, on: .front, lock: false)
+        #expect(model.focusMark?.result.locks == false)
+        #expect(await engine.focusTaps.map(\.lock) == [true, false])
+    }
+
+    @Test func zoomStopsGoRoundAndKnowWhereTheyAre() {
+        let zoom = CameraZoom(stops: [1, 2, 6], minFactor: 1, maxFactor: 20, shownMultiplier: 0.5, factor: 2.5)
+        #expect(zoom.currentStop == nil)
+        #expect(zoom.nextStop == 6)
+        #expect(CameraZoom(stops: [1, 2, 6], minFactor: 1, maxFactor: 20, shownMultiplier: 0.5, factor: 6).nextStop == 1)
+        #expect(zoom.clamped(40) == 20)
+        #expect(ZoomLabel.text(1.25) == "1.3×" || ZoomLabel.text(1.25) == "1.2×")
+    }
+}
+
+struct SelfieWindowPinchTests {
+    @Test func aPinchChangesTheWindowByOneSize() {
+        typealias Scale = CameraSettings.SelfieWindow.Scale
+        #expect(Scale.medium.after(pinch: 1.5) == .large)
+        #expect(Scale.large.after(pinch: 2) == .large)
+        #expect(Scale.medium.after(pinch: 0.6) == .small)
+        #expect(Scale.small.after(pinch: 0.5) == .small)
+        #expect(Scale.medium.after(pinch: 1.05) == .medium)
+    }
+}

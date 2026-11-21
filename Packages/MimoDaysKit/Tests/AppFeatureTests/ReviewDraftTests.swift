@@ -166,4 +166,15 @@ struct ReviewDraftTests {
         review.choose(ReviewPlace(label: "Yerevan", latitude: 40.18, longitude: 44.51, precision: .city, source: .manual))
         #expect(review.hasAnnotations && review.hasChosenPlace)
     }
+
+    /// P8.8: what's captured again survives a relaunch, and Save links it.
+    @Test func aRepeatSurvivesARelaunch() async throws {
+        defer { drafts.clear() }
+        let source = UUID()
+        let review = ReviewModel(capture: try drafts.adopt(try await capture()), repeatOf: source, drafts: drafts)
+        #expect(review.momentDraft.repeatOf == source)
+        let restored = ReviewModel(draft: try #require(drafts.load()), drafts: drafts)
+        #expect(restored.repeatOf == source && restored.promptID == nil)
+        #expect(restored.momentDraft.repeatOf == source)
+    }
 }

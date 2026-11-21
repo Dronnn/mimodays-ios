@@ -36,6 +36,8 @@ public enum Route: Equatable, Sendable {
     case settings
     /// Opens the camera. `promptID` is set when answering a surprise.
     case capture(promptID: UUID?)
+    /// P8.8 "Capture this again": a plain camera whose moment links to this one.
+    case captureAgain(UUID)
     /// Starts a movie (F02) on Movies, from a source chosen elsewhere when there is one (a place, a selection).
     case newMovie(MovieSourceRule?)
 }
@@ -60,10 +62,12 @@ public struct NewMovieRequest: Equatable, Identifiable, Sendable {
 public struct CaptureRequest: Equatable, Identifiable, Sendable {
     public var id = UUID()
     public var promptID: UUID?
+    /// P8.8: the moment this captures again.
+    public var repeatOf: UUID?
 
     public var isSurprise: Bool { promptID != nil }
 
-    public static func == (lhs: CaptureRequest, rhs: CaptureRequest) -> Bool { lhs.promptID == rhs.promptID }
+    public static func == (lhs: CaptureRequest, rhs: CaptureRequest) -> Bool { lhs.promptID == rhs.promptID && lhs.repeatOf == rhs.repeatOf }
 }
 
 /// Navigation state for the whole app. Views read it; routes come in through `open(_:)`.
@@ -111,6 +115,7 @@ public final class AppRouter {
         // Another camera over the open one would start over its capture; it stays as it is.
         if capture != nil {
             if case .capture = route { return }
+            if case .captureAgain = route { return }
             held = route
             return
         }
@@ -131,6 +136,11 @@ public final class AppRouter {
             newMovie = nil
             selectedTab = .today
             capture = CaptureRequest(promptID: promptID)
+        case let .captureAgain(source):
+            isSettingsPresented = false
+            newMovie = nil
+            selectedTab = .today
+            capture = CaptureRequest(repeatOf: source)
         }
     }
 

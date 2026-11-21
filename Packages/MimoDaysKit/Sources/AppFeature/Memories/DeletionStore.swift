@@ -49,7 +49,9 @@ struct DeletionStore {
     /// Recently Deleted: one recovered meanwhile (from another screen) stays.
     func deleteForever(_ ids: Set<UUID>) throws {
         var paths: [String] = []
-        for moment in try moments(ids) where moment.deletedAt != nil {
+        let gone = try moments(ids).filter { $0.deletedAt != nil }
+        try ThenNow.unlinkRepeats(of: Set(gone.map(\.id)), in: context)
+        for moment in gone {
             paths += moment.media.map(\.relativePath) + moment.voiceNotes.map(\.relativePath)
             context.delete(moment)
         }

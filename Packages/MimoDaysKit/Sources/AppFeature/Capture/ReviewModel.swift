@@ -21,6 +21,8 @@ final class ReviewModel {
     let capture: CaptureResult
     /// The surprise this capture answers, if it was opened in time.
     let promptID: UUID?
+    /// P8.8: the moment this captures again.
+    let repeatOf: UUID?
     /// The review's own placement: moving the window here doesn't change the camera's default.
     var window: CameraSettings.SelfieWindow {
         didSet { keepDraft() }
@@ -86,11 +88,12 @@ final class ReviewModel {
 
     /// A new capture; with `drafts` it is kept on disk until saved or retaken.
     init(
-        capture: CaptureResult, promptID: UUID? = nil, drafts: ReviewDraftStore? = nil,
+        capture: CaptureResult, promptID: UUID? = nil, repeatOf: UUID? = nil, drafts: ReviewDraftStore? = nil,
         voice services: VoiceServices = .simulated, places: PlaceServices = .simulated
     ) {
         self.capture = capture
         self.promptID = promptID
+        self.repeatOf = repeatOf
         self.drafts = drafts
         self.services = services
         self.places = places
@@ -104,6 +107,7 @@ final class ReviewModel {
     init(draft: ReviewDraft, drafts: ReviewDraftStore?, voice services: VoiceServices = .simulated, places: PlaceServices = .simulated) {
         capture = draft.capture
         promptID = draft.promptID
+        repeatOf = draft.repeatOf
         self.drafts = drafts
         self.services = services
         self.places = places
@@ -139,7 +143,7 @@ final class ReviewModel {
         // Nor bring back one whose files are gone.
         guard FileManager.default.fileExists(atPath: capture.mainURL.path) else { return }
         drafts.save(ReviewDraft(
-            capture: capture, caption: caption, note: note, window: window, promptID: promptID, voice: voice,
+            capture: capture, caption: caption, note: note, window: window, promptID: promptID, repeatOf: repeatOf, voice: voice,
             place: place, placeWasChosen: placeWasChosen
         ))
     }
@@ -321,7 +325,10 @@ final class ReviewModel {
 
     /// What Save keeps.
     var momentDraft: MomentDraft {
-        MomentDraft(capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID, voice: voice, place: place)
+        MomentDraft(
+            capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID, voice: voice,
+            place: place, repeatOf: repeatOf
+        )
     }
 
     /// Retake / Record again: nothing is kept.

@@ -11,6 +11,8 @@ struct ReviewDraft: Codable, Equatable {
     var note = ""
     var window: CameraSettings.SelfieWindow
     var promptID: UUID?
+    /// P8.8: kept across a retake and a relaunch.
+    var repeatOf: UUID?
     var voice: ReviewVoiceNote?
     var place: ReviewPlace?
     /// A place or "No place" was picked, so a late location fix doesn't fill it in.

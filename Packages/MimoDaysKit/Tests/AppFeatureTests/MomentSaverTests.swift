@@ -177,4 +177,23 @@ struct MomentSaverTests {
         #expect(moment.pipLayout == nil)
         #expect(Set(moment.media.map(\.role)) == [.rearSource, .thumbnail])
     }
+
+    /// P8.8: the new moment links to what it repeats, or to its first; nothing else is copied from it.
+    @Test func aRepeatLinksToItsSource() async throws {
+        let source = Moment(captured: time, origin: .manual, mediaType: .photo, createdAt: .now)
+        source.note = "Old note"
+        source.mood = .calm
+        container.mainContext.insert(source)
+        try container.mainContext.save()
+        var draft = MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)
+        draft.repeatOf = source.id
+        let moment = try await saver().save(draft)
+        #expect(moment.repeatOfMomentID == source.id)
+        #expect(moment.note == nil && moment.mood == nil && moment.origin == .manual)
+
+        source.deletedAt = .now
+        var late = MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)
+        late.repeatOf = source.id
+        #expect(try await saver().save(late).repeatOfMomentID == nil)
+    }
 }

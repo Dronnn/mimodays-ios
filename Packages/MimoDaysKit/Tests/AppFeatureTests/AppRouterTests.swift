@@ -113,4 +113,16 @@ struct AppRouterTests {
         #expect(router.capture?.promptID == (answerable ? id : nil))
         #expect(router.isSettingsPresented == !answerable)
     }
+
+    /// P8.8: "Capture this again" opens a plain camera that knows what it repeats; not over an open one.
+    @Test func captureAgainOpensAPlainCameraForIt() {
+        let router = AppRouter(selectedTab: .memories)
+        let source = UUID()
+        router.open(.captureAgain(source))
+        #expect(router.selectedTab == .today)
+        #expect(router.capture?.repeatOf == source && router.capture?.promptID == nil && router.capture?.isSurprise == false)
+        let shown = router.capture?.id
+        router.open(.captureAgain(UUID()))
+        #expect(router.capture?.id == shown)
+    }
 }

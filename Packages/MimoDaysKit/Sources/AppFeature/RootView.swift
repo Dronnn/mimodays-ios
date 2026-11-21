@@ -189,7 +189,7 @@ public struct RootView: View {
             if let onboarding {
                 onboarding.resumeCapture(promptID: draft.promptID)
             } else {
-                router.open(.capture(promptID: draft.promptID))
+                router.open(draft.repeatOf.map(Route.captureAgain) ?? .capture(promptID: draft.promptID))
             }
         }
         // After the review: it waits for Review to close.
@@ -273,6 +273,7 @@ public struct RootView: View {
             if let promptID, router.capture?.promptID != promptID { router.heldSurprise = promptID }
             return
         }
+        if router.capture != nil, case .captureAgain = route { return }
         // Before the launch's review is back (a tap iOS kept for the app as it opens), it waits for it.
         guard resumedLaunch, !appLock.isLockedOrDue else {
             heldRoute = route
@@ -493,7 +494,10 @@ struct CaptureFlowView: View {
                     let drafts = services.drafts
                     let adopted = try? drafts.adopt(capture)
                     let inTime = promptExpiry.map { capture.capturedAt.instant < $0 } ?? true
-                    review = ReviewModel(capture: adopted ?? capture, promptID: inTime ? request.promptID : nil, drafts: adopted == nil ? nil : drafts, voice: services.voice, places: services.places)
+                    review = ReviewModel(
+                        capture: adopted ?? capture, promptID: inTime ? request.promptID : nil, repeatOf: request.repeatOf,
+                        drafts: adopted == nil ? nil : drafts, voice: services.voice, places: services.places
+                    )
                 }
             )
         }

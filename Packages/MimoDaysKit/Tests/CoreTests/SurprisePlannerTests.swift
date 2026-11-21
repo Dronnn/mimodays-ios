@@ -171,6 +171,14 @@ struct SurprisePlannerTests {
         #expect(times.filter { thisWeek.contains($0) }.count == 1)
     }
 
+    /// Drawing again the same day adds nothing to a week under way: its share was drawn already.
+    @Test func aWeekUnderWayIsNotTopppedUpByARelaunch() {
+        let wednesday = Self.date("2026-11-11 06:00", in: calendar)
+        let first = draw(Self.rules(.weekly(3)), now: wednesday)
+        #expect(draw(Self.rules(.weekly(3)), now: wednesday, planned: first, seed: 5).isEmpty)
+        #expect(draw(Self.rules(.weekly(3)), now: Self.date("2026-11-12 09:00", in: calendar), planned: first, seed: 7).isEmpty)
+    }
+
     @Test func aPlannedWeekIsNotDrawnAgain() {
         let monday = Self.date("2026-11-09 06:00", in: calendar)
         let first = draw(Self.rules(.weekly(3)), now: monday)

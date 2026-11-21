@@ -96,23 +96,37 @@ public struct SurprisePlanner: Sendable {
         using generator: inout some RandomNumberGenerator
     ) -> [Date] {
         var enabledDays = 0
+        // Enabled days from today on, with or without a surprise already; those with one.
+        var daysAhead = 0
+        var takenAhead = 0
         var candidates: [Window] = []
+        let today = calendar.startOfDay(for: notBefore)
         var day = week.start
         while day < week.end {
             if isEnabled(day, rules) {
                 enabledDays += 1
-                if !taken.contains(where: { calendar.isDate($0, inSameDayAs: day) }),
-                   let window = window(on: day, rules, notBefore: notBefore) { candidates.append(window) }
+                if taken.contains(where: { calendar.isDate($0, inSameDayAs: day) }) {
+                    if day >= today {
+                        daysAhead += 1
+                        takenAhead += 1
+                    }
+                } else if let window = window(on: day, rules, notBefore: notBefore) {
+                    candidates.append(window)
+                    daysAhead += 1
+                }
             }
             guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
             day = next
         }
         guard enabledDays > 0, !candidates.isEmpty else { return [] }
-        // A week under way gets its share of the surprises for the enabled days still ahead.
-        let share = candidates.count == enabledDays
+        // A week under way gets its share of the surprises for the enabled days still ahead, counting the ones it has
+        // there: drawing again (a relaunch) adds none.
+        let share = daysAhead == enabledDays
             ? count
-            : Int((Double(count * candidates.count) / Double(enabledDays)).rounded())
-        let picked = candidates.shuffled(using: &generator).prefix(min(share, count - taken.count, candidates.count))
+            : Int((Double(count * daysAhead) / Double(enabledDays)).rounded())
+        let wanted = min(share - takenAhead, count - taken.count, candidates.count)
+        guard wanted > 0 else { return [] }
+        let picked = candidates.shuffled(using: &generator).prefix(wanted)
         return picked.flatMap { slots(1, in: $0, gap: 0, using: &generator) }.sorted()
     }
 

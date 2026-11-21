@@ -12,7 +12,7 @@ struct SearchModelTests {
     private static func entry(
         day: Int = 20261018, video: Bool = false, favorite: Bool = false,
         caption: String? = nil, note: String? = nil, transcript: String? = nil, voice: Bool? = nil, place: String? = nil,
-        collections: Set<UUID> = []
+        collections: Set<UUID> = [], mood: Mood? = nil
     ) -> SearchEntry {
         SearchEntry(
             item: MemoryItem(
@@ -20,7 +20,7 @@ struct SearchModelTests {
                 origin: .manual, isFavorite: favorite
             ),
             caption: caption, note: note, transcript: transcript, place: place, hasVoiceNote: voice ?? (transcript != nil),
-            collections: collections
+            collections: collections, mood: mood
         )
     }
 
@@ -46,6 +46,23 @@ struct SearchModelTests {
         #expect(hits[0].text?.hasPrefix("…") == true && hits[0].text?.contains("the lake, Lena") == true)
         #expect(hits[1].text == "“…we walked around the lake twice”")
         #expect(hits[2].text == "Sunset")
+    }
+
+    /// P8.10: any picked mood (OR), with the other filters and the words (AND); one group in the count.
+    @Test func moodsNarrowAsOneGroup() {
+        let calm = Self.entry(caption: "lake", mood: .calm)
+        let joyful = Self.entry(favorite: true, caption: "lake", mood: .joyful)
+        let none = Self.entry(caption: "lake")
+        let heavy = Self.entry(caption: "rain", mood: .heavy)
+        var filters = SearchFilters()
+        filters.moods = [.calm, .joyful]
+        #expect(filters.count == 1)
+        let ids = { (query: String, filters: SearchFilters) in Set(SearchModel.hits([calm, joyful, none, heavy], query: query, filters: filters).map(\.id)) }
+        #expect(ids("", filters) == [calm.item.id, joyful.item.id])
+        #expect(ids("rain", filters).isEmpty)
+        filters.favoritesOnly = true
+        #expect(filters.count == 2)
+        #expect(ids("lake", filters) == [joyful.item.id])
     }
 
     @Test func onlyFiltersListEveryMomentTheyLeave() {

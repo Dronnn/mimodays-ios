@@ -24,10 +24,13 @@ struct SearchFilters: Equatable {
     var collection: UUID?
     /// A place picked from the Places section.
     var place: String?
+    /// P8.10: any of these moods; one filter group however many are picked.
+    var moods: Set<Mood> = []
 
     /// "Filters · N".
     var count: Int {
-        [kind != .all, from != nil, to != nil, hasVoiceNote, hasWrittenNote, favoritesOnly, collection != nil, place != nil].filter(\.self).count
+        [kind != .all, from != nil, to != nil, hasVoiceNote, hasWrittenNote, favoritesOnly, collection != nil, place != nil, !moods.isEmpty]
+            .filter(\.self).count
     }
 
     var isEmpty: Bool { count == 0 }
@@ -42,6 +45,7 @@ struct SearchEntry: Equatable {
     var place: String?
     var hasVoiceNote: Bool
     var collections: Set<UUID> = []
+    var mood: Mood?
 }
 
 /// Where the words were found, in the order a row names it.
@@ -155,7 +159,7 @@ final class SearchModel {
                     caption: moment.title, note: moment.note,
                     transcript: voices[moment.id].flatMap { $0.isEmpty ? nil : $0 },
                     place: places[moment.id], hasVoiceNote: voices[moment.id] != nil,
-                    collections: memberships[moment.id] ?? []
+                    collections: memberships[moment.id] ?? [], mood: moment.mood
                 )
             }
         } catch {
@@ -222,6 +226,7 @@ final class SearchModel {
         if filters.favoritesOnly, !entry.item.isFavorite { return false }
         if let collection = filters.collection, !entry.collections.contains(collection) { return false }
         if let place = filters.place, entry.place != place { return false }
+        if !filters.moods.isEmpty, !(entry.mood.map(filters.moods.contains) ?? false) { return false }
         return true
     }
 

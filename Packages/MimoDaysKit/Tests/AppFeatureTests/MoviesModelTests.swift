@@ -287,4 +287,17 @@ struct MoviesModelTests {
         model.source = .lastYear
         #expect(model.title == "2025, the whole year")
     }
+
+    /// P8.9: each day of the period with a moment, a surprise first; hidden moments and lost files left out.
+    @Test func oneSecondDaysUseTheArchive() async throws {
+        let ids = try await save([20261102, 20261102, 20261103, 20261104, 20261201])
+        let moments = try context.fetch(FetchDescriptor<Moment>())
+        let byID = Dictionary(uniqueKeysWithValues: moments.map { ($0.id, $0) })
+        byID[ids[1]]!.origin = .randomPrompt
+        try MemoryVisibility.setHidden(true, byID[ids[2]]!, in: context)
+        for media in byID[ids[3]]!.media { try store.remove(media.relativePath) }
+        let days = try MoviesModel.oneSecondDays(in: context, store: store, days: OneSecondPerDay.days(ofMonth: 202611))
+        #expect(days.map(\.day) == [20261102])
+        #expect(days.first?.picked == ids[1] && days.first?.choices == [ids[1], ids[0]])
+    }
 }

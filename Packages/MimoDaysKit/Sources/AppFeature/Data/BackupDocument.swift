@@ -34,6 +34,7 @@ struct BackupDocument: Codable, Equatable {
     var neededVersion: Int {
         let usesNewFields = !(hiddenDays ?? []).isEmpty
             || moments.contains { $0.isHiddenFromMemories == true || $0.repeatOf != nil || $0.mood != nil }
+            || movies.contains { $0.sourceRule.kind == .oneSecondPerDay }
         return usesNewFields ? Self.currentVersion : Self.firstVersion
     }
 

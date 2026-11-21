@@ -332,7 +332,7 @@ final class NewMovieModel {
             source = .place(rule.momentIDs.first?.uuidString ?? "")
             placeIDs = rule.momentIDs
             placeName = placeLabel(of: rule.momentIDs)
-        case .selection, .onThisDay:
+        case .selection, .onThisDay, .oneSecondPerDay:
             source = .moments
             presetIDs = rule.momentIDs
         }

@@ -138,6 +138,23 @@ final class MoviesModel {
         }
     }
 
+    /// P8.9: the days of `days` with a moment to show, hidden ones left out (P8.3); a moment whose main file is gone
+    /// gives way to the day's next.
+    static func oneSecondDays(in context: ModelContext, store: MediaStore, days: ClosedRange<Int>) throws -> [OneSecondPerDay.Day] {
+        let first = days.lowerBound
+        let last = days.upperBound
+        var descriptor = FetchDescriptor<Moment>(predicate: #Predicate { $0.deletedAt == nil && $0.localDay >= first && $0.localDay <= last })
+        descriptor.relationshipKeyPathsForPrefetching = [\.media]
+        let moments = MemoryVisibility(context: context).visible(try context.fetch(descriptor))
+        return OneSecondPerDay.days(moments.map { moment in
+            let main = moment.media.first { $0.role == .rearSource || $0.role == .frontSource }
+            return OneSecondPerDay.Candidate(
+                id: moment.id, capturedAt: moment.capturedAt, day: moment.localDay, isSurprise: moment.origin == .randomPrompt,
+                isPlayable: main.map { store.fileExists($0.relativePath) } ?? false
+            )
+        })
+    }
+
     /// A whole month as a date range, its days as noon UTC like every day key.
     static func monthRule(_ month: Int) -> MovieSourceRule {
         MovieSourceRule(kind: .dateRange, start: MemoriesView.dayDate(month * 100 + 1), end: MemoriesView.dayDate(month * 100 + lastDay(of: month)))

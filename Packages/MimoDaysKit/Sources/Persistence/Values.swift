@@ -125,6 +125,9 @@ public enum MovieSourceKind: String, Codable, CaseIterable, Sendable {
     case onThisDay
     /// The moments at one place on the map (`momentIDs`).
     case place
+    /// P8.9: one second per day of `start`...`end` (a month or a year), the moments in `momentIDs` as chosen.
+    /// Needs backup version 2.
+    case oneSecondPerDay
 }
 
 /// Which moments a movie is built from.

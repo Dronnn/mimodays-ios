@@ -39,6 +39,8 @@ struct MovieExportView: View {
         Group {
             switch model.phase {
             case .options: MovieExportOptions(model: model, cover: cover)
+            // P8.13: its own "Waiting to export…" comes with the design; until then, progress at its start.
+            case .waiting: MovieRendering(progress: 0, remaining: nil, cover: cover, cancel: model.cancel)
             case let .rendering(progress, remaining): MovieRendering(progress: progress, remaining: remaining, cover: cover, cancel: model.cancel)
             case let .ready(render):
                 MovieReady(title: model.project.title, render: render, url: library.flatMap { try? $0.store.url(for: render.relativePath) }, cover: cover) {

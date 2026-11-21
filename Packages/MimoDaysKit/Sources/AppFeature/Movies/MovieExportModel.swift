@@ -14,6 +14,8 @@ import UserNotifications
 final class MovieExportModel {
     enum Phase: Equatable {
         case options
+        /// P8.13: handed to iOS, waiting for its turn.
+        case waiting
         /// `progress` 0...1; `remaining` seconds, once there's enough to guess from.
         case rendering(progress: Double, remaining: Double?)
         case ready(MovieRender)
@@ -38,17 +40,26 @@ final class MovieExportModel {
     private let freeSpace: () -> Int64?
     private(set) var task: Task<Void, Never>?
     private var background = UIBackgroundTaskIdentifier.invalid
+    /// P8.13: iOS 26 keeps the export going after MimoDays is left.
+    private let continuation: (any ContinuedExportScheduler)?
+    private var continued: (any ContinuedExportTask)?
+    /// iOS took this export on: F12 offers Back to Movies.
+    private(set) var runsInBackground = false
+    /// iOS turned it down: "Keep MimoDays open to finish this export."
+    private(set) var foregroundOnly = false
     private let logger = Logger(subsystem: "MimoDays", category: "Movies")
 
     /// Starts with the quality and place set in Settings (S06); a movie made before keeps its own quality.
     init(
         project: MovieProject, library: MediaLibrary, defaults: MovieDefaults = MovieDefaults(),
-        clock: any DateProvider = SystemDateProvider(), freeSpace: @escaping () -> Int64? = MovieExportModel.deviceFreeSpace
+        clock: any DateProvider = SystemDateProvider(), freeSpace: @escaping () -> Int64? = MovieExportModel.deviceFreeSpace,
+        continuation: (any ContinuedExportScheduler)? = nil
     ) {
         self.project = project
         self.library = library
         self.clock = clock
         self.freeSpace = freeSpace
+        self.continuation = continuation
         plan = MoviePlan(project, store: library.store)
         resolution = project.render?.resolution ?? defaults.resolution
         placeInFile = defaults.exactPlaceInFiles
@@ -80,14 +91,78 @@ final class MovieExportModel {
 
     // MARK: Render
 
+    /// F11's "You can leave MimoDays while the movie is being made."
+    var canLeave: Bool { continuation?.isAvailable == true }
+
     func start() {
         // Two taps before the options make way: one render, or Cancel would stop only the second.
         if case .rendering = phase { return }
+        if phase == .waiting { return }
         let needed = estimatedBytes(resolution)
         if let free = freeSpace(), free < needed + needed / 5 {
             phase = .failed(.space(needed: needed + needed / 5 - free))
             return
         }
+        runsInBackground = false
+        foregroundOnly = false
+        if let continuation, continuation.isAvailable {
+            phase = .waiting
+            let accepted = continuation.submit(title: String(appLocalized: "Exporting a movie", bundle: .module)) { [weak self] task in
+                guard let self else { return task.finish(success: false) }
+                runContinued(task)
+            }
+            if accepted {
+                runsInBackground = true
+                return
+            }
+            foregroundOnly = true
+        }
+        runInForeground()
+    }
+
+    /// iOS's turn came: the same render, its progress shown by iOS too.
+    private func runContinued(_ handed: any ContinuedExportTask) {
+        // Cancelled while it waited.
+        guard phase == .waiting, runsInBackground else { return handed.finish(success: false) }
+        continued = handed
+        handed.stopped = { [weak self, weak handed] in
+            guard let self, let handed, continued === handed else { return }
+            stoppedByIOS()
+        }
+        phase = .rendering(progress: 0, remaining: nil)
+        let started = clock.now()
+        task = Task { [weak self] in
+            guard let self else { return }
+            do {
+                let render = try await render(started: started)
+                guard !Task.isCancelled else {
+                    try? library.store.remove(render.relativePath)
+                    return
+                }
+                try store.attach(render, to: project)
+                phase = .ready(render)
+                handed.finish(success: true)
+                notifyIfAway()
+            } catch {
+                guard !Task.isCancelled, !(error is CancellationError) else { return }
+                logger.error("Exporting the movie failed: \(error.localizedDescription, privacy: .public)")
+                phase = .failed(.other)
+                handed.finish(success: false)
+            }
+            if continued === handed { continued = nil }
+        }
+    }
+
+    /// The system's Cancel, or iOS needed the time back: the render stops, the draft stays, F14 offers to try again.
+    private func stoppedByIOS() {
+        task?.cancel()
+        task = nil
+        continued?.finish(success: false)
+        continued = nil
+        phase = .failed(.other)
+    }
+
+    private func runInForeground() {
         phase = .rendering(progress: 0, remaining: nil)
         let started = clock.now()
         task = Task { [weak self] in
@@ -121,6 +196,9 @@ final class MovieExportModel {
         task?.cancel()
         task = nil
         phase = .options
+        continued?.finish(success: false)
+        continued = nil
+        runsInBackground = false
         endBackgroundTask()
     }
 
@@ -181,6 +259,7 @@ final class MovieExportModel {
         let elapsed = clock.now().timeIntervalSince(started)
         let remaining = fraction > 0.05 ? elapsed / fraction * (1 - fraction) : nil
         phase = .rendering(progress: fraction, remaining: remaining)
+        continued?.report(fraction)
     }
 
     static func preset(_ resolution: MovieResolution) -> String {

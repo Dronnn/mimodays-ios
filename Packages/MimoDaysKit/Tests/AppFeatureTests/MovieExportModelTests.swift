@@ -183,4 +183,111 @@ struct MovieExportModelTests {
         #expect(MovieExportModel.iso6709(latitude: 37.8044, longitude: -122.2712) == "+37.8044-122.2712/")
         #expect(MovieExportModel.iso6709(latitude: -3.5, longitude: 7.25) == "-03.5000+007.2500/")
     }
+
+    // MARK: P8.13 continued export
+
+    /// Takes or refuses exports; runs them when told to.
+    @MainActor
+    final class FakeContinuation: ContinuedExportScheduler {
+        var isAvailable = true
+        var accepts = true
+        private(set) var titles: [String] = []
+        private var waiting: [@MainActor (any ContinuedExportTask) -> Void] = []
+
+        func submit(title: String, run: @escaping @MainActor (any ContinuedExportTask) -> Void) -> Bool {
+            titles.append(title)
+            guard accepts else { return false }
+            waiting.append(run)
+            return true
+        }
+
+        /// iOS's turn comes for the oldest waiting export.
+        @discardableResult
+        func runNext() -> FakeTask {
+            let task = FakeTask()
+            waiting.removeFirst()(task)
+            return task
+        }
+    }
+
+    @MainActor
+    final class FakeTask: ContinuedExportTask {
+        var stopped: (@MainActor () -> Void)?
+        private(set) var reported: [Double] = []
+        private(set) var result: Bool?
+        func report(_ fraction: Double) { reported.append(fraction) }
+        func finish(success: Bool) { if result == nil { result = success } }
+    }
+
+    /// Handed to iOS, it waits, then renders when its turn comes; the system sees progress and the end.
+    @Test func iOSTakesTheExportOn() async throws {
+        let project = try await project(photos: 2)
+        let continuation = FakeContinuation()
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }, continuation: continuation)
+        model.resolution = .p720
+        #expect(model.canLeave)
+        model.start()
+        #expect(model.phase == .waiting && model.runsInBackground && !model.foregroundOnly)
+        #expect(continuation.titles == ["Exporting a movie"])
+        model.start()
+        #expect(continuation.titles.count == 1)
+        let task = continuation.runNext()
+        await model.waitForRender()
+        guard case .ready = model.phase else {
+            Issue.record("Expected ready, got \(model.phase)")
+            return
+        }
+        #expect(task.result == true)
+        #expect(!task.reported.isEmpty && task.reported.allSatisfy { (0...1).contains($0) })
+        #expect(project.render != nil)
+    }
+
+    /// iOS turns it down: the export runs as before, while MimoDays stays open.
+    @Test func refusedRunsInTheForeground() async throws {
+        let project = try await project(photos: 2)
+        let continuation = FakeContinuation()
+        continuation.accepts = false
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }, continuation: continuation)
+        model.resolution = .p720
+        model.start()
+        #expect(model.foregroundOnly && !model.runsInBackground)
+        await model.waitForRender()
+        guard case .ready = model.phase else {
+            Issue.record("Expected ready, got \(model.phase)")
+            return
+        }
+        // Before iOS 26, or not set up: nothing is handed over and nothing is said about leaving.
+        continuation.isAvailable = false
+        let plain = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }, continuation: continuation)
+        #expect(!plain.canLeave)
+        #expect(MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }).canLeave == false)
+    }
+
+    /// Cancel while it waits: when iOS's turn comes, nothing renders and iOS hears it's done.
+    @Test func cancelledWhileWaiting() async throws {
+        let project = try await project(photos: 2)
+        let continuation = FakeContinuation()
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }, continuation: continuation)
+        model.start()
+        model.cancel()
+        #expect(model.phase == .options)
+        let task = continuation.runNext()
+        #expect(task.result == false && model.phase == .options && model.task == nil)
+        #expect(project.render == nil)
+    }
+
+    /// The system's Cancel (or iOS taking the time back) stops the render; the draft stays and Try again is offered.
+    @Test func stoppedByIOSKeepsTheDraft() async throws {
+        let project = try await project(photos: 4)
+        let continuation = FakeContinuation()
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }, continuation: continuation)
+        model.start()
+        let task = continuation.runNext()
+        task.stopped?()
+        await model.waitForRender()
+        #expect(model.phase == .failed(.other))
+        #expect(task.result == false)
+        #expect(project.render == nil)
+        #expect(project.orderedClips.count == 4)
+    }
 }

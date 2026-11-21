@@ -26,6 +26,64 @@ struct SettingsModelTests {
         return SettingsModel(library: library, surprises: surprises, permissions: permissions)
     }
 
+    private func fallbackModel(suite: String = "SettingsFallback-\(UUID().uuidString)") -> (SettingsModel, SurpriseCoordinator) {
+        let permissions = PresetPermissionService(status: .granted)
+        let surprises = SurpriseCoordinator(
+            context: container.mainContext, notifications: notifications, permissions: permissions, clock: clock,
+            defaults: UserDefaults(suiteName: suite)
+        )
+        return (SettingsModel(library: library, surprises: surprises, permissions: permissions), surprises)
+    }
+
+    /// KK01/KK02: off by default; on, it starts at 8:00 PM when that fits the hours, else at their latest time.
+    @Test func theFallbackReminderStartsAtEightOrTheLatestTime() async {
+        let suite = "SettingsFallback-\(UUID().uuidString)"
+        let (model, surprises) = fallbackModel(suite: suite)
+        await model.load()
+        await model.setSurprises(true)
+        #expect(!model.fallback.isOn)
+        model.reminders.setLatest(18 * 60)
+        await model.replanning?.value
+        await model.setFallback(isOn: true)
+        #expect(model.fallback == FallbackReminder(isOn: true, minute: 18 * 60))
+        #expect(surprises.fallback == model.fallback)
+        await model.setFallbackMinute(17 * 60 + 30)
+        await model.setFallback(isOn: false)
+        // Off keeps the time for the next time it's on.
+        #expect(surprises.fallback == FallbackReminder(isOn: false, minute: 17 * 60 + 30))
+        let (relaunched, _) = fallbackModel(suite: suite)
+        await relaunched.load()
+        #expect(relaunched.fallback == FallbackReminder(isOn: false, minute: 17 * 60 + 30))
+    }
+
+    /// KK03: a time outside the surprise hours is kept, said, and not scheduled.
+    @Test func aTimeOutsideTheHoursIsSaid() async {
+        let (model, _) = fallbackModel()
+        await model.load()
+        await model.setSurprises(true)
+        await model.setFallback(isOn: true)
+        #expect(!model.fallbackOutsideHours)
+        await model.setFallbackMinute(23 * 60)
+        #expect(model.fallbackOutsideHours)
+        model.reminders.setLatest(23 * 60 + 30)
+        #expect(!model.fallbackOutsideHours)
+    }
+
+    /// KK05: iOS turned it down: the row says so, and Try again schedules it once it can.
+    @Test func aFailedFallbackIsSaidAndTriedAgain() async {
+        let (model, _) = fallbackModel()
+        await model.load()
+        await model.setSurprises(true)
+        model.reminders.frequency = .threeAWeek
+        await model.replanning?.value
+        await notifications.setScheduleError(.unavailable)
+        await model.setFallback(isOn: true)
+        #expect(model.fallbackFailed)
+        await notifications.setScheduleError(nil)
+        await model.retryFallback()
+        #expect(!model.fallbackFailed)
+    }
+
     private func schedule() throws -> SurpriseSchedule? {
         try container.mainContext.fetch(FetchDescriptor<SurpriseSchedule>()).first
     }

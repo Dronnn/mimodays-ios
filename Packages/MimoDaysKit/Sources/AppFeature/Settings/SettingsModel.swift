@@ -62,6 +62,10 @@ final class SettingsModel {
             surprisesOn = stored.isEnabled
             pause = stored.isPausedIndefinitely ? .indefinitely : stored.pausedUntil.map(Pause.until) ?? .off
         }
+        if let surprises {
+            fallback = surprises.fallback
+            fallbackFailed = surprises.fallbackFailed
+        }
         let backups = (try? context.fetch(FetchDescriptor<BackupManifest>(predicate: #Predicate { $0.restoredAt == nil }))) ?? []
         lastBackup = backups.map(\.createdAt).max()
         isLoading = false
@@ -97,6 +101,47 @@ final class SettingsModel {
     func resume() async {
         await surprises?.resume()
         await reloadPause()
+    }
+
+    // MARK: Fallback reminder (P8.14, KK01-KK05)
+
+    private(set) var fallback = FallbackReminder()
+    /// iOS didn't take one of the reminders: the row offers Try again.
+    private(set) var fallbackFailed = false
+
+    /// The time shown: the chosen one, or the one it would start at.
+    var fallbackMinute: Int {
+        fallback.minute ?? FallbackReminder.defaultMinute(earliest: reminders.earliestMinute, latest: reminders.latestMinute)
+    }
+
+    /// KK03: outside the surprise hours nothing is scheduled; the row says why.
+    var fallbackOutsideHours: Bool {
+        fallback.isOn && !(reminders.earliestMinute...reminders.latestMinute).contains(fallbackMinute)
+    }
+
+    /// Turned off, the time stays for the next time it's on.
+    func setFallback(isOn: Bool) async {
+        var value = fallback
+        value.isOn = isOn
+        if isOn, value.minute == nil { value.minute = fallbackMinute }
+        await saveFallback(value)
+    }
+
+    func setFallbackMinute(_ minute: Int) async {
+        var value = fallback
+        value.minute = minute
+        await saveFallback(value)
+    }
+
+    func retryFallback() async {
+        await saveFallback(fallback)
+    }
+
+    private func saveFallback(_ value: FallbackReminder) async {
+        fallback = value
+        guard let surprises else { return }
+        await surprises.setFallback(value)
+        fallbackFailed = surprises.fallbackFailed
     }
 
     private func reloadPause() async {

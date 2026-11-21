@@ -58,6 +58,21 @@ struct SettingsSnapshotTests {
         assertScreenSnapshots(of: page(SurpriseSettingsView(model: model)), variants: variants + SnapshotVariant.languages)
     }
 
+    /// §V16 KK01: the fallback reminder on, at 8:00 PM.
+    @Test func surprisesWithFallbackReminder() async {
+        let model = await model()
+        await model.setFallback(isOn: true)
+        assertScreenSnapshots(of: page(SurpriseSettingsView(model: model)), variants: variants + SnapshotVariant.languages)
+    }
+
+    /// §V16 KK03: a reminder time outside the surprise hours.
+    @Test func surprisesWithFallbackOutsideTheHours() async {
+        let model = await model()
+        await model.setFallback(isOn: true)
+        await model.setFallbackMinute(23 * 60)
+        assertScreenSnapshots(of: page(SurpriseSettingsView(model: model)), variants: [SnapshotVariant(.iPhone, .light)] + SnapshotVariant.languages)
+    }
+
     /// S02 when notifications are off in iOS Settings.
     @Test func surprisesWithoutNotifications() async {
         let model = await model(notifications: .denied)

@@ -10,10 +10,12 @@ struct SurpriseSettingsView: View {
     @State private var pausing = false
     @State private var sentNow = false
     @State private var asker = PermissionAsker()
+    @State private var picksFallbackTime = false
     @Environment(\.permissions) private var permissions
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.calendar) private var calendar
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(spacing: 0) {
@@ -45,6 +47,12 @@ struct SurpriseSettingsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 20)
+                    fallbackCard
+                        .padding(.horizontal, 16)
+                        .padding(.top, 18)
+                    fallbackNote
+                        .padding(.horizontal, 22)
+                        .padding(.top, 10)
                     DataCard {
                         Button { pausing = true } label: {
                             SettingsValueRow(title: Text("Pause surprises", bundle: .module), value: pauseValue)
@@ -113,6 +121,99 @@ struct SurpriseSettingsView: View {
             SettingsValueRow(title: Text("Time to catch it", bundle: .module), value: Text(Self.minutes(model.expiryMinutes)))
         }
         .accessibilityIdentifier("surprises.expiry")
+    }
+
+    // MARK: Fallback reminder (P8.14, §V16 KK01-KK05)
+
+    private var fallbackCard: some View {
+        DataCard {
+            DataToggleRow(
+                title: Text("Fallback reminder", bundle: .module, comment: "Surprises settings (P8.14 KK01): a reminder at a fixed time on days with no surprise"),
+                isOn: Binding { model.fallback.isOn } set: { isOn in
+                    if !isOn { picksFallbackTime = false }
+                    Task { await model.setFallback(isOn: isOn) }
+                }
+            )
+            .accessibilityIdentifier("surprises.fallback")
+            if model.fallback.isOn {
+                DataSeparator()
+                fallbackTimeRow
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var fallbackTimeRow: some View {
+        Button {
+            withAnimation(.snappy) { picksFallbackTime.toggle() }
+        } label: {
+            HStack(spacing: 6) {
+                Text("Reminder time", bundle: .module, comment: "Surprises settings (P8.14 KK01): when the fallback reminder comes")
+                    .textStyle(.rowTitle)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                Spacer(minLength: 8)
+                Text(verbatim: ReminderSchedule.time(model.fallbackMinute, calendar: calendar, locale: locale))
+                    .textStyle(.rowDetail)
+                    .foregroundStyle(model.fallbackOutsideHours ? ColorToken.textDestructive.color : ColorToken.textTertiary.color)
+                Icon.glyphChevron.image
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(model.fallbackOutsideHours ? ColorToken.textDestructive.color : ColorToken.textPrimary.color)
+                    .rotationEffect(.degrees(picksFallbackTime ? 90 : 0))
+                    .flipsForRightToLeftLayoutDirection(true)
+                    .accessibilityHidden(true)
+            }
+            .padding(.leading, 16)
+            .padding(.trailing, 14)
+            .frame(minHeight: Size.rowHeight)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(picksFallbackTime ? .isSelected : [])
+        .accessibilityIdentifier("surprises.fallbackTime")
+        if picksFallbackTime {
+            DatePicker(selection: Binding {
+                ReminderSchedule.date(model.fallbackMinute, calendar: calendar)
+            } set: { date in
+                let minute = ReminderSchedule.minute(of: date, calendar: calendar)
+                Task { await model.setFallbackMinute(minute) }
+            }, displayedComponents: .hourAndMinute) {
+                Text("Reminder time", bundle: .module)
+            }
+            .datePickerStyle(.wheel)
+            .labelsHidden()
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    /// What the reminder does, or why it can't: couldn't be set, outside the hours, surprises off (KK05).
+    @ViewBuilder
+    private var fallbackNote: some View {
+        if model.fallback.isOn, model.fallbackFailed {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Couldn't set the fallback reminder.", bundle: .module, comment: "Surprises settings (P8.14 KK05): iOS didn't take the reminder")
+                    .textStyle(.meta)
+                    .foregroundStyle(ColorToken.textDestructive.color)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button { Task { await model.retryFallback() } } label: {
+                    Text("Try again", bundle: .module).textStyle(.rowTitle).foregroundStyle(ColorToken.textLink.color)
+                }
+                .frame(minHeight: Size.minimumTapTarget)
+                .accessibilityIdentifier("surprises.fallbackRetry")
+            }
+        } else if model.fallbackOutsideHours {
+            let earliest = ReminderSchedule.time(model.reminders.earliestMinute, calendar: calendar, locale: locale)
+            let latest = ReminderSchedule.time(model.reminders.latestMinute, calendar: calendar, locale: locale)
+            Text("Choose a time inside your surprise hours (\(earliest) - \(latest)).", bundle: .module, comment: "Surprises settings (P8.14 KK03): the reminder time is outside Not before - Not after; the two times")
+                .textStyle(.meta)
+                .foregroundStyle(ColorToken.textDestructive.color)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else if model.fallback.isOn, !model.surprisesOn {
+            DataNote(text: Text("Turn on surprises to use a fallback reminder.", bundle: .module, comment: "Surprises settings (P8.14 KK05): the reminder is kept but waits while surprises are off"))
+        } else {
+            DataNote(text: Text("A reminder at this time on days with no scheduled surprise.", bundle: .module, comment: "Surprises settings (P8.14 KK01/KK02): under Fallback reminder"))
+        }
     }
 
     private func sectionLabel(_ text: Text) -> some View {

@@ -177,4 +177,15 @@ struct ReviewDraftTests {
         #expect(restored.repeatOf == source && restored.promptID == nil)
         #expect(restored.momentDraft.repeatOf == source)
     }
+
+    /// P8.4, P8.10: tags and mood are kept with the draft and saved with the moment.
+    @Test func tagsAndMoodSurviveARelaunch() async throws {
+        defer { drafts.clear() }
+        let review = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        review.tags = ["Lena", "bike"]
+        review.mood = .joyful
+        let restored = ReviewModel(draft: try #require(drafts.load()), drafts: drafts)
+        #expect(restored.tags == ["Lena", "bike"] && restored.mood == .joyful)
+        #expect(restored.momentDraft.tags == ["Lena", "bike"] && restored.momentDraft.mood == .joyful)
+    }
 }

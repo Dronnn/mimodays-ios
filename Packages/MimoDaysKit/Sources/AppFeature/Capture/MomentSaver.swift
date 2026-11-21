@@ -27,6 +27,9 @@ struct MomentDraft {
     var origin: MomentOrigin?
     /// P8.8: the moment this captures again; linked on save if it's still there.
     var repeatOf: UUID?
+    /// P8.4, P8.10.
+    var tags: [String] = []
+    var mood: Mood?
 }
 
 enum SaveError: Error, Equatable {
@@ -101,6 +104,8 @@ struct MomentSaver {
             moment.pipLayout = layout
             moment.captureFormat = capture.format
             moment.repeatOfMomentID = ThenNow.source(for: draft.repeatOf, in: context)
+            moment.tags = draft.tags
+            moment.mood = draft.mood
             let voiceNote = try draft.voice.map { voice in
                 let file = try store.store(copyOf: voice.url, in: .originals)
                 written.append(file.relativePath)

@@ -35,6 +35,9 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     var caption: String
     var note: String
     var isFavorite: Bool
+    /// P8.4, P8.10.
+    var tags: [String]
+    var mood: Mood?
     private(set) var place: ReviewPlace?
     private(set) var placeWasChosen = false
     private(set) var voice: Voice?
@@ -52,6 +55,8 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
 
     private let original: (caption: String, note: String, isFavorite: Bool, place: ReviewPlace?, voice: Voice?)
     private let originalCollections: Set<UUID>
+    private let originalTags: [String]
+    private let originalMood: Mood?
     private let thumbnailPath: String?
     private let voiceServices: VoiceServices
     private let places: PlaceServices
@@ -84,6 +89,10 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
         isFavorite = original.isFavorite
         self.place = place
         self.voice = saved
+        originalTags = moment.tags
+        originalMood = moment.mood
+        tags = originalTags
+        mood = originalMood
         originalCollections = Set(moment.memberships.compactMap(\.collection?.id))
         collectionIDs = originalCollections
     }
@@ -91,6 +100,7 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
     var hasChanges: Bool {
         caption != original.caption || note != original.note || isFavorite != original.isFavorite
             || (placeWasChosen && place != original.place) || voice != original.voice || collectionIDs != originalCollections
+            || tags != originalTags || mood != originalMood
     }
 
     func loadThumbnail() async {
@@ -251,6 +261,8 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
             let note = note.trimmingCharacters(in: .whitespacesAndNewlines)
             moment.note = note.isEmpty ? nil : note
             moment.isFavorite = isFavorite
+            moment.tags = tags
+            moment.mood = mood
             if placeWasChosen, place != original.place {
                 if let location = moment.location { library.context.delete(location) }
                 moment.location = place.map {

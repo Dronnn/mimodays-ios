@@ -26,10 +26,12 @@ struct SearchFilters: Equatable {
     var place: String?
     /// P8.10: any of these moods; one filter group however many are picked.
     var moods: Set<Mood> = []
+    /// P8.4: any of these tags (`Tags.key`); one filter group.
+    var tags: Set<String> = []
 
     /// "Filters · N".
     var count: Int {
-        [kind != .all, from != nil, to != nil, hasVoiceNote, hasWrittenNote, favoritesOnly, collection != nil, place != nil, !moods.isEmpty]
+        [kind != .all, from != nil, to != nil, hasVoiceNote, hasWrittenNote, favoritesOnly, collection != nil, place != nil, !moods.isEmpty, !tags.isEmpty]
             .filter(\.self).count
     }
 
@@ -46,6 +48,7 @@ struct SearchEntry: Equatable {
     var hasVoiceNote: Bool
     var collections: Set<UUID> = []
     var mood: Mood?
+    var tags: [String] = []
 }
 
 /// Where the words were found, in the order a row names it.
@@ -54,6 +57,7 @@ enum SearchField: Equatable {
     case note
     case voiceNote
     case place
+    case tag
 }
 
 /// A row in M08's Moments: the moment, what to show of it and where it matched (nil when only filters apply).
@@ -159,7 +163,7 @@ final class SearchModel {
                     caption: moment.title, note: moment.note,
                     transcript: voices[moment.id].flatMap { $0.isEmpty ? nil : $0 },
                     place: places[moment.id], hasVoiceNote: voices[moment.id] != nil,
-                    collections: memberships[moment.id] ?? [], mood: moment.mood
+                    collections: memberships[moment.id] ?? [], mood: moment.mood, tags: moment.tags
                 )
             }
         } catch {
@@ -227,6 +231,7 @@ final class SearchModel {
         if let collection = filters.collection, !entry.collections.contains(collection) { return false }
         if let place = filters.place, entry.place != place { return false }
         if !filters.moods.isEmpty, !(entry.mood.map(filters.moods.contains) ?? false) { return false }
+        if !filters.tags.isEmpty, !entry.tags.contains(where: { filters.tags.contains(Tags.key($0)) }) { return false }
         return true
     }
 
@@ -237,6 +242,7 @@ final class SearchModel {
             guard passes(entry, filters) else { return nil }
             let fields: [(SearchField, String?)] = [
                 (.caption, entry.caption), (.note, entry.note), (.voiceNote, entry.transcript), (.place, entry.place),
+                (.tag, entry.tags.isEmpty ? nil : entry.tags.joined(separator: " ")),
             ]
             guard let first = words.first else {
                 return SearchHit(entry: entry, text: entry.caption ?? entry.note.map { snippet($0, around: nil) }, field: nil)
@@ -248,6 +254,7 @@ final class SearchModel {
             case .note: entry.note.map { snippet($0, around: first) }
             case .voiceNote: entry.transcript.map { "“" + snippet($0, around: first) + "”" }
             case .place: entry.caption ?? entry.note.map { snippet($0, around: nil) } ?? entry.place
+            case .tag: entry.caption ?? entry.tags.first { contains($0, first) }
             }
             return SearchHit(entry: entry, text: text, field: field.0)
         }

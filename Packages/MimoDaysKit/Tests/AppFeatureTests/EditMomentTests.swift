@@ -183,4 +183,21 @@ struct EditMomentTests {
         try moment().deletedAt = .now
         #expect(EditMomentModel(id: id, library: library, voice: .simulated, places: .simulated) == nil)
     }
+
+    /// P8.4, P8.10: tags and mood change only on Save.
+    @Test func tagsAndMoodChangeOnSave() async throws {
+        let id = try await save()
+        let edit = try edit(id)
+        #expect(edit.tags.isEmpty && edit.mood == nil && !edit.hasChanges)
+        edit.tags = ["Lena"]
+        edit.mood = .calm
+        #expect(edit.hasChanges)
+        #expect(try moment().tags.isEmpty && moment().mood == nil)
+        try await edit.save()
+        #expect(try moment().tags == ["Lena"] && moment().mood == .calm)
+        let again = try self.edit(id)
+        again.mood = nil
+        try await again.save()
+        #expect(try moment().mood == nil && moment().tags == ["Lena"])
+    }
 }

@@ -3,6 +3,7 @@ import Core
 import Foundation
 import ImageIO
 import Observation
+import Persistence
 import UIKit
 
 /// Review (C07), or C13d after a recording that stopped early: the capture before it is kept.
@@ -23,6 +24,13 @@ final class ReviewModel {
     let promptID: UUID?
     /// P8.8: the moment this captures again.
     let repeatOf: UUID?
+    /// P8.4, P8.10.
+    var tags: [String] = [] {
+        didSet { keepDraft() }
+    }
+    var mood: Mood? {
+        didSet { keepDraft() }
+    }
     /// The review's own placement: moving the window here doesn't change the camera's default.
     var window: CameraSettings.SelfieWindow {
         didSet { keepDraft() }
@@ -108,6 +116,8 @@ final class ReviewModel {
         capture = draft.capture
         promptID = draft.promptID
         repeatOf = draft.repeatOf
+        tags = draft.tags ?? []
+        mood = draft.mood
         self.drafts = drafts
         self.services = services
         self.places = places
@@ -143,8 +153,8 @@ final class ReviewModel {
         // Nor bring back one whose files are gone.
         guard FileManager.default.fileExists(atPath: capture.mainURL.path) else { return }
         drafts.save(ReviewDraft(
-            capture: capture, caption: caption, note: note, window: window, promptID: promptID, repeatOf: repeatOf, voice: voice,
-            place: place, placeWasChosen: placeWasChosen
+            capture: capture, caption: caption, note: note, window: window, promptID: promptID, repeatOf: repeatOf,
+            tags: tags.isEmpty ? nil : tags, mood: mood, voice: voice, place: place, placeWasChosen: placeWasChosen
         ))
     }
 
@@ -327,7 +337,7 @@ final class ReviewModel {
     var momentDraft: MomentDraft {
         MomentDraft(
             capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID, voice: voice,
-            place: place, repeatOf: repeatOf
+            place: place, repeatOf: repeatOf, tags: tags, mood: mood
         )
     }
 

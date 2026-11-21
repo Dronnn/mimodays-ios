@@ -253,6 +253,7 @@ struct SearchResults: View {
         case .note: Text("matched in note", bundle: .module)
         case .voiceNote: Text("matched in voice note", bundle: .module)
         case .place: Text("matched in place", bundle: .module)
+        case .tag: Text("matched in tag", bundle: .module, comment: "Search row (P8.4): the words were found in one of the moment's tags")
         }
     }
 

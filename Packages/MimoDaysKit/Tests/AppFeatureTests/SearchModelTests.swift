@@ -12,7 +12,7 @@ struct SearchModelTests {
     private static func entry(
         day: Int = 20261018, video: Bool = false, favorite: Bool = false,
         caption: String? = nil, note: String? = nil, transcript: String? = nil, voice: Bool? = nil, place: String? = nil,
-        collections: Set<UUID> = [], mood: Mood? = nil
+        collections: Set<UUID> = [], mood: Mood? = nil, tags: [String] = []
     ) -> SearchEntry {
         SearchEntry(
             item: MemoryItem(
@@ -20,7 +20,7 @@ struct SearchModelTests {
                 origin: .manual, isFavorite: favorite
             ),
             caption: caption, note: note, transcript: transcript, place: place, hasVoiceNote: voice ?? (transcript != nil),
-            collections: collections, mood: mood
+            collections: collections, mood: mood, tags: tags
         )
     }
 
@@ -144,5 +144,23 @@ struct SearchModelTests {
         #expect(model.filteredCount == 1)
         model.clearFilters()
         #expect(model.filters.isEmpty && !model.isSearching)
+    }
+
+    /// P8.4: words find tags too; picked tags are any of them (OR), with mood and the rest (AND); one group.
+    @Test func tagsAreSearchedAndFiltered() {
+        let cafe = Self.entry(caption: "Morning", tags: ["Café", "Lena"])
+        let lena = Self.entry(mood: .calm, tags: ["lena"])
+        let other = Self.entry(caption: "lena's bike")
+        let ids = { (query: String, filters: SearchFilters) in Set(SearchModel.hits([cafe, lena, other], query: query, filters: filters).map(\.id)) }
+        #expect(ids("cafe", SearchFilters()) == [cafe.item.id])
+        let hit = SearchModel.hits([lena], query: "len", filters: SearchFilters()).first
+        #expect(hit?.field == .tag && hit?.text == "lena")
+        var filters = SearchFilters()
+        filters.tags = [Tags.key("LENA")]
+        #expect(filters.count == 1)
+        #expect(ids("", filters) == [cafe.item.id, lena.item.id])
+        filters.moods = [.calm]
+        #expect(filters.count == 2)
+        #expect(ids("", filters) == [lena.item.id])
     }
 }

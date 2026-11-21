@@ -196,4 +196,12 @@ struct MomentSaverTests {
         late.repeatOf = source.id
         #expect(try await saver().save(late).repeatOfMomentID == nil)
     }
+
+    @Test func tagsAndMoodAreSaved() async throws {
+        var draft = MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)
+        draft.tags = ["Lena", "bike"]
+        draft.mood = .heavy
+        let moment = try await saver().save(draft)
+        #expect(moment.tags == ["Lena", "bike"] && moment.mood == .heavy)
+    }
 }

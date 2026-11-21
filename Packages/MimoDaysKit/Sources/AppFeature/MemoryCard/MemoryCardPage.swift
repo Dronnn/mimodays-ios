@@ -130,6 +130,15 @@ struct MemoryCardPage: View {
                         swapped: swapped, cornerOnRight: cornerOnRight, controlsShown: $controlsShown,
                         actions: cardActions
                     )
+                    .overlay {
+                        // EE06: a Live Photo's still first, its motion on request.
+                        if let path = moment.motionPath {
+                            LivePhotoPlayback(
+                                url: model.url(path).flatMap { FileManager.default.fileExists(atPath: $0.path) ? $0 : nil },
+                                isCurrent: isCurrent && !showsBack
+                            )
+                        }
+                    }
                 }
             }
             .modifier(CardFace(angle: reduceMotion ? (showsBack ? 180 : 0) : flip.angle, isBack: false))

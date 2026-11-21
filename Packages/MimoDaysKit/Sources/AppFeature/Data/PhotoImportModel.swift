@@ -54,6 +54,10 @@ final class PhotoImportModel: Identifiable {
 
     /// Every copy the picker handed over, read or not yet, so closing mid-load leaves none behind.
     private var received: [URL] = []
+    /// Where each loaded file came from, by its id: "Try again" asks for a Live Photo's motion again.
+    private var sources: [Int: any PhotoPickerItemLoading] = [:]
+    /// "Try again" is asking.
+    private(set) var isRetrying = false
     private var loading: Task<Void, Never>?
     private let library: MediaLibrary
     private let saver: MomentSaver
@@ -84,6 +88,32 @@ final class PhotoImportModel: Identifiable {
     func skip(_ id: Int) {
         motionFailed.remove(id)
         skipped.insert(id)
+    }
+
+    /// "Try again": the Live Photos whose motion didn't come are asked for again; the ones that come now are ready.
+    func retryMotion() async {
+        guard !isRetrying else { return }
+        isRetrying = true
+        defer { isRetrying = false }
+        for id in motionFailed.sorted() {
+            guard let source = sources[id], let file = try? await source.loadFile() else { continue }
+            received += [file.url, file.motionURL].compactMap(\.self)
+            // The still from the first try stays; this copy only brought the motion.
+            try? FileManager.default.removeItem(at: file.url)
+            guard let motion = file.motionURL, await Self.plays(motion),
+                  let index = picked.firstIndex(where: { $0.id == id }) else { continue }
+            picked[index].motionURL = motion
+            motionFailed.remove(id)
+        }
+    }
+
+    /// "Keep motion" for every Live Photo whose still is already here; false when one didn't take.
+    func attachAllMotion() async -> Bool {
+        var done = true
+        for id in motionToAttach.keys.sorted() {
+            if await !attachMotion(id) { done = false }
+        }
+        return done
     }
 
     /// "Keep motion": the motion joins the moment that has this still; no second moment.
@@ -150,6 +180,7 @@ final class PhotoImportModel: Identifiable {
     /// Loads what the picker returned, then reads it.
     func load(_ items: [some PhotoPickerItemLoading]) async {
         var files: [PickedFile] = []
+        var sources: [Int: any PhotoPickerItemLoading] = [:]
         for (index, item) in items.enumerated() {
             let file = Task.isCancelled ? nil : try? await item.loadFile()
             if let file { received.append(file.url) }
@@ -164,9 +195,12 @@ final class PhotoImportModel: Identifiable {
                 unreadable += 1
                 continue
             }
+            // Its id once read is its place among the files.
+            sources[files.count] = item
             files.append(file)
             phase = .loading(Double(index + 1) / Double(items.count) / 2)
         }
+        self.sources = sources
         await load(files)
     }
 

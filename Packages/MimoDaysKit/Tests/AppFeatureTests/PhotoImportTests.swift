@@ -251,6 +251,36 @@ struct PhotoImportTests {
         #expect(moments.count == (skips ? 0 : 1) && moments.first?.livePhotoMotion == nil)
     }
 
+    /// A Live Photo handed over first without its motion, then with it.
+    private final class FlakyLivePhoto: PhotoPickerItemLoading, @unchecked Sendable {
+        let first: PickedFile
+        let second: PickedFile
+        private var calls = 0
+
+        init(first: PickedFile, second: PickedFile) {
+            self.first = first
+            self.second = second
+        }
+
+        func loadFile() async throws -> PickedFile? {
+            calls += 1
+            return calls == 1 ? first : second
+        }
+    }
+
+    /// EE05 Try again: the motion that didn't come comes now; the item is ready with it and imports as one moment.
+    @Test func tryAgainBringsTheMotion() async throws {
+        let item = FlakyLivePhoto(first: try await livePhoto(motion: false), second: try await livePhoto())
+        let model = model()
+        await model.load([item])
+        #expect(model.motionFailed == [0] && model.new.isEmpty)
+        await model.retryMotion()
+        #expect(model.motionFailed.isEmpty && model.new.count == 1)
+        #expect(model.picked.first?.motionURL != nil)
+        #expect(await model.importAll())
+        #expect(try moments().first?.livePhotoMotion != nil)
+    }
+
     /// The still is here already without motion: skipped as usual, and Keep motion adds it to that moment.
     @Test func keepMotionJoinsTheMomentAlreadyHere() async throws {
         let first = model()

@@ -286,11 +286,31 @@ struct ViewerSnapshotTests {
         assertScreenSnapshots(of: await thenNow(ids.now), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
-    private func hiddenPage(_ id: UUID) async throws -> some View {
+    /// P8.6 EE06: an imported Live Photo's card, its still first with Play Live Photo; Motion unavailable once its
+    /// motion file is gone.
+    @Test func memoryCardLivePhoto() async throws {
+        let id = try await save(video: false, note: "")
+        let context = container.mainContext
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first)
+        moment.origin = .imported
+        // Imported: no selfie window.
+        for media in moment.media where media.role == .frontSource || media.role == .composedPreview { context.delete(media) }
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let clip = try await engine.record(limit: .seconds(1))
+        if let selfie = clip.selfieURL { try? FileManager.default.removeItem(at: selfie) }
+        try await MomentSaver(context: context, store: store, clock: clock, freeBytes: { nil }).attachMotion(clip.mainURL, to: moment)
+        try context.save()
+        assertScreenSnapshots(of: try await hiddenPage(id, angle: 0), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, rightToLeft: true)])
+        try store.remove(try #require(moment.livePhotoMotion).relativePath)
+        assertScreenSnapshots(of: try await hiddenPage(id, angle: 0), variants: [SnapshotVariant(.iPhone, .light)], testName: "memoryCardLiveMotionUnavailable")
+    }
+
+    private func hiddenPage(_ id: UUID, angle: Double = 180) async throws -> some View {
         let model = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
         await model.load(id)
         let moment = try #require(model.moments[id])
-        return MemoryCardPage(model: model, moment: moment, isCurrent: false, screenWidth: 402, angle: 180, edit: {}, step: { _ in })
+        return MemoryCardPage(model: model, moment: moment, isCurrent: false, screenWidth: 402, angle: angle, edit: {}, step: { _ in })
             .frame(width: 359)
             .padding(.top, 108)
             .padding(.bottom, 84)

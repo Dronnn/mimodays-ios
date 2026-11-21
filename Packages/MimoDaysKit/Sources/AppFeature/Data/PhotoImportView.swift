@@ -10,6 +10,8 @@ struct PhotoImportView: View {
     let close: () -> Void
     let imported: () -> Void
     @State private var failed = false
+    /// "Keep motion" didn't take.
+    @State private var motionNotKept = false
     /// False once the screen is gone (a notification took over): a batch that ends then doesn't move the app.
     @State private var isShown = true
 
@@ -95,6 +97,24 @@ struct PhotoImportView: View {
                     .overlay(alignment: .bottomLeading) {
                         if item.isVideo, let duration = item.duration { VideoBadge(duration: duration).padding(6) }
                     }
+                    .overlay(alignment: .topLeading) {
+                        // P8.6: a Live Photo with its motion.
+                        if item.motionURL != nil { LiveBadge().scaleEffect(0.85, anchor: .topLeading).padding(5) }
+                    }
+                    .overlay {
+                        // Its motion didn't come: waiting for Try again, Import as still or Skip.
+                        if model.motionFailed.contains(item.id) {
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .strokeBorder(ColorToken.actionCoral.color, lineWidth: 2.5)
+                                .overlay(alignment: .topTrailing) {
+                                    Icon.glyphWarning.image
+                                        .resizable()
+                                        .frame(width: 18, height: 18)
+                                        .foregroundStyle(ColorToken.actionCoral.color)
+                                        .padding(6)
+                                }
+                        }
+                    }
                     .overlay {
                         if item.id == model.picked.prefix(8).last?.id, model.count > 8 {
                             ZStack {
@@ -139,9 +159,84 @@ struct PhotoImportView: View {
                     .frame(minHeight: 52)
                     .accessibilityElement(children: .combine)
                 }
+                if !model.motionToAttach.isEmpty {
+                    DataSeparator()
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("Already here without motion", bundle: .module).textStyle(.rowTitle).foregroundStyle(ColorToken.textPrimary.color)
+                            Text("Its motion can join the moment that's here.", bundle: .module)
+                                .textStyle(.rowCaption)
+                                .foregroundStyle(ColorToken.textSecondary.color)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 8)
+                        Button {
+                            Task { if await !model.attachAllMotion() { motionNotKept = true } }
+                        } label: { Text("Keep motion", bundle: .module) }
+                            .buttonStyle(ChipButtonStyle())
+                            .disabled(isImporting)
+                            .accessibilityIdentifier("import.keepMotion")
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .frame(minHeight: 52)
+                }
             }
             .padding(.top, 20)
+            if !model.motionFailed.isEmpty {
+                motionFailedCard.padding(.top, 14)
+                Text("Still loading or failed items aren't counted until resolved.", bundle: .module)
+                    .textStyle(.rowCaption)
+                    .foregroundStyle(ColorToken.textSecondary.color)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 14)
+            }
         }
+        .alert(Text("Motion couldn't be kept", bundle: .module), isPresented: $motionNotKept) {
+            Button(role: .cancel) {} label: { Text("OK", bundle: .module) }
+        } message: {
+            Text("The moment that's here stays as it was.", bundle: .module)
+        }
+    }
+
+    /// P8.6 EE05: Live Photos whose motion didn't come.
+    private var motionFailedCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                Icon.glyphWarning.image
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(ColorToken.actionCoral.color)
+                    .accessibilityHidden(true)
+                Text("Motion couldn't be loaded", bundle: .module)
+                    .textStyle(.rowTitle)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+            }
+            Text("The still picture can come in now, without its motion.", bundle: .module)
+                .textStyle(.rowCaption)
+                .foregroundStyle(ColorToken.textSecondary.color)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 4)
+            ChipFlow(spacing: 8, lineSpacing: 8) {
+                Button { Task { await model.retryMotion() } } label: {
+                    if model.isRetrying { Text("Loading motion…", bundle: .module) } else { Text("Try again", bundle: .module) }
+                }
+                .accessibilityIdentifier("import.liveRetry")
+                Button { model.motionFailed.forEach(model.importAsStill) } label: { Text("Import as still", bundle: .module) }
+                    .accessibilityIdentifier("import.liveStill")
+                Button { model.motionFailed.forEach(model.skip) } label: { Text("Skip", bundle: .module) }
+                    .accessibilityIdentifier("import.liveSkip")
+            }
+            .buttonStyle(ChipButtonStyle())
+            .disabled(model.isRetrying || isImporting)
+            .padding(.top, 14)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("import.livePhoto")
     }
 
     /// "8 photos and videos", "3 photos", "1 video".

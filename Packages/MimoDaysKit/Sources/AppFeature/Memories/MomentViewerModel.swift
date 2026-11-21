@@ -72,6 +72,8 @@ struct ViewerMoment: Equatable, Identifiable {
 
     /// P8.8: how many times this moment, or the one it repeats, was taken again; 0 when never.
     var thenNowRepeats = 0
+    /// P8.6: an imported Live Photo's motion.
+    var motionPath: String?
     var id: UUID
     var captured: CaptureTime
     /// The day it's kept under, as Settings › Memories › Days labels it: its day page and hidden day are this one.
@@ -128,6 +130,7 @@ struct ViewerMoment: Equatable, Identifiable {
         mainPath = summary.mainPath
         selfiePath = summary.selfiePath
         composedPath = moment.media.first { $0.role == .composedPreview }?.relativePath
+        motionPath = moment.mediaType == .photo ? moment.livePhotoMotion?.relativePath : nil
         collections = moment.memberships.compactMap { $0.collection.map { CollectionLink(id: $0.id, title: $0.title) } }
             .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
         voice = moment.voiceNotes.first.map { Voice(path: $0.relativePath, duration: $0.duration, transcript: $0.transcript) }

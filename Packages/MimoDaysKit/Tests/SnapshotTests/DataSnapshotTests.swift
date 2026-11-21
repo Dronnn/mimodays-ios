@@ -168,4 +168,28 @@ struct DataSnapshotTests {
         model.phase = .ready
         assertScreenSnapshots(of: page(PhotoImportView(model: model, close: {}, imported: {})), variants: variants)
     }
+
+    /// P8.6 EE05: Live Photos with their motion, one whose motion didn't come, one already here without motion.
+    @Test func importLivePhoto() {
+        let model = PhotoImportModel(
+            library: library, saver: MomentSaver(context: container.mainContext, store: store, freeBytes: { nil }), lookup: SimulatedPlaceLookup()
+        )
+        let time = CaptureTime(instant: Date(timeIntervalSince1970: 1_794_408_125), timeZone: .gmt)
+        model.picked = (0..<8).map { index in
+            var item = PhotoImportModel.Picked(
+                id: index, url: URL(filePath: "/tmp/\(index).jpg"), isVideo: index == 3, capturedAt: time, point: nil, checksum: "\(index)",
+                duration: index == 3 ? 10 : nil, hasAudio: false
+            )
+            item.isLivePhoto = [0, 5, 6].contains(index)
+            if [0, 5].contains(index) { item.motionURL = URL(filePath: "/tmp/\(index).mov") }
+            return item
+        }
+        model.motionFailed = [6]
+        model.skipped = [5]
+        model.motionToAttach = [5: UUID()]
+        model.phase = .ready
+        assertScreenSnapshots(of: page(PhotoImportView(model: model, close: {}, imported: {})), variants: [
+            SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge),
+        ] + SnapshotVariant.languages)
+    }
 }

@@ -8,6 +8,8 @@ struct CameraSettingsSheet: View {
     @Binding var settings: CameraSettings
     /// The rear lenses this phone can use; the choice shows with more than one.
     var lenses: [BackLens] = []
+    /// A lens tap, also on the chosen one (it may have been pinched away from).
+    var chooseLens: (BackLens) -> Void = { _ in }
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -24,7 +26,7 @@ struct CameraSettingsSheet: View {
                     }
                     if lenses.count > 1 {
                         section(Text("Back camera", bundle: .module, comment: "Camera ••• sheet: section title over the rear lens choice")) {
-                            SegmentedControl(selection: $settings.backLens, options: lenses, fitsLabels: true) { $0.label }
+                            SegmentedControl(selection: Binding(get: { settings.backLens }, set: chooseLens), options: lenses, fitsLabels: true) { $0.label }
                                 .accessibilityIdentifier("cameraSettings.lens")
                         }
                     }

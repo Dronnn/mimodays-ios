@@ -514,6 +514,37 @@ struct CameraZoomFocusTests {
         #expect(model.zooms[.back]?.shown == 1)
     }
 
+    /// Pinches on both cameras at once: neither is lost on the way to the camera.
+    @Test func pinchesOnBothCamerasBothArrive() async throws {
+        let (model, engine) = await camera()
+        model.pinch(2, on: .back, ended: true)
+        model.pinch(2, on: .front, ended: true)
+        try await settle(engine, .back, at: 4)
+        try await settle(engine, .front, at: 2)
+        #expect(await engine.zoomFactors[.back] == 4)
+        #expect(await engine.zoomFactors[.front] == 2)
+    }
+
+    /// Pinched away from the chosen lens, choosing it again in ••• goes back to it.
+    @Test func choosingTheSameLensAfterAPinchGoesBackToIt() async throws {
+        let (model, engine) = await camera()
+        model.pinch(2, on: .back, ended: true)
+        try await settle(engine, .back, at: 4)
+        model.chooseBackLens(.wide)
+        try await settle(engine, .back, at: 2)
+        #expect(await engine.zoomFactors[.back] == 2)
+        #expect(model.settings.backLens == .wide)
+    }
+
+    /// A swap moves the picture the lock was on, so the lock goes: no camera stays held without its mark.
+    @Test func aSwapReleasesALock() async throws {
+        let (model, engine) = await camera()
+        await model.focus(at: CGPoint(x: 0.2, y: 0.2), layerPoint: .zero, on: .back, lock: true)
+        await model.flip()
+        #expect(model.focusMark == nil)
+        #expect(await engine.focusTaps.last.map { $0.position == .back && !$0.lock } == true)
+    }
+
     @Test func aTapFocusesThereAndTheMarkFades() async throws {
         let (model, engine) = await camera()
         await model.focus(at: CGPoint(x: 0.2, y: 0.3), layerPoint: CGPoint(x: 40, y: 90), on: .back, lock: false)

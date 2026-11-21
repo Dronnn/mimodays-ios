@@ -69,6 +69,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     deinit {
         observers.forEach(NotificationCenter.default.removeObserver)
+        subjectObservers.values.forEach(NotificationCenter.default.removeObserver)
     }
 
     private func observeSystem() {
@@ -179,13 +180,15 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     public func setBackLens(_ lens: BackLens) async throws {
         try await onQueue {
-            guard lens != self.backLens else { return }
-            self.backLens = lens
-            // A virtual camera has the lens already: it zooms to it, no new session (P1.2).
+            // A virtual camera has the lens already: it zooms to it, no new session (P1.2). Also when it is the chosen
+            // lens: a pinch may have taken the camera to another one.
             if let device = self.cameras[.back]?.input.device, device.isVirtualDevice {
+                self.backLens = lens
                 if let factor = Self.stop(of: lens, on: device) { self.zoom(device, to: factor, smoothly: true) }
                 return
             }
+            guard lens != self.backLens else { return }
+            self.backLens = lens
             guard let setup = self.setup, self.recording == nil, setup.positions.contains(.back) else { return }
             // Another lens costs the hardware differently: the setup is worked out again.
             self.removeAllCameras()
@@ -517,7 +520,13 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             if let found = try negotiateDual(multiCam) { return found }
         }
         usesVirtualBack = true
-        try configure(.single(.back), formatWidth: maxFormatWidth)
+        do {
+            try configure(.single(.back), formatWidth: maxFormatWidth)
+        } catch where backDevice(backLens, paired: false)?.isVirtualDevice == true {
+            // The virtual camera can't run here: the lens's own camera can.
+            usesVirtualBack = false
+            try configure(.single(.back), formatWidth: maxFormatWidth)
+        }
         return .single(.back)
     }
 
@@ -815,10 +824,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             let multiplier = Double(device.displayVideoZoomFactorMultiplier)
             let minFactor = Double(device.minAvailableVideoZoomFactor)
             let maxFactor = max(minFactor, min(Double(device.maxAvailableVideoZoomFactor), CameraZoom.maxShown / max(multiplier, 0.01)))
-            let stops = Self.stops(of: device)
+            // Each stop keeps its lens when the ones out of reach go.
+            let lenses: [BackLens?] = device.isVirtualDevice ? Self.lenses(of: device) : []
+            let stops = Self.stops(of: device).enumerated()
+                .map { ($1, $0 < lenses.count ? lenses[$0] : nil) }
+                .filter { $0.0 >= minFactor && $0.0 <= maxFactor }
             return CameraZoom(
-                stops: stops.filter { $0 >= minFactor && $0 <= maxFactor },
-                lenses: device.isVirtualDevice ? Self.lenses(of: device) : [],
+                stops: stops.map(\.0),
+                lenses: device.isVirtualDevice ? stops.compactMap(\.1) : [],
                 minFactor: minFactor, maxFactor: maxFactor, shownMultiplier: multiplier,
                 factor: device.isRampingVideoZoom ? self.rampTargets[ObjectIdentifier(device)] ?? Double(device.videoZoomFactor) : Double(device.videoZoomFactor)
             )

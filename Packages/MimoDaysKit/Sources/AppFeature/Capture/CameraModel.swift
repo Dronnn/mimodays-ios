@@ -279,12 +279,29 @@ final class CameraModel {
         await engine.stop()
     }
 
+    /// The ••• sheet's rear lens. Choosing the one already chosen still goes back to it: a pinch may have left it.
+    func chooseBackLens(_ lens: BackLens) {
+        guard lens == settings.backLens else {
+            settings.backLens = lens
+            return
+        }
+        guard phase != .starting else { return }
+        Task { [engine] in
+            try? await engine.setBackLens(lens)
+            await self.refreshZoom()
+        }
+    }
+
     /// ↻: swaps the big camera on dual setups, switches cameras on single ones.
     func flip() async {
         guard phase == .ready else { return }
         showsSingleCameraNote = false
         if setup == .dual {
             isSwapped.toggle()
+            // The lock's mark goes with the swap, so the lock goes too: no camera stays held without a sign of it.
+            if let mark = focusMark, mark.result.locks {
+                _ = await engine.focus(at: CGPoint(x: 0.5, y: 0.5), on: mark.position, lock: false)
+            }
         } else if let flipped = try? await engine.flip() {
             setup = flipped
             await refreshZoom()
@@ -467,8 +484,8 @@ final class CameraModel {
 
     /// The zoom a pinch started from.
     private var pinchStart: [CameraPosition: Double] = [:]
-    /// The latest zoom asked for; one task hands them to the camera in order, skipping ones already passed.
-    private var zoomTarget: (position: CameraPosition, factor: Double, smoothly: Bool)?
+    /// The latest zoom asked for on each camera; one task hands them over, skipping ones already passed.
+    private var zoomTargets: [CameraPosition: (factor: Double, smoothly: Bool)] = [:]
     private var zoomTask: Task<Void, Never>?
 
     /// A pinch on a picture zooms that camera, from where it was when the pinch began.
@@ -493,12 +510,12 @@ final class CameraModel {
 
     private func setZoom(_ factor: Double, on position: CameraPosition, smoothly: Bool) {
         zooms[position]?.factor = factor
-        zoomTarget = (position, factor, smoothly)
+        zoomTargets[position] = (factor, smoothly)
         guard zoomTask == nil else { return }
         zoomTask = Task { [weak self] in
-            while let self, let target = self.zoomTarget {
-                self.zoomTarget = nil
-                await self.engine.setZoom(target.factor, on: target.position, smoothly: target.smoothly)
+            while let self, let (position, target) = self.zoomTargets.first {
+                self.zoomTargets[position] = nil
+                await self.engine.setZoom(target.factor, on: position, smoothly: target.smoothly)
             }
             self?.zoomTask = nil
         }

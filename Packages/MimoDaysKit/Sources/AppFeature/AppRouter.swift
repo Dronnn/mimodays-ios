@@ -40,6 +40,8 @@ public enum Route: Equatable, Sendable {
     case captureAgain(UUID)
     /// Starts a movie (F02) on Movies, from a source chosen elsewhere when there is one (a place, a selection).
     case newMovie(MovieSourceRule?)
+    /// P8.11: Write a moment on Today, the one left unfinished when there is one.
+    case write
 }
 
 /// A screen pushed on Movies (F06, F11, F15).
@@ -59,6 +61,11 @@ public struct NewMovieRequest: Equatable, Identifiable, Sendable {
 }
 
 /// What the camera was opened for.
+/// P8.11: one Write a moment sheet.
+public struct WriteRequest: Equatable, Identifiable, Sendable {
+    public var id = UUID()
+}
+
 public struct CaptureRequest: Equatable, Identifiable, Sendable {
     public var id = UUID()
     public var promptID: UUID?
@@ -80,10 +87,13 @@ public final class AppRouter {
     /// left behind would go on saving and writing while its draft opened again.
     public var capture: CaptureRequest?
 
-    /// The camera's cover is gone: what came while it was up opens now. Not before: a cover still on its way out
-    /// would take the new one with it.
+    /// P8.11: Write a moment is up.
+    public var writing: WriteRequest?
+
+    /// The camera's cover (or Write a moment) is gone: what came while it was up opens now. Not before: a cover still
+    /// on its way out would take the new one with it.
     public func captureDismissed() {
-        guard capture == nil else { return }
+        guard capture == nil, writing == nil else { return }
         // A surprise tapped meanwhile comes first, if it can still be answered (P2.0).
         if let surprise = heldSurprise {
             heldSurprise = nil
@@ -121,6 +131,12 @@ public final class AppRouter {
             held = route
             return
         }
+        // The words being written stay: everything waits for them to be saved or discarded.
+        if writing != nil {
+            if case .write = route { return }
+            held = route
+            return
+        }
         switch route {
         case let .tab(tab):
             dismissAll()
@@ -143,6 +159,11 @@ public final class AppRouter {
             newMovie = nil
             selectedTab = .today
             capture = CaptureRequest(repeatOf: source)
+        case .write:
+            isSettingsPresented = false
+            newMovie = nil
+            selectedTab = .today
+            writing = WriteRequest()
         }
     }
 

@@ -36,6 +36,21 @@ struct AppRouterTests {
         #expect(router.isSettingsPresented && router.held == nil)
     }
 
+    /// P8.11: the words being written aren't cut short either, a surprise included; it opens once they're saved
+    /// or discarded.
+    @Test func everythingWaitsForWriting() {
+        let router = AppRouter(selectedTab: .memories)
+        router.open(.write)
+        #expect(router.writing != nil && router.selectedTab == .today)
+        let prompt = UUID()
+        router.open(.capture(promptID: prompt))
+        router.open(.write)
+        #expect(router.capture == nil)
+        router.writing = nil
+        router.captureDismissed()
+        #expect(router.capture?.promptID == prompt && router.writing == nil && router.held == nil)
+    }
+
     @Test func surpriseOpensCameraOnTodayOverSettings() {
         let router = AppRouter(selectedTab: .memories)
         router.open(.settings)

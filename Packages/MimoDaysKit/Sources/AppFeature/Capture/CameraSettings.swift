@@ -156,6 +156,8 @@ struct CameraServices {
     var drafts: ReviewDraftStore
     var voice: VoiceServices
     var places: PlaceServices
+    /// P8.11: where a moment being written waits.
+    var writing = WritingDraftStore.temporary
 
     /// Previews and anything without a device camera.
     @MainActor static var simulated: CameraServices {

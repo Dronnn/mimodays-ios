@@ -208,6 +208,8 @@ struct TodayView: View {
                 .buttonStyle(.plain)
                 .accessibilityHidden(true)
                 .padding(.top, 17)
+                addMoment
+                    .padding(.top, 2)
             } else {
                 Button(action: capture) {
                     HStack(spacing: 10) {
@@ -219,8 +221,37 @@ struct TodayView: View {
                 .accessibilityIdentifier("capture")
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
+                addMoment
+                    .padding(.top, 10)
             }
         }
+    }
+
+    /// DD01/DD02: "+ Add a moment" under the camera; its menu writes one (P8.11).
+    private var addMoment: some View {
+        Menu {
+            Button { router.open(.write) } label: {
+                Label { Text("Write a moment", bundle: .module) } icon: { Icon.glyphText.image }
+            }
+            .accessibilityIdentifier("addMoment.write")
+        } label: {
+            HStack(spacing: 4) {
+                Icon.glyphPlus.image
+                    .resizable()
+                    .frame(width: 14, height: 14)
+                    .accessibilityHidden(true)
+                Text("Add a moment", bundle: .module)
+                    .textStyle(.reviewChip)
+            }
+            .foregroundStyle(ColorToken.textPrimary.color)
+            .padding(.horizontal, 12)
+            .frame(minHeight: 30)
+            .background(ReviewChipBlob().fill(ColorToken.surfaceChip.color))
+            .frame(minHeight: Size.minimumTapTarget)
+            .contentShape(Rectangle())
+        }
+        .menuOrder(.fixed)
+        .accessibilityIdentifier("today.addMoment")
     }
 
     @ViewBuilder

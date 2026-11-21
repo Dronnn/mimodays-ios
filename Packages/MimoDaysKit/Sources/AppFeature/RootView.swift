@@ -192,6 +192,8 @@ public struct RootView: View {
                 router.open(draft.repeatOf.map(Route.captureAgain) ?? .capture(promptID: draft.promptID))
             }
         }
+        // P8.11: a moment being written when iOS closed the app; after the review, if there is one.
+        if onboarding == nil, camera.writing.load() != nil { router.open(.write) }
         // After the review: it waits for Review to close.
         if let launchRoute { router.open(launchRoute) }
     }
@@ -202,6 +204,7 @@ public struct RootView: View {
         router.held = nil
         router.heldSurprise = nil
         router.capture = nil
+        router.writing = nil
         router.newMovie = nil
         router.moviesPath = []
         router.todayPath = NavigationPath()
@@ -355,6 +358,13 @@ public struct RootView: View {
         .fullScreenCover(item: $router.capture, onDismiss: router.captureDismissed) { request in
             CaptureFlowView(request: request, lastCapture: lastCapture, promptExpiry: request.promptID.flatMap(surprises.expiry)) { saved in
                 if let promptID = saved.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
+                showsSavedToast = true
+            }
+        }
+        .sheet(item: $router.writing, onDismiss: router.captureDismissed) { _ in
+            WriteMomentView(model: WriteMomentModel(
+                draft: camera.writing.load(), now: CaptureTime(instant: .now, timeZone: .current), drafts: camera.writing, places: camera.places
+            )) { _ in
                 showsSavedToast = true
             }
         }

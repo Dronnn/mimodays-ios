@@ -11,6 +11,8 @@ struct TextMomentDraft: Codable, Equatable {
     var place: ReviewPlace?
     var tags: [String] = []
     var mood: Mood?
+    /// A place or "No place" was picked: a late location fix no longer fills it in.
+    var placeWasChosen = false
 }
 
 enum TextMoment {

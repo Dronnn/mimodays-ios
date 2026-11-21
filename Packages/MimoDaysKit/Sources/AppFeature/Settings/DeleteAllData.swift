@@ -21,6 +21,8 @@ struct AppEraser {
     let drafts: ReviewDraftStore?
     /// Puts every setting of this iPhone back to its first-launch value.
     let resetSettings: @MainActor () -> Void
+    /// P8.11: the moment being written.
+    var writing: WritingDraftStore?
     /// The app's temporary folder, emptied too (exports, backups and picked photos waiting there); nil leaves it.
     var temporaryDirectory: URL?
 
@@ -69,6 +71,7 @@ struct AppEraser {
         // The records are gone, so the erase goes on to the end: what won't go now, or a quit cuts short, the next
         // launch removes (the capture in review first).
         drafts?.clear()
+        writing?.clear()
         do { try store.removeAll() } catch {
             Self.logger.error("Some files stayed after Delete All: \(error.localizedDescription, privacy: .public)")
         }

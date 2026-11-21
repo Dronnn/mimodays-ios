@@ -495,7 +495,7 @@ private struct CaptionField: View {
 
 /// `Chip / Review`: glyph and label on a hand-cut chip; peach once something was added (it then shows its
 /// first words).
-private struct ReviewChip: View {
+struct ReviewChip: View {
     var icon: Icon?
     /// A character in the glyph's place: "#", a mood's emoji.
     var mark: String?

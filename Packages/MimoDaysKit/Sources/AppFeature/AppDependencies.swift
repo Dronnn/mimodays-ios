@@ -101,7 +101,8 @@ public final class AppDependencies {
             settings: cameraSettings,
             drafts: ReviewDraftStore(root: Self.reviewRoot(configuration)),
             voice: Self.voice(simulated: simulatedCamera),
-            places: Self.places(configuration, context: modelContainer.mainContext, privacy: privacyPreferences)
+            places: Self.places(configuration, context: modelContainer.mainContext, privacy: privacyPreferences),
+            writing: WritingDraftStore(url: Self.reviewRoot(configuration).deletingLastPathComponent().appending(path: configuration.isUITesting ? "UITestWriting-\(UUID().uuidString).json" : "Writing.json"))
         )
         momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))
         // Before any screen: what a Delete All couldn't remove, and files a save or a deletion left behind when iOS
@@ -109,6 +110,7 @@ public final class AppDependencies {
         // The capture in review goes too when it's older than the erase, which may have been cut short before it; one
         // taken since stays.
         if let since = momentSaver.store.erasePendingSince, let saved = camera.drafts.savedAt, saved <= since { camera.drafts.clear() }
+        if let since = momentSaver.store.erasePendingSince, let saved = camera.writing.savedAt, saved <= since { camera.writing.clear() }
         momentSaver.store.finishPendingErase()
         OrphanFiles.remove(context: modelContainer.mainContext, store: momentSaver.store)
         OrphanFiles.removeScratch()
@@ -138,6 +140,7 @@ public final class AppDependencies {
                 UserDefaults.standard.removeObject(forKey: BackupReminder.key)
                 UserDefaults.standard.removeObject(forKey: MoviesModel.dismissedKey)
             },
+            writing: camera.writing,
             temporaryDirectory: FileManager.default.temporaryDirectory
         )
         UNUserNotificationCenter.current().delegate = notificationTaps

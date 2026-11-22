@@ -119,7 +119,7 @@ private struct PlaceContent: View {
         let ids = place.moments.map(\.id)
         return Group {
             if selection != nil {
-                SelectableTile(selection: $selection, id: moment.id) {
+                SelectableTile(selection: $selection, id: moment.id, shape: StripTile.shape(moment.item.capturedAt)) {
                     MemoryTile(item: moment.item, detail: tiles.details[moment.id], image: tiles.images[moment.id], leavesRoomForMark: true)
                 }
             } else {

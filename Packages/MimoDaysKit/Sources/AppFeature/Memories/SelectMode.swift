@@ -66,6 +66,8 @@ struct SelectButton: View {
 struct SelectableTile<Tile: View>: View {
     @Binding var selection: Set<UUID>?
     let id: UUID
+    /// The tile's hand-cut shape, for the selection ring.
+    let shape: AnyShape
     @ViewBuilder let tile: () -> Tile
 
     var body: some View {
@@ -75,7 +77,7 @@ struct SelectableTile<Tile: View>: View {
             if chosen.remove(id) == nil { chosen.insert(id) }
             selection = chosen
         } label: {
-            tile().overlay { SelectionMark(isOn: isOn) }
+            tile().overlay { SelectionMark(isOn: isOn, shape: shape) }
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isOn ? .isSelected : [])

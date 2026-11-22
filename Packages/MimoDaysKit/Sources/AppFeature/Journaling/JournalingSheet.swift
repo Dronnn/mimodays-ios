@@ -150,7 +150,7 @@ struct JournalingSheet: View {
                     if let image = model.thumbnails[index] { Image(uiImage: image).resizable().scaledToFill() }
                 }
                 .clipShape(StripTile.shape(index &* 7 + 1))
-                .overlay { SelectionMark(isOn: isOn, cornerRadius: 12) }
+                .overlay { SelectionMark(isOn: isOn, shape: StripTile.shape(index &* 7 + 1)) }
                 .contentShape(Rectangle())
                 .environment(\.layoutDirection, .leftToRight)
         }

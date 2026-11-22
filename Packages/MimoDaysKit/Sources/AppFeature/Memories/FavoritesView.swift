@@ -38,7 +38,7 @@ struct FavoritesView: View {
                         ForEach(favorites) { item in
                             Group {
                                 if selection != nil {
-                                    SelectableTile(selection: $selection, id: item.id) {
+                                    SelectableTile(selection: $selection, id: item.id, shape: StripTile.shape(item.capturedAt)) {
                                         MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id], leavesRoomForMark: true)
                                     }
                                 } else {

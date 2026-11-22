@@ -250,7 +250,7 @@ struct RecentlyDeletedView: View {
                             .overlay(alignment: .bottomLeading) { DaysLeftBadge(days: model.daysLeft(item)).padding(7) }
                         Group {
                             if selection != nil {
-                                SelectableTile(selection: $selection, id: item.id) { tile }
+                                SelectableTile(selection: $selection, id: item.id, shape: StripTile.shape(item.item.capturedAt)) { tile }
                             } else {
                                 NavigationLink(value: MemoriesRoute.deletedMoment(item.id)) { tile }
                                     .buttonStyle(.plain)

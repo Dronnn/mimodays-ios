@@ -104,8 +104,9 @@ struct PhotoImportView: View {
                     .overlay {
                         // Its motion didn't come: waiting for Try again, Import as still or Skip.
                         if model.motionFailed.contains(item.id) {
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .strokeBorder(ColorToken.actionCoral.color, lineWidth: 2.5)
+                            StripTile.shape(item.id)
+                                .stroke(ColorToken.actionCoral.color, lineWidth: 5)
+                                .clipShape(StripTile.shape(item.id))
                                 .overlay(alignment: .topTrailing) {
                                     Icon.glyphWarning.image
                                         .resizable()
@@ -123,7 +124,8 @@ struct PhotoImportView: View {
                             }
                         }
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    // Hand-cut like every tile.
+                    .clipShape(StripTile.shape(item.id))
                     .accessibilityHidden(true)
             }
         }
@@ -234,7 +236,7 @@ struct PhotoImportView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(InfoCardBlob().fill(ColorToken.surfaceCard.color))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("import.livePhoto")
     }

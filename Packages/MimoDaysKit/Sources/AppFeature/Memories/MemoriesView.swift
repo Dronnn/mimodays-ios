@@ -323,7 +323,7 @@ struct MemoriesView: View {
                 ForEach(items) { item in
                     Group {
                         if selection != nil {
-                            SelectableTile(selection: $selection, id: item.id) {
+                            SelectableTile(selection: $selection, id: item.id, shape: StripTile.shape(item.capturedAt)) {
                                 MemoryTile(item: item, detail: model.details[item.id], image: model.images[item.id], leavesRoomForMark: true)
                             }
                         } else {
@@ -405,12 +405,14 @@ struct MemoriesView: View {
 /// M13: an empty circle on each tile; a ticked one gets a coral check and a coral border.
 struct SelectionMark: View {
     let isOn: Bool
-    /// F05's smaller tiles have 10.
-    var cornerRadius: CGFloat = 12
+    /// The tile's own hand-cut shape: the ring follows its edge.
+    let shape: AnyShape
 
     var body: some View {
-        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            .strokeBorder(isOn ? ColorToken.actionCoral.color : .clear, lineWidth: 3)
+        // Twice as wide and clipped to the shape: 3 pt inside the tile's edge, wherever it bends.
+        shape
+            .stroke(isOn ? ColorToken.actionCoral.color : .clear, lineWidth: 6)
+            .clipShape(shape)
             .overlay(alignment: .bottomTrailing) {
                 ZStack {
                     Circle().fill(isOn ? ColorToken.actionCoral.color : ColorToken.mediaScrim.color)

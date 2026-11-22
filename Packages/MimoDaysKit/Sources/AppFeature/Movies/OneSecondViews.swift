@@ -295,7 +295,7 @@ struct OneSecondDaySheet: View {
             VStack(alignment: .leading, spacing: 6) {
                 MemoryTile(item: item, detail: model.tiles.details[item.id], image: model.tiles.images[item.id])
                     .frame(width: 80, height: 80)
-                    .overlay { SelectionMark(isOn: isOn, cornerRadius: 10) }
+                    .overlay { SelectionMark(isOn: isOn, shape: StripTile.shape(item.capturedAt)) }
                     .task { await model.tiles.load(item.id) }
                 Text(item.capturedAt, format: Self.time(item))
                     .textStyle(.rowCaption)

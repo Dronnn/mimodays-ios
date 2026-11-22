@@ -121,7 +121,7 @@ struct UnplacedView: View {
                     .padding(.top, 6)
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
                     ForEach(model.items) { item in
-                        SelectableTile(selection: $selection, id: item.id) {
+                        SelectableTile(selection: $selection, id: item.id, shape: StripTile.shape(item.capturedAt)) {
                             MemoryTile(item: item, detail: model.tiles.details[item.id], image: model.tiles.images[item.id], leavesRoomForMark: true)
                         }
                         .accessibilityIdentifier("unplaced.tile")

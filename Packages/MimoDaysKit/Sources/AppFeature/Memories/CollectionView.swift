@@ -166,7 +166,7 @@ struct AddMomentsSheet: View {
                     ForEach(items) { item in
                         Button { toggle(item.id) } label: {
                             MemoryTile(item: item, detail: nil, image: images[item.id], leavesRoomForMark: true)
-                                .overlay { SelectionMark(isOn: chosen.contains(item.id)) }
+                                .overlay { SelectionMark(isOn: chosen.contains(item.id), shape: StripTile.shape(item.capturedAt)) }
                         }
                         .buttonStyle(.plain)
                         .accessibilityAddTraits(chosen.contains(item.id) ? .isSelected : [])

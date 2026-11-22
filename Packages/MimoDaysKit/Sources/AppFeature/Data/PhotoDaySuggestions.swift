@@ -358,7 +358,7 @@ struct PhotoDaySheet: View {
                 .overlay(alignment: .bottomLeading) {
                     if asset.isVideo { VideoBadge(duration: asset.duration).padding(6) }
                 }
-                .overlay { SelectionMark(isOn: isOn, cornerRadius: 12) }
+                .overlay { SelectionMark(isOn: isOn, shape: StripTile.shape(asset.createdAt)) }
                 .contentShape(Rectangle())
                 // Badges and the mark keep their corners, like every grid of pictures here.
                 .environment(\.layoutDirection, .leftToRight)

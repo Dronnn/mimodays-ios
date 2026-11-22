@@ -432,7 +432,8 @@ struct TodayView: View {
                                 Image(uiImage: image).filling()
                             }
                         }
-                        .tileMotion(moment.id, isVideo: moment.mediaType == .video, still: image)
+                        // The hero already plays this one: one slot, one player (rev-app 20).
+                        .tileMotion(moment.id, isVideo: moment.mediaType == .video, still: image, plays: moment.id != heroPlaying)
                         .clipShape(StripTile.shape(moment.captured.instant))
                         .background(StripTile.shadow(StripTile.shape(moment.captured.instant)))
                 }

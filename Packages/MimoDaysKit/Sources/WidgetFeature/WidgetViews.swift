@@ -22,6 +22,11 @@ public extension View {
             .environment(\.layoutDirection, locale.language.characterDirection == .rightToLeft ? .rightToLeft : .leftToRight)
             .environment(\.typefaces, Typefaces(language: code))
     }
+
+    /// The widget's own background: the MimoDays card surface, edge to edge.
+    func widgetCard() -> some View {
+        containerBackground(for: .widget) { ColorToken.surfaceCard.color }
+    }
 }
 
 /// The Another control, made by the widget extension (its button runs an intent there); plain in tests.

@@ -7,12 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		18F5CBA930B2BB3C00DDA92F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18F5CBA830B2BB3C00DDA92F /* WidgetKit.framework */; };
+		18F5CBAB30B2BB3C00DDA92F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18F5CBAA30B2BB3C00DDA92F /* SwiftUI.framework */; };
+		18F5CBB630B2BB3D00DDA92F /* MimoDaysWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 18F5CBA630B2BB3C00DDA92F /* MimoDaysWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7E3A1C0F2B9D4E5F60718293 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 7E3A1C0E2B9D4E5F60718293 /* AppFeature */; };
 		7E3A1C112B9D4E5F60718293 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 7E3A1C102B9D4E5F60718293 /* Core */; };
 		7E3A1C132B9D4E5F60718293 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 7E3A1C122B9D4E5F60718293 /* Core */; };
+		7E3A1C152B9D4E5F60718293 /* WidgetFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 7E3A1C142B9D4E5F60718293 /* WidgetFeature */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		18F5CBB430B2BB3D00DDA92F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DB059A0DDC8A801BF84C382D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 18F5CBA530B2BB3C00DDA92F;
+			remoteInfo = MimoDaysWidgetsExtension;
+		};
 		AD141B339408966AF005D552 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DB059A0DDC8A801BF84C382D /* Project object */;
@@ -29,14 +40,54 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		18F5CBBB30B2BB3D00DDA92F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				18F5CBB630B2BB3D00DDA92F /* MimoDaysWidgetsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		18BFEEDB30A6E9C0000D41C9 /* MimoDaysKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MimoDaysKit; path = Packages/MimoDaysKit; sourceTree = "<group>"; };
 		18C246AE30A477E30055D2C7 /* MimoDays.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MimoDays.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18C246BD30A477E40055D2C7 /* MimoDaysTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MimoDaysTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		18C246C730A477E40055D2C7 /* MimoDaysUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MimoDaysUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		18F5CBA630B2BB3C00DDA92F /* MimoDaysWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MimoDaysWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		18F5CBA830B2BB3C00DDA92F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = /System/Library/Frameworks/WidgetKit.framework; sourceTree = "<absolute>"; };
+		18F5CBAA30B2BB3C00DDA92F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = /System/Library/Frameworks/SwiftUI.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		18F5CBB730B2BB3D00DDA92F /* Exceptions for "MimoDaysWidgets" folder in "MimoDaysWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 18F5CBA530B2BB3C00DDA92F /* MimoDaysWidgetsExtension */;
+		};
+		7E3A1C162B9D4E5F60718293 /* Exceptions for "MimoDays" folder in "MimoDaysWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				OpenCameraIntent.swift,
+			);
+			target = 18F5CBA530B2BB3C00DDA92F /* MimoDaysWidgetsExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		18F5CBAC30B2BB3C00DDA92F /* MimoDaysWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				18F5CBB730B2BB3D00DDA92F /* Exceptions for "MimoDaysWidgets" folder in "MimoDaysWidgetsExtension" target */,
+			);
+			path = MimoDaysWidgets;
+			sourceTree = "<group>";
+		};
 		3867631D356512F7B7C585A6 /* MimoDaysTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MimoDaysTests;
@@ -44,6 +95,9 @@
 		};
 		9AF324A7E5FC5C647DEB0D08 /* MimoDays */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7E3A1C162B9D4E5F60718293 /* Exceptions for "MimoDays" folder in "MimoDaysWidgetsExtension" target */,
+			);
 			path = MimoDays;
 			sourceTree = "<group>";
 		};
@@ -58,6 +112,14 @@
 		0069054DFF4F7536CF28F3AC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+			);
+		};
+		18F5CBA330B2BB3C00DDA92F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				18F5CBAB30B2BB3C00DDA92F /* SwiftUI.framework in Frameworks */,
+				18F5CBA930B2BB3C00DDA92F /* WidgetKit.framework in Frameworks */,
+				7E3A1C152B9D4E5F60718293 /* WidgetFeature in Frameworks */,
 			);
 		};
 		942BEAD15C99257A725DBBFC /* Frameworks */ = {
@@ -82,8 +144,18 @@
 				18C246AE30A477E30055D2C7 /* MimoDays.app */,
 				18C246BD30A477E40055D2C7 /* MimoDaysTests.xctest */,
 				18C246C730A477E40055D2C7 /* MimoDaysUITests.xctest */,
+				18F5CBA630B2BB3C00DDA92F /* MimoDaysWidgetsExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		18F5CBA730B2BB3C00DDA92F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				18F5CBA830B2BB3C00DDA92F /* WidgetKit.framework */,
+				18F5CBAA30B2BB3C00DDA92F /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		4D7E05E2480A926AFD3967B7 = {
@@ -93,6 +165,8 @@
 				9AF324A7E5FC5C647DEB0D08 /* MimoDays */,
 				3867631D356512F7B7C585A6 /* MimoDaysTests */,
 				A9FA4F910594906409D995F3 /* MimoDaysUITests */,
+				18F5CBAC30B2BB3C00DDA92F /* MimoDaysWidgets */,
+				18F5CBA730B2BB3C00DDA92F /* Frameworks */,
 				16F5C1FF61663F370A2775A4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -107,8 +181,12 @@
 				3B6CEAB5C8BE277F41E79F23 /* Sources */,
 				942BEAD15C99257A725DBBFC /* Frameworks */,
 				2AA2B1B4529345E127B1C341 /* Resources */,
+				18F5CBBB30B2BB3D00DDA92F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
+			);
+			dependencies = (
+				18F5CBB530B2BB3D00DDA92F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				9AF324A7E5FC5C647DEB0D08 /* MimoDays */,
@@ -167,6 +245,27 @@
 			productReference = 18C246C730A477E40055D2C7 /* MimoDaysUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		18F5CBA530B2BB3C00DDA92F /* MimoDaysWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 18F5CBB830B2BB3D00DDA92F /* Build configuration list for PBXNativeTarget "MimoDaysWidgetsExtension" */;
+			buildPhases = (
+				18F5CBA230B2BB3C00DDA92F /* Sources */,
+				18F5CBA330B2BB3C00DDA92F /* Frameworks */,
+				18F5CBA430B2BB3C00DDA92F /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				18F5CBAC30B2BB3C00DDA92F /* MimoDaysWidgets */,
+			);
+			name = MimoDaysWidgetsExtension;
+			packageProductDependencies = (
+				7E3A1C142B9D4E5F60718293 /* WidgetFeature */,
+			);
+			productName = MimoDaysWidgetsExtension;
+			productReference = 18F5CBA630B2BB3C00DDA92F /* MimoDaysWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -182,6 +281,9 @@
 					};
 					18C246C630A477E40055D2C7 = {
 						TestTargetID = 18C246AD30A477E30055D2C7;
+					};
+					18F5CBA530B2BB3C00DDA92F = {
+						CreatedOnToolsVersion = 27.2;
 					};
 				};
 			};
@@ -205,11 +307,17 @@
 				18C246AD30A477E30055D2C7 /* MimoDays */,
 				18C246BC30A477E40055D2C7 /* MimoDaysTests */,
 				18C246C630A477E40055D2C7 /* MimoDaysUITests */,
+				18F5CBA530B2BB3C00DDA92F /* MimoDaysWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		18F5CBA430B2BB3C00DDA92F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		2AA2B1B4529345E127B1C341 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
@@ -228,6 +336,11 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		18F5CBA230B2BB3C00DDA92F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		3B6CEAB5C8BE277F41E79F23 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -250,6 +363,11 @@
 			isa = PBXTargetDependency;
 			target = 18C246AD30A477E30055D2C7 /* MimoDays */;
 			targetProxy = C670C226D886DB96FEA3DC1B /* PBXContainerItemProxy */;
+		};
+		18F5CBB530B2BB3D00DDA92F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 18F5CBA530B2BB3C00DDA92F /* MimoDaysWidgetsExtension */;
+			targetProxy = 18F5CBB430B2BB3D00DDA92F /* PBXContainerItemProxy */;
 		};
 		91A3AD0599DEF0D463A61E2F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -300,6 +418,74 @@
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MimoDays.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MimoDays";
+			};
+			name = Release;
+		};
+		18F5CBB930B2BB3D00DDA92F /* Debug configuration for PBXNativeTarget "MimoDaysWidgetsExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MimoDaysWidgets/MimoDaysWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 21;
+				DEVELOPMENT_TEAM = FP287HDXWV;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MimoDaysWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MimoDays;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.7;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mrmaier.MimoDays.MimoDaysWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) WIDGET_EXTENSION";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		18F5CBBA30B2BB3D00DDA92F /* Release configuration for PBXNativeTarget "MimoDaysWidgetsExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MimoDaysWidgets/MimoDaysWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 21;
+				DEVELOPMENT_TEAM = FP287HDXWV;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MimoDaysWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MimoDays;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.7;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mrmaier.MimoDays.MimoDaysWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) WIDGET_EXTENSION";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -471,6 +657,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MimoDays/MimoDays.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = FP287HDXWV;
@@ -498,6 +685,7 @@
 				MARKETING_VERSION = 1.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mrmaier.MimoDays;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -513,6 +701,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MimoDays/MimoDays.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = FP287HDXWV;
@@ -540,6 +729,7 @@
 				MARKETING_VERSION = 1.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mrmaier.MimoDays;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -553,6 +743,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		18F5CBB830B2BB3D00DDA92F /* Build configuration list for PBXNativeTarget "MimoDaysWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				18F5CBB930B2BB3D00DDA92F /* Debug configuration for PBXNativeTarget "MimoDaysWidgetsExtension" */,
+				18F5CBBA30B2BB3D00DDA92F /* Release configuration for PBXNativeTarget "MimoDaysWidgetsExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		618A4673B5E57EBB68BBE9D3 /* Build configuration list for PBXNativeTarget "MimoDays" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -606,6 +804,10 @@
 		7E3A1C122B9D4E5F60718293 /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Core;
+		};
+		7E3A1C142B9D4E5F60718293 /* WidgetFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WidgetFeature;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

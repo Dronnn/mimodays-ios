@@ -3,7 +3,8 @@ import DesignSystem
 import SwiftUI
 
 /// C09 while it records: up to a minute, one bar per 1/54 of it. It stops on a tap, at the limit, when the sheet is
-/// swiped away, or when something interrupts (a call); what was recorded is kept every time.
+/// swiped away, when the app goes to the background, or when something interrupts (a call); what was recorded is kept
+/// every time.
 @MainActor
 @Observable
 final class VoiceRecording: Identifiable {
@@ -66,6 +67,7 @@ struct VoiceRecordingSheet: View {
     /// Once: on Stop, or when the sheet goes away for any other reason.
     let onFinish: (VoiceRecording) -> Void
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @State private var height: CGFloat = 293
     @State private var ended = false
 
@@ -126,6 +128,13 @@ struct VoiceRecordingSheet: View {
             dismiss()
         }
         .onDisappear { end() }
+        // To the background: kept now, finished and in the draft, before iOS may end the app (rev-capture 16).
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background {
+                end()
+                dismiss()
+            }
+        }
     }
 
     private func end() {

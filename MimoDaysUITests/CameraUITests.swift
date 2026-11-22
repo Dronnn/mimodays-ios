@@ -277,6 +277,23 @@ final class CameraUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["savedToast"].waitForExistence(timeout: 5))
     }
 
+    /// rev-capture 16: going to the background ends the recording and keeps it, in the draft iOS may close the app on.
+    @MainActor
+    func testAVoiceNoteRecordingIsKeptWhenTheAppGoesToTheBackground() {
+        openCamera(permissions: .notDetermined)
+        app.buttons["camera.shutter"].tap()
+        let chip = app.buttons["review.voiceNote"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        chip.tap()
+        XCTAssertTrue(app.buttons["voice.stop"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["review.voice.transcript"].waitForExistence(timeout: 1.5))
+        XCUIDevice.shared.press(.home)
+        XCTAssertTrue(app.wait(for: .runningBackground, timeout: 10))
+        app.activate()
+        XCTAssertTrue(app.buttons["review.voice.play"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["voice.stop"].exists)
+    }
+
     /// C09/C10: the microphone was explained when the camera opened in Video, so a Voice note records at once until
     /// Stop, then shows as a card with its words that plays; Retake asks before dropping it, and Save keeps it.
     @MainActor

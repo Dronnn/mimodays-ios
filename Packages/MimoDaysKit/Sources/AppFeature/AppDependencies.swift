@@ -22,6 +22,8 @@ public final class AppDependencies {
     var library: MediaLibrary { MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails) }
     let memoriesPreferences: MemoriesPreferences
     let moviePreferences: MoviePreferences
+    /// P8.13: one movie export at a time, kept while its screen is closed; iOS 26 continues it in the background.
+    let movieExports: MovieExportCenter
     let privacyPreferences: PrivacyPreferences
     let appearancePreferences: AppearancePreferences
     /// U16: the home side last shown, and whether the flip hint was shown.
@@ -71,6 +73,7 @@ public final class AppDependencies {
         journalingFixture = configuration.isUITesting ? configuration.journaling : nil
         memoriesPreferences = .memories(configuration.isUITesting ? nil : .standard)
         moviePreferences = .movies(configuration.isUITesting ? nil : .standard)
+        movieExports = MovieExportCenter(continuation: configuration.isUITesting ? nil : Self.continuedExport())
         let privacyPreferences = PrivacyPreferences.privacy(configuration.isUITesting ? nil : .standard)
         self.privacyPreferences = privacyPreferences
         appearancePreferences = .appearance(configuration.isUITesting ? nil : .standard)
@@ -284,5 +287,14 @@ public final class AppDependencies {
         modelContainer.mainContext.insert(prompt)
         try? modelContainer.mainContext.save()
         notificationTaps.deliver(prompt.id)
+    }
+}
+
+extension AppDependencies {
+    /// iOS 26's continued processing; before it, exports run while MimoDays is open (and a few minutes after).
+    @MainActor
+    static func continuedExport() -> (any ContinuedExportScheduler)? {
+        if #available(iOS 26, *) { return SystemContinuedExport() }
+        return nil
     }
 }

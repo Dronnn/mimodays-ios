@@ -165,6 +165,63 @@ struct MovieEditorSnapshotTests {
         )
     }
 
+    /// P8.13: iOS 26 takes exports on; its turn never comes in a snapshot.
+    @MainActor
+    private final class Continuation: ContinuedExportScheduler {
+        let isAvailable = true
+        func submit(title: String, run: @escaping @MainActor (any ContinuedExportTask) -> Void) -> Bool { true }
+    }
+
+    /// JJ01: "You can leave MimoDays while the movie is being made." above Export movie.
+    @Test func exportOptionsYouCanLeave() async throws {
+        let model = MovieExportModel(project: try await project(), library: library, freeSpace: { 12_000_000_000 }, continuation: Continuation())
+        assertScreenSnapshots(
+            of: page(MovieExportOptions(model: model, cover: nil).background(ColorToken.canvas.color.ignoresSafeArea())),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)] + SnapshotVariant.languages
+        )
+    }
+
+    /// JJ02: running with iOS - Back to Movies, Cancel export; and queued, "Waiting to export…".
+    @Test func renderingInTheBackground() {
+        assertScreenSnapshots(
+            of: page(MovieRendering(progress: 0.42, remaining: 20, cover: nil, away: .iOS, cancel: {}).background(ColorToken.canvas.color.ignoresSafeArea())),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge)]
+                + SnapshotVariant.languages
+        )
+        assertScreenSnapshots(
+            of: page(MovieRendering(progress: nil, remaining: nil, cover: nil, away: .iOS, cancel: {}).background(ColorToken.canvas.color.ignoresSafeArea())),
+            variants: [SnapshotVariant(.iPhone, .light)],
+            testName: "renderingWaiting"
+        )
+        assertScreenSnapshots(
+            of: page(MovieRendering(progress: 0.1, remaining: nil, cover: nil, away: .stayOpen, cancel: {}).background(ColorToken.canvas.color.ignoresSafeArea())),
+            variants: [SnapshotVariant(.iPhone, .light)],
+            testName: "renderingStayOpen"
+        )
+    }
+
+    /// JJ05.
+    @Test func exportCanceledAndStopped() {
+        for canceled in [true, false] {
+            assertScreenSnapshots(
+                of: page(MovieExportEnded(canceled: canceled, again: {}, back: {}).background(ColorToken.canvas.color.ignoresSafeArea())),
+                variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)] + SnapshotVariant.languages,
+                testName: canceled ? "exportCanceled" : "exportStopped"
+            )
+        }
+    }
+
+    /// JJ03: Movies' row for the export under way.
+    @Test func moviesExportRow() async throws {
+        let model = MovieExportModel(project: try await project(), library: library, freeSpace: { nil }, continuation: Continuation())
+        model.project.title = "October 2026"
+        model.start()
+        assertScreenSnapshots(
+            of: page(ExportRow(export: model, image: nil).padding(16).frame(maxHeight: .infinity, alignment: .top).background(ColorToken.canvas.color.ignoresSafeArea())),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .light, rightToLeft: true)]
+        )
+    }
+
     /// F13.
     @Test func ready() {
         let render = MovieRender(relativePath: "derived/x.mp4", renderedAt: .now, duration: 64, resolution: .p1080, byteCount: 95_000_000)

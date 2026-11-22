@@ -26,6 +26,8 @@ struct RestoreView: View {
     @Bindable var model: RestoreModel
     let close: () -> Void
     @State private var showsSkipped = false
+    @State private var exportInUse = false
+    @Environment(MovieExportCenter.self) private var exports: MovieExportCenter?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -46,6 +48,7 @@ struct RestoreView: View {
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
         .sheet(isPresented: $showsSkipped) { skippedList }
+        .exportInUseAlert($exportInUse)
         .onDisappear { if case .restoring = model.phase {} else { model.cancel() } }
     }
 
@@ -127,7 +130,14 @@ struct RestoreView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 10)
             }
-            Button(action: model.restore) { restoreLabel(summary) }
+            Button {
+                // P8.13: Replace everything removes files the running export reads.
+                if model.mode == .replaceEverything, exports?.isExporting == true {
+                    exportInUse = true
+                } else {
+                    model.restore()
+                }
+            } label: { restoreLabel(summary) }
                 .buttonStyle(.primary)
                 .disabled(!model.canRestore)
                 .accessibilityIdentifier("restore.start")

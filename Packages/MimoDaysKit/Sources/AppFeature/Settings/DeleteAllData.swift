@@ -138,6 +138,8 @@ struct DeleteAllView: View {
     @State var typed = ""
     @State private var isErasing = false
     @State private var failed = false
+    @State private var exportInUse = false
+    @Environment(MovieExportCenter.self) private var exports: MovieExportCenter?
     @FocusState private var isTyping: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -220,6 +222,10 @@ struct DeleteAllView: View {
             .scrollDismissesKeyboard(.interactively)
             Button {
                 isTyping = false
+                if exports?.isExporting == true {
+                    exportInUse = true
+                    return
+                }
                 isErasing = true
                 Task {
                     failed = !(await erase())
@@ -236,5 +242,6 @@ struct DeleteAllView: View {
             .padding(.bottom, 16)
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .exportInUseAlert($exportInUse)
     }
 }

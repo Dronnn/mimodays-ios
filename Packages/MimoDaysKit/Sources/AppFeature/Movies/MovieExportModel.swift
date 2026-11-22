@@ -20,6 +20,10 @@ final class MovieExportModel {
         case rendering(progress: Double, remaining: Double?)
         case ready(MovieRender)
         case failed(Failure)
+        /// P8.13 JJ05: Cancel export tapped while it waited or rendered.
+        case canceled
+        /// P8.13 JJ05: iOS stopped it (the system's Cancel, low battery, background time ran out).
+        case stopped
     }
 
     enum Failure: Equatable {
@@ -205,7 +209,7 @@ final class MovieExportModel {
         task = nil
         continued?.finish(success: false)
         continued = nil
-        phase = .failed(.other)
+        phase = .stopped
         record(.failed)
     }
 
@@ -246,7 +250,7 @@ final class MovieExportModel {
         let wasBusy = isBusy
         task?.cancel()
         task = nil
-        phase = .options
+        phase = wasBusy ? .canceled : .options
         if wasBusy { record(.cancelled) }
         continued?.finish(success: false)
         continued = nil
@@ -255,11 +259,11 @@ final class MovieExportModel {
     }
 
     /// iOS gives an app in the background a few minutes. When they run out, the render stops, the draft stays as it
-    /// was and F14 offers to try again; left running, iOS would end the app.
+    /// was and "Export stopped" offers to try again; left running, iOS would end the app.
     private func backgroundTimeRanOut() {
         task?.cancel()
         task = nil
-        phase = .failed(.other)
+        phase = .stopped
         record(.failed)
         endBackgroundTask()
     }

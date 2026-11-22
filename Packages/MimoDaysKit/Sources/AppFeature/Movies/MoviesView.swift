@@ -23,11 +23,17 @@ struct MoviesView: View {
     let model: MoviesModel
     @Environment(AppRouter.self) private var router
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(MovieExportCenter.self) private var exports: MovieExportCenter?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 header
+                if let export = exports?.row {
+                    exportRow(export)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 22)
+                }
                 if model.isEmpty {
                     emptyState.padding(.top, 92)
                 } else {
@@ -164,6 +170,17 @@ struct MoviesView: View {
             .padding(.top, 10)
         }
         .padding(.top, 18)
+    }
+
+    /// P8.13 JJ03: the export under way, or finished or stopped away from its screen; View export reopens it.
+    private func exportRow(_ export: MovieExportModel) -> some View {
+        let coverID = export.plan.clips.first { if case .card = $0.media { false } else { true } }?.momentID
+        return Button { router.moviesPath.append(.export(export.project.id)) } label: {
+            ExportRow(export: export, image: coverID.flatMap { model.tiles.images[$0] })
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("movies.viewExport")
+        .task(id: coverID) { if let coverID { await model.tiles.load(coverID) } }
     }
 
     private func sectionTitle(_ text: Text) -> some View {
@@ -401,6 +418,75 @@ extension MovieAspectRatio {
         case .portrait9x16: "9:16"
         case .landscape16x9: "16:9"
         case .square1x1: "1:1"
+        }
+    }
+}
+
+/// JJ03: a small poster, the title, where the export is, its progress, and View export.
+struct ExportRow: View {
+    let export: MovieExportModel
+    let image: UIImage?
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Poster(image: image)
+                .frame(width: 34, height: 52)
+                .clipShape(MoviePosterBlob())
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(export.project.title)
+                    .textStyle(.rowTitle)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .lineLimit(2)
+                status
+                    .textStyle(.rowCaption)
+                    .foregroundStyle(ColorToken.textLink.color)
+                if let progress {
+                    GeometryReader { proxy in
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color(hex: 0xE0D2C6))
+                            Capsule().fill(ColorToken.actionCoral.color).frame(width: proxy.size.width * progress)
+                        }
+                    }
+                    .frame(height: 4)
+                    .accessibilityHidden(true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            Text("View export", bundle: .module, comment: "P8.13 JJ03: Movies' row that reopens the running or finished export")
+                .textStyle(TextStyle(.body, size: 15, weight: 700, relativeTo: .subheadline, maximumScale: 1.35))
+                .foregroundStyle(ColorToken.textLink.color)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(minHeight: 76)
+        .background(InfoCardBlob().fill(ColorToken.surfaceCard.color))
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+    }
+
+    private var progress: Double? {
+        switch export.phase {
+        case .waiting: 0
+        case let .rendering(progress, _): min(max(progress, 0), 1)
+        default: nil
+        }
+    }
+
+    /// "Exporting · 42%".
+    private var status: Text {
+        switch export.phase {
+        case .waiting:
+            Text("Waiting to export…", bundle: .module)
+        case let .rendering(progress, _):
+            Text("Exporting · \(progress.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.shared.locale)))", bundle: .module, comment: "P8.13 JJ03: the export's progress in Movies, as Exporting · 42%")
+        case .ready:
+            Text("Your movie is ready", bundle: .module)
+        case .stopped, .failed:
+            Text("Export stopped", bundle: .module)
+        case .options, .canceled:
+            Text(verbatim: "")
         }
     }
 }

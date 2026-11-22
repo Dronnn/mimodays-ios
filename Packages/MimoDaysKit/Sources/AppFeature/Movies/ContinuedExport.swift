@@ -2,6 +2,7 @@ import BackgroundTasks
 import Foundation
 import Observation
 import Persistence
+import SwiftUI
 
 /// P8.13: a movie export iOS keeps running after MimoDays is left, with the system's progress and Cancel
 /// (iOS 26 continued processing). Without it, the export runs while MimoDays is open, as before.
@@ -91,6 +92,12 @@ extension ExportState {
 @Observable
 final class MovieExportCenter {
     private(set) var active: MovieExportModel?
+    /// iOS 26's continued processing, handed to every export model.
+    let continuation: (any ContinuedExportScheduler)?
+
+    init(continuation: (any ContinuedExportScheduler)? = nil) {
+        self.continuation = continuation
+    }
 
     /// The export screen's model for `project`: the one under way for it, or a new one. Nil while another movie is
     /// exporting: Movies offers View export for that one instead.
@@ -106,4 +113,31 @@ final class MovieExportCenter {
 
     /// Delete all, Replace everything and deleting the movie wait for this: its files are in use.
     var isExporting: Bool { active?.isBusy == true }
+
+    /// JJ03: Movies' View export row - the export under way, or one that finished or stopped while its screen was
+    /// closed. A cancel isn't news: no row.
+    var row: MovieExportModel? {
+        guard let active else { return nil }
+        switch active.phase {
+        case .waiting, .rendering, .ready, .stopped, .failed: return active
+        case .options, .canceled: return nil
+        }
+    }
+
+    /// Its screen closed: an export that isn't under way is done with (seen, canceled or never started).
+    func release(_ model: MovieExportModel) {
+        guard active === model, !model.isBusy else { return }
+        active = nil
+    }
+}
+
+extension View {
+    /// P8.13: Delete all, Replace everything and deleting the exporting movie wait until the export is canceled.
+    func exportInUseAlert(_ isPresented: Binding<Bool>) -> some View {
+        alert(Text("A movie is being exported", bundle: .module, comment: "P8.13: an action needs files the running export uses"), isPresented: isPresented) {
+            Button(role: .cancel) {} label: { Text("OK", bundle: .module) }
+        } message: {
+            Text("Cancel the export first: it uses these files.", bundle: .module, comment: "P8.13: under A movie is being exported")
+        }
+    }
 }

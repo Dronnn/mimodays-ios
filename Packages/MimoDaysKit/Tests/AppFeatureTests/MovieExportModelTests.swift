@@ -144,7 +144,8 @@ struct MovieExportModelTests {
         model.start()
         model.cancel()
         await model.waitForRender()
-        #expect(model.phase == .options)
+        // JJ05: Export canceled, with Export again.
+        #expect(model.phase == .canceled)
         #expect(project.render == nil)
     }
 
@@ -270,9 +271,9 @@ struct MovieExportModelTests {
         let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }, continuation: continuation)
         model.start()
         model.cancel()
-        #expect(model.phase == .options)
+        #expect(model.phase == .canceled)
         let task = continuation.runNext()
-        #expect(task.result == false && model.phase == .options && model.task == nil)
+        #expect(task.result == false && model.phase == .canceled && model.task == nil)
         #expect(project.render == nil)
     }
 
@@ -285,7 +286,8 @@ struct MovieExportModelTests {
         let task = continuation.runNext()
         task.stopped?()
         await model.waitForRender()
-        #expect(model.phase == .failed(.other))
+        // JJ05: Export stopped. Your draft is safe.
+        #expect(model.phase == .stopped)
         #expect(task.result == false)
         #expect(project.render == nil)
         #expect(project.orderedClips.count == 4)
@@ -338,5 +340,35 @@ struct MovieExportModelTests {
         #expect(!center.isExporting)
         let next = try #require(center.model(for: second, make: make(second)))
         #expect(next !== model && next.project.id == second.id)
+    }
+
+    /// JJ03: Movies shows the export under way and one that finished away from its screen, until that screen closes.
+    @Test func moviesShowsTheExportUntilItsSeen() async throws {
+        let project = try await project(photos: 2)
+        let continuation = FakeContinuation()
+        let center = MovieExportCenter(continuation: continuation)
+        let model = try #require(center.model(for: project) {
+            MovieExportModel(project: project, library: self.library, clock: self.clock, freeSpace: { nil }, continuation: center.continuation)
+        })
+        #expect(center.row == nil)
+        model.resolution = .p720
+        model.start()
+        #expect(center.row === model)
+        // Back to Movies: the screen closes, the export goes on.
+        center.release(model)
+        #expect(center.row === model)
+        continuation.runNext()
+        await model.waitForRender()
+        #expect(center.row === model)
+        // View export, then Done.
+        center.release(model)
+        #expect(center.row == nil && center.active == nil)
+        // A cancel isn't kept.
+        let again = try #require(center.model(for: project) {
+            MovieExportModel(project: project, library: self.library, clock: self.clock, freeSpace: { nil }, continuation: continuation)
+        })
+        again.start()
+        again.cancel()
+        #expect(center.row == nil)
     }
 }

@@ -10,15 +10,74 @@ struct MovieExportScreen: View {
     let projectID: UUID
     @Environment(\.mediaLibrary) private var library
     @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
+    @Environment(MovieExportCenter.self) private var exports: MovieExportCenter?
 
     var body: some View {
         if let library, let project = MovieStore.project(projectID, in: library.context) {
-            ModelHost({ MovieExportModel(project: project, library: library, defaults: moviePreferences?.value ?? MovieDefaults()) }) { model in
-                ModelHost({ MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails) }) { tiles in
-                    MovieExportHost(model: model, tiles: tiles)
+            // P8.13: the export under way for this movie, kept by the center while its screen is closed.
+            ModelHost({ ExportSlot(model: slot(project, library: library)) }) { slot in
+                if let model = slot.model {
+                    ModelHost({ MemoriesModel(context: library.context, store: library.store, thumbnails: library.thumbnails) }) { tiles in
+                        MovieExportHost(model: model, tiles: tiles)
+                    }
+                    .onDisappear { exports?.release(model) }
+                } else if let other = exports?.active {
+                    MovieExportElsewhere(title: other.project.title, projectID: other.project.id)
                 }
             }
         }
+    }
+
+    private func slot(_ project: MovieProject, library: MediaLibrary) -> MovieExportModel? {
+        let make = {
+            MovieExportModel(
+                project: project, library: library, defaults: moviePreferences?.value ?? MovieDefaults(), continuation: exports?.continuation
+            )
+        }
+        guard let exports else { return make() }
+        return exports.model(for: project, make: make)
+    }
+}
+
+/// The model for one visit to the export screen, or none while another movie exports.
+private final class ExportSlot {
+    let model: MovieExportModel?
+    init(model: MovieExportModel?) { self.model = model }
+}
+
+/// P8.13: one export at a time. Export on a second movie while the first is made offers View export for it.
+private struct MovieExportElsewhere: View {
+    let title: String
+    let projectID: UUID
+    @Environment(AppRouter.self) private var router
+
+    var body: some View {
+        VStack(spacing: 0) {
+            BackTitleBar(back: Text("Edit", bundle: .module), title: Text("Export movie", bundle: .module)) { pop() }
+            Spacer()
+            Text("“\(title)” is being exported. One movie is made at a time.", bundle: .module, comment: "P8.13: Export tapped on a second movie while another one is exported")
+                .textStyle(.sheetBody)
+                .foregroundStyle(ColorToken.textBody.color)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 40)
+            Spacer()
+            Button {
+                pop()
+                router.moviesPath.append(.export(projectID))
+            } label: { Text("View export", bundle: .module) }
+                .buttonStyle(.primary)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
+                .accessibilityIdentifier("export.viewOther")
+        }
+        .background(ColorToken.canvas.color.ignoresSafeArea())
+        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
+    }
+
+    private func pop() {
+        if !router.moviesPath.isEmpty { router.moviesPath.removeLast() }
     }
 }
 
@@ -39,9 +98,14 @@ struct MovieExportView: View {
         Group {
             switch model.phase {
             case .options: MovieExportOptions(model: model, cover: cover)
-            // P8.13: its own "Waiting to export…" comes with the design; until then, progress at its start.
-            case .waiting: MovieRendering(progress: 0, remaining: nil, cover: cover, cancel: model.cancel)
-            case let .rendering(progress, remaining): MovieRendering(progress: progress, remaining: remaining, cover: cover, cancel: model.cancel)
+            case .waiting:
+                MovieRendering(progress: nil, remaining: nil, cover: cover, away: away, cancel: model.cancel, back: backToMovies)
+            case let .rendering(progress, remaining):
+                MovieRendering(progress: progress, remaining: remaining, cover: cover, away: away, cancel: model.cancel, back: backToMovies)
+            case .canceled:
+                MovieExportEnded(canceled: true, again: model.start, back: backToMovies)
+            case .stopped:
+                MovieExportEnded(canceled: false, again: model.start, back: backToMovies)
             case let .ready(render):
                 MovieReady(title: model.project.title, render: render, url: library.flatMap { try? $0.store.url(for: render.relativePath) }, cover: cover) {
                     router.moviesPath = []
@@ -56,6 +120,18 @@ struct MovieExportView: View {
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
         .task(id: coverID) { if let id = coverID { await tiles.load(id) } }
+    }
+
+    /// P8.13 F12: what the screen says about leaving MimoDays.
+    private var away: MovieRendering.Away {
+        if model.runsInBackground { return .iOS }
+        if model.foregroundOnly { return .stayOpen }
+        return .minutes
+    }
+
+    /// JJ02: the export goes on; Movies shows it with View export.
+    private func backToMovies() {
+        router.moviesPath = []
     }
 
     /// The movie's first moment, past any text card (it has no picture), and of the ones the render kept.
@@ -115,6 +191,16 @@ struct MovieExportOptions: View {
                 .padding(.bottom, 24)
                 .frame(maxWidth: 640, alignment: .leading)
                 .frame(maxWidth: .infinity)
+            }
+            if model.canLeave {
+                // JJ01, only when iOS can take the export on.
+                Text("You can leave MimoDays while the movie is being made.", bundle: .module, comment: "P8.13 F11: above Export movie when iOS 26 can continue the export in the background")
+                    .textStyle(.meta)
+                    .foregroundStyle(ColorToken.textBody.color)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 22)
+                    .padding(.bottom, 14)
             }
             Button(action: model.start) { Text("Export movie", bundle: .module) }
                 .buttonStyle(.primary)
@@ -233,10 +319,23 @@ private struct TiltedPoster: View {
 // MARK: - F12
 
 struct MovieRendering: View {
-    let progress: Double
+    /// What leaving MimoDays does to the export.
+    enum Away {
+        /// iOS 26 took it on: it goes on, with the system's progress (JJ02).
+        case iOS
+        /// iOS turned it down: MimoDays has to stay open.
+        case stayOpen
+        /// Before iOS 26: a few minutes in the background, then a notice when ready.
+        case minutes
+    }
+
+    /// Nil while it waits its turn with iOS.
+    let progress: Double?
     let remaining: Double?
     let cover: UIImage?
+    var away = Away.minutes
     let cancel: () -> Void
+    var back: () -> Void = {}
 
     var body: some View {
         VStack(spacing: 0) {
@@ -252,7 +351,7 @@ struct MovieRendering: View {
                     GeometryReader { proxy in
                         ZStack(alignment: .leading) {
                             Capsule().fill(Color(hex: 0xE0D2C6))
-                            Capsule().fill(ColorToken.actionCoral.color).frame(width: proxy.size.width * min(max(progress, 0), 1))
+                            Capsule().fill(ColorToken.actionCoral.color).frame(width: proxy.size.width * min(max(progress ?? 0, 0), 1))
                         }
                     }
                     .frame(height: 8)
@@ -260,13 +359,13 @@ struct MovieRendering: View {
                     .padding(.top, 22)
                     .accessibilityElement()
                     .accessibilityLabel(Text("Progress", bundle: .module))
-                    .accessibilityValue(Text(progress, format: .percent.precision(.fractionLength(0))))
+                    .accessibilityValue(status)
                     .accessibilityIdentifier("export.progress")
                     status
                         .textStyle(.noteMeta)
                         .foregroundStyle(ColorToken.textLink.color)
                         .padding(.top, 16)
-                    Text("You can leave this screen or lock the phone. We'll let you know when it's ready.", bundle: .module)
+                    note
                         .textStyle(.sheetBody)
                         .foregroundStyle(ColorToken.textBody.color)
                         .multilineTextAlignment(.center)
@@ -276,16 +375,34 @@ struct MovieRendering: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            Button(action: cancel) { Text("Cancel", bundle: .module) }
+            if away == .iOS {
+                Button(action: back) { Text("Back to Movies", bundle: .module, comment: "P8.13 F12 and JJ05: closes the export screen; the export goes on in the background") }
+                    .buttonStyle(.primary)
+                    .padding(.horizontal, 20)
+                    .accessibilityIdentifier("export.backToMovies")
+            }
+            Button(action: cancel) { Text("Cancel export", bundle: .module, comment: "P8.13 F12: stops the export, the draft stays") }
                 .buttonStyle(TextButtonStyle())
                 .padding(.horizontal, 20)
+                .padding(.top, away == .iOS ? 6 : 0)
                 .padding(.bottom, 16)
                 .accessibilityIdentifier("export.cancel")
         }
     }
 
-    /// "42% · about 20 seconds left".
+    private var note: Text {
+        switch away {
+        case .iOS: Text("You can leave MimoDays. The export goes on, and its progress shows on the Lock Screen.", bundle: .module, comment: "P8.13 JJ02: iOS 26 continues the export in the background")
+        case .stayOpen: Text("Keep MimoDays open to finish this export.", bundle: .module, comment: "P8.13 F12: iOS couldn't take the export on")
+        case .minutes: Text("You can leave this screen or lock the phone. We'll let you know when it's ready.", bundle: .module)
+        }
+    }
+
+    /// "42% · about 20 seconds left", or "Waiting to export…".
     private var status: Text {
+        guard let progress else {
+            return Text("Waiting to export…", bundle: .module, comment: "P8.13 F12: iOS has the export queued behind other work")
+        }
         let percent = progress.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.shared.locale))
         guard let remaining else { return Text(percent) }
         let left = Duration.seconds(max(remaining.rounded(), 1)).formatted(.units(allowed: [.minutes, .seconds], width: .wide, maximumUnitCount: 1).locale(AppLanguage.shared.locale))
@@ -564,6 +681,64 @@ struct RenderedMoviePlayer: View {
 }
 
 // MARK: - F14
+
+/// P8.13 JJ05: Cancel export tapped, or iOS stopped it. The draft is as it was either way.
+struct MovieExportEnded: View {
+    let canceled: Bool
+    let again: () -> Void
+    let back: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 0) {
+                    ExplainerArt(glyph: .explainerWarning, ink: .textLink).padding(.top, 116)
+                    Group {
+                        if canceled {
+                            Text("Export canceled", bundle: .module, comment: "P8.13 JJ05: after Cancel export")
+                        } else {
+                            Text("Export stopped", bundle: .module, comment: "P8.13 JJ05: iOS stopped the export (the system's Cancel, low battery, time ran out)")
+                        }
+                    }
+                    .textStyle(TextStyle(.heading, size: 26, weight: 600, relativeTo: .title1, maximumScale: 1.35))
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 16)
+                    .accessibilityAddTraits(.isHeader)
+                    Group {
+                        if canceled {
+                            Text("You stopped it. The draft is unchanged.", bundle: .module, comment: "P8.13 JJ05: under Export canceled")
+                        } else {
+                            Text("Your draft is safe.", bundle: .module, comment: "P8.13 JJ05: under Export stopped")
+                        }
+                    }
+                    .textStyle(.sheetBody)
+                    .foregroundStyle(ColorToken.textBody.color)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 40)
+                    .padding(.top, 14)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            Button(action: again) {
+                if canceled {
+                    Text("Export again", bundle: .module, comment: "P8.13 JJ05: starts the canceled export again with the same options")
+                } else {
+                    Text("Try again", bundle: .module)
+                }
+            }
+            .buttonStyle(.primary)
+            .padding(.horizontal, 20)
+            .accessibilityIdentifier("export.again")
+            Button(action: back) { Text("Back to Movies", bundle: .module) }
+                .buttonStyle(TextButtonStyle())
+                .padding(.top, 14)
+                .padding(.bottom, 32)
+                .accessibilityIdentifier("export.backToMovies")
+        }
+    }
+}
 
 struct MovieExportFailed: View {
     let model: MovieExportModel

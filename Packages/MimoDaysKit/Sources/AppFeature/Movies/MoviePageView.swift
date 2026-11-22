@@ -36,6 +36,8 @@ struct MoviePageView: View {
     @State private var renaming = false
     @State private var name = ""
     @State private var deleting = false
+    @State private var exportInUse = false
+    @Environment(MovieExportCenter.self) private var exports: MovieExportCenter?
     @State private var saved = false
     @State private var problem: PhotosSaveProblem?
     @State private var sharing = false
@@ -99,7 +101,7 @@ struct MoviePageView: View {
                         .padding(.top, 24)
                         .accessibilityAddTraits(.isHeader)
                     projectCard.padding(.horizontal, 16).padding(.top, 6)
-                    Button { deleting = true } label: {
+                    Button(action: askToDelete) {
                         Text("Delete movie and project", bundle: .module)
                             .textStyle(.rowTitle)
                             .foregroundStyle(ColorToken.textLink.color)
@@ -131,6 +133,7 @@ struct MoviePageView: View {
             Button(role: .cancel) {} label: { Text("Cancel", bundle: .module) }
             Button { try? store.rename(project, to: name) } label: { Text("Rename", bundle: .module) }
         }
+        .exportInUseAlert($exportInUse)
         .confirmationDialog(Text("Delete this movie and its project?", bundle: .module), isPresented: $deleting, titleVisibility: .visible) {
             Button(role: .destructive) {
                 try? store.delete(project)
@@ -160,13 +163,22 @@ struct MoviePageView: View {
         .accessibilityIdentifier("movie.play")
     }
 
+    /// P8.13: its export is under way, so its files are in use.
+    private func askToDelete() {
+        if exports?.isExporting == true, exports?.active?.project.id == project.id {
+            exportInUse = true
+        } else {
+            deleting = true
+        }
+    }
+
     /// The ••• menu: the same things as on the page.
     private var more: some View {
         Menu {
             Button { router.moviesPath.append(.editor(project.id)) } label: { Text("Edit", bundle: .module) }
             Button(action: duplicate) { Text("Duplicate", bundle: .module) }
             Button(action: rename) { Text("Rename", bundle: .module) }
-            Button(role: .destructive) { deleting = true } label: { Text("Delete movie and project", bundle: .module) }
+            Button(role: .destructive, action: askToDelete) { Text("Delete movie and project", bundle: .module) }
         } label: {
             Icon.glyphMore.image
                 .resizable()

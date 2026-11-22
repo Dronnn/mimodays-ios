@@ -20,6 +20,7 @@ public struct RootView: View {
     private let momentSaver: MomentSaver
     private let memoriesPreferences: MemoriesPreferences
     private let moviePreferences: MoviePreferences
+    private let movieExports: MovieExportCenter
     private let privacyPreferences: PrivacyPreferences
     private let appearancePreferences: AppearancePreferences
     private let appLock: AppLock
@@ -74,6 +75,7 @@ public struct RootView: View {
         )
         memoriesPreferences = dependencies.memoriesPreferences
         moviePreferences = dependencies.moviePreferences
+        movieExports = dependencies.movieExports
         privacyPreferences = dependencies.privacyPreferences
         appearancePreferences = dependencies.appearancePreferences
         appLock = dependencies.appLock
@@ -124,6 +126,7 @@ public struct RootView: View {
         .environment(\.momentSaver, momentSaver)
         .environment(memoriesPreferences)
         .environment(moviePreferences)
+        .environment(movieExports)
         .environment(privacyPreferences)
         .environment(appearancePreferences)
         .environment(appLock)

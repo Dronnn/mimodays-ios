@@ -273,6 +273,9 @@ public protocol CaptureEngine: AnyObject, Sendable {
     func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto
     /// Records until `stopRecording()` is called or `limit` is reached, then returns the clip.
     func record(limit: Duration?) async throws -> CapturedVideo
+    /// Only `position`'s camera, when the other one isn't wanted (a hidden selfie window, rev-capture 9): no file
+    /// for it, and its share of the free space stays with the one recording. Nil records every camera.
+    func record(limit: Duration?, only position: CameraPosition?) async throws -> CapturedVideo
     func stopRecording() async
     /// The rear camera's light, for the flash button in video mode. Does nothing where there is none.
     func setTorch(_ mode: FlashMode) async
@@ -330,4 +333,10 @@ final class CaptureEventRelay: Sendable {
 
 public extension CaptureEngine {
     func reducedWidth() async -> Int32? { nil }
+}
+
+public extension CaptureEngine {
+    func record(limit: Duration?, only _: CameraPosition?) async throws -> CapturedVideo {
+        try await record(limit: limit)
+    }
 }

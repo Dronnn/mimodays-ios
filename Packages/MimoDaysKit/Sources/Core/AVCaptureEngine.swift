@@ -453,6 +453,10 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     // MARK: Video
 
     public func record(limit: Duration?) async throws -> CapturedVideo {
+        try await record(limit: limit, only: nil)
+    }
+
+    public func record(limit: Duration?, only: CameraPosition?) async throws -> CapturedVideo {
         let asked = CACurrentMediaTime()
         return try await withCheckedThrowingContinuation { continuation in
             queue.async {
@@ -465,7 +469,9 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     continuation.resume(throwing: CaptureError.alreadyRecording)
                     return
                 }
-                let outputs = setup.positions.compactMap { position in self.cameras[position].map { (position, $0.movie) } }
+                let wanted = setup.positions.filter { only == nil || $0 == only }
+                let outputs = (wanted.isEmpty ? setup.positions : wanted)
+                    .compactMap { position in self.cameras[position].map { (position, $0.movie) } }
                 // Each stream stops cleanly before the disk is full, keeping what it has.
                 guard let budget = CaptureStorage.freeBytes().flatMap({ CaptureStorage.budgetPerStream(freeBytes: $0, streams: outputs.count) })
                 else {

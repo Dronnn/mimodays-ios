@@ -405,7 +405,9 @@ final class CameraModel {
             return
         }
         do {
-            let recorded = arranged(try await engine.record(limit: limit), as: shot)
+            // A hidden selfie window records nothing (rev-capture 9).
+            let only = shot.showsSelfie ? nil : mainPosition
+            let recorded = arranged(try await engine.record(limit: limit, only: only), as: shot)
             await setTorch(.off).value
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
             measure(video)

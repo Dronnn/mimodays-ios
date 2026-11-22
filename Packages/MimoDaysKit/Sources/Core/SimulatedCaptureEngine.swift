@@ -156,9 +156,15 @@ public actor SimulatedCaptureEngine: CaptureEngine {
     }
 
     public func record(limit: Duration?) async throws -> CapturedVideo {
+        try await record(limit: limit, only: nil)
+    }
+
+    public func record(limit: Duration?, only: CameraPosition?) async throws -> CapturedVideo {
         guard isRunning, interruption == nil, let setup else { throw CaptureError.notRunning }
         guard !isRecording else { throw CaptureError.alreadyRecording }
-        if let freeBytes, CaptureStorage.budgetPerStream(freeBytes: freeBytes, streams: setup.positions.count) == nil {
+        let wanted = setup.positions.filter { only == nil || $0 == only }
+        let positions = wanted.isEmpty ? setup.positions : wanted
+        if let freeBytes, CaptureStorage.budgetPerStream(freeBytes: freeBytes, streams: positions.count) == nil {
             throw CaptureError.lowStorage
         }
         isRecording = true
@@ -184,7 +190,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
         var urls: [URL] = []
         do {
-            for position in setup.positions {
+            for position in positions {
                 if let footage {
                     urls.append(try await footage.clip(position, from: startedAt, seconds: seconds))
                 } else {
@@ -196,7 +202,7 @@ public actor SimulatedCaptureEngine: CaptureEngine {
             throw CaptureError.recordingFailed
         }
         return CapturedVideo(
-            mainURL: urls[0], mainPosition: setup.positions[0], selfieURL: urls.dropFirst().first,
+            mainURL: urls[0], mainPosition: positions[0], selfieURL: urls.dropFirst().first,
             duration: seconds, selfieOffset: 0, hasAudio: false, interruption: stopReason
         )
     }

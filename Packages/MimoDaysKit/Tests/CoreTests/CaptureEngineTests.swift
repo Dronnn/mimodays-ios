@@ -113,6 +113,19 @@ struct CapturePressurePolicyTests {
         #expect(Policy.response(to: .critical, setup: .dual, isRecording: false, frameRateCap: 24).frameRate == 15)
     }
 
+    /// rev-capture 9: a hidden selfie window records one camera, with all the room the two would have shared.
+    @Test func oneCameraRecordsWithTheWholeBudget() async throws {
+        let engine = SimulatedCaptureEngine(freeBytes: 230_000_000)
+        _ = await engine.start()
+        await #expect(throws: CaptureError.lowStorage) { try await engine.record(limit: .milliseconds(100)) }
+        let video = try await engine.record(limit: .milliseconds(100), only: .back)
+        defer { try? FileManager.default.removeItem(at: video.mainURL) }
+        #expect(video.mainPosition == .back && video.selfieURL == nil)
+        let front = try await engine.record(limit: .milliseconds(100), only: .front)
+        defer { try? FileManager.default.removeItem(at: front.mainURL) }
+        #expect(front.mainPosition == .front && front.selfieURL == nil)
+    }
+
     /// P1.1: the virtual rear camera at every width first, then the lens's own camera; never wider than the size.
     @Test func dualTiersTryTheVirtualCameraFirst() {
         #expect(Policy.dualTiers(hasVirtualPair: true, maxWidth: 1920) == [

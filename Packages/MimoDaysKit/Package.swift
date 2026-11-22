@@ -10,6 +10,7 @@ let package = Package(
         .library(name: "DesignSystem", targets: ["DesignSystem"]),
         .library(name: "Persistence", targets: ["Persistence"]),
         .library(name: "AppFeature", targets: ["AppFeature"]),
+        .library(name: "WidgetFeature", targets: ["WidgetFeature"]),
         .library(name: "TestSupport", targets: ["TestSupport"]),
     ],
     dependencies: [
@@ -19,7 +20,9 @@ let package = Package(
         .target(name: "Core"),
         .target(name: "DesignSystem", resources: [.process("Resources")]),
         .target(name: "Persistence", dependencies: ["Core"]),
-        .target(name: "AppFeature", dependencies: ["Core", "DesignSystem", "Persistence"], resources: [.process("Resources")]),
+        .target(name: "AppFeature", dependencies: ["Core", "DesignSystem", "Persistence", "WidgetFeature"], resources: [.process("Resources")]),
+        // P8.2: what the widget extension links - no archive, no SwiftData.
+        .target(name: "WidgetFeature", dependencies: ["DesignSystem"], resources: [.process("Resources")]),
         .target(
             name: "TestSupport",
             dependencies: [
@@ -34,9 +37,10 @@ let package = Package(
         .testTarget(name: "CoreTests", dependencies: ["Core", "TestSupport"]),
         .testTarget(name: "DesignSystemTests", dependencies: ["DesignSystem"]),
         .testTarget(name: "AppFeatureTests", dependencies: ["AppFeature", "TestSupport"]),
+        .testTarget(name: "WidgetFeatureTests", dependencies: ["WidgetFeature"]),
         // Integration tests: in-memory SwiftData + temporary file store.
         .testTarget(name: "IntegrationTests", dependencies: ["Core", "Persistence", "TestSupport"]),
         // Screen snapshots: light/dark, iPhone regular/compact, iPad, AX3.
-        .testTarget(name: "SnapshotTests", dependencies: ["AppFeature", "DesignSystem", "TestSupport"]),
+        .testTarget(name: "SnapshotTests", dependencies: ["AppFeature", "DesignSystem", "TestSupport", "WidgetFeature"]),
     ]
 )

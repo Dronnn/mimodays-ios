@@ -72,6 +72,8 @@ enum MovieComposer {
         // The title opens the first clip; a text card before it speaks for itself.
         let titled = plan.clips.firstIndex { !$0.isCard }
         for (index, clip) in plan.clips.enumerated() {
+            // A newer edit cancels this build: stop before reading the rest of the timeline (rev-library).
+            try Task.checkCancellation()
             let length = time(clip.duration)
             let range = CMTimeRange(start: cursor, duration: length)
             let lead = clip.lead.map(time)

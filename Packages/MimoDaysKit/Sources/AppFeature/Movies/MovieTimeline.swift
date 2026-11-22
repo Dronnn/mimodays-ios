@@ -135,13 +135,18 @@ struct MovieTimeline: View {
         }
     }
 
+    /// rev-library: the picture is read when the clip scrolls into view, and again if the cache let it go meanwhile;
+    /// clips far along a long timeline don't all load at once.
     private func clipFace(_ clip: MovieClip) -> some View {
         let id = clip.moment?.id
         return Color(hex: 0xC9B8AA)
             .overlay {
                 if let id, let image = model.tiles.images[id] { Image(uiImage: image).filling() }
             }
-            .task(id: id) { if let id { await model.tiles.load(id) } }
+            .onScrollVisibilityChange(threshold: 0.01) { visible in
+                guard visible, let id else { return }
+                Task { await model.tiles.load(id) }
+            }
     }
 
     /// `Editor / Text card` on the lane: "Aa" in coral and the words, on paper or plum.

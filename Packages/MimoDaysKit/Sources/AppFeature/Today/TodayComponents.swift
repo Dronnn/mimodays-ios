@@ -17,17 +17,12 @@ struct SurpriseRibbon: View {
                 .frame(width: 16, height: 16.5)
                 .foregroundStyle(ColorToken.accentApricot.color)
                 .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 0) {
-                Text(message)
-                    .textStyle(isLong ? .handSmall : .hand)
-                if let detail {
-                    Text(detail).textStyle(.handSmall)
-                }
-            }
-            .foregroundStyle(ColorToken.textPrimary.color)
-            .fixedSize(horizontal: false, vertical: true)
-            // The words fill the row up to the action, which never wraps.
-            .frame(maxWidth: isWide ? .infinity : nil, alignment: .leading)
+            words
+                .textStyle(isLong ? .handSmall : .hand)
+                .foregroundStyle(ColorToken.textPrimary.color)
+                .fixedSize(horizontal: false, vertical: true)
+                // The words fill the row up to the action, which never wraps.
+                .frame(maxWidth: isWide ? .infinity : nil, alignment: .leading)
             if let actionTitle {
                 Button(action: action) {
                     Text(actionTitle)
@@ -55,19 +50,20 @@ struct SurpriseRibbon: View {
         .accessibilityIdentifier("today.ribbon")
     }
 
-    private var isWide: Bool { actionTitle != nil || isLong || detail != nil }
+    private var isWide: Bool { actionTitle != nil || isLong }
 
     /// A whole sentence rather than a few words: smaller, across the width.
     private var isLong: Bool {
         switch status {
-        case .passed, .retryFailed: true
+        case .passed: true
         default: false
         }
     }
 
-    /// P8.7: under "A little later".
-    private var detail: LocalizedStringResource? {
-        status == .later ? resource("Your surprise will be back today.") : nil
+    /// P8.7 (FF02): "A little later · Your surprise will be back today." on one line.
+    private var words: Text {
+        guard status == .later else { return Text(message) }
+        return Text(message) + Text(verbatim: " · ") + Text(resource("Your surprise will be back today."))
     }
 
     private var message: LocalizedStringResource {

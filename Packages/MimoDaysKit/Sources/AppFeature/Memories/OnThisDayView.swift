@@ -23,14 +23,19 @@ final class OnThisDayModel {
     private(set) var years: [OnThisDayYear] = []
     private(set) var isLoaded = false
     private(set) var images: [String: UIImage] = [:]
-    /// yyyymmdd of today, in the device's zone.
-    let today: Int
+    /// yyyymmdd of today, in the device's zone; read again on every refresh, so a screen kept open past midnight
+    /// moves on to the new day (rev-library).
+    private(set) var today: Int
 
     private let library: MediaLibrary
+    private let clock: any DateProvider
+    private let calendar: Calendar
     private let logger = Logger(subsystem: "MimoDays", category: "OnThisDay")
 
     init(library: MediaLibrary, clock: any DateProvider = SystemDateProvider(), calendar: Calendar = .current) {
         self.library = library
+        self.clock = clock
+        self.calendar = calendar
         today = LocalDay(clock.now(), in: calendar.timeZone).key
     }
 
@@ -38,6 +43,7 @@ final class OnThisDayModel {
     var ids: [UUID] { years.flatMap { $0.moments.map(\.id) } }
 
     func refresh() async {
+        today = LocalDay(clock.now(), in: calendar.timeZone).key
         let monthDay = today % 10_000
         let year = today / 10_000
         let keys = (1...100).map { (year - $0) * 10_000 + monthDay }
@@ -150,6 +156,10 @@ struct OnThisDayView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .task { await model.refresh() }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in Task { await model.refresh() } }
+        // Midnight or a new time zone while it stays open.
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+            Task { await model.refresh() }
+        }
     }
 
     /// "1 YEAR AGO · 2025".

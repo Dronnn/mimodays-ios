@@ -185,14 +185,14 @@ struct RestoreView: View {
             ? String(appLocalized: "checked, no problems", bundle: .module, comment: "Restore (E07): the backup was read and every file matched")
             : String(appLocalized: "some files are damaged", bundle: .module, comment: "Restore (E07): the backup was read and some files didn't match")
         return String(
-            localized: "\(summary.moments) moments · \(summary.collections) collections · \(summary.projects) movie projects · \(check)", bundle: .module,
+            appLocalized: "\(summary.moments) moments · \(summary.collections) collections · \(summary.projects) movie projects · \(check)", bundle: .module,
             comment: "Restore (E07): what the backup holds, then how its check went"
         )
     }
 
     private func alreadyLine(_ summary: BackupService.Summary) -> String {
         String(
-            localized: "\(summary.alreadyHere) are already here. \(summary.new) are new.", bundle: .module,
+            appLocalized: "\(summary.alreadyHere) are already here. \(summary.new) are new.", bundle: .module,
             comment: "Restore (E07): how many of the backup's moments this iPhone has, and how many it doesn't"
         )
     }

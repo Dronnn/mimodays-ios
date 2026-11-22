@@ -65,6 +65,19 @@ struct OnThisDayTests {
         #expect(model.image(model.years.first?.moments.first?.mainPath) != nil)
     }
 
+    /// rev-library: kept open past midnight, the next refresh shows the new day's earlier years.
+    @Test func aRefreshAfterMidnightMovesToTheNewDay() async throws {
+        let eleventh = try await save(at: Self.date(2025, 11, 11, 8))
+        let twelfth = try await save(at: Self.date(2025, 11, 12, 8))
+        let clock = TestDateProvider(Self.date(2026, 11, 11, 23))
+        let model = OnThisDayModel(library: library, clock: clock, calendar: Self.utc)
+        await model.refresh()
+        #expect(model.ids == [eleventh])
+        clock.set(Self.date(2026, 11, 12, 0))
+        await model.refresh()
+        #expect(model.today == 2026_11_12 && model.ids == [twelfth])
+    }
+
     /// P8.3: a hidden moment and a hidden day stay out; the rest of that year stays.
     @Test func hiddenMomentsAndDaysStayOut() async throws {
         let kept = try await save(at: Self.date(2025, 11, 11, 8))

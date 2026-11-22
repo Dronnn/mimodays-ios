@@ -291,7 +291,7 @@ struct MoviePageView: View {
         }
         let made = render.renderedAt.formatted(.dateTime.month(.abbreviated).day().locale(AppLanguage.shared.locale))
         return String(
-            localized: "Movie · \(length) · \(shape.label) · \(quality) · made \(made)", bundle: .module,
+            appLocalized: "Movie · \(length) · \(shape.label) · \(quality) · made \(made)", bundle: .module,
             comment: "F15: a rendered movie's length, shape, quality and the day it was made"
         )
     }

@@ -173,12 +173,22 @@ final class MovieEditorModel {
     }
 
     /// The clip playing at `time`, and how far into it (0...1).
-    var playhead: (index: Int, fraction: Double)? {
+    var playhead: (index: Int, fraction: Double)? { position(at: time) }
+
+    /// The clip playing `seconds` into the movie, and how far into it (0...1).
+    func position(at seconds: Double) -> (index: Int, fraction: Double)? {
         guard !plan.clips.isEmpty else { return nil }
         let starts = starts
-        let index = starts.lastIndex { $0 <= time + 0.0001 } ?? 0
+        let index = starts.lastIndex { $0 <= seconds + 0.0001 } ?? 0
         let length = plan.clips[index].duration
-        return (index, length > 0 ? min(max((time - starts[index]) / length, 0), 1) : 0)
+        return (index, length > 0 ? min(max((seconds - starts[index]) / length, 0), 1) : 0)
+    }
+
+    /// How long the voice over the movie runs, from its file; nil for a song, which spans the whole movie (P5.3).
+    func voiceLength() async -> Double? {
+        guard let track, track.kind == .voiceover, let url = try? library.store.url(for: track.relativePath),
+              let seconds = try? await AVURLAsset(url: url).load(.duration).seconds, seconds.isFinite else { return nil }
+        return seconds
     }
 
     var selectedItem: Item? { items.indices.contains(selected) ? items[selected] : nil }
@@ -557,11 +567,20 @@ final class MovieEditorModel {
     private var voiceoverStart = 0.0
     /// The movie's end finishes the take.
     private var voiceoverEnd: (any NSObjectProtocol)?
+    /// A take that couldn't start or be kept for lack of space: the editor says so (P5.3).
+    var noRoomForVoice = false
+    /// Free bytes for a take, as the camera counts them; tests set it.
+    var freeBytes: () -> Int64? = CaptureStorage.freeBytes
 
     /// A take getting ready: the stage stops and goes silent, so the movie's sound isn't recorded into the voice.
     /// Its sheet comes up at once and starts it (`startVoiceover`). Nil while another one is on.
     func newVoiceover() -> VoiceRecording? {
-        guard voiceover == nil, duration > 0, let url = try? CaptureFiles.temporaryURL("m4a") else { return nil }
+        guard voiceover == nil, duration > 0 else { return nil }
+        if let free = freeBytes(), CaptureStorage.budgetPerStream(freeBytes: free, streams: 1) == nil {
+            noRoomForVoice = true
+            return nil
+        }
+        guard let url = try? CaptureFiles.temporaryURL("m4a") else { return nil }
         let take = VoiceRecording(recorder: voice.makeRecorder(), url: url, limit: duration)
         voiceover = take
         voiceoverStart = 0
@@ -670,7 +689,15 @@ final class MovieEditorModel {
         } catch {
             try? FileManager.default.removeItem(at: url)
             logger.error("Adding the voice failed: \(error.localizedDescription, privacy: .public)")
+            if Self.isOutOfSpace(error) { noRoomForVoice = true }
         }
+    }
+
+    static func isOutOfSpace(_ error: any Error) -> Bool {
+        let error = error as NSError
+        return (error.domain == NSCocoaErrorDomain && error.code == NSFileWriteOutOfSpaceError)
+            || (error.domain == NSPOSIXErrorDomain && error.code == Int(ENOSPC))
+            || (error.userInfo[NSUnderlyingErrorKey] as? NSError).map(isOutOfSpace) == true
     }
 
     private static func seconds(of url: URL) -> Double? {

@@ -11,6 +11,8 @@ struct MovieTimeline: View {
     let model: MovieEditorModel
     /// A transition dot: the item it leads into.
     let transition: (Int) -> Void
+    /// The voice over the movie's length, once read: its band runs from where it starts for as long as it lasts.
+    @State private var voiceLength: Double?
 
     /// Points per second of movie, and the narrowest an item gets.
     static let pointsPerSecond: CGFloat = 12
@@ -47,6 +49,7 @@ struct MovieTimeline: View {
             }
         }
         .frame(height: Self.laneHeight * 4)
+        .task(id: model.track?.relativePath) { voiceLength = await model.voiceLength() }
         // Time runs left to right in every language, as on the preview's scrubber: the playhead's offset, the lanes
         // and a touch agree (rev-library).
         .environment(\.layoutDirection, .leftToRight)
@@ -258,10 +261,13 @@ struct MovieTimeline: View {
 
     // MARK: Music
 
-    /// The song or the voice under the whole movie: its name and level on a sage band, with a song's fade in and out
-    /// drawn.
+    /// The song under the whole movie, or the voice where it was recorded: its name and level on a sage band, with a
+    /// song's fade in and out drawn.
     private func musicLane(_ widths: [CGFloat]) -> some View {
         let total = widths.reduce(0, +) + Self.spacing * CGFloat(max(widths.count - 1, 0))
+        let voice = model.track?.kind == .voiceover ? model.track?.startOffset : nil
+        let start = voice.map { x(at: $0, widths) } ?? 0
+        let end = voice.flatMap { offset in voiceLength.map { x(at: offset + $0, widths) } } ?? total
         return lane {
             if let music = model.track {
                 RibbonBlob()
@@ -275,12 +281,20 @@ struct MovieTimeline: View {
                             .lineLimit(1)
                             .padding(.leading, 40)
                     }
-                    .frame(width: total, height: 34)
+                    .frame(width: max(end - start, 34), height: 34)
+                    .padding(.leading, start)
+                    .frame(width: total, alignment: .leading)
                     .accessibilityHidden(true)
             } else {
                 Color.clear.frame(width: total)
             }
         }
+    }
+
+    /// Where `seconds` into the movie is across the lanes.
+    private func x(at seconds: Double, _ widths: [CGFloat]) -> CGFloat {
+        guard let position = model.position(at: seconds), widths.indices.contains(position.index) else { return 0 }
+        return widths.prefix(position.index).reduce(0, +) + Self.spacing * CGFloat(position.index) + widths[position.index] * position.fraction
     }
 
     // MARK: Playhead

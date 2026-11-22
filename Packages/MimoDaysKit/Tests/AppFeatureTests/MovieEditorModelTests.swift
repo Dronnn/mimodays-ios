@@ -288,6 +288,39 @@ struct MovieEditorModelTests {
         #expect(model.track?.kind == .soundtrack && model.track?.relativePath == music && store.fileExists(music))
     }
 
+    /// P5.3: no room for a take: none starts, and the editor says why.
+    @Test func aTakeWithoutRoomDoesntStartAndSaysWhy() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        await model.settled()
+        model.freeBytes = { 100_000_000 }
+        #expect(model.newVoiceover() == nil)
+        #expect(model.noRoomForVoice)
+        model.noRoomForVoice = false
+        model.freeBytes = { 10_000_000_000 }
+        let take = try #require(model.newVoiceover())
+        #expect(!model.noRoomForVoice)
+        model.finishVoiceover(take)
+        #expect(MovieEditorModel.isOutOfSpace(NSError(domain: NSCocoaErrorDomain, code: NSFileWriteOutOfSpaceError)))
+        #expect(!MovieEditorModel.isOutOfSpace(NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError)))
+    }
+
+    /// P5.3: the voice's band runs where it was recorded, from its start for its length; a song's spans the movie.
+    @Test func theVoicesBandRunsWhereItWasRecorded() async throws {
+        let ids = try await save(2)
+        let model = try editor(ids)
+        await model.settled()
+        model.setMusic(from: try song())
+        #expect(await model.voiceLength() == nil)
+        model.addVoiceover(at: try recordedVoice(seconds: 1.5), startingAt: 1)
+        let length = try #require(await model.voiceLength())
+        #expect(abs(length - 1.5) < 0.1)
+        #expect(model.track?.startOffset == 1)
+        let first = try #require(model.plan.clips.first).duration
+        let start = try #require(model.position(at: 1))
+        #expect(start.index == 0 && abs(start.fraction - 1 / first) < 0.001)
+    }
+
     @Test func recordingAgainReplacesTheVoiceAndTheOldFileGoesOnceNothingUsesIt() async throws {
         let ids = try await save(2)
         let model = try editor(ids)

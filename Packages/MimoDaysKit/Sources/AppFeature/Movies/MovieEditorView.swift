@@ -125,6 +125,12 @@ struct MovieEditorView: View {
             }
         }
         .permissionExplainers(asker)
+        .alert(
+            Text("Not enough space to record. Free up some space on this iPhone and try again.", bundle: .module),
+            isPresented: Binding { model.noRoomForVoice } set: { model.noRoomForVoice = $0 }
+        ) {
+            Button(role: .cancel) {} label: { Text("OK", bundle: .module) }
+        }
         .sheet(isPresented: $microphoneOff) {
             PermissionExplainerView(screen: .movieVoiceOff) {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }

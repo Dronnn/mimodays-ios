@@ -196,10 +196,10 @@ final class CameraUITests: XCTestCase {
         let window = app.descendants(matching: .any)["viewer.selfieWindow"]
         XCTAssertTrue(window.waitForExistence(timeout: 10))
         XCTAssertEqual(window.value as? String, "Top right, Medium")
-        // It plays by itself.
+        // It plays by itself, once both streams are loaded: on a busy CI machine that took over 3 s (run 45048101906).
         let play = app.buttons["viewer.play"]
         let playing = expectation(for: NSPredicate(format: "label == 'Pause'"), evaluatedWith: play)
-        wait(for: [playing], timeout: 3)
+        wait(for: [playing], timeout: 15)
         attachScreenshot("player-recorded")
         window.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.6)))

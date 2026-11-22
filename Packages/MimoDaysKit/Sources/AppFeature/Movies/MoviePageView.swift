@@ -40,6 +40,8 @@ struct MoviePageView: View {
     @Environment(MovieExportCenter.self) private var exports: MovieExportCenter?
     @State private var saved = false
     @State private var problem: PhotosSaveProblem?
+    /// The file's own shape; the draft's can have changed since it was made.
+    @State private var renderedShape: MovieAspectRatio?
     @State private var sharing = false
     @State private var savingToPhotos = false
     @State private var asker = PermissionAsker()
@@ -67,11 +69,15 @@ struct MoviePageView: View {
                         .padding(.top, 14)
                         .accessibilityAddTraits(.isHeader)
                     if let render = project.render {
-                        Text(Self.meta(render, project.aspectRatio))
+                        Text(Self.meta(render, renderedShape ?? project.aspectRatio))
                             .textStyle(.noteMeta)
                             .foregroundStyle(ColorToken.textSecondary.color)
                             .padding(.horizontal, 20)
                             .padding(.top, 6)
+                            .task(id: render.relativePath) {
+                                renderedShape = nil
+                                if let url { renderedShape = await MovieFiles.shape(of: url) }
+                            }
                     }
                     HStack(spacing: 16) {
                         if url != nil {

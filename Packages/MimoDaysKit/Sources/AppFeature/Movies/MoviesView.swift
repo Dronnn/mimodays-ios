@@ -160,10 +160,13 @@ struct MoviesView: View {
             VStack(spacing: 12) {
                 ForEach(model.movies) { movie in
                     NavigationLink(value: MovieRoute.movie(movie.id)) {
-                        MovieRow(movie: movie, image: movie.coverID.flatMap { model.tiles.images[$0] })
+                        MovieRow(movie: movie, shape: model.shape(of: movie), image: movie.coverID.flatMap { model.tiles.images[$0] })
                     }
                     .buttonStyle(.plain)
-                    .task { if let id = movie.coverID { await model.tiles.load(id) } }
+                    .task {
+                        if let id = movie.coverID { await model.tiles.load(id) }
+                        await model.loadShape(of: movie)
+                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -354,6 +357,7 @@ struct DraftCard: View {
 /// `Movie / Row`: the poster, the name, length · shape · when it was made, and Play.
 struct MovieRow: View {
     let movie: MovieCard
+    var shape: MovieAspectRatio?
     let image: UIImage?
 
     var body: some View {
@@ -372,7 +376,7 @@ struct MovieRow: View {
                     .textStyle(.rowTitle)
                     .foregroundStyle(ColorToken.textPrimary.color)
                 if let render = movie.render {
-                    MovieCard.meta(render, movie.aspectRatio)
+                    MovieCard.meta(render, shape ?? movie.aspectRatio)
                         .textStyle(.sectionCount)
                         .foregroundStyle(ColorToken.textSecondary.color)
                 }

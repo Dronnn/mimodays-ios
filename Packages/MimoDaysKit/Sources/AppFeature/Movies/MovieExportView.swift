@@ -602,6 +602,19 @@ private struct PhotosSaveAlert: ViewModifier {
 enum MovieFiles {
     enum Failure: Error { case notAllowed }
 
+    /// The shape a rendered file really has: the draft's can have changed since it was made (rev-library).
+    static func shape(of url: URL) async -> MovieAspectRatio? {
+        guard let track = try? await AVURLAsset(url: url).loadTracks(withMediaType: .video).first,
+              let (size, transform) = try? await track.load(.naturalSize, .preferredTransform) else { return nil }
+        let upright = size.applying(transform)
+        guard upright.height != 0 else { return nil }
+        let aspect = abs(upright.width / upright.height)
+        return MovieAspectRatio.allCases.min {
+            let a = $0.renderSize(.p1080), b = $1.renderSize(.p1080)
+            return abs(a.width / a.height - aspect) < abs(b.width / b.height - aspect)
+        }
+    }
+
     static func saveToPhotos(_ url: URL) async throws {
         try await saveToPhotos([url])
     }

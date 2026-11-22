@@ -377,4 +377,26 @@ struct MoviesModelTests {
         #expect(model.loadCandidates())
         #expect(model.oneSecondDays.first?.picked == other && Set(ids).contains(other))
     }
+
+    /// rev-library: a movie made 9:16 still says 9:16 after its draft turns square, until it is made again.
+    @Test func aMovieIsLabelledWithTheShapeItsFileWasMadeIn() async throws {
+        let movieStore = MovieStore(context: context, store: store, now: { Date(timeIntervalSince1970: 0) })
+        let project = try movieStore.create(
+            title: "September", source: MovieSourceRule(kind: .selection), length: .short, aspectRatio: .portrait9x16, fit: .fill, momentIDs: []
+        )
+        let file = try store.store(copyOf: Fixture.clip.url, in: .derived)
+        try movieStore.attach(
+            MovieRender(relativePath: file.relativePath, renderedAt: Date(timeIntervalSince1970: 0), duration: 2, resolution: .p1080, byteCount: file.byteCount),
+            to: project
+        )
+        project.aspectRatio = .square1x1
+        try context.save()
+
+        let model = movies()
+        model.refresh()
+        let movie = try #require(model.movies.first)
+        #expect(model.shape(of: movie) == .square1x1)
+        await model.loadShape(of: movie)
+        #expect(model.shape(of: movie) == .portrait9x16)
+    }
 }

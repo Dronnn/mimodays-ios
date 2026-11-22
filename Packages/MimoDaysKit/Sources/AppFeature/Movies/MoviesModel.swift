@@ -33,6 +33,8 @@ final class MoviesModel {
     private(set) var movies: [MovieCard] = []
     private(set) var suggestion: MovieSuggestion?
     private(set) var isLoaded = false
+    /// Rendered files' own shapes, by path, once read.
+    private(set) var renderedShapes: [String: MovieAspectRatio] = [:]
     let tiles: MemoriesModel
     private let library: MediaLibrary
     private let clock: any DateProvider
@@ -61,6 +63,17 @@ final class MoviesModel {
     private var store: MovieStore { MovieStore(context: library.context, store: library.store, now: { [clock] in clock.now() }) }
 
     var isEmpty: Bool { isLoaded && drafts.isEmpty && movies.isEmpty }
+
+    /// The shape the movie's file was made in, the draft's until the file is read.
+    func shape(of movie: MovieCard) -> MovieAspectRatio {
+        movie.render.flatMap { renderedShapes[$0.relativePath] } ?? movie.aspectRatio
+    }
+
+    func loadShape(of movie: MovieCard) async {
+        guard let path = movie.render?.relativePath, renderedShapes[path] == nil,
+              let url = try? library.store.url(for: path), let shape = await MovieFiles.shape(of: url) else { return }
+        renderedShapes[path] = shape
+    }
 
     /// "Edited 2 days ago" counts from here.
     var now: Date { clock.now() }

@@ -111,8 +111,19 @@ struct WeekdayPicker: View {
     @Environment(\.locale) private var locale
 
     var body: some View {
-        HStack(spacing: 8) {
-            ForEach(calendar.orderedWeekdays, id: \.self) { day in
+        // Seven 44 pt days in a row as drawn; where they don't fit (a narrow window), two rows (rev-app 19).
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) { days(calendar.orderedWeekdays) }
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) { days(Array(calendar.orderedWeekdays.prefix(4))) }
+                HStack(spacing: 8) { days(Array(calendar.orderedWeekdays.dropFirst(4))) }
+            }
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    private func days(_ weekdays: [Int]) -> some View {
+        ForEach(weekdays, id: \.self) { day in
                 let isOn = schedule.isOn(day)
                 Button {
                     schedule.toggle(day)
@@ -131,9 +142,7 @@ struct WeekdayPicker: View {
                     Text(verbatim: calendar.speaking(locale).standaloneWeekdaySymbols[day - 1]),
                 ])
                 .accessibilityAddTraits(isOn ? .isSelected : [])
-            }
         }
-        .accessibilityElement(children: .contain)
     }
 }
 

@@ -37,15 +37,16 @@ public struct SegmentedControl<Value: Hashable>: View {
                         .foregroundStyle((isSelected ? ColorToken.textLink : .textPrimary).color)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 6)
-                        .padding(.vertical, 8)
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .padding(.vertical, 10)
+                        // 44 pt to touch (rev-app 19); the track and the pill are drawn 2 pt in, 40 pt high as before.
+                        .frame(maxWidth: .infinity, minHeight: 44)
                         .background {
                             if isSelected {
                                 Icon.shapeSegmentPill.image
                                     .resizable()
                                     .foregroundStyle(ColorToken.accentPeach.color)
                                     .padding(.horizontal, 2)
-                                    .padding(.vertical, 4)
+                                    .padding(.vertical, 6)
                                     .matchedGeometryEffect(id: "pill", in: pill)
                             }
                         }
@@ -56,8 +57,9 @@ public struct SegmentedControl<Value: Hashable>: View {
             }
         }
         .background {
-            Icon.shapeSegmentTrack.image.resizable().foregroundStyle(ColorToken.surfaceChip.color)
+            Icon.shapeSegmentTrack.image.resizable().foregroundStyle(ColorToken.surfaceChip.color).padding(.vertical, 2)
         }
+        .padding(.vertical, -2)
         .accessibilityElement(children: .contain)
     }
 }

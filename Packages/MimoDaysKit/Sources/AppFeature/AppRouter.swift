@@ -68,6 +68,8 @@ public struct NewMovieRequest: Equatable, Identifiable, Sendable {
 /// P8.11: one Write a moment sheet.
 public struct WriteRequest: Equatable, Identifiable, Sendable {
     public var id = UUID()
+    /// P8.12 DD05: a Journaling Suggestion's writing prompt, as the hint.
+    public var prompt: String?
 }
 
 public struct CaptureRequest: Equatable, Identifiable, Sendable {
@@ -93,6 +95,10 @@ public final class AppRouter {
 
     /// P8.11: Write a moment is up.
     public var writing: WriteRequest?
+    /// P8.12: Today's menu offers Journaling Suggestions (iPhone, iPadOS 26; a stand-in in UI tests).
+    var offersJournaling = false
+    /// P8.12 DD03: Apple's Journaling Suggestions picker is up.
+    var isPickingJournaling = false
 
     /// The camera's cover (or Write a moment) is gone: what came while it was up opens now. Not before: a cover still
     /// on its way out would take the new one with it.

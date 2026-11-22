@@ -63,6 +63,25 @@ struct WriteMomentModelTests {
         #expect(drafts.load() == nil)
     }
 
+    /// P8.12 DD05: a Journaling Suggestion's prompt is the hint, kept with the draft, and never saved as words.
+    @Test func aPromptIsOnlyAHint() throws {
+        let model = WriteMomentModel(now: now, drafts: drafts, prompt: "What made you smile today?")
+        #expect(model.prompt == "What made you smile today?")
+        #expect(!model.canSave && !model.hasEdits)
+        #expect(drafts.load()?.prompt == "What made you smile today?")
+        model.body = "The bus driver waved"
+        let moment = try model.save(with: saver)
+        #expect(moment.note == "The bus driver waved" && moment.title == nil)
+    }
+
+    /// An unfinished moment opened from a suggestion keeps its words and takes the prompt.
+    @Test func aPromptJoinsTheUnfinishedDraft() {
+        WriteMomentModel(now: now, drafts: drafts).body = "Half a thought"
+        let reopened = WriteMomentModel(draft: drafts.load(), now: now, drafts: drafts, prompt: "A small win?")
+        #expect(reopened.body == "Half a thought" && reopened.prompt == "A small win?")
+        #expect(drafts.load()?.prompt == "A small win?")
+    }
+
     /// A failed save keeps the words for Try again.
     @Test func aFailedSaveKeepsTheDraft() {
         let model = WriteMomentModel(now: now, drafts: drafts)

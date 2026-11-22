@@ -12,6 +12,8 @@ public final class AppDependencies {
     let skipsOnboarding: Bool
     /// UI tests: where `-open-url` sends the app at launch.
     let launchRoute: Route?
+    /// UI tests: what the Journaling Suggestions stand-in picker hands back.
+    let journalingFixture: LaunchConfiguration.JournalingFixture?
     let surprises: SurpriseCoordinator
     let notificationTaps = SurpriseNotificationHandler()
     let camera: CameraServices
@@ -66,6 +68,7 @@ public final class AppDependencies {
         }
         skipsOnboarding = configuration.skipsOnboarding
         launchRoute = configuration.isUITesting ? configuration.openURL.flatMap(AppRouter.route(from:)) : nil
+        journalingFixture = configuration.isUITesting ? configuration.journaling : nil
         memoriesPreferences = .memories(configuration.isUITesting ? nil : .standard)
         moviePreferences = .movies(configuration.isUITesting ? nil : .standard)
         let privacyPreferences = PrivacyPreferences.privacy(configuration.isUITesting ? nil : .standard)

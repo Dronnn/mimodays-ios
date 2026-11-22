@@ -241,13 +241,21 @@ struct TodayView: View {
         }
     }
 
-    /// DD01/DD02: "+ Add a moment" under the camera; its menu writes one (P8.11).
+    /// DD01/DD02: "+ Add a moment" under the camera; its menu writes one (P8.11) or opens Journaling Suggestions (P8.12).
     private var addMoment: some View {
         Menu {
             Button { router.open(.write) } label: {
                 Label { Text("Write a moment", bundle: .module) } icon: { Icon.glyphText.image }
             }
             .accessibilityIdentifier("addMoment.write")
+            if router.offersJournaling {
+                Button { router.isPickingJournaling = true } label: {
+                    Label {
+                        Text("Add from Journaling Suggestions", bundle: .module, comment: "P8.12 DD02: Today's Add a moment menu, opens Apple's picker")
+                    } icon: { Icon.glyphSparkle.image }
+                }
+                .accessibilityIdentifier("addMoment.journaling")
+            }
         } label: {
             HStack(spacing: 4) {
                 Icon.glyphPlus.image

@@ -80,13 +80,19 @@ final class WriteMomentModel: Identifiable, PlaceChoosing {
     private let drafts: WritingDraftStore?
     private let places: PlaceServices
 
-    /// A new moment written now, or the one left unfinished (`draft`).
-    init(draft: TextMomentDraft? = nil, now: CaptureTime, drafts: WritingDraftStore?, places: PlaceServices = .simulated) {
-        self.draft = draft ?? TextMomentDraft(capturedAt: now)
+    /// A new moment written now, or the one left unfinished (`draft`). `prompt`: a Journaling Suggestion's, the hint
+    /// from now on (P8.12).
+    init(draft: TextMomentDraft? = nil, now: CaptureTime, drafts: WritingDraftStore?, places: PlaceServices = .simulated, prompt: String? = nil) {
+        var start = draft ?? TextMomentDraft(capturedAt: now)
+        if let prompt { start.prompt = prompt }
+        self.draft = start
         self.drafts = drafts
         self.places = places
-        if draft == nil { drafts?.save(self.draft) }
+        if draft == nil || prompt != nil { drafts?.save(self.draft) }
     }
+
+    /// DD05: the suggestion's prompt, only a hint.
+    var prompt: String? { draft.prompt }
 
     /// Save needs words in the body.
     var canSave: Bool { TextMoment.canSave(draft) }

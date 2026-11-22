@@ -43,6 +43,10 @@ struct WriteMomentView: View {
                         .padding(.top, 8)
                     ChipFlow(spacing: 8, lineSpacing: 2) { chips }
                         .padding(.top, 8)
+                    if let prompt = model.prompt {
+                        promptHint(prompt)
+                            .padding(.top, 16)
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 10)
@@ -139,8 +143,10 @@ struct WriteMomentView: View {
 
     private var bodyField: some View {
         TextField(text: $model.body, axis: .vertical) {
-            Text("Write what you want to remember…", bundle: .module)
-                .foregroundStyle(ColorToken.textTertiary.color)
+            Group {
+                if let prompt = model.prompt { Text(prompt) } else { Text("Write what you want to remember…", bundle: .module) }
+            }
+            .foregroundStyle(ColorToken.textTertiary.color)
         }
         .lineLimit(9...)
         .textStyle(.noteBody)
@@ -154,6 +160,30 @@ struct WriteMomentView: View {
         .accessibilityLabel(Text("Your words", bundle: .module))
         .accessibilityValue(Text(model.body))
         .accessibilityIdentifier("textMoment.body")
+    }
+
+    /// DD05: where the hint came from; only the person's own words are saved.
+    private func promptHint(_ prompt: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Icon.glyphSparkle.image
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .accessibilityHidden(true)
+                Text("From Journaling Suggestions: \(prompt)", bundle: .module, comment: "P8.12 DD05: %@ is the suggestion's writing prompt")
+                    .textStyle(.infoCard)
+                    .foregroundStyle(ColorToken.textPrimary.color)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(FieldBlob().fill(ColorToken.accentPeach.color))
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("textMoment.prompt")
+            DataNote(text: Text("The prompt is only a hint: only your own words are saved.", bundle: .module, comment: "P8.12 DD05: under the Journaling Suggestions prompt"))
+                .padding(.horizontal, 4)
+        }
     }
 
     private var count: some View {

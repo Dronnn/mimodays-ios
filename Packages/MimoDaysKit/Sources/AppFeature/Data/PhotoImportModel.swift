@@ -264,7 +264,7 @@ final class PhotoImportModel: Identifiable {
 
     /// A picked file read; a Live Photo's motion is kept only if it plays.
     nonisolated static func read(_ file: PickedFile, id: Int) async -> Picked? {
-        guard var item = await read(file.url, isVideo: file.isVideo, id: id) else { return nil }
+        guard var item = await read(file.url, isVideo: file.isVideo, id: id, sourceDate: file.date) else { return nil }
         item.isLivePhoto = file.isLivePhoto || file.motionURL != nil
         if let motion = file.motionURL, await plays(motion) { item.motionURL = motion }
         return item
@@ -276,7 +276,8 @@ final class PhotoImportModel: Identifiable {
         return !((try? await asset.loadTracks(withMediaType: .video)) ?? []).isEmpty
     }
 
-    nonisolated static func read(_ url: URL, isVideo: Bool, id: Int) async -> Picked? {
+    nonisolated static func read(_ url: URL, isVideo: Bool, id: Int, sourceDate: Date? = nil) async -> Picked? {
+        let fallback = { sourceDate.map { CaptureTime(instant: $0, timeZone: .current) } ?? fileTime(url) }
         guard let checksum = try? MediaStore.sha256(of: url) else { return nil }
         if isVideo {
             let asset = AVURLAsset(url: url)
@@ -294,7 +295,7 @@ final class PhotoImportModel: Identifiable {
             let location = await value(.quickTimeMetadataLocationISO6709)
             let hasAudio = !((try? await asset.loadTracks(withMediaType: .audio)) ?? []).isEmpty
             return Picked(
-                id: id, url: url, isVideo: true, capturedAt: time ?? fileTime(url), point: location.flatMap(point(iso6709:)), checksum: checksum, duration: duration,
+                id: id, url: url, isVideo: true, capturedAt: time ?? fallback(), point: location.flatMap(point(iso6709:)), checksum: checksum, duration: duration,
                 hasAudio: hasAudio
             )
         }
@@ -305,7 +306,7 @@ final class PhotoImportModel: Identifiable {
         let time = captureTime(
             exif: (exif?[kCGImagePropertyExifDateTimeOriginal] ?? tiff?[kCGImagePropertyTIFFDateTime]) as? String,
             offset: exif?[kCGImagePropertyExifOffsetTimeOriginal] as? String
-        ) ?? fileTime(url)
+        ) ?? fallback()
         return Picked(
             id: id, url: url, isVideo: false, capturedAt: time, point: point(gps: properties[kCGImagePropertyGPSDictionary] as? [CFString: Any]),
             checksum: checksum, duration: nil, hasAudio: false
@@ -376,6 +377,8 @@ struct PickedFile: Transferable {
     var motionURL: URL?
     /// A Live Photo, with or without its motion: without it, E05 asks before importing the still alone.
     var isLivePhoto = false
+    /// P8.12: when the file has no date of its own, the one its source gave (a Journaling Suggestion's photo).
+    var date: Date?
 
     static var transferRepresentation: some TransferRepresentation {
         FileRepresentation(importedContentType: .movie) { received in PickedFile(url: try copy(received.file), isVideo: true) }

@@ -28,6 +28,7 @@ public struct LaunchConfiguration: Equatable, Sendable {
     public static let openURLArgument = "-open-url"
     public static let brokenStoreArgument = "-broken-store"
     public static let whatsNewArgument = "-whats-new"
+    public static let journalingArgument = "-journaling"
 
     public var isUITesting: Bool
     public var skipsOnboarding: Bool
@@ -44,11 +45,26 @@ public struct LaunchConfiguration: Equatable, Sendable {
     public var breaksStore: Bool
     /// What's new opens over Today, as for someone who updated (UI tests only; otherwise it waits for an update).
     public var showsWhatsNew: Bool
+    /// What Apple's Journaling Suggestions picker hands back, where it can't run (the simulator; UI tests only).
+    public var journaling: JournalingFixture?
+
+    /// A stand-in for the suggestion picked in Apple's picker.
+    public enum JournalingFixture: String, Sendable {
+        /// Three photos.
+        case photos
+        /// A writing prompt.
+        case prompt
+        /// Two photos and a prompt.
+        case both
+        /// A workout only: nothing MimoDays takes.
+        case nothing
+    }
 
     public init(
         isUITesting: Bool, skipsOnboarding: Bool = false, usesFakeCamera: Bool = false,
         seed: Seed? = nil, permissions: PermissionStatus? = nil, surpriseTap: SurpriseTap? = nil, demoFootage: URL? = nil,
-        openURL: URL? = nil, breaksStore: Bool = false, showsWhatsNew: Bool = false
+        openURL: URL? = nil, breaksStore: Bool = false, showsWhatsNew: Bool = false,
+        journaling: JournalingFixture? = nil
     ) {
         self.isUITesting = isUITesting
         self.skipsOnboarding = skipsOnboarding
@@ -60,6 +76,7 @@ public struct LaunchConfiguration: Equatable, Sendable {
         self.openURL = openURL
         self.breaksStore = breaksStore
         self.showsWhatsNew = showsWhatsNew
+        self.journaling = journaling
     }
 
     public init(arguments: [String] = ProcessInfo.processInfo.arguments) {
@@ -73,6 +90,7 @@ public struct LaunchConfiguration: Equatable, Sendable {
         openURL = Self.value(after: Self.openURLArgument, in: arguments).flatMap(URL.init(string:))
         breaksStore = arguments.contains(Self.brokenStoreArgument)
         showsWhatsNew = arguments.contains(Self.whatsNewArgument)
+        journaling = Self.value(after: Self.journalingArgument, in: arguments).flatMap(JournalingFixture.init(rawValue:))
     }
 
     /// Launch arguments that reproduce this configuration, for `XCUIApplication.launchArguments`.
@@ -88,6 +106,7 @@ public struct LaunchConfiguration: Equatable, Sendable {
         if let openURL { result += [Self.openURLArgument, openURL.absoluteString] }
         if breaksStore { result.append(Self.brokenStoreArgument) }
         if showsWhatsNew { result.append(Self.whatsNewArgument) }
+        if let journaling { result += [Self.journalingArgument, journaling.rawValue] }
         return result
     }
 

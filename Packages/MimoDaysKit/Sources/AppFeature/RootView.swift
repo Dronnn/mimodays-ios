@@ -47,6 +47,11 @@ public struct RootView: View {
     /// §V17 LL03: over Today, once, for someone who used MimoDays before 1.0.7.
     @State private var showsWhatsNew: Bool
     private let whatsNew: WhatsNewPreferences
+    /// P8.12: the suggestion picked in Apple's picker, then the photo's import review.
+    @State private var journaling: JournalingModel?
+    @State private var journalingNext: JournalingModel.Next?
+    @State private var journalingImport: PhotoImportModel?
+    private let journalingFixture: LaunchConfiguration.JournalingFixture?
     private let launchRoute: Route?
     @Environment(\.scenePhase) private var scenePhase
 
@@ -87,6 +92,8 @@ public struct RootView: View {
         let showsOnboarding = !dependencies.skipsOnboarding && !flow.isCompleted
         _onboarding = State(initialValue: showsOnboarding ? flow : nil)
         whatsNew = dependencies.whatsNewPreferences
+        journalingFixture = dependencies.journalingFixture
+        router.offersJournaling = JournalingAvailability.isOffered(fixture: dependencies.journalingFixture)
         // A new install (or an onboarding not finished before the update) meets the new pages instead.
         if showsOnboarding { whatsNew.markSeen() }
         _showsWhatsNew = State(initialValue: !showsOnboarding && whatsNew.value.isDue)
@@ -245,6 +252,24 @@ public struct RootView: View {
         Task { await today.refresh() }
         closeWhatsNew()
         onboarding = Self.onboardingFlow(context: memories.library.context, permissions: permissions, surprises: surprises)
+    }
+
+    /// DD04 has gone: what its Continue chose opens now.
+    private func journalingDismissed() {
+        let next = journalingNext
+        journalingNext = nil
+        switch next {
+        case let .importPhoto(photo):
+            let model = PhotoImportModel(library: memories.library, saver: momentSaver, lookup: camera.places.lookup)
+            model.start([JournalingPhotoItem(photo: photo)])
+            journalingImport = model
+        case let .write(prompt):
+            router.writing = WriteRequest(prompt: prompt)
+        case .chooseAgain:
+            router.isPickingJournaling = true
+        case nil:
+            break
+        }
     }
 
     /// LL03's Continue, or the onboarding pages shown again: not shown again.
@@ -417,12 +442,32 @@ public struct RootView: View {
                 showsSavedToast = true
             }
         }
-        .sheet(item: $router.writing, onDismiss: router.captureDismissed) { _ in
+        .sheet(item: $router.writing, onDismiss: router.captureDismissed) { request in
             WriteMomentView(model: WriteMomentModel(
-                draft: camera.writing.load(), now: CaptureTime(instant: .now, timeZone: .current), drafts: camera.writing, places: camera.places
+                draft: camera.writing.load(), now: CaptureTime(instant: .now, timeZone: .current), drafts: camera.writing, places: camera.places,
+                prompt: request.prompt
             )) { _ in
                 savedKind = .today
                 showsSavedToast = true
+            }
+        }
+        // P8.12: Apple's picker, DD04, then the photo's import review or Write a moment; closing returns to Today.
+        .journalingPicker(isPresented: $router.isPickingJournaling, fixture: journalingFixture) { load in
+            journaling = JournalingModel(load: load)
+        }
+        .sheet(item: $journaling, onDismiss: journalingDismissed) { model in
+            JournalingSheet(model: model) { next in
+                journalingNext = next
+                journaling = nil
+            }
+        }
+        .fullScreenCover(item: $journalingImport) { model in
+            PhotoImportView(model: model) {
+                model.discard()
+                journalingImport = nil
+            } imported: {
+                model.discard()
+                journalingImport = nil
             }
         }
         .overlay(alignment: .bottom) {

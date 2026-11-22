@@ -130,6 +130,17 @@ struct TodayModelTests {
         try context.fetch(FetchDescriptor<SurpriseSchedule>()).first
     }
 
+    /// rev-app 17: kept open past midnight, the next refresh moves Today on to the new day.
+    @Test func aRefreshAfterMidnightMovesTodayOn() async {
+        let today = model()
+        clock.set(Self.date(2026, 11, 11, 23, 59))
+        await today.refresh()
+        #expect(today.day == 2026_11_11)
+        clock.set(Self.date(2026, 11, 12, 0, 1))
+        await today.refresh()
+        #expect(today.day == 2026_11_12)
+    }
+
     @Test func anEmptyStoreShowsNothingMadeUp() async {
         let today = model()
         await today.refresh()

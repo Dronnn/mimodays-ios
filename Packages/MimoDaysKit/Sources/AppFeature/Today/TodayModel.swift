@@ -119,8 +119,15 @@ final class TodayModel {
 
     var isEmpty: Bool { latest == nil }
 
-    /// Today's date line and "Your November" follow this clock, so tests see a fixed day.
-    var now: Date { clock.now() }
+    /// Today's date line and "Your November" follow this clock, so tests see a fixed day. Read through `day`, so the
+    /// screen draws again when a refresh finds a new day (rev-app 17).
+    var now: Date {
+        _ = day
+        return clock.now()
+    }
+
+    /// The day the last refresh found, yyyymmdd.
+    private(set) var day = 0
 
     /// "Today, 2:37 PM", "Yesterday, 6:42 PM", "Wed, Nov 11 · 6:42 PM": in the moment's own time zone (§H20).
     func timeText(_ time: CaptureTime) -> Text {
@@ -154,6 +161,7 @@ final class TodayModel {
         let now = clock.now()
         let calendar = calendar()
         let today = LocalDay(now, in: calendar.timeZone)
+        if day != today.key { day = today.key }
         latest = fetch(Self.alive, sort: [SortDescriptor(\.capturedAt, order: .reverse)], limit: 1).first.map(MomentSummary.init)
         count = (try? context.fetchCount(FetchDescriptor<Moment>(predicate: Self.alive))) ?? 0
         let key = today.key

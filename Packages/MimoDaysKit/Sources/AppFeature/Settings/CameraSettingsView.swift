@@ -8,6 +8,7 @@ struct CameraSettingsScreen: View {
     @Environment(\.permissions) private var permissions
     @State private var settings: CameraSettings?
     @State private var access = CameraSettingsView.Access.notAsked
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
@@ -24,10 +25,16 @@ struct CameraSettingsScreen: View {
         }
         .task {
             settings = services?.settings.load()
-            access = await CameraSettingsView.Access(
-                camera: permissions.status(of: .camera), microphone: permissions.status(of: .microphone)
-            )
+            await readAccess()
         }
+        // Back from iOS Settings, where its Permissions row leads: access may have changed there (rev-app 21).
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await readAccess() } }
+        }
+    }
+
+    private func readAccess() async {
+        access = await CameraSettingsView.Access(camera: permissions.status(of: .camera), microphone: permissions.status(of: .microphone))
     }
 }
 

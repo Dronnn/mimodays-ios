@@ -58,6 +58,10 @@ struct TodayView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await model.refresh() } }
         }
+        // Midnight, or a new time zone, while Today stays open.
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+            Task { await model.refresh() }
+        }
     }
 
     // MARK: Layouts

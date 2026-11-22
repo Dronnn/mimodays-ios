@@ -47,6 +47,9 @@ struct MovieTimeline: View {
             }
         }
         .frame(height: Self.laneHeight * 4)
+        // Time runs left to right in every language, as on the preview's scrubber: the playhead's offset, the lanes
+        // and a touch agree (rev-library).
+        .environment(\.layoutDirection, .leftToRight)
     }
 
     static func width(_ duration: Double) -> CGFloat {

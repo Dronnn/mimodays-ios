@@ -68,6 +68,8 @@ struct MovieEditorSnapshotTests {
     @Test func clips() async throws {
         let model = try await editor(.clips)
         assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: variants)
+        // rev-library: in Arabic the timeline still runs left to right, the playhead on its clip.
+        assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: [SnapshotVariant(.iPhone, .light, language: "ar")])
     }
 
     @Test func clipsOnDuo() async throws {
@@ -100,7 +102,8 @@ struct MovieEditorSnapshotTests {
     /// F09.
     @Test func audio() async throws {
         let model = try await editor(.audio)
-        assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: [SnapshotVariant(.iPhone, .light)])
+        // rev-library: in Arabic the level sliders still fill left to right, as the scrubber does.
+        assertScreenSnapshots(of: page(MovieEditorView(model: model, export: {})), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, language: "ar")])
     }
 
     /// F09 with the person's voice recorded over the movie: named as theirs, with its level.

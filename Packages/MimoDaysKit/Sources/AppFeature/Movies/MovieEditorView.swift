@@ -962,6 +962,8 @@ struct LevelSlider: View {
                     .offset(x: x)
             }
             .frame(maxHeight: .infinity)
+            // Left to right in every language, as the preview's scrubber: the fill, the knob and a touch agree.
+            .environment(\.layoutDirection, .leftToRight)
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 0)

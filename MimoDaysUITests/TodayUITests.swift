@@ -64,7 +64,9 @@ final class TodayUITests: XCTestCase {
         let month = app.buttons["today.month"]
         XCTAssertTrue(month.waitForExistence(timeout: 10))
         month.tap()
-        XCTAssertTrue(tab(1).isSelected)
+        // A slow machine is still switching tabs right after the tap: the bar comes back with Memories chosen.
+        expectation(for: NSPredicate(format: "exists == true AND isSelected == true"), evaluatedWith: tab(1))
+        waitForExpectations(timeout: 10)
     }
 
     /// Make my movie starts a new movie (F02) on Movies, as Movies' own Make a movie does.

@@ -93,9 +93,11 @@ final class MarkerView: MKAnnotationView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    func show(image: UIImage?, isPaper: Bool, count: Int, label: String, isSelected: Bool, typefaces: Typefaces) {
+    func show(image: UIImage?, isPaper: Bool, count: Int, name: String, label: String, isSelected: Bool, typefaces: Typefaces) {
         host.rootView = AnyView(MapMarker(image: image, count: count, isSelected: isSelected, isPaper: isPaper).environment(\.typefaces, typefaces))
         accessibilityLabel = label
+        // P4.2: Voice Control by the place's name, as on the Recent places tile.
+        accessibilityUserInputLabels = [name]
     }
 }
 
@@ -252,7 +254,7 @@ struct MapCanvas: UIViewRepresentable {
             if parent.images[cover.coverID] == nil { parent.onLoad(cover.coverID) }
             let name = members.count == 1 ? (cover.title ?? String(appLocalized: "Unnamed place", bundle: .module)) : String(appLocalized: "\(members.count) places", bundle: .module)
             view.show(
-                image: parent.images[cover.coverID], isPaper: cover.coverIsText, count: count,
+                image: parent.images[cover.coverID], isPaper: cover.coverIsText, count: count, name: name,
                 label: String(appLocalized: "Map marker: \(name) · \(String(appLocalized: "\(count) moments", bundle: .module))", bundle: .module),
                 isSelected: members.count == 1 && parent.selection == cover.id, typefaces: parent.typefaces
             )

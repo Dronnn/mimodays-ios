@@ -128,7 +128,6 @@ struct CameraView: View {
                     halves(turn, shape: shape, selfie: selfie)
                 } else {
                     InteractivePreview(model: model, position: model.mainPosition, activeArea: fills ? nil : turn.rect(shape))
-                        .accessibilityHidden(true)
                 }
                 if !fills {
                     FormatMask(frame: turn.rect(shape))
@@ -155,7 +154,6 @@ struct CameraView: View {
                     .position(x: rect.midX, y: rect.midY)
             }
         }
-        .accessibilityHidden(true)
     }
 
     private func overPreview(_ turn: CameraTurn, _ chrome: CameraChrome, shape: CGRect, windowArea: CGRect, insideShape: Bool) -> some View {

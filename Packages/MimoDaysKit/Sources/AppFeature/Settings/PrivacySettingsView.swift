@@ -72,6 +72,22 @@ struct PrivacySettingsView: View {
                     ))
                     .padding(.horizontal, 22)
                     .padding(.top, 12)
+                    // P8.2 (AA03, AA04): photos in widgets are opt-in; App Lock keeps them off.
+                    sectionLabel(Text("Widgets", bundle: .module))
+                        .padding(.top, 26)
+                    DataCard {
+                        DataToggleRow(title: Text("Show photos in widgets", bundle: .module), isOn: widgetPhotosBinding)
+                            .disabled(settings.appLock)
+                            .opacity(settings.appLock ? 0.5 : 1)
+                            .accessibilityIdentifier("privacySettings.widgetPhotos")
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 6)
+                    DataNote(text: settings.appLock
+                        ? Text("App Lock keeps widgets private: they show only MimoDays and Open MimoDays.", bundle: .module)
+                        : Text("Photos can appear on your Home Screen. Off by default.", bundle: .module))
+                        .padding(.horizontal, 22)
+                        .padding(.top, 12)
                     sectionLabel(Text("Places", bundle: .module))
                         .padding(.top, 26)
                     DataCard {
@@ -149,8 +165,16 @@ struct PrivacySettingsView: View {
                 settings.appLock = false
                 return
             }
-            Task { if await turnOnLock() { settings.appLock = true } }
+            Task {
+                guard await turnOnLock() else { return }
+                settings.appLock = true
+                settings.widgetPhotos = false
+            }
         }
+    }
+
+    private var widgetPhotosBinding: Binding<Bool> {
+        Binding { settings.widgetPhotos && !settings.appLock } set: { settings.widgetPhotos = $0 }
     }
 
     private func sectionLabel(_ text: Text) -> some View {

@@ -111,6 +111,18 @@ struct SettingsSnapshotTests {
         )
     }
 
+    /// P8.2 AA03: App Lock off, Show photos in widgets on.
+    @Test func privacyWithWidgetPhotos() {
+        var settings = PrivacySettings()
+        settings.widgetPhotos = true
+        assertScreenSnapshots(
+            of: page(PrivacySettingsView(
+                settings: Binding { settings } set: { settings = $0 }, biometry: .faceID, placeCount: 3, turnOnLock: { true }, removePlaces: {}
+            )),
+            variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark)] + SnapshotVariant.languages
+        )
+    }
+
     /// S05 "How MimoDays uses your data".
     @Test func dataUse() {
         assertScreenSnapshots(of: page(DataUseView()), variants: variants)

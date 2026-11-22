@@ -26,6 +26,8 @@ struct PrivacySettings: Codable, Equatable, Sendable {
     var lockAfter = LockDelay.immediately
     var savesPlace = true
     var precision = PlacePrecision.city
+    /// P8.2 Show photos in widgets: off until turned on; App Lock keeps it off.
+    var widgetPhotos = false
 
     init() {}
 
@@ -36,6 +38,7 @@ struct PrivacySettings: Codable, Equatable, Sendable {
         lockAfter = try container.decodeIfPresent(LockDelay.self, forKey: .lockAfter) ?? lockAfter
         savesPlace = try container.decodeIfPresent(Bool.self, forKey: .savesPlace) ?? savesPlace
         precision = try container.decodeIfPresent(PlacePrecision.self, forKey: .precision) ?? precision
+        widgetPhotos = try container.decodeIfPresent(Bool.self, forKey: .widgetPhotos) ?? widgetPhotos
     }
 }
 

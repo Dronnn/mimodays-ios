@@ -30794,6 +30794,144 @@
         }
       }
     },
+    "App Lock keeps widgets private: they show only MimoDays and Open MimoDays." : {
+      "comment" : "Privacy settings: note when App Lock is on; 'Open MimoDays' is the widget's button (P8.2).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Lock keeps widgets private: they show only MimoDays and Open MimoDays."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App-Sperre hält Widgets privat: Sie zeigen nur MimoDays und „MimoDays öffnen“."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le verrouillage de l’app garde les widgets privés : ils n’affichent que MimoDays et « Ouvrir MimoDays »."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El bloqueo de la app mantiene los widgets privados: solo muestran MimoDays y «Abrir MimoDays»."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il blocco app mantiene privati i widget: mostrano solo MimoDays e «Apri MimoDays»."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-vergrendeling houdt widgets privé: ze tonen alleen MimoDays en ‘MimoDays openen’."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applås håller widgetar privata: de visar bara MimoDays och ”Öppna MimoDays”."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blokada aplikacji chroni widżety: pokazują tylko MimoDays i „Otwórz MimoDays”."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Bloqueio do app mantém os widgets privados: eles mostram só MimoDays e “Abrir o MimoDays”."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Блокировка приложения скрывает личное в виджетах: в них только MimoDays и «Открыть MimoDays»."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Блокування застосунку приховує особисте у віджетах: у них лише MimoDays і «Відкрити MimoDays»."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Блакіроўка праграмы хавае асабістае ў віджэтах: у іх толькі MimoDays і «Адкрыць MimoDays»."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Հավելվածի կողպումը վիջեթները գաղտնի է պահում․ դրանցում միայն MimoDays և «Բացել MimoDays-ը»։"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "აპის ჩაკეტვა ვიჯეტებს პირადს ტოვებს: მათში მხოლოდ MimoDays და „MimoDays-ის გახსნა“ ჩანს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қолданба құлпы виджеттерді жеке қалдырады: оларда тек MimoDays және «MimoDays-ті ашу» көрінеді."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uygulama Kilidi widget'ları gizli tutar: yalnızca MimoDays ve “MimoDays'i aç” görünür."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "נעילת האפליקציה שומרת על פרטיות הווידג׳טים: מוצגים בהם רק MimoDays ו\"פתיחת MimoDays\"."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُبقي قفل التطبيق الأدوات خاصة: لا تعرض إلا MimoDays و«افتح MimoDays»."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリロック中はウィジェットに個人的な内容を出しません。表示されるのはMimoDaysと「MimoDaysを開く」だけです。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앱 잠금 중에는 위젯에 개인적인 내용이 보이지 않아요. MimoDays와 'MimoDays 열기'만 보여요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用锁会让小组件保持私密：只显示 MimoDays 和“打开 MimoDays”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App 鎖定會讓小工具保持私密：只顯示 MimoDays 和「打開 MimoDays」。"
+          }
+        }
+      }
+    },
     "Appearance" : {
       "comment" : "Settings (S01) row and the Appearance screen's title",
       "extractionState" : "manual",
@@ -103668,6 +103806,144 @@
         }
       }
     },
+    "Photos can appear on your Home Screen. Off by default." : {
+      "comment" : "Privacy settings: note under Show photos in widgets (P8.2).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos can appear on your Home Screen. Off by default."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos können auf deinem Home-Bildschirm erscheinen. Standardmäßig aus."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les photos peuvent apparaître sur ton écran d’accueil. Désactivé par défaut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las fotos pueden aparecer en tu pantalla de inicio. Desactivado por defecto."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le foto possono comparire nella tua schermata Home. Disattivato di default."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto's kunnen op je beginscherm verschijnen. Standaard uit."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder kan visas på din hemskärm. Av som standard."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zdjęcia mogą pojawiać się na twoim ekranie początkowym. Domyślnie wyłączone."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As fotos podem aparecer na sua Tela de Início. Desativado por padrão."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фото могут появляться на твоём экране «Домой». По умолчанию выключено."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фото можуть з’являтися на твоєму екрані «Додому». Типово вимкнено."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фота могуць з’яўляцца на тваім экране «Дадому». Прадвызначана выключана."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Լուսանկարները կարող են երևալ քո Հիմնական էկրանին։ Լռելյայն անջատված է։"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ფოტოები შეიძლება გამოჩნდეს შენს მთავარ ეკრანზე. ნაგულისხმევად გამორთულია."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фотолар сенің Басты экраныңда көрінуі мүмкін. Әдепкіде өшірулі."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotoğraflar Ana Ekranında görünebilir. Varsayılan olarak kapalı."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "תמונות יכולות להופיע במסך הבית שלך. כבוי כברירת מחדל."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تظهر الصور على شاشتك الرئيسية. متوقف افتراضيًا."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真がホーム画面に表示されることがあります。初期設定はオフです。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "홈 화면에 사진이 보일 수 있어요. 기본값은 꺼짐이에요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片可能会出现在你的主屏幕上。默认关闭。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片可能會出現在你的主畫面上。預設為關閉。"
+          }
+        }
+      }
+    },
     "Photos: to save what you export and, if you allow it, to find moments from a day you choose. Importing through the system picker needs no access." : {
       "comment" : "Help & about (P8.15)",
       "extractionState" : "manual",
@@ -126623,6 +126899,144 @@
         }
       }
     },
+    "Show photos in widgets" : {
+      "comment" : "Privacy settings switch, off by default (P8.2).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show photos in widgets"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos in Widgets zeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les photos dans les widgets"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar fotos en los widgets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra foto nei widget"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto's tonen in widgets"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visa bilder i widgetar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokazuj zdjęcia w widżetach"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar fotos nos widgets"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать фото в виджетах"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати фото у віджетах"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Паказваць фота ў віджэтах"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ցույց տալ լուսանկարները վիջեթներում"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ფოტოების ჩვენება ვიჯეტებში"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виджеттерде фотоларды көрсету"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget'larda fotoğrafları göster"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "הצגת תמונות בווידג׳טים"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عرض الصور في الأدوات"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウィジェットに写真を表示"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "위젯에 사진 표시"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在小组件中显示照片"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在小工具中顯示照片"
+          }
+        }
+      }
+    },
     "Show the introduction again" : {
       "comment" : "Help & about (S07): opens onboarding again from its first page",
       "extractionState" : "manual",
@@ -148529,6 +148943,144 @@
         }
       }
     },
+    "This memory is no longer available." : {
+      "comment" : "Alert when a widget's memory was deleted or hidden before it opened (P8.2).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This memory is no longer available."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Erinnerung ist nicht mehr da."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce souvenir n’est plus disponible."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este recuerdo ya no está disponible."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo ricordo non è più disponibile."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze herinnering is niet meer beschikbaar."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det här minnet finns inte längre."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To wspomnienie nie jest już dostępne."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta memória não está mais disponível."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этого воспоминания больше нет."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цього спогаду більше немає."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Гэтага ўспаміну больш няма."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Այս հիշողությունն այլևս հասանելի չէ։"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ეს მოგონება აღარ არის ხელმისაწვდომი."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бұл естелік енді жоқ."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu anı artık yok."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "הזיכרון הזה כבר לא זמין."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم تعد هذه الذكرى متاحة."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この思い出はもうありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 추억은 더 이상 없어요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个回忆已不在。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這個回憶已不在。"
+          }
+        }
+      }
+    },
     "This moment didn't save" : {
       "comment" : "Alert title when saving a moment failed for a reason other than space",
       "extractionState" : "manual",
@@ -168074,6 +168626,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "廣角"
+          }
+        }
+      }
+    },
+    "Widgets" : {
+      "comment" : "Privacy settings: section header for the widgets (P8.2).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgetar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widżety"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виджеты"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Віджети"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Віджэты"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Վիջեթներ"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ვიჯეტები"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виджеттер"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget'lar"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ווידג׳טים"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الأدوات"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウィジェット"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "위젯"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小组件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小工具"
           }
         }
       }

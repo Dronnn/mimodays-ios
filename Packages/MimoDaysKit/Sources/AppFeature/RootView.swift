@@ -1,9 +1,11 @@
 import Core
 import DesignSystem
 import os
+import Persistence
 import SwiftData
 import SwiftUI
 import UIKit
+import WidgetFeature
 
 /// App shell: four tabs, Settings from the gear on every tab root, Capture on Today.
 /// System tab bar on iPhone; floating tab bar / sidebar on iPad.
@@ -38,6 +40,8 @@ public struct RootView: View {
     @State private var statusBarOnTop = true
     /// The launch route and a draft left by iOS have been opened (once, after App Lock if it's on).
     @State private var resumedLaunch = false
+    /// P8.2: a widget's memory was gone or hidden by the time it opened.
+    @State private var memoryGone = false
     /// A notification tap or link that came while App Lock was on: opened once unlocked.
     @State private var heldRoute: Route?
     private let launchRoute: Route?
@@ -140,7 +144,12 @@ public struct RootView: View {
         .onChange(of: AppLanguage.shared.code) {
             SurpriseNotificationHandler.registerActions()
             Task { await surprises.languageChanged() }
+            publishWidgets()
         }
+        // P8.2: App Lock and Show photos in widgets reach the widgets at once.
+        .onChange(of: privacyPreferences.value.appLock) { publishWidgets() }
+        .onChange(of: privacyPreferences.value.widgetPhotos) { publishWidgets() }
+        .alert(Text("This memory is no longer available.", bundle: .module), isPresented: $memoryGone) {}
         // S09: Memories follows a change at once.
         .onChange(of: memoriesPreferences.value.opensIn) { _, mode in memories.mode = mode.memoriesMode }
         .onChange(of: memoriesPreferences.value.newestFirst) { _, newestFirst in
@@ -153,7 +162,11 @@ public struct RootView: View {
             relabelDays(days)
         }
         .onChange(of: scenePhase, initial: true) { _, phase in
-            if phase == .background { appLock.didEnterBackground() }
+            if phase == .background {
+                appLock.didEnterBackground()
+                // What changed while open (new, deleted, hidden moments) reaches the widgets.
+                publishWidgets()
+            }
             guard phase == .active else { return }
             Task {
                 await appLock.didBecomeActive()
@@ -202,6 +215,8 @@ public struct RootView: View {
     }
 
     private func startOver() {
+        // Delete all data: the widgets' copies go with it.
+        WidgetPublisher(context: memories.library.context, store: memories.library.store, shelf: WidgetShelf.shared).purge()
         router.isSettingsPresented = false
         // Nothing waits for the camera to close: everything is gone.
         router.held = nil
@@ -299,9 +314,26 @@ public struct RootView: View {
         }
         if case let .capture(promptID?) = route {
             router.open(.capture(promptID: surprises.open(promptID: promptID) ? promptID : nil))
+        } else if case let .memory(id) = route, !isShowable(id) {
+            // P8.2: checked once unlocked; the widget may be older than a delete or a hide.
+            router.open(.tab(.memories))
+            memoryGone = true
         } else {
             router.open(route)
         }
+    }
+
+    private func isShowable(_ id: UUID) -> Bool {
+        let context = memories.library.context
+        guard let moment = try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id && $0.deletedAt == nil })).first
+        else { return false }
+        return !MemoryVisibility(context: context).isHidden(moment)
+    }
+
+    private func publishWidgets() {
+        let publisher = WidgetPublisher(context: memories.library.context, store: memories.library.store, shelf: WidgetShelf.shared)
+        let privacy = privacyPreferences.value
+        Task { await publisher.publish(privacy: privacy, language: AppLanguage.shared.current) }
     }
 
     private func refreshSurprises() {

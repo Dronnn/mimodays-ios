@@ -42,6 +42,10 @@ public enum Route: Equatable, Sendable {
     case newMovie(MovieSourceRule?)
     /// P8.11: Write a moment on Today, the one left unfinished when there is one.
     case write
+    /// P8.2 Random memory: its Memory Card.
+    case memory(UUID)
+    /// P8.2 On this day.
+    case onThisDay
 }
 
 /// A screen pushed on Movies (F06, F11, F15).
@@ -159,6 +163,18 @@ public final class AppRouter {
             newMovie = nil
             selectedTab = .today
             capture = CaptureRequest(repeatOf: source)
+        case let .memory(id):
+            dismissAll()
+            selectedTab = .today
+            var path = NavigationPath()
+            path.append(MemoriesRoute.moment(MomentPager(ids: [id], start: id, origin: .today)))
+            todayPath = path
+        case .onThisDay:
+            dismissAll()
+            selectedTab = .today
+            var path = NavigationPath()
+            path.append(MemoriesRoute.onThisDay)
+            todayPath = path
         case .write:
             isSettingsPresented = false
             newMovie = nil
@@ -179,7 +195,8 @@ public final class AppRouter {
     /// Key in a surprise notification's `userInfo`.
     public static let promptIDKey = SurpriseNotification.promptIDKey
 
-    /// `mimodays://capture?prompt=<uuid>`, `mimodays://settings`, `mimodays://today` (and the other tabs).
+    /// `mimodays://capture?prompt=<uuid>`, `mimodays://settings`, `mimodays://today` (and the other tabs);
+    /// the widgets' `mimodays://memory/<uuid>` and `mimodays://onthisday`.
     public static func route(from url: URL) -> Route? {
         guard url.scheme == urlScheme, let host = url.host() else { return nil }
         switch host {
@@ -189,6 +206,10 @@ public final class AppRouter {
             return .capture(promptID: prompt.flatMap(UUID.init(uuidString:)))
         case "settings":
             return .settings
+        case "memory":
+            return url.pathComponents.dropFirst().first.flatMap(UUID.init(uuidString:)).map(Route.memory)
+        case "onthisday":
+            return .onThisDay
         default:
             return MainTab(rawValue: host).map(Route.tab)
         }

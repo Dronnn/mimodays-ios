@@ -90,13 +90,15 @@ struct AppRouterTests {
         ("mimodays://capture?prompt=6F1C2B3A-0000-4000-8000-000000000001",
          Route.capture(promptID: UUID(uuidString: "6F1C2B3A-0000-4000-8000-000000000001"))),
         ("mimodays://capture?prompt=not-a-uuid", Route.capture(promptID: nil)),
+        ("mimodays://memory/6F1C2B3A-0000-4000-8000-000000000001", Route.memory(UUID(uuidString: "6F1C2B3A-0000-4000-8000-000000000001")!)),
+        ("mimodays://onthisday", Route.onThisDay),
     ])
     func parsesURLs(string: String, expected: Route) throws {
         let url = try #require(URL(string: string))
         #expect(AppRouter.route(from: url) == expected)
     }
 
-    @Test(arguments: ["https://today", "mimodays://unknown", "mimodays:"])
+    @Test(arguments: ["https://today", "mimodays://unknown", "mimodays:", "mimodays://memory/not-a-uuid", "mimodays://memory"])
     func rejectsForeignURLs(string: String) throws {
         let url = try #require(URL(string: string))
         #expect(AppRouter.route(from: url) == nil)

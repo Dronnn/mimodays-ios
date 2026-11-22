@@ -13,4 +13,9 @@ struct OnboardingSnapshotTests {
             variants: SnapshotVariant.standard + SnapshotVariant.languages, testName: "\(page)"
         )
     }
+
+    /// §V17 LL03.
+    @Test func whatsNew() {
+        assertScreenSnapshots(of: WhatsNewView(onContinue: {}), variants: SnapshotVariant.standard + SnapshotVariant.languages)
+    }
 }

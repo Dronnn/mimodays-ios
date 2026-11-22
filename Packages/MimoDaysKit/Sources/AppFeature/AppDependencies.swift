@@ -24,6 +24,8 @@ public final class AppDependencies {
     let appearancePreferences: AppearancePreferences
     /// U16: the home side last shown, and whether the flip hint was shown.
     let homePreferences: HomePreferences
+    /// §V17 LL03: shown once after the 1.0.7 update.
+    let whatsNewPreferences: WhatsNewPreferences
     let appLock: AppLock
     /// S08 Delete all data.
     let eraser: AppEraser
@@ -71,6 +73,8 @@ public final class AppDependencies {
         appearancePreferences = .appearance(configuration.isUITesting ? nil : .standard)
         let homePreferences = HomePreferences.home(configuration.isUITesting ? nil : .standard)
         self.homePreferences = homePreferences
+        whatsNewPreferences = configuration.isUITesting
+            ? .whatsNew(nil, seen: !configuration.showsWhatsNew) : .whatsNew(.standard, seen: false)
         // UI tests keep notification requests in memory so nothing is left on the simulator.
         let notifications: any NotificationScheduler = configuration.isUITesting
             ? InMemoryNotificationScheduler() : SystemNotificationScheduler()

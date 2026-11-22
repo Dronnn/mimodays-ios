@@ -78,6 +78,37 @@ struct OnboardingResumeTests {
         #expect(store.record.isCompleted)
     }
 
+    /// §V17: the pages added in 1.0.7 don't move the numbers 1.0.6 saved.
+    @Test(arguments: [
+        (0, OnboardingPage.welcome), (1, .surprise), (2, .dualCamera), (3, .voice), (4, .movie), (5, .privacy),
+    ])
+    func stepsSavedBefore107ResumeOnTheirPage(step: Int, page: OnboardingPage) {
+        let resumed = flow(InMemoryOnboardingStore(OnboardingRecord(step: step)))
+        #expect(resumed.step == .intro)
+        #expect(resumed.page == page)
+    }
+
+    @Test func stepsSavedBefore107ResumeOnTheScheduleAndTheFirstCapture() {
+        #expect(flow(InMemoryOnboardingStore(OnboardingRecord(step: 6))).step == .schedule)
+        #expect(flow(InMemoryOnboardingStore(OnboardingRecord(step: 7))).step == .firstCapture)
+    }
+
+    @Test(arguments: OnboardingPage.allCases)
+    func everyPageResumes(page: OnboardingPage) {
+        let store = InMemoryOnboardingStore()
+        flow(store).page = page
+        let resumed = flow(store)
+        #expect(resumed.step == .intro)
+        #expect(resumed.page == page)
+    }
+
+    @Test func theNewPagesComeAfterTheVoice() {
+        #expect(OnboardingPage.voice.next == .ways)
+        #expect(OnboardingPage.ways.next == .widgets)
+        #expect(OnboardingPage.widgets.next == .movie)
+        #expect(OnboardingPage.allCases.count == 8)
+    }
+
     @Test func unknownStepsFallBackSafely() {
         #expect(flow(InMemoryOnboardingStore(OnboardingRecord(step: -3))).page == .welcome)
         #expect(flow(InMemoryOnboardingStore(OnboardingRecord(step: 99))).step == .firstCapture)

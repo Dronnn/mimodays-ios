@@ -101,10 +101,12 @@ final class OnboardingFlow {
         schedule = record.schedule
         remindersEnabled = record.remindersEnabled
         isCompleted = record.isCompleted
-        switch record.step {
-        case Self.scheduleStep: step = .schedule
-        case Self.firstCaptureStep...: step = .firstCapture
-        default: page = OnboardingPage(rawValue: max(record.step, 0)) ?? .welcome
+        if let saved = OnboardingPage(savedNumber: record.step) {
+            page = saved
+        } else if record.step == Self.scheduleStep {
+            step = .schedule
+        } else if record.step > Self.scheduleStep {
+            step = .firstCapture
         }
     }
 
@@ -252,12 +254,13 @@ final class OnboardingFlow {
 
     // MARK: Saving
 
-    private static let scheduleStep = OnboardingPage.allCases.count
-    private static let firstCaptureStep = scheduleStep + 1
+    /// After the six pages of 1.0.6, as saved then.
+    static let scheduleStep = 6
+    static let firstCaptureStep = 7
 
     private var savedStep: Int {
         switch step {
-        case .intro: page.rawValue
+        case .intro: page.savedNumber
         case .schedule: Self.scheduleStep
         case .reminders, .firstCapture, .firstMomentSaved: Self.firstCaptureStep
         }

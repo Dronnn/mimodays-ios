@@ -63,6 +63,42 @@ extension OnboardingPage {
                 .text(.localized(LocalizedStringResource("Tbilisi · optional", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.body, size: 14, weight: 600, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 121, y: 343), rotation: 0, width: 106),
                 .shape("onboardingVoice10", .token(.actionCoral), shadow: nil),
             ]
+        case .ways:
+            [
+                .shape("onboardingWays01", .placeholder(0x4B2938), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
+                .text(.verbatim("9:41"), TextStyle(.label, size: 26, weight: 700, tracking: 0, isUppercase: false, relativeTo: .body), .textOnCoral, center: CGPoint(x: 80, y: 248), rotation: 0),
+                .shape("onboardingWays10", .token(.textOnCoral, opacity: 0.22), shadow: nil),
+                .shape("onboardingWays11", .token(.textOnCoral), shadow: nil),
+                .shape("onboardingWays02", .token(.surfaceCard), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
+                .text(.localized(LocalizedStringResource("Lena rode her bike all the way to the lake.", bundle: .atURL(Bundle.module.bundleURL), comment: "Onboarding art: a moment written in words")), TextStyle(.hand, size: 15, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 80, y: 71), rotation: 0, width: 112, leadingLines: 3),
+                .shape("onboardingWays03", .token(.textLink), shadow: nil),
+                .text(.localized(LocalizedStringResource("in words", bundle: .atURL(Bundle.module.bundleURL), comment: "Onboarding art caption: a text moment")), TextStyle(.hand, size: 15, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textSecondary, center: CGPoint(x: 79, y: 187), rotation: 0, width: 110, leadingLines: 1),
+                .shape("onboardingWays04", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
+                .shape("onboardingWays05", .photo("onboardingPhotoWelcome04", frame: CGRect(x: 191.7, y: 9.7, width: 154.2, height: 156.7), rotation: 6), shadow: nil),
+                .shape("onboardingWays06", .token(.surfaceCard, opacity: 0.9), shadow: nil),
+                .text(.verbatim("LIVE"), TextStyle(.label, size: 11, weight: 700, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 229, y: 30), rotation: 0),
+                .text(.localized(LocalizedStringResource("from your Photos", bundle: .atURL(Bundle.module.bundleURL), comment: "Onboarding art caption: a photo brought in from the library")), TextStyle(.hand, size: 15, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textSecondary, center: CGPoint(x: 283, y: 193), rotation: 0, width: 130, leadingLines: 1),
+                .text(.localized(LocalizedStringResource("one press", bundle: .atURL(Bundle.module.bundleURL), comment: "Onboarding art caption: the camera control on the Lock Screen")), TextStyle(.hand, size: 15, weight: 400, tracking: 0, isUppercase: false, relativeTo: .body), .textSecondary, center: CGPoint(x: 99, y: 353), rotation: 0, width: 110, leadingLines: 1),
+                .shape("onboardingWays07", .token(.surfaceCard), shadow: ArtShadow(color: 0x2A1B21, opacity: 0.12, radius: 12, y: 4)),
+                .shape("onboardingWays08", .photo("onboardingPhotoMovie09", frame: CGRect(x: 188, y: 240, width: 53.1, height: 55.2)), shadow: nil),
+                .text(.localized(LocalizedStringResource("Morning walk", bundle: .atURL(Bundle.module.bundleURL), comment: "Onboarding art: the title of a Journaling Suggestion")), TextStyle(.label, size: 14, weight: 700, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 302.5, y: 253), rotation: 0, width: 105, leadingLines: 1),
+                .text(.localized(LocalizedStringResource("Riverside · 7:40 AM", bundle: .atURL(Bundle.module.bundleURL), comment: "Onboarding art: the place and time of a Journaling Suggestion")), TextStyle(.label, size: 12, weight: 500, tracking: 0, isUppercase: false, relativeTo: .body), .textSecondary, center: CGPoint(x: 302.5, y: 272), rotation: 0, width: 105, leadingLines: 1),
+                .shape("onboardingWays09", .token(.actionCoral), shadow: nil),
+                .text(.localized(LocalizedStringResource("Journaling Suggestion", bundle: .atURL(Bundle.module.bundleURL), comment: "Onboarding art: Apple's Journaling Suggestions, one of them")), TextStyle(.label, size: 12, weight: 600, tracking: 0, isUppercase: false, relativeTo: .body), .textLink, center: CGPoint(x: 280, y: 312), rotation: 0, width: 140, leadingLines: 1),
+            ]
+        case .widgets:
+            [
+                .shape("onboardingWidgets07", .token(.surfaceChip, opacity: 0.7), shadow: nil),
+                .shape("onboardingWidgets01", .token(.surfaceCard), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),
+                .text(.localized(LocalizedStringResource("On this day", bundle: .atURL(Bundle.module.bundleURL))), TextStyle(.body, size: 13, weight: 800, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 90.5, y: 59), rotation: 0, width: 145, leadingLines: 1),
+                .text(.localized(LocalizedStringResource("Random memory", bundle: .atURL(Bundle.module.bundleURL), comment: "The Random memory widget's name")), TextStyle(.body, size: 13, weight: 800, tracking: 0, isUppercase: false, relativeTo: .body), .textPrimary, center: CGPoint(x: 274.5, y: 59), rotation: 0, width: 145, leadingLines: 1),
+                .shape("onboardingWidgets02", .token(.mediaFrame), shadow: ArtShadow(color: 0x4B2938, opacity: 0.1, radius: 3, y: 2)),
+                .shape("onboardingWidgets03", .photo("onboardingPhotoWelcome02", frame: CGRect(x: 18.4, y: 73.4, width: 139.8, height: 112.7), rotation: 3), shadow: nil),
+                .shape("onboardingWidgets04", .photo("onboardingPhotoMovie02", frame: CGRect(x: 202.4, y: 73.4, width: 139.8, height: 112.7), rotation: 3), shadow: nil),
+                .text(.verbatim("2025"), TextStyle(.body, size: 12, weight: 700, tracking: 0, isUppercase: false, relativeTo: .body), .textLink, center: CGPoint(x: 144, y: 194), rotation: 0),
+                .shape("onboardingWidgets05", .token(.surfaceChip), shadow: nil),
+                .shape("onboardingWidgets06", .token(.textPrimary), shadow: nil),
+            ]
         case .movie:
             [
                 .shape("onboardingMovie01", .token(.mediaFrame), shadow: ArtShadow(color: 0x4A2734, opacity: 0.14, radius: 9, y: 6)),

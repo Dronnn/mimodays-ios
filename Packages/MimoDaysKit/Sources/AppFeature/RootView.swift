@@ -44,6 +44,9 @@ public struct RootView: View {
     @State private var memoryGone = false
     /// A notification tap or link that came while App Lock was on: opened once unlocked.
     @State private var heldRoute: Route?
+    /// §V17 LL03: over Today, once, for someone who used MimoDays before 1.0.7.
+    @State private var showsWhatsNew: Bool
+    private let whatsNew: WhatsNewPreferences
     private let launchRoute: Route?
     @Environment(\.scenePhase) private var scenePhase
 
@@ -81,7 +84,12 @@ public struct RootView: View {
         ))
         _home = State(initialValue: Home(preferences: dependencies.homePreferences))
         let flow = Self.onboardingFlow(context: dependencies.modelContainer.mainContext, permissions: dependencies.permissions, surprises: surprises)
-        _onboarding = State(initialValue: dependencies.skipsOnboarding || flow.isCompleted ? nil : flow)
+        let showsOnboarding = !dependencies.skipsOnboarding && !flow.isCompleted
+        _onboarding = State(initialValue: showsOnboarding ? flow : nil)
+        whatsNew = dependencies.whatsNewPreferences
+        // A new install (or an onboarding not finished before the update) meets the new pages instead.
+        if showsOnboarding { whatsNew.markSeen() }
+        _showsWhatsNew = State(initialValue: !showsOnboarding && whatsNew.value.isDue)
     }
 
     public var body: some View {
@@ -95,6 +103,10 @@ public struct RootView: View {
                 }
             } else {
                 tabs
+                    .accessibilityHidden(showsWhatsNew)
+                    .overlay {
+                        if showsWhatsNew { WhatsNewView(onContinue: closeWhatsNew) }
+                    }
             }
         }
         .onGeometryChange(for: Bool.self, of: { $0.safeAreaInsets.top > 0 }) { statusBarOnTop = $0 }
@@ -231,11 +243,19 @@ public struct RootView: View {
         memories.refresh()
         mosaic.refresh()
         Task { await today.refresh() }
+        closeWhatsNew()
         onboarding = Self.onboardingFlow(context: memories.library.context, permissions: permissions, surprises: surprises)
+    }
+
+    /// LL03's Continue, or the onboarding pages shown again: not shown again.
+    private func closeWhatsNew() {
+        whatsNew.markSeen()
+        showsWhatsNew = false
     }
 
     /// Help › "Show the introduction again".
     private func replayOnboarding() {
+        closeWhatsNew()
         router.isSettingsPresented = false
         let flow = Self.onboardingFlow(context: memories.library.context, permissions: permissions, surprises: surprises)
         flow.restart()

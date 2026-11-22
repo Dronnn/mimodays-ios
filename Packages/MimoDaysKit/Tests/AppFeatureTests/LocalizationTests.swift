@@ -143,7 +143,7 @@ struct LocalizationTests {
                 return schedule.summary(calendar: .current, locale: .current)
             }
             + (OnboardingPage.allCases.flatMap(\.artLayers) + FirstCaptureView.artLayers).compactMap { layer -> LocalizedStringResource? in
-                guard case let .text(.localized(resource), _, _, _, _, _) = layer else { return nil }
+                guard case let .text(.localized(resource), _, _, _, _, _, _) = layer else { return nil }
                 return resource
             }
         return resources.map(\.key)

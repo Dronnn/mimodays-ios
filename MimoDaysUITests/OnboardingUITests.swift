@@ -46,10 +46,39 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(app.tabBars.firstMatch.buttons.element(boundBy: 0).isSelected)
     }
 
+    /// §V17 LL03: over Today once for someone who updated; Continue closes it.
+    @MainActor
+    func testWhatsNewOpensOverTodayAndContinueClosesIt() {
+        app = XCUIApplication()
+        app.launchArguments = LaunchConfiguration(
+            isUITesting: true, skipsOnboarding: true, seed: .empty, permissions: .granted, showsWhatsNew: true
+        ).arguments
+        app.launch()
+        XCTAssertTrue(app.buttons["whatsNew.continue"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["capture"].isHittable)
+        tap("whatsNew.continue")
+        XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["whatsNew.continue"].exists)
+    }
+
+    @MainActor
+    /// Onboarding shows the new pages, so What's new doesn't follow it, even when it would be due.
+    func testANewInstallSeesNoWhatsNew() {
+        app = XCUIApplication()
+        app.launchArguments = LaunchConfiguration(isUITesting: true, seed: .empty, showsWhatsNew: true).arguments
+        app.launch()
+        tap("onboarding.skip")
+        tap("reminders.later")
+        tap("reminders.continue")
+        tap("firstCapture.later")
+        XCTAssertTrue(app.buttons["capture"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["whatsNew.continue"].exists)
+    }
+
     @MainActor
     func testContinueThroughEveryPageAndBack() {
         launch()
-        for _ in 0..<6 { tap("onboarding.continue") }
+        for _ in 0..<8 { tap("onboarding.continue") }
         XCTAssertTrue(app.buttons["reminders.enable"].waitForExistence(timeout: 5))
         tap("back")
         XCTAssertTrue(app.buttons["onboarding.continue"].waitForExistence(timeout: 5))

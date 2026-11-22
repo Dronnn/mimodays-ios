@@ -7,8 +7,12 @@ enum ArtLayer {
     /// A vector template image covering the whole canvas.
     case shape(_ asset: String, _ fill: ArtFill, shadow: ArtShadow?)
     /// Live text, so it can be translated; placed by its centre, like in the design. A longer translation shrinks
-    /// on its line to `width`: by default as wide as the picture allows around the centre.
-    case text(_ content: ArtText, _ style: TextStyle, _ color: ColorToken, center: CGPoint, rotation: Double, width: CGFloat? = nil)
+    /// on its line to `width`: by default as wide as the picture allows around the centre. With `leadingLines` it is
+    /// left-aligned in `width` and wraps to up to that many lines (§V17).
+    case text(
+        _ content: ArtText, _ style: TextStyle, _ color: ColorToken, center: CGPoint, rotation: Double, width: CGFloat? = nil,
+        leadingLines: Int? = nil
+    )
 }
 
 extension ArtLayer {
@@ -126,15 +130,22 @@ struct ArtCanvas: View {
                     color: Color(hex: shadow?.color ?? 0).opacity(shadow?.opacity ?? 0),
                     radius: shadow?.radius ?? 0, y: shadow?.y ?? 0
                 )
-        case let .text(content, style, color, center, rotation, width):
+        case let .text(content, style, color, center, rotation, width, leadingLines):
             let label = content.text
                 .textStyle(style)
                 .foregroundStyle(color.color)
                 // Light captions sit on photos; a soft shadow keeps them readable on bright ones.
                 .shadow(color: .black.opacity(color == .textOnCoral ? 0.45 : 0), radius: 2, y: 1)
-                .lineLimit(1)
+                .lineLimit(leadingLines ?? 1)
+                .multilineTextAlignment(.leading)
                 .minimumScaleFactor(0.5)
-            if let width {
+            if let leadingLines, let width {
+                label
+                    .frame(width: width, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: leadingLines > 1)
+                    .rotationEffect(.degrees(rotation))
+                    .position(center)
+            } else if let width {
                 label
                     .frame(maxWidth: width)
                     .rotationEffect(.degrees(rotation))

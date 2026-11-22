@@ -27759,6 +27759,143 @@
         }
       }
     },
+    "Add the On this day and Random memory widgets. They show photos only if you turn that on, and nothing private while App Lock is on." : {
+      "comment" : "Onboarding LL02: the Home Screen widgets and their privacy",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أضف أداتي «في مثل هذا اليوم» و«ذكرى عشوائية». لا تعرضان الصور إلا إذا شغّلت ذلك، ولا تعرضان أي شيء خاص أثناء تشغيل قفل التطبيق."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дадай віджэты «У гэты дзень» і «Выпадковы ўспамін». Фота яны паказваюць, толькі калі ты гэта ўключыш, а пры блакіроўцы праграмы — нічога асабістага."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge die Widgets „An diesem Tag“ und „Zufällige Erinnerung“ hinzu. Sie zeigen Fotos nur, wenn du das einschaltest, und nichts Privates, solange die App-Sperre an ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade los widgets Un día como hoy y Recuerdo al azar. Solo muestran fotos si lo activas, y nada privado mientras el bloqueo de la app esté activado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute les widgets Ce jour-là et Souvenir au hasard. Ils n’affichent des photos que si tu l’actives, et rien de privé tant que le verrouillage de l’app est activé."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אפשר להוסיף את הווידג׳טים ״ביום הזה״ ו״זיכרון אקראי״. הם מציגים תמונות רק אם מפעילים את זה, ושום דבר פרטי כשנעילת האפליקציה פועלת."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ավելացրու «Այս օրը» և «Պատահական հիշողություն» վիջեթները։ Լուսանկարներ դրանք ցույց են տալիս միայն, եթե դա միացնես, իսկ երբ հավելվածի կողպումը միացված է՝ ոչինչ անձնական։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi i widget In questo giorno e Ricordo a caso. Mostrano foto solo se lo attivi, e niente di privato finché Blocco app è attivo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「この日の思い出」と「ランダムな思い出」のウィジェットを追加しましょう。写真はオンにしたときだけ表示され、アプリロックがオンのあいだはプライベートなものは何も表示されません。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დაამატე ვიჯეტები „ამ დღეს“ და „შემთხვევითი მოგონება“. ფოტოებს მხოლოდ მაშინ აჩვენებენ, თუ ამას ჩართავ, ხოლო როცა აპის ჩაკეტვა ჩართულია — არაფერს პირადს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Осы күні» және «Кездейсоқ естелік» виджеттерін қос. Олар фотоларды тек сен қоссаң ғана көрсетеді, ал қолданба құлпы қосулы кезде жеке ештеңе көрсетпейді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이날의 추억과 랜덤 추억 위젯을 추가해 보세요. 사진은 직접 켰을 때만 보이고, 앱 잠금이 켜져 있는 동안에는 개인적인 내용이 보이지 않아요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voeg de widgets Op deze dag en Willekeurige herinnering toe. Ze tonen alleen foto's als je dat aanzet, en niets privés zolang App-vergrendeling aan staat."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj widżety Tego dnia i Losowe wspomnienie. Pokazują zdjęcia tylko wtedy, gdy to włączysz, i nic prywatnego, gdy Blokada aplikacji jest włączona."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicione os widgets Neste dia e Memória aleatória. Eles só mostram fotos se você ativar isso, e nada privado enquanto o Bloqueio do app estiver ativado."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавь виджеты «В этот день» и «Случайное воспоминание». Фото они показывают, только если ты это включишь, а при блокировке приложения — ничего личного."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lägg till widgetarna Den här dagen och Slumpvis minne. De visar bilder bara om du slår på det, och inget privat medan Applås är på."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarihte bugün ve Rastgele anı widget'larını ekle. Fotoğrafları yalnızca sen açarsan gösterirler, Uygulama Kilidi açıkken de özel hiçbir şey göstermezler."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додай віджети «Цього дня» і «Випадковий спогад». Фото вони показують, лише якщо ти це ввімкнеш, а з блокуванням застосунку — нічого особистого."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加“历史上的今天”和“随机回忆”小组件。只有你打开后才会显示照片；应用锁开启时不显示任何私人内容。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加入「那年今日」和「隨機回憶」小工具。只有你開啟後才會顯示照片；App 鎖定開啟時不顯示任何私人內容。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add the On this day and Random memory widgets. They show photos only if you turn that on, and nothing private while App Lock is on."
+          }
+        }
+      }
+    },
     "Add to collection" : {
       "comment" : "Viewer ••• menu item: put this moment in one or more collections.",
       "extractionState" : "manual",
@@ -34507,6 +34644,143 @@
         }
       }
     },
+    "Bring in photos, Live Photos and videos." : {
+      "comment" : "What's new row: importing from Photos",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أحضر الصور وصور Live Photos والفيديوهات."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дадавай фота, Live Photos і відэа."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hol Fotos, Live Photos und Videos dazu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trae fotos, Live Photos y videos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe des photos, des Live Photos et des vidéos."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אפשר להביא תמונות, Live Photos וסרטונים."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Բեր լուսանկարներ, Live Photos և տեսանյութեր։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Porta foto, Live Photo e video."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真、Live Photos、ビデオを取り込めます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შემოიტანე ფოტოები, Live Photos და ვიდეოები."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фото, Live Photos және бейнелерді әкел."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진, Live Photo, 비디오를 가져와요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haal foto's, Live Photos en video's binnen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj zdjęcia, Live Photos i wideo."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traga fotos, Live Photos e vídeos."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавляй фото, Live Photos и видео."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hämta bilder, Live Photos och videor."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotoğraf, Live Photo ve video getir."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додавай фото, Live Photos і відео."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入照片、实况照片和视频。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入照片、原況照片和影片。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bring in photos, Live Photos and videos."
+          }
+        }
+      }
+    },
     "Browse Photos" : {
       "comment" : "P8.5: opens the system photo picker (any date, no access needed)",
       "extractionState" : "manual",
@@ -37263,6 +37537,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在就記錄瞬間"
+          }
+        }
+      }
+    },
+    "Catch it your way." : {
+      "comment" : "Onboarding LL01 title: the new ways to catch a moment",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التقطها بطريقتك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лаві момант па-свойму."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halt ihn fest, wie du willst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captúralo a tu manera."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture-le à ta façon."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "תופסים את הרגע בדרך שלך."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Որսա այն քո ձևով։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catturalo a modo tuo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好きな方法で残そう。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დაიჭირე შენებურად."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Өз тәсіліңмен түсір."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원하는 방법으로 담아요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leg het vast op jouw manier."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Złap go po swojemu."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registre do seu jeito."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лови момент по-своему."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fånga det på ditt sätt."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kendi yolunla yakala."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лови мить по-своєму."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用你的方式记录。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用你的方式記錄。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catch it your way."
           }
         }
       }
@@ -62982,6 +63393,143 @@
         }
       }
     },
+    "From the Lock Screen, Control Center, Siri or the Action button." : {
+      "comment" : "What's new row: where the camera control is",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "من شاشة القفل أو مركز التحكم أو Siri أو زر الإجراء."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "З экрана блакіроўкі, Пункта кіравання, праз Siri або кнопкай дзеяння."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vom Sperrbildschirm, aus dem Kontrollzentrum, mit Siri oder der Aktionstaste."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde la pantalla bloqueada, el Centro de control, Siri o el botón de acción."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuis l’écran verrouillé, le Centre de contrôle, Siri ou le bouton Action."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ממסך הנעילה, ממרכז הבקרה, דרך Siri או בכפתור הפעולה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Կողպէկրանից, Կառավարման կենտրոնից, Siri-ով կամ Գործողության կոճակով։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dalla schermata di blocco, dal Centro di Controllo, con Siri o con il tasto Azione."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロック画面、コントロールセンター、Siri、アクションボタンから。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ჩაკეტილი ეკრანიდან, მართვის ცენტრიდან, Siri-ით ან მოქმედების ღილაკით."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Құлып экранынан, Басқару орталығынан, Siri арқылы немесе әрекет түймесімен."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠금 화면, 제어 센터, Siri 또는 동작 버튼에서."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vanaf het toegangsscherm, het bedieningspaneel, met Siri of de actieknop."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Z ekranu blokady, centrum sterowania, przez Siri lub przyciskiem czynności."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na Tela Bloqueada, na Central de Controle, com a Siri ou no Botão de Ação."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "С экрана блокировки, из Пункта управления, через Siri или кнопкой действия."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Från låsskärmen, Kontrollcenter, Siri eller åtgärdsknappen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kilitli Ekran'dan, Denetim Merkezi'nden, Siri'yle ya da Eylem düğmesiyle."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Із замкненого екрана, Центру керування, через Siri або кнопкою дії."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从锁定屏幕、控制中心、Siri 或操作按钮。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從鎖定畫面、控制中心、Siri 或動作按鈕。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From the Lock Screen, Control Center, Siri or the Action button."
+          }
+        }
+      }
+    },
     "From this day" : {
       "comment" : "P8.5 EE02: the sheet's title; the day's photos and videos in Photos",
       "extractionState" : "manual",
@@ -63116,6 +63664,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "這一天的"
+          }
+        }
+      }
+    },
+    "From your photo library" : {
+      "comment" : "What's new row title: importing from Photos",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "من مكتبة صورك"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "З тваёй медыятэкі"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus deiner Mediathek"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde tu fototeca"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuis ta photothèque"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מספריית התמונות שלך"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Քո լուսանկարների գրադարանից"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dalla tua libreria foto"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真ライブラリから"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შენი ფოტობიბლიოთეკიდან"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фото кітапханаңнан"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진 보관함에서"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uit je fotobibliotheek"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Z twojej biblioteki zdjęć"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Da sua fototeca"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Из твоей медиатеки"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Från ditt bildbibliotek"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotoğraf arşivinden"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "З твоєї медіатеки"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "来自你的图库"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "來自你的圖庫"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From your photo library"
           }
         }
       }
@@ -70273,6 +70958,280 @@
         }
       }
     },
+    "Journaling Suggestion" : {
+      "comment" : "Onboarding art: Apple's Journaling Suggestions, one of them",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اقتراح لليوميات"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прапанова для дзённіка"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Journaling-Vorschlag"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugerencia de diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestion de journal"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "הצעה ליומן"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Օրագրի առաջարկ"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento per il diario"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャーナルの提案"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დღიურის შეთავაზება"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Күнделік ұсынысы"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저널링 제안"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagboeksuggestie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugestia dziennika"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugestão de Diário"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предложение для Дневника"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagboksförslag"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Günlük Önerisi"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пропозиція для щоденника"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日记建议"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日記建議"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Journaling Suggestion"
+          }
+        }
+      }
+    },
+    "Journaling Suggestions" : {
+      "comment" : "What's new row title: Apple's Journaling Suggestions",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اقتراحات اليوميات"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прапановы для дзённіка"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Journaling-Vorschläge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugerencias de diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestions de journal"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "הצעות ליומן"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Օրագրի առաջարկներ"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimenti per il diario"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャーナルの提案"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დღიურის შეთავაზებები"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Күнделік ұсыныстары"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저널링 제안"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagboeksuggesties"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugestie dziennika"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugestões de Diário"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предложения для Дневника"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagboksförslag"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Günlük Önerileri"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пропозиції для щоденника"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日记建议"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日記建議"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Journaling Suggestions"
+          }
+        }
+      }
+    },
     "Joyful" : {
       "comment" : "Mood (P8.10): the happiest of five",
       "extractionState" : "manual",
@@ -73653,6 +74612,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保持原樣"
+          }
+        }
+      }
+    },
+    "Lena rode her bike all the way to the lake." : {
+      "comment" : "Onboarding art: a moment written in words",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ركبت لينا دراجتها حتى البحيرة."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лена даехала на ровары аж да возера."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena ist mit dem Rad bis zum See gefahren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena fue en bici hasta el lago."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena est allée jusqu’au lac à vélo."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לנה רכבה על האופניים עד האגם."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Լենան հեծանիվով հասավ մինչև լիճը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena è arrivata in bici fino al lago."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レナは自転車で湖まで行った。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ლენამ ველოსიპედით ტბამდე იარა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лена велосипедпен көлге дейін барды."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "레나가 자전거로 호수까지 갔어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena fietste helemaal naar het meer."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena dojechała rowerem aż nad jezioro."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Lena foi de bicicleta até o lago."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лена доехала на велосипеде до самого озера."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena cyklade hela vägen till sjön."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena bisikletle ta göle kadar gitti."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лена доїхала велосипедом аж до озера."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "莲娜一路骑车到了湖边。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓮娜一路騎車到了湖邊。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lena rode her bike all the way to the lake."
           }
         }
       }
@@ -78487,6 +79583,143 @@
         }
       }
     },
+    "Memories on your Home Screen." : {
+      "comment" : "Onboarding LL02 title: the widgets",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ذكرياتك على الشاشة الرئيسية."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Успаміны на пачатковым экране."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerungen auf deinem Home-Bildschirm."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuerdos en tu pantalla de inicio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des souvenirs sur ton écran d’accueil."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "זיכרונות במסך הבית."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Հիշողություններ քո Հիմնական էկրանին։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricordi sulla tua schermata Home."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホーム画面に思い出を。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მოგონებები შენს მთავარ ეკრანზე."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Естеліктер Негізгі экраныңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "홈 화면에 추억을."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herinneringen op je beginscherm."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wspomnienia na ekranie początkowym."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memórias na sua Tela de Início."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Воспоминания на экране «Домой»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minnen på din hemskärm."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anılar ana ekranında."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спогади на початковому екрані."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主屏幕上的回忆。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主畫面上的回憶。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memories on your Home Screen."
+          }
+        }
+      }
+    },
     "Memories opens in" : {
       "comment" : "Memories settings (S09): section title, whether Memories opens on the timeline or the calendar",
       "extractionState" : "manual",
@@ -80857,6 +82090,143 @@
         }
       }
     },
+    "Moments in words" : {
+      "comment" : "What's new row title: text moments",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لحظات بالكلمات"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моманты словамі"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momente in Worten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momentos con palabras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des moments en mots"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "רגעים במילים"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Պահեր բառերով"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momenti a parole"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "言葉で残す瞬間"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მომენტები სიტყვებით"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сөзбен жазылған сәттер"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "글로 남기는 순간"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momenten in woorden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momenty słowami"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momentos em palavras"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моменты словами"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ögonblick i ord"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kelimelerle anlar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Миті словами"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用文字记录瞬间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用文字記錄瞬間"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moments in words"
+          }
+        }
+      }
+    },
     "Moments show up here when they have a place. Location is off, so new moments are saved without one." : {
       "comment" : "Map with no places yet (P05), while location is off.",
       "extractionState" : "manual",
@@ -82509,6 +83879,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "更多"
+          }
+        }
+      }
+    },
+    "Morning walk" : {
+      "comment" : "Onboarding art: the title of a Journaling Suggestion",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نزهة الصباح"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ранішні шпацыр"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morgenspaziergang"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paseo matutino"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Balade du matin"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "הליכת בוקר"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Առավոտյան զբոսանք"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passeggiata mattutina"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "朝の散歩"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დილის სეირნობა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Таңғы серуен"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아침 산책"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ochtendwandeling"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poranny spacer"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caminhada matinal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Утренняя прогулка"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morgonpromenad"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sabah yürüyüşü"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ранкова прогулянка"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "晨间散步"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "晨間散步"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morning walk"
           }
         }
       }
@@ -97218,6 +98725,143 @@
         }
       }
     },
+    "On this day and Random memory on your Home Screen." : {
+      "comment" : "What's new row: the two widgets",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«في مثل هذا اليوم» و«ذكرى عشوائية» على شاشتك الرئيسية."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«У гэты дзень» і «Выпадковы ўспамін» на пачатковым экране."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„An diesem Tag“ und „Zufällige Erinnerung“ auf deinem Home-Bildschirm."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un día como hoy y Recuerdo al azar en tu pantalla de inicio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce jour-là et Souvenir au hasard sur ton écran d’accueil."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "״ביום הזה״ ו״זיכרון אקראי״ במסך הבית."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Այս օրը» և «Պատահական հիշողություն» քո Հիմնական էկրանին։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In questo giorno e Ricordo a caso sulla tua schermata Home."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「この日の思い出」と「ランダムな思い出」をホーム画面に。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„ამ დღეს“ და „შემთხვევითი მოგონება“ შენს მთავარ ეკრანზე."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Осы күні» және «Кездейсоқ естелік» Негізгі экраныңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "홈 화면에 이날의 추억과 랜덤 추억을."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op deze dag en Willekeurige herinnering op je beginscherm."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tego dnia i Losowe wspomnienie na ekranie początkowym."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neste dia e Memória aleatória na sua Tela de Início."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«В этот день» и «Случайное воспоминание» на экране «Домой»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den här dagen och Slumpvis minne på din hemskärm."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarihte bugün ve Rastgele anı ana ekranında."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Цього дня» і «Випадковий спогад» на початковому екрані."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主屏幕上的“历史上的今天”和“随机回忆”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主畫面上的「那年今日」和「隨機回憶」。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this day and Random memory on your Home Screen."
+          }
+        }
+      }
+    },
     "On this day on Today" : {
       "comment" : "Memories settings (S09): switch, show the On this day section on the Today screen",
       "extractionState" : "manual",
@@ -101180,6 +102824,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "快速打開相機"
+          }
+        }
+      }
+    },
+    "Open the camera with one press from the Lock Screen, Control Center or the Action button. Write a moment in words, bring in photos, Live Photos and videos from your library, or pick a Journaling Suggestion." : {
+      "comment" : "Onboarding LL01: the camera control, text moments, photo library import, Journaling Suggestions",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح الكاميرا بضغطة واحدة من شاشة القفل أو مركز التحكم أو زر الإجراء. اكتب لحظة بالكلمات، أو أحضر صورًا وصور Live Photos وفيديوهات من مكتبتك، أو اختر اقتراحًا من اقتراحات اليوميات."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Адкрывай камеру адным націскам з экрана блакіроўкі, Пункта кіравання або кнопкай дзеяння. Апішы момант словамі, дадай фота, Live Photos і відэа з медыятэкі або выберы прапанову для дзённіка."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne die Kamera mit einem Druck vom Sperrbildschirm, aus dem Kontrollzentrum oder mit der Aktionstaste. Schreib einen Moment in Worten, hol Fotos, Live Photos und Videos aus deiner Mediathek oder wähle einen Journaling-Vorschlag."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la cámara con una sola pulsación desde la pantalla bloqueada, el Centro de control o el botón de acción. Escribe un momento con palabras, trae fotos, Live Photos y videos de tu fototeca o elige una sugerencia de diario."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre l’appareil photo d’une seule pression depuis l’écran verrouillé, le Centre de contrôle ou le bouton Action. Écris un moment avec des mots, importe des photos, des Live Photos et des vidéos de ta photothèque, ou choisis une suggestion de journal."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אפשר לפתוח את המצלמה בלחיצה אחת ממסך הנעילה, ממרכז הבקרה או בכפתור הפעולה. אפשר לכתוב רגע במילים, להביא תמונות, Live Photos וסרטונים מהספרייה, או לבחור הצעה ליומן."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Բացիր տեսախցիկը մեկ սեղմումով կողպէկրանից, Կառավարման կենտրոնից կամ Գործողության կոճակով։ Գրիր պահը բառերով, բեր լուսանկարներ, Live Photos և տեսանյութեր քո գրադարանից կամ ընտրիր օրագրի առաջարկ։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri la fotocamera con un tocco dalla schermata di blocco, dal Centro di Controllo o con il tasto Azione. Scrivi un momento a parole, porta foto, Live Photo e video dalla tua libreria o scegli un suggerimento per il diario."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロック画面、コントロールセンター、アクションボタンからワンタッチでカメラを開けます。瞬間を言葉で書いたり、ライブラリから写真、Live Photos、ビデオを取り込んだり、ジャーナルの提案を選んだりできます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "გახსენი კამერა ერთი დაჭერით ჩაკეტილი ეკრანიდან, მართვის ცენტრიდან ან მოქმედების ღილაკით. დაწერე მომენტი სიტყვებით, შემოიტანე ფოტოები, Live Photos და ვიდეოები შენი ბიბლიოთეკიდან ან აირჩიე დღიურის შეთავაზება."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камераны құлып экранынан, Басқару орталығынан немесе әрекет түймесімен бір басып аш. Сәтті сөзбен жаз, кітапханаңнан фото, Live Photos және бейне әкел немесе күнделік ұсынысын таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠금 화면, 제어 센터 또는 동작 버튼에서 한 번에 카메라를 열어요. 순간을 글로 쓰거나, 보관함에서 사진, Live Photo, 비디오를 가져오거나, 저널링 제안을 골라요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open de camera met één druk vanaf het toegangsscherm, het bedieningspaneel of de actieknop. Schrijf een moment in woorden, haal foto's, Live Photos en video's uit je bibliotheek of kies een dagboeksuggestie."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz aparat jednym naciśnięciem z ekranu blokady, centrum sterowania lub przyciskiem czynności. Opisz moment słowami, dodaj zdjęcia, Live Photos i wideo ze swojej biblioteki albo wybierz sugestię dziennika."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abra a câmera com um toque na Tela Bloqueada, na Central de Controle ou no Botão de Ação. Escreva um momento em palavras, traga fotos, Live Photos e vídeos da sua fototeca ou escolha uma sugestão de diário."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открывай камеру одним нажатием с экрана блокировки, из Пункта управления или кнопкой действия. Опиши момент словами, добавь фото, Live Photos и видео из медиатеки или выбери предложение для Дневника."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppna kameran med ett tryck från låsskärmen, Kontrollcenter eller åtgärdsknappen. Skriv ett ögonblick i ord, hämta bilder, Live Photos och videor från ditt bibliotek eller välj ett dagboksförslag."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamerayı Kilitli Ekran'dan, Denetim Merkezi'nden ya da Eylem düğmesiyle tek dokunuşla aç. Bir anı kelimelerle yaz, arşivinden fotoğraf, Live Photo ve video getir ya da bir Günlük Önerisi seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкривай камеру одним натисканням із замкненого екрана, Центру керування або кнопкою дії. Опиши мить словами, додай фото, Live Photos і відео з медіатеки або вибери пропозицію для щоденника."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在锁定屏幕、控制中心或用操作按钮一按即可打开相机。用文字写下一个瞬间，从图库导入照片、实况照片和视频，或选一条日记建议。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在鎖定畫面、控制中心或用動作按鈕一按即可打開相機。用文字寫下一個瞬間，從圖庫匯入照片、原況照片和影片，或選一則日記建議。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the camera with one press from the Lock Screen, Control Center or the Action button. Write a moment in words, bring in photos, Live Photos and videos from your library, or pick a Journaling Suggestion."
           }
         }
       }
@@ -109861,6 +111642,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "精簡"
+          }
+        }
+      }
+    },
+    "Random memory" : {
+      "comment" : "The Random memory widget's name",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ذكرى عشوائية"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выпадковы ўспамін"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zufällige Erinnerung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuerdo al azar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Souvenir au hasard"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "זיכרון אקראי"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Պատահական հիշողություն"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricordo a caso"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ランダムな思い出"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შემთხვევითი მოგონება"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кездейсоқ естелік"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "랜덤 추억"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willekeurige herinnering"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Losowe wspomnienie"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memória aleatória"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случайное воспоминание"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slumpvis minne"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rastgele anı"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Випадковий спогад"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "随机回忆"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隨機回憶"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Random memory"
           }
         }
       }
@@ -118783,6 +120701,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "查看 %lld 項"
+          }
+        }
+      }
+    },
+    "Riverside · 7:40 AM" : {
+      "comment" : "Onboarding art: the place and time of a Journaling Suggestion",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ضفة النهر · 7:40 ص"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каля ракі · 7:40"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am Fluss · 7:40"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Junto al río · 7:40"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bord de la rivière · 7 h 40"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "על שפת הנהר · 7:40"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Գետափ · 7:40"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lungofiume · 7:40"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "川沿い · 午前7:40"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "მდინარის პირას · 7:40"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Өзен жағасы · 7:40"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "강변 · 오전 7:40"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aan de rivier · 7:40"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nad rzeką · 7:40"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beira-rio · 7:40"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У реки · 7:40"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vid ån · 07:40"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nehir kenarı · 07.40"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Біля річки · 7:40"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "河边 · 上午7:40"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "河邊 · 上午7:40"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riverside · 7:40 AM"
           }
         }
       }
@@ -131729,6 +133784,143 @@
         }
       }
     },
+    "Start a moment from a suggestion iOS makes on your iPhone." : {
+      "comment" : "What's new row: Journaling Suggestions",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ لحظة من اقتراح يقدّمه iOS على جهاز iPhone."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пачні момант з прапановы, якую iOS робіць на тваім iPhone."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beginne einen Moment mit einem Vorschlag, den iOS auf deinem iPhone macht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empieza un momento con una sugerencia que iOS te hace en tu iPhone."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commence un moment à partir d’une suggestion qu’iOS te fait sur ton iPhone."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אפשר להתחיל רגע מהצעה ש-iOS נותנת ב-iPhone."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Սկսիր պահը առաջարկից, որը iOS-ն անում է քո iPhone-ում։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inizia un momento da un suggerimento che iOS ti propone sul tuo iPhone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneでiOSがしてくれる提案から瞬間を始められます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დაიწყე მომენტი შეთავაზებიდან, რომელსაც iOS შენს iPhone-ზე გთავაზობს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS iPhone-ыңда ұсынған ұсыныстан сәт баста."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone에서 iOS가 건네는 제안으로 순간을 시작해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begin een moment vanuit een suggestie die iOS op je iPhone doet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zacznij moment od sugestii, którą iOS podsuwa na twoim iPhonie."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comece um momento a partir de uma sugestão que o iOS faz no seu iPhone."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начни момент с предложения, которое iOS делает на твоём iPhone."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Börja ett ögonblick från ett förslag som iOS ger dig på din iPhone."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone'unda iOS'un yaptığı bir öneriden bir an başlat."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почни мить із пропозиції, яку iOS робить на твоєму iPhone."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从 iOS 在 iPhone 上给出的建议开始一个瞬间。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從 iOS 在 iPhone 上給出的建議開始一個瞬間。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a moment from a suggestion iOS makes on your iPhone."
+          }
+        }
+      }
+    },
     "Step %lld of 3" : {
       "comment" : "New movie wizard: which step this is (shown in capitals)",
       "extractionState" : "manual",
@@ -138487,6 +140679,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "備份未儲存"
+          }
+        }
+      }
+    },
+    "The camera in one press" : {
+      "comment" : "What's new row title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الكاميرا بضغطة واحدة"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камера адным націскам"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kamera mit einem Druck"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cámara con una pulsación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’appareil photo d’une pression"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "המצלמה בלחיצה אחת"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Տեսախցիկը մեկ սեղմումով"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La fotocamera con un tocco"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワンタッチでカメラ"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "კამერა ერთი დაჭერით"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камера бір басумен"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "한 번에 여는 카메라"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De camera met één druk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aparat jednym naciśnięciem"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A câmera com um toque"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камера одним нажатием"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kameran med ett tryck"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tek dokunuşla kamera"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камера одним натисканням"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一按打开相机"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一按打開相機"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The camera in one press"
           }
         }
       }
@@ -167802,6 +170131,143 @@
         }
       }
     },
+    "What's new in MimoDays" : {
+      "comment" : "What's new (LL03) title, shown once after the 1.0.7 update",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الجديد في MimoDays"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Што новага ў MimoDays"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu in MimoDays"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novedades de MimoDays"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveautés de MimoDays"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מה חדש ב-MimoDays"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ինչ նոր կա MimoDays-ում"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novità di MimoDays"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysの新機能"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "რა არის ახალი MimoDays-ში"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-та не жаңа"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays의 새로운 기능"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuw in MimoDays"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowości w MimoDays"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novidades do MimoDays"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что нового в MimoDays"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nytt i MimoDays"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays'deki yenilikler"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Що нового в MimoDays"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 新功能"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays 新功能"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's new in MimoDays"
+          }
+        }
+      }
+    },
     "Whatever today looks like, it counts." : {
       "comment" : "Surprise notification body (one of two, picked at random)",
       "extractionState" : "manual",
@@ -170324,6 +172790,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "寫一個瞬間"
+          }
+        }
+      }
+    },
+    "Write a moment when there's nothing to film." : {
+      "comment" : "What's new row: text moments",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتب لحظة حين لا يكون هناك ما تصوّره."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запішы момант, калі здымаць няма чаго."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib einen Moment auf, wenn es nichts zu filmen gibt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe un momento cuando no haya nada que grabar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écris un moment quand il n’y a rien à filmer."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אפשר לכתוב רגע כשאין מה לצלם."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Գրիր պահը, երբ նկարելու բան չկա։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrivi un momento quando non c’è niente da filmare."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮るものがないときは、瞬間を言葉で書けます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დაწერე მომენტი, როცა გადასაღები არაფერია."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Түсіретін ештеңе болмаса, сәтті жазып қой."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "찍을 게 없을 때는 순간을 글로 써요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijf een moment op als er niets te filmen valt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opisz moment, gdy nie ma czego filmować."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escreva um momento quando não houver nada para filmar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запиши момент, когда снимать нечего."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv ett ögonblick när det inte finns något att filma."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çekecek bir şey olmadığında bir anı yaz."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запиши мить, коли знімати нічого."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没什么可拍时，就用文字写下瞬间。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒什麼可拍時，就用文字寫下瞬間。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write a moment when there's nothing to film."
           }
         }
       }
@@ -177780,6 +180383,143 @@
         }
       }
     },
+    "from your Photos" : {
+      "comment" : "Onboarding art caption: a photo brought in from the library",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "من صورك"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "з тваіх Фота"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aus deinen Fotos"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "desde tus Fotos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "depuis tes Photos"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מהתמונות שלך"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "քո Լուսանկարներից"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "dalle tue Foto"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真から"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შენი ფოტოებიდან"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фотоларыңнан"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진에서"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "uit je Foto's"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z twoich Zdjęć"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "das suas Fotos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "из твоих Фото"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "från dina Bilder"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotoğraflar'ından"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "з твоїх Фото"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "来自你的照片"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "來自你的照片"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "from your Photos"
+          }
+        }
+      }
+    },
     "front and back separately" : {
       "comment" : "Export (E02): under 'Original camera files'",
       "extractionState" : "manual",
@@ -178328,6 +181068,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "權限要求等 iOS 系統畫面，會在下次開啟 MimoDays 時切換語言。"
+          }
+        }
+      }
+    },
+    "in words" : {
+      "comment" : "Onboarding art caption: a text moment",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بالكلمات"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "словамі"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "in Worten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "con palabras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en mots"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "במילים"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "բառերով"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "a parole"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "言葉で"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "სიტყვებით"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "сөзбен"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "글로"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "in woorden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "słowami"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "em palavras"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "словами"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "i ord"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kelimelerle"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "словами"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用文字"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用文字"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "in words"
           }
         }
       }
@@ -179432,6 +182309,143 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在"
+          }
+        }
+      }
+    },
+    "one press" : {
+      "comment" : "Onboarding art caption: the camera control on the Lock Screen",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ضغطة واحدة"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "адзін націск"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ein Druck"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "una pulsación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "une pression"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לחיצה אחת"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "մեկ սեղմում"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "un tocco"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワンタッチ"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ერთი დაჭერა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "бір басу"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "한 번에"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "één druk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "jedno naciśnięcie"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "um toque"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "одно нажатие"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ett tryck"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tek dokunuş"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "одне натискання"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一按即开"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一按即開"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "one press"
           }
         }
       }

@@ -6,7 +6,7 @@ import SwiftData
 /// What onboarding keeps between launches.
 struct OnboardingRecord: Equatable {
     var isCompleted = false
-    /// Where to resume: intro pages 0-5, then the schedule (6), then the first capture (7).
+    /// Where to resume: an intro page (`OnboardingPage.savedNumber`), the schedule (6) or the first capture (7).
     var step = 0
     var schedule = ReminderSchedule()
     /// The person chose "Enable reminders" (even if iOS then said no); "Maybe later" leaves it off.

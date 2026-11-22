@@ -65190,140 +65190,140 @@
         }
       }
     },
-    "Hidden moments stay in your archive, Search and Map. They just don't come back in On this day or automatic movies." : {
+    "Hidden moments stay in your archive, Search and Map. They just don't come back in On this day, widgets or automatic movies." : {
       "comment" : "Help & about › Hide from memories (P8.15): what hiding does",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hidden moments stay in your archive, Search and Map. They just don't come back in On this day or automatic movies."
-          }
-        },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تبقى اللحظات المخفية في أرشيفك وفي البحث والخريطة، لكنها لا تعود في في مثل هذا اليوم ولا في الأفلام التلقائية."
+            "value" : "تبقى اللحظات المخفية في أرشيفك وفي البحث والخريطة، لكنها لا تعود في «في مثل هذا اليوم» ولا في الأدوات ولا في الأفلام التلقائية."
           }
         },
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Схаваныя моманты застаюцца ў архіве, Пошуку і на Карце. Яны проста не вяртаюцца ў «У гэты дзень» і ў аўтаматычных фільмах."
+            "value" : "Схаваныя моманты застаюцца ў архіве, Пошуку і на Карце. Яны проста не вяртаюцца ў «У гэты дзень», віджэтах і аўтаматычных фільмах."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ausgeblendete Momente bleiben in deinem Archiv, in der Suche und auf der Karte. Sie kommen nur nicht mehr in An diesem Tag oder in automatischen Filmen."
+            "value" : "Ausgeblendete Momente bleiben in deinem Archiv, in der Suche und auf der Karte. Sie kommen nur nicht mehr in An diesem Tag, in Widgets oder in automatischen Filmen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden moments stay in your archive, Search and Map. They just don't come back in On this day, widgets or automatic movies."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los momentos ocultos siguen en tu archivo, en Buscar y en Mapa. Solo dejan de aparecer en Un día como hoy y en las películas automáticas."
+            "value" : "Los momentos ocultos siguen en tu archivo, en Buscar y en Mapa. Solo dejan de aparecer en Un día como hoy, en los widgets y en las películas automáticas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les moments masqués restent dans vos archives, dans Rechercher et sur la Carte. Ils ne reviennent simplement plus dans Ce jour-là ni dans les films automatiques."
+            "value" : "Les moments masqués restent dans tes archives, dans Rechercher et sur la Carte. Ils ne reviennent simplement plus dans Ce jour-là, les widgets ni les films automatiques."
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "רגעים מוסתרים נשארים בארכיון, בחיפוש ובמפה. הם פשוט לא חוזרים ב״ביום הזה״ ובסרטים האוטומטיים."
+            "value" : "רגעים מוסתרים נשארים בארכיון, בחיפוש ובמפה. הם פשוט לא חוזרים ב״ביום הזה״, בווידג׳טים ובסרטים האוטומטיים."
           }
         },
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Թաքցված պահերը մնում են ձեր արխիվում, Որոնումում և Քարտեզում։ Պարզապես դրանք այլևս չեն հայտնվում «Այս օրը» բաժնում և ավտոմատ ֆիլմերում։"
+            "value" : "Թաքցված պահերը մնում են քո արխիվում, Որոնումում և Քարտեզում։ Պարզապես դրանք այլևս չեն հայտնվում «Այս օրը» բաժնում, վիջեթներում և ավտոմատ ֆիլմերում։"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I momenti nascosti restano nel tuo archivio, in Cerca e nella Mappa. Semplicemente non tornano più in In questo giorno né nei film automatici."
+            "value" : "I momenti nascosti restano nel tuo archivio, in Cerca e nella Mappa. Semplicemente non tornano più in In questo giorno, nei widget né nei film automatici."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "隠したモーメントはアーカイブ、検索、地図に残ります。「この日の思い出」と自動ムービーに出てこなくなるだけです。"
+            "value" : "隠したモーメントはアーカイブ、検索、地図に残ります。「この日の思い出」、ウィジェット、自動ムービーに出てこなくなるだけです。"
           }
         },
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "დამალული მომენტები რჩება თქვენს არქივში, ძიებასა და რუკაზე. უბრალოდ, ისინი აღარ ჩნდება „ამ დღეს“-ში და ავტომატურ ფილმებში."
+            "value" : "დამალული მომენტები რჩება შენს არქივში, ძიებასა და რუკაზე. უბრალოდ, ისინი აღარ ჩნდება „ამ დღეს“-ში, ვიჯეტებსა და ავტომატურ ფილმებში."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Жасырылған сәттер мұрағатта, Іздеуде және Картада қалады. Олар тек «Осы күні» бөлімінде және автоматты фильмдерде көрінбейді."
+            "value" : "Жасырылған сәттер мұрағатта, Іздеуде және Картада қалады. Олар тек «Осы күні» бөлімінде, виджеттерде және автоматты фильмдерде көрінбейді."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "숨긴 순간은 보관함, 검색, 지도에 그대로 남아 있어요. 이날의 추억과 자동 영화에만 다시 나오지 않아요."
+            "value" : "숨긴 순간은 보관함, 검색, 지도에 그대로 남아 있어요. 이날의 추억, 위젯, 자동 영화에만 다시 나오지 않아요."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verborgen momenten blijven in je archief, in Zoek en op de Kaart. Ze komen alleen niet meer terug in Op deze dag of in automatische films."
+            "value" : "Verborgen momenten blijven in je archief, in Zoek en op de Kaart. Ze komen alleen niet meer terug in Op deze dag, in widgets of in automatische films."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ukryte chwile zostają w archiwum, w Szukaj i na Mapie. Po prostu nie wracają w Tego dnia ani w automatycznych filmach."
+            "value" : "Ukryte chwile zostają w archiwum, w Szukaj i na Mapie. Po prostu nie wracają w Tego dnia, w widżetach ani w automatycznych filmach."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Os momentos ocultos continuam no seu arquivo, em Buscar e no Mapa. Eles só deixam de voltar em Neste dia e nos filmes automáticos."
+            "value" : "Os momentos ocultos continuam no seu arquivo, em Buscar e no Mapa. Eles só deixam de voltar em Neste dia, nos widgets e nos filmes automáticos."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скрытые моменты остаются в архиве, Поиске и на Карте. Они просто не возвращаются в «В этот день» и в автоматических фильмах."
+            "value" : "Скрытые моменты остаются в архиве, Поиске и на Карте. Они просто не возвращаются в «В этот день», виджетах и автоматических фильмах."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dolda ögonblick finns kvar i ditt arkiv, i Sök och på Kartan. De kommer bara inte tillbaka i Den här dagen eller i automatiska filmer."
+            "value" : "Dolda ögonblick finns kvar i ditt arkiv, i Sök och på Kartan. De kommer bara inte tillbaka i Den här dagen, i widgetar eller i automatiska filmer."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gizlenen anlar arşivinde, Ara’da ve Harita’da kalır. Yalnızca Tarihte bugün’de ve otomatik filmlerde yeniden çıkmazlar."
+            "value" : "Gizlenen anlar arşivinde, Ara’da ve Harita’da kalır. Yalnızca Tarihte bugün’de, widget'larda ve otomatik filmlerde yeniden çıkmazlar."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Приховані моменти залишаються в архіві, Пошуку й на Мапі. Вони просто не повертаються в «Цього дня» та в автоматичних фільмах."
+            "value" : "Приховані моменти залишаються в архіві, Пошуку й на Мапі. Вони просто не повертаються в «Цього дня», віджетах та автоматичних фільмах."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "隐藏的瞬间仍保留在你的存档、搜索和地图中，只是不会再出现在“历史上的今天”和自动影片里。"
+            "value" : "隐藏的瞬间仍保留在你的存档、搜索和地图中，只是不会再出现在“历史上的今天”、小组件和自动影片里。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "隱藏的瞬間仍保留在你的封存、搜尋和地圖中，只是不會再出現在「那年今日」和自動影片裡。"
+            "value" : "隱藏的瞬間仍保留在你的封存、搜尋和地圖中，只是不會再出現在「那年今日」、小工具和自動影片裡。"
           }
         }
       }
@@ -97356,6 +97356,144 @@
         }
       }
     },
+    "On this day shows moments from this date in past years. Random memory shows one moment at a time; tap Another for a different one." : {
+      "comment" : "Help & about › Widgets (P8.15): what each widget shows",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعرض «في مثل هذا اليوم» لحظات من هذا التاريخ في السنوات الماضية. وتعرض «ذكرى عشوائية» لحظة واحدة في كل مرة؛ اضغط على «غيرها» لتظهر أخرى."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«У гэты дзень» паказвае моманты з гэтай даты мінулых гадоў. «Выпадковы ўспамін» паказвае адзін момант; націсні «Іншы», каб убачыць іншы."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An diesem Tag zeigt Momente von diesem Datum aus früheren Jahren. Zufällige Erinnerung zeigt jeweils einen Moment; tippe auf „Noch eine“ für eine andere."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this day shows moments from this date in past years. Random memory shows one moment at a time; tap Another for a different one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un día como hoy muestra momentos de esta fecha en años anteriores. Recuerdo al azar muestra un momento cada vez; toca Otro para ver uno distinto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce jour-là montre des moments de cette date les années passées. Souvenir au hasard montre un moment à la fois ; touche Un autre pour en voir un différent."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "”ביום הזה“ מציג רגעים מהתאריך הזה בשנים קודמות. ”זיכרון אקראי“ מציג רגע אחד בכל פעם; מקישים על ”עוד אחד“ כדי לראות רגע אחר."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Այս օրը» վիջեթը ցույց է տալիս այս ամսաթվի պահերը նախորդ տարիներից։ «Պատահական հիշողություն»-ը ցույց է տալիս մեկ պահ, հպիր «Ուրիշը»՝ մեկ այլը տեսնելու համար։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In questo giorno mostra momenti di questa data negli anni passati. Ricordo a caso mostra un momento alla volta; tocca Un altro per vederne uno diverso."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「この日の思い出」は過去の同じ日付のモーメントを表示します。「ランダムな思い出」は一度に1つのモーメントを表示し、「別の思い出」をタップすると別のものに変わります。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„ამ დღეს“ გაჩვენებს ამ თარიღის მომენტებს წინა წლებიდან. „შემთხვევითი მოგონება“ ერთ მომენტს გაჩვენებს; შეეხე „სხვას“, რომ სხვა ნახო."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Осы күні» өткен жылдардағы осы күннің сәттерін көрсетеді. «Кездейсоқ естелік» бір уақытта бір сәтті көрсетеді; басқасын көру үшін «Басқасы» түрт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이날의 추억은 지난 몇 년 동안 같은 날짜의 순간을 보여 줘요. 랜덤 추억은 한 번에 한 순간을 보여 주고, 다른 추억을 탭하면 다른 순간으로 바뀌어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op deze dag toont momenten van deze datum uit vorige jaren. Willekeurige herinnering toont één moment tegelijk; tik op Nog een voor een ander."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tego dnia pokazuje chwile z tej daty z poprzednich lat. Losowe wspomnienie pokazuje jedną chwilę naraz; stuknij Inne, aby zobaczyć inną."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neste dia mostra momentos desta data em anos anteriores. Memória aleatória mostra um momento por vez; toque em Outra para ver outro."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«В этот день» показывает моменты с этой даты прошлых лет. «Случайное воспоминание» показывает один момент; нажми «Другое», чтобы увидеть другой."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den här dagen visar ögonblick från det här datumet tidigare år. Slumpvis minne visar ett ögonblick i taget; tryck på Ett till för ett annat."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarihte bugün, geçmiş yıllarda bu tarihteki anları gösterir. Rastgele anı her seferinde bir an gösterir; farklı bir tane için Başka’ya dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Цього дня» показує моменти з цієї дати минулих років. «Випадковий спогад» показує один момент; натисни «Інший», щоб побачити інший."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“历史上的今天”显示往年这一天的瞬间。“随机回忆”一次显示一个瞬间，轻点“换一个”即可换成别的。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「那年今日」會顯示往年這一天的瞬間。「隨機回憶」一次顯示一個瞬間，點一下「換一個」即可換成別的。"
+          }
+        }
+      }
+    },
     "On this day subtitle: %@" : {
       "comment" : "On this day (M14) subtitle; the argument is today's month and day.",
       "extractionState" : "manual",
@@ -103802,6 +103940,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "與短片比例不同的照片和影片"
+          }
+        }
+      }
+    },
+    "Photos appear only if you turn on Settings › Privacy & App Lock › Show photos in widgets. With App Lock on, widgets show only MimoDays." : {
+      "comment" : "Help & about › Widgets (P8.15): photos and App Lock",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا تظهر الصور إلا إذا شغّلت الإعدادات › الخصوصية وقفل التطبيق › عرض الصور في الأدوات. ومع تشغيل قفل التطبيق، لا تعرض الأدوات سوى MimoDays."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фота з'яўляюцца, толькі калі ўключыць Налады › Прыватнасць і блакіроўка › Паказваць фота ў віджэтах. Калі блакіроўка ўключана, віджэты паказваюць толькі MimoDays."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos erscheinen nur, wenn du Einstellungen › Datenschutz & App-Sperre › Fotos in Widgets zeigen einschaltest. Mit App-Sperre zeigen Widgets nur MimoDays."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos appear only if you turn on Settings › Privacy & App Lock › Show photos in widgets. With App Lock on, widgets show only MimoDays."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las fotos solo aparecen si activas Ajustes › Privacidad y bloqueo › Mostrar fotos en los widgets. Con el bloqueo activado, los widgets solo muestran MimoDays."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les photos n’apparaissent que si tu actives Réglages › Confidentialité et verrouillage › Afficher les photos dans les widgets. Avec le verrouillage activé, les widgets n’affichent que MimoDays."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "תמונות מופיעות רק אם מפעילים את הגדרות › פרטיות ונעילת האפליקציה › הצגת תמונות בווידג׳טים. כשנעילת האפליקציה פועלת, הווידג׳טים מציגים רק את MimoDays."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Լուսանկարները երևում են միայն, եթե միացնես Կարգավորումներ › Գաղտնիություն և հավելվածի կողպում › Ցույց տալ լուսանկարները վիջեթներում։ Երբ կողպումը միացված է, վիջեթները ցույց են տալիս միայն MimoDays։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le foto compaiono solo se attivi Impostazioni › Privacy e Blocco app › Mostra foto nei widget. Con Blocco app attivo, i widget mostrano solo MimoDays."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真は「設定」›「プライバシーとアプリロック」›「ウィジェットに写真を表示」をオンにしたときだけ表示されます。アプリロックがオンのとき、ウィジェットにはMimoDaysだけが表示されます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ფოტოები მხოლოდ მაშინ ჩანს, თუ ჩართავ პარამეტრები › კონფიდენციალურობა და აპის ჩაკეტვა › ფოტოების ჩვენება ვიჯეტებში. როცა აპის ჩაკეტვა ჩართულია, ვიჯეტები მხოლოდ MimoDays-ს აჩვენებს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фотолар Параметрлер › Құпиялылық және қолданба құлпы › Виджеттерде фотоларды көрсету қосулы болса ғана шығады. Қолданба құлпы қосулы кезде виджеттер тек MimoDays көрсетеді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정 › 개인정보 보호 및 앱 잠금 › 위젯에 사진 표시를 켜야만 사진이 나타나요. 앱 잠금이 켜져 있으면 위젯에는 MimoDays만 보여요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto's verschijnen alleen als je Instellingen › Privacy en App-vergrendeling › Foto's tonen in widgets aanzet. Met App-vergrendeling aan tonen widgets alleen MimoDays."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zdjęcia pojawiają się tylko wtedy, gdy włączysz Ustawienia › Prywatność i Blokada aplikacji › Pokazuj zdjęcia w widżetach. Gdy Blokada aplikacji jest włączona, widżety pokazują tylko MimoDays."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As fotos só aparecem se você ativar Ajustes › Privacidade e Bloqueio do app › Mostrar fotos nos widgets. Com o Bloqueio do app ativado, os widgets mostram só MimoDays."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фото появляются, только если включить Настройки › Конфиденциальность и блокировка › Показывать фото в виджетах. Когда блокировка включена, виджеты показывают только MimoDays."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder visas bara om du slår på Inställningar › Integritet och Applås › Visa bilder i widgetar. Med Applås på visar widgetar bara MimoDays."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotoğraflar yalnızca Ayarlar › Gizlilik ve Uygulama Kilidi › Widget'larda fotoğrafları göster açıksa görünür. Uygulama Kilidi açıkken widget'lar yalnızca MimoDays’i gösterir."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фото з’являються, лише якщо ввімкнути Налаштування › Конфіденційність і блокування застосунку › Показувати фото у віджетах. Коли блокування ввімкнено, віджети показують лише MimoDays."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只有在“设置”›“隐私与应用锁”›“在小组件中显示照片”打开时，才会显示照片。开启应用锁后，小组件只显示 MimoDays。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只有在「設定」›「隱私權與 App 鎖定」›「在小工具中顯示照片」開啟時，才會顯示照片。開啟 App 鎖定後，小工具只顯示 MimoDays。"
           }
         }
       }
@@ -156297,6 +156573,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "右上"
+          }
+        }
+      }
+    },
+    "Touch and hold the Home Screen, tap Edit, then Add Widget, and choose MimoDays." : {
+      "comment" : "Help & about › Widgets (P8.15): how to add them",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المس الشاشة الرئيسية مطولًا، واضغط على تعديل، ثم إضافة أداة، واختر MimoDays."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дакраніся да экрана «Дадому» і ўтрымлівай, націсні «Рэдагаваць», затым «Дадаць віджэт» і выберы MimoDays."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lege den Finger auf den Home-Bildschirm, tippe auf „Bearbeiten“, dann auf „Widget hinzufügen“ und wähle MimoDays."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch and hold the Home Screen, tap Edit, then Add Widget, and choose MimoDays."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén pulsada la pantalla de inicio, toca Editar, luego Añadir widget y elige MimoDays."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maintiens le doigt sur l’écran d’accueil, touche Modifier, puis Ajouter un widget, et choisis MimoDays."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "נוגעים ממושכות במסך הבית, מקישים על ”עריכה“, ואז על ”הוספת וידג׳ט“, ובוחרים ב-MimoDays."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Հպիր և պահիր Հիմնական էկրանը, հպիր «Խմբագրել», ապա «Ավելացնել վիջեթ» և ընտրիր MimoDays-ը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni premuta la schermata Home, tocca Modifica, poi Aggiungi widget e scegli MimoDays."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホーム画面を長押しし、「編集」、「ウィジェットを追加」の順にタップして、MimoDaysを選びます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ხანგრძლივად შეეხე მთავარ ეკრანს, შეეხე „რედაქტირებას“, შემდეგ „ვიჯეტის დამატებას“ და აირჩიე MimoDays."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Басты экранды басып тұр, «Өңдеу», сосын «Виджет қосу» түртіп, MimoDays таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "홈 화면을 길게 터치하고 편집, 위젯 추가를 차례로 탭한 다음 MimoDays를 고르세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Houd het beginscherm ingedrukt, tik op Wijzig, dan op Voeg widget toe en kies MimoDays."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dotknij i przytrzymaj ekran początkowy, stuknij Edytuj, potem Dodaj widżet i wybierz MimoDays."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque e mantenha pressionada a Tela de Início, toque em Editar, depois em Adicionar Widget e escolha MimoDays."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Коснись экрана «Домой» и удерживай, нажми «Править», затем «Добавить виджет» и выбери MimoDays."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Håll fingret på hemskärmen, tryck på Redigera, sedan Lägg till widget och välj MimoDays."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ana ekrana dokunup basılı tut, Düzenle’ye, sonra Widget Ekle’ye dokun ve MimoDays’i seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Торкнися й утримуй початковий екран, натисни «Редагувати», потім «Додати віджет» і вибери MimoDays."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按住主屏幕，轻点“编辑”，然后轻点“添加小组件”，选择 MimoDays。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按住主畫面，點一下「編輯」，然後點一下「加入小工具」，選擇 MimoDays。"
           }
         }
       }

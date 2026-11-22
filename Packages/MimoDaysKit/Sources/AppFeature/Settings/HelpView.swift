@@ -18,6 +18,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
     case permissions
     case newIPhone
     case cameraShortcut
+    case widgets
     case hideFromMemories
     case remindLater
     case tagsAndMood
@@ -34,6 +35,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
         case .permissions: Text("Permissions", bundle: .module)
         case .newIPhone: Text("Moving to a new iPhone", bundle: .module)
         case .cameraShortcut: Text("Open the camera quickly", bundle: .module)
+        case .widgets: Text("Widgets", bundle: .module)
         case .hideFromMemories: Text("Hide from memories", bundle: .module)
         case .remindLater: Text("Remind me later", bundle: .module)
         case .tagsAndMood: Text("Tags and mood", bundle: .module)
@@ -80,11 +82,17 @@ enum HelpArticle: String, CaseIterable, Hashable {
             Text("Action button (iPhone 15 Pro and later): Settings › Action Button › Shortcut › Open MimoDays Camera.", bundle: .module),
             Text("If the iPhone or App Lock is locked, Face ID comes first.", bundle: .module),
         ]
+        // P8.2 (P8.15): the steps as iOS names them.
+        case .widgets: [
+            Text("Touch and hold the Home Screen, tap Edit, then Add Widget, and choose MimoDays.", bundle: .module),
+            Text("On this day shows moments from this date in past years. Random memory shows one moment at a time; tap Another for a different one.", bundle: .module),
+            Text("Photos appear only if you turn on Settings › Privacy & App Lock › Show photos in widgets. With App Lock on, widgets show only MimoDays.", bundle: .module),
+        ]
         // P8.3, P8.7 (P8.15): the names as the menus show them.
         case .hideFromMemories: [
             Text("Open a moment, tap •••, then Hide from memories.", bundle: .module),
             Text("To hide a whole day, open the day, tap •••, then Hide this day from memories.", bundle: .module),
-            Text("Hidden moments stay in your archive, Search and Map. They just don't come back in On this day or automatic movies.", bundle: .module),
+            Text("Hidden moments stay in your archive, Search and Map. They just don't come back in On this day, widgets or automatic movies.", bundle: .module),
             Text("To show them again, use the same menu.", bundle: .module),
         ]
         case .remindLater: [

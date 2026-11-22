@@ -49,7 +49,7 @@ jobs:
   package:
     name: MimoDaysKit (unit, integration, snapshots)
     runs-on: xcode-27
-    timeout-minutes: 45
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: Packages/MimoDaysKit
@@ -57,23 +57,34 @@ jobs:
       - uses: actions/checkout@v4
       - name: Select Xcode 27.2
         run: sudo xcode-select -s /Applications/Xcode_27.2.app
-      # A run that stalls is sampled after 30 minutes, then stopped, so the stacks get uploaded. A slow runner
-      # takes about 20 minutes for the whole run.
+      # A run that stalls (nothing written for 10 minutes) is sampled, then stopped, so the stacks get uploaded. A
+      # slow runner that keeps going isn't: one took over 30 minutes and was cut off while still passing tests.
       - name: Package tests
         run: |
           mkdir -p results/samples
-          xcodebuild test -scheme MimoDaysKit-Package \
-            -destination "$DESTINATION" -resultBundlePath results/Package.xcresult \
-            -skip-testing:AppFeatureTests/ArchivePerformanceTests &
+          (
+            set -o pipefail
+            xcodebuild test -scheme MimoDaysKit-Package \
+              -destination "$DESTINATION" -resultBundlePath results/Package.xcresult \
+              -skip-testing:AppFeatureTests/ArchivePerformanceTests 2>&1 | tee results/package.log
+          ) &
           tests=$!
           (
-            sleep 1800
-            kill -0 "$tests" 2>/dev/null || exit 0
-            echo "::warning::Package tests still running after 30 minutes; sampling and stopping them"
-            for pid in $(pgrep -f 'xctest|MimoDaysKit'); do
-              sample "$pid" 5 -file "results/samples/sample-$pid.txt" >/dev/null 2>&1 || true
+            last=-1
+            quiet=0
+            while kill -0 "$tests" 2>/dev/null; do
+              sleep 60
+              size=$(wc -c < results/package.log 2>/dev/null || echo 0)
+              if [ "$size" = "$last" ]; then quiet=$((quiet + 1)); else quiet=0; last=$size; fi
+              if [ "$quiet" -ge 10 ]; then
+                echo "::warning::Package tests wrote nothing for 10 minutes; sampling and stopping them"
+                for pid in $(pgrep -f 'xctest|MimoDaysKit'); do
+                  sample "$pid" 5 -file "results/samples/sample-$pid.txt" >/dev/null 2>&1 || true
+                done
+                pkill -f 'xcodebuild test -scheme MimoDaysKit-Package' || true
+                exit 0
+              fi
             done
-            kill "$tests"
           ) &
           wait "$tests"
       # Timed on their own: run beside the movie exports, they time the runner's load, not the code.

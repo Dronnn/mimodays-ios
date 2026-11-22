@@ -41,6 +41,8 @@ struct PermissionAskerTests {
         let asker = PermissionAsker()
         let status = await asker.request(.location, using: PresetPermissionService(status: .notDetermined))
         #expect(status == .notDetermined && !asker.isAsking && asker.screen == nil)
+        // perm #3: the camera tries its microphone explainer again after one was dropped.
+        #expect(asker.wasDropped)
     }
 
     @Test func theCameraNamesItsOwnMicrophoneExplainer() async {
@@ -63,6 +65,7 @@ struct PermissionAskerTests {
         asker.shown()
         asker.dismissed()
         #expect(await request.value == .notDetermined)
+        #expect(!asker.wasDropped, "closed by the person, not dropped")
     }
 
     /// A dismissal of an explainer that was dropped before it showed doesn't answer the next request.

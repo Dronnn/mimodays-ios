@@ -528,13 +528,15 @@ struct MovieFileButtons: View {
                     Label { Text("Share", bundle: .module) } icon: { Icon.glyphShare.image.resizable().frame(width: 20, height: 20) }
                 }
                 .buttonStyle(SecondaryButtonStyle())
+                // The Photos explainer may be up: one sheet at a time.
+                .disabled(savingToPhotos)
                 .accessibilityIdentifier("ready.share")
             }
             Button { exporting = true } label: {
                 Label { Text("Save to Files", bundle: .module) } icon: { Icon.glyphFolder.image.resizable().frame(width: 20, height: 20) }
             }
             .buttonStyle(SecondaryButtonStyle())
-            .disabled(url == nil)
+            .disabled(url == nil || savingToPhotos)
             .accessibilityIdentifier("ready.files")
         }
         .sheet(isPresented: $exporting) {

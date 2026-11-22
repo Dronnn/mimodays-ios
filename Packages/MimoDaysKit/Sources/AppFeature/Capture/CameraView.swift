@@ -93,6 +93,11 @@ struct CameraView: View {
         Task {
             guard await permissions.status(of: .microphone) == .notDetermined else { return }
             _ = await asker.request(.microphone, screen: .microphone, using: permissions)
+            // Asked as the camera's cover was still coming in, the explainer can be dropped: once more, after it.
+            if asker.wasDropped, await permissions.status(of: .microphone) == .notDetermined,
+               model.mode == .video, model.settings.recordsSound, !showsSettings, !adjustsSelfie {
+                _ = await asker.request(.microphone, screen: .microphone, using: permissions)
+            }
             await model.refreshMicrophone()
         }
     }

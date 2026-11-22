@@ -85,6 +85,8 @@ struct MoviePageView: View {
                                 Label { Text("Share", bundle: .module) } icon: { Icon.glyphShare.image.resizable().frame(width: 20, height: 20) }
                             }
                             .buttonStyle(HalfButtonStyle())
+                            // The Photos explainer may be up: one sheet at a time.
+                            .disabled(savingToPhotos)
                             .accessibilityIdentifier("movie.share")
                         }
                         Button { Task { await save() } } label: {

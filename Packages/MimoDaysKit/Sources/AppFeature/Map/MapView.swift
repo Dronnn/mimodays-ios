@@ -46,6 +46,9 @@ struct MapView: View {
     @State private var quietRetry: Int?
     @State private var location = PermissionStatus.notDetermined
     @State private var showsUser = false
+    /// Counts the times MimoDays was left: a location answer read before then is stale once it's back (an Allow Once
+    /// has run out), so it isn't kept.
+    @State private var foregroundSession = 0
     /// The dot was on when MimoDays was left; it comes back if location is still allowed.
     @State private var resumesUserDot = false
     /// Show where I am was tapped with location turned off in iOS Settings.
@@ -110,7 +113,9 @@ struct MapView: View {
         .task {
             model.refresh()
             fitToken += 1
-            location = await permissions.status(of: .location)
+            let session = foregroundSession
+            let status = await permissions.status(of: .location)
+            if session == foregroundSession { location = status }
         }
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in model.refresh() }
         .onChange(of: model.filters) { fitToken += 1 }
@@ -119,11 +124,15 @@ struct MapView: View {
             switch phase {
             case .background:
                 // An Allow Once runs out once MimoDays is left: the dot goes, so MapKit doesn't ask again by itself.
-                resumesUserDot = showsUser
+                resumesUserDot = resumesUserDot || showsUser
                 showsUser = false
+                foregroundSession += 1
             case .active:
+                let session = foregroundSession
                 Task {
-                    location = await permissions.status(of: .location)
+                    let status = await permissions.status(of: .location)
+                    guard session == foregroundSession else { return }
+                    location = status
                     if resumesUserDot, location.isUsable { showsUser = true }
                     resumesUserDot = false
                 }
@@ -367,12 +376,19 @@ struct MapView: View {
             return
         }
         // Not the answer from before MimoDays was left: an Allow Once has run out by now.
-        location = await permissions.status(of: .location)
+        let session = foregroundSession
+        var status = await permissions.status(of: .location)
+        guard session == foregroundSession else { return }
+        location = status
         if location.needsSettings {
             locationOff = true
             return
         }
-        if location == .notDetermined { location = await asker.request(.location, using: permissions) }
+        if location == .notDetermined {
+            status = await asker.request(.location, using: permissions)
+            guard session == foregroundSession else { return }
+            location = status
+        }
         if location.isUsable {
             showsUser = true
         } else {

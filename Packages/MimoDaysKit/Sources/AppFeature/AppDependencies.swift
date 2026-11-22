@@ -97,7 +97,9 @@ public final class AppDependencies {
         #if targetEnvironment(simulator)
         let simulatedCamera = true
         #else
-        let simulatedCamera = configuration.usesFakeCamera
+        // Preset permissions can't open the real camera or microphone (iOS hasn't granted them): those UI tests get
+        // the simulated ones on a device too.
+        let simulatedCamera = configuration.usesFakeCamera || (configuration.isUITesting && configuration.permissions != nil)
         #endif
         #if DEBUG
         let footage = configuration.demoFootage.flatMap { DemoFootage(folder: $0) }

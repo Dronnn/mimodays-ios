@@ -512,6 +512,8 @@ struct CaptureFlowView: View {
     @State private var restoredDraft = false
     /// From the camera explainer's Continue until iOS has answered.
     @State private var requestsCamera = false
+    /// The flow was closed (a notification or a link took over): a late step doesn't ask iOS for anything.
+    @State private var isGone = false
 
     var body: some View {
         Group {
@@ -530,7 +532,10 @@ struct CaptureFlowView: View {
         .task { await refresh() }
         // The screen stays upright; the camera turns its own controls with the phone (C.3).
         .onAppear { OrientationLock.set(.portrait) }
-        .onDisappear { OrientationLock.set(nil) }
+        .onDisappear {
+            isGone = true
+            OrientationLock.set(nil)
+        }
         // Coming back from Settings with access turned on, or to a camera an error stopped.
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
@@ -553,6 +558,13 @@ struct CaptureFlowView: View {
                 guard !requestsCamera else { return }
                 requestsCamera = true
                 withAnimation(.easeOut(duration: 0.2)) { step = nil } completion: {
+                    // Closed or left while the explainer went: iOS would ask with nothing of ours on screen, or not at
+                    // all in the background. The explainer comes back the next time the camera opens.
+                    guard !isGone, scenePhase == .active else {
+                        requestsCamera = false
+                        if !isGone { step = .explain }
+                        return
+                    }
                     Task {
                         let status = await permissions.request(.camera)
                         requestsCamera = false

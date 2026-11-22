@@ -126,6 +126,8 @@ private final class OneFix: NSObject, CLLocationManagerDelegate {
         guard status == .authorizedWhenInUse || status == .authorizedAlways else { throw CLError(.denied) }
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
+                // Cancelled before it began: the cancellation handler's cleanup comes later, so don't start a fix.
+                guard !Task.isCancelled else { return continuation.resume(throwing: CancellationError()) }
                 answer = continuation
                 manager.delegate = self
                 manager.requestLocation()

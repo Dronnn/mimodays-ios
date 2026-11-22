@@ -234,6 +234,8 @@ final class PermissionAsker {
     @ObservationIgnored private var continued = false
     @ObservationIgnored private var appeared = false
     @ObservationIgnored private var attempt = 0
+    /// The last request's explainer never showed (SwiftUI dropped it): a screen that asks by itself can try again.
+    @ObservationIgnored private(set) var wasDropped = false
 
     /// The status after the explainer and the system prompt; `screen` when the permission has a more specific one
     /// (the camera's microphone). A request while one is going on asks nothing and returns `.notDetermined`, like
@@ -246,6 +248,7 @@ final class PermissionAsker {
         guard status == .notDetermined else { return status }
         continued = false
         appeared = false
+        wasDropped = false
         attempt += 1
         let current = attempt
         screen = explainer ?? PermissionScreen(explaining: permission)
@@ -268,6 +271,7 @@ final class PermissionAsker {
     private func dropIfNotShown(_ request: Int) async {
         try? await Task.sleep(for: .seconds(2))
         guard request == attempt, !appeared, answer != nil else { return }
+        wasDropped = true
         resolve()
     }
 

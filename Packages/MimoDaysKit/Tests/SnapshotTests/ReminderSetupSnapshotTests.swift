@@ -32,12 +32,17 @@ struct ReminderSetupSnapshotTests {
 
     /// W03 (P2.4): no reminders, and the first surprise shows in the app at the top.
     @Test func firstSurpriseInTheApp() {
-        let flow = OnboardingFlow(permissions: PresetPermissionService(status: .denied), store: InMemoryOnboardingStore())
+        // Due a minute ago, open for an hour: the flow's own watch keeps the ribbon up in every variant.
+        let first = SurpriseCoordinator.FirstSurprise(promptID: UUID(), plannedAt: .now.addingTimeInterval(-60), expiresAt: .now.addingTimeInterval(3_600))
+        let flow = OnboardingFlow(
+            permissions: PresetPermissionService(status: .denied), store: InMemoryOnboardingStore(), surprises: OnboardingSurprises(first: { first })
+        )
         flow.step = .reminders(.denied)
-        flow.inAppSurprise = UUID()
+        flow.inAppSurprise = first.promptID
         assertScreenSnapshots(
             of: OnboardingView(flow: flow) { _ in },
             variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .dark), SnapshotVariant(.iPhone, .light, .accessibilityExtraLarge), SnapshotVariant(.iPhone, .light, rightToLeft: true)]
+                + SnapshotVariant.languages
         )
     }
 }

@@ -55,7 +55,12 @@ struct CameraSnapshotTests {
     }
 
     @Test func surprise() async {
-        assertScreenSnapshots(of: screen(await camera(surprise: true)), variants: [SnapshotVariant(.iPhone, .light)])
+        assertScreenSnapshots(of: screen(await camera(surprise: true)), variants: [SnapshotVariant(.iPhone, .light)] + SnapshotVariant.languages)
+    }
+
+    /// P2.5 (O4): the first surprise on an iPhone that films with one camera: the label stays, the note says why.
+    @Test func surpriseSingleCamera() async {
+        assertScreenSnapshots(of: screen(await camera(multiCam: false, surprise: true)), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     /// P8.8 GG02: taking a moment again, its date in the chip.

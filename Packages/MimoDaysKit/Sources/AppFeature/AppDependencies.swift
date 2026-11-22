@@ -132,6 +132,8 @@ public final class AppDependencies {
         OrphanFiles.removeScratch()
         MovieExportModel.reconcileJobs(in: modelContainer.mainContext, now: Date())
         if !configuration.isUITesting { ImportedFormats.repairOnce(context: modelContainer.mainContext, defaults: .standard) }
+        let context = modelContainer.mainContext
+        camera.drafts.removeSaved { id in (try? context.fetchCount(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id }))) ?? 0 > 0 }
         camera.drafts.removeLeftovers()
         let mediaUse = mediaUse, movieExports = movieExports
         // P3.6: what was moved to the person's folder.

@@ -30,6 +30,8 @@ struct MomentDraft {
     /// P8.4, P8.10.
     var tags: [String] = []
     var mood: Mood?
+    /// The id to save under; a moment already saved with it is the same save again (rev-capture 19).
+    var momentID: UUID?
 }
 
 enum SaveError: Error, Equatable {
@@ -56,6 +58,11 @@ struct MomentSaver {
 
     func save(_ draft: MomentDraft) async throws -> Moment {
         let capture = draft.capture
+        // Saved already, and iOS ended the app before the draft went: nothing is copied twice.
+        if let id = draft.momentID, let saved = try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first {
+            capture.discardFiles()
+            return saved
+        }
         try checkSpace(for: [capture.mainURL, capture.selfieURL, capture.motionURL, draft.voice?.url].compactMap(\.self))
         var written: [String] = []
         var composedPhoto: URL?
@@ -90,7 +97,8 @@ struct MomentSaver {
             }
 
             let moment = Moment(
-                captured: capture.capturedAt, origin: draft.origin ?? (draft.promptID == nil ? .manual : .randomPrompt),
+                id: draft.momentID ?? UUID(), captured: capture.capturedAt,
+                origin: draft.origin ?? (draft.promptID == nil ? .manual : .randomPrompt),
                 mediaType: isPhoto ? .photo : .video, promptID: draft.promptID, createdAt: clock.now()
             )
             let caption = draft.caption.trimmingCharacters(in: .whitespacesAndNewlines)

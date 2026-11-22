@@ -20,6 +20,9 @@ struct ReviewDraft: Codable, Equatable {
     var place: ReviewPlace?
     /// A place or "No place" was picked, so a late location fix doesn't fill it in.
     var placeWasChosen = false
+    /// The id the saved moment gets, so a save iOS ended after its commit isn't made twice (rev-capture 19).
+    /// Optional, so drafts from before it still read.
+    var momentID: UUID?
 }
 
 /// C09/C10: a voice note recorded in review, kept apart from the clip's own sound.
@@ -110,6 +113,11 @@ struct ReviewDraftStore: Sendable {
         where !kept.contains(item.lastPathComponent) {
             try? FileManager.default.removeItem(at: item)
         }
+    }
+
+    /// At launch: a draft whose moment was saved before iOS ended the app, ahead of the draft's removal, is done.
+    func removeSaved(isSaved: (UUID) -> Bool) {
+        if let id = load()?.momentID, isSaved(id) { clear() }
     }
 
     /// Removes the draft and every file with it.

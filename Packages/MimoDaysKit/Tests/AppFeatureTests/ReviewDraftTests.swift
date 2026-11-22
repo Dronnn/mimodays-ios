@@ -36,6 +36,19 @@ struct ReviewDraftTests {
         #expect(FileManager.default.fileExists(atPath: review.capture.mainURL.path))
     }
 
+    /// rev-capture 19: the review keeps its moment's id across a relaunch, and a draft already saved goes at launch.
+    @Test func aDraftItsMomentWasSavedForGoesAtLaunch() async throws {
+        defer { drafts.clear() }
+        let review = ReviewModel(capture: try drafts.adopt(try await capture()), drafts: drafts)
+        #expect(drafts.load()?.momentID == review.momentID)
+        #expect(ReviewModel(draft: try #require(drafts.load()), drafts: drafts).momentID == review.momentID)
+        #expect(review.momentDraft.momentID == review.momentID)
+        drafts.removeSaved { _ in false }
+        #expect(drafts.load() != nil)
+        drafts.removeSaved { $0 == review.momentID }
+        #expect(drafts.load() == nil)
+    }
+
     @Test func adoptingMovesTheFilesOutOfTemporaryStorage() async throws {
         defer { drafts.clear() }
         let original = try await capture()

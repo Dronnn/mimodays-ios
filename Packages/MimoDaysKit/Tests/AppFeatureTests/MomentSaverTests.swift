@@ -197,6 +197,20 @@ struct MomentSaverTests {
         #expect(try await saver().save(late).repeatOfMomentID == nil)
     }
 
+    /// rev-capture 19: iOS ended the app after the commit, before the draft went: saving it again makes no second moment.
+    @Test func savingTheSameDraftAgainKeepsOneMoment() async throws {
+        var draft = MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)
+        draft.momentID = UUID()
+        let mainURL = draft.capture.mainURL
+        try FileManager.default.copyItem(at: mainURL, to: mainURL.appendingPathExtension("keep"))
+        let first = try await saver().save(draft)
+        try FileManager.default.moveItem(at: mainURL.appendingPathExtension("keep"), to: mainURL)
+        let again = try await saver().save(draft)
+        #expect(first.id == draft.momentID && again.id == first.id)
+        #expect(try moments().count == 1)
+        #expect(!FileManager.default.fileExists(atPath: mainURL.path))
+    }
+
     @Test func tagsAndMoodAreSaved() async throws {
         var draft = MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)
         draft.tags = ["Lena", "bike"]

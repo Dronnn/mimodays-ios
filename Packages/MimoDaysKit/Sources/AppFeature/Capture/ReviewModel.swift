@@ -22,6 +22,8 @@ final class ReviewModel {
     let capture: CaptureResult
     /// The surprise this capture answers, if it was opened in time.
     let promptID: UUID?
+    /// The saved moment's id, from the start (rev-capture 19).
+    let momentID: UUID
     /// P8.8: the moment this captures again.
     let repeatOf: UUID?
     /// P8.4, P8.10.
@@ -106,6 +108,7 @@ final class ReviewModel {
         self.services = services
         self.places = places
         fillsPlace = true
+        momentID = UUID()
         window = capture.window ?? CameraSettings.SelfieWindow()
         drafts?.claim.writer = self
         keepDraft()
@@ -122,6 +125,7 @@ final class ReviewModel {
         self.services = services
         self.places = places
         fillsPlace = false
+        momentID = draft.momentID ?? UUID()
         place = draft.place
         placeWasChosen = draft.placeWasChosen
         window = draft.window
@@ -154,7 +158,8 @@ final class ReviewModel {
         guard FileManager.default.fileExists(atPath: capture.mainURL.path) else { return }
         drafts.save(ReviewDraft(
             capture: capture, caption: caption, note: note, window: window, promptID: promptID, repeatOf: repeatOf,
-            tags: tags.isEmpty ? nil : tags, mood: mood, voice: voice, place: place, placeWasChosen: placeWasChosen
+            tags: tags.isEmpty ? nil : tags, mood: mood, voice: voice, place: place, placeWasChosen: placeWasChosen,
+            momentID: momentID
         ))
     }
 
@@ -337,7 +342,7 @@ final class ReviewModel {
     var momentDraft: MomentDraft {
         MomentDraft(
             capture: capture, caption: caption, note: note, window: hasSelfie ? windowFrame : nil, promptID: promptID, voice: voice,
-            place: place, repeatOf: repeatOf, tags: tags, mood: mood
+            place: place, repeatOf: repeatOf, tags: tags, mood: mood, momentID: momentID
         )
     }
 

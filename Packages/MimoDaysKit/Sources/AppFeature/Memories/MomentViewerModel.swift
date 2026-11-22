@@ -99,6 +99,8 @@ struct ViewerMoment: Equatable, Identifiable {
     var isHiddenWithDay = false
     var mainPath: String?
     var selfiePath: String?
+    /// The decoded pictures the card shows.
+    var picturePaths: [String] { [mainPath, selfiePath].compactMap(\.self) }
     /// The single picture made for sharing (photos).
     var composedPath: String?
     var voice: Voice?
@@ -218,15 +220,30 @@ final class MomentViewerModel {
         viewed.isHiddenWithDay = MemoryVisibility(context: library.context).isDayHidden(moment.localDay)
         viewed.thenNowRepeats = ThenNow.comparison(for: moment, in: library.context)?.repeats.count ?? 0
         moments[id] = viewed
+        // rev-library: decoded pictures stay for the pages around the one on screen only; a page further away
+        // reads them again when it comes back into view.
+        let near = nearbyIDs
+        images = images.filter { path, _ in near.contains { moments[$0]?.picturePaths.contains(path) == true } }
+        guard near.contains(id) else { return loadVoiceLevels(id, viewed) }
         // The selfie as big as the main picture: swapped, it fills the card (U23).
         for (path, size) in [(viewed.mainPath, Self.photoPixels), (viewed.selfiePath, Self.photoPixels)] {
             guard let path, images[path] == nil, let url = url(path),
                   let image = try? await library.thumbnails.thumbnail(for: url, maxPixelSize: size) else { continue }
             images[path] = UIImage(cgImage: image)
         }
+        loadVoiceLevels(id, viewed)
+    }
+
+    private func loadVoiceLevels(_ id: UUID, _ viewed: ViewerMoment) {
         if let voice = viewed.voice, voiceLevels[id] == nil, let url = url(voice.path) {
             voiceLevels[id] = VoiceWaveform.read(url, bars: Self.voiceBars)?.levels ?? []
         }
+    }
+
+    /// The page on screen and two either side: the lazy pager lays out the next ones before they show.
+    private var nearbyIDs: Set<UUID> {
+        guard let current, let index = ids.firstIndex(of: current) else { return Set(current.map { [$0] } ?? []) }
+        return Set(ids[max(index - 2, 0)...min(index + 2, ids.count - 1)])
     }
 
     /// Moments deleted elsewhere meanwhile (another viewer opened from this one) leave the pager too.

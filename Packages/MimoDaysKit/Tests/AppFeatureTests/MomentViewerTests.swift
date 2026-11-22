@@ -60,6 +60,22 @@ struct MomentViewerTests {
         #expect(viewer.currentMoment == moment)
     }
 
+    /// rev-library: swiping far keeps the decoded pictures of the pages around the one on screen only.
+    @Test func swipingFarKeepsOnlyTheNearbyPicturesDecoded() async throws {
+        var ids: [UUID] = []
+        for _ in 0..<6 { ids.append(try await save()) }
+        let viewer = MomentViewerModel(pager: MomentPager(ids: ids, start: ids[0]), library: library)
+        for id in ids { await viewer.load(id) }
+        #expect(viewer.image(viewer.moments[ids[0]]?.mainPath) != nil)
+        #expect(viewer.image(viewer.moments[ids[5]]?.mainPath) == nil, "too far from the first page")
+
+        viewer.current = ids[5]
+        await viewer.load(ids[5])
+        #expect(viewer.image(viewer.moments[ids[5]]?.mainPath) != nil)
+        #expect(viewer.image(viewer.moments[ids[0]]?.mainPath) == nil, "let go once far behind")
+        #expect(viewer.moments[ids[0]] != nil, "the moment itself stays")
+    }
+
     @Test func aFavoriteIsSavedAtOnce() async throws {
         let id = try await save()
         let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)

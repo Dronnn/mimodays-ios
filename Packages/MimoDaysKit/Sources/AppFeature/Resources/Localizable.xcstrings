@@ -194953,6 +194953,417 @@
           }
         }
       }
+    },
+    "Each original is replaced only after its smaller copy is checked, and both cameras of a moment stay together. A smaller video can't be made big again." : {
+      "comment" : "Help topic: Make videos smaller (P3.5)",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يُستبدل أي أصل إلا بعد التحقق من نسخته الأصغر، وتبقى الكاميرتان في اللحظة معًا. لا يمكن إعادة الفيديو المصغّر إلى حجمه الكبير."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожны арыгінал замяняецца толькі пасля праверкі яго меншай копіі, і абедзве камеры моманту застаюцца разам. Паменшанае відэа нельга зноў зрабіць вялікім."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes Original wird erst ersetzt, wenn seine kleinere Kopie geprüft ist, und beide Kameras eines Moments bleiben zusammen. Ein verkleinertes Video lässt sich nicht wieder vergrößern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada original se reemplaza solo después de comprobar su copia más pequeña, y las dos cámaras de un momento siguen juntas. Un vídeo reducido no puede volver a ser grande."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque original n’est remplacé qu’après vérification de sa copie plus petite, et les deux caméras d’un moment restent ensemble. Une vidéo réduite ne peut pas redevenir grande."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כל מקור מוחלף רק אחרי שהעותק הקטן שלו נבדק, ושתי המצלמות של רגע נשארות יחד. אי אפשר להגדיל שוב סרטון שהוקטן."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Յուրաքանչյուր բնօրինակ փոխարինվում է միայն դրա փոքր պատճենը ստուգելուց հետո, և պահի երկու տեսախցիկները մնում են միասին։ Փոքրացված տեսանյութը չի կարելի նորից մեծացնել։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ogni originale viene sostituito solo dopo il controllo della sua copia più piccola, e le due fotocamere di un momento restano insieme. Un video ridotto non può tornare grande."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオは小さいコピーを確認してから置き換え、瞬間の両方のカメラは一緒のままです。小さくしたビデオを元の大きさに戻すことはできません。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "თითოეული ორიგინალი იცვლება მხოლოდ მისი პატარა ასლის შემოწმების შემდეგ, და მომენტის ორივე კამერა ერთად რჩება. დაპატარავებული ვიდეოს ისევ გადიდება შეუძლებელია."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Әр түпнұсқа оның кішірек көшірмесі тексерілгеннен кейін ғана ауыстырылады, ал сәттің екі камерасы бірге қалады. Кішірейтілген бейнені қайта үлкейту мүмкін емес."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본은 작은 사본을 확인한 뒤에만 바뀌고, 한 순간의 두 카메라는 함께 유지돼요. 줄인 동영상은 다시 크게 만들 수 없어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elk origineel wordt pas vervangen nadat de kleinere kopie is gecontroleerd, en beide camera's van een moment blijven bij elkaar. Een verkleinde video kan niet weer groot worden."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Każdy oryginał jest zastępowany dopiero po sprawdzeniu mniejszej kopii, a obie kamery momentu zostają razem. Zmniejszonego filmu nie da się znowu powiększyć."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada original só é substituído depois que a cópia menor é verificada, e as duas câmeras de um momento continuam juntas. Um vídeo reduzido não pode voltar a ser grande."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каждый оригинал заменяется только после проверки его уменьшенной копии, и обе камеры момента остаются вместе. Уменьшенное видео нельзя снова сделать большим."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varje original ersätts först när den mindre kopian har kontrollerats, och båda kamerorna i ett ögonblick hålls ihop. En video som gjorts mindre kan inte bli stor igen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Her orijinal, yalnızca küçük kopyası kontrol edildikten sonra değiştirilir ve bir anın iki kamerası birlikte kalır. Küçültülen bir video yeniden büyütülemez."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожен оригінал замінюється лише після перевірки його меншої копії, і обидві камери миті залишаються разом. Зменшене відео не можна знову зробити великим."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每个原始视频都要在较小副本检查无误后才会被替换，一个瞬间的两个摄像头画面保持在一起。缩小后的视频无法再变大。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每個原始影片都要在較小副本檢查無誤後才會被取代，一個瞬間的兩個鏡頭畫面保持在一起。縮小後的影片無法再變大。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each original is replaced only after its smaller copy is checked, and both cameras of a moment stay together. A smaller video can't be made big again."
+          }
+        }
+      }
+    },
+    "In Settings › Camera, Video size sets how big new videos are. Balanced and Compact take less space than High." : {
+      "comment" : "Help topic: Make videos smaller (P3)",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في الإعدادات › الكاميرا، يحدد «حجم الفيديو» حجم الفيديوهات الجديدة. يشغل «متوازن» و«مضغوط» مساحة أقل من «عالٍ»."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Наладах › Камера «Памер відэа» задае, якімі вялікімі будуць новыя відэа. «Збалансаваны» і «Кампактны» займаюць менш месца, чым «Высокі»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unter Einstellungen › Kamera legt Videogröße fest, wie groß neue Videos werden. Ausgewogen und Kompakt brauchen weniger Platz als Hoch."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Ajustes › Cámara, Tamaño de vídeo decide cuánto ocupan los vídeos nuevos. Equilibrado y Compacto ocupan menos que Alto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Réglages › Caméra, Taille des vidéos fixe la taille des nouvelles vidéos. Équilibrée et Compacte prennent moins de place qu’Élevée."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בהגדרות › מצלמה, ״גודל סרטון״ קובע כמה גדולים יהיו סרטונים חדשים. ״מאוזן״ ו״קומפקטי״ תופסים פחות מקום מ״גבוה״."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Կարգավորումներ › Տեսախցիկ բաժնում «Տեսանյութի չափ»-ը որոշում է նոր տեսանյութերի չափը։ «Հավասարակշռված»-ը և «Կոմպակտ»-ը ավելի քիչ տեղ են զբաղեցնում, քան «Բարձր»-ը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Impostazioni › Fotocamera, Dimensione video stabilisce quanto sono grandi i nuovi video. Bilanciata e Compatta occupano meno spazio di Alta."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定 › カメラの「ビデオのサイズ」で、新しいビデオの大きさを決められます。「バランス」と「コンパクト」は「高」より容量が少なくなります。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "პარამეტრები › კამერაში „ვიდეოს ზომა“ განსაზღვრავს ახალი ვიდეოების ზომას. „დაბალანსებული“ და „კომპაქტური“ ნაკლებ ადგილს იკავებს, ვიდრე „მაღალი“."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Параметрлер › Камера бөліміндегі «Бейне өлшемі» жаңа бейнелердің көлемін анықтайды. «Теңгерімді» мен «Ықшам» «Жоғарыға» қарағанда аз орын алады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정 › 카메라의 동영상 크기에서 새 동영상의 크기를 정해요. 균형과 컴팩트는 높음보다 공간을 덜 차지해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Instellingen › Camera bepaalt Videogrootte hoe groot nieuwe video's worden. Gebalanceerd en Compact nemen minder ruimte in dan Hoog."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W Ustawieniach › Aparat opcja Rozmiar wideo ustala, jak duże będą nowe filmy. Zrównoważony i Kompaktowy zajmują mniej miejsca niż Wysoki."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em Ajustes › Câmera, Tamanho do vídeo define o tamanho dos vídeos novos. Equilibrado e Compacto ocupam menos espaço que Alto."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В Настройках › Камера «Размер видео» задаёт, какими большими будут новые видео. «Сбалансированный» и «Компактный» занимают меньше места, чем «Высокий»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I Inställningar › Kamera avgör Videostorlek hur stora nya videor blir. Balanserad och Kompakt tar mindre plats än Hög."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarlar › Kamera'daki Video boyutu, yeni videoların ne kadar büyük olacağını belirler. Dengeli ve Kompakt, Yüksek'ten daha az yer kaplar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Налаштуваннях › Камера «Розмір відео» визначає, якими великими будуть нові відео. «Збалансований» і «Компактний» займають менше місця, ніж «Високий»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在设置 › 相机中，“视频大小”决定新视频的大小。“均衡”和“紧凑”比“高”占用的空间更少。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在設定 › 相機中，「影片大小」決定新影片的大小。「均衡」和「精簡」比「高」佔用的空間更少。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Settings › Camera, Video size sets how big new videos are. Balanced and Compact take less space than High."
+          }
+        }
+      }
+    },
+    "To make older videos smaller, open Settings › Storage › Make videos smaller, choose the videos and the new size, then tap Make smaller. For one video, open it, tap ••• and Make smaller." : {
+      "comment" : "Help topic: Make videos smaller (P3.5)",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لتصغير الفيديوهات الأقدم، افتح الإعدادات › التخزين › تصغير الفيديوهات، واختر الفيديوهات والحجم الجديد، ثم اضغط «تصغير». ولفيديو واحد، افتحه واضغط ••• ثم «تصغير»."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каб паменшыць старыя відэа, адкрый Налады › Сховішча › Паменшыць відэа, выберы відэа і новы памер, потым націсні «Паменшыць». Для аднаго відэа адкрый яго, націсні ••• і «Паменшыць»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um ältere Videos zu verkleinern, öffne Einstellungen › Speicher › Videos verkleinern, wähle die Videos und die neue Größe und tippe auf Verkleinern. Für ein einzelnes Video öffne es, tippe auf ••• und dann auf Verkleinern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para reducir vídeos antiguos, abre Ajustes › Almacenamiento › Reducir vídeos, elige los vídeos y el nuevo tamaño y toca Reducir. Para un solo vídeo, ábrelo, toca ••• y Reducir."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour réduire des vidéos plus anciennes, ouvre Réglages › Stockage › Réduire les vidéos, choisis les vidéos et la nouvelle taille, puis touche Réduire. Pour une seule vidéo, ouvre-la, touche ••• puis Réduire."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כדי להקטין סרטונים ישנים, פותחים את הגדרות › אחסון › הקטנת סרטונים, בוחרים את הסרטונים ואת הגודל החדש ומקישים על ״הקטנה״. לסרטון אחד, פותחים אותו, מקישים על ••• ועל ״הקטנה״."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ավելի հին տեսանյութերը փոքրացնելու համար բացիր Կարգավորումներ › Պահեստ › Փոքրացնել տեսանյութերը, ընտրիր տեսանյութերը և նոր չափը, ապա հպիր «Փոքրացնել»։ Մեկ տեսանյութի համար բացիր այն, հպիր ••• և «Փոքրացնել»։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per ridurre i video più vecchi, apri Impostazioni › Spazio › Riduci i video, scegli i video e la nuova dimensione, poi tocca Riduci. Per un solo video, aprilo, tocca ••• e Riduci."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "古いビデオを小さくするには、設定 › ストレージ › ビデオを小さくするを開き、ビデオと新しいサイズを選んで「小さくする」をタップします。1本だけなら、そのビデオを開いて•••から「小さくする」をタップします。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ძველი ვიდეოების დასაპატარავებლად გახსენი პარამეტრები › საცავი › ვიდეოების დაპატარავება, აირჩიე ვიდეოები და ახალი ზომა, შემდეგ შეეხე „დაპატარავებას“. ერთი ვიდეოსთვის გახსენი ის, შეეხე ••• და „დაპატარავებას“."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ескі бейнелерді кішірейту үшін Параметрлер › Сақтау орны › Бейнелерді кішірейту бөлімін аш, бейнелер мен жаңа өлшемді таңдап, «Кішірейту» түймесін түрт. Бір бейне үшін оны ашып, ••• және «Кішірейту» түймесін түрт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오래된 동영상을 줄이려면 설정 › 저장 공간 › 동영상 줄이기를 열고, 동영상과 새 크기를 고른 다음 줄이기를 탭해요. 동영상 하나만 줄이려면 그 동영상을 열고 •••를 탭한 뒤 줄이기를 탭해요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om oudere video's te verkleinen open je Instellingen › Opslag › Video's verkleinen, kies je de video's en de nieuwe grootte en tik je op Verkleinen. Voor één video open je die, tik je op ••• en dan op Verkleinen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby zmniejszyć starsze filmy, otwórz Ustawienia › Pamięć › Zmniejsz filmy, wybierz filmy i nowy rozmiar, a potem stuknij Zmniejsz. Dla jednego filmu otwórz go, stuknij ••• i Zmniejsz."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para reduzir vídeos mais antigos, abra Ajustes › Armazenamento › Reduzir vídeos, escolha os vídeos e o novo tamanho e toque em Reduzir. Para um só vídeo, abra-o, toque em ••• e em Reduzir."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы уменьшить старые видео, открой Настройки › Хранилище › Уменьшить видео, выбери видео и новый размер, затем нажми «Уменьшить». Для одного видео открой его, нажми ••• и «Уменьшить»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "För att göra äldre videor mindre öppnar du Inställningar › Lagring › Gör videor mindre, väljer videorna och den nya storleken och trycker på Gör mindre. För en enda video öppnar du den, trycker på ••• och sedan Gör mindre."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eski videoları küçültmek için Ayarlar › Saklama Alanı › Videoları küçült'ü aç, videoları ve yeni boyutu seç, sonra Küçült'e dokun. Tek bir video için videoyu aç, •••'e ve Küçült'e dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Щоб зменшити старіші відео, відкрий Налаштування › Сховище › Зменшити відео, вибери відео й новий розмір, потім торкнися «Зменшити». Для одного відео відкрий його, торкнися ••• і «Зменшити»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要缩小较早的视频，请打开设置 › 储存空间 › 缩小视频，选择视频和新大小，然后轻点“缩小”。只缩小一个视频时，打开它，轻点 •••，再轻点“缩小”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要縮小較早的影片，請打開設定 › 儲存空間 › 縮小影片，選擇影片和新大小，然後點一下「縮小」。只縮小一部影片時，打開它，點一下 •••，再點一下「縮小」。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To make older videos smaller, open Settings › Storage › Make videos smaller, choose the videos and the new size, then tap Make smaller. For one video, open it, tap ••• and Make smaller."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

@@ -26,6 +26,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
     case thenNow
     case oneSecond
     case exportInBackground
+    case smallerVideos
     case writeMoment
     case journalingSuggestions
     case voiceControl
@@ -46,6 +47,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
         case .thenNow: Text("Then & Now", bundle: .module)
         case .oneSecond: Text("One second per day", bundle: .module)
         case .exportInBackground: Text("Export in the background", bundle: .module, comment: "Help topic title (P8.13): a movie export that goes on after MimoDays is left")
+        case .smallerVideos: Text("Make videos smaller", bundle: .module)
         case .writeMoment: Text("Write a moment", bundle: .module)
         case .journalingSuggestions: Text("Journaling Suggestions", bundle: .module)
         case .voiceControl: Text("Voice Control", bundle: .module, comment: "Help topic title: the iOS feature, by its name in Settings")
@@ -128,6 +130,11 @@ enum HelpArticle: String, CaseIterable, Hashable {
             Text("Start exporting a movie, then leave MimoDays: on iOS 26 the export goes on, with its progress on the Lock Screen.", bundle: .module, comment: "Help topic: Export in the background (P8.13)"),
             Text("Back in MimoDays, tap View export in Movies to watch or save the movie.", bundle: .module, comment: "Help topic: Export in the background (P8.13)"),
             Text("On earlier versions of iOS, keep MimoDays open while the movie is made.", bundle: .module, comment: "Help topic: Export in the background (P8.13)"),
+        ]
+        case .smallerVideos: [
+            Text("In Settings › Camera, Video size sets how big new videos are. Balanced and Compact take less space than High.", bundle: .module, comment: "Help topic: Make videos smaller (P3)"),
+            Text("To make older videos smaller, open Settings › Storage › Make videos smaller, choose the videos and the new size, then tap Make smaller. For one video, open it, tap ••• and Make smaller.", bundle: .module, comment: "Help topic: Make videos smaller (P3.5)"),
+            Text("Each original is replaced only after its smaller copy is checked, and both cameras of a moment stay together. A smaller video can't be made big again.", bundle: .module, comment: "Help topic: Make videos smaller (P3.5)"),
         ]
         case .writeMoment: [
             Text("On Today, tap Add a moment, then Write a moment.", bundle: .module),

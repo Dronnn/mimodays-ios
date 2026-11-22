@@ -161,6 +161,23 @@ public enum CapturePressurePolicy {
 
     /// Format widths tried for each camera of a dual setup, largest first, before keeping one camera.
     public static let dualFormatWidths: [Int32] = [1920, 1280, 640]
+    /// Frame rates tried at each width, highest first.
+    public static let dualFrameRates = [30, 24, 15]
+
+    /// P1.1: one way to set up both cameras.
+    public struct DualTier: Equatable, Sendable {
+        /// The phone's virtual rear camera (switching lenses as it zooms), else the chosen lens's own camera.
+        public var virtualBack: Bool
+        public var width: Int32
+    }
+
+    /// P1.1: the order a dual setup is tried in, before the rear camera alone: the virtual rear camera at each width
+    /// the size allows, largest first, then the lens's own camera at the same widths. Each tier tries
+    /// `dualFrameRates` in turn.
+    public static func dualTiers(hasVirtualPair: Bool, maxWidth: Int32) -> [DualTier] {
+        let widths = dualFormatWidths.filter { $0 <= maxWidth }
+        return (hasVirtualPair ? [true, false] : [false]).flatMap { virtual in widths.map { DualTier(virtualBack: virtual, width: $0) } }
+    }
 }
 
 /// The rear camera's flash for a photo, its light while a video records (Andrew, 2026-11-16).

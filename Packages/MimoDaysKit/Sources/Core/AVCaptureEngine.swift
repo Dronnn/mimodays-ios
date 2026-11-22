@@ -604,9 +604,9 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         // The virtual rear camera with the front one; then the lens's own camera with it, at the same tiers; then one
         // camera (P1.1). A pair that can't be added at one size (busy, over budget) tries the next size down.
         let hasVirtualPair = backDevice(backLens, paired: true)?.isVirtualDevice == true
-        for virtual in hasVirtualPair ? [true, false] : [false] {
-            usesVirtualBack = virtual
-            if let found = try negotiateDual(multiCam) { return found }
+        for tier in CapturePressurePolicy.dualTiers(hasVirtualPair: hasVirtualPair, maxWidth: maxFormatWidth) {
+            usesVirtualBack = tier.virtualBack
+            if negotiateDual(multiCam, width: tier.width) { return .dual }
         }
         try configureSingleBack(formatWidth: maxFormatWidth)
         return .single(.back)
@@ -623,23 +623,22 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
     }
 
-    private func negotiateDual(_ multiCam: AVCaptureMultiCamSession) throws -> CameraSetup? {
-        for width in CapturePressurePolicy.dualFormatWidths where width <= maxFormatWidth {
-            guard (try? configure(.dual, formatWidth: width)) != nil else { continue }
-            for frameRate in [30, 24, 15] {
-                // The session prices a camera at its format's top rate unless the input caps it; both costs count,
-                // and both cameras must take the rate.
-                session.beginConfiguration()
-                for camera in cameras.values { camera.input.videoMinFrameDurationOverride = CMTime(value: 1, timescale: CMTimeScale(frameRate)) }
-                session.commitConfiguration()
-                if setFrameRate(frameRate), multiCam.hardwareCost <= 1, multiCam.systemPressureCost <= 1 {
-                    frameRateCap = frameRate
-                    return .dual
-                }
+    /// Both cameras at `width`, at the highest frame rate within the budget; false leaves no camera added.
+    private func negotiateDual(_ multiCam: AVCaptureMultiCamSession, width: Int32) -> Bool {
+        guard (try? configure(.dual, formatWidth: width)) != nil else { return false }
+        for frameRate in CapturePressurePolicy.dualFrameRates {
+            // The session prices a camera at its format's top rate unless the input caps it; both costs count,
+            // and both cameras must take the rate.
+            session.beginConfiguration()
+            for camera in cameras.values { camera.input.videoMinFrameDurationOverride = CMTime(value: 1, timescale: CMTimeScale(frameRate)) }
+            session.commitConfiguration()
+            if setFrameRate(frameRate), multiCam.hardwareCost <= 1, multiCam.systemPressureCost <= 1 {
+                frameRateCap = frameRate
+                return true
             }
-            removeAllCameras()
         }
-        return nil
+        removeAllCameras()
+        return false
     }
 
     private func configure(_ setup: CameraSetup, formatWidth: Int32?) throws {

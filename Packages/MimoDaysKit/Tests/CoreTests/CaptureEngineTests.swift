@@ -113,6 +113,16 @@ struct CapturePressurePolicyTests {
         #expect(Policy.response(to: .critical, setup: .dual, isRecording: false, frameRateCap: 24).frameRate == 15)
     }
 
+    /// P1.1: the virtual rear camera at every width first, then the lens's own camera; never wider than the size.
+    @Test func dualTiersTryTheVirtualCameraFirst() {
+        #expect(Policy.dualTiers(hasVirtualPair: true, maxWidth: 1920) == [
+            .init(virtualBack: true, width: 1920), .init(virtualBack: true, width: 1280), .init(virtualBack: true, width: 640),
+            .init(virtualBack: false, width: 1920), .init(virtualBack: false, width: 1280), .init(virtualBack: false, width: 640),
+        ])
+        #expect(Policy.dualTiers(hasVirtualPair: false, maxWidth: 1280) == [.init(virtualBack: false, width: 1280), .init(virtualBack: false, width: 640)])
+        #expect(Policy.dualFrameRates == Policy.dualFrameRates.sorted(by: >))
+    }
+
     @Test func dualFormatsStepDown() {
         #expect(Policy.dualFormatWidths == Policy.dualFormatWidths.sorted(by: >))
     }

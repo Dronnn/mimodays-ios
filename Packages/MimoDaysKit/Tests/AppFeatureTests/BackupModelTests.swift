@@ -130,6 +130,32 @@ struct BackupModelTests {
         #expect(leftovers.isEmpty)
     }
 
+    /// rev-library: a moment backed up with its day by the sending phone's zone gets the receiving phone's choice,
+    /// "Where taken" here: 1 AM GMT is still the day before in New York.
+    @Test func restoredMomentsTakeThisPhonesDaySetting() async throws {
+        let phone = try await library(moments: 1)
+        let moment = try #require(try phone.context.fetch(FetchDescriptor<Moment>()).first)
+        let instant = Date(timeIntervalSince1970: 1_794_358_800) // Nov 11, 2026, 01:00 GMT
+        moment.capturedAt = instant
+        moment.timeZoneID = "America/New_York"
+        moment.localDay = LocalDay(instant, in: .gmt).key
+        try phone.context.save()
+        let backup = model(phone)
+        backup.start()
+        await backup.waitForPacking()
+        let url = try #require(backup.packed)
+
+        let newPhone = try await library(moments: 0)
+        let restore = RestoreModel(url: url, library: newPhone, days: .whereTaken, freeSpace: { nil })
+        restore.start()
+        await restore.settled()
+        restore.restore()
+        await restore.settled()
+        let restored = try #require(try newPhone.context.fetch(FetchDescriptor<Moment>()).first)
+        #expect(restored.localDay == LocalDay(instant, in: try #require(TimeZone(identifier: "America/New_York"))).key)
+        #expect(restored.localDay != LocalDay(instant, in: .gmt).key)
+    }
+
     @Test func restoreRefusesWhatWouldntFit() async throws {
         let phone = try await library(moments: 2)
         let backup = model(phone)

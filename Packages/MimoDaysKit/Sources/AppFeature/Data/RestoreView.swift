@@ -7,6 +7,7 @@ struct RestoreScreen: View {
     let library: MediaLibrary
     let close: () -> Void
     @State private var model: RestoreModel?
+    @Environment(MemoriesPreferences.self) private var memoriesPreferences: MemoriesPreferences?
 
     var body: some View {
         Group {
@@ -14,7 +15,7 @@ struct RestoreScreen: View {
         }
         .onAppear {
             guard model == nil else { return }
-            let model = RestoreModel(url: url, library: library)
+            let model = RestoreModel(url: url, library: library, days: memoriesPreferences?.value.days ?? .whereTaken)
             self.model = model
             model.start()
         }

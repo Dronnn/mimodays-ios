@@ -49,9 +49,16 @@ final class RestoreModel {
     private var reading: UUID?
     private static let logger = Logger(subsystem: "MimoDays", category: "Restore")
 
-    init(url: URL, library: MediaLibrary, now: @escaping () -> Date = Date.init, freeSpace: @escaping () -> Int64? = BackupModel.deviceFreeSpace) {
+    /// S09 on this iPhone: restored moments get their day by it, not the one the sending phone stored (rev-library).
+    private let days: MemoriesSettings.Days
+
+    init(
+        url: URL, library: MediaLibrary, days: MemoriesSettings.Days = .whereTaken, now: @escaping () -> Date = Date.init,
+        freeSpace: @escaping () -> Int64? = BackupModel.deviceFreeSpace
+    ) {
         self.url = url
         self.library = library
+        self.days = days
         self.freeSpace = freeSpace
         service = BackupService(library: library, now: now)
     }
@@ -142,6 +149,11 @@ final class RestoreModel {
             }
             do {
                 let outcome = try service.restore(check, mode: mode, unpacked: unpacked, moved: moved)
+                do {
+                    try MomentDays.relabel(library.context, days: days)
+                } catch {
+                    Self.logger.error("Relabelling restored days failed: \(error.localizedDescription, privacy: .public)")
+                }
                 // P3.6: those are on the phone again.
                 if !outcome.broughtBack.isEmpty { try? library.archive?.forget(outcome.broughtBack, in: nil) }
                 phase = .done(outcome)

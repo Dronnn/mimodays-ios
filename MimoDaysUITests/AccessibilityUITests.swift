@@ -125,6 +125,45 @@ final class AccessibilityUITests: XCTestCase {
         try audit("memories")
     }
 
+    /// P4.4: the calendar's month and year, whose days and months Voice Control reaches by the words shown.
+    @MainActor
+    func testTheCalendarPassesTheAudit() throws {
+        launch(.populated)
+        app.tabBars.firstMatch.buttons.element(boundBy: 1).tap()
+        let calendar = app.buttons["Calendar"]
+        XCTAssertTrue(calendar.waitForExistence(timeout: 20))
+        calendar.tap()
+        let title = app.buttons["calendar.title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+        try audit("calendar month")
+        title.tap()
+        XCTAssertTrue(app.buttons["calendar.month.11"].waitForExistence(timeout: 5))
+        try audit("calendar year")
+    }
+
+    /// P4.4: the movie editor, whose clip trim and timeline gestures have named controls.
+    @MainActor
+    func testTheMovieEditorPassesTheAudit() throws {
+        launch(.movie)
+        app.tabBars.firstMatch.buttons.element(boundBy: 3).tap()
+        let new = app.buttons["movies.new"]
+        XCTAssertTrue(new.waitForExistence(timeout: 10))
+        new.tap()
+        let thisYear = app.buttons["newMovie.source.thisYear"]
+        XCTAssertTrue(thisYear.waitForExistence(timeout: 5))
+        thisYear.tap()
+        app.buttons["newMovie.next"].firstMatch.tap()
+        let full = app.buttons["newMovie.length.full"]
+        XCTAssertTrue(full.waitForExistence(timeout: 5))
+        full.tap()
+        app.buttons["newMovie.next"].firstMatch.tap()
+        let build = app.buttons["newMovie.build"]
+        XCTAssertTrue(build.waitForExistence(timeout: 5))
+        build.tap()
+        XCTAssertTrue(app.buttons["editor.export"].waitForExistence(timeout: 20))
+        try audit("movie editor")
+    }
+
     @MainActor
     func testMoviesAndTheWizardPassTheAudit() throws {
         launch(.movie)

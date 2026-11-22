@@ -142,7 +142,7 @@ final class SearchModel {
             sortBy: [SortDescriptor(\.capturedAt, order: .reverse)]
         )
         descriptor.propertiesToFetch = [
-            \.id, \.localDay, \.capturedAt, \.timeZoneID, \.mediaTypeRaw, \.originRaw, \.isFavorite, \.title, \.note,
+            \.id, \.localDay, \.capturedAt, \.timeZoneID, \.mediaTypeRaw, \.originRaw, \.isFavorite, \.title, \.note, \.tags, \.moodRaw,
         ]
         do {
             let moments = try library.context.fetch(descriptor)

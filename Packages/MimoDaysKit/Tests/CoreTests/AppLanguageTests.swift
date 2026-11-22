@@ -44,6 +44,15 @@ struct AppLanguageTests {
         #expect(relaunched.locale.identifier == "de")
     }
 
+    /// rev-app 18: the iPhone switched to French while German was chosen here; Same as iPhone is French at once.
+    @Test func sameAsIPhoneFollowsTheIPhonesLanguageNow() {
+        let (defaults, suite) = defaults()
+        AppLanguage(defaults: defaults, domain: suite, preferred: ["en-US"]).code = "de"
+        let relaunched = AppLanguage(defaults: defaults, domain: suite, preferred: ["de", "en-US"], current: { ["fr-FR"] })
+        relaunched.code = nil
+        #expect(relaunched.locale.identifier == "fr")
+    }
+
     @Test(arguments: [("de-DE", "de"), ("zh-Hant-TW", "zh-Hant"), ("zh-Hans-CN", "zh-Hans"), ("pt-BR", "pt-BR"), ("he", "he"), ("fi", nil)])
     func readsWhatIOSStores(stored: String, code: String?) {
         let (defaults, suite) = defaults()

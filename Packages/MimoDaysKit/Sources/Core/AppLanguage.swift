@@ -9,7 +9,9 @@ import os
 /// draws for the app (permission prompts, the share sheet) follows from the next launch.
 @Observable
 public final class AppLanguage: @unchecked Sendable {
-    public static let shared = AppLanguage(defaults: .standard)
+    public static let shared = AppLanguage(
+        defaults: .standard, current: { UserDefaults.standard.persistentDomain(forName: UserDefaults.globalDomain)?[key] as? [String] }
+    )
 
     /// Every language MimoDays is translated into, English first.
     public static let supported = [
@@ -24,14 +26,19 @@ public final class AppLanguage: @unchecked Sendable {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let state: OSAllocatedUnfairLock<String?>
     @ObservationIgnored private let device: [String]
+    /// The iPhone's languages as they are now, from the device-wide settings, which a choice made in MimoDays doesn't
+    /// cover; nil where they can't be read.
+    @ObservationIgnored private let current: @Sendable () -> [String]?
 
     /// `domain` is where `defaults` keeps the app's own values (the bundle identifier for `.standard`), read
     /// directly so the device-wide language list doesn't count as a choice. `preferred` is what iOS gives this
     /// process: the iPhone's languages, or the app's own choice first once there is one, kept until the next launch.
     public init(
-        defaults: UserDefaults, domain: String? = Bundle.main.bundleIdentifier, preferred: [String] = Locale.preferredLanguages
+        defaults: UserDefaults, domain: String? = Bundle.main.bundleIdentifier, preferred: [String] = Locale.preferredLanguages,
+        current: @escaping @Sendable () -> [String]? = { nil }
     ) {
         self.defaults = defaults
+        self.current = current
         let saved = domain.flatMap { defaults.persistentDomain(forName: $0)?[Self.key] as? [String] }
         if saved == nil {
             defaults.set(preferred, forKey: Self.deviceKey)
@@ -80,7 +87,13 @@ public final class AppLanguage: @unchecked Sendable {
     /// as the iPhone's too, so the list remembered while following them is used (Same as iPhone stayed Hebrew
     /// after a switch back, 2026-11-17).
     public var systemCode: String {
-        Bundle.preferredLocalizations(from: Self.supported, forPreferences: device).first ?? "en"
+        Bundle.preferredLocalizations(from: Self.supported, forPreferences: deviceLanguages).first ?? "en"
+    }
+
+    /// A language changed on the iPhone while MimoDays had its own is seen at once (rev-app 18); the list remembered
+    /// at launch when the device-wide one can't be read.
+    private var deviceLanguages: [String] {
+        current().flatMap { $0.isEmpty ? nil : $0 } ?? device
     }
 
     /// A language's own name, e.g. "Deutsch", "日本語".

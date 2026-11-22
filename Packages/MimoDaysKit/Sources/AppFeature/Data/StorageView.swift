@@ -10,6 +10,8 @@ enum DataRoute: Hashable {
     case recentlyDeleted
     /// P3.5 X04/X05.
     case shrink
+    /// P3.6 X06.
+    case moveOriginals
 }
 
 struct StorageScreen: View {
@@ -86,6 +88,11 @@ struct StorageView: View {
                             DataIconRow(icon: .glyphFilm, title: Text("Make videos smaller", bundle: .module), value: shrinkValue)
                         }
                         .accessibilityIdentifier("storage.shrink")
+                        DataSeparator(leading: 64)
+                        NavigationLink(value: DataRoute.moveOriginals) {
+                            DataIconRow(icon: .glyphFolder, title: Text("Move originals", bundle: .module), value: moveValue)
+                        }
+                        .accessibilityIdentifier("storage.moveOriginals")
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 16)
@@ -166,10 +173,19 @@ struct StorageView: View {
     /// "frees ~2.1 GB", or how far a run got.
     private var shrinkValue: Text? {
         if let shrinks, shrinks.isRunning, let job = shrinks.job {
+            guard !job.moving else { return nil }
             return Text("\(job.total - job.remaining.count) of \(Text("\(job.total) videos", bundle: .module))", bundle: .module)
         }
         guard model.shrinkFrees > 0 else { return nil }
         return Text("frees ~\(Self.bytes(model.shrinkFrees))", bundle: .module, comment: "Storage (X03): what Make videos smaller would free, e.g. frees ~2.1 GB")
+    }
+
+    /// "Files or a drive", the folder's name, or how far a move got.
+    private var moveValue: Text {
+        if let shrinks, shrinks.isRunning, let job = shrinks.job, job.moving {
+            return Text("\(job.total - job.remaining.count) of \(Text("\(job.total) videos", bundle: .module))", bundle: .module)
+        }
+        return shrinks?.archive?.folderName.map { Text($0) } ?? Text("Files or a drive", bundle: .module, comment: "Storage (X03): where Move originals sends them")
     }
 
     private var lastBackup: Text {

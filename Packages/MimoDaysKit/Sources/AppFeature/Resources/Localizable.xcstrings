@@ -195364,6 +195364,2816 @@
           }
         }
       }
+    },
+    "A backup, an export or a run in Storage is using the files. Try again when it's done." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نسخة احتياطية أو تصدير أو عملية في التخزين تستخدم الملفات. حاول مجددًا عند انتهائها."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлы зараз выкарыстоўвае рэзервовая копія, экспарт або праца ў Сховішчы. Паспрабуй зноў, калі яна скончыцца."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Backup, ein Export oder ein Vorgang unter Speicher nutzt gerade die Dateien. Versuch es noch mal, wenn er fertig ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una copia de seguridad, una exportación o un proceso de Almacenamiento está usando los archivos. Vuelve a intentarlo cuando termine."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde, une exportation ou une opération de Stockage utilise les fichiers. Réessaie quand elle est terminée."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "גיבוי, ייצוא או פעולה באחסון משתמשים כרגע בקבצים. אפשר לנסות שוב כשזה יסתיים."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ֆայլերն այժմ օգտագործում է պահուստավորումը, արտահանումը կամ Պահեստի գործողությունը։ Կրկին փորձիր, երբ այն ավարտվի։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un backup, un'esportazione o un'operazione di Spazio sta usando i file. Riprova quando è finita."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ、書き出し、またはストレージの処理がファイルを使用中です。終わってからもう一度試してください。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ფაილებს ახლა იყენებს სარეზერვო ასლი, ექსპორტი ან საცავის პროცესი. სცადე ხელახლა, როცა დასრულდება."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлдарды қазір сақтық көшірме, экспорт немесе Сақтау орнындағы процесс пайдаланып жатыр. Ол аяқталғанда қайталап көр."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "백업, 내보내기 또는 저장 공간 작업이 파일을 사용하고 있어요. 끝난 뒤 다시 시도해 주세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een reservekopie, export of taak in Opslag gebruikt de bestanden. Probeer het opnieuw als die klaar is."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pliki są używane przez kopię zapasową, eksport lub zadanie w Pamięci. Spróbuj ponownie, gdy się zakończy."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um backup, uma exportação ou um processo do Armazenamento está usando os arquivos. Tente de novo quando terminar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлы сейчас использует резервная копия, экспорт или работа в Хранилище. Попробуй снова, когда она закончится."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En säkerhetskopia, en export eller en körning i Lagring använder filerna. Försök igen när den är klar."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dosyaları şu anda bir yedekleme, dışa aktarma veya Saklama Alanı işlemi kullanıyor. Bittiğinde yeniden dene."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файли зараз використовує резервна копія, експорт або робота у Сховищі. Спробуй знову, коли вона завершиться."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备份、导出或储存空间中的任务正在使用这些文件。完成后再试一次。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "備份、輸出或儲存空間中的工作正在使用這些檔案。完成後再試一次。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A backup, an export or a run in Storage is using the files. Try again when it's done."
+          }
+        }
+      },
+      "comment" : "Memory Card ••• Bring back the original (P3.6): something else holds the files"
+    },
+    "Bring back the original" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استعادة الأصل"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вярнуць арыгінал"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original zurückholen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuperar el original"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récupérer l’original"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "החזרת המקור"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Վերադարձնել բնօրինակը"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recupera l'originale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオを戻す"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ორიგინალის დაბრუნება"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Түпнұсқаны қайтару"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본 되돌리기"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Origineel terugzetten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przywróć oryginał"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trazer o original de volta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вернуть оригинал"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hämta tillbaka originalet"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orijinali geri getir"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повернути оригінал"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复原始视频"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢復原始影片"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bring back the original"
+          }
+        }
+      },
+      "comment" : "Memory Card ••• (P3.6): the full-size files back from the folder, in place of the smaller copy"
+    },
+    "Couldn't bring the original back" : {
+      "comment" : "Memory Card ••• Bring back the original (P3.6): it failed",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّرت استعادة الأصل"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не ўдалося вярнуць арыгінал"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Original ließ sich nicht zurückholen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido recuperar el original"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de récupérer l’original"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לא ניתן להחזיר את המקור"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Չհաջողվեց վերադարձնել բնօրինակը"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile recuperare l'originale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオを戻せませんでした"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ორიგინალის დაბრუნება ვერ მოხერხდა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Түпнұсқаны қайтару мүмкін болмады"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본을 되돌릴 수 없어요"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kan het origineel niet terugzetten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się przywrócić oryginału"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível trazer o original de volta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось вернуть оригинал"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det gick inte att hämta tillbaka originalet"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orijinal geri getirilemedi"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося повернути оригінал"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法恢复原始视频"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法恢復原始影片"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't bring the original back"
+          }
+        }
+      }
+    },
+    "Each original is checked in the folder before it leaves the phone. To bring originals back, use Backup › Add what's missing, or open a moment and choose Bring back the original." : {
+      "comment" : "Move originals (X06): the note under the choices",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُتحقَّق من كل أصل في المجلد قبل أن يغادر الهاتف. لاستعادة الأصول، استخدم النسخ الاحتياطي › إضافة ما ينقص، أو افتح لحظة واختر استعادة الأصل."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожны арыгінал правяраецца ў папцы, перш чым пакінуць тэлефон. Каб вярнуць арыгіналы, выкарыстай Рэзервовая копія › Дадаць адсутныя або адкрый момант і выберы «Вярнуць арыгінал»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes Original wird im Ordner geprüft, bevor es das iPhone verlässt. Originale holst du über Backup › Fehlendes hinzufügen zurück, oder du öffnest einen Moment und wählst Original zurückholen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada original se comprueba en la carpeta antes de salir del teléfono. Para recuperar originales, usa Copia de seguridad › Añadir lo que falta, o abre un momento y elige Recuperar el original."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque original est vérifié dans le dossier avant de quitter le téléphone. Pour récupérer des originaux, utilise Sauvegarde › Ajouter ce qui manque, ou ouvre un moment et choisis Récupérer l’original."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כל מקור נבדק בתיקייה לפני שהוא יוצא מהטלפון. כדי להחזיר מקורות, אפשר להשתמש בגיבוי › להוסיף את החסר, או לפתוח רגע ולבחור ״החזרת המקור״."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Յուրաքանչյուր բնօրինակ ստուգվում է թղթապանակում՝ նախքան հեռախոսից դուրս գալը։ Բնօրինակները վերադարձնելու համար օգտագործիր Պահուստավորում › Ավելացնել պակասողը կամ բացիր պահը և ընտրիր «Վերադարձնել բնօրինակը»։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ogni originale viene controllato nella cartella prima di lasciare il telefono. Per recuperare gli originali, usa Backup › Aggiungi ciò che manca, oppure apri un momento e scegli Recupera l'originale."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオは、iPhoneから消す前にフォルダ内で確認します。元に戻すには、バックアップ › 不足分を追加を使うか、瞬間を開いて「元のビデオを戻す」を選んでください。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "თითოეული ორიგინალი მოწმდება საქაღალდეში, სანამ ტელეფონს დატოვებს. ორიგინალების დასაბრუნებლად გამოიყენე სარეზერვო ასლი › ნაკლულის დამატება, ან გახსენი მომენტი და აირჩიე „ორიგინალის დაბრუნება“."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Әр түпнұсқа телефоннан кетпес бұрын қалтада тексеріледі. Түпнұсқаларды қайтару үшін Сақтық көшірме › Жетіспейтінін қосу бөлімін пайдалан немесе сәтті ашып, «Түпнұсқаны қайтару» тармағын таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본은 iPhone에서 지우기 전에 폴더에서 확인해요. 원본을 되돌리려면 백업 › 없는 항목만 추가를 사용하거나, 순간을 열고 원본 되돌리기를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elk origineel wordt in de map gecontroleerd voordat het van je telefoon gaat. Originelen terugzetten doe je met Reservekopie › Voeg toe wat ontbreekt, of open een moment en kies Origineel terugzetten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Każdy oryginał jest sprawdzany w folderze, zanim zniknie z telefonu. Aby przywrócić oryginały, użyj Kopia zapasowa › Dodaj brakujące albo otwórz moment i wybierz Przywróć oryginał."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada original é verificado na pasta antes de sair do iPhone. Para trazer originais de volta, use Backup › Adicionar o que falta, ou abra um momento e escolha Trazer o original de volta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каждый оригинал проверяется в папке, прежде чем покинуть телефон. Чтобы вернуть оригиналы, используй Резервная копия › Добавить недостающее или открой момент и выбери «Вернуть оригинал»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varje original kontrolleras i mappen innan det lämnar telefonen. Hämta tillbaka original med Säkerhetskopia › Lägg till det som saknas, eller öppna ett ögonblick och välj Hämta tillbaka originalet."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Her orijinal, telefondan ayrılmadan önce klasörde kontrol edilir. Orijinalleri geri getirmek için Yedekleme › Eksik olanları ekle'yi kullan ya da bir anı açıp Orijinali geri getir'i seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожен оригінал перевіряється в папці, перш ніж залишити телефон. Щоб повернути оригінали, скористайся Резервна копія › Додати відсутнє або відкрий момент і вибери «Повернути оригінал»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每个原始视频在离开手机前都会在文件夹中检查。要恢复原始视频，请使用“备份 › 添加缺少的内容”，或打开一个瞬间并选择“恢复原始视频”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每個原始影片在離開手機前都會在檔案夾中檢查。要恢復原始影片，請使用「備份 › 加入缺少的內容」，或打開一個瞬間並選擇「恢復原始影片」。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each original is checked in the folder before it leaves the phone. To bring originals back, use Backup › Add what's missing, or open a moment and choose Bring back the original."
+          }
+        }
+      }
+    },
+    "Each original was checked in the folder before its smaller copy took its place." : {
+      "comment" : "Move originals (X05): the note once it's done",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم التحقق من كل أصل في المجلد قبل أن تحل نسخته الأصغر محله."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожны арыгінал быў правераны ў папцы, перш чым яго месца заняла меншая копія."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes Original wurde im Ordner geprüft, bevor seine kleinere Kopie seinen Platz einnahm."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada original se comprobó en la carpeta antes de que su copia más pequeña ocupara su lugar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque original a été vérifié dans le dossier avant que sa copie plus petite ne prenne sa place."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כל מקור נבדק בתיקייה לפני שהעותק הקטן שלו תפס את מקומו."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Յուրաքանչյուր բնօրինակ ստուգվել է թղթապանակում՝ նախքան դրա փոքր պատճենը նրա տեղը զբաղեցնելը։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ogni originale è stato controllato nella cartella prima che la sua copia più piccola ne prendesse il posto."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオは、小さいコピーに置き換える前にフォルダ内で確認しました。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "თითოეული ორიგინალი შემოწმდა საქაღალდეში, სანამ მის ადგილს პატარა ასლი დაიკავებდა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Әр түпнұсқа оның орнын кішірек көшірмесі алмас бұрын қалтада тексерілді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본은 작은 사본으로 바꾸기 전에 폴더에서 확인했어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elk origineel is in de map gecontroleerd voordat de kleinere kopie de plaats innam."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Każdy oryginał został sprawdzony w folderze, zanim jego miejsce zajęła mniejsza kopia."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada original foi verificado na pasta antes que a cópia menor ocupasse o lugar dele."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каждый оригинал проверен в папке, прежде чем его место заняла уменьшенная копия."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varje original kontrollerades i mappen innan den mindre kopian tog dess plats."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Her orijinal, küçük kopyası yerini almadan önce klasörde kontrol edildi."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожен оригінал перевірено в папці, перш ніж його місце зайняла менша копія."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每个原始视频都先在文件夹中检查过，才由较小副本取代。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每個原始影片都先在檔案夾中檢查過，才由較小副本取代。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each original was checked in the folder before its smaller copy took its place."
+          }
+        }
+      }
+    },
+    "Files or a drive" : {
+      "comment" : "Storage (X03): where Move originals sends them",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الملفات أو قرص"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлы або дыск"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien oder ein Laufwerk"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivos o un disco"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichiers ou un disque"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "קבצים או כונן"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ֆայլեր կամ սկավառակ"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File o un'unità"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルまたはドライブ"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ფაილები ან დისკი"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлдар немесе диск"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일 또는 드라이브"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestanden of een schijf"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pliki lub dysk"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arquivos ou um disco"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлы или диск"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filer eller en enhet"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dosyalar veya bir sürücü"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файли або диск"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件或外接驱动器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檔案或外接磁碟"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files or a drive"
+          }
+        }
+      }
+    },
+    "Folder" : {
+      "comment" : "Move originals (X06): where the originals go",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المجلد"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папка"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossier"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "תיקייה"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Թղթապանակ"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartella"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダ"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "საქაღალდე"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қалта"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "폴더"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папка"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapp"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klasör"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папка"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件夹"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檔案夾"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        }
+      }
+    },
+    "Full-size originals go to a folder you choose: in Files, on iCloud Drive or on a drive. A smaller copy stays in MimoDays, so every moment still plays." : {
+      "comment" : "Move originals (X06): what it does",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تنتقل الأصول بالحجم الكامل إلى مجلد تختاره: في الملفات أو على iCloud Drive أو على قرص. تبقى نسخة أصغر في MimoDays، فتظل كل لحظة تعمل."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Арыгіналы поўнага памеру пераходзяць у папку, якую ты выбіраеш: у Файлах, на iCloud Drive або на дыску. У MimoDays застаецца меншая копія, таму кожны момант па-ранейшаму прайграецца."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originale in voller Größe kommen in einen Ordner deiner Wahl: in Dateien, in iCloud Drive oder auf ein Laufwerk. Eine kleinere Kopie bleibt in MimoDays, also spielt jeder Moment weiter ab."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los originales a tamaño completo van a una carpeta que elijas: en Archivos, en iCloud Drive o en un disco. Una copia más pequeña se queda en MimoDays, así que cada momento se sigue reproduciendo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les originaux en taille réelle vont dans un dossier de ton choix : dans Fichiers, sur iCloud Drive ou sur un disque. Une copie plus petite reste dans MimoDays, donc chaque moment se lit toujours."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "המקורות בגודל מלא עוברים לתיקייה לבחירתך: בקבצים, ב-iCloud Drive או בכונן. עותק קטן יותר נשאר ב-MimoDays, כך שכל רגע עדיין מתנגן."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ամբողջ չափի բնօրինակները տեղափոխվում են քո ընտրած թղթապանակ՝ Ֆայլերում, iCloud Drive-ում կամ սկավառակի վրա։ MimoDays-ում մնում է փոքր պատճենը, ուստի յուրաքանչյուր պահ դեռ նվագարկվում է։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gli originali a grandezza piena vanno in una cartella che scegli tu: in File, su iCloud Drive o su un'unità. In MimoDays resta una copia più piccola, così ogni momento si riproduce ancora."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フルサイズの元のビデオは、選んだフォルダ（ファイル、iCloud Drive、またはドライブ）に移動します。MimoDaysには小さいコピーが残るので、どの瞬間もそのまま再生できます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "სრული ზომის ორიგინალები გადადის შენ მიერ არჩეულ საქაღალდეში: ფაილებში, iCloud Drive-ზე ან დისკზე. MimoDays-ში რჩება პატარა ასლი, ასე რომ ყველა მომენტი კვლავ ითამაშებს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Толық өлшемді түпнұсқалар сен таңдаған қалтаға көшеді: Файлдарда, iCloud Drive-та немесе дискте. MimoDays-те кішірек көшірме қалады, сондықтан әр сәт бұрынғыдай ойнатылады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원래 크기의 원본은 선택한 폴더(파일, iCloud Drive 또는 드라이브)로 옮겨져요. MimoDays에는 작은 사본이 남아서 모든 순간을 계속 재생할 수 있어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originelen op volle grootte gaan naar een map die jij kiest: in Bestanden, op iCloud Drive of op een schijf. Een kleinere kopie blijft in MimoDays, dus elk moment speelt nog steeds af."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oryginały w pełnym rozmiarze trafiają do wybranego folderu: w Plikach, na iCloud Drive lub na dysku. W MimoDays zostaje mniejsza kopia, więc każdy moment nadal się odtwarza."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os originais em tamanho real vão para uma pasta que você escolher: no Arquivos, no iCloud Drive ou em um disco. Uma cópia menor fica no MimoDays, então todo momento continua tocando."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оригиналы в полном размере переносятся в папку, которую ты выберешь: в Файлах, на iCloud Drive или на диске. В MimoDays остаётся уменьшенная копия, так что каждый момент по-прежнему воспроизводится."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original i full storlek flyttas till en mapp du väljer: i Filer, på iCloud Drive eller på en enhet. En mindre kopia stannar i MimoDays, så varje ögonblick går fortfarande att spela upp."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tam boyutlu orijinaller seçtiğin bir klasöre gider: Dosyalar'da, iCloud Drive'da veya bir sürücüde. MimoDays'de daha küçük bir kopya kalır, böylece her an oynatılmaya devam eder."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оригінали в повному розмірі переносяться в папку, яку ти вибереш: у Файлах, на iCloud Drive або на диску. У MimoDays лишається менша копія, тож кожен момент і далі відтворюється."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全尺寸原始视频会移到你选择的文件夹：“文件”App、iCloud 云盘或外接驱动器中。MimoDays 会保留较小的副本，每个瞬间依然可以播放。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全尺寸原始影片會移到你選擇的檔案夾：「檔案」App、iCloud 雲碟或外接磁碟中。MimoDays 會保留較小的副本，每個瞬間依然可以播放。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full-size originals go to a folder you choose: in Files, on iCloud Drive or on a drive. A smaller copy stays in MimoDays, so every moment still plays."
+          }
+        }
+      }
+    },
+    "Move %lld originals" : {
+      "comment" : "Move originals (X06): starts the run, e.g. Move 142 originals",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Move %lld original"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Move %lld originals"
+                }
+              }
+            }
+          }
+        },
+        "ar" : {
+          "variations" : {
+            "plural" : {
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "نقل %lld أصل"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "نقل أصل واحد"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "نقل أصلين"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "نقل %lld أصول"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "نقل %lld أصلًا"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "نقل %lld أصل"
+                }
+              }
+            }
+          }
+        },
+        "be" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перанесці %lld арыгінал"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перанесці %lld арыгіналы"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перанесці %lld арыгіналаў"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перанесці %lld арыгінала"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Original auslagern"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Originale auslagern"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mover %lld original"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mover %lld originales"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Déplacer %lld original"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Déplacer %lld originaux"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Déplacer %lld originaux"
+                }
+              }
+            }
+          }
+        },
+        "he" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "העברת מקור אחד"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "העברת %lld מקורות"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "העברת %lld מקורות"
+                }
+              }
+            }
+          }
+        },
+        "hy" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Տեղափոխել %lld բնօրինակ"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Տեղափոխել %lld բնօրինակ"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sposta %lld originale"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sposta %lld originali"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sposta %lld originali"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "元のビデオを%lld本移動"
+                }
+              }
+            }
+          }
+        },
+        "ka" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld ორიგინალის გადატანა"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld ორიგინალის გადატანა"
+                }
+              }
+            }
+          }
+        },
+        "kk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld түпнұсқаны көшіру"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld түпнұсқаны көшіру"
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "원본 %lld개 옮기기"
+                }
+              }
+            }
+          }
+        },
+        "nl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld origineel verplaatsen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld originelen verplaatsen"
+                }
+              }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Przenieś %lld oryginał"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Przenieś %lld oryginały"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Przenieś %lld oryginałów"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Przenieś %lld oryginału"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mover %lld original"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mover %lld originais"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mover %lld originais"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перенести %lld оригинал"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перенести %lld оригинала"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перенести %lld оригиналов"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перенести %lld оригинала"
+                }
+              }
+            }
+          }
+        },
+        "sv" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Flytta %lld original"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Flytta %lld original"
+                }
+              }
+            }
+          }
+        },
+        "tr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld orijinali taşı"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld orijinali taşı"
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перенести %lld оригінал"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перенести %lld оригінали"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перенести %lld оригіналів"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Перенести %lld оригіналу"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "移出 %lld 个原始视频"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hant" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "移出 %lld 個原始影片"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Move original" : {
+      "comment" : "Memory Card ••• (P3.6): the full-size files to the chosen folder, a smaller copy stays",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نقل الأصل"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перанесці арыгінал"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original auslagern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover el original"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer l’original"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "העברת המקור"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Տեղափոխել բնօրինակը"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta l'originale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオを移動"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ორიგინალის გადატანა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Түпнұсқаны көшіру"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본 옮기기"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Origineel verplaatsen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenieś oryginał"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover o original"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенести оригинал"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flytta originalet"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orijinali taşı"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенести оригінал"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移出原始视频"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移出原始影片"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move original"
+          }
+        }
+      }
+    },
+    "Move originals" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نقل الأصول"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перанесці арыгіналы"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originale auslagern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover originales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer les originaux"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "העברת מקורות"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Տեղափոխել բնօրինակները"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta gli originali"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオを移動"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ორიგინალების გადატანა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Түпнұсқаларды көшіру"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본 옮기기"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originelen verplaatsen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenieś oryginały"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover originais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенести оригиналы"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flytta original"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orijinalleri taşı"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенести оригінали"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移出原始视频"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移出原始影片"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move originals"
+          }
+        }
+      },
+      "comment" : "Storage (X03) row and the Move originals screen's title (X06)"
+    },
+    "Moving originals" : {
+      "comment" : "Move originals (X05): title while it runs",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ نقل الأصول"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Арыгіналы пераносяцца"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originale werden ausgelagert"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moviendo originales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacement des originaux"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מעביר מקורות"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Բնօրինակները տեղափոխվում են"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spostamento degli originali"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオを移動中"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ორიგინალები გადაიტანება"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Түпнұсқалар көшірілуде"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본 옮기는 중"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originelen verplaatsen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenoszenie oryginałów"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movendo originais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оригиналы переносятся"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flyttar original"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orijinaller taşınıyor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оригінали переносяться"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在移出原始视频"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在移出原始影片"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving originals"
+          }
+        }
+      }
+    },
+    "Originals moved" : {
+      "comment" : "Move originals (X05): title once it's done",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نُقلت الأصول"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Арыгіналы перанесены"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originale ausgelagert"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originales movidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originaux déplacés"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "המקורות הועברו"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Բնօրինակները տեղափոխված են"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originali spostati"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のビデオを移動しました"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ორიგინალები გადატანილია"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Түпнұсқалар көшірілді"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본을 옮겼어요"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originelen verplaatst"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oryginały przeniesione"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originais movidos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оригиналы перенесены"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original flyttade"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orijinaller taşındı"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оригінали перенесено"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原始视频已移出"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原始影片已移出"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originals moved"
+          }
+        }
+      }
+    },
+    "The folder can't be opened. Connect the drive or choose the folder again in Settings › Storage › Move originals." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن فتح المجلد. وصّل القرص أو اختر المجلد مجددًا في الإعدادات › التخزين › نقل الأصول."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папку немагчыма адкрыць. Падключы дыск або зноў выберы папку ў Налады › Сховішча › Перанесці арыгіналы."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ordner lässt sich nicht öffnen. Schließ das Laufwerk an oder wähl den Ordner unter Einstellungen › Speicher › Originale auslagern neu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede abrir la carpeta. Conecta el disco o vuelve a elegir la carpeta en Ajustes › Almacenamiento › Mover originales."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d’ouvrir le dossier. Branche le disque ou choisis à nouveau le dossier dans Réglages › Stockage › Déplacer les originaux."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לא ניתן לפתוח את התיקייה. אפשר לחבר את הכונן או לבחור שוב את התיקייה בהגדרות › אחסון › העברת מקורות."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Թղթապանակը չի բացվում։ Միացրու սկավառակը կամ կրկին ընտրիր թղթապանակը Կարգավորումներ › Պահեստ › Տեղափոխել բնօրինակները բաժնում։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile aprire la cartella. Collega l'unità o scegli di nuovo la cartella in Impostazioni › Spazio › Sposta gli originali."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダを開けません。ドライブを接続するか、設定 › ストレージ › 元のビデオを移動でフォルダを選び直してください。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "საქაღალდე ვერ იხსნება. მიაერთე დისკი ან ხელახლა აირჩიე საქაღალდე: პარამეტრები › საცავი › ორიგინალების გადატანა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қалтаны ашу мүмкін емес. Дискті қос немесе Параметрлер › Сақтау орны › Түпнұсқаларды көшіру бөлімінде қалтаны қайта таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "폴더를 열 수 없어요. 드라이브를 연결하거나 설정 › 저장 공간 › 원본 옮기기에서 폴더를 다시 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De map kan niet worden geopend. Sluit de schijf aan of kies de map opnieuw via Instellingen › Opslag › Originelen verplaatsen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie można otworzyć folderu. Podłącz dysk albo wybierz folder ponownie w Ustawienia › Pamięć › Przenieś oryginały."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não é possível abrir a pasta. Conecte o disco ou escolha a pasta de novo em Ajustes › Armazenamento › Mover originais."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папку не удаётся открыть. Подключи диск или снова выбери папку в Настройки › Хранилище › Перенести оригиналы."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mappen går inte att öppna. Anslut enheten eller välj mappen igen under Inställningar › Lagring › Flytta original."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klasör açılamıyor. Sürücüyü bağla veya klasörü Ayarlar › Saklama Alanı › Orijinalleri taşı bölümünden yeniden seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папку не вдається відкрити. Підключи диск або знову вибери папку в Налаштування › Сховище › Перенести оригінали."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法打开文件夹。请连接驱动器，或在“设置 › 储存空间 › 移出原始视频”中重新选择文件夹。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法打開檔案夾。請連接磁碟，或在「設定 › 儲存空間 › 移出原始影片」中重新選擇檔案夾。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The folder can't be opened. Connect the drive or choose the folder again in Settings › Storage › Move originals."
+          }
+        }
+      },
+      "comment" : "Memory Card ••• Bring back the original (P3.6): the folder is gone or the drive unplugged"
+    },
+    "The folder can't be opened. Connect the drive or choose the folder again, then start again." : {
+      "comment" : "Move originals (X05): stopped, the folder is gone or the drive unplugged",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن فتح المجلد. وصّل القرص أو اختر المجلد مجددًا، ثم ابدأ من جديد."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папку немагчыма адкрыць. Падключы дыск або зноў выберы папку, потым пачні зноў."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ordner lässt sich nicht öffnen. Schließ das Laufwerk an oder wähl den Ordner neu, dann starte noch mal."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede abrir la carpeta. Conecta el disco o vuelve a elegir la carpeta y empieza de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d’ouvrir le dossier. Branche le disque ou choisis à nouveau le dossier, puis recommence."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "לא ניתן לפתוח את התיקייה. אפשר לחבר את הכונן או לבחור שוב את התיקייה, ואז להתחיל מחדש."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Թղթապանակը չի բացվում։ Միացրու սկավառակը կամ կրկին ընտրիր թղթապանակը, ապա սկսիր նորից։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile aprire la cartella. Collega l'unità o scegli di nuovo la cartella, poi ricomincia."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダを開けません。ドライブを接続するかフォルダを選び直してから、もう一度始めてください。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "საქაღალდე ვერ იხსნება. მიაერთე დისკი ან ხელახლა აირჩიე საქაღალდე, შემდეგ თავიდან დაიწყე."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қалтаны ашу мүмкін емес. Дискті қос немесе қалтаны қайта таңда, содан кейін қайта баста."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "폴더를 열 수 없어요. 드라이브를 연결하거나 폴더를 다시 선택한 뒤 다시 시작하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De map kan niet worden geopend. Sluit de schijf aan of kies de map opnieuw en begin daarna opnieuw."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie można otworzyć folderu. Podłącz dysk albo wybierz folder ponownie, a potem zacznij jeszcze raz."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não é possível abrir a pasta. Conecte o disco ou escolha a pasta de novo e comece outra vez."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папку не удаётся открыть. Подключи диск или снова выбери папку, затем начни заново."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mappen går inte att öppna. Anslut enheten eller välj mappen igen och börja sedan om."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klasör açılamıyor. Sürücüyü bağla veya klasörü yeniden seç, sonra tekrar başlat."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папку не вдається відкрити. Підключи диск або знову вибери папку, потім почни заново."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法打开文件夹。请连接驱动器或重新选择文件夹，然后重新开始。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法打開檔案夾。請連接磁碟或重新選擇檔案夾，然後重新開始。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The folder can't be opened. Connect the drive or choose the folder again, then start again."
+          }
+        }
+      }
+    },
+    "The folder doesn't have this moment's originals, or they changed there." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يحتوي المجلد على أصول هذه اللحظة، أو تغيّرت هناك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У папцы няма арыгіналаў гэтага моманту, або яны там змяніліся."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Ordner fehlen die Originale dieses Moments, oder sie wurden dort geändert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La carpeta no tiene los originales de este momento, o cambiaron allí."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier ne contient pas les originaux de ce moment, ou ils y ont changé."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בתיקייה אין את המקורות של הרגע הזה, או שהם השתנו שם."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Թղթապանակում այս պահի բնօրինակները չկան, կամ դրանք այնտեղ փոխվել են։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cartella non contiene gli originali di questo momento, oppure lì sono cambiati."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダにこの瞬間の元のビデオがないか、フォルダ内で変更されています。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "საქაღალდეში ამ მომენტის ორიგინალები არ არის, ან იქ შეიცვალა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қалтада бұл сәттің түпнұсқалары жоқ немесе олар онда өзгерген."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "폴더에 이 순간의 원본이 없거나 폴더에서 바뀌었어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De map bevat de originelen van dit moment niet, of ze zijn daar gewijzigd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W folderze nie ma oryginałów tego momentu albo zostały tam zmienione."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A pasta não tem os originais deste momento, ou eles foram alterados lá."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В папке нет оригиналов этого момента, или они там изменились."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mappen har inte det här ögonblickets original, eller så har de ändrats där."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klasörde bu anın orijinalleri yok veya orada değiştirilmiş."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У папці немає оригіналів цього моменту, або вони там змінилися."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件夹中没有这个瞬间的原始视频，或它们在那里被更改过。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檔案夾中沒有這個瞬間的原始影片，或它們在那裡被更改過。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The folder doesn't have this moment's originals, or they changed there."
+          }
+        }
+      },
+      "comment" : "Memory Card ••• Bring back the original (P3.6): nothing matching in the folder"
+    },
+    "There may not be enough free space. Free some space and try again." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد لا تتوفر مساحة كافية. حرّر بعض المساحة وحاول مجددًا."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Магчыма, не хапае вольнага месца. Вызвалі крыху месца і паспрабуй зноў."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möglicherweise ist nicht genug Platz frei. Schaff etwas Platz und versuch es noch mal."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede que no haya suficiente espacio libre. Libera algo de espacio y vuelve a intentarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il n’y a peut-être pas assez d’espace libre. Libère un peu d’espace et réessaie."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ייתכן שאין מספיק מקום פנוי. אפשר לפנות מקום ולנסות שוב."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Հնարավոր է՝ բավարար ազատ տեղ չկա։ Ազատիր որոշ տեղ և կրկին փորձիր։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potrebbe non esserci abbastanza spazio libero. Libera un po' di spazio e riprova."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "空き領域が足りない可能性があります。空き領域を増やしてからもう一度試してください。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შესაძლოა საკმარისი თავისუფალი ადგილი არ არის. გაათავისუფლე ადგილი და სცადე ხელახლა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бос орын жеткіліксіз болуы мүмкін. Біраз орын босатып, қайталап көр."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여유 공간이 부족할 수 있어요. 공간을 확보한 뒤 다시 시도하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is misschien niet genoeg vrije ruimte. Maak wat ruimte vrij en probeer het opnieuw."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Może brakować wolnego miejsca. Zwolnij trochę miejsca i spróbuj ponownie."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Talvez não haja espaço livre suficiente. Libere um pouco de espaço e tente de novo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Возможно, не хватает свободного места. Освободи немного места и попробуй снова."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det kanske inte finns tillräckligt med ledigt utrymme. Frigör lite utrymme och försök igen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeterli boş alan olmayabilir. Biraz yer aç ve yeniden dene."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можливо, бракує вільного місця. Звільни трохи місця і спробуй знову."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可用空间可能不足。请释放一些空间后再试一次。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可用空間可能不足。請釋放一些空間後再試一次。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There may not be enough free space. Free some space and try again."
+          }
+        }
+      },
+      "comment" : "Memory Card ••• Bring back the original (P3.6): it failed, likely for space"
+    },
+    "To keep the full-size originals, use Settings › Storage › Move originals: they go to a folder you choose, and a smaller copy stays here. To bring one back, open the moment, tap ••• and Bring back the original." : {
+      "extractionState" : "manual",
+      "comment" : "Help topic: Make videos smaller (P3.6)",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "للاحتفاظ بالأصول بالحجم الكامل، استخدم الإعدادات › التخزين › نقل الأصول: تنتقل إلى مجلد تختاره، وتبقى هنا نسخة أصغر. لاستعادة أحدها، افتح اللحظة، واضغط ••• ثم استعادة الأصل."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каб захаваць арыгіналы поўнага памеру, выкарыстай Налады › Сховішча › Перанесці арыгіналы: яны пяройдуць у папку, якую ты выберыш, а тут застанецца меншая копія. Каб вярнуць адзін, адкрый момант, націсні ••• і «Вярнуць арыгінал»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um die Originale in voller Größe zu behalten, nutz Einstellungen › Speicher › Originale auslagern: Sie kommen in einen Ordner deiner Wahl, und hier bleibt eine kleinere Kopie. Um eins zurückzuholen, öffne den Moment, tipp auf ••• und Original zurückholen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para conservar los originales a tamaño completo, usa Ajustes › Almacenamiento › Mover originales: van a una carpeta que elijas y aquí se queda una copia más pequeña. Para recuperar uno, abre el momento, toca ••• y Recuperar el original."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour garder les originaux en taille réelle, utilise Réglages › Stockage › Déplacer les originaux : ils vont dans un dossier de ton choix, et une copie plus petite reste ici. Pour en récupérer un, ouvre le moment, touche ••• puis Récupérer l’original."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כדי לשמור את המקורות בגודל מלא, אפשר להשתמש בהגדרות › אחסון › העברת מקורות: הם עוברים לתיקייה לבחירתך, ועותק קטן יותר נשאר כאן. כדי להחזיר אחד, פותחים את הרגע, מקישים על ••• ואז ״החזרת המקור״."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ամբողջ չափի բնօրինակները պահելու համար օգտագործիր Կարգավորումներ › Պահեստ › Տեղափոխել բնօրինակները․ դրանք կտեղափոխվեն քո ընտրած թղթապանակ, իսկ այստեղ կմնա փոքր պատճենը։ Մեկը վերադարձնելու համար բացիր պահը, հպիր ••• և «Վերադարձնել բնօրինակը»։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per conservare gli originali a grandezza piena, usa Impostazioni › Spazio › Sposta gli originali: vanno in una cartella che scegli tu e qui resta una copia più piccola. Per recuperarne uno, apri il momento, tocca ••• e Recupera l'originale."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フルサイズの元のビデオを残すには、設定 › ストレージ › 元のビデオを移動を使います。選んだフォルダに移動し、ここには小さいコピーが残ります。戻すには、瞬間を開いて ••• をタップし、「元のビデオを戻す」を選びます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "სრული ზომის ორიგინალების შესანახად გამოიყენე პარამეტრები › საცავი › ორიგინალების გადატანა: ისინი გადავა შენ მიერ არჩეულ საქაღალდეში, აქ კი პატარა ასლი დარჩება. ერთის დასაბრუნებლად გახსენი მომენტი, შეეხე ••• და „ორიგინალის დაბრუნება“."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Толық өлшемді түпнұсқаларды сақтау үшін Параметрлер › Сақтау орны › Түпнұсқаларды көшіру бөлімін пайдалан: олар сен таңдаған қалтаға көшеді, ал мұнда кішірек көшірме қалады. Біреуін қайтару үшін сәтті ашып, ••• түймесін түрт те, «Түпнұсқаны қайтару» тармағын таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원래 크기의 원본을 보관하려면 설정 › 저장 공간 › 원본 옮기기를 사용하세요. 선택한 폴더로 옮겨지고 여기에는 작은 사본이 남아요. 하나를 되돌리려면 순간을 열고 •••을 탭한 뒤 원본 되돌리기를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wil je de originelen op volle grootte bewaren, gebruik dan Instellingen › Opslag › Originelen verplaatsen: ze gaan naar een map die jij kiest en hier blijft een kleinere kopie. Om er een terug te zetten, open je het moment, tik je op ••• en kies je Origineel terugzetten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby zachować oryginały w pełnym rozmiarze, użyj Ustawienia › Pamięć › Przenieś oryginały: trafią do wybranego folderu, a tutaj zostanie mniejsza kopia. Aby przywrócić jeden, otwórz moment, stuknij ••• i Przywróć oryginał."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para manter os originais em tamanho real, use Ajustes › Armazenamento › Mover originais: eles vão para uma pasta que você escolher, e uma cópia menor fica aqui. Para trazer um de volta, abra o momento, toque em ••• e em Trazer o original de volta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы сохранить оригиналы в полном размере, используй Настройки › Хранилище › Перенести оригиналы: они перейдут в папку, которую ты выберешь, а здесь останется уменьшенная копия. Чтобы вернуть один, открой момент, нажми ••• и «Вернуть оригинал»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om du vill behålla originalen i full storlek använder du Inställningar › Lagring › Flytta original: de flyttas till en mapp du väljer och en mindre kopia stannar här. För att hämta tillbaka ett öppnar du ögonblicket, trycker på ••• och väljer Hämta tillbaka originalet."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tam boyutlu orijinalleri saklamak için Ayarlar › Saklama Alanı › Orijinalleri taşı'yı kullan: seçtiğin bir klasöre giderler ve burada daha küçük bir kopya kalır. Birini geri getirmek için anı aç, •••'ya dokun ve Orijinali geri getir'i seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Щоб зберегти оригінали в повному розмірі, скористайся Налаштування › Сховище › Перенести оригінали: вони перейдуть у папку, яку ти вибереш, а тут лишиться менша копія. Щоб повернути один, відкрий момент, торкнися ••• і «Повернути оригінал»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要保留全尺寸原始视频，请使用“设置 › 储存空间 › 移出原始视频”：它们会移到你选择的文件夹，这里保留较小的副本。要恢复某个视频，请打开该瞬间，轻点 •••，再选择“恢复原始视频”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要保留全尺寸原始影片，請使用「設定 › 儲存空間 › 移出原始影片」：它們會移到你選擇的檔案夾，這裡保留較小的副本。要恢復某部影片，請打開該瞬間，點一下 •••，再選擇「恢復原始影片」。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To keep the full-size originals, use Settings › Storage › Move originals: they go to a folder you choose, and a smaller copy stays here. To bring one back, open the moment, tap ••• and Bring back the original."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

@@ -4,6 +4,7 @@ import Observation
 import Persistence
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// P3.5 X04/X04b: which videos, the new size, and what they'd take after.
 @MainActor
@@ -39,11 +40,15 @@ final class ShrinkModel {
     private(set) var candidates: [ShrinkCandidate] = []
     private(set) var images: [UUID: UIImage] = [:]
     let library: MediaLibrary
+    /// P3.6 X06: Move originals, which always keeps a Compact copy.
+    let moving: Bool
     private let now: () -> Date
 
-    init(library: MediaLibrary, now: @escaping () -> Date = Date.init) {
+    init(library: MediaLibrary, moving: Bool = false, now: @escaping () -> Date = Date.init) {
         self.library = library
+        self.moving = moving
         self.now = now
+        if moving { size = .compact }
         refresh()
     }
 
@@ -100,12 +105,13 @@ final class ShrinkModel {
 }
 
 struct ShrinkScreen: View {
+    var moving = false
     @Environment(\.mediaLibrary) private var library
     @Environment(ShrinkRun.self) private var run: ShrinkRun?
 
     var body: some View {
         if let library, let run {
-            ModelHost({ ShrinkModel(library: library) }) { ShrinkHost(model: $0, run: run) }
+            ModelHost({ ShrinkModel(library: library, moving: moving) }) { ShrinkHost(model: $0, run: run) }
         }
     }
 }
@@ -118,7 +124,7 @@ private struct ShrinkHost: View {
     var body: some View {
         Group {
             switch run.phase {
-            case .idle: ShrinkView(model: model) { run.start(model.selection, size: model.size) }
+            case .idle: ShrinkView(model: model, archive: run.archive) { run.start(model.selection, size: model.size, moving: model.moving) }
             case .running, .waiting, .finished: ShrinkProgressView(run: run) { model.refresh() }
             }
         }
@@ -133,8 +139,11 @@ extension EnvironmentValues {
 /// X04.
 struct ShrinkView: View {
     @Bindable var model: ShrinkModel
+    /// P3.6: the folder for Move originals.
+    var archive: OriginalArchive?
     let start: () -> Void
     @State private var choosing = false
+    @State private var pickingFolder = false
     /// What Which videos showed before Choose…, for a Cancel.
     @State private var before = ShrinkModel.Which.month
     @Environment(\.shrinkBack) private var back
@@ -144,13 +153,13 @@ struct ShrinkView: View {
             BackTitleBar(back: Text("Storage", bundle: .module), action: back)
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Make videos smaller", bundle: .module)
+                    (model.moving ? Text("Move originals", bundle: .module) : Text("Make videos smaller", bundle: .module))
                         .textStyle(.pageTitle)
                         .foregroundStyle(ColorToken.textPrimary.color)
                         .accessibilityAddTraits(.isHeader)
                         .padding(.horizontal, 20)
                         .padding(.top, 4)
-                    Text("Older videos are made again at a smaller size. Both cameras of a moment stay together, and nothing else about the moment changes.", bundle: .module)
+                    intro
                         .textStyle(.pageIntro)
                         .foregroundStyle(ColorToken.textSecondary.color)
                         .fixedSize(horizontal: false, vertical: true)
@@ -161,28 +170,50 @@ struct ShrinkView: View {
                         .padding(.top, 6)
                         .padding(.horizontal, 20)
                         .accessibilityIdentifier("shrink.which")
-                    sectionLabel(Text("New size", bundle: .module)).padding(.top, 18)
-                    SegmentedControl(selection: $model.size, options: [VideoSize.balanced, .compact]) { $0.label }
-                        .padding(.top, 6)
-                        .padding(.horizontal, 20)
-                        .accessibilityIdentifier("shrink.size")
-                    summary
+                    if model.moving {
+                        sectionLabel(Text("Folder", bundle: .module, comment: "Move originals (X06): where the originals go")).padding(.top, 18)
+                        DataCard {
+                            Button { pickingFolder = true } label: {
+                                DataIconRow(
+                                    icon: .glyphFolder, title: archive?.folderName.map { Text($0) } ?? Text("Choose…", bundle: .module, comment: "Move originals (X06): pick the folder")
+                                )
+                            }
+                            .accessibilityIdentifier("shrink.folder")
+                        }
+                        .buttonStyle(.plain)
                         .padding(.horizontal, 16)
-                        .padding(.top, 28)
-                    DataNote(text: Text("Each original is replaced only after its smaller copy is checked. You can keep using MimoDays; it goes on after a restart.", bundle: .module))
+                        .padding(.top, 6)
+                        summary
+                            .padding(.horizontal, 16)
+                            .padding(.top, 20)
+                    } else {
+                        sectionLabel(Text("New size", bundle: .module)).padding(.top, 18)
+                        SegmentedControl(selection: $model.size, options: [VideoSize.balanced, .compact]) { $0.label }
+                            .padding(.top, 6)
+                            .padding(.horizontal, 20)
+                            .accessibilityIdentifier("shrink.size")
+                        summary
+                            .padding(.horizontal, 16)
+                            .padding(.top, 28)
+                    }
+                    DataNote(text: note)
                         .padding(.horizontal, 22)
                         .padding(.top, 12)
                 }
                 .padding(.bottom, 24)
             }
-            Button(action: start) { Text("Make smaller", bundle: .module, comment: "Make videos smaller (X04): starts the run") }
+            Button(action: start) { startLabel }
                 .buttonStyle(.primary)
-                .disabled(model.candidates.isEmpty)
+                .disabled(model.candidates.isEmpty || (model.moving && archive?.hasFolder != true))
                 .accessibilityIdentifier("shrink.start")
                 .padding(.horizontal, 20)
                 .padding(.bottom, 16)
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        .fileImporter(isPresented: $pickingFolder, allowedContentTypes: [.folder]) { result in
+            guard case let .success(url) = result else { return }
+            try? archive?.setFolder(url)
+        }
         .sheet(isPresented: $choosing) {
             ShrinkChooser(model: model, chosen: model.chosen) { picked in
                 choosing = false
@@ -193,6 +224,24 @@ struct ShrinkView: View {
                 }
             }
         }
+    }
+
+    private var intro: Text {
+        model.moving
+            ? Text("Full-size originals go to a folder you choose: in Files, on iCloud Drive or on a drive. A smaller copy stays in MimoDays, so every moment still plays.", bundle: .module)
+            : Text("Older videos are made again at a smaller size. Both cameras of a moment stay together, and nothing else about the moment changes.", bundle: .module)
+    }
+
+    private var note: Text {
+        model.moving
+            ? Text("Each original is checked in the folder before it leaves the phone. To bring originals back, use Backup › Add what's missing, or open a moment and choose Bring back the original.", bundle: .module)
+            : Text("Each original is replaced only after its smaller copy is checked. You can keep using MimoDays; it goes on after a restart.", bundle: .module)
+    }
+
+    private var startLabel: Text {
+        model.moving
+            ? Text("Move \(model.candidates.count) originals", bundle: .module, comment: "Move originals (X06): starts the run, e.g. Move 142 originals")
+            : Text("Make smaller", bundle: .module, comment: "Make videos smaller (X04): starts the run")
     }
 
     /// Choose… opens X04b each time it's picked.
@@ -408,9 +457,14 @@ struct ShrinkProgressView: View {
     }
 
     private var title: Text {
-        guard case let .finished(outcome) = run.phase else { return Text("Making videos smaller", bundle: .module) }
-        if outcome.stopped || outcome.stoppedForSpace { return Text("Stopped", bundle: .module, comment: "Make videos smaller (X05): the run was stopped") }
-        return Text("Videos made smaller", bundle: .module)
+        let moving = run.job?.moving ?? false
+        guard case let .finished(outcome) = run.phase else {
+            return moving ? Text("Moving originals", bundle: .module) : Text("Making videos smaller", bundle: .module)
+        }
+        if outcome.stopped || outcome.stoppedForSpace || outcome.folderUnavailable {
+            return Text("Stopped", bundle: .module, comment: "Make videos smaller (X05): the run was stopped")
+        }
+        return outcome.moving ? Text("Originals moved", bundle: .module) : Text("Videos made smaller", bundle: .module)
     }
 
     /// "37 of 142 videos".
@@ -429,10 +483,14 @@ struct ShrinkProgressView: View {
 
     private var note: Text {
         switch run.phase {
+        case let .finished(outcome) where outcome.folderUnavailable:
+            Text("The folder can't be opened. Connect the drive or choose the folder again, then start again.", bundle: .module)
         case let .finished(outcome) where outcome.stoppedForSpace:
             Text("There isn't enough free space for the next video. Free some space, then start again.", bundle: .module)
         case let .finished(outcome) where outcome.skipped > 0:
             Text("Some videos stayed as they were: their smaller copies didn't pass the check.", bundle: .module)
+        case let .finished(outcome) where outcome.moving:
+            Text("Each original was checked in the folder before its smaller copy took its place.", bundle: .module)
         case .finished:
             Text("Each original was replaced only after its smaller copy was checked.", bundle: .module)
         case .waiting:

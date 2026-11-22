@@ -48,6 +48,10 @@ struct MomentViewer: View {
     @Environment(ShrinkRun.self) private var shrinks: ShrinkRun?
     /// P3.5: Make smaller's sizes for this moment, while the choice is up.
     @State private var shrinking: ShrinkOffer?
+    /// P3.6: the moment to move once a folder is picked.
+    @State private var movingTo: UUID?
+    /// P3.6: why Bring back the original didn't.
+    @State private var bringBackFailure: ShrinkRun.BringBack?
     /// M07 while it is open.
     @State private var editing: EditMomentModel?
     /// M15 while it is open, for this moment.
@@ -133,6 +137,23 @@ struct MomentViewer: View {
         }
         .sheet(item: $exporting) { MomentExportSheet(model: $0) }
         .sheet(item: $sharingText) { ShareSheet(items: [$0.text]).presentationDetents([.medium, .large]) }
+        .fileImporter(isPresented: Binding { movingTo != nil } set: { if !$0 { movingTo = nil } }, allowedContentTypes: [.folder]) { result in
+            guard let id = movingTo, case let .success(url) = result, let shrinks, (try? shrinks.archive?.setFolder(url)) != nil else { return }
+            shrinks.start(.chosen([id]), size: .compact, moving: true)
+        }
+        .alert(
+            Text("Couldn't bring the original back", bundle: .module, comment: "Memory Card ••• Bring back the original (P3.6): it failed"),
+            isPresented: Binding { bringBackFailure != nil } set: { if !$0 { bringBackFailure = nil } }, presenting: bringBackFailure
+        ) { _ in
+            Button(role: .cancel) { bringBackFailure = nil } label: { Text("OK", bundle: .module) }
+        } message: { failure in
+            switch failure {
+            case .busy: Text("A backup, an export or a run in Storage is using the files. Try again when it's done.", bundle: .module)
+            case .noFolder, .folderUnavailable: Text("The folder can't be opened. Connect the drive or choose the folder again in Settings › Storage › Move originals.", bundle: .module)
+            case .notFound: Text("The folder doesn't have this moment's originals, or they changed there.", bundle: .module)
+            case .done, .failed: Text("There may not be enough free space. Free some space and try again.", bundle: .module)
+            }
+        }
         .alert(
             Text("Couldn't change what you see in memories", bundle: .module),
             isPresented: Binding(get: { model.failedVisibility != nil }, set: { if !$0 { model.dismissVisibilityFailure() } })
@@ -258,6 +279,27 @@ struct MomentViewer: View {
                             Label { Text("Make smaller", bundle: .module) } icon: { Icon.glyphFilm.image }
                         }
                         .accessibilityIdentifier("viewer.makeSmaller")
+                    }
+                    // P3.6 X07: one moment's originals to the folder, and back.
+                    if moment.mediaType == .video, let shrinks, !shrinks.isRunning, let archive = shrinks.archive {
+                        if !archive.moved(moment.id).isEmpty {
+                            Button {
+                                Task {
+                                    let result = await shrinks.bringBack(moment.id)
+                                    if result != .done { bringBackFailure = result }
+                                }
+                            } label: {
+                                Label { Text("Bring back the original", bundle: .module) } icon: { Icon.glyphUndo.image }
+                            }
+                            .accessibilityIdentifier("viewer.bringBack")
+                        } else if (try? ShrinkPolicy.candidates(.chosen([moment.id]), size: .compact, in: model.library.context).isEmpty) == false {
+                            Button {
+                                if archive.hasFolder { shrinks.start(.chosen([moment.id]), size: .compact, moving: true) } else { movingTo = moment.id }
+                            } label: {
+                                Label { Text("Move original", bundle: .module, comment: "Memory Card ••• (P3.6): the full-size files to the chosen folder, a smaller copy stays") } icon: { Icon.glyphFolder.image }
+                            }
+                            .accessibilityIdentifier("viewer.moveOriginal")
+                        }
                     }
                     // P8.8 GG01: the camera, to take it again; photos and videos.
                     if moment.mediaType != .text {

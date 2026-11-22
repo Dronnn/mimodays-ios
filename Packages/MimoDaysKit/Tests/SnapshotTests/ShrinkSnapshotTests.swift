@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 import TestSupport
 
-/// P3.5 Make videos smaller: X03's row, X04, X04b and X05.
+/// P3.5 Make videos smaller: X03's rows, X04, X04b and X05; P3.6 Move originals: X06.
 @MainActor
 @Suite(.tags(.snapshot), .serialized)
 struct ShrinkSnapshotTests {
@@ -92,6 +92,25 @@ struct ShrinkSnapshotTests {
         let model = ShrinkModel(library: library, now: { [now] in now })
         let chooser = ShrinkChooser(model: model, chosen: Set([moments[0].id, moments[1].id, moments[4].id])) { _ in }
         assertScreenSnapshots(of: page(chooser, run: run()), variants: variants)
+    }
+
+    /// X06: no folder yet, so Move waits for one.
+    @Test func moveOriginals() throws {
+        try videos(daysAgo: [2, 3] + Array(35..<60), seconds: 40)
+        let model = ShrinkModel(library: library, moving: true, now: { [now] in now })
+        let archive = OriginalArchive(indexURL: FileManager.default.temporaryDirectory.appending(path: "Index-\(UUID().uuidString).json"))
+        assertScreenSnapshots(of: page(ShrinkView(model: model, archive: archive, start: {}), run: run()), variants: variants)
+    }
+
+    /// X06 with the folder picked.
+    @Test func moveOriginalsToAFolder() throws {
+        try videos(daysAgo: Array(35..<60), seconds: 40)
+        let folder = FileManager.default.temporaryDirectory.appending(path: "\(UUID().uuidString)/Video archive")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let archive = OriginalArchive(indexURL: FileManager.default.temporaryDirectory.appending(path: "Index-\(UUID().uuidString).json"))
+        try archive.setFolder(folder)
+        let model = ShrinkModel(library: library, moving: true, now: { [now] in now })
+        assertScreenSnapshots(of: page(ShrinkView(model: model, archive: archive, start: {}), run: run()), variants: [SnapshotVariant(.iPhone, .light)])
     }
 
     /// X05: 37 of 142 videos, mid-run.

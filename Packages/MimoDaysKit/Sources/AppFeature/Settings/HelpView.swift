@@ -135,6 +135,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
             Text("In Settings › Camera, Video size sets how big new videos are. Balanced and Compact take less space than High.", bundle: .module, comment: "Help topic: Make videos smaller (P3)"),
             Text("To make older videos smaller, open Settings › Storage › Make videos smaller, choose the videos and the new size, then tap Make smaller. For one video, open it, tap ••• and Make smaller.", bundle: .module, comment: "Help topic: Make videos smaller (P3.5)"),
             Text("Each original is replaced only after its smaller copy is checked, and both cameras of a moment stay together. A smaller video can't be made big again.", bundle: .module, comment: "Help topic: Make videos smaller (P3.5)"),
+            Text("To keep the full-size originals, use Settings › Storage › Move originals: they go to a folder you choose, and a smaller copy stays here. To bring one back, open the moment, tap ••• and Bring back the original.", bundle: .module, comment: "Help topic: Make videos smaller (P3.6)"),
         ]
         case .writeMoment: [
             Text("On Today, tap Add a moment, then Write a moment.", bundle: .module),

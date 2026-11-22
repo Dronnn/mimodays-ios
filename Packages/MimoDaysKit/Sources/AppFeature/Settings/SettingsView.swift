@@ -90,6 +90,7 @@ private struct SettingsHost: View {
                     // Its own bar, as in Memories: the system back button and Select.
                     case .recentlyDeleted: RecentlyDeletedScreen()
                     case .shrink: ShrinkScreen().settingsPage()
+                    case .moveOriginals: ShrinkScreen(moving: true).settingsPage()
                     }
                 }
                 // Recently deleted opens its moments.

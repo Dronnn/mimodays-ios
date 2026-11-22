@@ -53,7 +53,8 @@ final class AccessibilityUITests: XCTestCase {
     /// What the audit reports that isn't so, each checked on screenshots at the default size and at AX3
     /// (2026-11-16): letter-spaced capitals (`labelCaps`) and text fields reported as clipped though shown whole; the
     /// keyboard's own suggestion bar; the system toolbar's Done, which iOS caps; the lens segment "Ultra wide",
-    /// shown whole on one line.
+    /// shown whole on one line. Review's chips since the second row (Tags, Mood): "Voice note" and the Mood chip's
+    /// emoji are reported clipped though drawn whole (screenshots of the failing audit, 2026-11-22).
     @MainActor
     private func isKnownFalsePositive(_ issue: XCUIAccessibilityAuditIssue) -> Bool {
         guard let element = issue.element else { return false }
@@ -61,7 +62,8 @@ final class AccessibilityUITests: XCTestCase {
         case .textClipped:
             let label = element.label
             let isSpacedCaps = label == label.uppercased() && label.contains { $0.isLetter }
-            return isSpacedCaps || element.elementType == .textField || label == "Ultra wide"
+            let isEmoji = !label.isEmpty && label.unicodeScalars.allSatisfy { $0.properties.isEmojiPresentation || $0.value == 0xFE0F }
+            return isSpacedCaps || isEmoji || element.elementType == .textField || ["Ultra wide", "Voice note"].contains(label)
         case .sufficientElementDescription:
             let keyboard = app.keyboards.firstMatch
             return element.label.isEmpty && keyboard.exists && element.frame.minY >= keyboard.frame.minY - 50

@@ -62,6 +62,11 @@ struct ReviewView: View {
             await model.load()
             await model.startPlayback()
         }
+        .task(id: model.repeatOf) {
+            // GG03: read once; written only when there is one.
+            let time = library.flatMap { ThenNow.capturedTime(of: model.repeatOf, in: $0.context) }
+            if time != repeating { repeating = time }
+        }
         .task {
             // Location is never asked for here: only after a tap on Place.
             guard await permissions.status(of: .location).isUsable else { return }
@@ -246,6 +251,16 @@ struct ReviewView: View {
         }
     }
 
+    /// When it was taken, or GG03: which moment this captures again.
+    @ViewBuilder
+    private var timeLine: some View {
+        if let repeating {
+            Text("Repeating a moment from \(ThenNow.dateText(repeating))", bundle: .module)
+        } else {
+            OriginLabel(origin: model.promptID == nil ? .manual : .randomPrompt, time: CaptureTimeLabel.text(model.capture.capturedAt))
+        }
+    }
+
     /// Place, Voice note (until there is one: then its card shows above), Note, then Tags (each tag once there are
     /// some) and Mood (CC01, CC02).
     @ViewBuilder
@@ -332,20 +347,12 @@ struct ReviewView: View {
             ChipFlow(spacing: 8, lineSpacing: 2) { chips }
             .disabled(isSaving)
             .padding(.top, 14)
-            Group {
-                // GG03: which moment this captures again.
-                if let repeating {
-                    Text("Repeating a moment from \(ThenNow.dateText(repeating))", bundle: .module)
-                } else {
-                    OriginLabel(origin: model.promptID == nil ? .manual : .randomPrompt, time: CaptureTimeLabel.text(model.capture.capturedAt))
-                }
-            }
-            .textStyle(.reviewMeta)
-            .foregroundStyle(ColorToken.textBody.color)
-            .padding(.leading, 2)
-            .padding(.top, 18)
-            .accessibilityIdentifier("review.time")
-            .task(id: model.repeatOf) { repeating = library.flatMap { ThenNow.capturedTime(of: model.repeatOf, in: $0.context) } }
+            timeLine
+                .textStyle(.reviewMeta)
+                .foregroundStyle(ColorToken.textBody.color)
+                .padding(.leading, 2)
+                .padding(.top, 18)
+                .accessibilityIdentifier("review.time")
             Button { save() } label: { Text("Save", bundle: .module) }
                 .buttonStyle(.primary)
                 .disabled(isSaving)

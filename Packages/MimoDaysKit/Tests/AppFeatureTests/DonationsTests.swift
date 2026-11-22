@@ -46,6 +46,30 @@ struct DonationsModelTests {
         #expect(!model.showsThankYou && model.notice == .pending)
     }
 
+    /// rev-app 13: approved while Donations was closed: thanked on the next visit, once.
+    @Test func aTipApprovedLaterIsThankedForOnTheNextVisit() async throws {
+        let defaults = try #require(UserDefaults(suiteName: "Tips-\(UUID().uuidString)"))
+        TipsApprovedLater.record(in: defaults)
+        let model = DonationsModel(store: FakeTipStore(products: Self.products), defaults: defaults)
+        await model.load()
+        #expect(model.showsThankYou)
+        let again = DonationsModel(store: FakeTipStore(products: Self.products), defaults: defaults)
+        await again.load()
+        #expect(!again.showsThankYou)
+    }
+
+    /// rev-app 13: approved while Donations is open, even after another tip cleared the waiting note.
+    @Test func aTipApprovedWhileOpenIsThankedFor() async throws {
+        let defaults = try #require(UserDefaults(suiteName: "Tips-\(UUID().uuidString)"))
+        let model = DonationsModel(store: FakeTipStore(products: Self.products, outcome: .cancelled), defaults: defaults)
+        await model.load()
+        model.finishedLater()
+        #expect(!model.showsThankYou)
+        TipsApprovedLater.record(in: defaults)
+        model.finishedLater()
+        #expect(model.showsThankYou)
+    }
+
     @Test func productIDsMatchTheTiers() {
         #expect(TipTier.allCases.map(\.productID) == [
             "com.mrmaier.MimoDays.tip.small", "com.mrmaier.MimoDays.tip.medium", "com.mrmaier.MimoDays.tip.large",

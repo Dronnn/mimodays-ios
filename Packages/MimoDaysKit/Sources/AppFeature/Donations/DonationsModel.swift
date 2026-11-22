@@ -33,9 +33,11 @@ final class DonationsModel {
     var showsThankYou = false
 
     private let store: any TipStore
+    private let defaults: UserDefaults
 
-    init(store: any TipStore) {
+    init(store: any TipStore, defaults: UserDefaults = .standard) {
         self.store = store
+        self.defaults = defaults
     }
 
     /// The tiers the App Store offers, in their order.
@@ -55,12 +57,18 @@ final class DonationsModel {
             prices = [:]
         }
         phase = prices.isEmpty ? .unavailable : .ready
+        thankForTipsApprovedLater()
     }
 
-    /// A tip that was waiting for approval went through.
+    /// A tip that was waiting for approval went through, while Donations is open.
     func finishedLater() {
-        guard notice == .pending else { return }
-        notice = nil
+        thankForTipsApprovedLater()
+    }
+
+    /// D03 for tips approved while Donations was closed or on another tip (rev-app 13), once.
+    private func thankForTipsApprovedLater() {
+        guard TipsApprovedLater.take(from: defaults) else { return }
+        if notice == .pending { notice = nil }
         showsThankYou = true
     }
 

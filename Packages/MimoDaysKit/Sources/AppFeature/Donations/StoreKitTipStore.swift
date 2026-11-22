@@ -54,7 +54,8 @@ final class StoreKitTipStore: TipStore {
         }
     }
 
-    /// Posted on the main actor when a tip arrives through `listenForTransactions`.
+    /// Posted on the main actor when a tip arrives through `listenForTransactions`; `TipsApprovedLater` keeps it
+    /// until Donations thanks for it.
     static let finishedLater = Notification.Name("MimoDaysTipFinishedLater")
 
     /// Tips approved later (Ask to Buy) or bought on another device arrive here; each is finished once verified.
@@ -66,9 +67,27 @@ final class StoreKitTipStore: TipStore {
                     logger.error("A tip transaction failed verification")
                     continue
                 }
+                // Kept before it's finished, so the thanks wait for the next visit to Donations (rev-app 13).
+                TipsApprovedLater.record()
                 await transaction.finish()
                 await MainActor.run { NotificationCenter.default.post(name: finishedLater, object: nil) }
             }
         }
+    }
+}
+
+/// Tips that went through outside a purchase (Ask to Buy approved later) and haven't been thanked for yet.
+enum TipsApprovedLater {
+    private static let key = "tipsApprovedLater"
+
+    static func record(in defaults: UserDefaults = .standard) {
+        defaults.set(defaults.integer(forKey: key) + 1, forKey: key)
+    }
+
+    /// True once for any number waiting: one thank-you covers them.
+    static func take(from defaults: UserDefaults = .standard) -> Bool {
+        guard defaults.integer(forKey: key) > 0 else { return false }
+        defaults.removeObject(forKey: key)
+        return true
     }
 }

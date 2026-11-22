@@ -70,6 +70,22 @@ struct VideoSizeTests {
         #expect(await engine.videoSizes == [.compact, .balanced])
     }
 
+    /// P3.3: a camera budget that holds both cameras below the size shows in the ••• sheet; gone when it fits.
+    @Test func aReducedSizeIsShown() async {
+        let engine = SimulatedCaptureEngine()
+        await engine.setSimulatedReducedWidth(1280)
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(), isSurprise: false,
+            microphoneStatus: { .granted }, onCapture: { _ in }
+        )
+        await model.start()
+        #expect(model.reducedWidth == 1280)
+        await engine.setSimulatedReducedWidth(nil)
+        model.settings.videoSize = .compact
+        for _ in 0..<50 where model.reducedWidth != nil { try? await Task.sleep(for: .milliseconds(20)) }
+        #expect(model.reducedWidth == nil)
+    }
+
     /// Each video taken counts toward the size it was taken at.
     @Test func aVideoTakenIsMeasured() async throws {
         let engine = SimulatedCaptureEngine()

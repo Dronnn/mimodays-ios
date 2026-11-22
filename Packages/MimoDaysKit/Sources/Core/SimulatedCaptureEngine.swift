@@ -90,6 +90,11 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
     public func setVideoSize(_ size: VideoSize) { videoSizes.append(size) }
 
+    /// P3.3: a budget that holds both cameras below the size (tests).
+    public var simulatedReducedWidth: Int32?
+    public func setSimulatedReducedWidth(_ width: Int32?) { simulatedReducedWidth = width }
+    public func reducedWidth() -> Int32? { simulatedReducedWidth }
+
     public func setBackLens(_ lens: BackLens) {
         backLens = lenses.contains(lens) ? lens : .wide
         // Like a virtual camera: the lens is a zoom stop.

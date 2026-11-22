@@ -233,12 +233,18 @@ struct CameraSnapshotTests {
     @Test func settingsSheet() {
         assertScreenSnapshots(of: CameraSettingsSheetPreview())
     }
+
+    /// P3.3: the iPhone holds both cameras at 720p while High is chosen.
+    @Test func settingsSheetReducedSize() {
+        assertScreenSnapshots(of: CameraSettingsSheetPreview(reducedWidth: 1280), variants: [SnapshotVariant(.iPhone, .light)])
+    }
 }
 
 /// The sheet's content on its own (a presented sheet doesn't render in snapshots).
 private struct CameraSettingsSheetPreview: View {
+    var reducedWidth: Int32?
     @State private var settings = CameraSettings()
-    var body: some View { CameraSettingsSheet(settings: $settings, lenses: [.ultraWide, .wide, .telephoto]) }
+    var body: some View { CameraSettingsSheet(settings: $settings, lenses: [.ultraWide, .wide, .telephoto], reducedWidth: reducedWidth) }
 }
 
 private struct SelfieWindowSheetPreview: View {

@@ -12,6 +12,8 @@ struct CameraSettingsSheet: View {
     var chooseLens: (BackLens) -> Void = { _ in }
     /// P3.4: what each video size took on this phone.
     var sizeRates: [VideoSize: VideoSizeMeter.Rate] = [:]
+    /// P3.3: both cameras record narrower than the size right now.
+    var reducedWidth: Int32?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -59,7 +61,7 @@ struct CameraSettingsSheet: View {
                     }
                     // X02.
                     section(Text("Video size", bundle: .module, comment: "Section over High / Balanced / Compact (P3.4)")) {
-                        VideoSizePicker(size: $settings.videoSize, rates: sizeRates)
+                        VideoSizePicker(size: $settings.videoSize, rates: sizeRates, reducedWidth: reducedWidth)
                     }
                     VStack(spacing: 0) {
                         toggle(Text("Record sound", bundle: .module), isOn: $settings.recordsSound, id: "cameraSettings.sound")

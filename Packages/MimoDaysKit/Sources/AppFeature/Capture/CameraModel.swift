@@ -113,12 +113,19 @@ final class CameraModel {
     private(set) var hold = DeviceHold.upright
     /// The hold a recording started in; the layout keeps it until the recording ends (U05).
     private(set) var recordingHold: DeviceHold?
+    /// P3.3: both cameras record narrower than the chosen size on this iPhone now (the ••• sheet says so).
+    private(set) var reducedWidth: Int32?
     var settings: CameraSettings {
         didSet {
             store.save(settings)
             if settings.recordsSound != oldValue.recordsSound { Task { await refreshMicrophone() } }
             // P3.4: from the next take, between takes.
-            if settings.videoSize != oldValue.videoSize { Task { [engine, size = settings.videoSize] in await engine.setVideoSize(size) } }
+            if settings.videoSize != oldValue.videoSize {
+                Task { [weak self, engine, size = settings.videoSize] in
+                    await engine.setVideoSize(size)
+                    await self?.refreshReducedWidth()
+                }
+            }
             if isRecording, settings.flash != oldValue.flash { setTorch(settings.flash) }
             if settings.backLens != oldValue.backLens, phase != .starting {
                 Task { [engine, lens = settings.backLens] in
@@ -259,6 +266,7 @@ final class CameraModel {
             if setupChanges == changes { setup = started }
             lenses = await engine.backLenses()
             await refreshZoom()
+            await refreshReducedWidth()
             showsSingleCameraNote = setup != .dual
             phase = .ready
             await refreshMicrophone()
@@ -273,6 +281,10 @@ final class CameraModel {
     func recover() async {
         guard interruption == .other, phase == .ready, !isClosed else { return }
         _ = try? await engine.start()
+    }
+
+    func refreshReducedWidth() async {
+        reducedWidth = await engine.reducedWidth()
     }
 
     /// The camera screen went away (closed, or Review took its place): a photo or clip still finishing is thrown
@@ -596,7 +608,10 @@ final class CameraModel {
                     setupChanges += 1
                     if setup != .dual { isSwapped = false }
                     focusMark = nil
-                    Task { await self.refreshZoom() }
+                    Task {
+                        await self.refreshZoom()
+                        await self.refreshReducedWidth()
+                    }
                 case let .interrupted(reason):
                     interruption = reason
                 case .resumed:

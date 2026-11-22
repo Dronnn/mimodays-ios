@@ -548,6 +548,16 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
     }
 
+    public func reducedWidth() async -> Int32? {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Int32?, Never>) in
+            queue.async {
+                guard self.setup == .dual, let device = self.cameras[.back]?.input.device else { return continuation.resume(returning: nil) }
+                let width = CMVideoFormatDescriptionGetDimensions(device.activeFormat.formatDescription).width
+                continuation.resume(returning: width < self.maxFormatWidth ? width : nil)
+            }
+        }
+    }
+
     /// The cameras again at the video size's width, keeping what the setup can (P3.3).
     private func reconfigureForSize() {
         guard let setup else { return }

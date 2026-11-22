@@ -80,6 +80,8 @@ final class VideoSizeMeter {
 struct VideoSizePicker: View {
     @Binding var size: VideoSize
     let rates: [VideoSize: VideoSizeMeter.Rate]
+    /// P3.3: the width both cameras record at now when the iPhone holds them below the size.
+    var reducedWidth: Int32? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -95,10 +97,18 @@ struct VideoSizePicker: View {
 
     private var caption: Text {
         let same = Text("Both cameras always record at the same size.", bundle: .module, comment: "Under the video size picker (P3.4)")
-        guard let rate = rates[size] else { return same }
+        guard let rate = rates[size] else { return reduced.map { Text("\(same) \($0)", bundle: .module) } ?? same }
         let measured = rate.bothCameras
             ? Text("About \(rate.megabytesPerMinute) MB a minute with both cameras.", bundle: .module, comment: "Under the video size picker (P3.4): measured on this phone from earlier videos at this size")
             : Text("About \(rate.megabytesPerMinute) MB a minute with one camera.", bundle: .module, comment: "Under the video size picker (P3.4): measured on this phone from earlier videos at this size")
-        return Text("\(measured) \(same)", bundle: .module, comment: "Under the video size picker: the measured size a minute, then that both cameras record at the same size")
+        let caption = Text("\(measured) \(same)", bundle: .module, comment: "Under the video size picker: the measured size a minute, then that both cameras record at the same size")
+        return reduced.map { Text("\(caption) \($0)", bundle: .module) } ?? caption
+    }
+
+    /// "Right now this iPhone can record both at 720p."
+    private var reduced: Text? {
+        guard let reducedWidth, reducedWidth < size.maxFormatWidth else { return nil }
+        let lines = reducedWidth >= 1280 ? "720p" : "480p"
+        return Text("Right now this iPhone can record both at \(lines).", bundle: .module, comment: "Under the video size picker (P3.3): the iPhone's camera budget holds both cameras below the chosen size, e.g. 720p")
     }
 }

@@ -244,6 +244,9 @@ public protocol CaptureEngine: AnyObject, Sendable {
     /// P3.4: the size of videos from now on, the same for both cameras. A new bit rate applies from the next take; a
     /// new width sets the cameras up again, after the recording when one is running.
     func setVideoSize(_ size: VideoSize) async
+    /// P3.3: how wide both cameras record now, when the hardware budget held them below the video size's width; nil
+    /// when they record at it, or with one camera.
+    func reducedWidth() async -> Int32?
     /// Switches to the other camera. Single-camera setups only; a dual setup is returned unchanged.
     func flip() async throws -> CameraSetup
     /// Adds or removes the microphone. Only with permission, and only for video.
@@ -306,4 +309,8 @@ final class CaptureEventRelay: Sendable {
     func yield(_ event: CaptureEvent) {
         sink.withLock { _ = $0?.yield(event) }
     }
+}
+
+public extension CaptureEngine {
+    func reducedWidth() async -> Int32? { nil }
 }

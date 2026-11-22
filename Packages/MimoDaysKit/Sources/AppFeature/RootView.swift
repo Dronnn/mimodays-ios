@@ -166,6 +166,8 @@ public struct RootView: View {
             if memoriesPreferences.value.days == .thisIPhone { relabelDays(.thisIPhone) }
         }
         .onReceive(NotificationCenter.default.publisher(for: CameraShortcut.requested)) { _ in openCameraShortcut() }
+        .onChange(of: router.capture != nil) { _, isOpen in CameraShortcut.openCameras += isOpen ? 1 : -1 }
+        .onDisappear { if router.capture != nil { CameraShortcut.openCameras -= 1 } }
         // Midnight, a clock change or a new time zone: hours follow the device.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
             refreshSurprises()
@@ -261,7 +263,7 @@ public struct RootView: View {
 
     /// P8.1: Siri, Shortcuts, the Action button or a control asked for the camera.
     private func openCameraShortcut() {
-        if CameraShortcut.take() { open(CameraShortcut.route) }
+        if CameraShortcut.take(inBackground: scenePhase == .background) { open(CameraShortcut.route) }
     }
 
     private func openHeldRoute() {

@@ -12,8 +12,12 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private static let logger = Logger(subsystem: "MimoDays", category: "Camera")
     private let session: AVCaptureSession
     private let isMultiCam: Bool
-    /// The video quality setting: no camera format wider than this.
-    private let maxFormatWidth: Int32
+    /// P3.4: the video size setting. Touched on `queue` only, once `init` has run.
+    private var videoSize: VideoSize
+    /// No camera format wider than the video size allows.
+    private var maxFormatWidth: Int32 { videoSize.maxFormatWidth }
+    /// A size asked for during a recording: the cameras change once it ends.
+    private var resizesAfterRecording = false
     private let previews: [CameraPosition: AVCaptureVideoPreviewLayer]
 
     // Touched on `queue` only.
@@ -53,11 +57,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     }
 
     @MainActor
-    public init(maxFormatWidth: Int32 = CapturePressurePolicy.dualFormatWidths[0]) {
+    public init(videoSize: VideoSize = .high) {
         let isMultiCam = AVCaptureMultiCamSession.isMultiCamSupported
         let session = isMultiCam ? AVCaptureMultiCamSession() : AVCaptureSession()
         self.isMultiCam = isMultiCam
-        self.maxFormatWidth = maxFormatWidth
+        self.videoSize = videoSize
         self.session = session
         previews = Dictionary(uniqueKeysWithValues: CameraPosition.allCases.map { position in
             let layer = AVCaptureVideoPreviewLayer(sessionWithNoConnection: session)
@@ -486,6 +490,10 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                     self.queue.async {
                         self.recording = nil
                         self.setSmoothAutoFocus(false)
+                        if self.resizesAfterRecording {
+                            self.resizesAfterRecording = false
+                            self.reconfigureForSize()
+                        }
                         // Pressure that rose while recording can drop the selfie camera now.
                         self.applyPressure()
                         // The session tells why it was interrupted; the movie output only that it was.
@@ -502,6 +510,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                 for (position, movie) in outputs {
                     movie.maxRecordedDuration = maximum
                     movie.maxRecordedFileSize = budget
+                    self.applyCompression(to: movie)
                     do {
                         movie.startRecording(to: try CaptureFiles.temporaryURL("mov"), recordingDelegate: delegate)
                     } catch {
@@ -520,6 +529,55 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
                 camera.movie.stopRecording()
             }
         }
+    }
+
+    public func setVideoSize(_ size: VideoSize) async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            queue.async {
+                defer { continuation.resume() }
+                let widthChanged = size.maxFormatWidth != self.videoSize.maxFormatWidth
+                self.videoSize = size
+                // The bit rate applies from the next take; another width needs the cameras set up again.
+                guard widthChanged, self.setup != nil else { return }
+                if self.recording != nil {
+                    self.resizesAfterRecording = true
+                } else {
+                    self.reconfigureForSize()
+                }
+            }
+        }
+    }
+
+    /// The cameras again at the video size's width, keeping what the setup can (P3.3).
+    private func reconfigureForSize() {
+        guard let setup else { return }
+        removeAllCameras()
+        if !isMultiCam { session.sessionPreset = maxFormatWidth < 1920 ? .hd1280x720 : .high }
+        do {
+            let changed = try configureWithinBudget()
+            self.setup = changed
+            applyPressure()
+            if changed != setup { eventSink.yield(.setupChanged(changed)) }
+        } catch {
+            // No camera left: no setup, so captures fail instead of waiting for outputs that are gone.
+            Self.logger.error("Video size: no camera fits, \(error.localizedDescription, privacy: .public)")
+            self.setup = nil
+        }
+    }
+
+    /// P3.2: HEVC where the output offers it, and the video size's bit rate where the output takes one. Only keys the
+    /// output lists are set: any other is an exception, not an error. Without them the size changes the width alone.
+    private func applyCompression(to movie: AVCaptureMovieFileOutput) {
+        guard let connection = movie.connection(with: .video) else { return }
+        let keys = movie.supportedOutputSettingsKeys(for: connection)
+        let codecs = movie.availableVideoCodecTypes
+        guard keys.contains(AVVideoCodecKey), let codec = codecs.contains(.hevc) ? .hevc : codecs.first else { return }
+        var settings: [String: Any] = [AVVideoCodecKey: codec]
+        if let bitRate = videoSize.averageBitRate, keys.contains(AVVideoCompressionPropertiesKey) {
+            settings[AVVideoCompressionPropertiesKey] = [AVVideoAverageBitRateKey: bitRate]
+        }
+        movie.setOutputSettings(settings, for: connection)
+        Self.logger.info("Video size \(self.videoSize.rawValue, privacy: .public): \(codec.rawValue, privacy: .public), bit rate \(self.videoSize.averageBitRate ?? 0, privacy: .public), keys \(keys, privacy: .public)")
     }
 
     // MARK: Configuration (on `queue`)

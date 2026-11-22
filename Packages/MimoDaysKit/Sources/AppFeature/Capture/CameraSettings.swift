@@ -20,19 +20,6 @@ struct CameraSettings: Codable, Equatable, Sendable {
         var duration: Duration { .seconds(rawValue) }
     }
 
-    /// The largest video format the camera may use. Two cameras at once never get more than 1080p.
-    enum VideoQuality: String, Codable, CaseIterable, Sendable {
-        case hd720
-        case hd1080
-
-        var maxFormatWidth: Int32 {
-            switch self {
-            case .hd720: 1280
-            case .hd1080: 1920
-            }
-        }
-    }
-
     /// Where the selfie window sits and how big it is (C04). Medium in the top right by default.
     struct SelfieWindow: Codable, Equatable, Sendable {
         enum Corner: String, Codable, CaseIterable, Sendable {
@@ -67,7 +54,8 @@ struct CameraSettings: Codable, Equatable, Sendable {
     /// Video until the person picks otherwise in Settings › Camera (or the camera's ••• sheet).
     var opensIn = Mode.video
     var videoLength = VideoLength.short
-    var videoQuality = VideoQuality.hd1080
+    /// P3.4: High, Balanced or Compact, for both cameras.
+    var videoSize = VideoSize.high
     var recordsSound = true
     var cameraSounds = false
     var selfieWindow = SelfieWindow()
@@ -82,19 +70,29 @@ struct CameraSettings: Codable, Equatable, Sendable {
 
     init() {}
 
-    /// Settings saved by an earlier version lack the newer keys; those keep their defaults.
+    /// 1.0.6 kept a video quality instead of the size: 720p becomes Compact, 1080p High.
+    private enum LegacyKeys: String, CodingKey {
+        case videoQuality
+    }
+
+    /// Settings saved by an earlier version lack the newer keys; those keep their defaults. A value this version
+    /// doesn't know resets that one setting, not all of them.
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        opensIn = try container.decodeIfPresent(Mode.self, forKey: .opensIn) ?? opensIn
-        videoLength = try container.decodeIfPresent(VideoLength.self, forKey: .videoLength) ?? videoLength
-        videoQuality = try container.decodeIfPresent(VideoQuality.self, forKey: .videoQuality) ?? videoQuality
-        recordsSound = try container.decodeIfPresent(Bool.self, forKey: .recordsSound) ?? recordsSound
-        cameraSounds = try container.decodeIfPresent(Bool.self, forKey: .cameraSounds) ?? cameraSounds
-        selfieWindow = try container.decodeIfPresent(SelfieWindow.self, forKey: .selfieWindow) ?? selfieWindow
-        format = try container.decodeIfPresent(CaptureFormat.self, forKey: .format) ?? format
-        flash = try container.decodeIfPresent(FlashMode.self, forKey: .flash) ?? flash
-        backLens = try container.decodeIfPresent(BackLens.self, forKey: .backLens) ?? backLens
-        arrangement = try container.decodeIfPresent(PiPLayout.Arrangement.self, forKey: .arrangement) ?? arrangement
+        let legacy = try decoder.container(keyedBy: LegacyKeys.self)
+        if let quality = try? legacy.decodeIfPresent(String.self, forKey: .videoQuality) {
+            videoSize = quality == "hd720" ? .compact : .high
+        }
+        opensIn = (try? container.decodeIfPresent(Mode.self, forKey: .opensIn)) ?? opensIn
+        videoLength = (try? container.decodeIfPresent(VideoLength.self, forKey: .videoLength)) ?? videoLength
+        videoSize = (try? container.decodeIfPresent(VideoSize.self, forKey: .videoSize)) ?? videoSize
+        recordsSound = (try? container.decodeIfPresent(Bool.self, forKey: .recordsSound)) ?? recordsSound
+        cameraSounds = (try? container.decodeIfPresent(Bool.self, forKey: .cameraSounds)) ?? cameraSounds
+        selfieWindow = (try? container.decodeIfPresent(SelfieWindow.self, forKey: .selfieWindow)) ?? selfieWindow
+        format = (try? container.decodeIfPresent(CaptureFormat.self, forKey: .format)) ?? format
+        flash = (try? container.decodeIfPresent(FlashMode.self, forKey: .flash)) ?? flash
+        backLens = (try? container.decodeIfPresent(BackLens.self, forKey: .backLens)) ?? backLens
+        arrangement = (try? container.decodeIfPresent(PiPLayout.Arrangement.self, forKey: .arrangement)) ?? arrangement
     }
 }
 
@@ -156,6 +154,8 @@ struct CameraServices {
     var drafts: ReviewDraftStore
     var voice: VoiceServices
     var places: PlaceServices
+    /// P3.4: the MB a minute each video size takes on this phone.
+    var videoSizes: VideoSizeMeter
     /// P8.11: where a moment being written waits.
     var writing = WritingDraftStore.temporary
 
@@ -165,7 +165,8 @@ struct CameraServices {
             makeEngine: { SimulatedCaptureEngine() }, settings: InMemoryCameraSettingsStore(),
             drafts: ReviewDraftStore(root: FileManager.default.temporaryDirectory.appending(path: "Review-\(UUID().uuidString)")),
             voice: .simulated,
-            places: .simulated
+            places: .simulated,
+            videoSizes: VideoSizeMeter(defaults: nil)
         )
     }
 }

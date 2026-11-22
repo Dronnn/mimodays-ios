@@ -74,7 +74,7 @@ struct CameraView: View {
         .task { await model.start() }
         .onDisappear { model.close() }
         .sheet(isPresented: $showsSettings, onDismiss: explainMicrophone) {
-            CameraSettingsSheet(settings: $model.settings, lenses: model.lenses, chooseLens: model.chooseBackLens)
+            CameraSettingsSheet(settings: $model.settings, lenses: model.lenses, chooseLens: model.chooseBackLens, sizeRates: model.videoSizes?.rates() ?? [:])
         }
         .sheet(isPresented: $adjustsSelfie, onDismiss: explainMicrophone) {
             SelfieWindowSheet(placement: $model.settings.selfieWindow)

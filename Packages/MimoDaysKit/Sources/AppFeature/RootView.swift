@@ -623,6 +623,7 @@ struct CaptureFlowView: View {
                 }
             )
             camera?.repeating = saver.flatMap { ThenNow.capturedTime(of: request.repeatOf, in: $0.context) }
+            camera?.videoSizes = services.videoSizes
         }
     }
 }

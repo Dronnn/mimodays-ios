@@ -83,7 +83,11 @@ struct SettingsSnapshotTests {
     @Test func camera() {
         var settings = CameraSettings()
         assertScreenSnapshots(
-            of: page(CameraSettingsView(settings: Binding { settings } set: { settings = $0 }, access: .allowed)), variants: variants
+            of: page(CameraSettingsView(
+                settings: Binding { settings } set: { settings = $0 }, access: .allowed,
+                // X01: measured on this phone.
+                sizeRates: [.high: .init(megabytesPerMinute: 110, bothCameras: true)]
+            )), variants: variants
         )
     }
 

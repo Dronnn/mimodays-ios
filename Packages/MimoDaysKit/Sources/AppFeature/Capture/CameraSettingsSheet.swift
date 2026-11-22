@@ -10,6 +10,8 @@ struct CameraSettingsSheet: View {
     var lenses: [BackLens] = []
     /// A lens tap, also on the chosen one (it may have been pinched away from).
     var chooseLens: (BackLens) -> Void = { _ in }
+    /// P3.4: what each video size took on this phone.
+    var sizeRates: [VideoSize: VideoSizeMeter.Rate] = [:]
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -54,6 +56,10 @@ struct CameraSettingsSheet: View {
                         SegmentedControl(selection: $settings.videoLength, options: CameraSettings.VideoLength.allCases) {
                             Text($0.settingsLabel)
                         }
+                    }
+                    // X02.
+                    section(Text("Video size", bundle: .module, comment: "Section over High / Balanced / Compact (P3.4)")) {
+                        VideoSizePicker(size: $settings.videoSize, rates: sizeRates)
                     }
                     VStack(spacing: 0) {
                         toggle(Text("Record sound", bundle: .module), isOn: $settings.recordsSound, id: "cameraSettings.sound")

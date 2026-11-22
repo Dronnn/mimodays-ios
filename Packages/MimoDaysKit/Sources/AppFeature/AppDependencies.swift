@@ -104,7 +104,7 @@ public final class AppDependencies {
             makeEngine: { @MainActor () -> any CaptureEngine in
                 simulatedCamera
                     ? SimulatedCaptureEngine(footage: footage)
-                    : AVCaptureEngine(maxFormatWidth: cameraSettings.load().videoQuality.maxFormatWidth)
+                    : AVCaptureEngine(videoSize: cameraSettings.load().videoSize)
             },
             // The simulator has no motion data; there the sensor follows the device orientation, which UI tests can set.
             makeOrientation: { MotionOrientationSensor() },
@@ -112,6 +112,7 @@ public final class AppDependencies {
             drafts: ReviewDraftStore(root: Self.reviewRoot(configuration)),
             voice: Self.voice(simulated: simulatedCamera),
             places: Self.places(configuration, context: modelContainer.mainContext, privacy: privacyPreferences),
+            videoSizes: VideoSizeMeter(defaults: configuration.isUITesting ? nil : .standard),
             writing: WritingDraftStore(url: Self.reviewRoot(configuration).deletingLastPathComponent().appending(path: configuration.isUITesting ? "UITestWriting-\(UUID().uuidString).json" : "Writing.json"))
         )
         momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))

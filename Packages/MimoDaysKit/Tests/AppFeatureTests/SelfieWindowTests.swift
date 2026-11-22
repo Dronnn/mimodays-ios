@@ -94,7 +94,28 @@ struct SelfieWindowSettingsTests {
         let settings = UserDefaultsCameraSettingsStore(defaults: defaults).load()
         #expect(settings.opensIn == .video && settings.videoLength == .medium && !settings.recordsSound && settings.cameraSounds)
         #expect(settings.selfieWindow == .init(corner: .bottomLeft, scale: .small))
-        #expect(settings.videoQuality == .hd1080)
+        #expect(settings.videoSize == .high)
+    }
+
+    /// P3.4: 1.0.6's 720p becomes Compact and 1080p High; a value this version doesn't know resets only itself.
+    @Test(arguments: [("hd720", VideoSize.compact), ("hd1080", .high)])
+    func savedVideoQualityBecomesASize(_ quality: String, _ size: VideoSize) throws {
+        let saved = #"{"opensIn":"photo","videoLength":60,"videoQuality":"\#(quality)"}"#
+        let settings = try JSONDecoder().decode(CameraSettings.self, from: Data(saved.utf8))
+        #expect(settings.videoSize == size && settings.opensIn == .photo && settings.videoLength == .long)
+    }
+
+    @Test func anUnknownValueResetsOnlyItself() throws {
+        let saved = #"{"opensIn":"photo","videoSize":"huge","videoLength":"forever","recordsSound":false}"#
+        let settings = try JSONDecoder().decode(CameraSettings.self, from: Data(saved.utf8))
+        #expect(settings.videoSize == .high && settings.videoLength == .short && settings.opensIn == .photo && !settings.recordsSound)
+    }
+
+    @Test func theSizeIsSavedUnderItsOwnKey() throws {
+        var settings = CameraSettings()
+        settings.videoSize = .balanced
+        let decoded = try JSONDecoder().decode(CameraSettings.self, from: JSONEncoder().encode(settings))
+        #expect(decoded.videoSize == .balanced)
     }
 
     @Test func theCameraKeepsWhatTheUserChose() async {

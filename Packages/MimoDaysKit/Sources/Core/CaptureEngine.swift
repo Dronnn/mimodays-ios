@@ -241,6 +241,9 @@ public protocol CaptureEngine: AnyObject, Sendable {
     func backLenses() async -> [BackLens]
     /// The rear lens from now on; before `start()`, the one it starts with. A lens the phone can't use is the wide one.
     func setBackLens(_ lens: BackLens) async throws
+    /// P3.4: the size of videos from now on, the same for both cameras. A new bit rate applies from the next take; a
+    /// new width sets the cameras up again, after the recording when one is running.
+    func setVideoSize(_ size: VideoSize) async
     /// Switches to the other camera. Single-camera setups only; a dual setup is returned unchanged.
     func flip() async throws -> CameraSetup
     /// Adds or removes the microphone. Only with permission, and only for video.

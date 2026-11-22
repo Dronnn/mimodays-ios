@@ -85,6 +85,11 @@ public actor SimulatedCaptureEngine: CaptureEngine {
 
     public func backLenses() -> [BackLens] { lenses }
 
+    /// Every size asked for, in order (P3.4).
+    public private(set) var videoSizes: [VideoSize] = []
+
+    public func setVideoSize(_ size: VideoSize) { videoSizes.append(size) }
+
     public func setBackLens(_ lens: BackLens) {
         backLens = lenses.contains(lens) ? lens : .wide
         // Like a virtual camera: the lens is a zoom stop.

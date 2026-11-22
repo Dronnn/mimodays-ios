@@ -117,6 +117,8 @@ final class CameraModel {
         didSet {
             store.save(settings)
             if settings.recordsSound != oldValue.recordsSound { Task { await refreshMicrophone() } }
+            // P3.4: from the next take, between takes.
+            if settings.videoSize != oldValue.videoSize { Task { [engine, size = settings.videoSize] in await engine.setVideoSize(size) } }
             if isRecording, settings.flash != oldValue.flash { setTorch(settings.flash) }
             if settings.backLens != oldValue.backLens, phase != .starting {
                 Task { [engine, lens = settings.backLens] in
@@ -128,6 +130,8 @@ final class CameraModel {
     }
 
     let isSurprise: Bool
+    /// P3.4: measures each video for the size picker; none in tests.
+    var videoSizes: VideoSizeMeter?
     /// P8.8 GG02: capturing again the moment taken then.
     var repeating: CaptureTime?
     let engine: any CaptureEngine
@@ -392,6 +396,7 @@ final class CameraModel {
             let recorded = arranged(try await engine.record(limit: limit), as: shot)
             await setTorch(.off).value
             guard let video = await MediaCheck.checked(recorded) else { throw CaptureError.recordingFailed }
+            measure(video)
             phase = .ready
             deliver(result(.video(video), selfie: video.selfieURL, at: capturedAt, as: shot))
         } catch {
@@ -399,6 +404,16 @@ final class CameraModel {
             phase = .ready
             failure = CaptureFailure(error)
         }
+    }
+
+    /// P3.4: the take's files and length, for the MB a minute under the size picker.
+    private func measure(_ video: CapturedVideo) {
+        guard let videoSizes else { return }
+        let files = [video.mainURL] + (video.selfieURL.map { [$0] } ?? [])
+        let bytes = files.reduce(Int64(0)) { sum, url in
+            sum + Int64((try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
+        }
+        videoSizes.record(settings.videoSize, streams: files.count, bytes: bytes, seconds: video.duration)
     }
 
     private func deliver(_ capture: CaptureResult) {

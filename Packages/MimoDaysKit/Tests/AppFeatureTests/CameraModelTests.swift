@@ -142,6 +142,7 @@ struct CameraModelInterruptionTests {
 
     /// The simulated recording with the selfie starting 0.3 s after the main stream.
     private actor OffsetVideoEngine: CaptureEngine {
+        func setVideoSize(_ size: VideoSize) {}
         private let base = SimulatedCaptureEngine()
         private(set) var recorded: CapturedVideo?
 
@@ -210,6 +211,7 @@ struct CameraModelInterruptionTests {
 
     /// The simulated camera, with a photo that comes only once released and a stop that doesn't cut it short.
     private actor HeldPhotoEngine: CaptureEngine {
+        func setVideoSize(_ size: VideoSize) {}
         private let base = SimulatedCaptureEngine()
         private var held: CheckedContinuation<Void, Never>?
         var isHolding: Bool { held != nil }

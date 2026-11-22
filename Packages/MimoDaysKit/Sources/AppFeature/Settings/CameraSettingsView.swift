@@ -14,7 +14,8 @@ struct CameraSettingsScreen: View {
             if let services, let settings {
                 CameraSettingsView(
                     settings: Binding { settings } set: { self.settings = $0; services.settings.save($0) },
-                    access: access
+                    access: access,
+                    sizeRates: services.videoSizes.rates()
                 )
             } else {
                 // An empty group never appears, so its task would never load the settings.
@@ -50,6 +51,8 @@ struct CameraSettingsView: View {
 
     @Binding var settings: CameraSettings
     let access: Access
+    /// P3.4: what each video size took on this phone.
+    var sizeRates: [VideoSize: VideoSizeMeter.Rate] = [:]
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -69,18 +72,13 @@ struct CameraSettingsView: View {
                         .padding(.top, 6)
                         .padding(.horizontal, 20)
                         .accessibilityIdentifier("cameraSettings.length")
+                    // X01.
+                    sectionLabel(Text("Video size", bundle: .module))
+                        .padding(.top, 16)
+                    VideoSizePicker(size: $settings.videoSize, rates: sizeRates)
+                        .padding(.top, 6)
+                        .padding(.horizontal, 20)
                     DataCard {
-                        Menu {
-                            Picker(selection: $settings.videoQuality) {
-                                ForEach(CameraSettings.VideoQuality.allCases, id: \.self) { Text(verbatim: $0.label).tag($0) }
-                            } label: {
-                                Text("Video quality", bundle: .module)
-                            }
-                        } label: {
-                            SettingsValueRow(title: Text("Video quality", bundle: .module), value: Text(verbatim: settings.videoQuality.label))
-                        }
-                        .accessibilityIdentifier("cameraSettings.quality")
-                        DataSeparator()
                         Menu {
                             Picker(selection: $settings.selfieWindow.corner) {
                                 ForEach(CameraSettings.SelfieWindow.Corner.allCases, id: \.self) { Text($0.title).tag($0) }
@@ -170,11 +168,13 @@ struct SettingsValueRow: View {
     }
 }
 
-extension CameraSettings.VideoQuality {
-    var label: String {
+extension VideoSize {
+    /// X01/X02: the segment names.
+    var label: Text {
         switch self {
-        case .hd720: "720p"
-        case .hd1080: "1080p"
+        case .high: Text("High", bundle: .module, comment: "Video size (P3.4): today's size, the default")
+        case .balanced: Text("Balanced", bundle: .module, comment: "Video size (P3.4): 1080p at a lower bit rate")
+        case .compact: Text("Compact", bundle: .module, comment: "Video size (P3.4): the smallest videos")
         }
     }
 }

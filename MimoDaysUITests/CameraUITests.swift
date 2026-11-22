@@ -256,6 +256,8 @@ final class CameraUITests: XCTestCase {
         note.tap()
         let text = app.textViews["note.text"]
         XCTAssertTrue(text.waitForExistence(timeout: 5))
+        // The editor focuses itself on appearing; a slow runner can type before it has.
+        text.tap()
         text.typeText("Lena on her bike")
         // The counter follows the typing a moment later on a busy simulator.
         let counted = expectation(for: NSPredicate(format: "label == '16 of 500 characters'"), evaluatedWith: app.staticTexts["note.count"])

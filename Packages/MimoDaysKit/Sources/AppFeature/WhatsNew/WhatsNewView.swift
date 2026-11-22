@@ -59,7 +59,11 @@ struct WhatsNewView: View {
                 .background(ColorToken.canvas.color.ignoresSafeArea(edges: .bottom))
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
+        // A container of its own: an identifier on the bare stack would replace its buttons' identifiers. Modal, so
+        // VoiceOver stays out of Today underneath.
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("whatsNew")
+        .accessibilityAddTraits(.isModal)
     }
 }
 

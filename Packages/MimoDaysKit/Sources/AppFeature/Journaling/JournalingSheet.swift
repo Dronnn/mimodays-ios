@@ -19,6 +19,8 @@ struct JournalingSheet: View {
         .background(ColorToken.surfaceSheet.color.ignoresSafeArea())
         // Opened once; Try again opens it again.
         .task { if model.phase == .loading, model.pick == nil { await model.start() } }
+        // A container of its own: on the bare stack the identifier would replace its buttons' identifiers.
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("journaling")
     }
 

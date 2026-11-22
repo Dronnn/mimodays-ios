@@ -32,6 +32,8 @@ final class ViewerVideoPlayer {
         didSet { applySound() }
     }
 
+    /// Before every start, from a tap or a scrub alike: Review's voice note stops talking over it (rev-capture 17).
+    var willPlay: (() -> Void)?
     private var timeObserver: Any?
     private var endObserver: (any NSObjectProtocol)?
     /// A Mosaic piece's loop (U16): no sound, and other apps' sound left alone.
@@ -84,6 +86,7 @@ final class ViewerVideoPlayer {
     /// Both streams start at the same host time from the main one's position.
     func play() {
         guard isReady else { return }
+        willPlay?()
         if !isSilent { try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback) }
         start(at: main.currentTime())
         isPlaying = true

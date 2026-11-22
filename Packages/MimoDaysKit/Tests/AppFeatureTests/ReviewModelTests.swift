@@ -117,3 +117,39 @@ struct ReviewModelTests {
         #expect(urls.allSatisfy { !FileManager.default.fileExists(atPath: $0.path) })
     }
 }
+
+/// rev-capture 17: Review's video and voice note never talk over each other.
+@MainActor
+struct ReviewAudioTests {
+    private func review() async throws -> ReviewModel {
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let video = try await engine.record(limit: .seconds(1))
+        let review = ReviewModel(capture: CaptureResult(media: .video(video), window: .init(), capturedAt: CaptureTime(instant: .now, timeZone: .gmt)))
+        let voice = FileManager.default.temporaryDirectory.appending(path: "voice-\(UUID().uuidString).m4a")
+        try SimulatedVoiceRecorder.writeTone(to: voice, seconds: 1.2)
+        review.addVoice(at: voice, recordedAt: .now)
+        return review
+    }
+
+    @Test func playingTheVideoPausesTheVoiceNote() async throws {
+        let review = try await review()
+        defer { review.discard() }
+        await review.startPlayback()
+        let player = try #require(review.playback)
+        review.toggleVoice()
+        #expect(review.playsVoice)
+        player.play()
+        #expect(!review.playsVoice)
+    }
+
+    @Test func theVideoDoesntStartWhileAVoiceNoteRecords() async throws {
+        let review = try await review()
+        defer { review.discard() }
+        let recording = try review.makeVoiceRecording()
+        #expect(recording.start())
+        await review.startPlayback()
+        #expect(review.playback?.isReady == true && review.playback?.isPlaying == false)
+        recording.finish()
+    }
+}

@@ -92,6 +92,8 @@ final class ReviewModel {
     /// C10 waveform, one level (0...1) per bar.
     private(set) var voiceLevels: [Float] = []
     private(set) var playsVoice = false
+    /// The voice note being recorded, while its sheet is up.
+    @ObservationIgnored private weak var voiceRecording: VoiceRecording?
     let voicePlayer = AVPlayer()
     private var voiceEndObserver: (any NSObjectProtocol)?
     private var transcription: Task<Void, Never>?
@@ -217,7 +219,9 @@ final class ReviewModel {
     func makeVoiceRecording() throws -> VoiceRecording {
         let url = try drafts?.newVoiceURL() ?? CaptureFiles.temporaryURL("m4a")
         Task { [transcriber = services.transcriber] in await transcriber.prepare() }
-        return VoiceRecording(recorder: services.makeRecorder(), url: url, limit: Self.voiceLimit)
+        let recording = VoiceRecording(recorder: services.makeRecorder(), url: url, limit: Self.voiceLimit)
+        voiceRecording = recording
+        return recording
     }
 
     /// A finished C09 recording becomes the voice note, in place of any earlier one. Under half a second is dropped.
@@ -279,6 +283,12 @@ final class ReviewModel {
         playsVoice = true
     }
 
+    private func pauseVoice() {
+        guard playsVoice else { return }
+        voicePlayer.pause()
+        playsVoice = false
+    }
+
     func stopVoice() {
         voicePlayer.pause()
         voicePlayer.replaceCurrentItem(with: nil)
@@ -327,9 +337,13 @@ final class ReviewModel {
            let stream = try? await VideoComposer.selfieStream(selfieURL, offset: video.selfieOffset, mainDuration: duration) {
             selfie = AVPlayerItem(asset: stream)
         }
+        // The voice note pauses whenever the video starts, however it was started.
+        player.willPlay = { [weak self] in self?.pauseVoice() }
         await player.load(main: AVPlayerItem(asset: main), selfie: selfie)
-        // Saved, retaken or recording a voice note meanwhile.
-        guard playback === player, !playsVoice else { return }
+        // Saved or retaken meanwhile: this player is done with.
+        guard playback === player else { return player.stop() }
+        // Not over a voice note playing or being recorded: its audio session stays as it is.
+        guard !playsVoice, voiceRecording?.isFinished != false else { return }
         player.play()
     }
 

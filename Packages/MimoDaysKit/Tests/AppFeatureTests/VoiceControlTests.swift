@@ -74,6 +74,20 @@ struct VoiceControlTests {
         #expect(Set(picture?.actions ?? []) == ["Focus in the middle", "Lock focus and exposure"])
     }
 
+    /// rev-library: a card offers only what it can do: no Swap on one camera, no Previous on the first moment.
+    @Test func aCardOffersOnlyTheActionsItCanRun() {
+        let card = Color.orange.frame(width: 300, height: 400)
+            .accessibilityElement()
+            .accessibilityLabel(Text(verbatim: "Card"))
+            .memoryCardActions(MemoryCardActions(flip: {}, swap: nil, step: { _ in }, canStep: { $0 > 0 }))
+        #expect(Set(nodes(card).first { $0.label == "Card" }?.actions ?? []) == ["Flip card", "Next moment"])
+        let both = Color.orange.frame(width: 300, height: 400)
+            .accessibilityElement()
+            .accessibilityLabel(Text(verbatim: "Card"))
+            .memoryCardActions(MemoryCardActions(flip: {}, swap: {}, step: { _ in }))
+        #expect(Set(nodes(both).first { $0.label == "Card" }?.actions ?? []) == ["Flip card", "Swap cameras", "Next moment", "Previous moment"])
+    }
+
     /// P4.3: the selfie window's drag, pinch and press come down to one named action, which opens its sheet.
     @Test func theSelfieWindowNamesItsAdjustment() {
         let window = nodes(AdjustableSelfieWindow(

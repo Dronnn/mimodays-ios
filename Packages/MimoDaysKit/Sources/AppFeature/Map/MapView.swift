@@ -1016,6 +1016,13 @@ struct PlacePreview: View {
             .environment(\.layoutDirection, .leftToRight)
             .task { await model.load(moment.id) }
             .accessibilityElement()
-            .accessibilityLabel(MemoryTile.kind(moment.item.mediaType))
+            .accessibilityLabel(Self.label(moment))
+    }
+
+    /// "Photo, Nov 11, 2025, 6:42 PM": the four previews told apart (rev-library), the time in the moment's own zone.
+    static func label(_ moment: MapMoment) -> Text {
+        var when = Date.FormatStyle(date: .abbreviated, time: .shortened)
+        when.timeZone = moment.item.captured.timeZone
+        return MemoryTile.kind(moment.item.mediaType) + Text(verbatim: ", ") + Text(moment.item.capturedAt, format: when)
     }
 }

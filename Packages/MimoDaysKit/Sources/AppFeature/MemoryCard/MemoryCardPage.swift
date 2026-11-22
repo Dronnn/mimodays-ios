@@ -182,7 +182,10 @@ struct MemoryCardPage: View {
         MemoryCardActions(
             flip: { flipOver() },
             swap: hasWindow && !flip.showsBack ? { swap() } : nil,
-            step: step
+            step: step,
+            canStep: { [model, id = moment.id] offset in
+                model.ids.firstIndex(of: id).map { model.ids.indices.contains($0 + offset) } ?? false
+            }
         )
     }
 
@@ -229,16 +232,27 @@ struct MemoryCardPage: View {
 /// What VoiceOver can do on a card (U25): flip it, swap its cameras, go to the next or previous moment.
 struct MemoryCardActions {
     let flip: () -> Void
+    /// Nil on a one-camera moment and on the back: no Swap cameras then.
     let swap: (() -> Void)?
     let step: (Int) -> Void
+    /// Next and Previous are offered only where there is a moment to go to (rev-library).
+    var canStep: (Int) -> Bool = { _ in true }
 }
 
 extension View {
     /// The card's VoiceOver actions on this element.
     func memoryCardActions(_ actions: MemoryCardActions) -> some View {
-        accessibilityAction(named: Text("Flip card", bundle: .module), actions.flip)
-            .accessibilityAction(named: Text("Swap cameras", bundle: .module)) { actions.swap?() }
-            .accessibilityAction(named: Text("Next moment", bundle: .module)) { actions.step(1) }
-            .accessibilityAction(named: Text("Previous moment", bundle: .module)) { actions.step(-1) }
+        accessibilityActions {
+            Button(action: actions.flip) { Text("Flip card", bundle: .module) }
+            if let swap = actions.swap {
+                Button(action: swap) { Text("Swap cameras", bundle: .module) }
+            }
+            if actions.canStep(1) {
+                Button { actions.step(1) } label: { Text("Next moment", bundle: .module) }
+            }
+            if actions.canStep(-1) {
+                Button { actions.step(-1) } label: { Text("Previous moment", bundle: .module) }
+            }
+        }
     }
 }

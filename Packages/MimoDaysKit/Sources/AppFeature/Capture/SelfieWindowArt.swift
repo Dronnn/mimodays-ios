@@ -1,4 +1,5 @@
 import CoreImage
+import Persistence
 import DesignSystem
 import UIKit
 
@@ -14,6 +15,17 @@ struct SelfieWindowArt: @unchecked Sendable {
     private let openingRect: CGRect
     private let rotation: CGAffineTransform
     let canvas: CGSize
+    /// Moves a full main frame so the part the format shows sits on the canvas.
+    private var mainShift = CGAffineTransform.identity
+
+    /// rev-capture 13: on the part of a `main`-sized frame the format shows, as the card does; `window` is placed on
+    /// that part.
+    init(window: SelfieWindowFrame, main: CGSize, format: CaptureFormat) {
+        let crop = MomentComposition.formatCrop(main, format)
+        self.init(window: window, canvas: crop.size)
+        // Core Image counts from the bottom.
+        mainShift = CGAffineTransform(translationX: -crop.minX, y: -(main.height - crop.maxY))
+    }
 
     init(window: SelfieWindowFrame, canvas: CGSize) {
         self.canvas = canvas
@@ -64,7 +76,7 @@ struct SelfieWindowArt: @unchecked Sendable {
 
     /// `main` must fill the canvas (origin at zero); `selfie` is any upright image.
     func compose(main: CIImage, selfie: CIImage?) -> CIImage {
-        let framed = frame.composited(over: main)
+        let framed = frame.composited(over: main.transformed(by: mainShift))
         guard let selfie else { return framed }
         let extent = selfie.extent
         let fill = max(openingRect.width / extent.width, openingRect.height / extent.height)

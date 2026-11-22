@@ -226,11 +226,13 @@ struct MomentViewerTests {
         generator.requestedTimeToleranceBefore = .zero
         generator.requestedTimeToleranceAfter = .zero
         let frame = try await generator.image(at: CMTime(seconds: 0.5, preferredTimescale: 600)).image
-        #expect(CGSize(width: frame.width, height: frame.height) == source.pixelSize)
+        // rev-capture 13: what the card shows, the format's part of the frame.
+        let shown = MomentComposition.formatCrop(source.pixelSize, try #require(viewer.moments[id]?.format)).size
+        #expect(CGSize(width: frame.width, height: frame.height) == shown)
 
         let window = try #require(saved.timing.window)
-        let rect = PhotoComposer.placement(of: window, in: source.pixelSize).rect
-        #expect(rect.midX < source.pixelSize.width / 2 && rect.midY > source.pixelSize.height / 2)
+        let rect = PhotoComposer.placement(of: window, in: shown).rect
+        #expect(rect.midX < shown.width / 2 && rect.midY > shown.height / 2)
         let pixel = try Self.pixels(frame)
         // Along the window's tilted vertical axis: the border's middle, and well inside the opening.
         let border = SelfieWindowStyle.border * rect.width / SelfieWindowStyle.size.width
@@ -315,9 +317,11 @@ struct MomentViewerTests {
         #expect(layout.placement(nearest: saved) == moved && reread.moments[id]?.composedPath == composed)
 
         let image = try #require(await ImageDecoding.thumbnail(try store.url(for: composed), maxPixelSize: nil))
-        #expect(CGSize(width: image.width, height: image.height) == photo.pixelSize)
-        let rect = PhotoComposer.placement(of: saved.windowFrame(in: photo.pixelSize), in: photo.pixelSize).rect
-        #expect(rect.midX < photo.pixelSize.width / 2 && rect.midY > photo.pixelSize.height / 2)
+        // rev-capture 13: what the card shows, the format's part of the photo.
+        let shown = MomentComposition.formatCrop(photo.pixelSize, try #require(reread.moments[id]?.format)).size
+        #expect(CGSize(width: image.width, height: image.height) == shown)
+        let rect = PhotoComposer.placement(of: saved.windowFrame(in: shown), in: shown).rect
+        #expect(rect.midX < shown.width / 2 && rect.midY > shown.height / 2)
         let inside = try Self.pixels(image)((Int(rect.midX), Int(rect.midY)))
         #expect(inside.g > inside.r, "mint selfie: \(inside)")
     }

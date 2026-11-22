@@ -156,8 +156,8 @@ struct ViewerMoment: Equatable, Identifiable {
                 timing: VideoTiming(
                     duration: main.duration ?? 0, selfieOffset: selfie?.startOffset ?? 0, hasAudio: main.hasAudio,
                     mainPosition: main.role == .frontSource ? .front : .back,
-                    window: layout?.windowFrame(in: pixelSize),
-                    halves: layout?.isHalves == true ? moment.captureFormat : nil
+                    window: layout?.windowFrame(in: MomentComposition.formatCrop(pixelSize, moment.captureFormat).size),
+                    halves: layout?.isHalves == true ? moment.captureFormat : nil, format: moment.captureFormat
                 ),
                 pixelSize: pixelSize, layout: layout
             )
@@ -403,7 +403,7 @@ final class MomentViewerModel {
         }
         if var video = viewed.video {
             video.layout = saved
-            video.timing.window = saved.windowFrame(in: video.pixelSize)
+            video.timing.window = saved.windowFrame(in: MomentComposition.formatCrop(video.pixelSize, viewed.format).size)
             video.timing.halves = saved.isHalves ? viewed.format : nil
             moments[id]?.video = video
         } else {
@@ -443,7 +443,10 @@ final class MomentViewerModel {
                       let main = url(viewed.mainPath), let selfie = url(viewed.selfiePath) {
                 let composed = layout.isHalves
                     ? try await PhotoComposer.compose(mainURL: main, selfieURL: selfie, halves: viewed.format)
-                    : try await PhotoComposer.compose(mainURL: main, selfieURL: selfie, window: layout.windowFrame(in: photo.pixelSize))
+                    : try await PhotoComposer.compose(
+                        mainURL: main, selfieURL: selfie,
+                        window: layout.windowFrame(in: MomentComposition.formatCrop(photo.pixelSize, viewed.format).size), format: viewed.format
+                    )
                 defer { try? FileManager.default.removeItem(at: composed) }
                 moments[viewed.id]?.composedPath = try replace(.composedPreview, of: viewed.id, with: composed)
                 guard let image = await ReviewModel.still(composed, maxPixelSize: MomentSaver.thumbnailSize, at: 0)?.cgImage else { return }

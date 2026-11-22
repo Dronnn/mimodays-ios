@@ -14,6 +14,8 @@ struct VideoTiming: Codable, Equatable, Sendable {
     var window: SelfieWindowFrame?
     /// H.8: the two streams share the format's frame in halves instead (the window is ignored).
     var halves: CaptureFormat?
+    /// rev-capture 13: the window composite shows the format's part of the main frame, as the card; nil, all of it.
+    var format: CaptureFormat?
 }
 
 /// Plays (and later exports) the two streams as one: the main video with the selfie video in the signature
@@ -72,6 +74,8 @@ enum VideoComposer {
         let mainSize = CGSize(width: abs(upright.width), height: abs(upright.height))
         let art: any FrameArt = if let format = timing.halves {
             HalvesArt(format: format, main: mainSize)
+        } else if let format = timing.format {
+            SelfieWindowArt(window: timing.window ?? SelfieWindowFrame(frame: .zero, preview: mainSize), main: mainSize, format: format)
         } else {
             SelfieWindowArt(window: timing.window ?? SelfieWindowFrame(frame: .zero, preview: mainSize), canvas: mainSize)
         }

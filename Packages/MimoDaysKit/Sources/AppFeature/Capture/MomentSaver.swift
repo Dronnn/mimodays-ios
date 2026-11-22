@@ -74,7 +74,7 @@ struct MomentSaver {
                 if let halves {
                     composedPhoto = try? await PhotoComposer.compose(mainURL: capture.mainURL, selfieURL: selfieURL, halves: halves)
                 } else if let window {
-                    composedPhoto = try? await PhotoComposer.compose(mainURL: capture.mainURL, selfieURL: selfieURL, window: window)
+                    composedPhoto = try? await PhotoComposer.compose(mainURL: capture.mainURL, selfieURL: selfieURL, window: window, format: capture.format)
                 }
             }
             let mainRole = role(capture.mainPosition)

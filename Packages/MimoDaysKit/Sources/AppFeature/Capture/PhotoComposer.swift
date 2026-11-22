@@ -24,9 +24,10 @@ enum PhotoComposer {
 
     /// Reads both files upright (orientation and mirroring applied), composes, writes HEIC (JPEG where HEIC
     /// encoding isn't available). Runs off the main actor.
-    static func compose(mainURL: URL, selfieURL: URL, window: SelfieWindowFrame) async throws -> URL {
+    /// What the card shows: the format's part of the main photo (rev-capture 13).
+    static func compose(mainURL: URL, selfieURL: URL, window: SelfieWindowFrame, format: CaptureFormat) async throws -> URL {
         try await compose(mainURL: mainURL, selfieURL: selfieURL) {
-            render(SelfieWindowArt(window: window, canvas: CGSize(width: $0.width, height: $0.height)), main: $0, selfie: $1)
+            render(SelfieWindowArt(window: window, main: CGSize(width: $0.width, height: $0.height), format: format), main: $0, selfie: $1)
         }
     }
 

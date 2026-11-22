@@ -101,6 +101,14 @@ struct MomentComposition: Equatable, Sendable {
         return CGRect(x: 0, y: (1 - height) / 2, width: 1, height: height)
     }
 
+    /// rev-capture 13: the part of a full frame of `size` the card shows for `format`, centred, in whole pixels (top-left
+    /// origin). "As seen" pictures are this part, and a saved window's place is a share of it.
+    static func formatCrop(_ size: CGSize, _ format: CaptureFormat) -> CGRect {
+        let rect = fitted(aspect: format.aspectRatio, in: CGRect(origin: .zero, size: size), fit: .showAll)
+        let width = min(size.width, rect.width.rounded()), height = min(size.height, rect.height.rounded())
+        return CGRect(x: ((size.width - width) / 2).rounded(.down), y: ((size.height - height) / 2).rounded(.down), width: width, height: height)
+    }
+
     /// A rectangle of `aspect` on `bounds`: Fill covers it and reaches past it, Show all fits inside.
     static func fitted(aspect: CGFloat, in bounds: CGRect, fit: MovieFit) -> CGRect {
         let boundsAspect = bounds.width / bounds.height

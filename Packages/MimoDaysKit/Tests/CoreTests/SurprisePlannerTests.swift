@@ -1,4 +1,4 @@
-import Core
+@testable import Core
 import Foundation
 import Testing
 import TestSupport
@@ -209,6 +209,29 @@ struct SurprisePlannerTests {
         let times = draw(Self.rules(.daily(2)), now: autumn)
         #expect(times.count == 28)
         #expect(times.allSatisfy { (8 * 60...22 * 60).contains(Self.minute(of: $0, calendar)) })
+    }
+
+    /// rev-app 9: the calendar moves a time the clocks skip to 03:00, after the window's latest time. A window
+    /// inside the skipped hour has no minute that night; one ending in it ends before the gap.
+    @Test func aWindowTheClocksSkipBringsNoSurpriseAfterIt() {
+        let night = Self.date("2026-03-29 00:00", in: calendar) // 02:00 -> 03:00
+        let skipped = draw(Self.rules(.daily(1), from: 2 * 60, to: 2 * 60 + 30), now: night)
+        #expect(!skipped.contains { calendar.isDate($0, inSameDayAs: night) })
+        for seed in UInt64(1)...80 {
+            let times = draw(Self.rules(.daily(1), from: 60, to: 2 * 60 + 30), now: night, seed: seed)
+            #expect(times.filter { calendar.isDate($0, inSameDayAs: night) }.allSatisfy { Self.minute(of: $0, calendar) < 2 * 60 })
+        }
+    }
+
+    /// rev-app 9: the two 02:30s of the night the clocks go back fire an hour apart.
+    @Test func repeatedClockTimesFireAtTheirOwnInstant() {
+        let first = Self.date("2026-10-25 02:30", in: calendar)
+        let second = first.addingTimeInterval(3_600)
+        #expect(calendar.component(.hour, from: second) == 2)
+        let utc = Calendar(identifier: .gregorian)
+        let fires = [first, second].map { SystemNotificationScheduler.components(firing: $0) }
+        #expect(fires[0] != fires[1])
+        #expect(fires.compactMap { utc.date(from: $0) } == [first, second])
     }
 
     @Test func timesFollowTheCalendarsTimeZone() {

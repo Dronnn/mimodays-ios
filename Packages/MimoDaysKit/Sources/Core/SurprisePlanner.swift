@@ -146,8 +146,13 @@ public struct SurprisePlanner: Sendable {
 
     /// The day's window, cut to start no earlier than `notBefore` (rounded up to a whole minute).
     private func window(on day: Date, _ rules: SurpriseRules, notBefore: Date) -> Window? {
-        guard let start = time(rules.earliestMinute, on: day), let end = time(rules.latestMinute, on: day), end >= start
-        else { return nil }
+        guard let start = time(rules.earliestMinute, on: day), var end = time(rules.latestMinute, on: day) else { return nil }
+        // A latest time the clocks skip (spring forward) comes out as the first time after the gap: the window
+        // ends at the last minute before it instead.
+        if calendar.component(.hour, from: end) * 60 + calendar.component(.minute, from: end) != rules.latestMinute {
+            end.addTimeInterval(-60)
+        }
+        guard end >= start else { return nil }
         let from = max(start, roundedUpToMinute(notBefore))
         guard from <= end else { return nil }
         return Window(start: from, minutes: Int(end.timeIntervalSince(from) / 60), isPartial: from > start)

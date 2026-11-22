@@ -19,6 +19,14 @@ public struct SystemNotificationScheduler: NotificationScheduler {
         .sorted { $0.fireDate < $1.fireDate }
     }
 
+    /// The exact instant in UTC: local clock times repeat when the clocks go back, and two surprises an hour
+    /// apart would come together. The coordinator re-plans when the device's time zone changes.
+    static func components(firing date: Date) -> DateComponents {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .gmt
+        return calendar.dateComponents([.timeZone, .year, .month, .day, .hour, .minute, .second], from: date)
+    }
+
     public func schedule(_ notification: SurpriseNotification) async throws {
         let content = UNMutableNotificationContent()
         content.title = notification.title
@@ -26,14 +34,7 @@ public struct SystemNotificationScheduler: NotificationScheduler {
         content.sound = .default
         content.userInfo = [SurpriseNotification.promptIDKey: notification.promptID]
         if let category = notification.categoryID { content.categoryIdentifier = category }
-        // Components carry the time zone, so the request fires at this exact instant; the coordinator
-        // re-plans when the device's time zone changes.
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = .current
-        let components = calendar.dateComponents(
-            [.timeZone, .year, .month, .day, .hour, .minute, .second], from: notification.fireDate
-        )
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: Self.components(firing: notification.fireDate), repeats: false)
         try await UNUserNotificationCenter.current()
             .add(UNNotificationRequest(identifier: notification.id, content: content, trigger: trigger))
     }

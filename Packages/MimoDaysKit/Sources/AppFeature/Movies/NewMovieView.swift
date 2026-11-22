@@ -944,10 +944,11 @@ struct LengthStep: View {
         .accessibilityAddTraits(isOn ? .isSelected : [])
     }
 
+    /// Hand-cut like every card; the selection ring follows the same edge.
     private func option(_ isOn: Bool) -> some View {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
+        InfoCardBlob()
             .fill((isOn ? ColorToken.surfaceCard : .surfaceChip).color)
-            .strokeBorder(isOn ? ColorToken.actionCoral.color : .clear, lineWidth: 2)
+            .overlay { if isOn { InfoCardBlob().stroke(ColorToken.actionCoral.color, lineWidth: 2) } }
     }
 }
 

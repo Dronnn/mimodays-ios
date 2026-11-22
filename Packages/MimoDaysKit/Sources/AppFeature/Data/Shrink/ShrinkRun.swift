@@ -25,7 +25,8 @@ final class MediaUse {
     }
 }
 
-/// P3.5 X05: makes the chosen videos smaller one moment at a time, in the background of the app. A moment's streams are
+/// P3.5 X05 / P3.6: makes the chosen videos smaller one moment at a time, in the background of the app; when moving
+/// originals, each full-size file is first copied to the person's folder and read back there. A moment's streams are
 /// made again in tmp, checked, then swapped in with one save; the old files go after the save, or once nothing reads
 /// them. What is left is saved, so a run goes on after a restart from the video it stopped at; files from a run iOS
 /// ended mid-way are left for the launch cleanup (tmp's Shrink- folders, files no record points to).
@@ -45,8 +46,11 @@ final class ShrinkRun {
         var done: Int
         var skipped: Int
         var freed: Int64
+        var moving = false
         var stoppedForSpace = false
         var stopped = false
+        /// P3.6: the folder couldn't be opened (a drive unplugged, the folder gone).
+        var folderUnavailable = false
     }
 
     /// What is left of a run, saved after each moment.
@@ -57,6 +61,18 @@ final class ShrinkRun {
         var done = 0
         var skipped = 0
         var freed: Int64 = 0
+        /// P3.6: originals go to the folder first.
+        var moving = false
+    }
+
+    enum BringBack: Equatable {
+        case done
+        case busy
+        case noFolder
+        case folderUnavailable
+        /// The folder doesn't hold this moment's originals, or they didn't check out.
+        case notFound
+        case failed
     }
 
     private static let logger = Logger(subsystem: "MimoDays", category: "Storage")
@@ -69,6 +85,7 @@ final class ShrinkRun {
     var isRunning: Bool { phase == .running || phase == .waiting }
 
     private let library: MediaLibrary
+    let archive: OriginalArchive?
     private let transcoder: any VideoTranscoding
     private let defaults: UserDefaults?
     private let busy: @MainActor () -> Bool
@@ -79,12 +96,13 @@ final class ShrinkRun {
     private var leftovers: [String] = []
 
     init(
-        library: MediaLibrary, transcoder: any VideoTranscoding = AVVideoTranscoder(), defaults: UserDefaults?,
+        library: MediaLibrary, archive: OriginalArchive? = nil, transcoder: any VideoTranscoding = AVVideoTranscoder(), defaults: UserDefaults?,
         busy: @escaping @MainActor () -> Bool = { false },
         freeSpace: @escaping @MainActor () -> Int64? = { CaptureStorage.freeBytes() },
         scratch: URL = FileManager.default.temporaryDirectory
     ) {
         self.library = library
+        self.archive = archive
         self.transcoder = transcoder
         self.defaults = defaults
         self.busy = busy
@@ -93,11 +111,12 @@ final class ShrinkRun {
         job = defaults?.data(forKey: Self.key).flatMap { try? JSONDecoder().decode(Job.self, from: $0) }
     }
 
-    /// X04 "Make smaller", or a Memory Card's "Make smaller".
-    func start(_ selection: ShrinkSelection, size: VideoSize) {
+    /// X04 "Make smaller", or a Memory Card's "Make smaller"; with `moving`, X06 "Move originals" (always to Compact).
+    func start(_ selection: ShrinkSelection, size: VideoSize, moving: Bool = false) {
         guard !isRunning else { return }
+        let size = moving ? .compact : size
         let ids = (try? ShrinkPolicy.candidates(selection, size: size, in: library.context).map(\.id)) ?? []
-        job = Job(size: size, remaining: ids, total: ids.count)
+        job = Job(size: size, remaining: ids, total: ids.count, moving: moving)
         save()
         run()
     }
@@ -124,6 +143,16 @@ final class ShrinkRun {
         phase = .running
         task = Task { [weak self] in
             guard let self else { return }
+            var folder: URL?
+            if job?.moving == true {
+                guard let picked = try? archive?.folder() else {
+                    finish(folderUnavailable: true)
+                    return
+                }
+                folder = picked
+            }
+            let scoped = folder?.startAccessingSecurityScopedResource() ?? false
+            defer { if scoped { folder?.stopAccessingSecurityScopedResource() } }
             while let id = job?.remaining.first, !Task.isCancelled {
                 while busy(), !Task.isCancelled {
                     phase = .waiting
@@ -132,7 +161,7 @@ final class ShrinkRun {
                 guard !Task.isCancelled else { return }
                 phase = .running
                 removeLeftovers()
-                switch await shrink(id) {
+                switch await shrink(id, folder: folder) {
                 case let .done(freed):
                     job?.done += 1
                     job?.freed += freed
@@ -140,6 +169,9 @@ final class ShrinkRun {
                     job?.skipped += 1
                 case .noSpace:
                     finish(stoppedForSpace: true)
+                    return
+                case .folderUnavailable:
+                    finish(folderUnavailable: true)
                     return
                 case .cancelled:
                     return
@@ -152,9 +184,12 @@ final class ShrinkRun {
         }
     }
 
-    private func finish(stoppedForSpace: Bool = false, stopped: Bool = false) {
+    private func finish(stoppedForSpace: Bool = false, stopped: Bool = false, folderUnavailable: Bool = false) {
         let job = job ?? Job(size: .compact, remaining: [], total: 0)
-        phase = .finished(Outcome(total: job.total, done: job.done, skipped: job.skipped, freed: job.freed, stoppedForSpace: stoppedForSpace, stopped: stopped))
+        phase = .finished(Outcome(
+            total: job.total, done: job.done, skipped: job.skipped, freed: job.freed, moving: job.moving,
+            stoppedForSpace: stoppedForSpace, stopped: stopped, folderUnavailable: folderUnavailable
+        ))
         self.job = nil
         save()
         removeLeftovers()
@@ -181,68 +216,108 @@ final class ShrinkRun {
         case done(freed: Int64)
         case skipped
         case noSpace
+        case folderUnavailable
         case cancelled
     }
 
-    private func shrink(_ id: UUID) async -> Result {
+    private func shrink(_ id: UUID, folder: URL?) async -> Result {
         guard let job, let candidate = try? ShrinkPolicy.candidates(.chosen([id]), size: job.size, in: library.context).first else {
             // Gone, deleted, or already that small: nothing to do.
             return .done(freed: 0)
         }
         let needed = candidate.estimatedBytes(at: job.size) + Self.spareBytes
         if let free = freeSpace(), free < needed { return .noSpace }
-        let folder = scratch.appending(path: "Shrink-\(UUID().uuidString)", directoryHint: .isDirectory)
-        defer { try? FileManager.default.removeItem(at: folder) }
+        let work = scratch.appending(path: "Shrink-\(UUID().uuidString)", directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: work) }
         var copies: [(stream: ShrinkCandidate.Stream, url: URL)] = []
+        var moved: [MovedOriginal] = []
         do {
-            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
             for stream in candidate.streams {
                 let source = try library.store.url(for: stream.relativePath)
-                let copy = folder.appending(path: "\(stream.mediaID.uuidString).mov")
+                if let folder {
+                    let entry = MovedOriginal(
+                        mediaID: stream.mediaID, momentID: id,
+                        fileName: OriginalArchive.fileName(capturedAt: candidate.capturedAt, selfie: stream.isSelfie, mediaID: stream.mediaID),
+                        checksum: stream.checksum, byteCount: stream.byteCount, pixelWidth: stream.pixelWidth, pixelHeight: stream.pixelHeight,
+                        codec: stream.codec, movedAt: .now
+                    )
+                    do {
+                        try await detachedWork { try OriginalArchive.put(source, as: entry.fileName, checksum: entry.checksum, in: folder) }
+                    } catch {
+                        Self.logger.error("Copying an original to the folder failed: \(error.localizedDescription, privacy: .public)")
+                        discard(moved, from: folder)
+                        // A folder that can't be written to at all stops the run; one bad file skips its moment.
+                        return FileManager.default.isWritableFile(atPath: folder.path) ? .skipped : .folderUnavailable
+                    }
+                    moved.append(entry)
+                }
+                let copy = work.appending(path: "\(stream.mediaID.uuidString).mov")
                 try await transcoder.transcode(source, to: copy, size: job.size)
                 let size = Int64((try? copy.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
                 guard size > 0, size < stream.byteCount, await TranscodeCheck.matches(original: source, copy: copy, size: job.size) else {
                     Self.logger.notice("A smaller copy didn't stand in; the original stays")
+                    discard(moved, from: folder)
                     return .skipped
                 }
                 copies.append((stream, copy))
             }
         } catch is CancellationError {
+            discard(moved, from: folder)
             return .cancelled
         } catch {
+            discard(moved, from: folder)
             if Task.isCancelled { return .cancelled }
             Self.logger.error("Making a video smaller failed: \(error.localizedDescription, privacy: .public)")
             return .skipped
         }
-        guard !Task.isCancelled else { return .cancelled }
-        return await commit(id, copies)
+        guard !Task.isCancelled else {
+            discard(moved, from: folder)
+            return .cancelled
+        }
+        let result = await commit(id, copies.map { ($0.stream.mediaID, $0.stream.checksum, $0.url) })
+        if case .done = result, let folder, !moved.isEmpty {
+            do { try archive?.record(moved, in: folder) } catch {
+                Self.logger.error("Recording moved originals failed: \(error.localizedDescription, privacy: .public)")
+            }
+        } else {
+            discard(moved, from: folder)
+        }
+        return result
     }
 
-    /// The new files in, the records changed in one save, then the old files out.
-    private func commit(_ id: UUID, _ copies: [(stream: ShrinkCandidate.Stream, url: URL)]) async -> Result {
+    /// A moment whose swap didn't happen keeps its original on the phone: its copy in the folder goes.
+    private func discard(_ moved: [MovedOriginal], from folder: URL?) {
+        guard let folder else { return }
+        for entry in moved { OriginalArchive.remove(entry, from: folder) }
+    }
+
+    /// The new files in, the records changed in one save, then the old files out. Each file replaces the stream
+    /// whose checksum it was made from; a stream changed meanwhile leaves the whole moment as it is.
+    private func commit(_ id: UUID, _ files: [(mediaID: UUID, checksum: String, url: URL)]) async -> Result {
         var infos: [UUID: MomentSaver.Info] = [:]
-        for copy in copies {
-            guard let info = try? await MomentSaver.videoInfo(copy.url) else { return .skipped }
-            infos[copy.stream.mediaID] = info
+        for file in files {
+            guard let info = try? await MomentSaver.videoInfo(file.url) else { return .skipped }
+            infos[file.mediaID] = info
         }
         let context = library.context
         guard let moment = try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first else { return .done(freed: 0) }
         // Changed since it was read (an edit, a restore): leave it.
         let current = Dictionary(uniqueKeysWithValues: moment.media.map { ($0.id, $0) })
-        guard copies.allSatisfy({ current[$0.stream.mediaID]?.checksum == $0.stream.checksum }) else { return .skipped }
+        guard files.allSatisfy({ current[$0.mediaID]?.checksum == $0.checksum }) else { return .skipped }
         var stored: [String] = []
         var replaced: [String] = []
         var freed: Int64 = 0
         do {
-            for copy in copies {
-                guard let media = current[copy.stream.mediaID], let info = infos[copy.stream.mediaID] else { continue }
-                let file = try library.store.store(moving: copy.url, in: .originals, fileExtension: "mov")
-                stored.append(file.relativePath)
+            for file in files {
+                guard let media = current[file.mediaID], let info = infos[file.mediaID] else { continue }
+                let new = try library.store.store(moving: file.url, in: .originals, fileExtension: "mov")
+                stored.append(new.relativePath)
                 replaced.append(media.relativePath)
-                freed += media.byteCount - file.byteCount
-                media.relativePath = file.relativePath
-                media.checksum = file.checksum
-                media.byteCount = file.byteCount
+                freed += media.byteCount - new.byteCount
+                media.relativePath = new.relativePath
+                media.checksum = new.checksum
+                media.byteCount = new.byteCount
                 media.pixelWidth = info.width
                 media.pixelHeight = info.height
                 media.codec = info.codec
@@ -257,6 +332,47 @@ final class ShrinkRun {
         }
         leftovers.append(contentsOf: replaced)
         removeLeftovers()
-        return .done(freed: max(freed, 0))
+        return .done(freed: freed)
+    }
+
+    // MARK: Bring back
+
+    /// P3.6 Memory Card ••• "Bring back the original": the moment's full-size files from the folder, checked, in place
+    /// of its Compact copies. Looks in the folder's own list too, for originals moved on another iPhone.
+    func bringBack(_ momentID: UUID) async -> BringBack {
+        guard !isRunning, !busy() else { return .busy }
+        guard let archive, archive.hasFolder else { return .noFolder }
+        guard let folder = try? archive.folder() else { return .folderUnavailable }
+        let scoped = folder.startAccessingSecurityScopedResource()
+        defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
+        let media = (try? library.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == momentID })).first)?.media ?? []
+        var entries = archive.moved(momentID)
+        if entries.isEmpty {
+            let ids = Set(media.map(\.id))
+            entries = OriginalArchive.manifest(in: folder).filter { ids.contains($0.mediaID) }
+        }
+        guard !entries.isEmpty else { return .notFound }
+        let needed = entries.reduce(Int64(0)) { $0 + $1.byteCount } + Self.spareBytes
+        if let free = freeSpace(), free < needed { return .failed }
+        let work = scratch.appending(path: "Shrink-\(UUID().uuidString)", directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: work) }
+        var files: [(mediaID: UUID, checksum: String, url: URL)] = []
+        for entry in entries {
+            // The phone's copy now, to check nothing changed while the original was read.
+            guard let current = media.first(where: { $0.id == entry.mediaID }) else { return .notFound }
+            do {
+                try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
+                let copy = try await detachedWork { try OriginalArchive.fetch(entry, from: folder, into: work) }
+                files.append((entry.mediaID, current.checksum, copy))
+            } catch {
+                Self.logger.error("Bringing an original back failed: \(error.localizedDescription, privacy: .public)")
+                return .notFound
+            }
+        }
+        guard case .done = await commit(momentID, files) else { return .failed }
+        do { try archive.forget(Set(entries.map(\.mediaID)), in: folder) } catch {
+            Self.logger.error("Forgetting brought-back originals failed: \(error.localizedDescription, privacy: .public)")
+        }
+        return .done
     }
 }

@@ -22,6 +22,8 @@ struct ShrinkCandidate: Equatable, Sendable, Identifiable {
         var duration: Double
         var pixelWidth: Int
         var pixelHeight: Int
+        var codec: String? = nil
+        var isSelfie = false
     }
 
     var id: UUID
@@ -99,7 +101,8 @@ enum ShrinkPolicy {
             .map {
                 ShrinkCandidate.Stream(
                     mediaID: $0.id, relativePath: $0.relativePath, checksum: $0.checksum, byteCount: $0.byteCount,
-                    duration: $0.duration ?? 0, pixelWidth: $0.pixelWidth, pixelHeight: $0.pixelHeight
+                    duration: $0.duration ?? 0, pixelWidth: $0.pixelWidth, pixelHeight: $0.pixelHeight, codec: $0.codec,
+                    isSelfie: $0.role == .frontSource
                 )
             }
     }

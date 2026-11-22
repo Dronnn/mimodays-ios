@@ -132,8 +132,13 @@ public final class AppDependencies {
         if !configuration.isUITesting { ImportedFormats.repairOnce(context: modelContainer.mainContext, defaults: .standard) }
         camera.drafts.removeLeftovers()
         let mediaUse = mediaUse, movieExports = movieExports
+        // P3.6: what was moved to the person's folder.
+        let archive = OriginalArchive(indexURL: configuration.isUITesting
+            ? FileManager.default.temporaryDirectory.appending(path: "UITestOriginals-\(UUID().uuidString).json")
+            : URL.applicationSupportDirectory.appending(path: "MovedOriginals.json"))
         shrinks = ShrinkRun(
             library: MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails, use: mediaUse),
+            archive: archive,
             defaults: configuration.isUITesting ? nil : .standard,
             busy: { mediaUse.isReading || movieExports.isExporting }
         )

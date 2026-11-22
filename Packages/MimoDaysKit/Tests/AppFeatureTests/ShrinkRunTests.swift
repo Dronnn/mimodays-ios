@@ -19,11 +19,11 @@ final class ShrinkRunTests {
         }
     }
 
-    private let container: ModelContainer
-    private let store: MediaStore
-    private let scratch: URL
-    private let defaults: UserDefaults
-    private var library: MediaLibrary { MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline()) }
+    let container: ModelContainer
+    let store: MediaStore
+    let scratch: URL
+    let defaults: UserDefaults
+    var library: MediaLibrary { MediaLibrary(context: container.mainContext, store: store, thumbnails: ThumbnailPipeline()) }
 
     init() throws {
         container = try MimoDaysStore.makeContainer(inMemory: true)
@@ -40,7 +40,7 @@ final class ShrinkRunTests {
     }
 
     /// A video moment whose record says 1080p at a high bit rate, over a real small clip.
-    private func moment(daysAgo: Int = 60) async throws -> Moment {
+    func moment(daysAgo: Int = 60) async throws -> Moment {
         let date = Date.now.addingTimeInterval(TimeInterval(-daysAgo * 86_400))
         let moment = Moment(captured: CaptureTime(instant: date, timeZone: .current), origin: .manual, mediaType: .video, createdAt: date)
         container.mainContext.insert(moment)
@@ -57,15 +57,15 @@ final class ShrinkRunTests {
         return moment
     }
 
-    private func paths(_ moment: Moment) -> Set<String> {
+    func paths(_ moment: Moment) -> Set<String> {
         Set(moment.media.filter { $0.role == .rearSource || $0.role == .frontSource }.map(\.relativePath))
     }
 
-    private func exists(_ path: String) -> Bool {
+    func exists(_ path: String) -> Bool {
         (try? store.url(for: path)).map { FileManager.default.fileExists(atPath: $0.path) } ?? false
     }
 
-    private func finished(_ run: ShrinkRun) async throws -> ShrinkRun.Outcome {
+    func finished(_ run: ShrinkRun) async throws -> ShrinkRun.Outcome {
         for _ in 0..<600 {
             if case let .finished(outcome) = run.phase { return outcome }
             try await Task.sleep(for: .milliseconds(20))
@@ -190,6 +190,110 @@ final class ShrinkRunTests {
         next.resumeIfNeeded()
         #expect(try await finished(next).done == 2)
         #expect(paths(first).isDisjoint(with: firstBefore))
+    }
+}
+
+/// P3.6: originals go to the folder, checked there, a Compact copy stays; and come back.
+@MainActor
+extension ShrinkRunTests {
+    private func archive(folder: URL?) throws -> OriginalArchive {
+        let archive = OriginalArchive(indexURL: scratch.appending(path: "index-\(UUID().uuidString).json"))
+        if let folder {
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            try archive.setFolder(folder)
+        }
+        return archive
+    }
+
+    private func originals(in folder: URL) -> [String] {
+        ((try? FileManager.default.contentsOfDirectory(atPath: folder.appending(path: OriginalArchive.subfolder).path)) ?? []).filter { $0.hasSuffix(".mov") }
+    }
+
+    @Test func movingCopiesOriginalsOutAndKeepsACompactCopy() async throws {
+        let moment = try await moment()
+        let before = Dictionary(uniqueKeysWithValues: moment.media.filter { $0.role == .rearSource || $0.role == .frontSource }.map { ($0.id, $0.checksum) })
+        let folder = scratch.appending(path: "Drive")
+        let archive = try archive(folder: folder)
+        let run = ShrinkRun(library: library, archive: archive, transcoder: CopyingTranscoder(), defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        run.start(.all, size: .balanced, moving: true)
+        let outcome = try await finished(run)
+        #expect(outcome.done == 1 && outcome.moving)
+        #expect(run.job == nil)
+        // Each original is in the folder, byte for byte, and listed there.
+        let files = originals(in: folder)
+        #expect(files.count == 2)
+        #expect(archive.entries.count == 2)
+        for entry in archive.entries {
+            let url = folder.appending(path: OriginalArchive.subfolder).appending(path: entry.fileName)
+            #expect(try MediaStore.sha256(of: url) == before[entry.mediaID])
+            #expect(entry.momentID == moment.id)
+        }
+        #expect(OriginalArchive.manifest(in: folder).count == 2)
+        // The phone keeps new, smaller files.
+        #expect(paths(moment).allSatisfy(exists))
+        #expect(moment.media.filter { before[$0.id] != nil }.allSatisfy { $0.byteCount < 60_000_000 })
+    }
+
+    @Test func movingWithoutAFolderChangesNothing() async throws {
+        let moment = try await moment()
+        let before = paths(moment)
+        let run = ShrinkRun(library: library, archive: try archive(folder: nil), transcoder: CopyingTranscoder(), defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        run.start(.all, size: .compact, moving: true)
+        let outcome = try await finished(run)
+        #expect(outcome.folderUnavailable && outcome.done == 0)
+        #expect(paths(moment) == before)
+    }
+
+    /// A smaller copy that fails keeps the original on the phone and takes its folder copy back out.
+    @Test func aFailedMoveLeavesNothingInTheFolder() async throws {
+        let moment = try await moment()
+        let before = paths(moment)
+        let folder = scratch.appending(path: "Drive")
+        let archive = try archive(folder: folder)
+        let failing = CopyingTranscoder(before: { throw TranscodeError.failed })
+        let run = ShrinkRun(library: library, archive: archive, transcoder: failing, defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        run.start(.all, size: .compact, moving: true)
+        #expect(try await finished(run).skipped == 1)
+        #expect(originals(in: folder).isEmpty && archive.entries.isEmpty)
+        #expect(paths(moment) == before && before.allSatisfy(exists))
+    }
+
+    @Test func originalsComeBack() async throws {
+        let moment = try await moment()
+        let checksums = Set(moment.media.filter { $0.role == .rearSource || $0.role == .frontSource }.map(\.checksum))
+        let folder = scratch.appending(path: "Drive")
+        let archive = try archive(folder: folder)
+        let run = ShrinkRun(library: library, archive: archive, transcoder: CopyingTranscoder(), defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        run.start(.all, size: .compact, moving: true)
+        _ = try await finished(run)
+        let compact = paths(moment)
+        #expect(await run.bringBack(moment.id) == .done)
+        #expect(Set(moment.media.filter { $0.role == .rearSource || $0.role == .frontSource }.map(\.checksum)) == checksums)
+        #expect(paths(moment).allSatisfy(exists))
+        #expect(!compact.contains(where: exists), "The Compact copies are gone")
+        #expect(archive.entries.isEmpty)
+        #expect(originals(in: folder).count == 2, "The folder keeps its files")
+    }
+
+    /// On another iPhone after a restore: nothing in the app's list, the folder's own list finds them.
+    @Test func originalsComeBackFromTheFolderAlone() async throws {
+        let moment = try await moment()
+        let folder = scratch.appending(path: "Drive")
+        let mover = ShrinkRun(library: library, archive: try archive(folder: folder), transcoder: CopyingTranscoder(), defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        mover.start(.all, size: .compact, moving: true)
+        _ = try await finished(mover)
+        let fresh = try archive(folder: folder)
+        #expect(fresh.entries.isEmpty)
+        let run = ShrinkRun(library: library, archive: fresh, transcoder: CopyingTranscoder(), defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        #expect(await run.bringBack(moment.id) == .done)
+    }
+
+    @Test func nothingToBringBack() async throws {
+        let moment = try await moment()
+        let run = ShrinkRun(library: library, archive: try archive(folder: scratch.appending(path: "Drive")), defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        #expect(await run.bringBack(moment.id) == .notFound)
+        let none = ShrinkRun(library: library, archive: try archive(folder: nil), defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        #expect(await none.bringBack(moment.id) == .noFolder)
     }
 }
 

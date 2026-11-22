@@ -499,6 +499,29 @@ struct MovieEditorModelTests {
         #expect(model.plan.clips.count == 2)
     }
 
+    /// rev-library: a card's voice plays only while the card sheet can show it; a deleted moment's note goes quiet.
+    @Test func aCardsVoiceFromADeletedMomentGoesQuiet() async throws {
+        let ids = try await save(2)
+        let id = ids[1]
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first)
+        let file = try store.store(copyOf: Fixture.voiceNote.url, in: .originals)
+        let note = MomentVoiceNote(relativePath: file.relativePath, duration: 2, recordedAt: clock.now())
+        moment.voiceNotes.append(note)
+        try context.save()
+        let model = try editor(ids)
+        model.addCard()
+        model.setCardHasVoice(true)
+        #expect(model.selectedCardVoice?.id == note.id)
+        #expect(model.plan.clips.first?.voiceURL != nil)
+
+        moment.deletedAt = clock.now()
+        try context.save()
+        model.reload()
+        model.select(0)
+        #expect(model.selectedCardVoice == nil)
+        #expect(model.plan.clips.first?.isCard == true && model.plan.clips.first?.voiceURL == nil)
+    }
+
     @Test func thePlayheadFollowsTheTime() async throws {
         let ids = try await save(3)
         let model = try editor(ids)

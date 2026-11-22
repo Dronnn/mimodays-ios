@@ -188,11 +188,10 @@ struct MoviePlan: Sendable, Equatable {
     /// U51: the card for as long as it's set to show, with the voice comment picked for it.
     @MainActor
     private static func card(_ card: MovieTextCard, store: MediaStore) -> Clip {
-        var voice: URL?
-        if let id = card.voiceNoteID,
-           let note = try? card.modelContext?.fetch(FetchDescriptor<MomentVoiceNote>(predicate: #Predicate { $0.id == id })).first {
-            voice = try? store.url(for: note.relativePath)
-        }
+        // rev-library: only a voice the editor offers, a note of a clip still in the movie whose moment isn't deleted,
+        // so a card never plays one the card sheet can't show.
+        let offered = card.project.map { MovieStore.liveClips(of: $0).compactMap { $0.moment?.voiceNotes.first } } ?? []
+        let voice = card.voiceNoteID.flatMap { id in offered.first { $0.id == id } }.flatMap { try? store.url(for: $0.relativePath) }
         return Clip(
             momentID: card.id, media: .card(text: card.text, look: card.look), mainURL: nil, selfieURL: nil, window: nil,
             placement: nil, layout: nil, duration: card.duration, transition: card.transition, atmosphere: card.atmosphere,

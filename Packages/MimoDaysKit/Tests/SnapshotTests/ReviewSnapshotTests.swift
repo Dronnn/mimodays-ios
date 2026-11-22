@@ -35,6 +35,8 @@ struct ReviewSnapshotTests {
             media: media, window: window, capturedAt: time, format: format, arrangement: halves ? .halves : nil
         ))
         await model.load()
+        // The still, not wherever the player has got to by the time the picture is taken (CI, run 44784801668).
+        model.autoplays = false
         return model
     }
 

@@ -63,10 +63,12 @@ final class TodayUITests: XCTestCase {
         launch(.populated)
         let month = app.buttons["today.month"]
         XCTAssertTrue(month.waitForExistence(timeout: 10))
+        // Today has loaded its month (the strip under the title) before the tap, so the title isn't moving under it.
+        let strip = app.descendants(matching: .any)["today.strip"]
+        XCTAssertTrue(app.buttons["today.monthTile"].firstMatch.waitForExistence(timeout: 10) || strip.waitForExistence(timeout: 5))
         month.tap()
-        // A slow machine is still switching tabs right after the tap: the bar comes back with Memories chosen.
-        expectation(for: NSPredicate(format: "exists == true AND isSelected == true"), evaluatedWith: tab(1))
-        waitForExpectations(timeout: 10)
+        // Memories itself, not the tab bar, which a slow machine is still bringing back right after the tap.
+        XCTAssertTrue(app.buttons["memories.search"].waitForExistence(timeout: 10))
     }
 
     /// Make my movie starts a new movie (F02) on Movies, as Movies' own Make a movie does.

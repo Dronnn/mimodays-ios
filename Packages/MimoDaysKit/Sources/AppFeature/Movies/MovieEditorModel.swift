@@ -633,9 +633,11 @@ final class MovieEditorModel {
         voiceoverEnd = nil
     }
 
-    /// Up to three seconds for `condition`; false at once when `take` is finished meanwhile or the stage failed.
+    /// Until `condition`, as long as the stage takes (a big movie on a busy phone took over three seconds; its sheet
+    /// shows it getting ready and Stop ends the wait); false at once when `take` is finished meanwhile or the stage
+    /// failed, and after half a minute of a stage that never gets there.
     private func wait(for take: VoiceRecording, until condition: () -> Bool) async -> Bool {
-        for _ in 0 ..< 100 {
+        for _ in 0 ..< 1000 {
             guard voiceover === take, !failed, player.currentItem?.status != .failed else { return false }
             if condition() { return true }
             try? await Task.sleep(for: .milliseconds(30))

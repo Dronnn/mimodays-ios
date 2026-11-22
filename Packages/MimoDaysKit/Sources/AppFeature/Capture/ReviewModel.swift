@@ -89,6 +89,8 @@ final class ReviewModel {
     private(set) var selfie: UIImage?
     /// Both streams in step on the card, round and round, as the viewer plays them (U42).
     private(set) var playback: ViewerVideoPlayer?
+    /// A video plays on the card on its own; snapshots keep its first frame, whenever they're taken (P5.5).
+    var autoplays = true
     /// C10 waveform, one level (0...1) per bar.
     private(set) var voiceLevels: [Float] = []
     private(set) var playsVoice = false
@@ -337,7 +339,7 @@ final class ReviewModel {
 
     /// Plays a video on the card from the start, with sound, once both streams are ready.
     func startPlayback() async {
-        guard let video, playback == nil else { return }
+        guard autoplays, let video, playback == nil else { return }
         let player = ViewerVideoPlayer(duration: video.duration)
         playback = player
         let main = AVURLAsset(url: video.mainURL)

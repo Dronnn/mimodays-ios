@@ -40,6 +40,19 @@ struct PlaceSheet<Model: PlaceChoosing>: View {
         _recents = State(initialValue: model.recentPlaces())
     }
 
+    /// Recents, "No place" and the note under them, before anything is typed.
+    private var nearby: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            card { suggestions }
+                .padding(.top, 14)
+            Text("Places are stored on this iPhone only. You can choose how precise they are in Settings.", bundle: .module)
+                .textStyle(.rowCaption)
+                .foregroundStyle(ColorToken.textTertiary.color)
+                .padding(.horizontal, 8)
+                .padding(.top, 14)
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Place", bundle: .module)
@@ -50,13 +63,12 @@ struct PlaceSheet<Model: PlaceChoosing>: View {
             searchField
                 .padding(.top, 13)
             if trimmed.isEmpty {
-                card { suggestions }
-                    .padding(.top, 14)
-                Text("Places are stored on this iPhone only. You can choose how precise they are in Settings.", bundle: .module)
-                    .textStyle(.rowCaption)
-                    .foregroundStyle(ColorToken.textTertiary.color)
-                    .padding(.horizontal, 8)
-                    .padding(.top, 14)
+                // As drawn while it fits; at the largest text sizes on a short screen it scrolls, so "No place" and
+                // the last recents stay reachable (rev-library).
+                ViewThatFits(in: .vertical) {
+                    nearby
+                    ScrollView { nearby }.scrollBounceBehavior(.basedOnSize)
+                }
             } else {
                 ScrollView {
                     searchResults.padding(.top, 14)

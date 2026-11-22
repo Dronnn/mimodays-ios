@@ -142,6 +142,28 @@ struct MomentExportSheet: View {
     @State private var height: CGFloat = 520
 
     var body: some View {
+        // As drawn while it fits; at the largest text sizes on a short screen it scrolls, so Share stays reachable
+        // (rev-library).
+        ViewThatFits(in: .vertical) {
+            content
+            ScrollView { content }.scrollBounceBehavior(.basedOnSize)
+        }
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height = $0 }
+        .presentationDetents([.height(height)])
+        .presentationDragIndicator(.visible)
+        .presentationCornerRadius(28)
+        .presentationBackground(ColorToken.canvas.color)
+        // While Photos reads the files, the save removes them itself when it's done.
+        .onDisappear { if !savingToPhotos { model.cancel() } }
+        .sheet(isPresented: Binding(get: { sharing != nil }, set: { if !$0 { sharing = nil; model.removeFiles() } })) {
+            ShareSheet(items: sharing ?? [])
+        }
+        .exportFailureAlert(model)
+        .permissionExplainers(asker)
+        .photosSaveAlert($photosProblem)
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Export moment", bundle: .module)
                 .textStyle(.sheetTitle)
@@ -196,19 +218,6 @@ struct MomentExportSheet: View {
         .padding(.horizontal, 16)
         .padding(.top, 30)
         .padding(.bottom, 26)
-        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height = $0 }
-        .presentationDetents([.height(height)])
-        .presentationDragIndicator(.visible)
-        .presentationCornerRadius(28)
-        .presentationBackground(ColorToken.canvas.color)
-        // While Photos reads the files, the save removes them itself when it's done.
-        .onDisappear { if !savingToPhotos { model.cancel() } }
-        .sheet(isPresented: Binding(get: { sharing != nil }, set: { if !$0 { sharing = nil; model.removeFiles() } })) {
-            ShareSheet(items: sharing ?? [])
-        }
-        .exportFailureAlert(model)
-        .permissionExplainers(asker)
-        .photosSaveAlert($photosProblem)
     }
 
     private var kindNote: Text {

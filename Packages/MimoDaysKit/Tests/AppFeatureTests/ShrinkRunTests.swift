@@ -81,10 +81,18 @@ final class ShrinkRunTests {
     @Test func aRunSwapsInSmallerFiles() async throws {
         let first = try await moment(), second = try await moment(daysAgo: 90)
         let before = paths(first).union(paths(second))
+        // P3.7: ids, roles, the selfie layout and the streams' offsets stay as they were.
+        func shape(_ moment: Moment) -> [String] {
+            moment.media.sorted { $0.id.uuidString < $1.id.uuidString }.map { "\($0.id) \($0.role) \($0.startOffset ?? -1)" }
+        }
+        let shapes = (shape(first), shape(second))
+        let layout = first.pipLayout
         let run = ShrinkRun(library: library, transcoder: CopyingTranscoder(), defaults: defaults, freeSpace: { nil }, scratch: scratch)
         run.start(.all, size: .compact)
         let outcome = try await finished(run)
         #expect(outcome.done == 2 && outcome.skipped == 0)
+        #expect(shape(first) == shapes.0 && shape(second) == shapes.1)
+        #expect(first.pipLayout == layout)
         #expect(outcome.freed > 0)
         let after = paths(first).union(paths(second))
         #expect(after.isDisjoint(with: before))

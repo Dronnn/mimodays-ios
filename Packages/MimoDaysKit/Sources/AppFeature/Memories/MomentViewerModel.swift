@@ -12,6 +12,8 @@ struct MediaLibrary {
     let context: ModelContext
     let store: MediaStore
     let thumbnails: ThumbnailPipeline
+    /// P3.5: who reads moments' files now; nil where nothing makes videos smaller.
+    var use: MediaUse? = nil
 }
 
 extension EnvironmentValues {

@@ -27,7 +27,9 @@ struct RestoreView: View {
     let close: () -> Void
     @State private var showsSkipped = false
     @State private var exportInUse = false
+    @State private var shrinkInUse = false
     @Environment(MovieExportCenter.self) private var exports: MovieExportCenter?
+    @Environment(ShrinkRun.self) private var shrinks: ShrinkRun?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -49,6 +51,7 @@ struct RestoreView: View {
         .toolbar(.hidden, for: .navigationBar)
         .sheet(isPresented: $showsSkipped) { skippedList }
         .exportInUseAlert($exportInUse)
+        .shrinkInUseAlert($shrinkInUse)
         .onDisappear { if case .restoring = model.phase {} else { model.cancel() } }
     }
 
@@ -134,6 +137,8 @@ struct RestoreView: View {
                 // P8.13: Replace everything removes files the running export reads.
                 if model.mode == .replaceEverything, exports?.isExporting == true {
                     exportInUse = true
+                } else if model.mode == .replaceEverything, shrinks?.isRunning == true {
+                    shrinkInUse = true
                 } else {
                     model.restore()
                 }

@@ -27,10 +27,10 @@ enum OrphanFiles {
         return paths
     }
 
-    /// What a backup, an export, an import or a capture put in tmp, left when iOS ended the app before it was handed
+    /// What a backup, an export, an import, a capture or Make smaller put in tmp, left when iOS ended the app before it was handed
     /// on. A capture in review lives in the review draft's own folder, so nothing in tmp's Capture is still needed.
     static func removeScratch(in folder: URL = FileManager.default.temporaryDirectory) {
-        let scratch = ["Backup-", "Export-", "Movie-", "MimoDays-"]
+        let scratch = ["Backup-", "Export-", "Movie-", "MimoDays-", "Shrink-"]
         for item in (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? [] {
             let name = item.lastPathComponent
             // MovieFiller-1.mov is the kept filler clip; MovieFiller-<UUID>.mov is one being made.

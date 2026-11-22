@@ -26,6 +26,8 @@ final class MomentExportModel: Identifiable {
     var failure: Failure?
 
     private let exporter: MomentExporter
+    /// P3.5: Make smaller waits while the files are written.
+    private let use: MediaUse?
     private(set) var folder: URL?
     private var work: Task<[URL], any Error>?
 
@@ -33,6 +35,7 @@ final class MomentExportModel: Identifiable {
     init(ids: [UUID], library: MediaLibrary, exactPlace: Bool = false, freeSpace: () -> Int64? = BackupModel.deviceFreeSpace) {
         self.ids = ids
         exporter = MomentExporter(library: library)
+        use = library.use
         contents = exporter.contents(ids)
         available = freeSpace()
         options.exactPlace = exactPlace
@@ -66,7 +69,11 @@ final class MomentExportModel: Identifiable {
         let items = exporter.items(ids, options: options)
         let archive = archive
         progress = 0
-        defer { progress = nil }
+        let reading = use?.begin()
+        defer {
+            progress = nil
+            use?.end(reading)
+        }
         let report: @Sendable (Double) -> Void = { [weak self] value in Task { @MainActor in self?.report(value) } }
         let work = Task {
             try await detachedWork {

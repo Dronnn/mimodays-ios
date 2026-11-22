@@ -35,7 +35,18 @@ final class RestoreModel {
     private let service: BackupService
     private let freeSpace: () -> Int64?
     private var check: BackupArchive.Check?
-    private var task: Task<Void, Never>?
+    private var task: Task<Void, Never>? {
+        // P3.5: Make smaller waits while this reads the files, and keeps the ones it replaces.
+        didSet {
+            if task == nil {
+                library.use?.end(reading)
+                reading = nil
+            } else if reading == nil {
+                reading = library.use?.begin()
+            }
+        }
+    }
+    private var reading: UUID?
     private static let logger = Logger(subsystem: "MimoDays", category: "Restore")
 
     init(url: URL, library: MediaLibrary, now: @escaping () -> Date = Date.init, freeSpace: @escaping () -> Int64? = BackupModel.deviceFreeSpace) {

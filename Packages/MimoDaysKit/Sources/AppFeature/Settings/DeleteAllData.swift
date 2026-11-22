@@ -139,7 +139,9 @@ struct DeleteAllView: View {
     @State private var isErasing = false
     @State private var failed = false
     @State private var exportInUse = false
+    @State private var shrinkInUse = false
     @Environment(MovieExportCenter.self) private var exports: MovieExportCenter?
+    @Environment(ShrinkRun.self) private var shrinks: ShrinkRun?
     @FocusState private var isTyping: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -226,6 +228,10 @@ struct DeleteAllView: View {
                     exportInUse = true
                     return
                 }
+                if shrinks?.isRunning == true {
+                    shrinkInUse = true
+                    return
+                }
                 isErasing = true
                 Task {
                     failed = !(await erase())
@@ -243,5 +249,6 @@ struct DeleteAllView: View {
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .exportInUseAlert($exportInUse)
+        .shrinkInUseAlert($shrinkInUse)
     }
 }

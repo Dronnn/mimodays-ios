@@ -59,7 +59,18 @@ final class BackupModel {
     private let now: () -> Date
     private let freeSpace: () -> Int64?
     private let scheduleReminder: (BackupReminder, Date) -> Void
-    private var task: Task<Void, Never>?
+    private var task: Task<Void, Never>? {
+        // P3.5: Make smaller waits while this reads the files, and keeps the ones it replaces.
+        didSet {
+            if task == nil {
+                library.use?.end(reading)
+                reading = nil
+            } else if reading == nil {
+                reading = library.use?.begin()
+            }
+        }
+    }
+    private var reading: UUID?
     private var document: BackupDocument?
     private var missesFiles = false
     private static let logger = Logger(subsystem: "MimoDays", category: "Backup")

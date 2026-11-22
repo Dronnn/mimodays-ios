@@ -224,7 +224,7 @@ struct MomentSaver {
         return window.map { PhotoComposer.compose(main: main, selfie: selfie, window: $0) } ?? main
     }
 
-    private struct Info {
+    struct Info {
         var width: Int
         var height: Int
         var orientation = 1
@@ -242,7 +242,7 @@ struct MomentSaver {
     }
 
     /// Upright size, codec FourCC, duration and audio presence.
-    private static func videoInfo(_ url: URL) async throws -> Info {
+    static func videoInfo(_ url: URL) async throws -> Info {
         let asset = AVURLAsset(url: url)
         guard let track = try await asset.loadTracks(withMediaType: .video).first else { throw SaveError.failed }
         let (natural, transform, formats) = try await track.load(.naturalSize, .preferredTransform, .formatDescriptions)

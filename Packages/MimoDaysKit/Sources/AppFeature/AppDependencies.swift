@@ -19,7 +19,10 @@ public final class AppDependencies {
     let camera: CameraServices
     let momentSaver: MomentSaver
     let thumbnails = ThumbnailPipeline()
-    var library: MediaLibrary { MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails) }
+    var library: MediaLibrary { MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails, use: mediaUse) }
+    /// P3.5: who reads moments' files now (backup, restore, moment export), and Make smaller, which waits for them.
+    let mediaUse = MediaUse()
+    let shrinks: ShrinkRun
     let memoriesPreferences: MemoriesPreferences
     let moviePreferences: MoviePreferences
     /// P8.13: one movie export at a time, kept while its screen is closed; iOS 26 continues it in the background.
@@ -128,6 +131,14 @@ public final class AppDependencies {
         MovieExportModel.reconcileJobs(in: modelContainer.mainContext, now: Date())
         if !configuration.isUITesting { ImportedFormats.repairOnce(context: modelContainer.mainContext, defaults: .standard) }
         camera.drafts.removeLeftovers()
+        let mediaUse = mediaUse, movieExports = movieExports
+        shrinks = ShrinkRun(
+            library: MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails, use: mediaUse),
+            defaults: configuration.isUITesting ? nil : .standard,
+            busy: { mediaUse.isReading || movieExports.isExporting }
+        )
+        // After the sweep above: a run iOS ended goes on from the video it stopped at.
+        shrinks.resumeIfNeeded()
         appLock = AppLock(settings: { privacyPreferences.value })
         if configuration.isUITesting {
             tipStore = SampleTipStore()

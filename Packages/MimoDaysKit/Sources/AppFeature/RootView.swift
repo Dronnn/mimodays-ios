@@ -21,6 +21,7 @@ public struct RootView: View {
     private let memoriesPreferences: MemoriesPreferences
     private let moviePreferences: MoviePreferences
     private let movieExports: MovieExportCenter
+    private let shrinks: ShrinkRun
     private let privacyPreferences: PrivacyPreferences
     private let appearancePreferences: AppearancePreferences
     private let appLock: AppLock
@@ -76,6 +77,7 @@ public struct RootView: View {
         memoriesPreferences = dependencies.memoriesPreferences
         moviePreferences = dependencies.moviePreferences
         movieExports = dependencies.movieExports
+        shrinks = dependencies.shrinks
         privacyPreferences = dependencies.privacyPreferences
         appearancePreferences = dependencies.appearancePreferences
         appLock = dependencies.appLock
@@ -127,6 +129,7 @@ public struct RootView: View {
         .environment(memoriesPreferences)
         .environment(moviePreferences)
         .environment(movieExports)
+        .environment(shrinks)
         .environment(privacyPreferences)
         .environment(appearancePreferences)
         .environment(appLock)

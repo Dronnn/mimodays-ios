@@ -522,6 +522,31 @@ struct MovieEditorModelTests {
         #expect(model.plan.clips.first?.isCard == true && model.plan.clips.first?.voiceURL == nil)
     }
 
+    /// rev-library: the preview leaves a damaged picture out as the export does, and a voice note that can't be read
+    /// doesn't stop the movie playing.
+    @Test func thePreviewLeavesOutWhatTheExportLeavesOut() async throws {
+        let ids = try await save(3)
+        let id = ids[1]
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first)
+        try Data("not a picture".utf8).write(to: try store.url(for: try #require(MomentSummary(moment).mainPath)))
+        let voiced = ids[2]
+        let other = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == voiced })).first)
+        let file = try store.store(Data("not a sound".utf8), in: .originals, fileExtension: "m4a")
+        other.voiceNotes.append(MomentVoiceNote(relativePath: file.relativePath, duration: 2, recordedAt: clock.now()))
+        try context.save()
+
+        let model = try editor(ids)
+        await model.settled()
+        model.select(1)
+        model.setIncludesVoiceNote(true)
+        await model.settled()
+        #expect(order(model) == [ids[0], ids[2]])
+        #expect(model.plan.clips.map(\.momentID) == [ids[0], ids[2]])
+        #expect(!model.failed)
+        let export = await MoviePlan(model.project, store: store).leavingOutUnreadable()
+        #expect(export.clips.map(\.momentID) == model.plan.clips.map(\.momentID))
+    }
+
     @Test func thePlayheadFollowsTheTime() async throws {
         let ids = try await save(3)
         let model = try editor(ids)

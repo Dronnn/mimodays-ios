@@ -785,9 +785,16 @@ final class MovieEditorModel {
         reload()
     }
 
+    /// rev-library: moments whose picture can't be read, left out here as the export leaves them out; each moment is
+    /// checked once.
+    private var unreadable: Set<UUID> = []
+    private var checkedMoments: Set<UUID> = []
+
     /// Reads the clips back and rebuilds what the stage plays, keeping its place.
     func reload() {
-        plan = MoviePlan(project, store: library.store)
+        let full = MoviePlan(project, store: library.store)
+        plan = full
+        plan.clips.removeAll { !$0.isCard && unreadable.contains($0.momentID) }
         // The plan has the same order: each of its entries is a card by its id or the next clip of that moment.
         var clips = MovieStore.liveClips(of: project)
         let cards = Dictionary(project.textCards.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -801,6 +808,14 @@ final class MovieEditorModel {
         let plan = plan
         rebuild?.cancel()
         rebuild = Task {
+            let found = await full.unreadableMoments(skipping: checkedMoments)
+            guard !Task.isCancelled else { return }
+            checkedMoments.formUnion(full.clips.filter { !$0.isCard }.map(\.momentID))
+            if !found.isEmpty {
+                unreadable.formUnion(found)
+                rebuild = nil
+                return reload()
+            }
             do {
                 let composed = try await MovieComposer.compose(plan, renderSize: plan.aspectRatio.renderSize(Self.previewResolution))
                 guard !Task.isCancelled else { return }
@@ -819,7 +834,13 @@ final class MovieEditorModel {
     }
 
     /// Waits for the stage to catch up with the last change (tests, export).
-    func settled() async { await rebuild?.value }
+    func settled() async {
+        // A build that found an unreadable clip starts the next one itself.
+        while let task = rebuild {
+            await task.value
+            if rebuild == task { return }
+        }
+    }
 
     /// A take still on ends with it, kept as recorded. Music and voice files no project uses any more go when the
     /// editor closes. Ones Undo can still bring back stay: going to Export closes it too, and the editor is still there

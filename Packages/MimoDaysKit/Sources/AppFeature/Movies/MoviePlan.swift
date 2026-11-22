@@ -220,10 +220,20 @@ extension MoviePlan {
     /// Doc 01 §16: a moment whose picture can't be read any more (a damaged file) is left out of the export, as a
     /// deleted one is, rather than stopping it or showing an empty frame (Andrew, 2026-11-16).
     func leavingOutUnreadable() async -> MoviePlan {
+        let unreadable = await unreadableMoments()
         var plan = self
-        plan.clips = []
-        for clip in clips where await clip.isReadable { plan.clips.append(clip) }
+        plan.clips.removeAll { !$0.isCard && unreadable.contains($0.momentID) }
         return plan
+    }
+
+    /// The moments whose picture can't be read: the editor leaves them out too, so its preview is the export
+    /// (rev-library).
+    func unreadableMoments(skipping checked: Set<UUID> = []) async -> Set<UUID> {
+        var found: Set<UUID> = []
+        for clip in clips where !clip.isCard && !checked.contains(clip.momentID) {
+            if await !clip.isReadable { found.insert(clip.momentID) }
+        }
+        return found
     }
 }
 

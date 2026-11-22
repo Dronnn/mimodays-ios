@@ -109,12 +109,13 @@ enum MovieComposer {
                 // Each asset stays in a local: a track holds its asset weakly, and inserting from a track whose
                 // asset has gone fails (-12780).
                 let selfieAsset = clip.selfieURL.map { AVURLAsset(url: $0) }
-                if let selfieAsset, let selfie = try await selfieAsset.loadTracks(withMediaType: .video).first,
-                   let (part, at) = selfiePart(
-                       mainStart: start, length: clip.duration, offset: selfieOffset, selfieLength: try await selfie.load(.timeRange).duration.seconds
-                   ) {
-                    try selfieTrack.insertTimeRange(part, of: selfie, at: cursor + at)
-                    selfieOrientation = .init(try await selfie.load(.preferredTransform))
+                // rev-library: a selfie, voice or music file that can't be read is left out, the clip plays on without
+                // it, in the preview and the export alike.
+                if let selfieAsset, let selfie = (try? await selfieAsset.loadTracks(withMediaType: .video))?.first,
+                   let selfieRange = try? await selfie.load(.timeRange),
+                   let (part, at) = selfiePart(mainStart: start, length: clip.duration, offset: selfieOffset, selfieLength: selfieRange.duration.seconds),
+                   (try? selfieTrack.insertTimeRange(part, of: selfie, at: cursor + at)) != nil {
+                    selfieOrientation = .init((try? await selfie.load(.preferredTransform)) ?? .identity)
                     selfieTrackID = selfieTrack.trackID
                 }
                 if hasAudio, clip.soundOn, let audio = try await asset.loadTracks(withMediaType: .audio).first {
@@ -142,12 +143,12 @@ enum MovieComposer {
                 )
             }
             let voiceAsset = clip.voiceURL.map { AVURLAsset(url: $0) }
-            if let voiceAsset, let voice = try await voiceAsset.loadTracks(withMediaType: .audio).first {
+            if let voiceAsset, let voice = (try? await voiceAsset.loadTracks(withMediaType: .audio))?.first,
+               let available = try? await voice.load(.timeRange) {
                 // A note longer than its clip stops with it.
-                let available = try await voice.load(.timeRange)
                 let room = cursor + length - voiceAt
                 if room > .zero {
-                    try voiceTrack.insertTimeRange(CMTimeRange(start: available.start, duration: CMTimeMinimum(available.duration, room)), of: voice, at: voiceAt)
+                    try? voiceTrack.insertTimeRange(CMTimeRange(start: available.start, duration: CMTimeMinimum(available.duration, room)), of: voice, at: voiceAt)
                 }
             }
             let next = plan.clips.indices.contains(index + 1) ? plan.clips[index + 1] : nil
@@ -162,15 +163,15 @@ enum MovieComposer {
         // and out.
         let musicAsset = plan.music.map { AVURLAsset(url: $0.url) }
         var musicRamp: CMTimeRange?
-        if let musicAsset, let song = try await musicAsset.loadTracks(withMediaType: .audio).first,
+        if let musicAsset, let song = (try? await musicAsset.loadTracks(withMediaType: .audio))?.first,
+           let available = try? await song.load(.timeRange),
            let musicTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
-            let available = try await song.load(.timeRange)
             let start = CMTimeMinimum(time(plan.music?.start ?? 0), cursor)
             let played = CMTimeRange(start: available.start, duration: CMTimeMinimum(available.duration, cursor - start))
-            if played.duration > .zero {
-                try musicTrack.insertTimeRange(played, of: song, at: start)
+            if played.duration > .zero, (try? musicTrack.insertTimeRange(played, of: song, at: start)) != nil {
                 musicRamp = CMTimeRange(start: start, duration: played.duration)
             }
+            if musicTrack.segments.allSatisfy(\.isEmpty) { composition.removeTrack(musicTrack) }
         }
         // Tracks nothing was put in would make players and exporters stumble.
         for track in [selfieTrack, soundTrack, voiceTrack] where track.segments.allSatisfy(\.isEmpty) {

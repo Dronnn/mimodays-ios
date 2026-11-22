@@ -36,6 +36,16 @@ struct PhotoComposerTests {
         #expect(pixels(Int(rect.midX), Int(rect.minY + 3 * scale)).isClose(to: (0xFB, 0xF6, 0xEF)))
     }
 
+    /// rev-capture 25: the frame and its opening are drawn around the window only, not over the whole photo.
+    @Test func theWindowArtCoversOnlyTheWindow() {
+        let canvas = CGSize(width: 3024, height: 4032)
+        let art = SelfieWindowArt(window: window, canvas: canvas)
+        let rect = PhotoComposer.placement(of: window, in: canvas).rect
+        #expect(art.frame.extent.width * art.frame.extent.height < canvas.width * canvas.height / 8)
+        #expect(art.frame.extent.contains(CGRect(x: rect.minX, y: canvas.height - rect.maxY, width: rect.width, height: rect.height)))
+        #expect(art.opening.extent == art.frame.extent)
+    }
+
     @MainActor
     @Test func theShutterDeliversBothSourcesWithTheWindowAndTime() async throws {
         var results: [CaptureResult] = []

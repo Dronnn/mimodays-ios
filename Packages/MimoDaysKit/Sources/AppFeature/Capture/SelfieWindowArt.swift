@@ -38,13 +38,20 @@ struct SelfieWindowArt: @unchecked Sendable {
         let outer = CGRect(x: -rect.width / 2, y: -rect.height / 2, width: rect.width, height: rect.height)
         let inner = outer.insetBy(dx: style.border * scale, dy: style.border * scale)
 
+        // rev-capture 25: only the window's own region is drawn (tilted, with its shadow), not two full canvases.
+        let spread = (style.shadowBlur * 2 + abs(style.shadowY)) * scale + 2
+        let region = outer.applying(CGAffineTransform(rotationAngle: tilt))
+            .offsetBy(dx: rect.midX, dy: rect.midY)
+            .insetBy(dx: -spread, dy: -spread)
+            .integral
+            .intersection(CGRect(origin: .zero, size: canvas))
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         format.opaque = false
-        let renderer = UIGraphicsImageRenderer(size: canvas, format: format)
+        let renderer = UIGraphicsImageRenderer(size: region.isNull ? CGSize(width: 1, height: 1) : region.size, format: format)
         let frameImage = renderer.image { context in
             let cg = context.cgContext
-            cg.translateBy(x: rect.midX, y: rect.midY)
+            cg.translateBy(x: rect.midX - region.minX, y: rect.midY - region.minY)
             cg.rotate(by: tilt)
             cg.setShadow(
                 offset: CGSize(width: 0, height: style.shadowY * scale), blur: style.shadowBlur * scale,
@@ -58,13 +65,15 @@ struct SelfieWindowArt: @unchecked Sendable {
         }
         let openingImage = renderer.image { context in
             let cg = context.cgContext
-            cg.translateBy(x: rect.midX, y: rect.midY)
+            cg.translateBy(x: rect.midX - region.minX, y: rect.midY - region.minY)
             cg.rotate(by: tilt)
             UIColor.white.setFill()
             UIBezierPath(cgPath: SelfieWindowShape().path(in: inner).cgPath).fill()
         }
-        frame = frameImage.cgImage.map { CIImage(cgImage: $0) } ?? CIImage.empty()
-        opening = openingImage.cgImage.map { CIImage(cgImage: $0) } ?? CIImage.empty()
+        // Core Image counts from the bottom.
+        let place = CGAffineTransform(translationX: region.isNull ? 0 : region.minX, y: region.isNull ? 0 : canvas.height - region.maxY)
+        frame = region.isNull ? CIImage.empty() : frameImage.cgImage.map { CIImage(cgImage: $0).transformed(by: place) } ?? CIImage.empty()
+        opening = region.isNull ? CIImage.empty() : openingImage.cgImage.map { CIImage(cgImage: $0).transformed(by: place) } ?? CIImage.empty()
 
         // Core Image has its origin at the bottom left: flip the centre, and the same visual tilt is positive.
         let center = CGPoint(x: rect.midX, y: canvas.height - rect.midY)

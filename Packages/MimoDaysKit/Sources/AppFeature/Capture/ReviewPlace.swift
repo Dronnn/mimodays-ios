@@ -42,7 +42,9 @@ struct RecentPlace: Equatable, Identifiable {
     /// Named places from saved moments, the most used first, then the latest.
     @MainActor
     static func load(from context: ModelContext, limit: Int = 3) -> [RecentPlace] {
-        let descriptor = FetchDescriptor<MomentLocation>(predicate: #Predicate { $0.placeLabel != nil })
+        var descriptor = FetchDescriptor<MomentLocation>(predicate: #Predicate { $0.placeLabel != nil })
+        // rev-capture 25: one round trip for the moments' dates instead of a fault per place.
+        descriptor.relationshipKeyPathsForPrefetching = [\.moment]
         guard let locations = try? context.fetch(descriptor) else { return [] }
         var byLabel: [String: (place: ReviewPlace, uses: Int, latest: Date)] = [:]
         for location in locations {

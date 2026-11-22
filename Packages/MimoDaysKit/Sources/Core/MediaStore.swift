@@ -43,6 +43,12 @@ public struct MediaStore: Sendable {
 
     /// Copies `source` into `area`. The copy is written to a temporary name first and moved into place,
     /// so a crash never leaves a half-written file under a real name.
+    /// The same, off the caller's actor: a minute of video from two cameras copies and hashes for seconds, which
+    /// mustn't hold the main thread (rev-capture 25).
+    public func storeDetached(copyOf source: URL, in area: Area, fileExtension: String? = nil) async throws -> StoredFile {
+        try await Task.detached(priority: .userInitiated) { try store(copyOf: source, in: area, fileExtension: fileExtension) }.value
+    }
+
     public func store(copyOf source: URL, in area: Area, fileExtension: String? = nil) throws -> StoredFile {
         let relativePath = newRelativePath(area, fileExtension ?? source.pathExtension)
         let destination = url(forUnchecked: relativePath)

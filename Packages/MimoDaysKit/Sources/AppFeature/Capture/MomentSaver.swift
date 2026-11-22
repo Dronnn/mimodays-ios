@@ -118,11 +118,12 @@ struct MomentSaver {
             moment.repeatOfMomentID = ThenNow.source(for: draft.repeatOf, in: context)
             moment.tags = draft.tags
             moment.mood = draft.mood
-            let voiceNote = try draft.voice.map { voice in
-                let file = try store.store(copyOf: voice.url, in: .originals)
+            var voiceNote: MomentVoiceNote?
+            if let voice = draft.voice {
+                let file = try await store.storeDetached(copyOf: voice.url, in: .originals)
                 written.append(file.relativePath)
                 let transcript = voice.transcript?.trimmingCharacters(in: .whitespacesAndNewlines)
-                return MomentVoiceNote(
+                voiceNote = MomentVoiceNote(
                     relativePath: file.relativePath, duration: voice.duration, recordedAt: voice.recordedAt,
                     transcript: transcript?.isEmpty == false ? transcript : nil
                 )
@@ -189,7 +190,7 @@ struct MomentSaver {
     private func stored(
         _ url: URL, role: MediaRole, isVideo: Bool, area: MediaStore.Area = .originals, written: inout [String]
     ) async throws -> MomentMedia {
-        let file = try store.store(copyOf: url, in: area)
+        let file = try await store.storeDetached(copyOf: url, in: area)
         written.append(file.relativePath)
         let info = isVideo ? try await Self.videoInfo(url) : try Self.imageInfo(url)
         return MomentMedia(

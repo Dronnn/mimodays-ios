@@ -68,6 +68,22 @@ struct SimulatedCaptureEngineTests {
         #expect(clip.selfieURL == nil)
     }
 
+    /// A take stopped early: its limit's timer doesn't stop the next take.
+    @Test func anEarlyStopDoesNotLeaveItsTimerForTheNextTake() async throws {
+        let engine = SimulatedCaptureEngine(multiCam: false)
+        _ = await engine.start()
+        async let first = engine.record(limit: .seconds(1))
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+        await engine.stopRecording()
+        _ = try await first
+        async let second = engine.record(limit: nil)
+        while await !engine.isRecording { try await Task.sleep(for: .milliseconds(20)) }
+        try await Task.sleep(for: .seconds(1.5))
+        #expect(await engine.isRecording)
+        await engine.stopRecording()
+        _ = try await second
+    }
+
     @Test func oneRecordingAtATime() async throws {
         let engine = SimulatedCaptureEngine()
         _ = await engine.start()

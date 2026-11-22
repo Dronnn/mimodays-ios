@@ -186,7 +186,7 @@ struct RotateReason: View {
     var lines = 1
 
     var body: some View {
-        text
+        Self.text(mode, format)
             .textStyle(TextStyle(.body, size: 12, weight: 600, relativeTo: .caption1, maximumScale: 1.35))
             .foregroundStyle(CameraPalette.cream.opacity(0.7))
             .multilineTextAlignment(.center)
@@ -196,7 +196,7 @@ struct RotateReason: View {
             .accessibilityIdentifier("camera.rotateReason")
     }
 
-    private var text: Text {
+    static func text(_ mode: CameraSettings.Mode, _ format: CaptureFormat) -> Text {
         switch (mode, format == .landscape) {
         case (.video, true): Text("Recording starts working once the phone is sideways", bundle: .module, comment: "Camera (U03): under the dimmed record button")
         case (.video, false): Text("Recording starts working once the phone is upright", bundle: .module, comment: "Camera (U06): under the dimmed record button")

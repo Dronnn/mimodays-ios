@@ -175,15 +175,19 @@ public actor SimulatedCaptureEngine: CaptureEngine {
         let clock = ContinuousClock()
         let started = clock.now
         let startedAt = Date.now
+        // The limit's timer belongs to this take: stopped early, it can't stop the next one (rev-capture).
+        var timer: Task<Void, Never>?
         await withCheckedContinuation { continuation in
             stopSignal = continuation
             if let limit {
-                Task { [weak self] in
-                    try? await Task.sleep(for: limit)
+                timer = Task { [weak self] in
+                    do { try await Task.sleep(for: limit) } catch { return }
+                    guard !Task.isCancelled else { return }
                     await self?.signalStop()
                 }
             }
         }
+        timer?.cancel()
         var elapsed = started.duration(to: clock.now)
         if let limit { elapsed = min(elapsed, limit) }
         let seconds = max(0.5, Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18)

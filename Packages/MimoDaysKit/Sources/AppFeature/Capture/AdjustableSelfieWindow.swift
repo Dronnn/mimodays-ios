@@ -39,8 +39,11 @@ struct AdjustableSelfieWindow<Content: View>: View {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("Selfie window", bundle: .module))
                 .accessibilityValue(Text(placement.accessibilityValue))
-                .accessibilityAction(named: Text("Adjust selfie window", bundle: .module)) {
-                    if isEnabled { showsSheet = true }
+                // Offered only while it can run: not during a recording (rev-capture).
+                .accessibilityActions {
+                    if isEnabled {
+                        Button { showsSheet = true } label: { Text("Adjust selfie window", bundle: .module) }
+                    }
                 }
                 .accessibilityIdentifier(id)
         }

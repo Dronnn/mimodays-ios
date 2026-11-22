@@ -92,8 +92,9 @@ struct MomentSaver {
                 media.append(try await stored(composedPhoto, role: .composedPreview, isVideo: false, area: .derived, written: &written))
             }
             if let thumbnail = try? await thumbnail(capture, composedPhoto: composedPhoto, window: window, halves: halves) {
+                // Gone whether it is kept or the copy fails (rev-capture).
+                defer { try? FileManager.default.removeItem(at: thumbnail) }
                 media.append(try await stored(thumbnail, role: .thumbnail, isVideo: false, area: .derived, written: &written))
-                try? FileManager.default.removeItem(at: thumbnail)
             }
 
             let moment = Moment(

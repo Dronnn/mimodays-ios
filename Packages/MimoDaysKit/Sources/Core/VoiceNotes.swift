@@ -33,16 +33,23 @@ public final class AVVoiceRecorder: VoiceRecorder {
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
         try session.setActive(true)
-        let recorder = try AVAudioRecorder(url: url, settings: [
-            AVFormatIDKey: kAudioFormatMPEG4AAC,
-            AVSampleRateKey: 44_100,
-            AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
-        ])
-        recorder.isMeteringEnabled = true
-        guard recorder.record(forDuration: limit) else { throw VoiceRecorderError.couldNotStart }
-        self.recorder = recorder
-        lastElapsed = 0
+        do {
+            let recorder = try AVAudioRecorder(url: url, settings: [
+                AVFormatIDKey: kAudioFormatMPEG4AAC,
+                AVSampleRateKey: 44_100,
+                AVNumberOfChannelsKey: 1,
+                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
+            ])
+            recorder.isMeteringEnabled = true
+            guard recorder.record(forDuration: limit) else { throw VoiceRecorderError.couldNotStart }
+            self.recorder = recorder
+            lastElapsed = 0
+        } catch {
+            // Nothing recorded: the session goes back, so other audio resumes, and no partial file is left (rev-capture).
+            try? session.setActive(false, options: .notifyOthersOnDeactivation)
+            try? FileManager.default.removeItem(at: url)
+            throw error
+        }
     }
 
     public var elapsed: TimeInterval {
@@ -91,7 +98,8 @@ public final class SimulatedVoiceRecorder: VoiceRecorder {
     public var elapsed: TimeInterval {
         if let stoppedAt { return stoppedAt }
         guard let startedAt else { return 0 }
-        return min(limit, now().timeIntervalSince(startedAt))
+        // A clock set back mid-recording reads as no time, never less (rev-capture).
+        return max(0, min(limit, now().timeIntervalSince(startedAt)))
     }
 
     public var level: Float {

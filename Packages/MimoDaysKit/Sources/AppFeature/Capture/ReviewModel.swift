@@ -299,6 +299,9 @@ final class ReviewModel {
         voicePlayer.pause()
         voicePlayer.replaceCurrentItem(with: nil)
         playsVoice = false
+        // Its item is gone: the observer for its end goes too, not left behind with each Review (rev-capture).
+        if let voiceEndObserver { NotificationCenter.default.removeObserver(voiceEndObserver) }
+        voiceEndObserver = nil
     }
 
     /// How much of the voice note has played, 0...1.

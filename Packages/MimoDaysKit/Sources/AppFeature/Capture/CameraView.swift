@@ -322,7 +322,9 @@ struct CameraView: View {
 
     /// VoiceOver on the dimmed shutter (U07).
     private var rotateHint: Text {
-        model.format == .landscape
+        // A photo isn't recorded: the line under its shutter (rev-capture).
+        if model.mode == .photo { return RotateReason.text(.photo, model.format) }
+        return model.format == .landscape
             ? Text("Turn your phone sideways to record 16:9.", bundle: .module, comment: "Camera (U07): VoiceOver hint on the dimmed shutter while the phone is upright and 16:9 is picked")
             : Text("Turn your phone upright to record \(model.format.label).", bundle: .module, comment: "Camera (U07): VoiceOver hint on the dimmed shutter while the phone is sideways, e.g. 'Turn your phone upright to record 9:16.'")
     }

@@ -143,7 +143,7 @@ struct SearchResults: View {
                     placeRow(place, isLast: index == places.count - 1)
                 }
             }
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard())
             .padding(.horizontal, 16)
             .padding(.top, 6)
         }

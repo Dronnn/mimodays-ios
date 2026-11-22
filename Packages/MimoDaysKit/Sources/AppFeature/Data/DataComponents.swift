@@ -7,7 +7,7 @@ struct DataCard<Content: View>: View {
 
     var body: some View {
         VStack(spacing: 0) { content }
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard())
     }
 }
 

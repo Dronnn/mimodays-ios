@@ -256,11 +256,11 @@ struct MapView: View {
         }
         .frame(width: Self.panelWidth)
         .background(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
+            HandCutCard(cornerRadius: 28)
                 .fill(ColorToken.surfaceSheet.color)
                 .shadow(color: Color(hex: 0x4B2938).opacity(0.14), radius: 14, y: 4)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .clipShape(HandCutCard(cornerRadius: 28))
         .padding(16)
         .padding(.bottom, 8)
     }
@@ -850,7 +850,7 @@ struct PlacesList: View {
                     .accessibilityIdentifier("map.place")
                 }
             }
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard())
             .padding(.horizontal, 16)
             // Moments still without a place stay reachable once others have one (the empty map's card is gone then).
             if model.unlocatedCount > 0 {

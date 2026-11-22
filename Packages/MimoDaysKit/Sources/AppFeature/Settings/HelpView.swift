@@ -28,6 +28,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
     case exportInBackground
     case writeMoment
     case journalingSuggestions
+    case voiceControl
     case fallbackReminder
 
     var title: Text {
@@ -47,6 +48,7 @@ enum HelpArticle: String, CaseIterable, Hashable {
         case .exportInBackground: Text("Export in the background", bundle: .module, comment: "Help topic title (P8.13): a movie export that goes on after MimoDays is left")
         case .writeMoment: Text("Write a moment", bundle: .module)
         case .journalingSuggestions: Text("Journaling Suggestions", bundle: .module)
+        case .voiceControl: Text("Voice Control", bundle: .module, comment: "Help topic title: the iOS feature, by its name in Settings")
         case .fallbackReminder: Text("Fallback reminder", bundle: .module)
         }
     }
@@ -135,6 +137,10 @@ enum HelpArticle: String, CaseIterable, Hashable {
             Text("On Today, tap Add a moment, then Add from Journaling Suggestions, and pick a suggestion.", bundle: .module, comment: "Help topic: Journaling Suggestions (P8.12)"),
             Text("iOS makes the suggestions on your iPhone. MimoDays sees only the one you pick: its photo becomes a moment, or its question is a hint for writing one.", bundle: .module, comment: "Help topic: Journaling Suggestions (P8.12)"),
             Text("You choose what iOS may suggest in Settings › Privacy & Security › Journaling Suggestions.", bundle: .module, comment: "Help topic: Journaling Suggestions (P8.12)"),
+        ]
+        case .voiceControl: [
+            Text("Turn on Voice Control in Settings › Accessibility › Voice Control, then use MimoDays with your voice.", bundle: .module, comment: "Help topic: Voice Control; the path as iOS Settings names it"),
+            Text("Ask Voice Control to show names: every button in MimoDays shows the name to say for it.", bundle: .module, comment: "Help topic: Voice Control"),
         ]
         case .fallbackReminder: [
             Text("In Settings › Surprises, turn on Fallback reminder and choose a time.", bundle: .module),

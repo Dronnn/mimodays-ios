@@ -60,7 +60,7 @@ struct CameraSettingsSheet: View {
                         Rectangle().fill(ColorToken.separator.color).frame(height: 1).padding(.leading, 16)
                         toggle(Text("Shutter sound", bundle: .module), detail: Text("In silent mode, photos never make a sound.", bundle: .module), isOn: $settings.cameraSounds, id: "cameraSettings.shutter")
                     }
-                    .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .background(ColorToken.surfaceCard.color, in: HandCutCard())
                     .padding(.top, 12)
                 }
                 .padding(.horizontal, Spacing.screenMargin)

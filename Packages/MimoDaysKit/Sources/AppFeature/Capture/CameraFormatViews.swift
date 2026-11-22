@@ -133,7 +133,7 @@ struct RotateHint: View {
         .padding(.top, 14)
         .padding(.bottom, 22)
         .frame(width: 300)
-        .background(CameraPalette.background.opacity(0.78), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(CameraPalette.background.opacity(0.78), in: HandCutCard())
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("camera.rotateHint")
     }

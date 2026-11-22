@@ -189320,6 +189320,420 @@
           }
         }
       }
+    },
+    "Voice Control" : {
+      "comment" : "Help topic title: the iOS feature, by its name in Settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التحكم الصوتي"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Галасавое кіраванне"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprachsteuerung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control por voz"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrôle vocal"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "שליטה קולית"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ձայնային կառավարում"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controllo vocale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声コントロール"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ხმოვანი მართვა"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дауыспен басқару"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "음성 제어"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stemregie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sterowanie głosowe"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controle por Voz"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Управление голосом"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Röststyrning"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesle Denetim"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голосове керування"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音控制"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "語音控制"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice Control"
+          }
+        }
+      }
+    },
+    "Turn on Voice Control in Settings › Accessibility › Voice Control, then use MimoDays with your voice." : {
+      "comment" : "Help topic: Voice Control; the path as iOS Settings names it",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "شغّل التحكم الصوتي في الإعدادات › تسهيلات الاستخدام › التحكم الصوتي، ثم استخدم MimoDays بصوتك."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уключы галасавое кіраванне ў Наладах › Універсальны доступ › Галасавое кіраванне і карыстайся MimoDays голасам."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schalte die Sprachsteuerung in Einstellungen › Bedienungshilfen › Sprachsteuerung ein und bediene MimoDays mit deiner Stimme."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa Control por voz en Ajustes › Accesibilidad › Control por voz y usa MimoDays con tu voz."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active le Contrôle vocal dans Réglages › Accessibilité › Contrôle vocal, puis utilise MimoDays à la voix."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מפעילים שליטה קולית בהגדרות › נגישות › שליטה קולית, ואז אפשר להשתמש ב-MimoDays בקול."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Միացրու ձայնային կառավարումը Կարգավորումներ › Մատչելիություն › Ձայնային կառավարում բաժնում և օգտագործիր MimoDays-ը ձայնով։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attiva Controllo vocale in Impostazioni › Accessibilità › Controllo vocale, poi usa MimoDays con la voce."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定 › アクセシビリティ › 音声コントロールで音声コントロールをオンにすると、MimoDaysを声で操作できます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ჩართე ხმოვანი მართვა პარამეტრებში › მისაწვდომობა › ხმოვანი მართვა და გამოიყენე MimoDays ხმით."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Параметрлер › Арнайы мүмкіндіктер › Дауыспен басқару бөлімінде дауыспен басқаруды қос та, MimoDays-ті дауыспен қолдан."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정 › 손쉬운 사용 › 음성 제어에서 음성 제어를 켜면 MimoDays를 목소리로 사용할 수 있어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zet Stemregie aan in Instellingen › Toegankelijkheid › Stemregie en gebruik MimoDays met je stem."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Włącz sterowanie głosowe w Ustawieniach › Dostępność › Sterowanie głosowe i używaj MimoDays głosem."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ative o Controle por Voz em Ajustes › Acessibilidade › Controle por Voz e use o MimoDays com a voz."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включи управление голосом в Настройках › Универсальный доступ › Управление голосом и пользуйся MimoDays голосом."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slå på Röststyrning i Inställningar › Hjälpmedel › Röststyrning och använd MimoDays med rösten."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarlar › Erişilebilirlik › Sesle Denetim’den Sesle Denetim’i aç ve MimoDays’i sesinle kullan."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увімкни голосове керування в Параметрах › Доступність › Голосове керування й користуйся MimoDays голосом."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在“设置”›“辅助功能”›“语音控制”中打开语音控制，即可用声音使用 MimoDays。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「設定」›「輔助使用」›「語音控制」中開啟語音控制，即可用聲音使用 MimoDays。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on Voice Control in Settings › Accessibility › Voice Control, then use MimoDays with your voice."
+          }
+        }
+      }
+    },
+    "Ask Voice Control to show names: every button in MimoDays shows the name to say for it." : {
+      "comment" : "Help topic: Voice Control",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اطلب من التحكم الصوتي إظهار الأسماء: يعرض كل زر في MimoDays الاسم الذي تقوله له."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Папрасі галасавое кіраванне паказаць назвы: кожная кнопка ў MimoDays пакажа назву, якую трэба сказаць."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lass dir von der Sprachsteuerung die Namen zeigen: Jede Taste in MimoDays zeigt den Namen, den du dafür sagst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pide a Control por voz que muestre los nombres: cada botón de MimoDays muestra el nombre que hay que decir."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demande au Contrôle vocal d’afficher les noms : chaque bouton de MimoDays montre le nom à prononcer."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אפשר לבקש משליטה קולית להציג שמות: כל כפתור ב-MimoDays מציג את השם שצריך לומר."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Խնդրիր ձայնային կառավարմանը ցույց տալ անունները․ MimoDays-ի յուրաքանչյուր կոճակ ցույց կտա այն անունը, որը պետք է ասել։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiedi a Controllo vocale di mostrare i nomi: ogni pulsante di MimoDays mostra il nome da dire."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声コントロールで名前を表示すると、MimoDaysの各ボタンに話しかけるときの名前が表示されます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "სთხოვე ხმოვან მართვას სახელების ჩვენება: MimoDays-ის ყველა ღილაკი აჩვენებს სახელს, რომელიც უნდა თქვა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дауыспен басқарудан атауларды көрсетуді сұра: MimoDays-тегі әр түйме айтылатын атауын көрсетеді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "음성 제어에 이름을 보여 달라고 하면 MimoDays의 모든 버튼에 말할 이름이 표시돼요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vraag Stemregie om namen te tonen: elke knop in MimoDays toont de naam die je zegt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poproś sterowanie głosowe o pokazanie nazw: każdy przycisk w MimoDays pokaże nazwę, którą trzeba powiedzieć."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peça ao Controle por Voz para mostrar os nomes: cada botão do MimoDays mostra o nome a dizer."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попроси управление голосом показать названия: у каждой кнопки в MimoDays появится название, которое нужно произнести."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Be Röststyrning att visa namn: varje knapp i MimoDays visar namnet du ska säga."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesle Denetim’den adları göstermesini iste: MimoDays’teki her düğme söylenecek adını gösterir."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попроси голосове керування показати назви: кожна кнопка в MimoDays покаже назву, яку треба вимовити."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让语音控制显示名称：MimoDays 中的每个按钮都会显示要说出的名称。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "讓語音控制顯示名稱：MimoDays 中的每個按鈕都會顯示要說出的名稱。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask Voice Control to show names: every button in MimoDays shows the name to say for it."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

@@ -100,7 +100,7 @@ struct SearchFiltersSheet: View {
 
     private func card(@ViewBuilder _ content: () -> some View) -> some View {
         VStack(spacing: 0, content: content)
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard())
     }
 
     // MARK: Days
@@ -326,7 +326,7 @@ struct ChoiceListSheet<ID: Hashable>: View {
                             row(choice.0, choice.1, isLast: index == choices.count - 1)
                         }
                     }
-                    .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .background(ColorToken.surfaceCard.color, in: HandCutCard())
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
                 }

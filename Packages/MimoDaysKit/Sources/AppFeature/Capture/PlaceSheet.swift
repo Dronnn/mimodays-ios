@@ -179,7 +179,7 @@ struct PlaceSheet<Model: PlaceChoosing>: View {
 
     private func card(@ViewBuilder _ content: () -> some View) -> some View {
         VStack(spacing: 0, content: content)
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard())
     }
 
     /// A 64 pt row: peach disc with a glyph, title and detail, a coral check when chosen, a chevron otherwise.

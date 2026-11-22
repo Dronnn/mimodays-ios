@@ -246,7 +246,7 @@ struct WizardCard<Content: View>: View {
                 }
             }
         }
-        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(ColorToken.surfaceCard.color, in: HandCutCard())
         .padding(.horizontal, 16)
     }
 }
@@ -805,7 +805,7 @@ struct LengthStep: View {
                     }
                     .padding(.horizontal, 16)
                     .frame(minHeight: 52)
-                    .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .background(ColorToken.surfaceCard.color, in: HandCutCard(cornerRadius: 16))
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
                     .accessibilityIdentifier("newMovie.customMinutes")

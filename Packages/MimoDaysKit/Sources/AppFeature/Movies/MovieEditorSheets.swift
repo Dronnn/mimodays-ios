@@ -169,11 +169,13 @@ private struct TrimRange: View {
                     }
                 }
                 .background(Color(hex: 0xC9B8AA))
-                .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+                .clipShape(HandCutCard(cornerRadius: 9, wobble: 1.5))
                 ColorToken.mediaScrim.color.frame(width: x0)
                 ColorToken.mediaScrim.color.frame(width: max(width - x1, 0)).offset(x: x1)
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .strokeBorder(ColorToken.actionCoral.color, lineWidth: 3)
+                // The kept part, cut like the strip.
+                HandCutCard(cornerRadius: 9, wobble: 1.5)
+                    .stroke(ColorToken.actionCoral.color, lineWidth: 6)
+                    .clipShape(HandCutCard(cornerRadius: 9, wobble: 1.5))
                     .frame(width: max(x1 - x0, 0))
                     .offset(x: x0)
                 handle.offset(x: x0 - 10)
@@ -292,7 +294,7 @@ struct TitleSheet: View {
                 .frame(minHeight: 52)
                 .accessibilityIdentifier("title.shows")
             }
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard())
             .padding(.horizontal, 16)
             .padding(.top, 20)
             Spacer(minLength: 0)

@@ -156,8 +156,8 @@ struct MovieExportOptions: View {
                     HStack(alignment: .center, spacing: 21) {
                         Poster(image: cover)
                             .frame(width: 60, height: 104)
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(ColorToken.mediaFrame.color, lineWidth: 3))
+                            .clipShape(MoviePosterBlob())
+                            .overlay(MoviePosterBlob().stroke(ColorToken.mediaFrame.color, lineWidth: 6).clipShape(MoviePosterBlob()))
                             .shadow(color: Color(hex: 0x4B2938).opacity(0.15), radius: 4, y: 2)
                         VStack(alignment: .leading, spacing: 5) {
                             Text(model.project.title)
@@ -182,7 +182,7 @@ struct MovieExportOptions: View {
                         Color(hex: 0x4B2938).opacity(0.12).frame(height: 1).padding(.leading, 16)
                         toggle(Text("Exact place in the file", bundle: .module), isOn: $model.placeInFile, id: "export.place")
                     }
-                    .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .background(ColorToken.surfaceCard.color, in: HandCutCard())
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
                     note(Text("Captions you added are part of the picture. File details are hidden unless you turn them on.", bundle: .module))
@@ -308,8 +308,8 @@ private struct TiltedPoster: View {
     var body: some View {
         Poster(image: image)
             .frame(width: 160, height: 284)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(ColorToken.mediaFrame.color, lineWidth: 5))
+            .clipShape(MoviePosterBlob())
+            .overlay(MoviePosterBlob().stroke(ColorToken.mediaFrame.color, lineWidth: 10).clipShape(MoviePosterBlob()))
             .shadow(color: Color(hex: 0x4B2938).opacity(0.18), radius: 8, y: 4)
             .rotationEffect(.degrees(degrees))
             .accessibilityHidden(true)

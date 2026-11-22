@@ -197,7 +197,7 @@ struct MosaicView: View {
         .fixedSize(horizontal: false, vertical: true)
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 24, style: .continuous).fill(ColorToken.surfaceCard.color))
+        .background(HandCutCard(cornerRadius: 24).fill(ColorToken.surfaceCard.color))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("mosaic.growing")
     }
@@ -305,7 +305,7 @@ private struct ZoomSource: ViewModifier {
 
     func body(content: Content) -> some View {
         if let namespace {
-            content.matchedTransitionSource(id: id, in: namespace) { $0.clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)) }
+            content.matchedTransitionSource(id: id, in: namespace) { $0.clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)) } // the only clip iOS takes here
         } else {
             content
         }

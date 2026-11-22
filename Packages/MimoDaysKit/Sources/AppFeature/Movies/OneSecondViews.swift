@@ -46,7 +46,7 @@ struct OneSecondPeriodSheet: View {
             }
             .padding(.horizontal, 8)
             .frame(minHeight: 56)
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard(cornerRadius: 16))
             .padding(.horizontal, 16)
             .padding(.top, 18)
             summary.padding(.top, 22)
@@ -152,7 +152,7 @@ struct OneSecondLengthCard: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(ColorToken.surfaceCard.color, in: HandCutCard(cornerRadius: 16))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("newMovie.oneSecondLength")
     }
@@ -173,7 +173,7 @@ struct OneSecondDaysList: View {
                 row(day)
             }
         }
-        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(ColorToken.surfaceCard.color, in: HandCutCard())
         .padding(.horizontal, 16)
         .sheet(item: Binding(get: { changing.map(ChangingDay.init) }, set: { changing = $0?.id })) { item in
             if let day = model.oneSecondDays.first(where: { $0.day == item.id }) {

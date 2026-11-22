@@ -634,7 +634,7 @@ private struct CameraNote: View {
         .padding(.trailing, 16)
         .padding(.top, 14)
         .padding(.bottom, 16)
-        .background(CameraPalette.background.opacity(0.88), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .background(CameraPalette.background.opacity(0.88), in: HandCutCard(cornerRadius: 18))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier(id)
         .onChange(of: announcement, initial: true) { _, announcement in

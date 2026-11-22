@@ -98,7 +98,7 @@ struct CollectionsView: View {
             .foregroundStyle(ColorToken.textPrimary.color)
             .padding(.horizontal, 14)
             .frame(minHeight: 64)
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard())
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -295,7 +295,7 @@ struct CollectionPickerSheet: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("collections.newFromPicker")
                 }
-                .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .background(ColorToken.surfaceCard.color, in: HandCutCard())
             }
             .padding(.top, 14)
         }

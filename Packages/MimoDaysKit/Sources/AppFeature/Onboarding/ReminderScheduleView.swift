@@ -156,7 +156,7 @@ struct TimeWindowCard: View {
                 .padding(.leading, 16)
             row(.latest)
         }
-        .background(inSettings ? .clear : ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: Radius.card))
+        .background(inSettings ? .clear : ColorToken.surfaceCard.color, in: HandCutCard(cornerRadius: Radius.card))
     }
 
     @ViewBuilder

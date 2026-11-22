@@ -297,7 +297,7 @@ struct MovieEditorView: View {
                 MoviePlayerSurface(player: model.player)
                     .frame(width: size.width, height: size.height)
                     .background(Color.black)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .clipShape(HandCutCard(cornerRadius: 12))
                     // The movie is one element and the selfie window over it another, each with its own actions.
                     .accessibilityElement()
                     .accessibilityLabel(Text("Movie preview", bundle: .module))
@@ -829,7 +829,7 @@ struct CaptionsPanel: View {
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("editor.title")
         }
-        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(ColorToken.surfaceCard.color, in: HandCutCard())
         .padding(.horizontal, 16)
     }
 

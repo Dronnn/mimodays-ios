@@ -202,7 +202,7 @@ struct MoviePageView: View {
             separator
             row(.glyphText, Text("Rename", bundle: .module), id: "movie.rename", action: rename)
         }
-        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(ColorToken.surfaceCard.color, in: HandCutCard())
     }
 
     private var separator: some View {

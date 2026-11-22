@@ -263,7 +263,7 @@ struct EditMomentView: View {
             }
             favoriteRow
         }
-        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(ColorToken.surfaceCard.color, in: HandCutCard())
     }
 
     /// "Lena's firsts", "Lena's firsts and Walks", or None.

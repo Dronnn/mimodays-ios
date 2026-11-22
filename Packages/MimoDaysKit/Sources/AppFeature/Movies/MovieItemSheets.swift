@@ -510,7 +510,7 @@ private struct AtmosphereDiagram: View {
             }
         }
         .padding(14)
-        .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(ColorToken.surfaceChip.color))
+        .background(HandCutCard(cornerRadius: 16).fill(ColorToken.surfaceChip.color))
         .accessibilityElement()
         .accessibilityLabel(Text("Sound leads by \(TransitionSheet.seconds(lead)), then the picture fades in", bundle: .module))
     }

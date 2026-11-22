@@ -157,7 +157,7 @@ struct MapFiltersSheet: View {
 
     private func card(@ViewBuilder _ content: () -> some View) -> some View {
         VStack(spacing: 0, content: content)
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard())
     }
 
     @ViewBuilder

@@ -156,7 +156,7 @@ struct TagEditorSheet: View {
                                 suggestionRow(tag, isLast: index == suggestions.count - 1)
                             }
                         }
-                        .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: Radius.card))
+                        .background(ColorToken.surfaceCard.color, in: HandCutCard(cornerRadius: Radius.card))
                         .padding(.top, 8)
                     }
                     Text("Up to 10 tags. A tag helps you find this moment later.", bundle: .module, comment: "Tags sheet (P8.4 CC03): under the list")
@@ -279,7 +279,7 @@ struct MoodPickerSheet: View {
                     row(mood, isLast: mood == Mood.allCases.last)
                 }
             }
-            .background(ColorToken.surfaceCard.color, in: RoundedRectangle(cornerRadius: Radius.card))
+            .background(ColorToken.surfaceCard.color, in: HandCutCard(cornerRadius: Radius.card))
             .padding(.horizontal, 16)
             .padding(.top, 8)
             Button { draft = nil } label: {

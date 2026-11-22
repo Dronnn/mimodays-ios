@@ -178,4 +178,58 @@ struct RemindLaterTests {
         #expect(!pending.isEmpty)
         #expect(pending.allSatisfy { $0.categoryID == SurpriseCoordinator.remindLaterCategory })
     }
+
+    /// A replan (new answer window, hours that still fit) keeps the surprise that is coming back, with the new window,
+    /// and counts it for its day.
+    @Test func aReplanKeepsAFittingRetry() async {
+        let prompt = surprise(at: "2026-11-11 10:00")
+        clock.set(date("2026-11-11 10:02"))
+        let coordinator = coordinator()
+        await coordinator.remindLater(promptID: prompt.id)
+        schedule.expiryMinutes = 30
+        await coordinator.settingsChanged()
+        #expect(prompt.outcome == .pending)
+        #expect(prompt.plannedAt == date("2026-11-11 10:32"))
+        #expect(prompt.expiresAt == date("2026-11-11 11:02"))
+        #expect(await notifications.pending().contains { $0.id == prompt.notificationRequestID })
+    }
+
+    /// Answered from Today while it was coming back: the retry's notification goes.
+    @Test func aCaptureCancelsTheRetry() async throws {
+        let prompt = surprise(at: "2026-11-11 10:00")
+        clock.set(date("2026-11-11 10:01"))
+        let coordinator = coordinator()
+        #expect(coordinator.open(promptID: prompt.id))
+        clock.set(date("2026-11-11 10:02"))
+        await coordinator.remindLater(promptID: prompt.id)
+        let moment = Moment(captured: CaptureTime(instant: date("2026-11-11 10:03"), timeZone: calendar.timeZone), origin: .randomPrompt, mediaType: .photo, createdAt: date("2026-11-11 10:03"))
+        context.insert(moment)
+        try context.save()
+        coordinator.captured(promptID: prompt.id, momentID: moment.id)
+        #expect(prompt.outcome == .captured)
+        for _ in 0..<100 where await notifications.pending().contains(where: { $0.id == prompt.notificationRequestID }) {
+            await Task.yield()
+        }
+        #expect(await !notifications.pending().contains { $0.id == prompt.notificationRequestID })
+    }
+
+    /// On the spring clock change the hours still close at 22:00 on the clock: the whole window fits before it.
+    @Test func theHoursCloseOnTheClockOnAClockChangeDay() async {
+        let prompt = surprise(at: "2027-03-28 21:20")
+        clock.set(date("2027-03-28 21:25"))
+        #expect(await coordinator().remindLater(promptID: prompt.id) == .later(date("2027-03-28 21:45")))
+    }
+
+    /// Paused after "Remind me later" failed: Today offers Resume rather than the failure.
+    @Test func pauseComesBeforeAFailedRetry() async {
+        let prompt = surprise(at: "2026-11-11 10:00")
+        clock.set(date("2026-11-11 10:02"))
+        await notifications.setScheduleError(.unavailable)
+        let coordinator = coordinator()
+        #expect(await coordinator.remindLater(promptID: prompt.id) == .failed(.failed))
+        clock.set(date("2026-11-11 10:20"))
+        #expect(await coordinator.todayStatus(latestCapture: nil).status == .retryFailed(.failed))
+        await coordinator.pause(.indefinitely)
+        #expect(await coordinator.todayStatus(latestCapture: nil).status == .paused(until: nil))
+    }
 }

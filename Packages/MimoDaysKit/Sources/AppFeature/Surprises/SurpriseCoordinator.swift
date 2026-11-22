@@ -253,6 +253,10 @@ final class SurpriseCoordinator {
         prompt.outcome = .captured
         prompt.capturedMomentID = momentID
         save()
+        // Answered while it was coming back (P8.7): its notification goes.
+        if prompt.notificationRequestID.hasPrefix(Self.retryPrefix) {
+            Task { await serially { await self.syncNotifications(now: self.clock.now()) } }
+        }
     }
 
     // MARK: Remind me later (P8.7)
@@ -300,7 +304,9 @@ final class SurpriseCoordinator {
         guard let prompt = fetchPrompt(promptID), prompt.outcome == .pending, Self.isOrdinary(prompt.notificationRequestID),
               prompt.plannedAt <= now, now < prompt.expiresAt,
               let schedule = fetchSchedule(), schedule.isEnabled,
-              await permissions.status(of: .notifications).isUsable else { return .ignored }
+              await permissions.status(of: .notifications).isUsable,
+              // Answered while iOS was asked.
+              prompt.outcome == .pending else { return .ignored }
         let calendar = calendar(for: schedule)
         let window = TimeInterval(schedule.expiryMinutes * 60)
         guard let time = retryTime(now: now, window: window, schedule: schedule, calendar: calendar, prompt: prompt) else {
@@ -328,8 +334,10 @@ final class SurpriseCoordinator {
     /// before the next surprise; nil when there's none, or surprises are paused.
     private func retryTime(now: Date, window: TimeInterval, schedule: SurpriseSchedule, calendar: Calendar, prompt: SurprisePrompt) -> Date? {
         guard !schedule.isPausedIndefinitely, (schedule.pausedUntil ?? .distantPast) <= now else { return nil }
-        let day = calendar.startOfDay(for: now)
-        guard let close = calendar.date(byAdding: .minute, value: schedule.latestMinute, to: day),
+        // The surprise's own day (one live past midnight stays on it) and its closing time on the clock, as the
+        // planner reads it: on a clock-change day minutes from midnight would be an hour off.
+        let day = calendar.startOfDay(for: prompt.plannedAt)
+        guard let close = calendar.date(bySettingHour: schedule.latestMinute / 60, minute: schedule.latestMinute % 60, second: 0, of: day),
               let tomorrow = calendar.date(byAdding: .day, value: 1, to: day) else { return nil }
         var latest = min(now.addingTimeInterval(Self.retryDelay), close.addingTimeInterval(-window), tomorrow.addingTimeInterval(-window))
         if let next = fetchUpcomingPending(now: now).first(where: { $0.id != prompt.id }) {
@@ -396,7 +404,15 @@ final class SurpriseCoordinator {
             let notBefore = max(now, schedule.pausedUntil ?? now)
             // A plan that no longer fits (new hours, days, pause or time zone) is drawn again from now on.
             if replan || upcoming.contains(where: { !fits($0.plannedAt, rules, calendar, notBefore: notBefore) }) {
-                upcoming.forEach { $0.outcome = .cancelled }
+                for prompt in upcoming {
+                    // P8.7: a surprise coming back is the same one, already counted for its day; it stays while it
+                    // still fits, with the window as it is now.
+                    if prompt.notificationRequestID.hasPrefix(Self.retryPrefix), fits(prompt.plannedAt, rules, calendar, notBefore: notBefore) {
+                        prompt.expiresAt = prompt.plannedAt.addingTimeInterval(TimeInterval(schedule.expiryMinutes * 60))
+                        continue
+                    }
+                    prompt.outcome = .cancelled
+                }
             }
             let planned = prompts
                 .filter { $0.outcome != .cancelled && !$0.notificationRequestID.hasPrefix(Self.sendNowPrefix) }
@@ -629,10 +645,6 @@ enum SurpriseStatus: Equatable {
             self = .later
             return
         }
-        if let retryFailure {
-            self = .retryFailed(retryFailure)
-            return
-        }
         guard let schedule, schedule.isEnabled, notificationsAllowed else {
             self = .off
             return
@@ -643,6 +655,11 @@ enum SurpriseStatus: Equatable {
         }
         if let until = schedule.pausedUntil, until > now {
             self = .paused(until: until)
+            return
+        }
+        // After Turn on and Resume: their buttons matter more than a failed "Remind me later".
+        if let retryFailure {
+            self = .retryFailed(retryFailure)
             return
         }
         let last = prompts.filter { $0.plannedAt <= now && $0.outcome != .cancelled }.max { $0.plannedAt < $1.plannedAt }

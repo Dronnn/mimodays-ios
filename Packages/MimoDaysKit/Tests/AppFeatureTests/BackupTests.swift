@@ -95,12 +95,13 @@ struct BackupTests {
     }
 
     private func restore(
-        _ url: URL, into library: MediaLibrary, mode: BackupService.Mode = .addMissing, losing lost: Int = 0, damaging: Set<String> = []
+        _ url: URL, into library: MediaLibrary, mode: BackupService.Mode = .addMissing, losing lost: Int = 0, damaging: Set<String> = [],
+        moved: [MovedOriginal] = []
     ) throws -> BackupService.Outcome {
         let service = BackupService(library: library, now: { [clock] in clock.now() })
         var check = try BackupArchive.check(url)
         check.damaged.formUnion(damaging)
-        let wanted = service.files(for: check, mode: mode)
+        let wanted = service.files(for: check, mode: mode, moved: moved)
         let folder = temporary("unpacked")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         var unpacked: [String: URL] = [:]
@@ -109,7 +110,38 @@ struct BackupTests {
         }
         // Files that couldn't be unpacked (no space).
         for path in unpacked.keys.sorted().prefix(lost) { unpacked[path] = nil }
-        return try service.restore(check, mode: mode, unpacked: unpacked)
+        return try service.restore(check, mode: mode, unpacked: unpacked, moved: moved)
+    }
+
+    /// P3.6: an original moved to a folder comes back from a backup made before the move, in place of its small copy.
+    @Test func addingBringsBackMovedOriginals() async throws {
+        let phone = try library()
+        _ = try await fill(phone)
+        let (url, _) = try backUp(phone)
+        let moment = try #require(try phone.context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.deletedAt == nil })).first)
+        let media = try #require(moment.media.first { $0.role == .rearSource })
+        let original = (path: media.relativePath, checksum: media.checksum, bytes: media.byteCount)
+        // Its Compact copy stands in.
+        let small = temporary("small.mov")
+        try Data(repeating: 1, count: 100).write(to: small)
+        let stored = try phone.store.store(moving: small, in: .originals, fileExtension: "mov")
+        try phone.store.remove(original.path)
+        media.relativePath = stored.relativePath
+        media.checksum = stored.checksum
+        media.byteCount = stored.byteCount
+        try phone.context.save()
+        let entry = MovedOriginal(
+            mediaID: media.id, momentID: moment.id, fileName: "x.mov", checksum: original.checksum, byteCount: original.bytes,
+            pixelWidth: media.pixelWidth, pixelHeight: media.pixelHeight, codec: media.codec, movedAt: clock.now()
+        )
+        let outcome = try restore(url, into: phone, moved: [entry])
+        #expect(outcome.broughtBack == [media.id])
+        #expect(outcome.restored == 0)
+        #expect(media.checksum == original.checksum && media.byteCount == original.bytes)
+        #expect(try MediaStore.sha256(of: try phone.store.url(for: media.relativePath)) == original.checksum)
+        #expect(!FileManager.default.fileExists(atPath: try phone.store.url(for: stored.relativePath).path))
+        // Done once: nothing more to bring.
+        #expect(try restore(url, into: phone, moved: [entry]).broughtBack.isEmpty)
     }
 
     /// V7: replacing with a backup one of whose files can't come in keeps the library as it is.

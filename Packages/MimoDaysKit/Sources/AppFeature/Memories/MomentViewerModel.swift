@@ -14,6 +14,8 @@ struct MediaLibrary {
     let thumbnails: ThumbnailPipeline
     /// P3.5: who reads moments' files now; nil where nothing makes videos smaller.
     var use: MediaUse? = nil
+    /// P3.6: what was moved to the person's folder.
+    var archive: OriginalArchive? = nil
 }
 
 extension EnvironmentValues {

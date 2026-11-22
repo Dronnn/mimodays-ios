@@ -133,13 +133,28 @@ struct BackupService {
         )
     }
 
-    /// The files a restore unpacks: those of the moments and projects it adds, left out the damaged ones.
-    func files(for check: BackupArchive.Check, mode: Mode) -> Set<String> {
+    /// The files a restore unpacks: those of the moments and projects it adds, left out the damaged ones; adding,
+    /// also the originals moved to a folder that the backup holds (P3.6).
+    func files(for check: BackupArchive.Check, mode: Mode, moved: [MovedOriginal] = []) -> Set<String> {
         let here = mode == .addMissing ? existingMomentIDs() : []
         let projectsHere = mode == .addMissing ? existingProjectIDs() : []
         let moments = check.document.moments.filter { $0.hasContent && !here.contains($0.id) }.flatMap(\.paths)
         let projects = check.document.movies.filter { !projectsHere.contains($0.id) }.flatMap(\.paths)
-        return Set(moments + projects).subtracting(check.damaged)
+        let originals = mode == .addMissing ? Array(Self.originals(in: check, moved: moved).keys) : []
+        return Set(moments + projects + originals).subtracting(check.damaged)
+    }
+
+    /// P3.6 X06: "To bring originals back, use Backup › Add what's missing": a stream whose original went to a folder,
+    /// when the backup holds that very file (by its checksum before the move). Backup path -> what was moved.
+    static func originals(in check: BackupArchive.Check, moved: [MovedOriginal]) -> [String: MovedOriginal] {
+        let byID = Dictionary(moved.map { ($0.mediaID, $0) }, uniquingKeysWith: { first, _ in first })
+        var found: [String: MovedOriginal] = [:]
+        for record in check.document.moments {
+            for media in record.media where !check.damaged.contains(media.path) {
+                if let entry = byID[media.id], entry.checksum == media.checksum { found[media.path] = entry }
+            }
+        }
+        return found
     }
 
     func bytes(of paths: Set<String>, in document: BackupDocument) -> Int64 {
@@ -154,11 +169,13 @@ struct BackupService {
         var alreadyHere: Int
         /// When the moments left out were taken, so the person knows which.
         var skipped: [Date] = []
+        /// P3.6: streams whose originals came back from the backup.
+        var broughtBack: Set<UUID> = []
     }
 
     /// Puts the records back, their files moved in from `unpacked` (backup path -> unpacked file). A moment
     /// any of whose files is damaged is skipped whole; links to it are dropped.
-    func restore(_ check: BackupArchive.Check, mode: Mode, unpacked: [String: URL]) throws -> Outcome {
+    func restore(_ check: BackupArchive.Check, mode: Mode, unpacked: [String: URL], moved: [MovedOriginal] = []) throws -> Outcome {
         let document = check.document
         // Replacing: what is here goes in the same save as the backup comes in, so a failed save keeps it all; its
         // files go only after that save. Until then the fetches below leave it out.
@@ -331,6 +348,23 @@ struct BackupService {
             }
         }
 
+        // P3.6: adding, a moved original the backup holds takes its Compact copy's place, in the same save.
+        var broughtBack: Set<UUID> = []
+        if !replacing {
+            let media = Dictionary(((try? context.fetch(FetchDescriptor<MomentMedia>())) ?? []).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+            for (path, entry) in Self.originals(in: check, moved: moved) {
+                guard let current = media[entry.mediaID], current.checksum != entry.checksum, move(path), let new = paths[path] else { continue }
+                oldFiles.insert(current.relativePath)
+                current.relativePath = new
+                current.checksum = entry.checksum
+                current.byteCount = entry.byteCount
+                current.pixelWidth = entry.pixelWidth
+                current.pixelHeight = entry.pixelHeight
+                current.codec = entry.codec
+                broughtBack.insert(entry.mediaID)
+            }
+        }
+
         do {
             try context.save()
         } catch {
@@ -350,7 +384,8 @@ struct BackupService {
         context.insert(manifest)
         try? context.save()
         return Outcome(
-            restored: restored, wanted: wanted, damagedFiles: damagedFiles, alreadyHere: document.moments.count(where: \.hasContent) - wanted, skipped: skipped.sorted()
+            restored: restored, wanted: wanted, damagedFiles: damagedFiles, alreadyHere: document.moments.count(where: \.hasContent) - wanted,
+            skipped: skipped.sorted(), broughtBack: broughtBack
         )
     }
 

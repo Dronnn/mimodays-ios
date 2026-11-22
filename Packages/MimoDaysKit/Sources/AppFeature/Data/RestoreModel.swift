@@ -105,7 +105,8 @@ final class RestoreModel {
     /// E07's button: unpack what's needed, then put the records back.
     func restore() {
         guard task == nil, let check, case .ready = phase else { return }
-        let wanted = service.files(for: check, mode: mode)
+        let moved = library.archive?.entries ?? []
+        let wanted = service.files(for: check, mode: mode, moved: moved)
         let needed = Int64(Double(service.bytes(of: wanted, in: check.document)) * 1.05)
         if let free = freeSpace(), free < needed {
             phase = .failed(.space(needed: needed - free))
@@ -140,7 +141,10 @@ final class RestoreModel {
                 return
             }
             do {
-                phase = .done(try service.restore(check, mode: mode, unpacked: unpacked))
+                let outcome = try service.restore(check, mode: mode, unpacked: unpacked, moved: moved)
+                // P3.6: those are on the phone again.
+                if !outcome.broughtBack.isEmpty { try? library.archive?.forget(outcome.broughtBack, in: nil) }
+                phase = .done(outcome)
             } catch {
                 Self.logger.error("Restoring failed: \(error.localizedDescription, privacy: .public)")
                 phase = .failed(.other)

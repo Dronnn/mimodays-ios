@@ -19,7 +19,9 @@ public final class AppDependencies {
     let camera: CameraServices
     let momentSaver: MomentSaver
     let thumbnails = ThumbnailPipeline()
-    var library: MediaLibrary { MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails, use: mediaUse) }
+    var library: MediaLibrary {
+        MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails, use: mediaUse, archive: shrinks.archive)
+    }
     /// P3.5: who reads moments' files now (backup, restore, moment export), and Make smaller, which waits for them.
     let mediaUse = MediaUse()
     let shrinks: ShrinkRun
@@ -137,7 +139,7 @@ public final class AppDependencies {
             ? FileManager.default.temporaryDirectory.appending(path: "UITestOriginals-\(UUID().uuidString).json")
             : URL.applicationSupportDirectory.appending(path: "MovedOriginals.json"))
         shrinks = ShrinkRun(
-            library: MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails, use: mediaUse),
+            library: MediaLibrary(context: modelContainer.mainContext, store: momentSaver.store, thumbnails: thumbnails, use: mediaUse, archive: archive),
             archive: archive,
             defaults: configuration.isUITesting ? nil : .standard,
             busy: { mediaUse.isReading || movieExports.isExporting }

@@ -245,9 +245,15 @@ final class ReviewModel {
         voiceLevels = []
     }
 
-    /// Save waits for this: seconds on device, since the model is never downloaded here.
+    /// Save doesn't wait for the words: what isn't done yet is worked out into the saved note (rev-capture 18).
+    /// The words as Review shows them, once worked out.
     func finishTranscription() async {
         await transcription?.value
+    }
+
+    func cancelTranscription() {
+        transcription?.cancel()
+        transcription = nil
     }
 
     private func transcribe() {

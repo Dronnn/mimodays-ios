@@ -304,6 +304,13 @@ final class EditMomentModel: Identifiable, PlaceChoosing {
             try? library.store.remove(path)
             try? library.store.remove(LoopPreviews.path(for: path))
         }
-        if case let .recorded(recorded) = voice { try? FileManager.default.removeItem(at: recorded.url) }
+        if case let .recorded(recorded) = voice {
+            try? FileManager.default.removeItem(at: recorded.url)
+            // Recorded before iOS had the speech model: its words come into the saved note later (rev-capture 18).
+            if recorded.transcript == nil {
+                let context = library.context, store = library.store, transcriber = voiceServices.transcriber
+                Task { await SavedTranscripts.fill(id, context: context, store: store, transcriber: transcriber) }
+            }
+        }
     }
 }

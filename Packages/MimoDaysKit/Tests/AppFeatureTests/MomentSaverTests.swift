@@ -211,6 +211,20 @@ struct MomentSaverTests {
         #expect(!FileManager.default.fileExists(atPath: mainURL.path))
     }
 
+    /// rev-capture 18: a note saved before its words were ready gets them later; one replaced meanwhile doesn't.
+    @Test func aSavedVoiceNoteGetsItsWordsLater() async throws {
+        let url = FileManager.default.temporaryDirectory.appending(path: "voice-\(UUID().uuidString).m4a")
+        try SimulatedVoiceRecorder.writeTone(to: url, seconds: 1.2)
+        var draft = MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)
+        draft.voice = ReviewVoiceNote(url: url, duration: 1.2, recordedAt: time.instant)
+        let moment = try await saver().save(draft)
+        #expect(moment.voiceNotes.first?.transcript == nil)
+        await SavedTranscripts.fill(moment.id, context: container.mainContext, store: store, transcriber: SimulatedTranscriber(text: "first snow"))
+        #expect(moment.voiceNotes.first?.transcript == "first snow")
+        await SavedTranscripts.fill(moment.id, context: container.mainContext, store: store, transcriber: SimulatedTranscriber(text: "other"))
+        #expect(moment.voiceNotes.first?.transcript == "first snow")
+    }
+
     @Test func tagsAndMoodAreSaved() async throws {
         var draft = MomentDraft(capture: try await photo(), caption: "", window: window, promptID: nil)
         draft.tags = ["Lena", "bike"]

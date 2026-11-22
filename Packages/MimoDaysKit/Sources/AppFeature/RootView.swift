@@ -578,8 +578,13 @@ struct CaptureFlowView: View {
     /// Keeps the moment, then closes. A failure leaves review as it is, so Try again works.
     private func save(_ review: ReviewModel) async throws {
         guard let saver else { throw SaveError.failed }
-        await review.finishTranscription()
+        // Words not worked out yet come later, into the saved note: Save doesn't wait for them.
+        review.cancelTranscription()
         let moment = try await saver.save(review.momentDraft)
+        if moment.voiceNotes.first?.transcript == nil, !moment.voiceNotes.isEmpty {
+            let id = moment.id, transcriber = (services ?? .simulated).voice.transcriber
+            Task { await SavedTranscripts.fill(id, context: saver.context, store: saver.store, transcriber: transcriber) }
+        }
         review.stopPlayback()
         review.clearDraft()
         let thenNow: SavedToast.Kind = review.repeatOf == nil ? .today : moment.repeatOfMomentID == nil ? .originalGone : .thenNow

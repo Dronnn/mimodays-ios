@@ -45,6 +45,9 @@ struct MomentViewer: View {
     @Environment(\.camera) private var camera
     @Environment(MoviePreferences.self) private var moviePreferences: MoviePreferences?
     @Environment(AppRouter.self) private var router: AppRouter?
+    @Environment(ShrinkRun.self) private var shrinks: ShrinkRun?
+    /// P3.5: Make smaller's sizes for this moment, while the choice is up.
+    @State private var shrinking: ShrinkOffer?
     /// M07 while it is open.
     @State private var editing: EditMomentModel?
     /// M15 while it is open, for this moment.
@@ -106,6 +109,20 @@ struct MomentViewer: View {
             DeleteConfirmationSheet(count: 1, parts: moment.parts, movieDrafts: model.movieDrafts(moment.id)) {
                 model.delete(moment.id)
             }
+        }
+        .confirmationDialog(
+            Text("Make this video smaller?", bundle: .module, comment: "Memory Card ••• Make smaller (P3.5): the choice of size"),
+            isPresented: Binding { shrinking != nil } set: { if !$0 { shrinking = nil } }, titleVisibility: .visible, presenting: shrinking
+        ) { offer in
+            ForEach(offer.sizes, id: \.size) { option in
+                Button {
+                    shrinks?.start(.chosen([offer.id]), size: option.size)
+                } label: {
+                    Text("\(option.size.label): about \(StorageView.bytes(option.bytes))", bundle: .module, comment: "Memory Card ••• Make smaller (P3.5): a size and what the video takes at it, e.g. Balanced: about 40 MB")
+                }
+            }
+        } message: { offer in
+            Text("Now \(StorageView.bytes(offer.bytes)). The original is replaced only after its smaller copy is checked; you can follow it in Settings › Storage.", bundle: .module)
         }
         .sheet(item: $collecting) { collecting in
             CollectionPickerSheet(library: model.library, selection: Binding(
@@ -234,6 +251,13 @@ struct MomentViewer: View {
                             } icon: { Icon.glyphArchive.image }
                         }
                         .accessibilityIdentifier("viewer.hideFromMemories")
+                    }
+                    // P3.5 X07: one moment, from its card.
+                    if moment.mediaType == .video, shrinks?.isRunning == false, let offer = ShrinkOffer(moment.id, context: model.library.context) {
+                        Button { shrinking = offer } label: {
+                            Label { Text("Make smaller", bundle: .module) } icon: { Icon.glyphFilm.image }
+                        }
+                        .accessibilityIdentifier("viewer.makeSmaller")
                     }
                     // P8.8 GG01: the camera, to take it again; photos and videos.
                     if moment.mediaType != .text {

@@ -28,6 +28,8 @@ final class StorageModel {
     private(set) var deletedCount = 0
     private(set) var deletedBytes: Int64 = 0
     private(set) var lastBackup: Date?
+    /// X03: what Make videos smaller frees as it first opens (older than 30 days, Balanced).
+    private(set) var shrinkFrees: Int64 = 0
 
     let library: MediaLibrary
     private let temporaryDirectory: URL
@@ -65,6 +67,8 @@ final class StorageModel {
         self.deletedBytes = deletedBytes
         let backups = (try? library.context.fetch(FetchDescriptor<BackupManifest>(predicate: #Predicate { $0.restoredAt == nil }))) ?? []
         lastBackup = backups.map(\.createdAt).max()
+        let candidates = (try? ShrinkPolicy.candidates(.olderThan30Days, size: .balanced, in: library.context)) ?? []
+        shrinkFrees = candidates.reduce(Int64(0)) { $0 + $1.bytes - $1.estimatedBytes(at: .balanced) }
     }
 
     /// Clear temporary files: the cache and the temporary folder. Never originals, previews or movies.

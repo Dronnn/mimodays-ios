@@ -89,6 +89,7 @@ private struct SettingsHost: View {
                     case let .backup(back): BackupScreen(back: back.label).settingsPage()
                     // Its own bar, as in Memories: the system back button and Select.
                     case .recentlyDeleted: RecentlyDeletedScreen()
+                    case .shrink: ShrinkScreen().settingsPage()
                     }
                 }
                 // Recently deleted opens its moments.

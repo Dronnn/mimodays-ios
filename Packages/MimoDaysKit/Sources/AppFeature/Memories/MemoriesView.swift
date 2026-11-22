@@ -343,14 +343,17 @@ struct MemoriesView: View {
     }
 
     /// "TODAY · WED, NOV 11", "YESTERDAY · TUE, NOV 10", "MON, NOV 9"; years only when it isn't this one.
-    private func dayLabel(_ key: Int) -> Text {
-        let date = Self.dayDate(key)
-        let today = LocalDay(model.now, in: calendar.timeZone).key
+    private func dayLabel(_ key: Int) -> Text { Self.dayLabel(key, now: model.now, calendar: calendar) }
+
+    /// Also P3.5's Choose videos.
+    static func dayLabel(_ key: Int, now: Date, calendar: Calendar) -> Text {
+        let date = dayDate(key)
+        let today = LocalDay(now, in: calendar.timeZone).key
         var format = Date.FormatStyle(timeZone: .gmt).weekday(.abbreviated).month(.abbreviated).day()
         if key / 10_000 != today / 10_000 { format = format.year() }
         let text = Text(date, format: format)
         if key == today { return Text("Day label today: \(text)", bundle: .module) }
-        if let yesterday = calendar.date(byAdding: .day, value: -1, to: model.now),
+        if let yesterday = calendar.date(byAdding: .day, value: -1, to: now),
            key == LocalDay(yesterday, in: calendar.timeZone).key {
             return Text("Day label yesterday: \(text)", bundle: .module)
         }

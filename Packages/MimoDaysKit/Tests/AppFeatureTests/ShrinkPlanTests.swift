@@ -91,4 +91,37 @@ struct ShrinkPlanTests {
         #expect(candidate.estimatedBytes(at: .compact) == 2 * Int64(30 * Double(2_500_000 + 128_000) / 8))
         #expect(candidate.estimatedBytes(at: .high) == candidate.bytes)
     }
+
+    /// Memory Card ••• Make smaller: both cameras now, and what each size leaves.
+    @Test func anOfferForOneVideo() throws {
+        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let context = container.mainContext
+        let moment = video(daysAgo: 1, megabitsPerSecond: 16, in: context)
+        let small = video(daysAgo: 1, megabitsPerSecond: 2, width: 1280, in: context)
+        let offer = try #require(ShrinkOffer(moment.id, context: context))
+        #expect(offer.bytes == 2 * 60_000_000)
+        #expect(offer.sizes.map(\.size) == [.balanced, .compact])
+        #expect(offer.sizes[1].bytes < offer.sizes[0].bytes && offer.sizes[0].bytes < offer.bytes)
+        #expect(ShrinkOffer(small.id, context: context) == nil)
+    }
+
+    /// X04: the summary follows Which videos and New size.
+    @Test func theScreenCounts() throws {
+        let container = try MimoDaysStore.makeContainer(inMemory: true)
+        let context = container.mainContext
+        let recent = video(daysAgo: 2, in: context)
+        video(daysAgo: 40, in: context)
+        let model = ShrinkModel(library: MediaLibrary(context: context, store: try MediaStore(root: FileManager.default.temporaryDirectory.appending(path: "ShrinkModel-\(UUID().uuidString)")), thumbnails: ThumbnailPipeline()), now: { now })
+        #expect(model.candidates.count == 1)
+        model.which = .all
+        #expect(model.candidates.count == 2)
+        #expect(model.frees > 0 && model.bytesAfter < model.bytesNow)
+        let balanced = model.frees
+        model.size = .compact
+        #expect(model.frees > balanced)
+        model.which = .chosen
+        model.chosen = [recent.id]
+        #expect(model.candidates.map(\.id) == [recent.id])
+        #expect(model.choices().flatMap(\.choices).count == 2)
+    }
 }

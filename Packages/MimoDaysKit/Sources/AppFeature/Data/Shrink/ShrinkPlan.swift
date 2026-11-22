@@ -104,3 +104,32 @@ enum ShrinkPolicy {
             }
     }
 }
+
+/// P3.5: Memory Card ••• Make smaller: the sizes this video would get smaller at, with what it'd take.
+struct ShrinkOffer: Identifiable, Equatable {
+    struct Option: Equatable {
+        var size: VideoSize
+        var bytes: Int64
+    }
+
+    var id: UUID
+    var bytes: Int64
+    var sizes: [Option]
+
+    /// Nil when it's already as small as Compact.
+    @MainActor
+    init?(_ id: UUID, context: ModelContext) {
+        guard let moment = try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first else { return nil }
+        // Both cameras now; a stream already small enough stays as it is.
+        let bytes = ShrinkPolicy.cameraStreams(of: moment).reduce(Int64(0)) { $0 + $1.byteCount }
+        var sizes: [Option] = []
+        for size in [VideoSize.balanced, .compact] {
+            guard let candidate = try? ShrinkPolicy.candidates(.chosen([id]), size: size, in: context).first else { continue }
+            sizes.append(Option(size: size, bytes: bytes - candidate.bytes + candidate.estimatedBytes(at: size)))
+        }
+        guard !sizes.isEmpty else { return nil }
+        self.id = id
+        self.bytes = bytes
+        self.sizes = sizes
+    }
+}

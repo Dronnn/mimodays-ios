@@ -8,6 +8,8 @@ enum DataRoute: Hashable {
     /// E06, from Settings, Storage or Delete all data's Back up first.
     case backup(back: SettingsBack)
     case recentlyDeleted
+    /// P3.5 X04/X05.
+    case shrink
 }
 
 struct StorageScreen: View {
@@ -34,6 +36,7 @@ private struct StorageHost: View {
 /// E09: how much MimoDays uses, as a bar and by kind; temporary files can go, originals never.
 struct StorageView: View {
     let model: StorageModel
+    @Environment(ShrinkRun.self) private var shrinks: ShrinkRun?
     /// Rendered movies open the Movies tab.
     let openMovies: () -> Void
     @Environment(\.dismiss) private var dismiss
@@ -77,6 +80,16 @@ struct StorageView: View {
                         .accessibilityIdentifier("storage.clear")
                         .padding(.horizontal, 20)
                         .padding(.top, 20)
+                    // X03.
+                    DataCard {
+                        NavigationLink(value: DataRoute.shrink) {
+                            DataIconRow(icon: .glyphFilm, title: Text("Make videos smaller", bundle: .module), value: shrinkValue)
+                        }
+                        .accessibilityIdentifier("storage.shrink")
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 20)
                     DataCard {
                         NavigationLink(value: DataRoute.recentlyDeleted) {
                             DataIconRow(
@@ -148,6 +161,15 @@ struct StorageView: View {
         .frame(minHeight: 52)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
+    }
+
+    /// "frees ~2.1 GB", or how far a run got.
+    private var shrinkValue: Text? {
+        if let shrinks, shrinks.isRunning, let job = shrinks.job {
+            return Text("\(job.total - job.remaining.count) of \(Text("\(job.total) videos", bundle: .module))", bundle: .module)
+        }
+        guard model.shrinkFrees > 0 else { return nil }
+        return Text("frees ~\(Self.bytes(model.shrinkFrees))", bundle: .module, comment: "Storage (X03): what Make videos smaller would free, e.g. frees ~2.1 GB")
     }
 
     private var lastBackup: Text {

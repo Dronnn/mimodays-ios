@@ -41,6 +41,7 @@ final class ShrinkRun {
     }
 
     struct Outcome: Equatable {
+        var total: Int
         var done: Int
         var skipped: Int
         var freed: Int64
@@ -114,6 +115,11 @@ final class ShrinkRun {
         finish(stopped: true)
     }
 
+    /// X05 "Done": back to X04.
+    func acknowledge() {
+        if case .finished = phase { phase = .idle }
+    }
+
     private func run() {
         phase = .running
         task = Task { [weak self] in
@@ -148,7 +154,7 @@ final class ShrinkRun {
 
     private func finish(stoppedForSpace: Bool = false, stopped: Bool = false) {
         let job = job ?? Job(size: .compact, remaining: [], total: 0)
-        phase = .finished(Outcome(done: job.done, skipped: job.skipped, freed: job.freed, stoppedForSpace: stoppedForSpace, stopped: stopped))
+        phase = .finished(Outcome(total: job.total, done: job.done, skipped: job.skipped, freed: job.freed, stoppedForSpace: stoppedForSpace, stopped: stopped))
         self.job = nil
         save()
         removeLeftovers()

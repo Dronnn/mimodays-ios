@@ -26,7 +26,11 @@ struct MapFilters: Equatable {
     var favoritesOnly = false
     var collection: UUID?
 
-    var count: Int { [kind != .all, from != nil, to != nil, favoritesOnly, collection != nil].filter(\.self).count }
+    /// This year is one filter, though it has both ends.
+    var count: Int {
+        let wholeYear = from.map { $0 % 10_000 == 101 && to == $0 - 101 + 1231 } ?? false
+        return [kind != .all, from != nil, to != nil && !wholeYear, favoritesOnly, collection != nil].filter(\.self).count
+    }
     var isEmpty: Bool { count == 0 }
 
     /// P04's first switch.
@@ -39,7 +43,7 @@ struct MapFilters: Equatable {
     func period(thisYear: Int) -> Period {
         switch (from, to) {
         case (nil, nil): .allTime
-        case (thisYear * 10_000 + 101, nil): .thisYear
+        case (thisYear * 10_000 + 101, thisYear * 10_000 + 1231): .thisYear
         default: .custom
         }
     }

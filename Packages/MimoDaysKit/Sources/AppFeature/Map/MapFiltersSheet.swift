@@ -28,7 +28,8 @@ struct MapFiltersSheet: View {
             customChosen = period == .custom
             switch period {
             case .allTime: (model.filters.from, model.filters.to) = (nil, nil)
-            case .thisYear: (model.filters.from, model.filters.to) = (thisYear * 10_000 + 101, nil)
+            // Both ends: a photo imported with a date in a later year isn't this year's.
+            case .thisYear: (model.filters.from, model.filters.to) = (thisYear * 10_000 + 101, thisYear * 10_000 + 1231)
             case .custom: picking = .from
             }
         }
@@ -214,7 +215,8 @@ struct MapFiltersSheet: View {
     private func dateBinding(_ bound: Bound) -> Binding<Date> {
         Binding {
             let key = (bound == .from ? model.filters.from : model.filters.to) ?? LocalDay(.now, in: calendar.timeZone).key
-            return calendar.date(from: DateComponents(year: key / 10_000, month: key / 100 % 100, day: key % 100, hour: 12)) ?? .now
+            // The key is a Gregorian day: read it as one whatever this iPhone's calendar is, which only draws it.
+            return LocalDay(key: key)?.start(in: calendar.timeZone)?.addingTimeInterval(12 * 3600) ?? .now
         } set: { date in
             let key = LocalDay(date, in: calendar.timeZone).key
             if bound == .from {

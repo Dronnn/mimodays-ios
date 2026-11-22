@@ -168,7 +168,8 @@ struct SearchFiltersSheet: View {
     private func dateBinding(_ bound: Bound) -> Binding<Date> {
         Binding {
             let key = (bound == .from ? model.filters.from : model.filters.to) ?? LocalDay(.now, in: calendar.timeZone).key
-            return calendar.date(from: DateComponents(year: key / 10_000, month: key / 100 % 100, day: key % 100, hour: 12)) ?? .now
+            // The key is a Gregorian day: read it as one whatever this iPhone's calendar is, which only draws it.
+            return LocalDay(key: key)?.start(in: calendar.timeZone)?.addingTimeInterval(12 * 3600) ?? .now
         } set: { date in
             let key = LocalDay(date, in: calendar.timeZone).key
             if bound == .from {

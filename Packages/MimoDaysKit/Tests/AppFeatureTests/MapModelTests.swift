@@ -119,4 +119,13 @@ struct MapModelTests {
         let map = model()
         #expect(map.place(map.places.first { $0.label == "Lake Merritt" }?.id ?? "")?.moments.count == 2)
     }
+
+    /// rev-library: This year has both ends, so a later year's import stays out; it still counts as one filter.
+    @Test func thisYearEndsOnTheLastDayOfTheYear() {
+        let filters = MapFilters(from: 2026_01_01, to: 2026_12_31)
+        #expect(filters.period(thisYear: 2026) == .thisYear)
+        #expect(filters.count == 1)
+        #expect(MapFilters(from: 2026_01_01).period(thisYear: 2026) == .custom)
+        #expect(MapFilters(from: 2026_03_01, to: 2026_12_31).count == 2)
+    }
 }

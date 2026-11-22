@@ -241,7 +241,7 @@ struct MomentSaver {
         var hasAudio = false
     }
 
-    private static func imageInfo(_ url: URL) throws -> Info {
+    static func imageInfo(_ url: URL) throws -> Info {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
               let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
               let width = properties[kCGImagePropertyPixelWidth] as? Int,

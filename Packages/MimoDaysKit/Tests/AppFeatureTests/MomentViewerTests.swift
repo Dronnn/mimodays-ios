@@ -272,6 +272,26 @@ struct MomentViewerTests {
         #expect(inside.g > inside.r, "mint selfie: \(inside)")
     }
 
+    /// rev-capture 14: a photo saved without its composite (the render failed) gets one when the window moves.
+    @Test func aPhotoWithoutItsCompositeGetsOneWhenTheWindowMoves() async throws {
+        let id = try await save()
+        let moment = try #require(try library.context.fetch(FetchDescriptor<Moment>()).first { $0.id == id })
+        let composite = try #require(moment.media.first { $0.role == .composedPreview })
+        moment.media.removeAll { $0.role == .composedPreview }
+        library.context.delete(composite)
+        try library.context.save()
+        let viewer = MomentViewerModel(pager: MomentPager(ids: [id], start: id), library: library)
+        await viewer.load(id)
+        #expect(viewer.moments[id]?.composedPath == nil)
+        let photo = try #require(viewer.moments[id]?.photo)
+        let layout = SelfieWindowLayout.media(width: 402, aspectRatio: photo.aspectRatio, topInset: 62)
+        viewer.setWindow(PiPLayout(layout.windowFrame(CameraSettings.SelfieWindow(corner: .bottomLeft)), source: .frontSource), for: id)
+        await viewer.thumbnailRefresh?.value
+        let composed = try #require(viewer.moments[id]?.composedPath)
+        #expect(FileManager.default.fileExists(atPath: try store.url(for: composed).path))
+        #expect(moment.media.filter { $0.role == .composedPreview }.count == 1)
+    }
+
     /// 9.28: a photo's window moves like a video's - kept on the moment, and the shared picture and the
     /// thumbnail are composed again with it; the old files go.
     @Test func movingAPhotosWindowRecomposesWhatIsShared() async throws {

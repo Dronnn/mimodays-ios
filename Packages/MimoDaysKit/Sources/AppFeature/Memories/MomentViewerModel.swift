@@ -6,6 +6,7 @@ import os
 import Persistence
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// What screens need to read moments and their media; set once at the root.
 struct MediaLibrary {
@@ -463,12 +464,23 @@ final class MomentViewerModel {
     /// Stores a copy of `file` as the moment's media of that role, then removes the old file. The new path.
     @discardableResult
     private func replace(_ role: MediaRole, of id: UUID, with file: URL) throws -> String? {
-        guard let media = fetch(id)?.media.first(where: { $0.role == role }) else { return nil }
+        guard let moment = fetch(id) else { return nil }
+        let existing = moment.media.first { $0.role == role }
+        let info = existing == nil ? try MomentSaver.imageInfo(file) : nil
         let stored = try library.store.store(copyOf: file, in: .derived)
-        let old = media.relativePath
-        media.relativePath = stored.relativePath
-        media.checksum = stored.checksum
-        media.byteCount = stored.byteCount
+        var old: String?
+        if let media = existing {
+            old = media.relativePath
+            media.relativePath = stored.relativePath
+            media.checksum = stored.checksum
+            media.byteCount = stored.byteCount
+        } else if let info {
+            // A save whose composite failed has none yet: it's made now (rev-capture 14).
+            moment.media.append(MomentMedia(
+                role: role, relativePath: stored.relativePath, uniformType: UTType(filenameExtension: file.pathExtension)?.identifier ?? "public.jpeg",
+                pixelWidth: info.width, pixelHeight: info.height, checksum: stored.checksum, byteCount: stored.byteCount, orientation: info.orientation
+            ))
+        }
         do {
             try library.context.save()
         } catch {
@@ -476,7 +488,7 @@ final class MomentViewerModel {
             try? library.store.remove(stored.relativePath)
             throw error
         }
-        try? library.store.remove(old)
+        if let old { try? library.store.remove(old) }
         return stored.relativePath
     }
 

@@ -147,6 +147,30 @@ public struct MediaStore: Sendable {
         FileManager.default.createFile(atPath: root.appending(path: Self.erasePending).path, contents: nil)
     }
 
+    /// How far a Delete All that isn't done yet got, kept in its marker: the wall clock can be set back, so what is
+    /// still its to take is read from here, not from times (P5.2).
+    public enum EraseStage: String, Sendable {
+        /// Its records may still be here (also a marker from before stages were kept).
+        case started = ""
+        /// Its records are gone; the capture in review and the moment being written may still be there.
+        case records
+        /// Only files are left.
+        case drafts
+    }
+
+    /// Nil when no Delete All is pending.
+    public var eraseStage: EraseStage? {
+        guard isErasePending else { return nil }
+        let text = (try? String(contentsOf: root.appending(path: Self.erasePending), encoding: .utf8)) ?? ""
+        return EraseStage(rawValue: text) ?? .started
+    }
+
+    /// Written over the marker in place, so it keeps the time the erase began.
+    public func setEraseStage(_ stage: EraseStage) {
+        guard isErasePending else { return }
+        try? Data(stage.rawValue.utf8).write(to: root.appending(path: Self.erasePending))
+    }
+
     /// The erase didn't happen after all (its records stayed).
     public func clearErasePending() {
         try? FileManager.default.removeItem(at: root.appending(path: Self.erasePending))

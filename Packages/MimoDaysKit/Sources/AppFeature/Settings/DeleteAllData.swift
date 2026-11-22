@@ -43,13 +43,14 @@ struct AppEraser {
         await notifications.cancel(ids: pending.map(\.id) + [BackupReminder.notificationID])
         await notifications.removeAll()
         // Before the records go: a quit from here on has the rest done at the next launch.
-        let wasPending = store.isErasePending
+        let earlier = store.eraseStage
         store.markErasePending()
+        store.setEraseStage(.started)
         do {
             try deleteRecords()
         } catch {
             context.rollback()
-            if !wasPending { store.clearErasePending() }
+            if let earlier { store.setEraseStage(earlier) } else { store.clearErasePending() }
             throw error
         }
         finish()
@@ -59,7 +60,7 @@ struct AppEraser {
     /// from before it are still here) is done now, as the person asked (P5.2). True when it was.
     @discardableResult
     func finishCutShortErase() -> Bool {
-        guard let since = store.erasePendingSince,
+        guard store.eraseStage == .started, let since = store.erasePendingSince,
               ((try? context.fetchCount(FetchDescriptor<Moment>(predicate: #Predicate { $0.createdAt <= since }))) ?? 0) > 0
         else { return false }
         do {
@@ -91,6 +92,7 @@ struct AppEraser {
         try deleteAll(BackupManifest.self)
         try deleteAll(AppPreferences.self)
         try context.save()
+        store.setEraseStage(.records)
     }
 
     private func finish() {
@@ -98,6 +100,7 @@ struct AppEraser {
         // launch removes (the capture in review first).
         drafts?.clear()
         writing?.clear()
+        store.setEraseStage(.drafts)
         do { try store.removeAll() } catch {
             Self.logger.error("Some files stayed after Delete All: \(error.localizedDescription, privacy: .public)")
         }

@@ -287,6 +287,8 @@ struct DeleteAllTests {
         #expect(!FileManager.default.fileExists(atPath: drafts.root.path))
         #expect(!store.fileExists(kept.relativePath))
         #expect(FileManager.default.fileExists(atPath: locked.appending(path: "a.heic").path))
+        // Only files are left for it: a capture reviewed since isn't its to take, whatever the clock says (P5.2).
+        #expect(store.eraseStage == .drafts)
         // The erase keeps the time it began, so a capture reviewed since isn't one for it to take.
         let since = try #require(store.erasePendingSince)
         store.markErasePending()
@@ -325,6 +327,7 @@ struct DeleteAllTests {
         let eraser = AppEraser(context: context, store: store, notifications: InMemoryNotificationScheduler(), drafts: drafts) { didReset = true }
         #expect(!eraser.finishCutShortErase())
         store.markErasePending()
+        #expect(store.eraseStage == .started)
 
         #expect(eraser.finishCutShortErase())
         #expect(eraser.counts() == AppEraser.Counts())

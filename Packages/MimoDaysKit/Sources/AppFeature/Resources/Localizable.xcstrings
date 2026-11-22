@@ -188354,6 +188354,972 @@
           }
         }
       }
+    },
+    "Export in the background" : {
+      "comment" : "Help topic title (P8.13): a movie export that goes on after MimoDays is left",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التصدير في الخلفية"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспарт у фоне"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export im Hintergrund"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar en segundo plano"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter en arrière-plan"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ייצוא ברקע"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Արտահանում ֆոնային ռեժիմում"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esportazione in background"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックグラウンドで書き出す"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ექსპორტი ფონურ რეჟიმში"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фондық экспорт"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "백그라운드에서 내보내기"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporteren op de achtergrond"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eksport w tle"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar em segundo plano"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспорт в фоне"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportera i bakgrunden"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arka planda dışa aktarma"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Експорт у фоні"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在后台导出"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在背景輸出"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export in the background"
+          }
+        }
+      }
+    },
+    "Start exporting a movie, then leave MimoDays: on iOS 26 the export goes on, with its progress on the Lock Screen." : {
+      "comment" : "Help topic: Export in the background (P8.13)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ تصدير فيلم، ثم اخرج من MimoDays: في iOS 26 يستمر التصدير، ويظهر تقدّمه على شاشة القفل."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пачні экспарт фільма і выйдзі з MimoDays: на iOS 26 экспарт працягваецца, а яго ход відаць на экране блакіроўкі."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte den Export eines Films und verlass MimoDays: Unter iOS 26 geht der Export weiter, der Fortschritt steht auf dem Sperrbildschirm."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empieza a exportar una película y sal de MimoDays: en iOS 26 la exportación continúa y su progreso aparece en la pantalla bloqueada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lance l’export d’un film, puis quitte MimoDays : sur iOS 26, l’export continue et sa progression s’affiche sur l’écran verrouillé."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "אפשר להתחיל לייצא סרט ולצאת מ-MimoDays: ב-iOS 26 הייצוא ממשיך, וההתקדמות מופיעה במסך הנעילה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Սկսիր ֆիլմի արտահանումը և դուրս եկ MimoDays-ից․ iOS 26-ում արտահանումը շարունակվում է, իսկ ընթացքը երևում է կողպէկրանին։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvia l’esportazione di un film, poi esci da MimoDays: su iOS 26 l’esportazione continua e il suo avanzamento appare sulla schermata di blocco."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ムービーの書き出しを始めてからMimoDaysを離れても、iOS 26では書き出しが続き、進行状況がロック画面に表示されます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დაიწყე ფილმის ექსპორტი და გამოდი MimoDays-დან: iOS 26-ზე ექსპორტი გრძელდება, პროგრესი კი ჩაკეტილ ეკრანზე ჩანს."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильм экспортын баста да, MimoDays-тен шық: iOS 26 жүйесінде экспорт жалғаса береді, барысы құлып экранында көрінеді."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영화 내보내기를 시작하고 MimoDays를 떠나도 돼요. iOS 26에서는 내보내기가 계속되고 진행 상황이 잠금 화면에 표시돼요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begin met het exporteren van een film en verlaat MimoDays: op iOS 26 gaat de export door, met de voortgang op het toegangsscherm."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zacznij eksport filmu i wyjdź z MimoDays: w iOS 26 eksport trwa dalej, a jego postęp widać na ekranie blokady."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comece a exportar um filme e saia do MimoDays: no iOS 26 a exportação continua, com o progresso na Tela Bloqueada."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начни экспорт фильма и выйди из MimoDays: на iOS 26 экспорт продолжается, а его ход виден на экране блокировки."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Börja exportera en film och lämna MimoDays: i iOS 26 fortsätter exporten och förloppet visas på låsskärmen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir filmi dışa aktarmaya başla ve MimoDays’ten çık: iOS 26’da dışa aktarma devam eder, ilerlemesi Kilitli Ekran’da görünür."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почни експорт фільму й вийди з MimoDays: на iOS 26 експорт триває, а його поступ видно на замкненому екрані."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始导出影片后即可离开 MimoDays：在 iOS 26 上导出会继续，进度显示在锁定屏幕上。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始輸出短片後即可離開 MimoDays：在 iOS 26 上輸出會繼續，進度顯示在鎖定畫面上。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start exporting a movie, then leave MimoDays: on iOS 26 the export goes on, with its progress on the Lock Screen."
+          }
+        }
+      }
+    },
+    "Back in MimoDays, tap View export in Movies to watch or save the movie." : {
+      "comment" : "Help topic: Export in the background (P8.13)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عند العودة إلى MimoDays، اضغط عرض التصدير في الأفلام لمشاهدة الفيلم أو حفظه."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вярнуўшыся ў MimoDays, націсні «Паказаць экспарт» у раздзеле «Фільмы», каб паглядзець або захаваць фільм."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück in MimoDays tippst du in Filme auf Export ansehen, um den Film anzusehen oder zu sichern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De vuelta en MimoDays, toca Ver exportación en Películas para ver o guardar la película."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De retour dans MimoDays, touche Voir l’export dans Films pour regarder ou enregistrer le film."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כשחוזרים ל-MimoDays, מקישים על הצגת הייצוא בסרטים כדי לצפות בסרט או לשמור אותו."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays վերադառնալով՝ Ֆիլմեր բաժնում հպիր «Դիտել արտահանումը»՝ ֆիլմը դիտելու կամ պահելու համար։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tornato in MimoDays, tocca Vedi esportazione in Film per guardare o salvare il film."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDaysに戻ったら、ムービーで「書き出しを見る」をタップして、ムービーを見たり保存したりできます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ში დაბრუნებისას ფილმებში შეეხე „ექსპორტის ნახვას“, რომ ფილმი ნახო ან შეინახო."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays-ке оралғанда, фильмді көру не сақтау үшін Фильмдер бөлімінде «Экспортты көру» түймесін түрт."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays로 돌아와서 무비의 내보내기 보기를 탭하면 영화를 보거나 저장할 수 있어요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terug in MimoDays tik je in Films op Export bekijken om de film te bekijken of te bewaren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po powrocie do MimoDays stuknij Pokaż eksport w Filmach, aby obejrzeć lub zachować film."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De volta ao MimoDays, toque em Ver exportação em Filmes para assistir ou salvar o filme."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вернувшись в MimoDays, нажми «Показать экспорт» в разделе «Фильмы», чтобы посмотреть или сохранить фильм."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "När du är tillbaka i MimoDays trycker du på Visa export i Filmer för att titta på eller spara filmen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MimoDays’e döndüğünde filmi izlemek ya da kaydetmek için Filmler’de Dışa aktarmayı gör’e dokun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повернувшись у MimoDays, натисни «Показати експорт» у розділі «Фільми», щоб переглянути чи зберегти фільм."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回到 MimoDays 后，在“影片”中轻点“查看导出”即可观看或存储影片。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回到 MimoDays 後，在「短片」中點一下「查看輸出」即可觀看或儲存短片。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back in MimoDays, tap View export in Movies to watch or save the movie."
+          }
+        }
+      }
+    },
+    "On earlier versions of iOS, keep MimoDays open while the movie is made." : {
+      "comment" : "Help topic: Export in the background (P8.13)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في إصدارات iOS السابقة، أبقِ MimoDays مفتوحًا أثناء إنشاء الفيلم."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На ранейшых версіях iOS трымай MimoDays адкрытым, пакуль робіцца фільм."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unter älteren iOS-Versionen lass MimoDays geöffnet, während der Film entsteht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En versiones anteriores de iOS, mantén MimoDays abierto mientras se crea la película."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur les versions antérieures d’iOS, garde MimoDays ouvert pendant la création du film."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "בגרסאות קודמות של iOS, צריך להשאיר את MimoDays פתוח בזמן שהסרט נוצר."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS-ի ավելի վաղ տարբերակներում MimoDays-ը բաց պահիր, մինչ ֆիլմը պատրաստվում է։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sulle versioni precedenti di iOS, tieni aperto MimoDays mentre il film viene creato."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "それより前のiOSでは、ムービーができるまでMimoDaysを開いたままにしてください。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS-ის ძველ ვერსიებზე MimoDays ღია დატოვე, სანამ ფილმი მზადდება."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS-тың бұрынғы нұсқаларында фильм жасалып жатқанда MimoDays-ті ашық ұста."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이전 버전의 iOS에서는 영화가 만들어지는 동안 MimoDays를 열어 두세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Houd MimoDays op eerdere versies van iOS open terwijl de film wordt gemaakt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We wcześniejszych wersjach iOS trzymaj MimoDays otwarte, dopóki film się tworzy."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em versões anteriores do iOS, mantenha o MimoDays aberto enquanto o filme é feito."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На более ранних версиях iOS держи MimoDays открытым, пока делается фильм."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tidigare versioner av iOS håller du MimoDays öppet medan filmen görs."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daha eski iOS sürümlerinde film hazırlanırken MimoDays’i açık tut."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На попередніх версіях iOS тримай MimoDays відкритим, поки створюється фільм."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在更早版本的 iOS 上，制作影片时请保持 MimoDays 打开。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在較早版本的 iOS 上，製作短片時請保持 MimoDays 開啟。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On earlier versions of iOS, keep MimoDays open while the movie is made."
+          }
+        }
+      }
+    },
+    "On Today, tap Add a moment, then Add from Journaling Suggestions, and pick a suggestion." : {
+      "comment" : "Help topic: Journaling Suggestions (P8.12)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في اليوم، اضغط أضف لحظة، ثم إضافة من اقتراحات اليوميات، واختر اقتراحًا."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На «Сёння» націсні «Дадаць момант», потым «Дадаць з прапаноў для дзённіка» і выберы прапанову."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe in Heute auf Moment hinzufügen, dann auf Aus Journaling-Vorschlägen hinzufügen, und wähle einen Vorschlag."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Hoy, toca Añadir un momento, luego Añadir desde Sugerencias de diario, y elige una sugerencia."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Aujourd’hui, touche Ajouter un moment, puis Ajouter depuis les suggestions de journal, et choisis une suggestion."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "במסך היום מקישים על הוספת רגע, אחר כך על הוספה מהצעות ליומן, ובוחרים הצעה."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Այսօր էջում հպիր «Ավելացնել պահ», հետո «Ավելացնել օրագրի առաջարկներից» և ընտրիր առաջարկ։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Oggi, tocca Aggiungi un momento, poi Aggiungi dai suggerimenti per il diario, e scegli un suggerimento."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日で「モーメントを追加」、続いて「ジャーナルの提案から追加」をタップし、提案を選びます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "დღეს გვერდზე შეეხე „მომენტის დამატებას“, შემდეგ „დამატება დღიურის შეთავაზებებიდან“ და აირჩიე შეთავაზება."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бүгін бетінде «Сәт қосу», содан кейін «Күнделік ұсыныстарынан қосу» түймесін түртіп, ұсынысты таңда."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘에서 순간 추가, 저널링 제안에서 추가를 차례로 탭하고 제안을 골라요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tik in Vandaag op Moment toevoegen, dan op Toevoegen uit dagboeksuggesties, en kies een suggestie."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W Dziś stuknij Dodaj chwilę, potem Dodaj z sugestii dziennika i wybierz sugestię."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em Hoje, toque em Adicionar um momento, depois em Adicionar das Sugestões de Diário, e escolha uma sugestão."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На «Сегодня» нажми «Добавить момент», потом «Добавить из предложений для Дневника» и выбери предложение."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I Idag trycker du på Lägg till ett ögonblick, sedan Lägg till från dagboksförslag, och väljer ett förslag."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugün’de An ekle’ye, sonra Günlük Önerilerinden ekle’ye dokun ve bir öneri seç."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На «Сьогодні» натисни «Додати момент», потім «Додати з пропозицій для щоденника» й вибери пропозицію."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在“今天”中轻点“添加瞬间”，然后轻点“从日记建议添加”，并选择一条建议。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「今天」中點一下「新增瞬間」，再點一下「從日記建議加入」，然後選擇一則建議。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Today, tap Add a moment, then Add from Journaling Suggestions, and pick a suggestion."
+          }
+        }
+      }
+    },
+    "iOS makes the suggestions on your iPhone. MimoDays sees only the one you pick: its photo becomes a moment, or its question is a hint for writing one." : {
+      "comment" : "Help topic: Journaling Suggestions (P8.12)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ينشئ iOS الاقتراحات على iPhone. لا يرى MimoDays إلا الاقتراح الذي تختاره: تصبح صورته لحظة، أو يصبح سؤاله تلميحًا لكتابة لحظة."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS робіць прапановы на тваім iPhone. MimoDays бачыць толькі тую, што ты выбіраеш: яе фота становіцца момантам, а пытанне — падказкай, каб напісаць момант."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS erstellt die Vorschläge auf deinem iPhone. MimoDays sieht nur den, den du wählst: Sein Foto wird ein Moment, oder seine Frage ist ein Hinweis zum Schreiben."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS crea las sugerencias en tu iPhone. MimoDays solo ve la que eliges: su foto se convierte en un momento, o su pregunta es una pista para escribir uno."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS crée les suggestions sur ton iPhone. MimoDays ne voit que celle que tu choisis : sa photo devient un moment, ou sa question t’aide à en écrire un."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS יוצר את ההצעות ב-iPhone. MimoDays רואה רק את ההצעה שנבחרה: התמונה שלה הופכת לרגע, או שהשאלה שלה עוזרת לכתוב רגע."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS-ը առաջարկները ստեղծում է քո iPhone-ում։ MimoDays-ը տեսնում է միայն ընտրածդ առաջարկը․ դրա լուսանկարը դառնում է պահ, կամ հարցը՝ հուշում պահ գրելու համար։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS crea i suggerimenti sul tuo iPhone. MimoDays vede solo quello che scegli: la sua foto diventa un momento, oppure la sua domanda è uno spunto per scriverne uno."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提案はiPhone上でiOSが作成します。MimoDaysが見るのは選んだ提案だけです。その写真がモーメントになるか、その問いかけがモーメントを書くヒントになります。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შეთავაზებებს iOS შენს iPhone-ზე ქმნის. MimoDays მხოლოდ შენ მიერ არჩეულს ხედავს: მისი ფოტო მომენტი ხდება, ან მისი კითხვა მომენტის დაწერის მინიშნებაა."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ұсыныстарды iOS сенің iPhone-ыңда жасайды. MimoDays тек сен таңдағанын көреді: оның фотосы сәтке айналады немесе сұрағы сәт жазуға кеңес болады."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제안은 iOS가 iPhone에서 만들어요. MimoDays는 고른 제안만 봐요. 그 사진이 순간이 되거나, 그 질문이 순간을 쓰는 힌트가 돼요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS maakt de suggesties op je iPhone. MimoDays ziet alleen de suggestie die je kiest: de foto wordt een moment, of de vraag is een hint om er een te schrijven."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS tworzy sugestie na Twoim iPhonie. MimoDays widzi tylko tę, którą wybierasz: jej zdjęcie staje się chwilą albo jej pytanie podpowiada, co napisać."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O iOS cria as sugestões no seu iPhone. O MimoDays vê só a que você escolhe: a foto dela vira um momento, ou a pergunta dela é uma dica para escrever um."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS делает предложения на твоём iPhone. MimoDays видит только то, что ты выбираешь: его фото становится моментом, а вопрос — подсказкой, чтобы написать момент."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS skapar förslagen på din iPhone. MimoDays ser bara det du väljer: dess bild blir ett ögonblick, eller dess fråga blir en ledtråd för att skriva ett."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Önerileri iPhone’unda iOS oluşturur. MimoDays yalnızca seçtiğin öneriyi görür: fotoğrafı bir an olur ya da sorusu bir an yazmak için ipucu olur."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS створює пропозиції на твоєму iPhone. MimoDays бачить лише ту, яку ти вибираєш: її фото стає моментом, а питання — підказкою, щоб написати момент."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建议由 iOS 在你的 iPhone 上生成。MimoDays 只会看到你选的那一条：它的照片成为一个瞬间，或它的问题成为写瞬间的提示。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建議由 iOS 在你的 iPhone 上產生。MimoDays 只會看到你選的那一則：它的照片會變成一個瞬間，或它的問題會成為寫瞬間的提示。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS makes the suggestions on your iPhone. MimoDays sees only the one you pick: its photo becomes a moment, or its question is a hint for writing one."
+          }
+        }
+      }
+    },
+    "You choose what iOS may suggest in Settings › Privacy & Security › Journaling Suggestions." : {
+      "comment" : "Help topic: Journaling Suggestions (P8.12)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تختار ما يمكن أن يقترحه iOS في الإعدادات › الخصوصية والأمن › اقتراحات اليوميات."
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Што можа прапаноўваць iOS, ты выбіраеш у Наладах › Прыватнасць і бяспека › Прапановы для дзённіка."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was iOS vorschlagen darf, wählst du in Einstellungen › Datenschutz & Sicherheit › Journaling-Vorschläge."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliges lo que iOS puede sugerir en Ajustes › Privacidad y seguridad › Sugerencias de diario."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu choisis ce qu’iOS peut suggérer dans Réglages › Confidentialité et sécurité › Suggestions de journal."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מה iOS יכול להציע בוחרים בהגדרות › פרטיות ואבטחה › הצעות ליומן."
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Թե ինչ կարող է առաջարկել iOS-ը, ընտրում ես Կարգավորումներ › Գաղտնիություն և անվտանգություն › Օրագրի առաջարկներ բաժնում։"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli cosa può suggerire iOS in Impostazioni › Privacy e sicurezza › Suggerimenti per il diario."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOSが提案できる内容は、設定 › プライバシーとセキュリティ › ジャーナルの提案で選べます。"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "რისი შეთავაზება შეუძლია iOS-ს, ირჩევ პარამეტრებში › კონფიდენციალურობა და უსაფრთხოება › დღიურის შეთავაზებები."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS не ұсына алатынын Параметрлер › Құпиялық және қауіпсіздік › Күнделік ұсыныстары бөлімінде таңдайсың."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS가 제안할 수 있는 항목은 설정 › 개인정보 보호 및 보안 › 저널링 제안에서 골라요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat iOS mag voorstellen, kies je in Instellingen › Privacy en beveiliging › Dagboeksuggesties."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To, co iOS może proponować, wybierasz w Ustawieniach › Prywatność i ochrona › Sugestie dziennika."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você escolhe o que o iOS pode sugerir em Ajustes › Privacidade e Segurança › Sugestões de Diário."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что может предлагать iOS, ты выбираешь в Настройках › Конфиденциальность и безопасность › Предложения для Дневника."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du väljer vad iOS får föreslå i Inställningar › Integritet och säkerhet › Dagboksförslag."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS’in neler önerebileceğini Ayarlar › Gizlilik ve Güvenlik › Günlük Önerileri’nde seçersin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Що може пропонувати iOS, ти вибираєш у Параметрах › Приватність і безпека › Пропозиції для щоденника."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可以在“设置”›“隐私与安全性”›“日记建议”中选择 iOS 可以建议的内容。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可以在「設定」›「隱私權與安全性」›「日記建議」中選擇 iOS 可以建議的內容。"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You choose what iOS may suggest in Settings › Privacy & Security › Journaling Suggestions."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

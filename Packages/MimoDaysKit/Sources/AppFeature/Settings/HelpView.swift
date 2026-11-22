@@ -25,7 +25,9 @@ enum HelpArticle: String, CaseIterable, Hashable {
     case momentsFromPhotos
     case thenNow
     case oneSecond
+    case exportInBackground
     case writeMoment
+    case journalingSuggestions
     case fallbackReminder
 
     var title: Text {
@@ -42,7 +44,9 @@ enum HelpArticle: String, CaseIterable, Hashable {
         case .momentsFromPhotos: Text("Moments from Photos", bundle: .module)
         case .thenNow: Text("Then & Now", bundle: .module)
         case .oneSecond: Text("One second per day", bundle: .module)
+        case .exportInBackground: Text("Export in the background", bundle: .module, comment: "Help topic title (P8.13): a movie export that goes on after MimoDays is left")
         case .writeMoment: Text("Write a moment", bundle: .module)
+        case .journalingSuggestions: Text("Journaling Suggestions", bundle: .module)
         case .fallbackReminder: Text("Fallback reminder", bundle: .module)
         }
     }
@@ -118,9 +122,19 @@ enum HelpArticle: String, CaseIterable, Hashable {
             Text("In Movies, tap New movie, then One second per day, and pick a month or a year.", bundle: .module),
             Text("Each day with moments gives one second: its first surprise, or else its earliest moment. Tap Change on a day to pick another.", bundle: .module),
         ]
+        case .exportInBackground: [
+            Text("Start exporting a movie, then leave MimoDays: on iOS 26 the export goes on, with its progress on the Lock Screen.", bundle: .module, comment: "Help topic: Export in the background (P8.13)"),
+            Text("Back in MimoDays, tap View export in Movies to watch or save the movie.", bundle: .module, comment: "Help topic: Export in the background (P8.13)"),
+            Text("On earlier versions of iOS, keep MimoDays open while the movie is made.", bundle: .module, comment: "Help topic: Export in the background (P8.13)"),
+        ]
         case .writeMoment: [
             Text("On Today, tap Add a moment, then Write a moment.", bundle: .module),
             Text("Write what you want to remember, and add a place, tags and mood if you like. It becomes a paper card among your photos and videos.", bundle: .module),
+        ]
+        case .journalingSuggestions: [
+            Text("On Today, tap Add a moment, then Add from Journaling Suggestions, and pick a suggestion.", bundle: .module, comment: "Help topic: Journaling Suggestions (P8.12)"),
+            Text("iOS makes the suggestions on your iPhone. MimoDays sees only the one you pick: its photo becomes a moment, or its question is a hint for writing one.", bundle: .module, comment: "Help topic: Journaling Suggestions (P8.12)"),
+            Text("You choose what iOS may suggest in Settings › Privacy & Security › Journaling Suggestions.", bundle: .module, comment: "Help topic: Journaling Suggestions (P8.12)"),
         ]
         case .fallbackReminder: [
             Text("In Settings › Surprises, turn on Fallback reminder and choose a time.", bundle: .module),

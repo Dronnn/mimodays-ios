@@ -34,7 +34,8 @@ final class AccessibilityUITests: XCTestCase {
         shot.lifetime = .deleteOnSuccess
         add(shot)
         // A busy CI machine can run out of the audit's own time (F3: "Audit failed to complete in time", with the
-        // keyboard up on a full library); that is the machine, not the screen, so it gets one more go.
+        // keyboard up on a full library; or XCTest's "Timed out while running accessibility audit"); that is the
+        // machine, not the screen, so it gets one more go.
         for attempt in 1...2 {
             do {
                 try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(.contrast)) { issue in
@@ -44,7 +45,7 @@ final class AccessibilityUITests: XCTestCase {
                     return true
                 }
                 return
-            } catch where attempt == 1 && "\(error)".localizedCaseInsensitiveContains("in time") {
+            } catch where attempt == 1 && ["in time", "timed out"].contains(where: "\(error)".localizedCaseInsensitiveContains) {
                 continue
             }
         }

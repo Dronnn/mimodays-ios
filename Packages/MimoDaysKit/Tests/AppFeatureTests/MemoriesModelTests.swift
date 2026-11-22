@@ -105,6 +105,24 @@ struct MemoriesModelTests {
         #expect(model.images[video] != nil)
     }
 
+    /// P8.6: a photo with its Live Photo motion says so, for the movie picker's badge.
+    @Test func aLivePhotosTileKnowsItsMotion() async throws {
+        let photo = try await save(at: Self.date(2026, 11, 9))
+        let live = try await save(at: Self.date(2026, 11, 10))
+        let moment = try #require(try context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == live })).first)
+        let engine = SimulatedCaptureEngine()
+        _ = await engine.start()
+        let clip = try await engine.record(limit: .seconds(1))
+        if let selfie = clip.selfieURL { try? FileManager.default.removeItem(at: selfie) }
+        try await MomentSaver(context: context, store: store, clock: clock, freeBytes: { nil }).attachMotion(clip.mainURL, to: moment)
+        try context.save()
+        let model = model()
+        await model.load(photo)
+        await model.load(live)
+        #expect(model.details[live]?.isLivePhoto == true)
+        #expect(model.details[photo]?.isLivePhoto == false)
+    }
+
     /// Back in the app (or after a save elsewhere), a tile already on screen keeps its video length: it isn't loaded
     /// again, so the refresh fills it in.
     @Test func aRefreshKeepsTheBadgesOfTilesOnScreen() async throws {

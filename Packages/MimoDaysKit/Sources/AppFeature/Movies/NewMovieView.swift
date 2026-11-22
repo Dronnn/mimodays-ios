@@ -991,7 +991,7 @@ struct MomentsStep: View {
                     ForEach(shown) { item in
                         let isOn = model.picked.contains(item.id)
                         Button { model.toggle(item.id) } label: {
-                            MemoryTile(item: item, detail: model.tiles.details[item.id], image: model.tiles.images[item.id], videoBadgeAtTop: true)
+                            MemoryTile(item: item, detail: model.tiles.details[item.id], image: model.tiles.images[item.id], videoBadgeAtTop: true, showsLivePhoto: true)
                                 .overlay { SelectionMark(isOn: isOn, shape: StripTile.shape(item.capturedAt)) }
                         }
                         .buttonStyle(.plain)

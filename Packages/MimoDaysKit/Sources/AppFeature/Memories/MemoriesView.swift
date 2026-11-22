@@ -480,6 +480,8 @@ struct MemoryTile: View {
     /// F05's small tiles: the video's length goes top left, clear of the selection circle (the mic steps aside too);
     /// they don't show the favourite heart, which lives there.
     var videoBadgeAtTop = false
+    /// P8.6: the movie picker marks Live Photos, whose motion plays in the movie; browsing doesn't.
+    var showsLivePhoto = false
     /// The tile badges' deliberate offset of their glyph from the disc's centre (design: 5 pt right and down).
     static let badgeOffset: CGFloat = 5
 
@@ -513,6 +515,8 @@ struct MemoryTile: View {
                 if let duration = detail?.duration {
                     VideoBadge(duration: duration)
                         .padding(videoBadgeAtTop ? 6 : 7)
+                } else if showsLivePhoto, detail?.isLivePhoto == true {
+                    LiveBadge().scaleEffect(0.85, anchor: videoBadgeAtTop ? .topLeading : .bottomLeading).padding(6)
                 }
             }
             .overlay(alignment: .bottomTrailing) {
@@ -542,7 +546,7 @@ struct MemoryTile: View {
     private var label: Text {
         var clock = Date.FormatStyle(date: .omitted, time: .shortened)
         clock.timeZone = item.captured.timeZone
-        var text = MemoryTile.kind(item.mediaType)
+        var text = showsLivePhoto && detail?.isLivePhoto == true ? Text("Live Photo", bundle: .module) : MemoryTile.kind(item.mediaType)
         text = text + Text(verbatim: ", ") + Text(item.capturedAt, format: clock)
         // P8.11: the words are read too.
         if let excerpt = detail?.excerpt { text = text + Text(verbatim: ", ") + Text(excerpt) }

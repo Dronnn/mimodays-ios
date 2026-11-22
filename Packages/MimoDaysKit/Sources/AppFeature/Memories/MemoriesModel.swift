@@ -29,6 +29,8 @@ struct TileDetail: Equatable {
     var hasVoiceNote: Bool
     /// P8.11: a written moment's first words.
     var excerpt: String?
+    /// P8.6: a photo that keeps its Live Photo motion.
+    var isLivePhoto = false
 }
 
 /// The timeline as rows: a month's title, then its days, newest first. Flat, so the list stays lazy
@@ -355,7 +357,8 @@ final class MemoriesModel {
             thumbnailPath: moment.media.first { $0.role == .thumbnail }?.relativePath,
             duration: moment.mediaType == .video ? moment.media.compactMap(\.duration).max() : nil,
             hasVoiceNote: !moment.voiceNotes.isEmpty,
-            excerpt: moment.mediaType == .text ? TextMoment.excerpt(moment.note ?? "", limit: TextMoment.tileExcerptLimit) : nil
+            excerpt: moment.mediaType == .text ? TextMoment.excerpt(moment.note ?? "", limit: TextMoment.tileExcerptLimit) : nil,
+            isLivePhoto: moment.mediaType == .photo && moment.media.contains { $0.role == .livePhotoMotion }
         )
     }
 }

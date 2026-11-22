@@ -1124,7 +1124,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ у гэты дзень. Выберыце той, што дасць яму секунду."
+            "value" : "%@ у гэты дзень. Выберы той, што дасць яму секунду."
           }
         },
         "de" : {
@@ -1142,7 +1142,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ ce jour-là. Choisissez celui qui donnera sa seconde."
+            "value" : "%@ ce jour-là. Choisis celui qui donnera sa seconde."
           }
         },
         "he" : {
@@ -1154,7 +1154,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ այս օրը։ Ընտրեք այն, որը կտա նրա վայրկյանը։"
+            "value" : "%@ այս օրը։ Ընտրիր այն, որը կտա նրա վայրկյանը։"
           }
         },
         "it" : {
@@ -1172,13 +1172,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ ამ დღეს. აირჩიეთ ის, რომელიც მის წამს მისცემს."
+            "value" : "%@ ამ დღეს. აირჩიე ის, რომელიც მის წამს მისცემს."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Бұл күні %@. Секундына біреуін таңдаңыз."
+            "value" : "Бұл күні %@. Секундына біреуін таңда."
           }
         },
         "ko" : {
@@ -1208,7 +1208,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ в этот день. Выберите тот, что даст ему секунду."
+            "value" : "%@ в этот день. Выбери тот, что даст ему секунду."
           }
         },
         "sv" : {
@@ -1226,7 +1226,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ цього дня. Виберіть той, що дасть йому секунду."
+            "value" : "%@ цього дня. Вибери той, що дасть йому секунду."
           }
         },
         "zh-Hans" : {
@@ -2898,7 +2898,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, па адной секундзе. Націсніце на дзень, каб змяніць яго момант."
+            "value" : "%@, па адной секундзе. Націсні на дзень, каб змяніць яго момант."
           }
         },
         "de" : {
@@ -2916,7 +2916,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, une seconde chacun. Touchez un jour pour changer son moment."
+            "value" : "%@, une seconde chacun. Touche un jour pour changer son moment."
           }
         },
         "he" : {
@@ -2928,7 +2928,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@՝ մեկական վայրկյան։ Հպեք օրին՝ նրա պահը փոխելու համար։"
+            "value" : "%@՝ մեկական վայրկյան։ Հպիր օրին՝ նրա պահը փոխելու համար։"
           }
         },
         "it" : {
@@ -2946,13 +2946,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, თითოეული ერთი წამი. შეეხეთ დღეს მისი მომენტის შესაცვლელად."
+            "value" : "%@, თითოეული ერთი წამი. შეეხე დღეს მისი მომენტის შესაცვლელად."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, әрқайсысы бір секунд. Сәтін өзгерту үшін күнді түртіңіз."
+            "value" : "%@, әрқайсысы бір секунд. Сәтін өзгерту үшін күнді түрт."
           }
         },
         "ko" : {
@@ -2982,7 +2982,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, по одной секунде. Нажмите на день, чтобы сменить его момент."
+            "value" : "%@, по одной секунде. Нажми на день, чтобы сменить его момент."
           }
         },
         "sv" : {
@@ -3000,7 +3000,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, по одній секунді. Торкніться дня, щоб змінити його момент."
+            "value" : "%@, по одній секунді. Торкнися дня, щоб змінити його момент."
           }
         },
         "zh-Hans" : {
@@ -26224,7 +26224,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Дадайце камеру MimoDays адзін раз і адкрывайце камеру адным націскам, не шукаючы праграму."
+            "value" : "Дадай камеру MimoDays адзін раз і адкрывай камеру адным націскам, не шукаючы праграму."
           }
         },
         "de" : {
@@ -26242,7 +26242,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajoutez Appareil photo MimoDays une fois, puis ouvrez l’appareil photo d’une seule pression, sans chercher l’app."
+            "value" : "Ajoute Appareil photo MimoDays une fois, puis ouvre l’appareil photo d’une seule pression, sans chercher l’app."
           }
         },
         "he" : {
@@ -26254,7 +26254,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Մեկ անգամ ավելացրեք MimoDays տեսախցիկը, և բացեք տեսախցիկը մեկ սեղմումով՝ առանց հավելվածը փնտրելու։"
+            "value" : "Մեկ անգամ ավելացրու MimoDays տեսախցիկը, և բացիր տեսախցիկը մեկ սեղմումով՝ առանց հավելվածը փնտրելու։"
           }
         },
         "it" : {
@@ -26272,13 +26272,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ერთხელ დაამატეთ MimoDays კამერა და გახსენით კამერა ერთი დაჭერით, აპის ძებნის გარეშე."
+            "value" : "ერთხელ დაამატე MimoDays კამერა და გახსენი კამერა ერთი დაჭერით, აპის ძებნის გარეშე."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays камерасын бір рет қосыңыз, сосын қолданбаны іздемей, камераны бір басумен ашыңыз."
+            "value" : "MimoDays камерасын бір рет қос, сосын қолданбаны іздемей, камераны бір басумен аш."
           }
         },
         "ko" : {
@@ -26308,7 +26308,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавьте камеру MimoDays один раз и открывайте камеру одним нажатием, не ища приложение."
+            "value" : "Добавь камеру MimoDays один раз и открывай камеру одним нажатием, не ища приложение."
           }
         },
         "sv" : {
@@ -26320,13 +26320,13 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MimoDays Kamera’yı bir kez ekleyin, sonra uygulamayı aramadan kamerayı tek dokunuşla açın."
+            "value" : "MimoDays Kamera’yı bir kez ekle, sonra uygulamayı aramadan kamerayı tek dokunuşla aç."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Додайте камеру MimoDays один раз і відкривайте камеру одним натисканням, не шукаючи застосунок."
+            "value" : "Додай камеру MimoDays один раз і відкривай камеру одним натисканням, не шукаючи застосунок."
           }
         },
         "zh-Hans" : {
@@ -26776,7 +26776,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Дадайце тэг"
+            "value" : "Дадай тэг"
           }
         },
         "de" : {
@@ -26794,7 +26794,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajoutez un tag"
+            "value" : "Ajoute un tag"
           }
         },
         "he" : {
@@ -26806,7 +26806,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ավելացրեք պիտակ"
+            "value" : "Ավելացրու պիտակ"
           }
         },
         "it" : {
@@ -26824,13 +26824,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "დაამატეთ თეგი"
+            "value" : "დაამატე თეგი"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тег қосыңыз"
+            "value" : "Тег қос"
           }
         },
         "ko" : {
@@ -26860,7 +26860,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавьте тег"
+            "value" : "Добавь тег"
           }
         },
         "sv" : {
@@ -26878,7 +26878,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Додайте тег"
+            "value" : "Додай тег"
           }
         },
         "zh-Hans" : {
@@ -38541,7 +38541,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modifié par vous · %@"
+            "value" : "Modifié par toi · %@"
           }
         },
         "he" : {
@@ -38553,7 +38553,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Փոխել եք դուք · %@"
+            "value" : "Փոխել ես դու · %@"
           }
         },
         "it" : {
@@ -38571,13 +38571,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "თქვენ შეცვალეთ · %@"
+            "value" : "შენ შეცვალე · %@"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сіз өзгерттіңіз · %@"
+            "value" : "Сен өзгерттің · %@"
           }
         },
         "ko" : {
@@ -38607,7 +38607,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Изменено вами · %@"
+            "value" : "Изменено тобой · %@"
           }
         },
         "sv" : {
@@ -39075,7 +39075,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выберыце паўтор"
+            "value" : "Выберы паўтор"
           }
         },
         "de" : {
@@ -39123,13 +39123,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "აირჩიეთ გამეორება"
+            "value" : "აირჩიე გამეორება"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Қайталауды таңдаңыз"
+            "value" : "Қайталауды таңда"
           }
         },
         "ko" : {
@@ -39159,7 +39159,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выберите повтор"
+            "value" : "Выбери повтор"
           }
         },
         "sv" : {
@@ -39177,7 +39177,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть повтор"
+            "value" : "Вибери повтор"
           }
         },
         "zh-Hans" : {
@@ -39213,7 +39213,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выберыце час у межах вашых гадзін сюрпрызаў (%1$@ - %2$@)."
+            "value" : "Выберы час у межах тваіх гадзін сюрпрызаў (%1$@ - %2$@)."
           }
         },
         "de" : {
@@ -39231,7 +39231,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choisissez une heure dans vos heures de surprises (%1$@ - %2$@)."
+            "value" : "Choisis une heure dans tes heures de surprises (%1$@ - %2$@)."
           }
         },
         "he" : {
@@ -39243,7 +39243,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ընտրեք ժամ ձեր անակնկալների ժամերի սահմաններում (%1$@ - %2$@)։"
+            "value" : "Ընտրիր ժամ քո անակնկալների ժամերի սահմաններում (%1$@ - %2$@)։"
           }
         },
         "it" : {
@@ -39261,13 +39261,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "აირჩიეთ დრო თქვენი სიურპრიზების საათებში (%1$@ - %2$@)."
+            "value" : "აირჩიე დრო შენი სიურპრიზების საათებში (%1$@ - %2$@)."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тосынсый уақытының ішінде уақыт таңдаңыз (%1$@ - %2$@)."
+            "value" : "Тосынсый уақытының ішінде уақыт таңда (%1$@ - %2$@)."
           }
         },
         "ko" : {
@@ -39297,7 +39297,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выберите время в пределах ваших часов сюрпризов (%1$@ - %2$@)."
+            "value" : "Выбери время в пределах твоих часов сюрпризов (%1$@ - %2$@)."
           }
         },
         "sv" : {
@@ -39315,7 +39315,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть час у межах ваших годин сюрпризів (%1$@ - %2$@)."
+            "value" : "Вибери час у межах твоїх годин сюрпризів (%1$@ - %2$@)."
           }
         },
         "zh-Hans" : {
@@ -43526,7 +43526,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пункт кіравання: правядзіце ўніз ад правага верхняга кута, націсніце +, «Дадаць элемент кіравання», камера MimoDays."
+            "value" : "Пункт кіравання: правядзі ўніз ад правага верхняга кута, націсні +, «Дадаць элемент кіравання», камера MimoDays."
           }
         },
         "de" : {
@@ -43544,7 +43544,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Centre de contrôle : balayez vers le bas depuis le coin supérieur droit, touchez +, Ajouter une commande, Appareil photo MimoDays."
+            "value" : "Centre de contrôle : balaie vers le bas depuis le coin supérieur droit, touche +, Ajouter une commande, Appareil photo MimoDays."
           }
         },
         "he" : {
@@ -43556,7 +43556,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Կառավարման կենտրոն․ սահեցրեք ներքև վերին աջ անկյունից, հպեք +, «Ավելացնել կառավարում», MimoDays տեսախցիկ։"
+            "value" : "Կառավարման կենտրոն․ սահեցրու ներքև վերին աջ անկյունից, հպիր +, «Ավելացնել կառավարում», MimoDays տեսախցիկ։"
           }
         },
         "it" : {
@@ -43574,13 +43574,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "მართვის ცენტრი: ზედა მარჯვენა კუთხიდან ჩამოასრიალეთ, შეეხეთ +-ს, „მართვის ელემენტის დამატება“, MimoDays კამერა."
+            "value" : "მართვის ცენტრი: ზედა მარჯვენა კუთხიდან ჩამოასრიალე, შეეხე +-ს, „მართვის ელემენტის დამატება“, MimoDays კამერა."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Басқару орталығы: жоғарғы оң жақтан төмен сырғытып, + түймесін, «Басқару элементін қосу», MimoDays камерасы дегенді түртіңіз."
+            "value" : "Басқару орталығы: жоғарғы оң жақтан төмен сырғытып, + түймесін, «Басқару элементін қосу», MimoDays камерасы дегенді түрт."
           }
         },
         "ko" : {
@@ -43610,7 +43610,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пункт управления: смахните вниз от правого верхнего угла, коснитесь +, «Добавить элемент управления», камера MimoDays."
+            "value" : "Пункт управления: смахни вниз от правого верхнего угла, коснись +, «Добавить элемент управления», камера MimoDays."
           }
         },
         "sv" : {
@@ -43622,13 +43622,13 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denetim Merkezi: sağ üstten aşağı kaydırın, + simgesine, Denetim Ekle’ye, MimoDays Kamera’ya dokunun."
+            "value" : "Denetim Merkezi: sağ üstten aşağı kaydır, + simgesine, Denetim Ekle’ye, MimoDays Kamera’ya dokun."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пункт керування: проведіть униз від правого верхнього кута, торкніться +, «Додати елемент керування», камера MimoDays."
+            "value" : "Пункт керування: проведи вниз від правого верхнього кута, торкнися +, «Додати елемент керування», камера MimoDays."
           }
         },
         "zh-Hans" : {
@@ -44095,7 +44095,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de modifier ce que vous voyez dans les souvenirs"
+            "value" : "Impossible de modifier ce que tu vois dans les souvenirs"
           }
         },
         "he" : {
@@ -68786,7 +68786,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Калі хочаце, зніміце момант, каб запомніць сённяшні дзень."
+            "value" : "Калі хочаш, зрабі здымак моманту, каб запомніць сённяшні дзень."
           }
         },
         "de" : {
@@ -68804,7 +68804,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si vous le souhaitez, saisissez un moment pour vous souvenir d’aujourd’hui."
+            "value" : "Si tu veux, saisis un moment pour te souvenir d’aujourd’hui."
           }
         },
         "he" : {
@@ -68816,7 +68816,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Եթե ցանկանաք, նկարեք մի պահ՝ այսօրը հիշելու համար։"
+            "value" : "Եթե ցանկանաս, նկարիր մի պահ՝ այսօրը հիշելու համար։"
           }
         },
         "it" : {
@@ -68834,13 +68834,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "თუ გსურთ, გადაიღეთ მომენტი, რომ დღევანდელი დღე დაიმახსოვროთ."
+            "value" : "თუ გსურს, გადაიღე მომენტი, რომ დღევანდელი დღე დაიმახსოვრო."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Қаласаңыз, бүгінгі күнді есте сақтау үшін бір сәт түсіріңіз."
+            "value" : "Қаласаң, бүгінгі күнді есте сақтау үшін бір сәт түсір."
           }
         },
         "ko" : {
@@ -68870,7 +68870,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Если хотите, снимите момент, чтобы запомнить сегодняшний день."
+            "value" : "Если хочешь, сними момент, чтобы запомнить сегодняшний день."
           }
         },
         "sv" : {
@@ -68888,7 +68888,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Якщо хочете, зніміть момент, щоб запам’ятати сьогоднішній день."
+            "value" : "Якщо хочеш, зніми момент, щоб запам’ятати сьогоднішній день."
           }
         },
         "zh-Hans" : {
@@ -76835,7 +76835,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Экран блакіроўкі: дакраніцеся да экрана блакіроўкі і ўтрымлівайце, націсніце «Наладзіць», «Экран блакіроўкі», кнопку ўнізе, затым камеру MimoDays."
+            "value" : "Экран блакіроўкі: дакраніся да экрана блакіроўкі і ўтрымлівай, націсні «Наладзіць», «Экран блакіроўкі», кнопку ўнізе, затым камеру MimoDays."
           }
         },
         "de" : {
@@ -76853,7 +76853,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Écran verrouillé : maintenez le doigt sur l’écran verrouillé, touchez Personnaliser, Écran verrouillé, un bouton en bas, puis Appareil photo MimoDays."
+            "value" : "Écran verrouillé : maintiens le doigt sur l’écran verrouillé, touche Personnaliser, Écran verrouillé, un bouton en bas, puis Appareil photo MimoDays."
           }
         },
         "he" : {
@@ -76865,7 +76865,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Կողպէկրան․ հպեք և պահեք կողպէկրանը, հպեք «Հարմարեցնել», «Կողպէկրան», ներքևի կոճակներից մեկին, ապա MimoDays տեսախցիկ։"
+            "value" : "Կողպէկրան․ հպիր և պահիր կողպէկրանը, հպիր «Հարմարեցնել», «Կողպէկրան», ներքևի կոճակներից մեկին, ապա MimoDays տեսախցիկ։"
           }
         },
         "it" : {
@@ -76883,13 +76883,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ჩაკეტილი ეკრანი: ხანგრძლივად შეეხეთ ჩაკეტილ ეკრანს, შეეხეთ „მორგებას“, „ჩაკეტილ ეკრანს“, ქვედა ღილაკს და შემდეგ MimoDays კამერას."
+            "value" : "ჩაკეტილი ეკრანი: ხანგრძლივად შეეხე ჩაკეტილ ეკრანს, შეეხე „მორგებას“, „ჩაკეტილ ეკრანს“, ქვედა ღილაკს და შემდეგ MimoDays კამერას."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Құлыптау экраны: құлыптау экранын басып тұрып, «Баптау», «Құлыптау экраны», төмендегі түймені, сосын MimoDays камерасын түртіңіз."
+            "value" : "Құлыптау экраны: құлыптау экранын басып тұрып, «Баптау», «Құлыптау экраны», төмендегі түймені, сосын MimoDays камерасын түрт."
           }
         },
         "ko" : {
@@ -76919,7 +76919,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Экран блокировки: коснитесь экрана блокировки и удерживайте, нажмите «Настроить», «Экран блокировки», кнопку внизу, затем камеру MimoDays."
+            "value" : "Экран блокировки: коснись экрана блокировки и удерживай, нажми «Настроить», «Экран блокировки», кнопку внизу, затем камеру MimoDays."
           }
         },
         "sv" : {
@@ -76931,13 +76931,13 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kilitli Ekran: Kilitli Ekran’a dokunup basılı tutun, Özelleştir’e, Kilitli Ekran’a, alttaki bir düğmeye ve sonra MimoDays Kamera’ya dokunun."
+            "value" : "Kilitli Ekran: Kilitli Ekran’a dokunup basılı tut, Özelleştir’e, Kilitli Ekran’a, alttaki bir düğmeye ve sonra MimoDays Kamera’ya dokun."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Замкнений екран: торкніться й утримуйте замкнений екран, натисніть «Налаштувати», «Замкнений екран», кнопку внизу, а потім камеру MimoDays."
+            "value" : "Замкнений екран: торкнися й утримуй замкнений екран, натисни «Налаштувати», «Замкнений екран», кнопку внизу, а потім камеру MimoDays."
           }
         },
         "zh-Hans" : {
@@ -92713,7 +92713,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тэгаў пакуль няма. Дадайце іх да моманту ў праглядзе або ў рэдагаванні моманту."
+            "value" : "Тэгаў пакуль няма. Дадай іх да моманту ў праглядзе або ў рэдагаванні моманту."
           }
         },
         "de" : {
@@ -92731,7 +92731,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pas encore de tags. Ajoutez-en à un moment lors de la relecture ou dans Modifier le moment."
+            "value" : "Pas encore de tags. Ajoutes-en à un moment lors de la relecture ou dans Modifier le moment."
           }
         },
         "he" : {
@@ -92743,7 +92743,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Պիտակներ դեռ չկան։ Ավելացրեք դրանք պահին դիտման կամ պահի խմբագրման ժամանակ։"
+            "value" : "Պիտակներ դեռ չկան։ Ավելացրու դրանք պահին դիտման կամ պահի խմբագրման ժամանակ։"
           }
         },
         "it" : {
@@ -92761,13 +92761,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "თეგები ჯერ არ არის. დაამატეთ ისინი მომენტს გადახედვისას ან მომენტის რედაქტირებისას."
+            "value" : "თეგები ჯერ არ არის. დაამატე ისინი მომენტს გადახედვისას ან მომენტის რედაქტირებისას."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Әзірге тег жоқ. Оларды сәтті қарау кезінде немесе сәтті өңдеуде қосыңыз."
+            "value" : "Әзірге тег жоқ. Оларды сәтті қарау кезінде немесе сәтті өңдеуде қос."
           }
         },
         "ko" : {
@@ -92797,7 +92797,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тегов пока нет. Добавьте их к моменту при просмотре или в редактировании момента."
+            "value" : "Тегов пока нет. Добавь их к моменту при просмотре или в редактировании момента."
           }
         },
         "sv" : {
@@ -92815,7 +92815,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тегів поки немає. Додайте їх до моменту під час перегляду або в редагуванні моменту."
+            "value" : "Тегів поки немає. Додай їх до моменту під час перегляду або в редагуванні моменту."
           }
         },
         "zh-Hans" : {
@@ -102564,7 +102564,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Яго задаеце толькі вы. MimoDays ніколі не адгадвае ваш настрой."
+            "value" : "Яго задаеш толькі ты. MimoDays ніколі не адгадвае твой настрой."
           }
         },
         "de" : {
@@ -102582,7 +102582,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous seul la choisissez. MimoDays ne devine jamais votre humeur."
+            "value" : "Toi seul la choisis. MimoDays ne devine jamais ton humeur."
           }
         },
         "he" : {
@@ -102594,7 +102594,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Այն սահմանում եք միայն դուք։ MimoDays-ը երբեք չի գուշակում ձեր տրամադրությունը։"
+            "value" : "Այն սահմանում ես միայն դու։ MimoDays-ը երբեք չի գուշակում քո տրամադրությունը։"
           }
         },
         "it" : {
@@ -102612,13 +102612,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "მას მხოლოდ თქვენ ირჩევთ. MimoDays არასოდეს ცდილობს თქვენი განწყობის გამოცნობას."
+            "value" : "მას მხოლოდ შენ ირჩევ. MimoDays არასოდეს ცდილობს შენი განწყობის გამოცნობას."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Оны тек сіз белгілейсіз. MimoDays көңіл-күйіңізді ешқашан болжамайды."
+            "value" : "Оны тек сен белгілейсің. MimoDays көңіл-күйіңді ешқашан болжамайды."
           }
         },
         "ko" : {
@@ -102648,7 +102648,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Его задаёте только вы. MimoDays никогда не угадывает ваше настроение."
+            "value" : "Его задаёшь только ты. MimoDays никогда не угадывает твоё настроение."
           }
         },
         "sv" : {
@@ -102666,7 +102666,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Його задаєте лише ви. MimoDays ніколи не вгадує ваш настрій."
+            "value" : "Його задаєш лише ти. MimoDays ніколи не вгадує твій настрій."
           }
         },
         "zh-Hans" : {
@@ -103116,7 +103116,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Адкрыйце момант, націсніце •••, потым Схаваць з успамінаў."
+            "value" : "Адкрый момант, націсні •••, потым Схаваць з успамінаў."
           }
         },
         "de" : {
@@ -103134,7 +103134,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvrez un moment, touchez •••, puis Masquer des souvenirs."
+            "value" : "Ouvre un moment, touche •••, puis Masquer des souvenirs."
           }
         },
         "he" : {
@@ -103146,7 +103146,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Բացեք պահը, հպեք •••, ապա՝ Թաքցնել հիշողություններից։"
+            "value" : "Բացիր պահը, հպիր •••, ապա՝ Թաքցնել հիշողություններից։"
           }
         },
         "it" : {
@@ -103164,13 +103164,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "გახსენით მომენტი, შეეხეთ •••-ს, შემდეგ — მოგონებებიდან დამალვა."
+            "value" : "გახსენი მომენტი, შეეხე •••-ს, შემდეგ — მოგონებებიდან დამალვა."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сәтті ашып, ••• түймесін, содан кейін Естеліктерден жасыру түймесін басыңыз."
+            "value" : "Сәтті ашып, ••• түймесін, содан кейін Естеліктерден жасыру түймесін бас."
           }
         },
         "ko" : {
@@ -103200,7 +103200,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Откройте момент, нажмите •••, затем Скрыть из воспоминаний."
+            "value" : "Открой момент, нажми •••, затем Скрыть из воспоминаний."
           }
         },
         "sv" : {
@@ -103218,7 +103218,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відкрийте момент, натисніть •••, потім Приховати зі спогадів."
+            "value" : "Відкрий момент, натисни •••, потім Приховати зі спогадів."
           }
         },
         "zh-Hans" : {
@@ -123942,7 +123942,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enregistré. Retrouvez-le dans « Avant et maintenant » au dos de la carte"
+            "value" : "Enregistré. Retrouve-le dans « Avant et maintenant » au dos de la carte"
           }
         },
         "he" : {
@@ -128928,7 +128928,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Хуткія каманды і Siri: скажыце «Адкрыць камеру MimoDays» або дадайце яе ў праграме «Хуткія каманды»."
+            "value" : "Хуткія каманды і Siri: скажы «Адкрыць камеру MimoDays» або дадай яе ў праграме «Хуткія каманды»."
           }
         },
         "de" : {
@@ -128946,7 +128946,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Raccourcis et Siri : dites « Ouvrir l’appareil photo MimoDays », ou ajoutez-le dans l’app Raccourcis."
+            "value" : "Raccourcis et Siri : dis « Ouvrir l’appareil photo MimoDays », ou ajoute-le dans l’app Raccourcis."
           }
         },
         "he" : {
@@ -128958,7 +128958,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Արագ հրամաններ և Siri․ ասեք «Բացել MimoDays-ի տեսախցիկը» կամ ավելացրեք այն «Արագ հրամաններ» հավելվածում։"
+            "value" : "Արագ հրամաններ և Siri․ ասա «Բացել MimoDays-ի տեսախցիկը» կամ ավելացրու այն «Արագ հրամաններ» հավելվածում։"
           }
         },
         "it" : {
@@ -128976,13 +128976,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "სწრაფი ბრძანებები და Siri: თქვით „MimoDays-ის კამერის გახსნა“ ან დაამატეთ Shortcuts აპში."
+            "value" : "სწრაფი ბრძანებები და Siri: თქვი „MimoDays-ის კამერის გახსნა“ ან დაამატე Shortcuts აპში."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Жылдам пәрмендер және Siri: «MimoDays камерасын ашу» деп айтыңыз немесе оны Shortcuts қолданбасында қосыңыз."
+            "value" : "Жылдам пәрмендер және Siri: «MimoDays камерасын ашу» деп айт немесе оны Shortcuts қолданбасында қос."
           }
         },
         "ko" : {
@@ -129012,7 +129012,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Быстрые команды и Siri: скажите «Открыть камеру MimoDays» или добавьте её в приложении «Команды»."
+            "value" : "Быстрые команды и Siri: скажи «Открыть камеру MimoDays» или добавь её в приложении «Команды»."
           }
         },
         "sv" : {
@@ -129024,13 +129024,13 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kestirmeler ve Siri: “MimoDays Kamerasını Aç” deyin ya da Kestirmeler uygulamasında ekleyin."
+            "value" : "Kestirmeler ve Siri: “MimoDays Kamerasını Aç” de ya da Kestirmeler uygulamasında ekle."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Швидкі команди і Siri: скажіть «Відкрити камеру MimoDays» або додайте її в застосунку «Команди»."
+            "value" : "Швидкі команди і Siri: скажи «Відкрити камеру MimoDays» або додай її в застосунку «Команди»."
           }
         },
         "zh-Hans" : {
@@ -145521,7 +145521,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Той самы сюрпрыз вернецца адзін раз, пазней сёння, у межах вашых гадзін сюрпрызаў."
+            "value" : "Той самы сюрпрыз вернецца адзін раз, пазней сёння, у межах тваіх гадзін сюрпрызаў."
           }
         },
         "de" : {
@@ -145539,7 +145539,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La même surprise revient une fois, plus tard dans la journée, dans vos heures de surprises."
+            "value" : "La même surprise revient une fois, plus tard dans la journée, dans tes heures de surprises."
           }
         },
         "he" : {
@@ -145551,7 +145551,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Նույն անակնկալը կվերադառնա մեկ անգամ՝ այսօր ավելի ուշ, ձեր անակնկալների ժամերի սահմաններում։"
+            "value" : "Նույն անակնկալը կվերադառնա մեկ անգամ՝ այսօր ավելի ուշ, քո անակնկալների ժամերի սահմաններում։"
           }
         },
         "it" : {
@@ -145569,7 +145569,7 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "იგივე სიურპრიზი ერთხელ დაბრუნდება, დღესვე მოგვიანებით, თქვენი სიურპრიზების საათებში."
+            "value" : "იგივე სიურპრიზი ერთხელ დაბრუნდება, დღესვე მოგვიანებით, შენი სიურპრიზების საათებში."
           }
         },
         "kk" : {
@@ -145605,7 +145605,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тот же сюрприз вернётся один раз, позже сегодня, в пределах ваших часов сюрпризов."
+            "value" : "Тот же сюрприз вернётся один раз, позже сегодня, в пределах твоих часов сюрпризов."
           }
         },
         "sv" : {
@@ -145623,7 +145623,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Той самий сюрприз повернеться один раз, пізніше сьогодні, у межах ваших годин сюрпризів."
+            "value" : "Той самий сюрприз повернеться один раз, пізніше сьогодні, у межах твоїх годин сюрпризів."
           }
         },
         "zh-Hans" : {
@@ -159190,7 +159190,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Каб схаваць увесь дзень, адкрыйце дзень, націсніце •••, потым Схаваць гэты дзень з успамінаў."
+            "value" : "Каб схаваць увесь дзень, адкрый дзень, націсні •••, потым Схаваць гэты дзень з успамінаў."
           }
         },
         "de" : {
@@ -159208,7 +159208,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pour masquer une journée entière, ouvrez le jour, touchez •••, puis Masquer ce jour des souvenirs."
+            "value" : "Pour masquer une journée entière, ouvre le jour, touche •••, puis Masquer ce jour des souvenirs."
           }
         },
         "he" : {
@@ -159220,7 +159220,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ամբողջ օրը թաքցնելու համար բացեք օրը, հպեք •••, ապա՝ Թաքցնել այս օրը հիշողություններից։"
+            "value" : "Ամբողջ օրը թաքցնելու համար բացիր օրը, հպիր •••, ապա՝ Թաքցնել այս օրը հիշողություններից։"
           }
         },
         "it" : {
@@ -159238,13 +159238,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "მთელი დღის დასამალად გახსენით დღე, შეეხეთ •••-ს, შემდეგ — ამ დღის მოგონებებიდან დამალვა."
+            "value" : "მთელი დღის დასამალად გახსენი დღე, შეეხე •••-ს, შემდეგ — ამ დღის მოგონებებიდან დამალვა."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Бүкіл күнді жасыру үшін күнді ашып, ••• түймесін, содан кейін Бұл күнді естеліктерден жасыру түймесін басыңыз."
+            "value" : "Бүкіл күнді жасыру үшін күнді ашып, ••• түймесін, содан кейін Бұл күнді естеліктерден жасыру түймесін бас."
           }
         },
         "ko" : {
@@ -159274,7 +159274,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Чтобы скрыть весь день, откройте день, нажмите •••, затем Скрыть этот день из воспоминаний."
+            "value" : "Чтобы скрыть весь день, открой день, нажми •••, затем Скрыть этот день из воспоминаний."
           }
         },
         "sv" : {
@@ -159292,7 +159292,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Щоб приховати весь день, відкрийте день, натисніть •••, потім Приховати цей день зі спогадів."
+            "value" : "Щоб приховати весь день, відкрий день, натисни •••, потім Приховати цей день зі спогадів."
           }
         },
         "zh-Hans" : {
@@ -159484,7 +159484,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pour les afficher à nouveau, utilisez le même menu."
+            "value" : "Pour les afficher à nouveau, utilise le même menu."
           }
         },
         "he" : {
@@ -159496,7 +159496,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Դրանք կրկին ցույց տալու համար օգտագործեք նույն ընտրացանկը։"
+            "value" : "Դրանք կրկին ցույց տալու համար օգտագործիր նույն ընտրացանկը։"
           }
         },
         "it" : {
@@ -159514,13 +159514,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "მათ კვლავ საჩვენებლად იგივე მენიუ გამოიყენეთ."
+            "value" : "მათ კვლავ საჩვენებლად იგივე მენიუ გამოიყენე."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Оларды қайта көрсету үшін сол мәзірді пайдаланыңыз."
+            "value" : "Оларды қайта көрсету үшін сол мәзірді пайдалан."
           }
         },
         "ko" : {
@@ -162628,7 +162628,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Уключыце сюрпрызы, каб карыстацца запасным напамінаннем."
+            "value" : "Уключы сюрпрызы, каб карыстацца запасным напамінаннем."
           }
         },
         "de" : {
@@ -162646,7 +162646,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activez les surprises pour utiliser le rappel de secours."
+            "value" : "Active les surprises pour utiliser le rappel de secours."
           }
         },
         "he" : {
@@ -162658,7 +162658,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Միացրեք անակնկալները՝ պահուստային հիշեցումն օգտագործելու համար։"
+            "value" : "Միացրու անակնկալները՝ պահուստային հիշեցումն օգտագործելու համար։"
           }
         },
         "it" : {
@@ -162676,13 +162676,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ჩართეთ სიურპრიზები სარეზერვო შეხსენების გამოსაყენებლად."
+            "value" : "ჩართე სიურპრიზები სარეზერვო შეხსენების გამოსაყენებლად."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Қосалқы еске салғышты пайдалану үшін тосынсыйларды қосыңыз."
+            "value" : "Қосалқы еске салғышты пайдалану үшін тосынсыйларды қос."
           }
         },
         "ko" : {
@@ -162712,7 +162712,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Включите сюрпризы, чтобы пользоваться запасным напоминанием."
+            "value" : "Включи сюрпризы, чтобы пользоваться запасным напоминанием."
           }
         },
         "sv" : {
@@ -162730,7 +162730,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Увімкніть сюрпризи, щоб користуватися запасним нагадуванням."
+            "value" : "Увімкни сюрпризи, щоб користуватися запасним нагадуванням."
           }
         },
         "zh-Hans" : {
@@ -166186,7 +166186,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jusqu’à 10 tags. Un tag vous aide à retrouver ce moment plus tard."
+            "value" : "Jusqu’à 10 tags. Un tag t’aide à retrouver ce moment plus tard."
           }
         },
         "he" : {
@@ -168915,7 +168915,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les vidéos donnent leur première seconde ; vous pouvez la déplacer dans l’éditeur."
+            "value" : "Les vidéos donnent leur première seconde ; tu peux la déplacer dans l’éditeur."
           }
         },
         "he" : {
@@ -172069,7 +172069,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Калі сюрпрыз прыйшоў не ў час, націсніце і ўтрымлівайце яго апавяшчэнне, потым націсніце Нагадаць пазней."
+            "value" : "Калі сюрпрыз прыйшоў не ў час, націсні і ўтрымлівай яго апавяшчэнне, потым націсні Нагадаць пазней."
           }
         },
         "de" : {
@@ -172087,7 +172087,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si une surprise arrive au mauvais moment, touchez sa notification de manière prolongée, puis Me le rappeler plus tard."
+            "value" : "Si une surprise arrive au mauvais moment, touche sa notification de manière prolongée, puis Me le rappeler plus tard."
           }
         },
         "he" : {
@@ -172099,7 +172099,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Եթե անակնկալը եկել է անհարմար պահին, հպեք և պահեք դրա ծանուցումը, ապա հպեք Հիշեցնել ավելի ուշ։"
+            "value" : "Եթե անակնկալը եկել է անհարմար պահին, հպիր և պահիր դրա ծանուցումը, ապա հպիր Հիշեցնել ավելի ուշ։"
           }
         },
         "it" : {
@@ -172117,13 +172117,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "თუ სიურპრიზი მოუხერხებელ დროს მოვიდა, შეეხეთ და გეჭიროთ მის შეტყობინებაზე, შემდეგ — მოგვიანებით შემახსენე."
+            "value" : "თუ სიურპრიზი მოუხერხებელ დროს მოვიდა, ხანგრძლივად შეეხე მის შეტყობინებას, შემდეგ — მოგვიანებით შემახსენე."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тосынсый ыңғайсыз уақытта келсе, оның хабарландыруын басып тұрыңыз да, Кейінірек еске салу түймесін басыңыз."
+            "value" : "Тосынсый ыңғайсыз уақытта келсе, оның хабарландыруын басып тұр да, Кейінірек еске салу түймесін бас."
           }
         },
         "ko" : {
@@ -172153,7 +172153,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Если сюрприз пришёл не вовремя, нажмите и удерживайте его уведомление, затем нажмите Напомнить позже."
+            "value" : "Если сюрприз пришёл не вовремя, нажми и удерживай его уведомление, затем нажми Напомнить позже."
           }
         },
         "sv" : {
@@ -172171,7 +172171,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Якщо сюрприз прийшов не вчасно, натисніть і утримуйте його сповіщення, потім натисніть Нагадати пізніше."
+            "value" : "Якщо сюрприз прийшов не вчасно, натисни й утримуй його сповіщення, потім натисни Нагадати пізніше."
           }
         },
         "zh-Hans" : {
@@ -174869,7 +174869,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Напішыце тое, што хочаце запомніць…"
+            "value" : "Напішы тое, што хочаш запомніць…"
           }
         },
         "de" : {
@@ -174887,7 +174887,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Écrivez ce que vous voulez retenir…"
+            "value" : "Écris ce que tu veux retenir…"
           }
         },
         "he" : {
@@ -174899,7 +174899,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Գրեք այն, ինչ ուզում եք հիշել…"
+            "value" : "Գրիր այն, ինչ ուզում ես հիշել…"
           }
         },
         "it" : {
@@ -174917,13 +174917,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "დაწერეთ ის, რისი დამახსოვრებაც გსურთ…"
+            "value" : "დაწერე ის, რისი დამახსოვრებაც გსურს…"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Есте сақтағыңыз келетінді жазыңыз…"
+            "value" : "Есте сақтағың келетінді жаз…"
           }
         },
         "ko" : {
@@ -174953,7 +174953,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Напишите то, что хотите запомнить…"
+            "value" : "Напиши то, что хочешь запомнить…"
           }
         },
         "sv" : {
@@ -174971,7 +174971,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Напишіть те, що хочете запам’ятати…"
+            "value" : "Напиши те, що хочеш запам’ятати…"
           }
         },
         "zh-Hans" : {
@@ -175853,7 +175853,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous pouvez ajouter jusqu’à 10 tags."
+            "value" : "Tu peux ajouter jusqu’à 10 tags."
           }
         },
         "he" : {
@@ -178481,7 +178481,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вашы моманты застануцца ў архіве."
+            "value" : "Твае моманты застануцца ў архіве."
           }
         },
         "de" : {
@@ -178499,7 +178499,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos moments restent dans les archives."
+            "value" : "Tes moments restent dans les archives."
           }
         },
         "he" : {
@@ -178511,7 +178511,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ձեր պահերը մնում են արխիվում։"
+            "value" : "Քո պահերը մնում են արխիվում։"
           }
         },
         "it" : {
@@ -178529,13 +178529,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "თქვენი მომენტები არქივში რჩება."
+            "value" : "შენი მომენტები არქივში რჩება."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сәттеріңіз мұрағатта қалады."
+            "value" : "Сәттерің мұрағатта қалады."
           }
         },
         "ko" : {
@@ -178565,7 +178565,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваши моменты останутся в архиве."
+            "value" : "Твои моменты останутся в архиве."
           }
         },
         "sv" : {
@@ -178583,7 +178583,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваші моменти залишаться в архіві."
+            "value" : "Твої моменти залишаться в архіві."
           }
         },
         "zh-Hans" : {
@@ -180389,7 +180389,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваш сюрпрыз вернецца сёння."
+            "value" : "Твой сюрпрыз вернецца сёння."
           }
         },
         "de" : {
@@ -180407,7 +180407,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre surprise reviendra aujourd’hui."
+            "value" : "Ta surprise reviendra aujourd’hui."
           }
         },
         "he" : {
@@ -180419,7 +180419,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ձեր անակնկալը այսօր կվերադառնա։"
+            "value" : "Քո անակնկալը այսօր կվերադառնա։"
           }
         },
         "it" : {
@@ -180437,13 +180437,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "თქვენი სიურპრიზი დღესვე დაბრუნდება."
+            "value" : "შენი სიურპრიზი დღესვე დაბრუნდება."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тосын сыйыңыз бүгін қайта келеді."
+            "value" : "Тосын сыйың бүгін қайта келеді."
           }
         },
         "ko" : {
@@ -180473,7 +180473,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваш сюрприз вернётся сегодня."
+            "value" : "Твой сюрприз вернётся сегодня."
           }
         },
         "sv" : {
@@ -180491,7 +180491,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваш сюрприз повернеться сьогодні."
+            "value" : "Твій сюрприз повернеться сьогодні."
           }
         },
         "zh-Hans" : {
@@ -180665,7 +180665,7 @@
         "be" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вашы словы"
+            "value" : "Твае словы"
           }
         },
         "de" : {
@@ -180683,7 +180683,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos mots"
+            "value" : "Tes mots"
           }
         },
         "he" : {
@@ -180695,7 +180695,7 @@
         "hy" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ձեր խոսքերը"
+            "value" : "Քո խոսքերը"
           }
         },
         "it" : {
@@ -180713,13 +180713,13 @@
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "თქვენი სიტყვები"
+            "value" : "შენი სიტყვები"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сіздің сөздеріңіз"
+            "value" : "Сенің сөздерің"
           }
         },
         "ko" : {
@@ -180749,7 +180749,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваши слова"
+            "value" : "Твои слова"
           }
         },
         "sv" : {
@@ -180767,7 +180767,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваші слова"
+            "value" : "Твої слова"
           }
         },
         "zh-Hans" : {

@@ -189,11 +189,41 @@ struct LocalizationTests {
         }
     }
 
+    /// The app speaks informally everywhere (ты, tu, sen...): no formal "you" or formal imperatives slip back in.
+    @Test func everyTranslationSpeaksInformally() throws {
+        let url = URL(filePath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appending(path: "Sources/AppFeature/Resources/Localizable.xcstrings")
+        let catalog = try JSONDecoder().decode(Catalog.self, from: Data(contentsOf: url))
+        let formal = [
+            "ru": #"(?<![\p{L}])(вы|вас|вам|вами|ваш\p{L}*)(?![\p{L}])|(?<![\p{L}])(выберите|нажмите|откройте|добавьте|включите|напишите|скажите|коснитесь)(?![\p{L}])"#,
+            "uk": #"(?<![\p{L}])(ви|вас|вам|ваш\p{L}*)(?![\p{L}])|(?<![\p{L}])(виберіть|натисніть|відкрийте|додайте|увімкніть|напишіть|скажіть|торкніться)(?![\p{L}])"#,
+            "be": #"(?<![\p{L}])(вы|вас|вам|ваш\p{L}*)(?![\p{L}])|(?<![\p{L}])(выберыце|націсніце|адкрыйце|дадайце|уключыце|напішыце|скажыце)(?![\p{L}])"#,
+            "fr": #"(?<![\p{L}])(vous|votre|vos)(?![\p{L}])"#,
+            "kk": #"(?<![\p{L}])(сіз\p{L}*)(?![\p{L}])"#,
+            "hy": #"(?<![\p{L}])(դուք|ձեր|ձեզ)(?![\p{L}])"#,
+            "ka": #"(?<![\p{L}])(თქვენ\p{L}*)(?![\p{L}])"#,
+            "tr": #"(?<![\p{L}])(siz\p{L}*|dokunun|ekleyin|seçin|açın)(?![\p{L}])"#,
+        ]
+        for (key, entry) in catalog.strings {
+            for (language, pattern) in formal {
+                let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+                for value in entry.localizations?[language]?.units.compactMap(\.value) ?? [] {
+                    let found = regex.firstMatch(in: value, range: NSRange(value.startIndex..., in: value)) != nil
+                    #expect(!found, "formal \(language): \(key) -> \(value)")
+                }
+            }
+        }
+    }
+
     private struct Catalog: Decodable {
         struct Entry: Decodable {
             /// A string, or its plural or device (iPad) variants, which can nest.
             final class Localization: Decodable {
-                struct Unit: Decodable { var state: String }
+                struct Unit: Decodable {
+                    var state: String
+                    var value: String?
+                }
                 struct Variations: Decodable {
                     var plural: [String: Localization]?
                     var device: [String: Localization]?

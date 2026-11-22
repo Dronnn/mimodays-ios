@@ -374,6 +374,23 @@ struct SurpriseCoordinatorTests {
         #expect(try prompts(.pending).count { $0.plannedAt <= soon } == 1)
     }
 
+    /// P5.2: one due within the second that iOS never took won't come: it is dropped, not left beside the new one.
+    /// One whose second has begun may just have been shown, so it stays.
+    @Test func aSurpriseIOSNeverTookDueWithinTheSecondIsDropped() async throws {
+        let now = date("2026-11-11 23:30").addingTimeInterval(0.7)
+        clock.set(now)
+        let coordinator = coordinator()
+        await coordinator.refresh()
+        let lost = SurprisePrompt(plannedAt: now.addingTimeInterval(0.5), expiresAt: now.addingTimeInterval(900), notificationRequestID: "lost")
+        let shown = SurprisePrompt(plannedAt: now.addingTimeInterval(0.2), expiresAt: now.addingTimeInterval(900), notificationRequestID: "shown")
+        context.insert(lost)
+        context.insert(shown)
+        try context.save()
+        #expect(await coordinator.sendNow())
+        #expect(lost.outcome == .cancelled)
+        #expect(shown.outcome == .pending)
+    }
+
     /// iOS turned the request down: Settings doesn't say it's on its way, and Today doesn't wait for it.
     @Test func aSendIOSRefusesIsNotReportedAsSent() async throws {
         clock.set(date("2026-11-11 23:30"))

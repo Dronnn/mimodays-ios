@@ -134,10 +134,11 @@ final class SurpriseCoordinator {
                 sent = true
                 return
             }
-            // One not yet due that iOS doesn't have won't come: it doesn't go out next to this one either. One due by
-            // now may just have been shown (iOS fires on the whole second, so a second's margin).
-            let checked = self.clock.now().addingTimeInterval(1)
-            for prompt in dueSoon where prompt.plannedAt > checked { prompt.outcome = .cancelled }
+            // One iOS doesn't have won't come once its trigger's second is still ahead: it doesn't go out next to this
+            // one either. iOS fires at the whole second the trigger names, before the prompt's fraction, so one whose
+            // second has begun may just have been shown (P5.2: one due within the second was kept, never to come).
+            let checked = self.clock.now().timeIntervalSinceReferenceDate
+            for prompt in dueSoon where prompt.plannedAt.timeIntervalSinceReferenceDate.rounded(.down) > checked { prompt.outcome = .cancelled }
             let id = UUID()
             let time = soon
             let minutes = self.fetchSchedule()?.expiryMinutes ?? SurpriseSchedule().expiryMinutes

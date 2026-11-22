@@ -310,6 +310,37 @@ struct DeleteAllTests {
         #expect(!FileManager.default.fileExists(atPath: locked.appending(path: "a.heic").path))
     }
 
+    /// P5.2: iOS ended the app while the records were being deleted (the commit never landed): the next launch
+    /// finishes the erase; a moment taken after a finished one is never taken by it.
+    @Test func aDeleteAllCutShortBeforeItsRecordsWentIsFinishedAtLaunch() throws {
+        let onboarding = SwiftDataOnboardingStore(context: context)
+        var record = onboarding.load()
+        record.isCompleted = true
+        onboarding.save(record)
+        let captured = CaptureTime(instant: Date(timeIntervalSince1970: 1_794_355_200), timeZone: .gmt)
+        context.insert(Moment(captured: captured, origin: .manual, mediaType: .photo, createdAt: .now.addingTimeInterval(-60)))
+        try context.save()
+        _ = try drafts.newVoiceURL()
+        var didReset = false
+        let eraser = AppEraser(context: context, store: store, notifications: InMemoryNotificationScheduler(), drafts: drafts) { didReset = true }
+        #expect(!eraser.finishCutShortErase())
+        store.markErasePending()
+
+        #expect(eraser.finishCutShortErase())
+        #expect(eraser.counts() == AppEraser.Counts())
+        #expect(!onboarding.load().isCompleted)
+        #expect(didReset)
+        #expect(!FileManager.default.fileExists(atPath: drafts.root.path))
+        #expect(!store.isErasePending)
+
+        // A marker left by files that wouldn't go: what's taken since stays.
+        store.markErasePending()
+        context.insert(Moment(captured: captured, origin: .manual, mediaType: .photo, createdAt: .now.addingTimeInterval(60)))
+        try context.save()
+        #expect(!eraser.finishCutShortErase())
+        #expect(eraser.counts().moments == 1)
+    }
+
     /// The backup reminder isn't a surprise, so `pending()` doesn't list it; it goes all the same.
     @Test func theBackupReminderGoesToo() async throws {
         let notifications = CancelRecorder()

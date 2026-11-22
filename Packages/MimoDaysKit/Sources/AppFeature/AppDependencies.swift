@@ -123,6 +123,26 @@ public final class AppDependencies {
             writing: WritingDraftStore(url: Self.reviewRoot(configuration).deletingLastPathComponent().appending(path: configuration.isUITesting ? "UITestWriting-\(UUID().uuidString).json" : "Writing.json"))
         )
         momentSaver = MomentSaver(context: modelContainer.mainContext, store: try MediaStore(root: Self.mediaRoot(configuration)))
+        let memoriesPreferences = self.memoriesPreferences
+        let moviePreferences = self.moviePreferences
+        let appearancePreferences = self.appearancePreferences
+        eraser = AppEraser(
+            context: modelContainer.mainContext, store: momentSaver.store, notifications: notifications, drafts: camera.drafts,
+            resetSettings: {
+                memoriesPreferences.reset()
+                moviePreferences.reset()
+                privacyPreferences.reset()
+                appearancePreferences.reset()
+                homePreferences.reset()
+                cameraSettings.save(CameraSettings())
+                UserDefaults.standard.removeObject(forKey: BackupReminder.key)
+                UserDefaults.standard.removeObject(forKey: MoviesModel.dismissedKey)
+            },
+            writing: camera.writing,
+            temporaryDirectory: FileManager.default.temporaryDirectory
+        )
+        // A Delete All cut short before its records went is finished first, so it starts again from onboarding.
+        eraser.finishCutShortErase()
         // Before any screen: what a Delete All couldn't remove, and files a save or a deletion left behind when iOS
         // ended the app mid-way.
         // The capture in review goes too when it's older than the erase, which may have been cut short before it; one
@@ -158,24 +178,6 @@ public final class AppDependencies {
             tipStore = StoreKitTipStore()
             tipTransactions = StoreKitTipStore.listenForTransactions()
         }
-        let memoriesPreferences = self.memoriesPreferences
-        let moviePreferences = self.moviePreferences
-        let appearancePreferences = self.appearancePreferences
-        eraser = AppEraser(
-            context: modelContainer.mainContext, store: momentSaver.store, notifications: notifications, drafts: camera.drafts,
-            resetSettings: {
-                memoriesPreferences.reset()
-                moviePreferences.reset()
-                privacyPreferences.reset()
-                appearancePreferences.reset()
-                homePreferences.reset()
-                cameraSettings.save(CameraSettings())
-                UserDefaults.standard.removeObject(forKey: BackupReminder.key)
-                UserDefaults.standard.removeObject(forKey: MoviesModel.dismissedKey)
-            },
-            writing: camera.writing,
-            temporaryDirectory: FileManager.default.temporaryDirectory
-        )
         UNUserNotificationCenter.current().delegate = notificationTaps
         notificationTaps.remindLater = { [surprises] in await surprises.remindLater(promptID: $0) }
         SurpriseNotificationHandler.registerActions()

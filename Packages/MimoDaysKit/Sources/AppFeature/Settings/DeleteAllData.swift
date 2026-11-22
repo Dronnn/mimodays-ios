@@ -46,28 +46,54 @@ struct AppEraser {
         let wasPending = store.isErasePending
         store.markErasePending()
         do {
-            // Children before their parents, so no rule is left pointing at a deleted row.
-            try deleteAll(MovieAudioTrack.self)
-            try deleteAll(MovieClip.self)
-            try deleteAll(ExportJob.self)
-            try deleteAll(MovieProject.self)
-            try deleteAll(CollectionMembership.self)
-            try deleteAll(MomentCollection.self)
-            try deleteAll(MomentVoiceNote.self)
-            try deleteAll(MomentMedia.self)
-            try deleteAll(MomentLocation.self)
-            try deleteAll(SurprisePrompt.self)
-            try deleteAll(SurpriseSchedule.self)
-            try deleteAll(Moment.self)
-            try deleteAll(HiddenDay.self)
-            try deleteAll(BackupManifest.self)
-            try deleteAll(AppPreferences.self)
-            try context.save()
+            try deleteRecords()
         } catch {
             context.rollback()
             if !wasPending { store.clearErasePending() }
             throw error
         }
+        finish()
+    }
+
+    /// At launch, before any screen: a Delete All that iOS ended while its records were still being deleted (moments
+    /// from before it are still here) is done now, as the person asked (P5.2). True when it was.
+    @discardableResult
+    func finishCutShortErase() -> Bool {
+        guard let since = store.erasePendingSince,
+              ((try? context.fetchCount(FetchDescriptor<Moment>(predicate: #Predicate { $0.createdAt <= since }))) ?? 0) > 0
+        else { return false }
+        do {
+            try deleteRecords()
+        } catch {
+            context.rollback()
+            Self.logger.error("A cut-short Delete All couldn't finish: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+        finish()
+        return true
+    }
+
+    private func deleteRecords() throws {
+        // Children before their parents, so no rule is left pointing at a deleted row.
+        try deleteAll(MovieAudioTrack.self)
+        try deleteAll(MovieClip.self)
+        try deleteAll(ExportJob.self)
+        try deleteAll(MovieProject.self)
+        try deleteAll(CollectionMembership.self)
+        try deleteAll(MomentCollection.self)
+        try deleteAll(MomentVoiceNote.self)
+        try deleteAll(MomentMedia.self)
+        try deleteAll(MomentLocation.self)
+        try deleteAll(SurprisePrompt.self)
+        try deleteAll(SurpriseSchedule.self)
+        try deleteAll(Moment.self)
+        try deleteAll(HiddenDay.self)
+        try deleteAll(BackupManifest.self)
+        try deleteAll(AppPreferences.self)
+        try context.save()
+    }
+
+    private func finish() {
         // The records are gone, so the erase goes on to the end: what won't go now, or a quit cuts short, the next
         // launch removes (the capture in review first).
         drafts?.clear()

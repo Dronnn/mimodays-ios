@@ -25,6 +25,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     private var cameras: [CameraPosition: Camera] = [:]
     private var microphone: AVCaptureDeviceInput?
     private var backLens = BackLens.wide
+    /// Each camera's shown multiplier, worked out once (on `queue`).
+    private var multipliers: [String: Double] = [:]
     /// The rear camera may be the phone's virtual camera, which changes lens by itself as it zooms (P1.1). Off for the
     /// tier that tries the lens's own camera instead.
     private var usesVirtualBack = true
@@ -191,7 +193,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             // A lens the virtual camera lacks runs on its own: an iPhone 16 Pro has no triple camera beside the front
             // one, only the 0.5x/1x pair, so 5x is its telephoto alone (Andrew, 2026-11-23).
             let lenses = Self.lenses(of: device)
-            return lenses + own.filter { !lenses.contains($0) }
+            return BackLens.allCases.filter { lenses.contains($0) || own.contains($0) }
         }) ?? [.wide]
     }
 
@@ -622,8 +624,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
         // The virtual rear camera with the front one; then the lens's own camera with it, at the same tiers; then one
         // camera (P1.1). A pair that can't be added at one size (busy, over budget) tries the next size down.
-        // A lens the virtual camera lacks (the 5x telephoto beside the selfie) goes straight to its own camera.
-        let hasVirtualPair = backDevice(backLens, paired: true).map { $0.isVirtualDevice && Self.lenses(of: $0).contains(backLens) } == true
+        // A lens the virtual camera lacks (the 5x telephoto beside the selfie) goes straight to its own camera, when it
+        // has one that pairs; a saved lens that doesn't (a backup from another phone) keeps the virtual one.
+        let hasVirtualPair = backDevice(backLens, paired: true).map {
+            $0.isVirtualDevice && (Self.lenses(of: $0).contains(backLens) || physicalBackDevice(backLens, paired: true) == nil)
+        } == true
         for tier in CapturePressurePolicy.dualTiers(hasVirtualPair: hasVirtualPair, maxWidth: maxFormatWidth) {
             usesVirtualBack = tier.virtualBack
             if negotiateDual(multiCam, width: tier.width) { return .dual }
@@ -937,7 +942,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     public func zoom(on position: CameraPosition) async -> CameraZoom? {
         try? await onQueue { () -> CameraZoom? in
             guard let device = self.cameras[position]?.input.device else { return nil }
-            let multiplier = Self.shownMultiplier(device)
+            let multiplier = self.shownMultiplier(device)
             let minFactor = Double(device.minAvailableVideoZoomFactor)
             let maxFactor = max(minFactor, min(Double(device.maxAvailableVideoZoomFactor), CameraZoom.maxShown / max(multiplier, 0.01)))
             // Each stop keeps its lens when the ones out of reach go.
@@ -955,12 +960,29 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     }
 
     /// What people read at the device's 1: its own multiplier, or for a lens running alone (the telephoto beside the
-    /// selfie, which says 1) its view against the wide camera's, to the half: 5×, 3×, 0.5×.
+    /// selfie, which says 1) its place against the wide camera: from a virtual camera's switch-overs, else from the two
+    /// views, to the half. 5×, 3×, 0.5×.
+    private func shownMultiplier(_ device: AVCaptureDevice) -> Double {
+        if let known = multipliers[device.uniqueID] { return known }
+        let multiplier = Self.shownMultiplier(device)
+        multipliers[device.uniqueID] = multiplier
+        return multiplier
+    }
+
     private static func shownMultiplier(_ device: AVCaptureDevice) -> Double {
         let given = Double(device.displayVideoZoomFactorMultiplier)
         guard !device.isVirtualDevice, given == 1, device.deviceType != .builtInWideAngleCamera,
               let wide = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: device.position)
         else { return given }
+        // Exact where a virtual camera has both lenses: where it switches to each, against where it switches to the wide.
+        for type in virtualBackTypes {
+            guard let virtual = AVCaptureDevice.default(type, for: .video, position: device.position) else { continue }
+            let lenses = virtual.constituentDevices.map(\.deviceType)
+            let stops = stops(of: virtual)
+            guard let own = lenses.firstIndex(of: device.deviceType), let wideIndex = lenses.firstIndex(of: .builtInWideAngleCamera),
+                  own < stops.count, wideIndex < stops.count, stops[wideIndex] > 0 else { continue }
+            return stops[own] / stops[wideIndex]
+        }
         func halfWidth(_ device: AVCaptureDevice) -> Double { tan(Double(device.activeFormat.videoFieldOfView) * .pi / 360) }
         let ratio = halfWidth(wide) / max(halfWidth(device), 0.0001)
         return ratio > 0 ? max((ratio * 2).rounded() / 2, 0.5) : given
@@ -975,7 +997,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     private func zoom(_ device: AVCaptureDevice, to factor: Double, smoothly: Bool) {
         let minFactor = device.minAvailableVideoZoomFactor
-        let maxFactor = max(minFactor, min(device.maxAvailableVideoZoomFactor, CGFloat(CameraZoom.maxShown) / max(device.displayVideoZoomFactorMultiplier, 0.01)))
+        let maxFactor = max(minFactor, min(device.maxAvailableVideoZoomFactor, CGFloat(CameraZoom.maxShown / max(shownMultiplier(device), 0.01))))
         let clamped = min(max(CGFloat(factor), minFactor), maxFactor)
         guard (try? device.lockForConfiguration()) != nil else { return }
         defer { device.unlockForConfiguration() }

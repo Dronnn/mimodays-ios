@@ -154,14 +154,32 @@ struct CameraModelInterruptionTests {
         #expect(model.microphoneOn)
     }
 
+    /// A microphone the cameras can't take doesn't cost the camera: it starts again without it.
+    @Test func aMicrophoneTheCamerasRefuseLeavesTheCameraWorking() async {
+        let engine = MicrophoneAtStartEngine(refusesMicrophone: true)
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .granted }, onCapture: { _ in }
+        )
+        await model.start()
+        #expect(model.phase == .ready)
+        #expect(await engine.microphoneAtStart == false)
+    }
+
     /// Notes whether the microphone was on when the camera started.
     private actor MicrophoneAtStartEngine: CaptureEngine {
         private let base = SimulatedCaptureEngine()
         private(set) var microphoneAtStart: Bool?
+        var refusesMicrophone = false
+
+        init(refusesMicrophone: Bool = false) { self.refusesMicrophone = refusesMicrophone }
 
         func setVideoSize(_ size: VideoSize) {}
         func start() async throws -> CameraSetup {
             microphoneAtStart = await base.hasMicrophone
+            if refusesMicrophone, microphoneAtStart == true { throw CaptureError.configurationFailed }
             return try await base.start()
         }
         func stop() async {}

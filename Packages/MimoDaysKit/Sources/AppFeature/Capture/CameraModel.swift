@@ -263,7 +263,15 @@ final class CameraModel {
             }
             // A setup change reported while starting (heat dropped the selfie camera) is newer than what start saw.
             let changes = setupChanges
-            let started = try await engine.start()
+            let started: CameraSetup
+            do {
+                started = try await engine.start()
+            } catch {
+                // A microphone the cameras couldn't take mustn't cost the camera: it starts without, as before.
+                guard mode == .video, microphoneOn else { throw error }
+                try? await engine.setMicrophone(false)
+                started = try await engine.start()
+            }
             // Closed while the camera was starting: its stop ran first, so the camera goes off again.
             guard !isClosed else {
                 await engine.stop()

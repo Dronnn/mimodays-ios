@@ -254,7 +254,13 @@ final class CameraModel {
         isClosed = false
         do {
             // The saved lens is for the first start only: Retake keeps the framing the shot was taken with.
-            if setup == nil { try? await engine.setBackLens(settings.backLens) }
+            if setup == nil {
+                try? await engine.setBackLens(settings.backLens)
+                // The microphone joins before the cameras start: added to a running camera, it held the first
+                // recording up to 0.8 s on an iPhone 16 Pro (P8.18).
+                microphone = await microphoneStatus()
+                try? await engine.setMicrophone(mode == .video && microphoneOn)
+            }
             // A setup change reported while starting (heat dropped the selfie camera) is newer than what start saw.
             let changes = setupChanges
             let started = try await engine.start()

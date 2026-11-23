@@ -140,6 +140,45 @@ struct CameraModelInterruptionTests {
         results.first?.discardFiles()
     }
 
+    /// P8.18: opened in video with sound, the microphone is on before the camera starts, not added to it running.
+    @Test func theMicrophoneJoinsBeforeTheCameraStarts() async {
+        let engine = MicrophoneAtStartEngine()
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .granted }, onCapture: { _ in }
+        )
+        await model.start()
+        #expect(await engine.microphoneAtStart == true)
+        #expect(model.microphoneOn)
+    }
+
+    /// Notes whether the microphone was on when the camera started.
+    private actor MicrophoneAtStartEngine: CaptureEngine {
+        private let base = SimulatedCaptureEngine()
+        private(set) var microphoneAtStart: Bool?
+
+        func setVideoSize(_ size: VideoSize) {}
+        func start() async throws -> CameraSetup {
+            microphoneAtStart = await base.hasMicrophone
+            return try await base.start()
+        }
+        func stop() async {}
+        func backLenses() async -> [BackLens] { await base.backLenses() }
+        func setBackLens(_ lens: BackLens) async throws { try await base.setBackLens(lens) }
+        func flip() async throws -> CameraSetup { try await base.flip() }
+        func setMicrophone(_ enabled: Bool) async throws { try await base.setMicrophone(enabled) }
+        func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto { try await base.capturePhoto(flash: flash, silent: silent) }
+        func record(limit: Duration?) async throws -> CapturedVideo { try await base.record(limit: limit) }
+        func stopRecording() async { await base.stopRecording() }
+        func setTorch(_ mode: FlashMode) async { await base.setTorch(mode) }
+        func setCaptureHold(_ hold: DeviceHold) async { await base.setCaptureHold(hold) }
+        @MainActor func previewLayer(for _: CameraPosition) -> CALayer? { nil }
+        @MainActor func setPreviewHold(_: DeviceHold) {}
+        nonisolated var events: AsyncStream<CaptureEvent> { base.events }
+    }
+
     /// The simulated recording with the selfie starting 0.3 s after the main stream.
     private actor OffsetVideoEngine: CaptureEngine {
         func setVideoSize(_ size: VideoSize) {}

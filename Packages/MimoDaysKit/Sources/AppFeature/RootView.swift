@@ -189,6 +189,8 @@ public struct RootView: View {
         .onChange(of: scenePhase, initial: true) { _, phase in
             if phase == .background {
                 appLock.didEnterBackground()
+                // rev-app 10: iOS may wake the app to plan surprises ahead while it isn't opened.
+                SurpriseBackgroundRefresh.schedule()
                 // What changed while open (new, deleted, hidden moments) reaches the widgets.
                 publishWidgets()
             }

@@ -5,6 +5,7 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.mrmaier.MimoDays.export.*</string>
+		<string>com.mrmaier.MimoDays.surprises</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
@@ -16,6 +17,10 @@
 				<string>mimodays</string>
 			</array>
 		</dict>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
 	</array>
 </dict>
 </plist>

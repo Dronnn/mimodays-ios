@@ -646,3 +646,13 @@ struct SurpriseNotificationHandlerTests {
         #expect(opened == [id, next])
     }
 }
+
+/// rev-app 10: the background wake-up the app asks iOS for, to plan surprises while it isn't opened.
+struct SurpriseBackgroundRefreshTests {
+    @Test func theWakeUpIsAskedForHalfADayOnUnderItsPermittedName() throws {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let request = SurpriseBackgroundRefresh.request(now: now)
+        #expect(request.identifier == "com.mrmaier.MimoDays.surprises")
+        #expect(request.earliestBeginDate == now.addingTimeInterval(12 * 60 * 60))
+    }
+}

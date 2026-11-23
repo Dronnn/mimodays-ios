@@ -57,6 +57,13 @@ public final class AppDependencies {
         simulated ? .simulated : VoiceServices(makeRecorder: { AVVoiceRecorder() }, transcriber: OnDeviceTranscriber())
     }
 
+    /// rev-app 10: iOS woke the app in the background: the next wake-up is asked for, then the surprise plan is
+    /// drawn ahead and its notifications synced, as an opening would.
+    public func refreshSurprisesInBackground() async {
+        SurpriseBackgroundRefresh.schedule()
+        await surprises.refresh()
+    }
+
     /// Throws when the store or the media folder can't be opened: the launch shows a way back instead of a crash.
     public init(configuration: LaunchConfiguration = LaunchConfiguration()) throws {
         if configuration.isUITesting, configuration.breaksStore { throw BrokenStoreForTesting() }

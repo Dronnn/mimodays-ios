@@ -21,6 +21,10 @@ struct MimoDaysApp: App {
         WindowGroup {
             AppLaunchView(configuration: configuration, opened: dependencies)
         }
+        // rev-app 10: iOS wakes the app now and then, and the surprise plan reaches ahead without it being opened.
+        .backgroundTask(.appRefresh(SurpriseBackgroundRefresh.identifier)) { [dependencies] in
+            await dependencies?.refreshSurprisesInBackground()
+        }
     }
 }
 

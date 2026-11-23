@@ -15,11 +15,10 @@ env:
   DESTINATION: platform=iOS Simulator,name=iPhone 18 Pro,OS=27.2
 
 jobs:
-  app:
-    name: App (unit + UI)
+  unit:
+    name: App unit
     runs-on: xcode-27
-    # The UI suite alone takes 40+ minutes on hosted runners (20-150 s a test).
-    timeout-minutes: 75
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode 27.2
@@ -31,6 +30,35 @@ jobs:
         run: >
           xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan Unit
           -destination "$DESTINATION" -resultBundlePath results/Unit.xcresult CODE_SIGNING_ALLOWED=NO
+      - name: Upload results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-unit-results
+          path: results
+
+  ui:
+    name: App UI (${{ matrix.shard }})
+    runs-on: xcode-27
+    # The UI suite takes about 50 minutes on one hosted runner (20-150 s a test): two runners take half each, split by
+    # the classes' times. The second takes every class the first doesn't, new ones included.
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+            filter: >-
+              -only-testing:MimoDaysUITests/CameraUITests -only-testing:MimoDaysUITests/AccessibilityUITests
+              -only-testing:MimoDaysUITests/TodayUITests -only-testing:MimoDaysUITests/MapUITests
+          - shard: 2
+            filter: >-
+              -skip-testing:MimoDaysUITests/CameraUITests -skip-testing:MimoDaysUITests/AccessibilityUITests
+              -skip-testing:MimoDaysUITests/TodayUITests -skip-testing:MimoDaysUITests/MapUITests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.2
+        run: sudo xcode-select -s /Applications/Xcode_27.2.app
       - name: UI tests
         env:
           # Read by tests that drive Files' own picker, which stalls on hosted runners.
@@ -38,13 +66,22 @@ jobs:
         run: >
           xcodebuild test -project MimoDays.xcodeproj -scheme MimoDays -testPlan UI
           -destination "$DESTINATION" -resultBundlePath results/UI.xcresult CODE_SIGNING_ALLOWED=NO
-          -retry-tests-on-failure -test-iterations 2
+          -retry-tests-on-failure -test-iterations 2 ${{ matrix.filter }}
       - name: Upload results
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: app-results
+          name: app-ui-${{ matrix.shard }}-results
           path: results
+
+  # The check main's protection asks for: green only when the unit tests and both UI halves are.
+  app:
+    name: App (unit + UI)
+    needs: [unit, ui]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.unit.result }}" = success && test "${{ needs.ui.result }}" = success
 
   package:
     name: MimoDaysKit (unit, integration, snapshots)

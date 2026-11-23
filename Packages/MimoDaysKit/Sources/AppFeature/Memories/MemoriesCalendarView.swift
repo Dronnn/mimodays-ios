@@ -94,43 +94,49 @@ struct MemoriesCalendarView: View {
         let cover = items.first
         let isSelected = model.selectedDay == key
         let isFuture = key > model.today
-        return Button { model.selectedDay = key } label: {
-            ZStack(alignment: .bottomLeading) {
-                if let cover {
-                    Color(hex: 0xC9B8AA)
-                        .overlay {
-                            if let image = model.images[cover.id] { Image(uiImage: image).filling() }
-                        }
-                        .overlay(alignment: .bottom) {
-                            LinearGradient(colors: [.clear, ColorToken.mediaScrim.color], startPoint: .top, endPoint: .bottom)
-                                .frame(height: 26)
-                        }
-                        .clipShape(StripTile.shape(key))
-                        .background(StripTile.shadow(StripTile.shape(key)))
-                        .task { await model.load(cover.id) }
-                    Text(key % 100, format: .number)
-                        .textStyle(.calendarDayOnPhoto)
-                        .foregroundStyle(ColorToken.mediaFrame.color)
-                        .padding(.leading, 6)
-                        .padding(.bottom, 4)
-                } else {
-                    Text(key % 100, format: .number)
-                        .textStyle(.calendarDay)
-                        .foregroundStyle(ColorToken.textSecondary.color)
-                        .opacity(isFuture ? 0.45 : 1)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
+        let label = ZStack(alignment: .bottomLeading) {
+            if let cover {
+                Color(hex: 0xC9B8AA)
+                    .overlay {
+                        if let image = model.images[cover.id] { Image(uiImage: image).filling() }
+                    }
+                    .overlay(alignment: .bottom) {
+                        LinearGradient(colors: [.clear, ColorToken.mediaScrim.color], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 26)
+                    }
+                    .clipShape(StripTile.shape(key))
+                    .background(StripTile.shadow(StripTile.shape(key)))
+                    .task { await model.load(cover.id) }
+                Text(key % 100, format: .number)
+                    .textStyle(.calendarDayOnPhoto)
+                    .foregroundStyle(ColorToken.mediaFrame.color)
+                    .padding(.leading, 6)
+                    .padding(.bottom, 4)
+            } else {
+                Text(key % 100, format: .number)
+                    .textStyle(.calendarDay)
+                    .foregroundStyle(ColorToken.textSecondary.color)
+                    .opacity(isFuture ? 0.45 : 1)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .aspectRatio(47 / 52, contentMode: .fit)
-            .padding(4)
-            .overlay {
-                if isSelected {
-                    // The day's own hand-cut shape, around it.
-                    StripTile.shape(key).stroke(ColorToken.actionCoral.color, lineWidth: 2.5).padding(1.25)
-                }
+        }
+        .aspectRatio(47 / 52, contentMode: .fit)
+        .padding(4)
+        .overlay {
+            if isSelected {
+                // The day's own hand-cut shape, around it.
+                StripTile.shape(key).stroke(ColorToken.actionCoral.color, lineWidth: 2.5).padding(1.25)
             }
-            .padding(-4)
-            .contentShape(Rectangle())
+        }
+        .padding(-4)
+        .contentShape(Rectangle())
+        // A second tap on the selected day opens it (Andrew, 2026-11-23); the first one selects it.
+        return Group {
+            if isSelected, !items.isEmpty {
+                NavigationLink(value: MemoriesRoute.day(key)) { label }
+            } else {
+                Button { model.selectedDay = key } label: { label }
+            }
         }
         .buttonStyle(.plain)
         .disabled(isFuture)

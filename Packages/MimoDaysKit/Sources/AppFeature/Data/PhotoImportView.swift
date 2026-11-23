@@ -38,9 +38,12 @@ struct PhotoImportView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     tiles
                     if case let .loading(progress) = model.phase {
-                        ProgressView(value: progress)
-                            .tint(ColorToken.actionCoral.color)
-                            .padding(.top, 24)
+                        // Nothing in yet (one Live Photo can take seconds): a spinner, not an empty bar.
+                        Group {
+                            if progress == 0 { ProgressView().frame(maxWidth: .infinity) } else { ProgressView(value: progress) }
+                        }
+                        .tint(ColorToken.actionCoral.color)
+                        .padding(.top, 24)
                     } else {
                         summary
                     }
@@ -57,6 +60,9 @@ struct PhotoImportView: View {
             } label: {
                 if case let .importing(progress) = model.phase {
                     Text("Importing \(progress.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.shared.locale)))", bundle: .module)
+                } else if case .loading = model.phase {
+                    // No count while the files come: "Import 0" read as nothing picked.
+                    Text("Import", bundle: .module)
                 } else {
                     Text("Import \(model.new.count)", bundle: .module)
                 }

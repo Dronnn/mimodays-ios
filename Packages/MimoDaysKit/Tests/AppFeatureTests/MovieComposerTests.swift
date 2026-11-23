@@ -575,3 +575,41 @@ struct MovieComposerTests {
         }
     }
 }
+
+/// A voice recorded over the movie keeps to its pictures when a clip it was recorded over breaks later.
+struct MovieVoiceAnchorTests {
+    private let a = UUID(), b = UUID(), c = UUID()
+
+    private func clip(_ id: UUID, _ seconds: Double) -> MoviePlan.Clip {
+        MoviePlan.Clip(
+            momentID: id, media: .photo, mainURL: URL(filePath: "/dev/null"), selfieURL: nil, window: nil, placement: nil, layout: nil,
+            duration: seconds, transition: .cut, atmosphere: nil, caption: nil, voiceURL: nil, soundOn: true
+        )
+    }
+
+    private func plan(voiceAt start: Double, recordedOver: Set<UUID>?) -> MoviePlan {
+        MoviePlan(
+            clips: [clip(a, 2), clip(b, 3), clip(c, 4)], aspectRatio: .portrait9x16, fit: .fill,
+            music: .init(url: URL(filePath: "/dev/null"), gain: 1, fades: false, start: start, recordedOver: recordedOver)
+        )
+    }
+
+    @Test func aClipThatBrokeBeforeTheVoiceTakesItsTimeWithIt() {
+        let left = plan(voiceAt: 6, recordedOver: [a, b, c]).leavingOut([b])
+        #expect(left.clips.map(\.momentID) == [a, c])
+        #expect(left.music?.start == 3)
+    }
+
+    @Test func aVoiceThatStartedInTheBrokenClipStartsWhereItWas() {
+        #expect(plan(voiceAt: 3.5, recordedOver: [a, b, c]).leavingOut([b]).music?.start == 2)
+    }
+
+    @Test func aClipBrokenAlreadyWhenTheVoiceWasRecordedOrAfterItMovesNothing() {
+        #expect(plan(voiceAt: 6, recordedOver: [a, c]).leavingOut([b]).music?.start == 6)
+        #expect(plan(voiceAt: 3, recordedOver: [a, b, c]).leavingOut([c]).music?.start == 3)
+    }
+
+    @Test func musicAndOlderVoicesStayPut() {
+        #expect(plan(voiceAt: 6, recordedOver: nil).leavingOut([a, b]).music?.start == 6)
+    }
+}

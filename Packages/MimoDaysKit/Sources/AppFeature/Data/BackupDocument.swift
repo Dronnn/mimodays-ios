@@ -206,6 +206,8 @@ struct BackupDocument: Codable, Equatable {
         var startOffset: Double
         var gain: Double
         var gainEnvelope: [GainPoint]
+        /// 1.0.7: a voice's moments as it was recorded; absent in older backups.
+        var recordedOver: [UUID]?
     }
 
     static func encoder() -> JSONEncoder {
@@ -355,7 +357,10 @@ extension BackupDocument.MovieRecord {
             )
         }
         audioTracks = project.audioTracks.map {
-            .init(id: $0.id, kind: $0.kindRaw, path: $0.relativePath, name: $0.name, startOffset: $0.startOffset, gain: $0.gain, gainEnvelope: $0.gainEnvelope)
+            .init(
+                id: $0.id, kind: $0.kindRaw, path: $0.relativePath, name: $0.name, startOffset: $0.startOffset, gain: $0.gain,
+                gainEnvelope: $0.gainEnvelope, recordedOver: $0.recordedOver
+            )
         }
     }
 

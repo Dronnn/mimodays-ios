@@ -98,6 +98,8 @@ final class MovieEditorModel {
         var gain: Double
         /// Seconds into the movie where it starts: a voice recorded as the movie played.
         var startOffset = 0.0
+        /// A voice: the moments the movie showed as it was recorded.
+        var recordedOver: [UUID]?
     }
 
     let project: MovieProject
@@ -555,6 +557,7 @@ final class MovieEditorModel {
         guard let new else { return }
         let track = MovieAudioTrack(kind: new.kind, relativePath: new.relativePath, startOffset: new.startOffset, gain: new.gain)
         track.name = new.name
+        track.recordedOver = new.recordedOver
         track.project = project
         library.context.insert(track)
     }
@@ -687,7 +690,13 @@ final class MovieEditorModel {
         do {
             let file = try library.store.store(moving: url, in: .originals, fileExtension: "m4a")
             audioFiles.insert(file.relativePath)
-            edit { put(Track(kind: .voiceover, relativePath: file.relativePath, name: nil, gain: Self.voiceoverGain, startOffset: start)) }
+            let shown = plan.clips.filter { !$0.isCard }.map(\.momentID)
+            edit {
+                put(Track(
+                    kind: .voiceover, relativePath: file.relativePath, name: nil, gain: Self.voiceoverGain, startOffset: start,
+                    recordedOver: Array(Set(shown))
+                ))
+            }
         } catch {
             try? FileManager.default.removeItem(at: url)
             logger.error("Adding the voice failed: \(error.localizedDescription, privacy: .public)")
@@ -822,8 +831,7 @@ final class MovieEditorModel {
     /// Reads the clips back and rebuilds what the stage plays, keeping its place.
     func reload() {
         let full = MoviePlan(project, store: library.store)
-        plan = full
-        plan.clips.removeAll { !$0.isCard && unreadable.contains($0.momentID) }
+        plan = full.leavingOut(unreadable)
         // The plan has the same order: each of its entries is a card by its id or the next clip of that moment.
         var clips = MovieStore.liveClips(of: project)
         let cards = Dictionary(project.textCards.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -886,6 +894,9 @@ final class MovieEditorModel {
 
 private extension MovieEditorModel.Track {
     init(_ track: MovieAudioTrack) {
-        self.init(kind: track.kind, relativePath: track.relativePath, name: track.name, gain: track.gain, startOffset: track.startOffset)
+        self.init(
+            kind: track.kind, relativePath: track.relativePath, name: track.name, gain: track.gain, startOffset: track.startOffset,
+            recordedOver: track.recordedOver
+        )
     }
 }

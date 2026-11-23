@@ -208,6 +208,8 @@ struct BackupTests {
         track.kind = .voiceover
         track.name = nil
         track.gain = 0.4
+        let shown = [UUID(), UUID()]
+        track.recordedOver = shown
         try phone.context.save()
         let (url, _) = try backUp(phone)
 
@@ -215,6 +217,7 @@ struct BackupTests {
         _ = try restore(url, into: newPhone)
         let restored = try #require(try newPhone.context.fetch(FetchDescriptor<MovieAudioTrack>()).first)
         #expect(restored.kind == .voiceover && restored.name == nil && restored.gain == 0.4 && restored.startOffset == 0)
+        #expect(restored.recordedOver == shown)
         #expect(newPhone.store.fileExists(restored.relativePath))
         #expect(records(newPhone) == records(phone))
     }

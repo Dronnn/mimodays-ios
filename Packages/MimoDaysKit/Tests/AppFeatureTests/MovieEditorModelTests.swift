@@ -275,7 +275,11 @@ struct MovieEditorModelTests {
         #expect(track.relativePath.hasPrefix(MediaStore.Area.originals.rawValue))
         #expect(store.fileExists(track.relativePath) && !FileManager.default.fileExists(atPath: recorded.path()), "moved in")
         // The movie plays it, as it is: no fades over the first and last words.
-        #expect(model.plan.music == MoviePlan.Music(url: try store.url(for: track.relativePath), gain: MovieEditorModel.voiceoverGain, fades: false))
+        // It keeps the moments it was recorded over, so a clip that breaks later moves it with its pictures.
+        #expect(Set(model.project.audioTracks.first?.recordedOver ?? []) == Set(ids))
+        #expect(model.plan.music == MoviePlan.Music(
+            url: try store.url(for: track.relativePath), gain: MovieEditorModel.voiceoverGain, fades: false, recordedOver: Set(ids)
+        ))
         // Its level is the person's to set, one Undo step for the drag.
         model.beginLevelChange()
         model.setTrackLevel(0.3)

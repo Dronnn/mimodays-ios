@@ -65,6 +65,8 @@ struct MoviePlan: Sendable, Equatable {
         var fades = true
         /// Seconds into the movie where it starts.
         var start: Double = 0
+        /// A voice: the moments the movie showed when it was recorded.
+        var recordedOver: Set<UUID>?
     }
 
     var clips: [Clip]
@@ -92,7 +94,10 @@ struct MoviePlan: Sendable, Equatable {
         voiceNoteLevel = project.voiceNoteLevel
         music = project.audioTracks.first.flatMap { track in
             (try? store.url(for: track.relativePath)).map {
-                Music(url: $0, gain: track.gain, fades: track.kind == .soundtrack, start: max(track.startOffset, 0))
+                Music(
+                    url: $0, gain: track.gain, fades: track.kind == .soundtrack, start: max(track.startOffset, 0),
+                    recordedOver: track.recordedOver.map(Set.init)
+                )
             }
         }
         let clips: [(Int, Clip)] = MovieStore.liveClips(of: project).compactMap { clip in
@@ -220,9 +225,26 @@ extension MoviePlan {
     /// Doc 01 §16: a moment whose picture can't be read any more (a damaged file) is left out of the export, as a
     /// deleted one is, rather than stopping it or showing an empty frame (Andrew, 2026-11-16).
     func leavingOutUnreadable() async -> MoviePlan {
-        let unreadable = await unreadableMoments()
+        leavingOut(await unreadableMoments())
+    }
+
+    /// The plan without the clips of `unreadable` moments. A voice recorded over the movie keeps to its pictures: a
+    /// clip it was recorded over that broke since takes its time before the voice out from under it. One that was
+    /// unreadable already wasn't on the voice's timeline.
+    func leavingOut(_ unreadable: Set<UUID>) -> MoviePlan {
         var plan = self
         plan.clips.removeAll { !$0.isCard && unreadable.contains($0.momentID) }
+        guard var music, let recordedOver = music.recordedOver else { return plan }
+        var at = 0.0
+        var shift = 0.0
+        for clip in clips where at < music.start {
+            let broken = !clip.isCard && unreadable.contains(clip.momentID)
+            if broken, !recordedOver.contains(clip.momentID) { continue }
+            if broken { shift += min(clip.duration, music.start - at) }
+            at += clip.duration
+        }
+        music.start -= shift
+        plan.music = music
         return plan
     }
 

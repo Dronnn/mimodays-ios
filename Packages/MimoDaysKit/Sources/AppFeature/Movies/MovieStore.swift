@@ -126,6 +126,7 @@ struct MovieStore {
             let new = MovieAudioTrack(kind: track.kind, relativePath: track.relativePath, startOffset: track.startOffset, gain: track.gain)
             new.gainEnvelope = track.gainEnvelope
             new.name = track.name
+            new.recordedOver = track.recordedOver
             new.project = copy
             context.insert(new)
         }

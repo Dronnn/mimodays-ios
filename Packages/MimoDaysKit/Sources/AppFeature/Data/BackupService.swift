@@ -343,6 +343,7 @@ struct BackupService {
                 let new = MovieAudioTrack(id: track.id, kind: AudioTrackKind(rawValue: track.kind) ?? .soundtrack, relativePath: path, startOffset: track.startOffset, gain: track.gain)
                 new.name = track.name
                 new.gainEnvelope = track.gainEnvelope
+                new.recordedOver = track.recordedOver
                 new.project = project
                 context.insert(new)
             }

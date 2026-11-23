@@ -477,6 +477,9 @@ public enum SchemaV2: VersionedSchema {
         public var startOffset: Double
         public var gain: Double
         public var gainEnvelope: [GainPoint]
+        /// A voice: the moments the movie showed when it was recorded over it, so a clip that breaks later takes its
+        /// time out from under the voice too. Nil for music and for voices from before 1.0.7.
+        public var recordedOver: [UUID]?
         public var project: MovieProject?
 
         public init(id: UUID = UUID(), kind: AudioTrackKind, relativePath: String, startOffset: Double = 0, gain: Double = 1) {

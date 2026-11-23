@@ -265,7 +265,8 @@ struct MovieTimeline: View {
     /// song's fade in and out drawn.
     private func musicLane(_ widths: [CGFloat]) -> some View {
         let total = widths.reduce(0, +) + Self.spacing * CGFloat(max(widths.count - 1, 0))
-        let voice = model.track?.kind == .voiceover ? model.track?.startOffset : nil
+        // Where the movie plays it: a clip that broke since it was recorded moves it with its pictures.
+        let voice = model.track?.kind == .voiceover ? model.plan.music?.start : nil
         let start = voice.map { x(at: $0, widths) } ?? 0
         let end = voice.flatMap { offset in voiceLength.map { x(at: offset + $0, widths) } } ?? total
         return lane {

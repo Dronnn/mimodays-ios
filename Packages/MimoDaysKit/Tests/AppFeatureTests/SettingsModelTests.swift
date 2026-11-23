@@ -35,6 +35,25 @@ struct SettingsModelTests {
         return (SettingsModel(library: library, surprises: surprises, permissions: permissions), surprises)
     }
 
+    /// rev-app 16: the storage size is walked off the main thread and comes to the same as Storage's own count.
+    @Test func theStorageSizeIsMeasuredOffTheMainThreadToTheSameTotal() async throws {
+        let moment = Moment(captured: CaptureTime(instant: .now, timeZoneID: "UTC"), origin: .manual, mediaType: .photo, createdAt: .now)
+        container.mainContext.insert(moment)
+        moment.media = [MomentMedia(
+            role: .rearSource, relativePath: "a.jpg", uniformType: "public.jpeg", pixelWidth: 4, pixelHeight: 3, checksum: "x", byteCount: 5000
+        )]
+        try container.mainContext.save()
+        let empty = FileManager.default.temporaryDirectory.appending(path: "SettingsTmp-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: empty, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: empty) }
+        let total = await StorageModel.total(in: container, store: store, temporaryDirectory: empty)
+        #expect(total == StorageModel(library: library, temporaryDirectory: empty).usage.total)
+        #expect(total >= 5000)
+        let model = model()
+        await model.load()
+        #expect((model.storageBytes ?? 0) >= 5000)
+    }
+
     /// KK01/KK02: off by default; on, it starts at 8:00 PM when that fits the hours, else at their latest time.
     @Test func theFallbackReminderStartsAtEightOrTheLatestTime() async {
         let suite = "SettingsFallback-\(UUID().uuidString)"

@@ -41,13 +41,39 @@ final class StorageModel {
     }
 
     func load() {
-        let moments = (try? library.context.fetch(FetchDescriptor<Moment>())) ?? []
+        let measured = Self.measure(library.context, store: library.store, temporaryDirectory: temporaryDirectory)
+        usage = measured.usage
+        deletedCount = measured.deletedCount
+        deletedBytes = measured.deletedBytes
+        let backups = (try? library.context.fetch(FetchDescriptor<BackupManifest>(predicate: #Predicate { $0.restoredAt == nil }))) ?? []
+        lastBackup = backups.map(\.createdAt).max()
+        let candidates = (try? ShrinkPolicy.candidates(.olderThan30Days, size: .balanced, in: library.context)) ?? []
+        shrinkFrees = candidates.reduce(Int64(0)) { $0 + $1.bytes - $1.estimatedBytes(at: .balanced) }
+    }
+
+    /// rev-app 16: what everything takes, measured off the main thread with a context of its own; Settings shows the
+    /// total when it's ready.
+    nonisolated static func total(in container: ModelContainer, store: MediaStore, temporaryDirectory: URL) async -> Int64 {
+        await Task.detached(priority: .utility) {
+            measure(ModelContext(container), store: store, temporaryDirectory: temporaryDirectory).usage.total
+        }.value
+    }
+
+    /// Walks the records and the files they point at: on whatever thread owns `context`.
+    nonisolated private static func measure(
+        _ context: ModelContext, store: MediaStore, temporaryDirectory: URL
+    ) -> (usage: Usage, deletedCount: Int, deletedBytes: Int64) {
+        let size = { (relativePath: String) -> Int64 in
+            guard let url = try? store.url(for: relativePath) else { return 0 }
+            return Int64((try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
+        }
+        let moments = (try? context.fetch(FetchDescriptor<Moment>())) ?? []
         var usage = Usage()
         var deletedBytes: Int64 = 0
         var deletedCount = 0
         for moment in moments {
             let media = moment.media.reduce(Int64(0)) { $0 + $1.byteCount }
-            let voice = moment.voiceNotes.reduce(Int64(0)) { $0 + size(of: $1.relativePath) }
+            let voice = moment.voiceNotes.reduce(Int64(0)) { $0 + size($1.relativePath) }
             if moment.deletedAt == nil {
                 usage.moments += media
                 usage.voiceNotes += voice
@@ -57,31 +83,26 @@ final class StorageModel {
             }
         }
         usage.recentlyDeleted = deletedBytes
-        let projects = (try? library.context.fetch(FetchDescriptor<MovieProject>())) ?? []
-        usage.movies = projects.reduce(Int64(0)) { sum, project in sum + (project.render.map { size(of: $0.relativePath) } ?? 0) }
+        let projects = (try? context.fetch(FetchDescriptor<MovieProject>())) ?? []
+        usage.movies = projects.reduce(Int64(0)) { sum, project in sum + (project.render.map { size($0.relativePath) } ?? 0) }
         // A track shared by two projects is one file.
-        usage.soundtracks = Set(projects.flatMap { $0.audioTracks.map(\.relativePath) }).reduce(Int64(0)) { $0 + size(of: $1) }
-        usage.temporary = ((try? library.store.usage()[.cache]) ?? 0) + temporaryFiles().reduce(Int64(0)) { $0 + Self.allocated($1) }
-        self.usage = usage
-        self.deletedCount = deletedCount
-        self.deletedBytes = deletedBytes
-        let backups = (try? library.context.fetch(FetchDescriptor<BackupManifest>(predicate: #Predicate { $0.restoredAt == nil }))) ?? []
-        lastBackup = backups.map(\.createdAt).max()
-        let candidates = (try? ShrinkPolicy.candidates(.olderThan30Days, size: .balanced, in: library.context)) ?? []
-        shrinkFrees = candidates.reduce(Int64(0)) { $0 + $1.bytes - $1.estimatedBytes(at: .balanced) }
+        usage.soundtracks = Set(projects.flatMap { $0.audioTracks.map(\.relativePath) }).reduce(Int64(0)) { $0 + size($1) }
+        let temporary = temporaryFiles(store: store, in: temporaryDirectory)
+        usage.temporary = ((try? store.usage()[.cache]) ?? 0) + temporary.reduce(Int64(0)) { $0 + allocated($1) }
+        return (usage, deletedCount, deletedBytes)
     }
 
     /// Clear temporary files: the cache and the temporary folder. Never originals, previews or movies.
     func clearTemporary() {
         try? library.store.clearCache()
-        for url in temporaryFiles() { try? FileManager.default.removeItem(at: url) }
+        for url in Self.temporaryFiles(store: library.store, in: temporaryDirectory) { try? FileManager.default.removeItem(at: url) }
         Task { [thumbnails = library.thumbnails] in await thumbnails.removeAll() }
         load()
     }
 
     /// The temporary folder's items, leaving out the media store when it lives there (UI tests).
-    private func temporaryFiles() -> [URL] {
-        let root = library.store.root.standardizedFileURL.path
+    nonisolated private static func temporaryFiles(store: MediaStore, in temporaryDirectory: URL) -> [URL] {
+        let root = store.root.standardizedFileURL.path
         let items = (try? FileManager.default.contentsOfDirectory(at: temporaryDirectory, includingPropertiesForKeys: nil)) ?? []
         return items.filter { item in
             let path = item.standardizedFileURL.path
@@ -89,13 +110,8 @@ final class StorageModel {
         }
     }
 
-    private func size(of relativePath: String) -> Int64 {
-        guard let url = try? library.store.url(for: relativePath) else { return 0 }
-        return Int64((try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
-    }
-
     /// A file's size, or everything inside a folder.
-    private static func allocated(_ url: URL) -> Int64 {
+    nonisolated private static func allocated(_ url: URL) -> Int64 {
         let keys: Set<URLResourceKey> = [.isRegularFileKey, .fileSizeKey]
         if let values = try? url.resourceValues(forKeys: keys), values.isRegularFile == true { return Int64(values.fileSize ?? 0) }
         guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: Array(keys)) else { return 0 }

@@ -69,9 +69,12 @@ final class SettingsModel {
         let backups = (try? context.fetch(FetchDescriptor<BackupManifest>(predicate: #Predicate { $0.restoredAt == nil }))) ?? []
         lastBackup = backups.map(\.createdAt).max()
         isLoading = false
-        // Its initializer measures once.
-        storageBytes = StorageModel(library: library).usage.total
+        // rev-app 16: measured off the main thread, while the notification status is read.
+        let container = context.container
+        let store = library.store
+        async let storage = StorageModel.total(in: container, store: store, temporaryDirectory: FileManager.default.temporaryDirectory)
         notifications = await permissions.status(of: .notifications)
+        storageBytes = await storage
     }
 
     /// "Surprise me": turning it on asks for notifications the first time, through `request` (the view's explainer).

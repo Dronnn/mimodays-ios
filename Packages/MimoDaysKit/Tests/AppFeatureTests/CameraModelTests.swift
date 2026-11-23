@@ -519,6 +519,59 @@ struct CameraZoomFocusTests {
         #expect(ZoomLabel.text(zoom.shown).hasPrefix("1"))
     }
 
+    /// An iPhone 16 Pro beside the selfie: the 0.5x/1x pair, and 5x only as the telephoto's own camera, chosen in the
+    /// ••• sheet; the label stays within the camera running (Andrew, 2026-11-23).
+    @Test func theSheetChoosesALensThePairLacks() async throws {
+        let engine = PairAndTelephotoEngine()
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(), isSurprise: false,
+            microphoneStatus: { .denied }, onCapture: { _ in }
+        )
+        await model.start()
+        #expect(model.lenses == [.ultraWide, .wide, .telephoto])
+        #expect(model.mainZoom?.shown == 1)
+        model.nextZoomStop()
+        #expect(model.mainZoom?.shown == 0.5)
+        #expect(model.settings.backLens == .ultraWide)
+        model.chooseBackLens(.telephoto)
+        for _ in 0..<50 where model.mainZoom?.shown != 5 { try await Task.sleep(for: .milliseconds(10)) }
+        #expect(model.mainZoom?.shown == 5)
+        model.nextZoomStop()
+        #expect(model.settings.backLens == .telephoto)
+    }
+
+    /// The 0.5x/1x virtual pair, with the telephoto run on its own when chosen.
+    private actor PairAndTelephotoEngine: CaptureEngine {
+        private let base = SimulatedCaptureEngine()
+        private var lens = BackLens.wide
+        private var factor = 2.0
+
+        func backLenses() async -> [BackLens] { [.ultraWide, .wide, .telephoto] }
+        func setBackLens(_ lens: BackLens) async throws {
+            self.lens = lens
+            factor = lens == .wide ? 2 : 1
+        }
+        func zoom(on position: CameraPosition) async -> CameraZoom? {
+            guard position == .back else { return nil }
+            if lens == .telephoto { return CameraZoom(stops: [1], minFactor: 1, maxFactor: 2, shownMultiplier: 5, factor: factor) }
+            return CameraZoom(stops: [1, 2], lenses: [.ultraWide, .wide], minFactor: 1, maxFactor: 20, shownMultiplier: 0.5, factor: factor)
+        }
+        func setZoom(_ factor: Double, on _: CameraPosition, smoothly _: Bool) async { self.factor = factor }
+        func setVideoSize(_ size: VideoSize) {}
+        func start() async throws -> CameraSetup { _ = try await base.start(); return .single(.back) }
+        func stop() async {}
+        func flip() async throws -> CameraSetup { try await base.flip() }
+        func setMicrophone(_ enabled: Bool) async throws {}
+        func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto { try await base.capturePhoto(flash: flash, silent: silent) }
+        func record(limit: Duration?) async throws -> CapturedVideo { try await base.record(limit: limit) }
+        func stopRecording() async {}
+        func setTorch(_ mode: FlashMode) async {}
+        func setCaptureHold(_ hold: DeviceHold) async {}
+        @MainActor func previewLayer(for _: CameraPosition) -> CALayer? { nil }
+        @MainActor func setPreviewHold(_: DeviceHold) {}
+        nonisolated var events: AsyncStream<CaptureEvent> { base.events }
+    }
+
     @Test func theLabelStepsThroughTheLensesAndRoundAgain() async throws {
         let (model, engine) = await camera()
         model.nextZoomStop()

@@ -255,9 +255,11 @@ extension PhotosPickerItem: PhotoPickerItemLoading {
     /// A Live Photo comes as its still and motion (P8.6): the picker's bundle, else its resources; if neither loads,
     /// the still alone, marked so E05 asks before importing it without motion.
     func loadFile() async throws -> PickedFile? {
+        // Photos' picker lists only the still's types for a Live Photo, yet hands over its bundle: every photo is asked.
+        let isVideo = supportedContentTypes.contains { $0.conforms(to: .movie) }
+        if !isVideo, let bundle = try? await loadTransferable(type: LivePhotoBundleFile.self) { return bundle.file }
         let isLive = supportedContentTypes.contains { $0.conforms(to: .livePhotoBundle) || $0.conforms(to: .livePhoto) }
         guard isLive else { return try await loadTransferable(type: PickedFile.self) }
-        if let bundle = try? await loadTransferable(type: LivePhotoBundleFile.self) { return bundle.file }
         if let livePhoto = try? await loadTransferable(type: PHLivePhoto.self), let file = try? await LivePhotoFiles.write(livePhoto) { return file }
         var still = try await loadTransferable(type: PickedFile.self)
         still?.isLivePhoto = true

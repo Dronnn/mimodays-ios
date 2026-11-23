@@ -264,11 +264,15 @@ extension PhotosPickerItem: PhotoPickerItemLoading {
         // Photos' picker lists only the still's types for a Live Photo, yet hands over its bundle: every photo is asked.
         let isVideo = supportedContentTypes.contains { $0.conforms(to: .movie) }
         if !isVideo, let bundle = try? await loadTransferable(type: LivePhotoBundleFile.self) { return bundle.file }
-        let isLive = supportedContentTypes.contains { $0.conforms(to: .livePhotoBundle) || $0.conforms(to: .livePhoto) }
-        guard isLive else { return try await loadTransferable(type: PickedFile.self) }
-        if let livePhoto = try? await loadTransferable(type: PHLivePhoto.self), let file = try? await LivePhotoFiles.write(livePhoto) { return file }
+        var isLive = supportedContentTypes.contains { $0.conforms(to: .livePhotoBundle) || $0.conforms(to: .livePhoto) }
+        if !isVideo, let livePhoto = try? await loadTransferable(type: PHLivePhoto.self),
+           PHAssetResource.assetResources(for: livePhoto).contains(where: { $0.type == .pairedVideo }) {
+            if let file = try? await LivePhotoFiles.write(livePhoto) { return file }
+            isLive = true
+        }
+        // The still alone; a Live Photo's is marked so E05 asks before importing it without motion.
         var still = try await loadTransferable(type: PickedFile.self)
-        still?.isLivePhoto = true
+        if isLive { still?.isLivePhoto = true }
         return still
     }
 }

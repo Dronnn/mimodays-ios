@@ -944,7 +944,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             guard let device = self.cameras[position]?.input.device else { return nil }
             let multiplier = self.shownMultiplier(device)
             let minFactor = Double(device.minAvailableVideoZoomFactor)
-            let maxFactor = max(minFactor, min(Double(device.maxAvailableVideoZoomFactor), CameraZoom.maxShown / max(multiplier, 0.01)))
+            let maxFactor = max(minFactor, min(Double(device.maxAvailableVideoZoomFactor), CameraZoom.maxShown(multiplier: multiplier) / max(multiplier, 0.01)))
             // Each stop keeps its lens when the ones out of reach go.
             let lenses: [BackLens?] = device.isVirtualDevice ? Self.lenses(of: device) : []
             let stops = Self.stops(of: device).enumerated()
@@ -997,7 +997,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
 
     private func zoom(_ device: AVCaptureDevice, to factor: Double, smoothly: Bool) {
         let minFactor = device.minAvailableVideoZoomFactor
-        let maxFactor = max(minFactor, min(device.maxAvailableVideoZoomFactor, CGFloat(CameraZoom.maxShown / max(shownMultiplier(device), 0.01))))
+        let multiplier = shownMultiplier(device)
+        let maxFactor = max(minFactor, min(device.maxAvailableVideoZoomFactor, CGFloat(CameraZoom.maxShown(multiplier: multiplier) / max(multiplier, 0.01))))
         let clamped = min(max(CGFloat(factor), minFactor), maxFactor)
         guard (try? device.lockForConfiguration()) != nil else { return }
         defer { device.unlockForConfiguration() }

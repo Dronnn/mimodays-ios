@@ -218,6 +218,10 @@ public struct CameraZoom: Equatable, Sendable {
     /// Never past what people are told the camera reaches.
     public static let maxShown: Double = 10
 
+    /// How far a camera goes, as people read it: 10×, or for a longer lens five times its own (5× to 25×), as the Camera
+    /// app does (Andrew, 2026-11-23).
+    public static func maxShown(multiplier: Double) -> Double { max(maxShown, multiplier * 5) }
+
     public func clamped(_ factor: Double) -> Double { min(max(factor, minFactor), maxFactor) }
 
     public var shown: Double { factor * shownMultiplier }

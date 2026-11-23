@@ -237,3 +237,13 @@ struct CaptureInterruptionTests {
         #expect(await events.next() == .resumed)
     }
 }
+
+struct CameraZoomReachTests {
+    /// The 0.5x/1x pair and a 1x lens go to 10×; a 5× telephoto alone to 25×, a 3× one to 15×, as the Camera app.
+    @Test func aLongerLensZoomsToFiveTimesItsOwn() {
+        #expect(CameraZoom.maxShown(multiplier: 0.5) == 10)
+        #expect(CameraZoom.maxShown(multiplier: 1) == 10)
+        #expect(CameraZoom.maxShown(multiplier: 5) == 25)
+        #expect(CameraZoom.maxShown(multiplier: 3) == 15)
+    }
+}

@@ -278,6 +278,8 @@ struct DayView: View {
                 }
             }
             .aspectRatio(370 / 250, contentMode: .fit)
+            // Videos play here as on Memories' other tiles (Andrew, 2026-11-23).
+            .tileMotion(moment.id, isVideo: moment.mediaType == .video, still: model.image(moment.picturePath))
             .clipShape(DayCardBlob())
             .overlay(alignment: .topTrailing) {
                 if let selfie = moment.windowPath {

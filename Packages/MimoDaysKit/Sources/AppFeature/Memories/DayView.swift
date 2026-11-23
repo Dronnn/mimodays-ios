@@ -278,7 +278,8 @@ struct DayView: View {
                 }
             }
             .aspectRatio(370 / 250, contentMode: .fit)
-            // Videos play here as on Memories' other tiles (Andrew, 2026-11-23).
+            // Videos play here as on Memories' other tiles (Andrew, 2026-11-23); held, the card lifts in its own shape.
+            .contentShape(.contextMenuPreview, DayCardBlob())
             .tileMotion(moment.id, isVideo: moment.mediaType == .video, still: model.image(moment.picturePath))
             .clipShape(DayCardBlob())
             .overlay(alignment: .topTrailing) {

@@ -96,6 +96,15 @@ struct SimulatedCaptureEngineTests {
 }
 
 struct AVCaptureEngineTests {
+    /// Sideways the front camera's photos and videos take the other half turn (they came out upside down); upright and the back
+    /// camera stay as they were.
+    @Test func sidewaysTheFrontCameraRecordsTheOtherWayRound() {
+        #expect(AVCaptureEngine.recordingAngle(0, for: .front) == 180)
+        #expect(AVCaptureEngine.recordingAngle(180, for: .front) == 0)
+        #expect(AVCaptureEngine.recordingAngle(90, for: .front) == 90)
+        for angle: CGFloat in [0, 90, 180] { #expect(AVCaptureEngine.recordingAngle(angle, for: .back) == angle) }
+    }
+
     /// The simulator has no cameras: starting reports it instead of crashing.
     @Test @MainActor func startWithoutCamerasFails() async {
         let engine = AVCaptureEngine()

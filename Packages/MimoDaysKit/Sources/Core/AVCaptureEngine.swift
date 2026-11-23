@@ -369,6 +369,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
     }
 
+    /// What a photo or movie connection of the camera at `position` is turned by for the hold's `angle`. The front
+    /// camera's captures are mirrored before they're turned, so sideways they take the other half turn: with the back
+    /// camera's angle its photos and videos came out upside down (Andrew's device, 2026-11-23). Upright both are 90.
+    static func recordingAngle(_ angle: CGFloat, for position: CameraPosition) -> CGFloat {
+        guard position == .front, angle == 0 || angle == 180 else { return angle }
+        return 180 - angle
+    }
+
     @MainActor
     public func setPreviewHold(_ hold: DeviceHold) {
         let angle = Self.rotationAngle(hold)
@@ -387,7 +395,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         let angle = Self.rotationAngle(hold)
         captureAngle.withLock { $0 = angle }
         try? await onQueue {
-            for camera in self.cameras.values {
+            for (position, camera) in self.cameras {
+                let angle = Self.recordingAngle(angle, for: position)
                 for connection in [camera.photo.connection(with: .video), camera.movie.connection(with: .video)].compactMap(\.self)
                 where connection.isVideoRotationAngleSupported(angle) {
                     connection.videoRotationAngle = angle
@@ -778,7 +787,11 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         func rotate(_ angle: CGFloat) {
             if connection.isVideoRotationAngleSupported(angle) { connection.videoRotationAngle = angle }
         }
-        if connection.videoPreviewLayer == nil { captureAngle.withLock { rotate($0) } } else { previewAngle.withLock { rotate($0) } }
+        if connection.videoPreviewLayer == nil {
+            captureAngle.withLock { rotate(Self.recordingAngle($0, for: position)) }
+        } else {
+            previewAngle.withLock { rotate($0) }
+        }
         if position == .front, connection.isVideoMirroringSupported {
             connection.automaticallyAdjustsVideoMirroring = false
             connection.isVideoMirrored = true

@@ -165,7 +165,7 @@ struct CameraSnapshotTests {
         assertScreenSnapshots(of: screen(model), variants: [SnapshotVariant(.iPhone, .light), SnapshotVariant(.iPhone, .light, rightToLeft: true)] + SnapshotVariant.languages)
     }
 
-    /// P1.6: a long press on the picture: the hand-cut mark with AE/AF Lock above it.
+    /// P1.6: a long press on the picture: the hand-cut mark with Focus & light locked above it.
     @Test func focusLocked() async {
         let model = await camera()
         await model.focus(at: CGPoint(x: 0.5, y: 0.4), layerPoint: CGPoint(x: 200, y: 330), on: .back, lock: true)

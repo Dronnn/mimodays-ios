@@ -92,12 +92,12 @@ struct FocusMarkView: View {
             }
     }
 
-    /// AE/AF as the Camera app says it; only the half the camera can keep, where it keeps only one.
+    /// In plain words, not the Camera app's AE/AF (Andrew, 2026-11-23); only what the camera can keep.
     private var lockLabel: Text {
         switch (mark.result.focuses, mark.result.exposes) {
-        case (true, true): Text("AE/AF Lock", bundle: .module, comment: "Camera (P1.6): focus and exposure are kept after a long press; as the Camera app says it")
-        case (true, false): Text("AF Lock", bundle: .module, comment: "Camera (P1.6): only focus is kept after a long press")
-        default: Text("AE Lock", bundle: .module, comment: "Camera (P1.6): only exposure is kept after a long press")
+        case (true, true): Text("Focus & light locked", bundle: .module, comment: "Camera (P1.6): focus and exposure are kept after a long press")
+        case (true, false): Text("Focus locked", bundle: .module, comment: "Camera (P1.6): only focus is kept after a long press")
+        default: Text("Light locked", bundle: .module, comment: "Camera (P1.6): only exposure (brightness) is kept after a long press")
         }
     }
 }

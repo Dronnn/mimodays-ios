@@ -524,8 +524,8 @@ private struct ModeSwitch: View {
                         .opacity(mode == value ? 1 : 0)
                 }
             }
-            // Sideways each row spans the column, so the target stays wide where it is short.
-            .frame(minWidth: isVertical ? 124 : nil, minHeight: isVertical ? 24 : Size.minimumTapTarget, alignment: isVertical ? .center : .top)
+            // Sideways each row spans the column (§V18).
+            .frame(minWidth: isVertical ? 124 : nil, minHeight: Size.minimumTapTarget, alignment: isVertical ? .center : .top)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

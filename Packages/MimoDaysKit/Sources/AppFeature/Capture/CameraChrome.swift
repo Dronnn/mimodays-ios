@@ -203,24 +203,29 @@ struct CameraChrome {
                 : box(CGPoint(x: size.width / 2, y: Self.shutterLine), CGSize(width: side, height: side))
         }
 
-        /// PHOTO / VIDEO: above the shutter; sideways one over the other (U04).
+        /// PHOTO / VIDEO: above the shutter; sideways one over the other in 44 pt rows, right on it (§V18).
         var modeSwitch: CGRect {
             sideways
-                ? sidewaysBox(-72, CGSize(width: Self.height, height: 48))
+                ? sidewaysBox(-(42 + 2 + 44), CGSize(width: Self.height, height: 88))
                 : CGRect(x: 0, y: 14, width: size.width, height: 44)
         }
 
         var flip: CGRect {
             let side: CGFloat = 48
-            if sideways { return box(CGPoint(x: line, y: size.height - 50), CGSize(width: side, height: side)) }
+            if sideways { return box(CGPoint(x: bottomRowCenter + bottomRowOffset, y: size.height - 50), CGSize(width: side, height: side)) }
             let x = isRightToLeft ? 60 : size.width - 60
             return box(CGPoint(x: x, y: Self.shutterLine), CGSize(width: side, height: side))
         }
 
-        /// U01: the last capture, across the shutter from the flip button; sideways at the top of the column (U04, U06).
+        /// §V18: sideways the last capture and the flip button share the column's foot, in the order they flank the
+        /// shutter upright, 16 pt towards the preview: the screen's edge is 50 pt from the shutter's centre.
+        private var bottomRowOffset: CGFloat { isRightToLeft ? -32 : 32 }
+        private var bottomRowCenter: CGFloat { line + (turn.hold == .landscapeRight ? 16 : -16) }
+
+        /// U01: the last capture, across the shutter from the flip button; sideways beside it at the column's foot (§V18).
         var lastCapture: CGRect {
             let side: CGFloat = 52
-            if sideways { return box(CGPoint(x: line, y: 50), CGSize(width: side, height: side)) }
+            if sideways { return box(CGPoint(x: bottomRowCenter - bottomRowOffset, y: size.height - 50), CGSize(width: side, height: side)) }
             let x = isRightToLeft ? size.width - 60 : 60
             return box(CGPoint(x: x, y: Self.shutterLine), CGSize(width: side, height: side))
         }

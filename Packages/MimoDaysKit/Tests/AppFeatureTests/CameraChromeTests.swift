@@ -55,6 +55,27 @@ struct CameraChromeTests {
         }
     }
 
+    /// §V18: sideways PHOTO and VIDEO are 44 pt rows on the shutter; the last capture and Flip share the column's foot,
+    /// clear of each other, on the smallest iPhone too.
+    @Test func sidewaysTheModesTakeFullRowsAndTheLastCaptureSitsBesideFlip() {
+        for width in [375.0, 402, 440] {
+            for hold in [DeviceHold.landscapeLeft, .landscapeRight] {
+                for rightToLeft in [false, true] {
+                    let turn = CameraTurn(hold: hold, screen: CGSize(width: width, height: CameraChrome.Bar.height))
+                    let bar = CameraChrome.Bar(turn: turn, isRightToLeft: rightToLeft)
+                    let whole = CGRect(origin: .zero, size: turn.size)
+                    let modes = bar.modeSwitch, shutter = bar.shutter(84), last = bar.lastCapture, flip = bar.flip
+                    let name = "\(width) \(hold) \(rightToLeft)"
+                    #expect(modes.height == 2 * 44 && modes.maxY <= shutter.minY, "\(name)")
+                    #expect(whole.insetBy(dx: 8, dy: 8).contains(last) && whole.insetBy(dx: 8, dy: 8).contains(flip), "\(name)")
+                    #expect(!last.intersects(flip) && last.midY == flip.midY, "\(name)")
+                    #expect(!modes.intersects(last) && shutter.maxY < last.minY, "\(name)")
+                    #expect(rightToLeft ? last.minX > flip.maxX : last.maxX < flip.minX, "\(name)")
+                }
+            }
+        }
+    }
+
     @Test func sidewaysThePickersSitSideBySideAtThePersonsBottom() {
         let sideways = chrome(.landscapeLeft)
         let format = sideways.formatPicker(withDuration: true)

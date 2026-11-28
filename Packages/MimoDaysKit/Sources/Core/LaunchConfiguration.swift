@@ -8,6 +8,8 @@ public struct LaunchConfiguration: Equatable, Sendable {
         case populated
         /// Enough moments this year for a movie.
         case movie
+        /// A year of moments, three a day, for scrolling performance runs (P5.4).
+        case year
     }
 
     /// A surprise notification tap the app simulates at launch (UI tests for flow 02).

@@ -207,6 +207,9 @@ public final class AppDependencies {
         if configuration.isUITesting, configuration.seed == .movie {
             seedMovieMoments()
         }
+        if configuration.isUITesting, configuration.seed == .year {
+            seedYearOfMoments()
+        }
         #if DEBUG
         if configuration.isUITesting, let folder = footage?.folder {
             seedDemoMoments(from: folder)
@@ -236,6 +239,32 @@ public final class AppDependencies {
                 let place = index == dates.count - 1
                     ? ReviewPlace.current(city: "Yerevan", at: GeoPoint(latitude: 40.18111, longitude: 44.51361, horizontalAccuracy: 30)) : nil
                 _ = try? await momentSaver.save(MomentDraft(capture: capture, caption: "", window: window, promptID: nil, place: place))
+            }
+        }
+    }
+
+    /// `-seed year`: three moments a day for the past year, oldest first, so today's latest is the last one saved
+    /// (P5.4). Every fourth has a place, every fifth a caption.
+    private func seedYearOfMoments() {
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let dates = (0..<365).reversed().flatMap { back in
+            [9, 13, 19].compactMap { hour in
+                calendar.date(byAdding: .day, value: -back, to: today).flatMap { calendar.date(bySettingHour: hour, minute: 0, second: 0, of: $0) }
+            }
+        }.filter { $0 < now }
+        let window = SelfieWindowFrame(frame: CGRect(x: 266.7, y: 111.1, width: 112, height: 150), preview: CGSize(width: 402, height: 536))
+        Task {
+            let engine = SimulatedCaptureEngine()
+            _ = await engine.start()
+            for (index, date) in dates.enumerated() {
+                guard let photo = try? await engine.capturePhoto(flash: .off, silent: true) else { continue }
+                let capture = CaptureResult(media: .photo(photo), window: .init(), capturedAt: CaptureTime(instant: date, timeZone: .current))
+                let place = index % 4 == 0
+                    ? ReviewPlace.current(city: "Yerevan", at: GeoPoint(latitude: 40.18111, longitude: 44.51361, horizontalAccuracy: 30)) : nil
+                let caption = index % 5 == 0 ? "Moment \(index)" : ""
+                _ = try? await momentSaver.save(MomentDraft(capture: capture, caption: caption, window: window, promptID: nil, place: place))
             }
         }
     }

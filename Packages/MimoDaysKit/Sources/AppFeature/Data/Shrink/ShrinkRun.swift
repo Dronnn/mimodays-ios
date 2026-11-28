@@ -351,14 +351,16 @@ final class ShrinkRun {
             Self.logger.error("Storing a smaller video failed: \(error.localizedDescription, privacy: .public)")
             return .skipped
         }
-        // Changed while the files went in: leave it.
-        guard files.allSatisfy({ current[$0.mediaID]?.checksum == $0.checksum }) else {
+        // Stopped, deleted or changed while the files went in: leave it, read fresh (rev-codex-data).
+        let now = try? context.fetch(FetchDescriptor<Moment>(predicate: #Predicate { $0.id == id })).first
+        let latest = Dictionary(uniqueKeysWithValues: (now?.media ?? []).map { ($0.id, $0) })
+        guard !Task.isCancelled, let now, files.allSatisfy({ latest[$0.mediaID]?.checksum == $0.checksum }) else {
             for path in stored { try? library.store.remove(path) }
-            return .skipped
+            return Task.isCancelled ? .cancelled : .skipped
         }
         do {
             for file in files {
-                guard let media = current[file.mediaID], let info = infos[file.mediaID], let new = news[file.mediaID] else { continue }
+                guard let media = latest[file.mediaID], let info = infos[file.mediaID], let new = news[file.mediaID] else { continue }
                 replaced.append(media.relativePath)
                 freed += media.byteCount - new.byteCount
                 media.relativePath = new.relativePath
@@ -368,7 +370,7 @@ final class ShrinkRun {
                 media.pixelHeight = info.height
                 media.codec = info.codec
             }
-            moment.modifiedAt = .now
+            now.modifiedAt = .now
             try context.save()
         } catch {
             context.rollback()

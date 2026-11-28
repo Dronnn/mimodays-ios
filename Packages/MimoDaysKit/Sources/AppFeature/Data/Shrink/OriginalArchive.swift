@@ -31,6 +31,7 @@ final class OriginalArchive {
         case folderUnavailable
         case checksumMismatch
         case notFound
+        case notWritten
     }
 
     nonisolated static let subfolder = "MimoDays Originals"
@@ -133,12 +134,13 @@ final class OriginalArchive {
         return "\(stamp) \(selfie ? "selfie" : "main") \(mediaID.uuidString.prefix(8)).mov"
     }
 
-    /// Writes a file's (or a folder's) pending changes to its drive.
-    private nonisolated static func flush(_ url: URL) {
+    /// Writes a file's (or a folder's) pending changes to its drive; false when the drive didn't take them.
+    @discardableResult
+    private nonisolated static func flush(_ url: URL) -> Bool {
         let descriptor = open(url.path, O_RDONLY)
-        guard descriptor >= 0 else { return }
+        guard descriptor >= 0 else { return false }
         defer { close(descriptor) }
-        if fcntl(descriptor, F_FULLFSYNC) == -1 { fsync(descriptor) }
+        return fcntl(descriptor, F_FULLFSYNC) != -1 || fsync(descriptor) == 0
     }
 
     /// Copies `source` into the folder as `name` and reads the copy back: it stays only if its checksum is `checksum`.
@@ -151,7 +153,8 @@ final class OriginalArchive {
         do {
             try FileManager.default.copyItem(at: source, to: partial)
             // On the drive, not only in memory: a drive pulled out after Done keeps the original (rev-data 6).
-            flush(partial)
+            // A copy the drive didn't take stays off it, and the original on the phone.
+            guard flush(partial) else { throw ArchiveError.notWritten }
             guard try MediaStore.sha256(of: partial) == checksum else { throw ArchiveError.checksumMismatch }
             try? FileManager.default.removeItem(at: destination)
             try FileManager.default.moveItem(at: partial, to: destination)

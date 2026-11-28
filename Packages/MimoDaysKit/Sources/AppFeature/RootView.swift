@@ -317,16 +317,8 @@ public struct RootView: View {
     /// In time it's "A little surprise"; too late it's a plain capture, never backdated (doc 01). During onboarding
     /// its camera opens over the page, which comes back when it closes (P2.0).
     private func openSurprise(_ promptID: UUID) {
-        if let onboarding {
-            // A tap iOS kept for the app as it opens waits for the launch's draft, which comes back first.
-            guard resumedLaunch else {
-                heldRoute = .capture(promptID: promptID)
-                return
-            }
-            onboarding.openSurprise(promptID)
-        } else {
-            open(.capture(promptID: promptID))
-        }
+        // `open` holds it for the launch's draft and App Lock, then hands it to onboarding if that's up (rev-surprises 2).
+        open(.capture(promptID: promptID))
     }
 
     /// P8.1: Siri, Shortcuts, the Action button or a control asked for the camera.
@@ -351,6 +343,11 @@ public struct RootView: View {
             return
         }
         if router.capture != nil, case .captureAgain = route { return }
+        // Words being written: a surprise waits for them and opens then only if still in time (rev-surprises 3).
+        if router.writing != nil, case let .capture(promptID?) = route {
+            router.heldSurprise = promptID
+            return
+        }
         // Before the launch's review is back (a tap iOS kept for the app as it opens), it waits for it.
         guard resumedLaunch, !appLock.isLockedOrDue else {
             heldRoute = route

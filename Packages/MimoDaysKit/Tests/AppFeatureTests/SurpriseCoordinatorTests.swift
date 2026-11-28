@@ -620,6 +620,33 @@ struct OnboardingSurprisesTests {
         #expect(prompts.count { $0.notificationRequestID.hasPrefix(SurpriseCoordinator.firstPrefix) } == 1)
     }
 
+    /// A replay (Help › "Show the introduction again") saves the schedule as it's changed; "Maybe later" there plans
+    /// the new one, so the old plan's surprises don't keep coming (rev-surprises 1).
+    @Test func maybeLaterOnAReplayPlansTheChangedSchedule() async {
+        let first = flow(answer: .granted)
+        first.schedule.frequency = .threeADay
+        await first.enableReminders()
+        first.firstMomentSaved(SavedMoment(photo: .placeholder, selfie: nil, capturedAt: .now))
+        let before = await notifications.pending().count
+        let permissions = PresetPermissionService(status: .granted, requestResult: .granted)
+        let surprises = SurpriseCoordinator(
+            context: container.mainContext, notifications: notifications, permissions: permissions,
+            clock: TestDateProvider(), calendar: { DeviceCalendar("Europe/Berlin").calendar },
+            generator: SeededRandomNumberGenerator(seed: 2)
+        )
+        let replay = OnboardingFlow(
+            permissions: permissions, store: SwiftDataOnboardingStore(context: container.mainContext),
+            surprises: OnboardingSurprises(surprises)
+        )
+        replay.restart()
+        replay.finishIntro()
+        replay.schedule.frequency = .onceADay
+        replay.remindLater()
+        for _ in 0..<200 { await Task.yield() }
+        let after = await notifications.pending().count
+        #expect(before == 42 && after == 14, "before \(before), after \(after)")
+    }
+
     /// Denied or "Maybe later": no plan, only the first surprise, shown in the app.
     @Test func deniedOrLaterPlansOnlyTheFirstSurprise() async {
         await flow(answer: .denied).enableReminders()

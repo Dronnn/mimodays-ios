@@ -494,6 +494,14 @@ final class SurpriseCoordinator {
         return fallbackInMemory ?? FallbackReminder()
     }
 
+    /// Delete All: the fallback reminder and a "Remind me later" note go with the other device settings (rev-surprises 4).
+    func resetSettings() {
+        defaults?.removeObject(forKey: Self.fallbackKey)
+        defaults?.removeObject(forKey: Self.retryNoteKey)
+        fallbackInMemory = nil
+        retryNoteInMemory = nil
+    }
+
     /// The last scheduling of the reminders failed: Settings offers Try again (a refresh).
     private(set) var fallbackFailed = false
 

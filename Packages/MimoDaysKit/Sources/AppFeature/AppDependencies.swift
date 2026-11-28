@@ -133,6 +133,7 @@ public final class AppDependencies {
         let memoriesPreferences = self.memoriesPreferences
         let moviePreferences = self.moviePreferences
         let appearancePreferences = self.appearancePreferences
+        let surprises = self.surprises
         eraser = AppEraser(
             context: modelContainer.mainContext, store: momentSaver.store, notifications: notifications, drafts: camera.drafts,
             resetSettings: {
@@ -144,6 +145,7 @@ public final class AppDependencies {
                 cameraSettings.save(CameraSettings())
                 UserDefaults.standard.removeObject(forKey: BackupReminder.key)
                 UserDefaults.standard.removeObject(forKey: MoviesModel.dismissedKey)
+                surprises.resetSettings()
             },
             writing: camera.writing,
             temporaryDirectory: FileManager.default.temporaryDirectory

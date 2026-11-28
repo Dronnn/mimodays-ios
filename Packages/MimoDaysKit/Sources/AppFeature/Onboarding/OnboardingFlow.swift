@@ -162,8 +162,8 @@ final class OnboardingFlow {
         guard !isEnablingReminders else { return }
         if !isCompleted { remindersEnabled = false }
         step = .reminders(.later)
-        // "Maybe later" changes no settings on a replay, so there is nothing to plan then.
-        if !isCompleted { Task { await remindersChosen() } }
+        // On a replay the schedule page saved each change as it was made: the plan follows it (rev-surprises 1).
+        Task { await remindersChosen() }
     }
 
     func finishReminders() {

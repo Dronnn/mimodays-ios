@@ -151,9 +151,10 @@ struct OnboardingFlowTests {
         flow.finishIntro()
         await flow.enableReminders()
         #expect(surprises.chosen == [false])
+        // "Maybe later" plans what the replay changed, still with no first surprise.
         flow.remindLater()
-        await Task.yield()
-        #expect(surprises.chosen == [false])
+        for _ in 0..<50 where surprises.chosen.count < 2 { await Task.yield() }
+        #expect(surprises.chosen == [false, false])
     }
 
     /// P2.0, P2.3: a tap opens the surprise camera over the page; closing it brings the page back.

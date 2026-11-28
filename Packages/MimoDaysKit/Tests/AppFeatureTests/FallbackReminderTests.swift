@@ -53,6 +53,15 @@ struct FallbackReminderTests {
         #expect(await fallbacks().isEmpty)
     }
 
+    /// Delete All starts over: the reminder is off again, as on a new install (rev-surprises 4).
+    @Test func deleteAllTurnsItOff() async {
+        let coordinator = coordinator()
+        await coordinator.setFallback(FallbackReminder(isOn: true, minute: 20 * 60))
+        coordinator.resetSettings()
+        #expect(coordinator.fallback == FallbackReminder())
+        #expect(self.coordinator().fallback == FallbackReminder())
+    }
+
     /// 8:00 PM when the hours allow it, else the latest time inside them.
     @Test func itStartsAtEightOrTheLatestTimeThatFits() {
         #expect(FallbackReminder.defaultMinute(earliest: 8 * 60, latest: 22 * 60) == 20 * 60)

@@ -283,6 +283,22 @@ extension ShrinkRunTests {
         #expect(originals(in: folder).count == 2, "The folder keeps its files")
     }
 
+    /// Another folder picked after a move: the originals moved earlier come back from where they went (rev-data 2).
+    @Test func originalsComeBackFromTheFolderTheyWentTo() async throws {
+        let moment = try await moment()
+        let first = scratch.appending(path: "Drive")
+        let archive = try archive(folder: first)
+        let run = ShrinkRun(library: library, archive: archive, transcoder: CopyingTranscoder(), defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        run.start(.all, size: .compact, moving: true)
+        _ = try await finished(run)
+        let second = scratch.appending(path: "Other drive")
+        try FileManager.default.createDirectory(at: second, withIntermediateDirectories: true)
+        try archive.setFolder(second)
+        #expect(await run.bringBack(moment.id) == .done)
+        #expect(archive.entries.isEmpty)
+        #expect(OriginalArchive.manifest(in: first).allSatisfy { $0.folderBookmark == nil }, "The folder's list keeps no bookmarks")
+    }
+
     /// On another iPhone after a restore: nothing in the app's list, the folder's own list finds them.
     @Test func originalsComeBackFromTheFolderAlone() async throws {
         let moment = try await moment()

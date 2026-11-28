@@ -389,7 +389,12 @@ final class ShrinkRun {
             guard let current = media.first(where: { $0.id == entry.mediaID }) else { return .notFound }
             do {
                 try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
-                let copy = try await detachedWork { try OriginalArchive.fetch(entry, from: folder, into: work) }
+                // Moved before another folder was picked: from the folder it went to (rev-data 2).
+                let source = archive.folder(of: entry, otherThan: folder)
+                let scopedSource = source?.startAccessingSecurityScopedResource() ?? false
+                defer { if scopedSource { source?.stopAccessingSecurityScopedResource() } }
+                let from = source ?? folder
+                let copy = try await detachedWork { try OriginalArchive.fetch(entry, from: from, into: work) }
                 files.append((entry.mediaID, current.checksum, copy))
             } catch {
                 Self.logger.error("Bringing an original back failed: \(error.localizedDescription, privacy: .public)")

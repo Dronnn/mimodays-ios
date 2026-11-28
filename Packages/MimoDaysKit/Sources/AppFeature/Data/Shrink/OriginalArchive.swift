@@ -15,6 +15,9 @@ struct MovedOriginal: Codable, Equatable, Sendable {
     var pixelHeight: Int
     var codec: String?
     var movedAt: Date
+    /// The folder it went to, for when another folder is picked later (rev-data 2). Only in the app's own list: on
+    /// another iPhone the folder's list is read from the folder it is in.
+    var folderBookmark: Data?
 }
 
 /// P3.6 (Penpot §V3 X06/X07): the folder the person picked and what was moved there. The list is kept in the app and
@@ -69,6 +72,15 @@ final class OriginalArchive {
         try save()
     }
 
+    /// The folder `entry` went to, when it isn't the one picked now and can still be found.
+    func folder(of entry: MovedOriginal, otherThan current: URL) -> URL? {
+        guard let data = entry.folderBookmark else { return nil }
+        var stale = false
+        guard let url = try? URL(resolvingBookmarkData: data, options: [], relativeTo: nil, bookmarkDataIsStale: &stale),
+              url.standardizedFileURL != current.standardizedFileURL else { return nil }
+        return url
+    }
+
     /// The picked folder; throws when there is none or its bookmark no longer resolves (a drive unplugged, the folder
     /// gone). The caller wraps its work in the folder's security scope.
     func folder() throws -> URL {
@@ -87,7 +99,11 @@ final class OriginalArchive {
     /// After a moment's streams were swapped for their Compact copies.
     func record(_ moved: [MovedOriginal], in folder: URL) async throws {
         entries.removeAll { entry in moved.contains { $0.mediaID == entry.mediaID } }
-        entries.append(contentsOf: moved)
+        entries.append(contentsOf: moved.map { entry in
+            var entry = entry
+            entry.folderBookmark = entry.folderBookmark ?? bookmark
+            return entry
+        })
         try save()
         // The folder may be a slow drive or a cloud: read and written off the main actor (rev-data 3).
         let listed = entries
@@ -170,6 +186,11 @@ final class OriginalArchive {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .iso8601
-        try encoder.encode((theirs + entries).sorted { $0.fileName < $1.fileName }).write(to: target.appending(path: manifestName), options: .atomic)
+        let listed = (theirs + entries).map { entry in
+            var entry = entry
+            entry.folderBookmark = nil
+            return entry
+        }
+        try encoder.encode(listed.sorted { $0.fileName < $1.fileName }).write(to: target.appending(path: manifestName), options: .atomic)
     }
 }

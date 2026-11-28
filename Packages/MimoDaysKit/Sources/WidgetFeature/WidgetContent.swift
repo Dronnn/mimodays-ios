@@ -42,14 +42,21 @@ public enum WidgetContent {
     }
 
     /// yyyymmdd for a date in `calendar`'s zone.
+    /// Day keys are Gregorian, as the app's `localDay`, whatever calendar the phone shows (Buddhist, Japanese...).
+    private static func gregorian(_ calendar: Calendar) -> Calendar {
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = calendar.timeZone
+        return gregorian
+    }
+
     public static func dayKey(_ date: Date, calendar: Calendar) -> Int {
-        let parts = calendar.dateComponents([.year, .month, .day], from: date)
+        let parts = gregorian(calendar).dateComponents([.year, .month, .day], from: date)
         return (parts.year ?? 0) * 10_000 + (parts.month ?? 0) * 100 + (parts.day ?? 0)
     }
 
     /// Noon of a yyyymmdd day, for formatting it.
     public static func date(ofDay key: Int, calendar: Calendar) -> Date {
         let parts = DateComponents(year: key / 10_000, month: key / 100 % 100, day: key % 100, hour: 12)
-        return calendar.date(from: parts) ?? Date(timeIntervalSince1970: 0)
+        return gregorian(calendar).date(from: parts) ?? Date(timeIntervalSince1970: 0)
     }
 }

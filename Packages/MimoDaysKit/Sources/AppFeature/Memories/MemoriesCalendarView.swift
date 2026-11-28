@@ -98,7 +98,11 @@ struct MemoriesCalendarView: View {
             if let cover {
                 Color(hex: 0xC9B8AA)
                     .overlay {
-                        if let image = model.images[cover.id] { Image(uiImage: image).filling() }
+                        if cover.mediaType == .text {
+                            PaperTileFace(glyphSize: 12)
+                        } else if let image = model.images[cover.id] {
+                            Image(uiImage: image).filling()
+                        }
                     }
                     .overlay(alignment: .bottom) {
                         LinearGradient(colors: [.clear, ColorToken.mediaScrim.color], startPoint: .top, endPoint: .bottom)

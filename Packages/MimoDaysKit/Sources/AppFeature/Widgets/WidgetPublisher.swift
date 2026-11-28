@@ -49,9 +49,8 @@ struct WidgetPublisher {
         let visibility = MemoryVisibility(context: context)
         let days = (0..<Self.days).compactMap { calendar.date(byAdding: .day, value: $0, to: now) }
             .map { WidgetContent.dayKey($0, calendar: calendar) }
-        let monthDays = Set(days.map { $0 % 10_000 })
-        let thisYear = days[0] / 10_000
-        let keys = monthDays.flatMap { monthDay in (1...100).map { (thisYear - $0) * 10_000 + monthDay } }
+        // Each day's own earlier years: a week across New Year has days of two years.
+        let keys = days.flatMap { day in (1...100).map { (day / 10_000 - $0) * 10_000 + day % 10_000 } }
         let candidates = visibility.visible(fetch(#Predicate { $0.deletedAt == nil && keys.contains($0.localDay) }, limit: nil))
         // The nearest earlier year with moments on the day's month and day, as Today's On this day.
         let onThisDay = days.compactMap { today -> WidgetPayload.Day? in

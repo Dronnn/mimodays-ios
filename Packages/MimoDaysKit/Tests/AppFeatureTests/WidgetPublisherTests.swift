@@ -73,6 +73,25 @@ struct WidgetPublisherTests {
         #expect(next.cover.id == tomorrow.id && next.cover.kind == .text)
     }
 
+    /// A week across New Year: January's days find last year's moments, not only the year before (rev-memories 2).
+    @Test func aWeekAcrossNewYearFindsLastYear() throws {
+        let lastJanuary = try insert((2026, 1, 1))
+        let newYearsEve = calendar.date(from: DateComponents(year: 2026, month: 12, day: 28, hour: 10))!
+        let payload = try publisher().payload(showsPhotos: false, language: "en", now: newYearsEve, calendar: calendar)
+        let january = try #require(payload.onThisDay.first { $0.today == 2027_01_01 })
+        #expect(january.cover.id == lastJanuary.id)
+    }
+
+    /// A phone on the Buddhist calendar: the days are still the archive's Gregorian ones (rev-memories 1).
+    @Test func anotherCalendarKeepsGregorianDays() throws {
+        let cover = try insert((2025, 11, 22))
+        var buddhist = Calendar(identifier: .buddhist)
+        buddhist.timeZone = calendar.timeZone
+        let payload = try publisher().payload(showsPhotos: false, language: "th", now: now, calendar: buddhist)
+        #expect(payload.firstDay == 2026_11_22)
+        #expect(payload.onThisDay.first { $0.today == 2026_11_22 }?.cover.id == cover.id)
+    }
+
     @Test func hiddenAndDeletedMomentsNeverShow() throws {
         let hidden = try insert((2025, 11, 22))
         hidden.isHiddenFromMemories = true

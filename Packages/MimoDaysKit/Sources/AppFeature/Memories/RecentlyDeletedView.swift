@@ -372,17 +372,27 @@ struct DeletedMomentView: View {
     /// Recover came too late: its 30 days were up.
     @State private var expired = false
 
+    /// A written moment shows its paper, as everywhere else.
+    @ViewBuilder
+    private func face(_ item: MemoryItem) -> some View {
+        if item.mediaType == .text {
+            PaperTileFace(glyphSize: 20, isLarge: true)
+        } else if let image = model.images[id] {
+            Image(uiImage: image).filling()
+        }
+    }
+
     var body: some View {
         ScrollView {
             if let item = model.items.first(where: { $0.id == id }) {
                 VStack(spacing: 0) {
                     Color(hex: 0x9C8573)
-                        .overlay { if let image = model.images[id] { Image(uiImage: image).filling() } }
+                        .overlay { face(item.item) }
                         .aspectRatio(386 / 440, contentMode: .fit)
                         .clipShape(ViewerPhotoBlob())
                         .overlay(alignment: .bottomLeading) { DaysLeftBadge(days: model.daysLeft(item)).padding(16) }
                         .accessibilityElement()
-                        .accessibilityLabel(item.item.mediaType == .video ? Text("Video", bundle: .module) : Text("Photo", bundle: .module))
+                        .accessibilityLabel(MemoryTile.kind(item.item.mediaType))
                         .padding(.horizontal, 8)
                         .task { await model.load(item, pixels: MomentViewerModel.photoPixels) }
                     // `Card / Deleted info`: 370x64, the clock centred 14 pt in, lines 18 pt apart.

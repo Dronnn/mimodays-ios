@@ -55,8 +55,15 @@ struct PaperCardFront: View {
         .overlay { MemoryCardOutline().strokeBorder(ColorToken.borderSubtle.color, lineWidth: 3).allowsHitTesting(false) }
         .accessibilityElement(children: .combine)
         .accessibilityAction(named: Text("Read moment", bundle: .module), actions.flip)
-        .accessibilityAction(named: Text("Next moment", bundle: .module)) { actions.step(1) }
-        .accessibilityAction(named: Text("Previous moment", bundle: .module)) { actions.step(-1) }
+        // Only where there is one, as on the photo and video cards.
+        .accessibilityActions {
+            if actions.canStep(1) {
+                Button { actions.step(1) } label: { Text("Next moment", bundle: .module) }
+            }
+            if actions.canStep(-1) {
+                Button { actions.step(-1) } label: { Text("Previous moment", bundle: .module) }
+            }
+        }
         .accessibilityIdentifier("card.readMoment")
     }
 

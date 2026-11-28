@@ -15,7 +15,7 @@ struct WritingDraftStore: Sendable {
             }
             try JSONEncoder().encode(draft).write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
         } catch {
-            Logger(subsystem: "MimoDays", category: "Writing").error("Keeping the written draft failed: \\(String(describing: error), privacy: .public)")
+            Logger(subsystem: "MimoDays", category: "Writing").error("Keeping the written draft failed: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -34,7 +34,7 @@ struct WritingDraftStore: Sendable {
     }
 
     static var temporary: WritingDraftStore {
-        WritingDraftStore(url: FileManager.default.temporaryDirectory.appending(path: "Writing-\\(UUID().uuidString).json"))
+        WritingDraftStore(url: FileManager.default.temporaryDirectory.appending(path: "Writing-\(UUID().uuidString).json"))
     }
 }
 

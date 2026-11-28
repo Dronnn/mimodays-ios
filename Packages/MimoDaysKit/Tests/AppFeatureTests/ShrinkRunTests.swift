@@ -266,6 +266,71 @@ extension ShrinkRunTests {
         #expect(paths(moment) == before && before.allSatisfy(exists))
     }
 
+    /// Holds the first transcode until opened, past a Stop, as a long copy to a slow drive does.
+    @MainActor
+    final class Gate {
+        private var calls = 0
+        private var waiter: CheckedContinuation<Void, Never>?
+        var holding: Bool { waiter != nil }
+        func pass() async {
+            calls += 1
+            guard calls == 1 else { return }
+            await withCheckedContinuation { waiter = $0 }
+        }
+        func open() {
+            waiter?.resume()
+            waiter = nil
+        }
+    }
+
+    /// Stop, then Move again: the stopped run ends before the new one copies, so its cleanup can't take the new run's
+    /// originals out of the folder (rev-data 5).
+    @Test func aStoppedRunLeavesTheNextRunsOriginals() async throws {
+        let moment = try await moment()
+        let before = Dictionary(uniqueKeysWithValues: moment.media.filter { $0.role == .rearSource || $0.role == .frontSource }.map { ($0.id, $0.checksum) })
+        let folder = scratch.appending(path: "Drive")
+        let archive = try archive(folder: folder)
+        let gate = Gate()
+        let held = CopyingTranscoder(before: { await gate.pass() })
+        let run = ShrinkRun(library: library, archive: archive, transcoder: held, defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        run.start(.all, size: .compact, moving: true)
+        for _ in 0..<500 where !gate.holding { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(gate.holding)
+        run.stop()
+        run.start(.all, size: .compact, moving: true)
+        try await Task.sleep(for: .milliseconds(200))
+        gate.open()
+        #expect(try await finished(run).done == 1)
+        // The stopped run's last steps, had it still been going.
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(archive.entries.count == 2)
+        for entry in archive.entries {
+            let url = folder.appending(path: OriginalArchive.subfolder).appending(path: entry.fileName)
+            #expect(try MediaStore.sha256(of: url) == before[entry.mediaID])
+        }
+    }
+
+    /// Listed by a try iOS ended before the swap, then a retry that fails: the original stays on the phone and comes
+    /// off the list, so its card doesn't offer to bring back what isn't in the folder (rev-data 7).
+    @Test func aFailedRetryTakesTheOriginalOffTheList() async throws {
+        let moment = try await moment()
+        let folder = scratch.appending(path: "Drive")
+        let archive = try archive(folder: folder)
+        let listed = moment.media.filter { $0.role == .rearSource || $0.role == .frontSource }.map { media in
+            MovedOriginal(
+                mediaID: media.id, momentID: moment.id, fileName: "\(media.id.uuidString).mov", checksum: media.checksum,
+                byteCount: media.byteCount, pixelWidth: 1, pixelHeight: 1, codec: nil, movedAt: .now
+            )
+        }
+        try await archive.record(listed, in: folder)
+        let failing = CopyingTranscoder(before: { throw TranscodeError.failed })
+        let run = ShrinkRun(library: library, archive: archive, transcoder: failing, defaults: defaults, freeSpace: { nil }, scratch: scratch)
+        run.start(.all, size: .compact, moving: true)
+        #expect(try await finished(run).skipped == 1)
+        #expect(archive.entries.isEmpty && archive.moved(moment.id).isEmpty)
+        #expect(originals(in: folder).isEmpty)
+    }
+
     @Test func originalsComeBack() async throws {
         let moment = try await moment()
         let checksums = Set(moment.media.filter { $0.role == .rearSource || $0.role == .frontSource }.map(\.checksum))

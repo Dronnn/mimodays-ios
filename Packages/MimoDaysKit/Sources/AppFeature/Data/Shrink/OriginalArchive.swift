@@ -133,6 +133,14 @@ final class OriginalArchive {
         return "\(stamp) \(selfie ? "selfie" : "main") \(mediaID.uuidString.prefix(8)).mov"
     }
 
+    /// Writes a file's (or a folder's) pending changes to its drive.
+    private nonisolated static func flush(_ url: URL) {
+        let descriptor = open(url.path, O_RDONLY)
+        guard descriptor >= 0 else { return }
+        defer { close(descriptor) }
+        if fcntl(descriptor, F_FULLFSYNC) == -1 { fsync(descriptor) }
+    }
+
     /// Copies `source` into the folder as `name` and reads the copy back: it stays only if its checksum is `checksum`.
     nonisolated static func put(_ source: URL, as name: String, checksum: String, in folder: URL) throws {
         let target = folder.appending(path: subfolder, directoryHint: .isDirectory)
@@ -142,9 +150,12 @@ final class OriginalArchive {
         try? FileManager.default.removeItem(at: partial)
         do {
             try FileManager.default.copyItem(at: source, to: partial)
+            // On the drive, not only in memory: a drive pulled out after Done keeps the original (rev-data 6).
+            flush(partial)
             guard try MediaStore.sha256(of: partial) == checksum else { throw ArchiveError.checksumMismatch }
             try? FileManager.default.removeItem(at: destination)
             try FileManager.default.moveItem(at: partial, to: destination)
+            flush(target)
         } catch {
             try? FileManager.default.removeItem(at: partial)
             throw error

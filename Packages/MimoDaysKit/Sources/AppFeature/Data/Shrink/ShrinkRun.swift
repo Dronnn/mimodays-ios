@@ -130,9 +130,14 @@ final class ShrinkRun {
     /// X05 "Stop": the moment being made is dropped, those done stay smaller.
     func stop() {
         task?.cancel()
+        stopping = task
         task = nil
         finish(stopped: true)
     }
+
+    /// A stopped run still ending: it may be in a long copy that can't be cut short, and its cleanup removes files by
+    /// name. The next run and Bring back wait for it, so it never removes their files (rev-data 5).
+    private var stopping: Task<Void, Never>?
 
     /// X05 "Done": back to X04.
     func acknowledge() {
@@ -141,7 +146,10 @@ final class ShrinkRun {
 
     private func run() {
         phase = .running
+        let stopped = stopping
+        stopping = nil
         task = Task { [weak self] in
+            await stopped?.value
             guard let self else { return }
             var folder: URL?
             if job?.moving == true {
@@ -228,7 +236,9 @@ final class ShrinkRun {
             // Gone, deleted, or already that small: nothing to do.
             return .done(freed: 0)
         }
-        let needed = candidate.estimatedBytes(at: job.size) + Self.spareBytes
+        var needed = candidate.estimatedBytes(at: job.size) + Self.spareBytes
+        // A folder on the phone itself (On My iPhone, iCloud Drive before upload) holds the original's copy too (rev-data 8).
+        if let folder, Self.sameVolume(folder, library.store.root) { needed += candidate.bytes }
         if let free = freeSpace(), free < needed { return .noSpace }
         let work = scratch.appending(path: "Shrink-\(UUID().uuidString)", directoryHint: .isDirectory)
         defer { try? FileManager.default.removeItem(at: work) }
@@ -249,7 +259,7 @@ final class ShrinkRun {
                         try await detachedWork { try OriginalArchive.put(source, as: entry.fileName, checksum: entry.checksum, in: folder) }
                     } catch {
                         Self.logger.error("Copying an original to the folder failed: \(error.localizedDescription, privacy: .public)")
-                        discard(moved, from: folder)
+                        await discard(moved, of: id, from: folder)
                         // A folder that can't be written to at all stops the run; one bad file skips its moment.
                         return FileManager.default.isWritableFile(atPath: folder.path) ? .skipped : .folderUnavailable
                     }
@@ -260,22 +270,22 @@ final class ShrinkRun {
                 let size = Int64((try? copy.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
                 guard size > 0, size < stream.byteCount, await TranscodeCheck.matches(original: source, copy: copy, size: job.size) else {
                     Self.logger.notice("A smaller copy didn't stand in; the original stays")
-                    discard(moved, from: folder)
+                    await discard(moved, of: id, from: folder)
                     return .skipped
                 }
                 copies.append((stream, copy))
             }
         } catch is CancellationError {
-            discard(moved, from: folder)
+            await discard(moved, of: id, from: folder)
             return .cancelled
         } catch {
-            discard(moved, from: folder)
+            await discard(moved, of: id, from: folder)
             if Task.isCancelled { return .cancelled }
             Self.logger.error("Making a video smaller failed: \(error.localizedDescription, privacy: .public)")
             return .skipped
         }
         guard !Task.isCancelled else {
-            discard(moved, from: folder)
+            await discard(moved, of: id, from: folder)
             return .cancelled
         }
         // The moved originals are listed before their phone copies go: ended in between, the list still finds them
@@ -283,21 +293,30 @@ final class ShrinkRun {
         if let folder, !moved.isEmpty {
             do { try await archive?.record(moved, in: folder) } catch {
                 Self.logger.error("Recording moved originals failed: \(error.localizedDescription, privacy: .public)")
-                discard(moved, from: folder)
+                await discard(moved, of: id, from: folder)
                 return .skipped
             }
         }
         let result = await commit(id, copies.map { ($0.stream.mediaID, $0.stream.checksum, $0.url) })
         if case .done = result {} else if let folder, !moved.isEmpty {
-            try? await archive?.forget(Set(moved.map(\.mediaID)), in: folder)
-            discard(moved, from: folder)
+            await discard(moved, of: id, from: folder)
         }
         return result
     }
 
-    /// A moment whose swap didn't happen keeps its original on the phone: its copy in the folder goes.
-    private func discard(_ moved: [MovedOriginal], from folder: URL?) {
+    private nonisolated static func sameVolume(_ a: URL, _ b: URL) -> Bool {
+        let key = URLResourceKey.volumeIdentifierKey
+        guard let first = try? a.resourceValues(forKeys: [key]).volumeIdentifier,
+              let second = try? b.resourceValues(forKeys: [key]).volumeIdentifier else { return false }
+        return first.isEqual(second)
+    }
+
+    /// A moment whose swap didn't happen keeps its original on the phone: its copy in the folder goes, and off the list
+    /// it may be on from an earlier try that iOS ended (rev-data 7).
+    private func discard(_ moved: [MovedOriginal], of momentID: UUID, from folder: URL?) async {
         guard let folder else { return }
+        let listed = archive?.moved(momentID).map(\.mediaID) ?? []
+        if !listed.isEmpty { try? await archive?.forget(Set(listed), in: folder) }
         for entry in moved { OriginalArchive.remove(entry, from: folder) }
     }
 
@@ -368,6 +387,7 @@ final class ShrinkRun {
     /// of its Compact copies. Looks in the folder's own list too, for originals moved on another iPhone.
     func bringBack(_ momentID: UUID) async -> BringBack {
         guard !isRunning, !busy() else { return .busy }
+        await stopping?.value
         guard let archive, archive.hasFolder else { return .noFolder }
         guard let folder = try? archive.folder() else { return .folderUnavailable }
         let scoped = folder.startAccessingSecurityScopedResource()

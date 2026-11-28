@@ -168,6 +168,55 @@ struct CameraModelInterruptionTests {
         #expect(await engine.microphoneAtStart == false)
     }
 
+    /// Stop tapped before the recording began: whatever the outputs make of it, no "couldn't record" (rev-camera 3).
+    @Test func aStopBeforeTheRecordingBeganSaysNothingFailed() async {
+        let engine = EarlyStopEngine()
+        var settings = CameraSettings()
+        settings.opensIn = .video
+        settings.recordsSound = false
+        let model = CameraModel(
+            engine: engine, store: InMemoryCameraSettingsStore(settings), isSurprise: false,
+            microphoneStatus: { .granted }, onCapture: { _ in }
+        )
+        await model.start()
+        let recording = Task { await model.shutter() }
+        while !(await engine.isWaiting) { await Task.yield() }
+        #expect(model.phase == .recording(startedAt: nil))
+        await model.shutter()
+        await recording.value
+        #expect(model.phase == .ready)
+        #expect(model.failure == nil)
+    }
+
+    /// A recording that never begins: Stop ends it with the outputs' error, as a one-frame take does.
+    private actor EarlyStopEngine: CaptureEngine {
+        private let base = SimulatedCaptureEngine()
+        private var stop: CheckedContinuation<Void, Never>?
+        var isWaiting: Bool { stop != nil }
+
+        func setVideoSize(_ size: VideoSize) {}
+        func start() async throws -> CameraSetup { try await base.start() }
+        func stop() async {}
+        func backLenses() async -> [BackLens] { await base.backLenses() }
+        func setBackLens(_ lens: BackLens) async throws { try await base.setBackLens(lens) }
+        func flip() async throws -> CameraSetup { try await base.flip() }
+        func setMicrophone(_ enabled: Bool) async throws { try await base.setMicrophone(enabled) }
+        func capturePhoto(flash: FlashMode, silent: Bool) async throws -> CapturedPhoto { try await base.capturePhoto(flash: flash, silent: silent) }
+        func record(limit _: Duration?) async throws -> CapturedVideo {
+            await withCheckedContinuation { stop = $0 }
+            throw CaptureError.recordingFailed
+        }
+        func stopRecording() async {
+            stop?.resume()
+            stop = nil
+        }
+        func setTorch(_ mode: FlashMode) async {}
+        func setCaptureHold(_ hold: DeviceHold) async {}
+        @MainActor func previewLayer(for _: CameraPosition) -> CALayer? { nil }
+        @MainActor func setPreviewHold(_: DeviceHold) {}
+        nonisolated var events: AsyncStream<CaptureEvent> { base.events }
+    }
+
     /// Notes whether the microphone was on when the camera started.
     private actor MicrophoneAtStartEngine: CaptureEngine {
         private let base = SimulatedCaptureEngine()

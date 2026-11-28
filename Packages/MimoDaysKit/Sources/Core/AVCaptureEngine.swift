@@ -585,10 +585,19 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         removeAllCameras()
         if !isMultiCam { session.sessionPreset = maxFormatWidth < 1920 ? .hd1280x720 : .high }
         do {
-            let changed = try configureWithinBudget()
+            // The selfie camera alone (flipped where one camera runs at a time) stays the selfie camera.
+            let changed: CameraSetup
+            if setup == .single(.front) {
+                frameRateCap = 30
+                try configure(setup, formatWidth: maxFormatWidth)
+                changed = setup
+            } else {
+                changed = try configureWithinBudget()
+            }
             self.setup = changed
             applyPressure()
-            if changed != setup { eventSink.yield(.setupChanged(changed)) }
+            // Also the same setup: its cameras are new, at their first zoom and with no lock (rev-camera 2).
+            eventSink.yield(.setupChanged(changed))
         } catch {
             // No camera left: no setup, so captures fail instead of waiting for outputs that are gone.
             Self.logger.error("Video size: no camera fits, \(error.localizedDescription, privacy: .public)")

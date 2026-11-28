@@ -368,6 +368,7 @@ final class CameraModel {
         case (.video, .recording):
             // Stop can come while the recording is still starting (torch, microphone): it's kept for it.
             stopsRecording = true
+            if case .recording(startedAt: nil) = phase { stoppedBeforeItBegan = true }
             await engine.stopRecording()
         default: break
         }
@@ -375,6 +376,8 @@ final class CameraModel {
 
     /// Stop was tapped for the recording now starting or running.
     private var stopsRecording = false
+    /// That Stop came before the recording had begun.
+    private var stoppedBeforeItBegan = false
 
     private func takePhoto() async {
         phase = .busy
@@ -403,6 +406,7 @@ final class CameraModel {
         let limit = recordingLength.duration
         phase = .recording(startedAt: nil)
         stopsRecording = false
+        stoppedBeforeItBegan = false
         shutterAt = Date()
         recordingHold = hold
         defer { recordingHold = nil }
@@ -430,7 +434,8 @@ final class CameraModel {
         } catch {
             await setTorch(.off).value
             phase = .ready
-            failure = CaptureFailure(error)
+            // Stopped as it started: too short to keep, and nothing failed that the person didn't ask for (rev-camera 3).
+            if !stoppedBeforeItBegan { failure = CaptureFailure(error) }
         }
     }
 
@@ -623,7 +628,9 @@ final class CameraModel {
                     self.setup = setup
                     setupChanges += 1
                     if setup != .dual { isSwapped = false }
+                    // New cameras hold no lock.
                     focusMark = nil
+                    lockedPositions = []
                     Task {
                         await self.refreshZoom()
                         await self.refreshReducedWidth()

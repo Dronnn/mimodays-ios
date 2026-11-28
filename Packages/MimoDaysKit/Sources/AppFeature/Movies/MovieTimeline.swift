@@ -147,7 +147,12 @@ struct MovieTimeline: View {
         let id = clip.moment?.id
         return Color(hex: 0xC9B8AA)
             .overlay {
-                if let id, let image = model.tiles.images[id] { Image(uiImage: image).filling() }
+                // A written moment: its paper, as on every other tile.
+                if clip.moment?.mediaType == .text {
+                    PaperTileFace(glyphSize: 12)
+                } else if let id, let image = model.tiles.images[id] {
+                    Image(uiImage: image).filling()
+                }
             }
             .onScrollVisibilityChange(threshold: 0.01) { visible in
                 guard visible, let id else { return }

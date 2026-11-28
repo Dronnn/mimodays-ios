@@ -154,8 +154,11 @@ final class MovieExportModel {
         if let continuation, continuation.isAvailable {
             phase = .waiting
             record(.queued)
+            let submission = UUID()
+            self.submission = submission
             let accepted = continuation.submit(title: String(appLocalized: "Exporting a movie", bundle: .module)) { [weak self] task in
-                guard let self else { return task.finish(success: false) }
+                // One cancelled while it waited, then started by iOS after a new one: not this export (rev-movies 2).
+                guard let self, self.submission == submission else { return task.finish(success: false) }
                 runContinued(task)
             }
             if accepted {
@@ -246,7 +249,12 @@ final class MovieExportModel {
         }
     }
 
+    /// The export handed to iOS last; a cancel forgets it.
+    private var submission: UUID?
+
     func cancel() {
+        if continued == nil, runsInBackground { continuation?.cancelWaiting() }
+        submission = nil
         let wasBusy = isBusy
         task?.cancel()
         task = nil

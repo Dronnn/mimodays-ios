@@ -836,7 +836,8 @@ final class MovieEditorModel {
         var clips = MovieStore.liveClips(of: project)
         let cards = Dictionary(project.textCards.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         items = plan.clips.compactMap { planned in
-            if planned.isCard { return cards[planned.momentID].map(Item.card) }
+            if planned.isCard, let card = cards[planned.momentID] { return .card(card) }
+            // A written moment is a paper card in the plan but a clip here, like any other moment (rev-movies 1).
             guard let index = clips.firstIndex(where: { $0.moment?.id == planned.momentID }) else { return nil }
             return .clip(clips.remove(at: index))
         }

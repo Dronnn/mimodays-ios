@@ -632,6 +632,18 @@ struct MovieEditorModelTests {
 
     // MARK: U50-U54
 
+    /// P8.11: a written moment is a paper card in the plan and its own item in the editor, so the items after it stay
+    /// in step with the plan (rev-movies 1).
+    @Test func aWrittenMomentKeepsTheItemsInStep() async throws {
+        let photos = try await save(2)
+        let saver = MomentSaver(context: context, store: store, clock: clock, freeBytes: { nil })
+        let written = try saver.saveText(TextMomentDraft(capturedAt: CaptureTime(instant: clock.now().addingTimeInterval(1800), timeZone: .gmt), body: "Rain all day"))
+        let ids = [photos[0], written.id, photos[1]]
+        let model = try editor(ids)
+        #expect(model.items.count == model.plan.clips.count)
+        #expect(model.items.map { $0.clip?.moment?.id } == model.plan.clips.map(\.momentID))
+    }
+
     @Test func aCardGoesInFirstMovesBetweenClipsAndUndoes() async throws {
         let ids = try await save(2)
         let model = try editor(ids)

@@ -193,6 +193,7 @@ struct MovieExportModelTests {
         var isAvailable = true
         var accepts = true
         private(set) var titles: [String] = []
+        private(set) var cancelledWaiting = 0
         private var waiting: [@MainActor (any ContinuedExportTask) -> Void] = []
 
         func submit(title: String, run: @escaping @MainActor (any ContinuedExportTask) -> Void) -> Bool {
@@ -201,6 +202,8 @@ struct MovieExportModelTests {
             waiting.append(run)
             return true
         }
+
+        func cancelWaiting() { cancelledWaiting += 1 }
 
         /// iOS's turn comes for the oldest waiting export.
         @discardableResult
@@ -275,6 +278,24 @@ struct MovieExportModelTests {
         let task = continuation.runNext()
         #expect(task.result == false && model.phase == .canceled && model.task == nil)
         #expect(project.render == nil)
+    }
+
+    /// Cancelled while it waited, then exported again: the first request, started late by iOS, doesn't take the new
+    /// export over; the new one renders (rev-movies 2).
+    @Test func aCancelledRequestStartedLateLeavesTheNewExport() async throws {
+        let project = try await project(photos: 2)
+        let continuation = FakeContinuation()
+        let model = MovieExportModel(project: project, library: library, clock: clock, freeSpace: { nil }, continuation: continuation)
+        model.start()
+        model.cancel()
+        #expect(continuation.cancelledWaiting == 1)
+        model.start()
+        #expect(model.phase == .waiting)
+        let stale = continuation.runNext()
+        #expect(stale.result == false && model.phase == .waiting)
+        let fresh = continuation.runNext()
+        await model.waitForRender()
+        #expect(fresh.result == true)
     }
 
     /// The system's Cancel (or iOS taking the time back) stops the render; the draft stays and Try again is offered.

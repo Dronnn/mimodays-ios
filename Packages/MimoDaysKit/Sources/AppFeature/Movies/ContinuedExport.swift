@@ -13,6 +13,12 @@ protocol ContinuedExportScheduler: AnyObject {
     /// Hands one export to iOS. False when iOS turns it down: then it runs in the foreground only. `run` comes once
     /// iOS starts it, at once or after another app's work.
     func submit(title: String, run: @escaping @MainActor (any ContinuedExportTask) -> Void) -> Bool
+    /// The export submitted last, cancelled while it still waits for iOS: its request and progress go.
+    func cancelWaiting()
+}
+
+extension ContinuedExportScheduler {
+    func cancelWaiting() {}
 }
 
 /// The running export as iOS sees it.
@@ -37,6 +43,15 @@ final class SystemContinuedExport: ContinuedExportScheduler {
         return permitted.contains("\(Self.prefix).*")
     }
 
+    /// The request submitted last.
+    private var submitted: String?
+
+    func cancelWaiting() {
+        guard let submitted else { return }
+        BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: submitted)
+        self.submitted = nil
+    }
+
     func submit(title: String, run: @escaping @MainActor (any ContinuedExportTask) -> Void) -> Bool {
         let identifier = "\(Self.prefix).\(UUID().uuidString)"
         let registered = BGTaskScheduler.shared.register(forTaskWithIdentifier: identifier, using: .main) { task in
@@ -52,6 +67,7 @@ final class SystemContinuedExport: ContinuedExportScheduler {
         request.strategy = .queue
         do {
             try BGTaskScheduler.shared.submit(request)
+            submitted = identifier
             return true
         } catch {
             return false

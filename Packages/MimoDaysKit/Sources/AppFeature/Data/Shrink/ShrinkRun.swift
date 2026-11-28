@@ -161,7 +161,10 @@ final class ShrinkRun {
                 guard !Task.isCancelled else { return }
                 phase = .running
                 removeLeftovers()
-                switch await shrink(id, folder: folder) {
+                let result = await shrink(id, folder: folder)
+                // Stopped meanwhile: the job may be a new run's already.
+                guard !Task.isCancelled else { return }
+                switch result {
                 case let .done(freed):
                     job?.done += 1
                     job?.freed += freed
@@ -275,12 +278,18 @@ final class ShrinkRun {
             discard(moved, from: folder)
             return .cancelled
         }
-        let result = await commit(id, copies.map { ($0.stream.mediaID, $0.stream.checksum, $0.url) })
-        if case .done = result, let folder, !moved.isEmpty {
-            do { try archive?.record(moved, in: folder) } catch {
+        // The moved originals are listed before their phone copies go: ended in between, the list still finds them
+        // (rev-data 1). One that can't be listed stays on the phone.
+        if let folder, !moved.isEmpty {
+            do { try await archive?.record(moved, in: folder) } catch {
                 Self.logger.error("Recording moved originals failed: \(error.localizedDescription, privacy: .public)")
+                discard(moved, from: folder)
+                return .skipped
             }
-        } else {
+        }
+        let result = await commit(id, copies.map { ($0.stream.mediaID, $0.stream.checksum, $0.url) })
+        if case .done = result {} else if let folder, !moved.isEmpty {
+            try? await archive?.forget(Set(moved.map(\.mediaID)), in: folder)
             discard(moved, from: folder)
         }
         return result
@@ -308,11 +317,29 @@ final class ShrinkRun {
         var stored: [String] = []
         var replaced: [String] = []
         var freed: Int64 = 0
+        // Moved in and hashed off the main actor: a brought-back original can be gigabytes (rev-data 4).
+        var news: [UUID: StoredFile] = [:]
+        let store = library.store
         do {
             for file in files {
-                guard let media = current[file.mediaID], let info = infos[file.mediaID] else { continue }
-                let new = try library.store.store(moving: file.url, in: .originals, fileExtension: "mov")
+                let url = file.url
+                let new = try await detachedWork { try store.store(moving: url, in: .originals, fileExtension: "mov") }
                 stored.append(new.relativePath)
+                news[file.mediaID] = new
+            }
+        } catch {
+            for path in stored { try? library.store.remove(path) }
+            Self.logger.error("Storing a smaller video failed: \(error.localizedDescription, privacy: .public)")
+            return .skipped
+        }
+        // Changed while the files went in: leave it.
+        guard files.allSatisfy({ current[$0.mediaID]?.checksum == $0.checksum }) else {
+            for path in stored { try? library.store.remove(path) }
+            return .skipped
+        }
+        do {
+            for file in files {
+                guard let media = current[file.mediaID], let info = infos[file.mediaID], let new = news[file.mediaID] else { continue }
                 replaced.append(media.relativePath)
                 freed += media.byteCount - new.byteCount
                 media.relativePath = new.relativePath
@@ -370,7 +397,7 @@ final class ShrinkRun {
             }
         }
         guard case .done = await commit(momentID, files) else { return .failed }
-        do { try archive.forget(Set(entries.map(\.mediaID)), in: folder) } catch {
+        do { try await archive.forget(Set(entries.map(\.mediaID)), in: folder) } catch {
             Self.logger.error("Forgetting brought-back originals failed: \(error.localizedDescription, privacy: .public)")
         }
         return .done

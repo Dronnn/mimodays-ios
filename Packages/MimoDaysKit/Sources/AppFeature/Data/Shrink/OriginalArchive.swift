@@ -85,18 +85,21 @@ final class OriginalArchive {
     }
 
     /// After a moment's streams were swapped for their Compact copies.
-    func record(_ moved: [MovedOriginal], in folder: URL) throws {
+    func record(_ moved: [MovedOriginal], in folder: URL) async throws {
         entries.removeAll { entry in moved.contains { $0.mediaID == entry.mediaID } }
         entries.append(contentsOf: moved)
         try save()
-        try Self.writeManifest(entries, in: folder)
+        // The folder may be a slow drive or a cloud: read and written off the main actor (rev-data 3).
+        let listed = entries
+        try await detachedWork { try Self.writeManifest(listed, in: folder) }
     }
 
     /// After a moment's originals came back.
-    func forget(_ mediaIDs: Set<UUID>, in folder: URL?) throws {
+    func forget(_ mediaIDs: Set<UUID>, in folder: URL?) async throws {
         entries.removeAll { mediaIDs.contains($0.mediaID) }
         try save()
-        if let folder { try? Self.writeManifest(entries, in: folder) }
+        let listed = entries
+        if let folder { try? await detachedWork { try Self.writeManifest(listed, in: folder) } }
     }
 
     private func save() throws {

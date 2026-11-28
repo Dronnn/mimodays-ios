@@ -155,7 +155,7 @@ final class RestoreModel {
                     Self.logger.error("Relabelling restored days failed: \(error.localizedDescription, privacy: .public)")
                 }
                 // P3.6: those are on the phone again.
-                if !outcome.broughtBack.isEmpty { try? library.archive?.forget(outcome.broughtBack, in: nil) }
+                if !outcome.broughtBack.isEmpty { try? await library.archive?.forget(outcome.broughtBack, in: nil) }
                 phase = .done(outcome)
             } catch {
                 Self.logger.error("Restoring failed: \(error.localizedDescription, privacy: .public)")

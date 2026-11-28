@@ -62,6 +62,8 @@ final class OnboardingFlow {
     var step: OnboardingStep = .intro { didSet { save() } }
     var page: OnboardingPage = .welcome { didSet { save() } }
     var schedule = ReminderSchedule() { didSet { save() } }
+    /// The schedule as a replay found it.
+    private var scheduleAtReplay: ReminderSchedule?
     /// The camera: the first capture, or a surprise over whatever page is showing (P2.0).
     var capture: CaptureRequest?
 
@@ -162,8 +164,9 @@ final class OnboardingFlow {
         guard !isEnablingReminders else { return }
         if !isCompleted { remindersEnabled = false }
         step = .reminders(.later)
-        // On a replay the schedule page saved each change as it was made: the plan follows it (rev-surprises 1).
-        Task { await remindersChosen() }
+        // On a replay the schedule page saved each change as it was made: a changed schedule is planned again
+        // (rev-surprises 1); an unchanged one keeps its plan, and a surprise due soon with it.
+        if !isCompleted || schedule != scheduleAtReplay { Task { await remindersChosen() } }
     }
 
     func finishReminders() {
@@ -241,6 +244,7 @@ final class OnboardingFlow {
     /// Help › "Show the introduction again": from the first page. A finished onboarding stays finished, so closing
     /// the app on the way doesn't bring it back on the next launch.
     func restart() {
+        scheduleAtReplay = schedule
         firstMoment = nil
         capture = nil
         page = .welcome

@@ -326,6 +326,20 @@ public struct RootView: View {
         if CameraShortcut.take(inBackground: scenePhase == .background) { open(CameraShortcut.route) }
     }
 
+    /// The camera or Write a moment closed: what came meanwhile opens now, unless App Lock came down meanwhile - then
+    /// it waits for the unlock and goes through `open`, which checks a surprise is still in time (rev-codex-surprises 2).
+    private func coverDismissed() {
+        guard appLock.isLockedOrDue else { return router.captureDismissed() }
+        guard router.capture == nil, router.writing == nil else { return }
+        if let surprise = router.heldSurprise {
+            heldRoute = .capture(promptID: surprise)
+        } else if let held = router.held {
+            heldRoute = held
+        }
+        router.heldSurprise = nil
+        router.held = nil
+    }
+
     private func openHeldRoute() {
         // Not before the launch's review is back, which would then close what this opened.
         guard resumedLaunch, let heldRoute else { return }
@@ -350,6 +364,8 @@ public struct RootView: View {
         }
         // Before the launch's review is back (a tap iOS kept for the app as it opens), it waits for it.
         guard resumedLaunch, !appLock.isLockedOrDue else {
+            // A surprise waiting there stays ahead of a plain camera (rev-codex-surprises 3).
+            if case .capture(_?)? = heldRoute, route == CameraShortcut.route { return }
             heldRoute = route
             return
         }
@@ -440,14 +456,14 @@ public struct RootView: View {
         .sheet(isPresented: $router.isSettingsPresented) {
             SettingsScreen(surprises: surprises)
         }
-        .fullScreenCover(item: $router.capture, onDismiss: router.captureDismissed) { request in
+        .fullScreenCover(item: $router.capture, onDismiss: coverDismissed) { request in
             CaptureFlowView(request: request, lastCapture: lastCapture, promptExpiry: request.promptID.flatMap(surprises.expiry)) { saved in
                 if let promptID = saved.promptID { surprises.captured(promptID: promptID, momentID: saved.momentID) }
                 savedKind = saved.thenNow
                 showsSavedToast = true
             }
         }
-        .sheet(item: $router.writing, onDismiss: router.captureDismissed) { request in
+        .sheet(item: $router.writing, onDismiss: coverDismissed) { request in
             WriteMomentView(model: WriteMomentModel(
                 draft: camera.writing.load(), now: CaptureTime(instant: .now, timeZone: .current), drafts: camera.writing, places: camera.places,
                 prompt: request.prompt

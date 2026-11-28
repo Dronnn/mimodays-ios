@@ -151,10 +151,22 @@ struct OnboardingFlowTests {
         flow.finishIntro()
         await flow.enableReminders()
         #expect(surprises.chosen == [false])
-        // "Maybe later" plans what the replay changed, still with no first surprise.
+        // "Maybe later" with the schedule as it was keeps the plan.
         flow.remindLater()
-        for _ in 0..<50 where surprises.chosen.count < 2 { await Task.yield() }
-        #expect(surprises.chosen == [false, false])
+        for _ in 0..<50 { await Task.yield() }
+        #expect(surprises.chosen == [false])
+    }
+
+    /// A replay that changed the schedule plans it on "Maybe later", still with no first surprise (rev-surprises 1).
+    @Test func maybeLaterOnAReplayPlansOnlyAChangedSchedule() async {
+        let surprises = Surprises()
+        let flow = flow(surprises, completed: true)
+        flow.restart()
+        flow.finishIntro()
+        flow.schedule.frequency = flow.schedule.frequency == .threeAWeek ? .threeADay : .threeAWeek
+        flow.remindLater()
+        for _ in 0..<50 where surprises.chosen.isEmpty { await Task.yield() }
+        #expect(surprises.chosen == [false])
     }
 
     /// P2.0, P2.3: a tap opens the surprise camera over the page; closing it brings the page back.

@@ -226,8 +226,6 @@ final class CameraModel {
         if case .recording(startedAt: _?) = phase { true } else { false }
     }
 
-    /// When the shutter started the current recording; for the log of how long the cameras took to begin.
-    private var shutterAt: Date?
     /// The length chosen at the shutter, which the recording, its timer and its ring keep.
     private(set) var recordingLength = CameraSettings.VideoLength.short
 
@@ -407,7 +405,6 @@ final class CameraModel {
         phase = .recording(startedAt: nil)
         stopsRecording = false
         stoppedBeforeItBegan = false
-        shutterAt = Date()
         recordingHold = hold
         defer { recordingHold = nil }
         await engine.setCaptureHold(hold)
@@ -641,9 +638,7 @@ final class CameraModel {
                     interruption = nil
                 case .recordingStarted:
                     guard case let .recording(startedAt) = phase, startedAt == nil else { break }
-                    let now = Date()
-                    if let shutterAt { Self.logger.info("Recording began \(Int(now.timeIntervalSince(shutterAt) * 1000), privacy: .public) ms after the shutter") }
-                    phase = .recording(startedAt: now)
+                    phase = .recording(startedAt: Date())
                 }
             }
         }

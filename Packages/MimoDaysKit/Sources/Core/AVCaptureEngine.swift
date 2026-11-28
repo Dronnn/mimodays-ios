@@ -152,12 +152,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     // MARK: Session
 
     public func start() async throws -> CameraSetup {
-        let asked = CACurrentMediaTime()
-        return try await onQueue {
-            let began = CACurrentMediaTime()
-            defer {
-                Self.logger.info("Start: waited \(Self.ms(began - asked), privacy: .public) ms, took \(Self.ms(CACurrentMediaTime() - began), privacy: .public) ms, running \(self.session.isRunning, privacy: .public), interrupted \(self.session.isInterrupted, privacy: .public)")
-            }
+        try await onQueue {
             self.isActive = true
             self.restartedAfterError = nil
             if let setup = self.setup {
@@ -314,13 +309,7 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     }
 
     public func setMicrophone(_ enabled: Bool) async throws {
-        let asked = CACurrentMediaTime()
         try await onQueue {
-            let began = CACurrentMediaTime()
-            let changes = enabled != (self.microphone != nil)
-            defer {
-                if changes { Self.logger.info("Microphone \(enabled, privacy: .public): waited \(Self.ms(began - asked), privacy: .public) ms, took \(Self.ms(CACurrentMediaTime() - began), privacy: .public) ms, running \(self.session.isRunning, privacy: .public)") }
-            }
             if !enabled {
                 guard let microphone = self.microphone else { return }
                 self.session.beginConfiguration()
@@ -472,10 +461,8 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
     }
 
     public func record(limit: Duration?, only: CameraPosition?) async throws -> CapturedVideo {
-        let asked = CACurrentMediaTime()
-        return try await withCheckedThrowingContinuation { continuation in
+        try await withCheckedThrowingContinuation { continuation in
             queue.async {
-                Self.logger.info("Record: waited \(Self.ms(CACurrentMediaTime() - asked), privacy: .public) ms for the camera, running \(self.session.isRunning, privacy: .public), interrupted \(self.session.isInterrupted, privacy: .public)")
                 guard let setup = self.setup, self.session.isRunning else {
                     continuation.resume(throwing: CaptureError.notRunning)
                     return
@@ -1031,7 +1018,6 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
         }
     }
 
-    private static func ms(_ seconds: CFTimeInterval) -> Int { Int(seconds * 1000) }
 
     private func onQueue<T: Sendable>(_ work: @escaping @Sendable () throws -> T) async throws -> T {
         try await withCheckedThrowingContinuation { continuation in

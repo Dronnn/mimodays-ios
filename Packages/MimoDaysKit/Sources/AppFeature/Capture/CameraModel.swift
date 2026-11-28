@@ -432,7 +432,8 @@ final class CameraModel {
             await setTorch(.off).value
             phase = .ready
             // Stopped as it started: too short to keep, and nothing failed that the person didn't ask for (rev-camera 3).
-            if !stoppedBeforeItBegan { failure = CaptureFailure(error) }
+            // Any other reason (no space, no camera) is still said.
+            if !stoppedBeforeItBegan || error as? CaptureError != .recordingFailed { failure = CaptureFailure(error) }
         }
     }
 

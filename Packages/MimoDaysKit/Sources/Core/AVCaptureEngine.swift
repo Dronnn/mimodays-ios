@@ -576,8 +576,14 @@ public final class AVCaptureEngine: CaptureEngine, @unchecked Sendable {
             let changed: CameraSetup
             if setup == .single(.front) {
                 frameRateCap = 30
-                try configure(setup, formatWidth: maxFormatWidth)
-                changed = setup
+                do {
+                    try configure(setup, formatWidth: maxFormatWidth)
+                    changed = setup
+                } catch {
+                    // The selfie camera can't come back at this size: what runs within the budget, rather than none.
+                    removeAllCameras()
+                    changed = try configureWithinBudget()
+                }
             } else {
                 changed = try configureWithinBudget()
             }

@@ -128,6 +128,8 @@ struct VoiceRecordingSheet: View {
             dismiss()
         }
         .onDisappear { end() }
+        // P8.20: the sheet is up only while it records; going to the background would end the take.
+        .keepsScreenOn()
         // To the background: kept now, finished and in the draft, before iOS may end the app (rev-capture 16).
         .onChange(of: scenePhase) { _, phase in
             if phase == .background {

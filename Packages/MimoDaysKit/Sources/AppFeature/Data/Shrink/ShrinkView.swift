@@ -129,6 +129,8 @@ private struct ShrinkHost: View {
             }
         }
         .environment(\.shrinkBack, { dismiss() })
+        // P8.20: making videos smaller takes minutes, watched on this page.
+        .keepsScreenOn(run.isRunning)
     }
 }
 

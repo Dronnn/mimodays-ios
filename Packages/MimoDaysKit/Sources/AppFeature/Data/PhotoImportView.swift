@@ -75,6 +75,8 @@ struct PhotoImportView: View {
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .interactiveDismissDisabled(isImporting)
+        // P8.20: a long import runs on without a touch.
+        .keepsScreenOn(model.phase != .ready && model.phase != .failed)
         .onDisappear { isShown = false }
         .alert(Text("Some files couldn't be imported", bundle: .module), isPresented: $failed) {
             Button(action: imported) { Text("OK", bundle: .module) }

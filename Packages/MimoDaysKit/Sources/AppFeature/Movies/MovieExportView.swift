@@ -120,6 +120,13 @@ struct MovieExportView: View {
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
         .task(id: coverID) { if let id = coverID { await tiles.load(id) } }
+        // P8.20: the movie is watched being made; where iOS can't carry it on, locking would stop it.
+        .keepsScreenOn({
+            switch model.phase {
+            case .waiting, .rendering: true
+            default: false
+            }
+        }())
     }
 
     /// P8.13 F12: what the screen says about leaving MimoDays.

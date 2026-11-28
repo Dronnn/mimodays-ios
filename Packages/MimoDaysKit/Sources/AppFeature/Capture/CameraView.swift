@@ -73,6 +73,8 @@ struct CameraView: View {
         .statusBarHidden(model.layoutHold.isLandscape || followsWindow)
         .task { await model.start() }
         .onDisappear { model.close() }
+        // P8.20: a minute's recording outlasts the auto-lock, which would stop it.
+        .keepsScreenOn(model.isRecording)
         .sheet(isPresented: $showsSettings, onDismiss: explainMicrophone) {
             CameraSettingsSheet(settings: $model.settings, lenses: model.lenses, chooseLens: model.chooseBackLens, sizeRates: model.videoSizes?.rates() ?? [:], reducedWidth: model.reducedWidth)
         }

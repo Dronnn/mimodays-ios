@@ -180,6 +180,8 @@ struct BackupFlowView: View {
         }
         .background(ColorToken.canvas.color.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
+        // P8.20: packing a large archive runs on without a touch.
+        .keepsScreenOn({ if case .working = model.phase { true } else { false } }())
         .onChange(of: model.phase) { _, phase in
             if case .working(.choosing, _) = phase { choosing = true }
         }

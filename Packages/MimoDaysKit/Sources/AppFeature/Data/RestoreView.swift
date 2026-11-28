@@ -54,6 +54,13 @@ struct RestoreView: View {
         .exportInUseAlert($exportInUse)
         .shrinkInUseAlert($shrinkInUse)
         .onDisappear { if case .restoring = model.phase {} else { model.cancel() } }
+        // P8.20: checking and restoring a large backup run on without a touch.
+        .keepsScreenOn({
+            switch model.phase {
+            case .checking, .restoring: true
+            default: false
+            }
+        }())
     }
 
     /// `Navigation / Editor bar`: Cancel until it's done, then Done.
